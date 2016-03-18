@@ -1067,6 +1067,11 @@ class Document2(models.Model):
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
       raise FilesystemException(_('Cannot create or modify directory with name: %s') % self.name)
 
+    # Validate that parent directory does not create cycle
+    if self._contains_cycle():
+      raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
+                                (self.name, self.parent_directory.uuid))
+
   def move(self, directory, user):
     if not directory.is_directory:
       raise FilesystemException(_('Target with UUID %s is not a directory') % directory.uuid)
@@ -1170,6 +1175,32 @@ class Document2(models.Model):
             snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
             snippet['is_redacted'] = True
       self.data = json.dumps(data_dict)
+
+  def _contains_cycle(self):
+    """
+    Uses Floyd's cycle-detection algorithm to detect a cycle (aka Tortoise and Hare)
+    https://en.wikipedia.org/wiki/Cycle_detection#Tortoise_and_hare
+    """
+    slow = self
+    fast = self
+    while True:
+      slow = slow.parent_directory
+      if slow and slow.uuid == self.uuid:
+        slow = self
+
+      if fast.parent_directory is not None:
+        if fast.parent_directory.uuid == self.uuid:
+          fast = self.parent_directory.parent_directory
+        else:
+          fast = fast.parent_directory.parent_directory
+      else:
+        return False
+
+      if slow is None or fast is None:
+        return False
+
+      if slow == fast:
+        return True
 
 
 class DirectoryManager(Document2Manager):

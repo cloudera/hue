@@ -345,6 +345,23 @@ class TestDocument2(object):
     assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
 
 
+  def test_validate_circular_directory(self):
+    # Test that saving a document with cycle raises an error, i.e. - This should fail:
+    # a.parent_directory = b
+    # b.parent_directory = c
+    # c.parent_directory = a
+    c_dir = Directory.objects.create(name='c', owner=self.user)
+    b_dir = Directory.objects.create(name='b', owner=self.user, parent_directory=c_dir)
+    a_dir = Directory.objects.create(name='a', owner=self.user, parent_directory=b_dir)
+    response = self.client.post('/desktop/api2/doc/move', {
+        'source_doc_uuid': json.dumps(c_dir.uuid),
+        'destination_doc_uuid': json.dumps(a_dir.uuid)
+    })
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_true('circular dependency' in data['message'], data)
+
+
 class TestDocument2Permissions(object):
 
   def setUp(self):
