@@ -277,6 +277,7 @@
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
+    self.statusForButtons = ko.observable(typeof snippet.statusForButtons != "undefined" && snippet.statusForButtons != null ? snippet.statusForButtons : '');
 
     self.properties = ko.observable(ko.mapping.fromJS(typeof snippet.properties != "undefined" && snippet.properties != null ? snippet.properties : getDefaultSnippetProperties(self.type())));
     self.hasProperties = ko.computed(function() {
@@ -525,6 +526,7 @@
       logGA('execute/' + self.type());
 
       self.status('running');
+      self.statusForButtons('executing');
       self.errors([]);
       self.result.logLines = 0;
       self.progress(0);
@@ -539,6 +541,7 @@
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
+        self.statusForButtons('executed');
         if (data.status == 0) {
           self.result.clear();
           self.result.handle(data.handle);
@@ -746,11 +749,13 @@
         self.checkStatusTimeout = null;
       }
       logGA('cancel');
+      self.statusForButtons('canceling');
 
       $.post("/notebook/api/cancel_statement", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
+        self.statusForButtons('canceled');
         if (data.status == 0) {
           self.status('canceled');
         } else {
