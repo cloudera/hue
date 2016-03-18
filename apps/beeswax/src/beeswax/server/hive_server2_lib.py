@@ -467,8 +467,10 @@ class HiveServerClient:
     self.user = user
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
-    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
-             use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username))
+    LOG.info(
+        '%s: use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
+        self.query_server['server_name'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
+    )
 
     self.use_sasl = use_sasl
     self.kerberos_principal_short_name = kerberos_principal_short_name
