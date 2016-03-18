@@ -1125,7 +1125,14 @@ class Document2(models.Model):
     return self
 
   def update_permission(self, user, name='read', users=None, groups=None):
-    # TODO check in settings if user can sync, re-share, which perms...
+    # Check if user has access to grant permissions
+    if users or groups:
+      if name == 'read':
+        self.can_read_or_exception(user)
+      elif name == 'write':
+        self.can_write_or_exception(user)
+      else:
+        raise ValueError(_('Invalid permission type: %s') % name)
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
 
