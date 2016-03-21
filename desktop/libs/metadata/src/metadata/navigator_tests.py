@@ -105,6 +105,7 @@ class TestNavigatorApi(object):
     resp = self.client.post(reverse('metadata:delete_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
+    del props['hue']
     assert_equal(entity['properties'], json_resp['entity']['properties'])
 
 

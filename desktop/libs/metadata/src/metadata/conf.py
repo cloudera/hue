@@ -34,6 +34,7 @@ def get_auth_password():
     return password
   return DEFAULT_AUTH_PASSWORD.get()
 
+
 def get_optimizer_url():
   return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
 
@@ -108,7 +109,7 @@ NAVIGATOR = ConfigSection(
   members=dict(
     API_URL=Config(
       key='api_url',
-      help=_t('Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)'),
+      help=_t('Base URL to Navigator API (e.g. - http://localhost:7187/api)'),
       default=None),
     AUTH_USERNAME=Config(
       key="auth_username",
