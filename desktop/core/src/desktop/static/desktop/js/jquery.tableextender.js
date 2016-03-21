@@ -25,6 +25,7 @@
       fixedHeader: false,
       fixedFirstColumn: false,
       firstColumnTooltip: false,
+      classToRemove: 'resultTable',
       hintElement: null,
       includeNavigator: true,
       mainScrollable: window,
@@ -53,7 +54,6 @@
     }
     this._defaults = defaults;
     this._name = pluginName;
-    this.previousPath = "";
     this.init();
   }
 
@@ -198,7 +198,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").remove();
     var clonedCell = $(plugin.element).clone();
     clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedCell.removeAttr("id").removeClass("resultTable").find("tbody").remove();
+    clonedCell.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
     clonedCell.find("thead>tr th:not(:eq(0))").remove();
     clonedCell.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
     clonedCell.find("thead>tr th:eq(0)").click(function () {
@@ -218,7 +218,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerColumn").remove();
     var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass("resultTable");
+    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove);
     clonedTable.find("thead>tr th:not(:eq(0))").remove();
     clonedTable.find("tbody>tr").each(function () {
       $(this).find("td:not(:eq(0))").remove();
@@ -287,7 +287,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass("resultTable").find("tbody").remove();
+    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
     $(plugin.element).find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");

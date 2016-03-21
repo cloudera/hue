@@ -135,7 +135,7 @@ ${ assist.assistPanel() }
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 10px"></th>
+          <th style="width: 1%">&nbsp;</th>
           <th>${_('Name')}</th>
           <th>${_('Type')}</th>
         </tr>
@@ -158,7 +158,7 @@ ${ assist.assistPanel() }
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 10px"></th>
+          <th style="width: 1%">&nbsp;</th>
           <th>${_('Values')}</th>
           <th>${_('Spec')}</th>
           <th>${_('Browse')}</th>
@@ -182,28 +182,26 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped table-condensed table-nowrap">
-      <thead>
+  <table class="table table-striped table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: headers -->
+        <th data-bind="text: $data"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: rows -->
         <tr>
-          <th style="width: 10px"></th>
-          <!-- ko foreach: headers -->
-          <th data-bind="text: $data"></th>
+          <td data-bind="text: $index()+1"></td>
+          <!-- ko foreach: $data -->
+            <td data-bind="text: $data"></td>
           <!-- /ko -->
         </tr>
-      </thead>
-      <tbody>
-        <!-- ko foreach: rows -->
-          <tr>
-            <td data-bind="text: $index()+1"></td>
-            <!-- ko foreach: $data -->
-              <td data-bind="text: $data"></td>
-            <!-- /ko -->
-          </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
-  </div>
+      <!-- /ko -->
+    </tbody>
+  </table>
 
   <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -811,24 +809,70 @@ ${ assist.assistPanel() }
         $('.right-panel').getNiceScroll().resize();
       });
 
-      ko.applyBindings(viewModel);
-
-      if (location.getParameter('refresh') === 'true') {
-        huePubSub.publish('assist.db.refresh', 'hive');
-        hueUtils.replaceURL('?');
-      }
-
-      // TODO: Use ko for this and the put the queries in the MetastoreTable
-      $('a[data-toggle="tab"]').on('shown', function (e) {
-        if ($(e.target).attr("href") == "#queries") {
+      viewModel.currentTab.subscribe(function(tab){
+        if (tab == 'table-queries') {
           viewModel.loadingQueries(true);
           $.getJSON('/metastore/table/' + viewModel.database().name + '/' + viewModel.database().table().name + '/queries', function (data) {
             viewModel.queries(data.queries);
             viewModel.loadingQueries(false);
           });
         }
+        if (tab == 'table-sample') {
+          var selector = '#sample .sample-table';
+          if ($(selector).parents('.dataTables_wrapper').length == 0){
+            hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){
+              $(selector).dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bDestroy": true,
+                "bFilter": false,
+                "bAutoWidth": false,
+                "oLanguage": {
+                  "sEmptyTable": "${_('No data available')}",
+                  "sZeroRecords": "${_('No matching records')}"
+                },
+                "fnDrawCallback": function (oSettings) {
+                  $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+                  $(selector).jHueTableExtender({
+                    fixedHeader: true,
+                    fixedFirstColumn: true,
+                    includeNavigator: false,
+                    parentId: 'sample',
+                    classToRemove: 'sample-table',
+                    mainScrollable: '.right-panel',
+                    stickToTopPosition: 73,
+                    clonedContainerPosition: "fixed"
+                  });
+                  $(selector).jHueHorizontalScrollbar();
+                },
+                "aoColumnDefs": [
+                  {
+                    "sType": "numeric",
+                    "aTargets": [ "sort-numeric" ]
+                  },
+                  {
+                    "sType": "string",
+                    "aTargets": [ "sort-string" ]
+                  },
+                  {
+                    "sType": "date",
+                    "aTargets": [ "sort-date" ]
+                  }
+                ]
+              });
+            });
+          }
+        }
         $('.right-panel').getNiceScroll().resize();
       });
+
+      ko.applyBindings(viewModel);
+
+      if (location.getParameter('refresh') === 'true') {
+        huePubSub.publish('assist.db.refresh', 'hive');
+        hueUtils.replaceURL('?');
+      }
 
       window.scrollToColumn = function (col) {
         if (!col.table.samples.loading()) {

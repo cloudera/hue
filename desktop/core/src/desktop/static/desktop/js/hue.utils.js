@@ -183,6 +183,25 @@ Array.prototype.diff = function (a) {
     return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
   }
 
+  /**
+   * @param {string} selector
+   * @param {Function} condition
+   * @param {Function} callback
+   * @param {number} [timeout]
+   * @constructor
+   */
+  hueUtils.waitForRendered = function (selector, condition, callback, timeout) {
+    var $el = $(selector);
+    if (condition($el)) {
+      callback($el);
+    }
+    else {
+      window.setTimeout(function () {
+        hueUtils.waitForRendered(selector, condition, callback);
+      }, timeout || 100)
+    }
+  }
+
 
 }(hueUtils = window.hueUtils || {}));
 
