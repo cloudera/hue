@@ -223,12 +223,12 @@
 
   HueDocument.prototype.removeGroupReadShare = function (group) {
     var self = this;
-    self.updateSharePerm(self.definition().perms.read.groups, group.id);
+    self.removeFromPerms(self.definition().perms.read.groups, group.id);
   };
 
   HueDocument.prototype.removeGroupWriteShare = function (group) {
     var self = this;
-    self.updateSharePerm(self.definition().perms.write.groups, group.id);
+    self.removeFromPerms(self.definition().perms.write.groups, group.id);
   };
 
   return HueDocument;
