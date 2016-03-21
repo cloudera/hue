@@ -38,6 +38,9 @@ def get_auth_password():
 def get_optimizer_url():
   return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
 
+def has_optimizer():
+  return bool(get_optimizer_url())
+
 
 OPTIMIZER = ConfigSection(
   key='optimizer',
@@ -97,6 +100,13 @@ OPTIMIZER = ConfigSection(
       key="ssl_cert_ca_verify",
       help=_t("In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"),
       dynamic_default=default_ssl_validate,
+      type=coerce_bool
+    ),
+
+    MOCKING = Config(
+      key="mocking",
+      help=_t("Use mock data"),
+      default=True,
       type=coerce_bool
     )
   )

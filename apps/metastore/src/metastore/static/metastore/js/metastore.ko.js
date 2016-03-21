@@ -115,7 +115,11 @@
       $.post('/metadata/api/optimizer_api/top_tables', function(data){
         if (data && data.status == 0) {
           self.optimizerStats(ko.mapping.fromJS(data.top_tables));
+        } else {
+          $(document).trigger("error", data.message);
         }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
       });
     }
 
@@ -453,6 +457,7 @@
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = options.optimizerEnabled || false;
+    self.optimizerUrl = ko.observable(options.optimizer_url);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
