@@ -229,6 +229,7 @@ ${ fileBrowser.fileBrowser() }
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
+        superuser: '${ user.is_superuser }' === 'True',
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
           errorFetchingTableFields: '${_('An error occurred fetching the table fields. Please try again.')}',

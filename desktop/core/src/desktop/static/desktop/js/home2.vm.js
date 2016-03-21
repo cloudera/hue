@@ -39,6 +39,7 @@
     var self = this;
 
     self.user = options.user;
+    self.superuser = options.superuser;
     self.assistHelper = AssistHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -51,6 +52,7 @@
       assistHelper: self.assistHelper,
       app: 'documents',
       user: self.user,
+      superuser: self.superuser,
       definition: {
         name: '/'
       }
@@ -67,20 +69,16 @@
 
   HomeViewModel.prototype.openUuid = function (uuid) {
     var self = this;
-    self.activeEntry(undefined);
-    var entry = new HueFileEntry({
-      activeEntry: self.activeEntry,
-      trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
-      app: 'documents',
-      user: self.user,
+    var entry = self.activeEntry().createNewEntry({
       definition: {
         uuid: location.getParameter('uuid'),
         name: 'unknown',
         type: 'directory',
         path: '/unknown'
-      }
+      },
+      parent: null
     });
+    self.activeEntry(undefined);
 
     var lastParent = entry;
 
@@ -100,19 +98,15 @@
     var self = this;
     var parts = path.split('/');
     parts.shift(); // Remove root
-    self.activeEntry(undefined);
-    var lastChild = new HueFileEntry({
-      activeEntry: self.activeEntry,
-      trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
-      app: 'documents',
-      user: self.user,
+    var lastChild = self.activeEntry().createNewEntry({
       definition: {
         name: '',
         type: 'directory',
         path: '/'
-      }
+      },
+      parent: null
     });
+    self.activeEntry(undefined);
 
     var loadDeep = function () {
       if (parts.length > 0) {

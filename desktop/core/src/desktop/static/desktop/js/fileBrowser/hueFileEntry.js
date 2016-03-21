@@ -47,6 +47,7 @@
     self.assistHelper = options.assistHelper;
     self.app = options.app;
     self.user = options.user;
+    self.superuser = options.superuser;
 
     self.document = ko.observable();
 
@@ -196,6 +197,18 @@
     moveNext();
   };
 
+  HueFileEntry.prototype.createNewEntry = function (options) {
+    var self = this;
+    return new HueFileEntry($.extend({
+      activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
+      assistHelper: self.assistHelper,
+      app: self.app,
+      user: self.user,
+      superuser: self.superuser
+    }, options));
+  };
+
   HueFileEntry.prototype.search = function (query) {
     var self = this;
 
@@ -208,16 +221,11 @@
       return;
     }
 
-    var resultEntry = new HueFileEntry({
-      activeEntry: self.activeEntry,
-      trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
+    var resultEntry = self.createNewEntry({
       definition: {
         isSearchResult: true,
         name: '"' + query + '"'
       },
-      app: self.app,
-      user: self.user,
       parent: owner
     });
 
@@ -233,13 +241,8 @@
         var newEntries = [];
 
         $.each(data.documents, function (idx, definition) {
-          var entry = new HueFileEntry({
-            activeEntry: self.activeEntry,
-            trashEntry: self.trashEntry,
-            assistHelper: self.assistHelper,
+          var entry = self.createNewEntry({
             definition: definition,
-            app: self.app,
-            user: self.user,
             parent: self
           });
           if (!entry.isTrash()) {
@@ -300,13 +303,8 @@
           var newEntries = [];
 
           $.each(data.children, function (idx, definition) {
-            var entry = new HueFileEntry({
-              activeEntry: self.activeEntry,
-              trashEntry: self.trashEntry,
-              assistHelper: self.assistHelper,
+            var entry = self.createNewEntry({
               definition: definition,
-              app: self.app,
-              user: self.user,
               parent: self
             });
             if (entry.isTrash()) {
@@ -327,13 +325,8 @@
           });
           self.entries(newEntries);
           if (! self.parent && data.parent) {
-            self.parent = new HueFileEntry({
-              activeEntry: self.activeEntry,
-              trashEntry: self.trashEntry,
-              assistHelper: self.assistHelper,
+            self.parent = self.createNewEntry({
               definition: data.parent,
-              app: self.app,
-              user: self.user,
               parent: null
             });
           }
@@ -365,15 +358,15 @@
 
   HueFileEntry.prototype.moveToTrash = function () {
     var self = this;
-    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
+    if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
     }
-  }
+  };
 
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
-    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
+    if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       $('#deleteEntriesModal').modal('show');
     }
