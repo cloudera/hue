@@ -722,7 +722,7 @@ ${ assist.assistPanel() }
                 }],
                 navigationSettings: {
                   openItem: true,
-                  showStats: false
+                  showStats: true
                 }
               },
               visibleAssistPanels: ['sql']
