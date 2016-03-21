@@ -374,7 +374,7 @@ ${ assist.assistPanel() }
       </div>
       <!-- /ko -->
 
-      %if is_optimizer_enabled:
+      %if is_optimizer_enabled and False:
       <!-- ko with: optimizerStats  -->
       <div class="span4 tile chart-container">
         <h4>${ _('Navigator optimizer') }</h4>
@@ -417,6 +417,13 @@ ${ assist.assistPanel() }
               </form>
             </div>
           % endif
+          <!-- ko with: $root.optimizerEnabled  -->
+          &nbsp;
+          &nbsp;
+          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { location.href = $root.optimizerUrl() + 'optimizer/#/table/12'; }, disable: $parent.selectedTables().length !== 1">
+            <i class="fa fa-eye"></i> ${_('View in Optimizer')}
+          </button>          
+          <!-- /ko -->
         </div>
 
         <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
@@ -426,6 +433,10 @@ ${ assist.assistPanel() }
             <th>&nbsp;</th>
             <th>${ _('Table Name') }</th>
             <th width="50%">${ _('Comment') }</th>
+            <!-- ko with: $root.optimizerEnabled  -->
+            <th width="10%">${ _('Popularity') }</th>
+            <th width="10%">${ _('Columns') }</th>
+            <!-- /ko -->
             <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
@@ -447,12 +458,19 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
+              <!-- ko with: $root.optimizerEnabled  -->
+                <td data-bind="text: 100"></td>
+                <td data-bind="text: 15"></td>
+              <!-- /ko -->
               <td class="center">
                 <!-- ko if: type == 'Table' -->
                   <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
                 <!-- /ko -->
                 <!-- ko if: type == 'View' -->
                   <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
+                <!-- /ko -->
+                <!-- ko with: $root.optimizerEnabled  -->
+                  <i class="fa fa-fw fa-cubes muted" title="${ _('View') }"></i>
                 <!-- /ko -->
               </td>
             </tr>

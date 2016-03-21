@@ -17,6 +17,7 @@
 
 import json
 import logging
+import random
 
 from django.http import Http404
 from django.utils.translation import ugettext as _
@@ -28,6 +29,8 @@ from desktop.models import Document2
 from notebook.models import Notebook
 
 from metadata.optimizer_client import OptimizerApi
+from metadata.conf import OPTIMIZER
+
 
 LOG = logging.getLogger(__name__)
 
@@ -53,9 +56,14 @@ def error_handler(view_fn):
 def top_tables(request):
   response = {'status': -1}
 
+  len = request.POST.get('len', 500)
+
   api = OptimizerApi()
 
-  response['top_tables'] = api.top_tables()
+  response['top_tables'] = api.top_tables() if not OPTIMIZER.MOCKING.get() else [
+      {'name': 'a', 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
+    for i in xrange(0, len)
+  ]
   response['status'] = 0
 
   return JsonResponse(response)
