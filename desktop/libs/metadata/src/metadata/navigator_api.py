@@ -25,7 +25,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
-from metadata.navigator import NavigatorApi, is_navigator_enabled
+from metadata.navigator_client import NavigatorApi, is_navigator_enabled
 
 LOG = logging.getLogger(__name__)
 

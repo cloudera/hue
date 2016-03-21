@@ -17,6 +17,7 @@
 
 from django.conf.urls import patterns, url
 
+
 # Navigator API
 urlpatterns = patterns('metadata.navigator_api',
   url(r'^api/navigator/find_entity/?$', 'find_entity', name='find_entity'),
@@ -29,7 +30,7 @@ urlpatterns = patterns('metadata.navigator_api',
 
 
 # Optimizer API
-urlpatterns = patterns('metadata.optimizer_api',
+urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer_api/top_tables/?$', 'top_tables', name='top_tables'),
   url(r'^api/optimizer_api/table_details/?$', 'table_details', name='table_details'),
   url(r'^api/optimizer_api/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),

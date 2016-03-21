@@ -26,6 +26,7 @@ from metadata.conf import NAVIGATOR
 
 
 LOG = logging.getLogger(__name__)
+VERSION = 'v3'
 
 
 def is_navigator_enabled():
@@ -38,11 +39,11 @@ class NavigatorApiException(Exception):
 
 class NavigatorApi(object):
   """
-  http://cloudera.github.io/navigator/apidocs/v2/index.html
+  http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
 
   def __init__(self, api_url=None, user=None, password=None):
-    self._api_url = (api_url or NAVIGATOR.API_URL.get()).strip('/')
+    self._api_url = '%s/%s' % ((api_url or NAVIGATOR.API_URL.get()).strip('/'), VERSION)
     self._username = user or NAVIGATOR.AUTH_USERNAME.get()
     self._password = password or NAVIGATOR.AUTH_PASSWORD.get()
 
@@ -56,8 +57,8 @@ class NavigatorApi(object):
 
   def find_entity(self, source_type, type, name, **filters):
     """
-    GET /api/v2/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities.html
+    GET /api/v3/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
     """
     try:
       params = self.__params
@@ -95,8 +96,8 @@ class NavigatorApi(object):
 
   def get_entity(self, entity_id):
     """
-    GET /api/v2/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    GET /api/v3/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
@@ -108,8 +109,8 @@ class NavigatorApi(object):
 
   def update_entity(self, entity_id, **metadata):
     """
-    PUT /api/v2/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    PUT /api/v3/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
       # TODO: Check permissions of entity
