@@ -374,17 +374,15 @@ ${ assist.assistPanel() }
       </div>
       <!-- /ko -->
 
-      %if is_optimizer_enabled and False:
-      <!-- ko with: optimizerStats  -->
+      <!-- ko with: $root.optimizerEnabled() && optimizerStats()  -->
       <div class="span4 tile chart-container">
         <h4>${ _('Navigator optimizer') }</h4>
 
-        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: details}, fqs: ko.observableArray([]),
-                      transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }" class="chart"></div>
+        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: [{'name': 'customers', 'total': 30}, {'name': 'sample_07', 'total': 10}, {'name': 'web_logs', 'total': 100}]}, fqs: ko.observableArray([]),
+                      transformer: pieChartDataTransformer, maxWidth: 200, parentSelector: '.chart-container' }" class="chart"></div>
 
       </div>
       <!-- /ko -->
-      %endif
 
     </div>
 
@@ -459,8 +457,8 @@ ${ assist.assistPanel() }
               </td>
               <td data-bind="text: comment"></td>
               <!-- ko with: $root.optimizerEnabled  -->
-                <td data-bind="text: 100"></td>
-                <td data-bind="text: 15"></td>
+                <td data-bind="text: Math.floor(Math.random() * 100) + 1"></td>
+                <td data-bind="text: Math.floor(Math.random() * 50) + 1"></td>
               <!-- /ko -->
               <td class="center">
                 <!-- ko if: type == 'Table' -->
@@ -470,7 +468,8 @@ ${ assist.assistPanel() }
                   <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
                 <!-- /ko -->
                 <!-- ko with: $root.optimizerEnabled  -->
-                  <i class="fa fa-fw fa-cubes muted" title="${ _('View') }"></i>
+                  <i class="fa fa-fw fa-calendar muted" data-bind="css: {'fa-database': Math.random() > 0.5 }" title="${ _('Fact table') }"></i>
+                  ## Dimension table == fw fa-calendar
                 <!-- /ko -->
               </td>
             </tr>
@@ -822,10 +821,10 @@ ${ assist.assistPanel() }
 
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
-    $(rawDatum.counts()).each(function (cnt, item) {
+    $(rawDatum.counts).each(function (cnt, item) {
       _data.push({
-        label: item.name(),
-        value: item.total(),
+        label: item.name,
+        value: item.total,
         obj: item
       });
     });
