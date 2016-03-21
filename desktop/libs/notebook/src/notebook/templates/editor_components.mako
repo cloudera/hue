@@ -1395,37 +1395,6 @@ ${ require.config() }
     return _width;
   };
 
-  function createXScrollbar(el) {
-    if ($(el).parents('.dataTables_wrapper').length > 0) {
-      var scrollingRatio = function() { return $(el).parents('.dataTables_wrapper').width() - $(el).parents('.dataTables_wrapper').find('hue-scrollbar-x').width() };
-      if ($(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').length == 0 && $(el).parents('.dataTables_wrapper').width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 5;
-        var scrollbarRail = $('<div>');
-        var scrollbar = $('<div>').addClass('hue-scrollbar-x');
-        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper').width() * ($(el).parents('.dataTables_wrapper').width() / $(el).parents('.dataTables_wrapper')[0].scrollWidth)));
-        scrollbar.appendTo(scrollbarRail);
-        scrollbar.draggable({
-          axis: 'x',
-          containment: 'parent',
-          drag: function (e, ui) {
-            $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left/(scrollbarRail.width() - $(this).width())))
-          }
-        });
-        scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
-        scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
-        scrollbarRail.css("marginLeft", (colWidth) + "px");
-      }
-      else {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 5;
-        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
-        var scrollbarRail = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail');
-        var scrollbar = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x');
-        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper').width() * ($(el).parents('.dataTables_wrapper').width() / $(el).parents('.dataTables_wrapper')[0].scrollWidth)));
-        scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
-      }
-    }
-  }
-
   function createDatatable(el, snippet, vm) {
     $(el).addClass("dt");
     var DATATABLES_MAX_HEIGHT = 330;
@@ -1454,7 +1423,7 @@ ${ require.config() }
             stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
             clonedContainerPosition: "fixed"
           });
-          createXScrollbar(el);
+          $(el).jHueHorizontalScrollbar();
         }
         else {
           $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -1497,7 +1466,7 @@ ${ require.config() }
         stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
         clonedContainerPosition: "fixed"
       });
-      createXScrollbar(el);
+      $(el).jHueHorizontalScrollbar();
     }
     else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -1969,7 +1938,7 @@ ${ require.config() }
                 parentId: 'snippet_' + snippet.id(),
                 clonedContainerPosition: "fixed"
               });
-              createXScrollbar(_el);
+              _el.jHueHorizontalScrollbar();
             }
             else {
               _el.jHueTableExtender({
