@@ -456,7 +456,7 @@
     self.assistHelper = AssistHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
-    self.optimizerEnabled = options.optimizerEnabled || false;
+    self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     self.optimizerUrl = ko.observable(options.optimizer_url);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
@@ -675,7 +675,7 @@
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback, self.optimizerEnabled);
+      metastoreDatabase.load(callback, self.optimizerEnabled());
     } else if (callback) {
       callback();
     }
