@@ -68,7 +68,7 @@ class TestNavigatorApi(object):
 
 
   def test_api_find_entity(self):
-    resp = self.client.post(reverse('metadata:find_entity'), self._format_json_body({'type': 'database', 'name': 'default'}))
+    resp = self.client.get(reverse('metadata:find_entity'), {'type': 'database', 'name': 'default'})
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'])
     assert_true('entity' in json_resp, json_resp)

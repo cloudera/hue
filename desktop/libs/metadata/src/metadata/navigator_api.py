@@ -58,9 +58,9 @@ def search_entities(request):
   response = {'status': -1}
 
   api = NavigatorApi()
-  query_s = request.REQUEST.get('query_s')
-  offset = request.REQUEST.get('offset', 0)
-  limit = request.REQUEST.get('limit', 100)
+  query_s = request.GET.get('query_s')
+  offset = request.GET.get('offset', 0)
+  limit = request.GET.get('limit', 100)
 
   if not query_s:
     raise MetadataApiException("search_entities requires query_s search string")
@@ -79,35 +79,37 @@ def search_entities(request):
   return JsonResponse(response)
 
 
-@require_POST
 @error_handler
 def find_entity(request):
   response = {'status': -1}
 
   api = NavigatorApi()
-  entity_type = json.loads(request.POST.get('type', ''))
+  entity_type = request.GET.get('type', '')
+  database = request.GET.get('database', '')
+  table = request.GET.get('table', '')
+  name = request.GET.get('name', '')
+  path = request.GET.get('path', '')
 
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
 
   if entity_type.lower() == 'database':
-    name = json.loads(request.POST.get('name', ''))
     if not name:
       raise MetadataApiException('get_database requires name param')
     response['entity'] = api.get_database(name)
   elif entity_type.lower() == 'table':
-    database = json.loads(request.POST.get('database', ''))
-    name = request.POST.get('name', '')
     if not database or not name:
       raise MetadataApiException('get_table requires database and name param')
     response['entity'] = api.get_table(database, name)
+  elif entity_type.lower() == 'field':
+    if not database or not table or not name:
+      raise MetadataApiException('get_field requires database, table, and name params')
+    response['entity'] = api.get_field(database, table, name)
   elif entity_type.lower() == 'directory':
-    path = json.loads(request.POST.get('path', ''))
     if not path:
       raise MetadataApiException('get_directory requires path param')
     response['entity'] = api.get_directory(path)
   elif entity_type.lower() == 'file':
-    path = json.loads(request.POST.get('path', ''))
     if not path:
       raise MetadataApiException('get_file requires path param')
     response['entity'] = api.get_file(path)
