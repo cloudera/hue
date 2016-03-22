@@ -169,6 +169,15 @@ class NavigatorApi(object):
     return self.find_entity(source_type='HIVE', type='TABLE', name=table_name, parentPath=parent_path)
 
 
+  def get_field(self, database_name, table_name, field_name):
+    parent_path = '\/%s\/%s' % (database_name, table_name)
+    return self.find_entity(source_type='HIVE', type='FIELD', name=field_name, parentPath=parent_path)
+
+
+  def get_partition(self, database_name, table_name, partition_spec):
+    raise NotImplementedError
+
+
   def get_directory(self, path):
     dir_name, dir_path = self._clean_path(path)
     return self.find_entity(source_type='HDFS', type='DIRECTORY', name=dir_name, fileSystemPath=dir_path)
