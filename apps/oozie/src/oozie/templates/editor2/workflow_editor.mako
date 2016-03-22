@@ -374,11 +374,13 @@ ${ workflow.render() }
           <!-- ko foreach: Object.keys($data.history.properties) -->
           <dt data-bind="text: $data"></dt>
           <dd>
-            <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-              <a data-bind="text: $parent.history.properties[$data], attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
-            <!-- /ko -->
-            <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-            <span data-bind="text: $parent.history.properties[$data]"></span>
+            <!-- ko if: typeof $parent.history.properties[$data] == 'function' -->
+              <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+                <a data-bind="text: $parent.history.properties[$data], attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
+              <!-- /ko -->
+              <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+              <span data-bind="text: $parent.history.properties[$data]"></span>
+              <!-- /ko -->
             <!-- /ko -->
           </dd>
           <!-- /ko -->
