@@ -55,6 +55,44 @@ class NavigatorApi(object):
     self.__params = ()
 
 
+  def search_entities(self, query_s, limit=100, offset=0, **filters):
+    """
+    GET /api/v3/entities?query=()
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
+    :param query_s: a query string of search terms (e.g. - sales quarterly);
+      Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist
+      of search_fields.
+      TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
+    :param filters: TODO: IMPLEMENT ME, required to support property search
+    """
+    search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
+
+    try:
+      params = self.__params
+
+      search_terms = [term.lower() for term in query_s.strip().split()]
+
+      query_clauses = []
+      for term in search_terms:
+        query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+
+      filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
+
+      params += (
+        ('query', filter_query),
+        ('offset', offset),
+        ('limit', limit),
+      )
+
+      response = self._root.get('entities', headers=self.__headers, params=params)
+
+      return response
+    except RestException, e:
+      msg = 'Failed to search for entities with search query: %s' % query_s
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
+
   def find_entity(self, source_type, type, name, **filters):
     """
     GET /api/v3/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))

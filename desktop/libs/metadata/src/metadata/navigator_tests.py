@@ -57,6 +57,11 @@ class TestNavigatorApi(object):
     cls.user.save()
 
 
+  def test_search_entities(self):
+    # TODO: write me
+    pass
+
+
   def test_find_entity(self):
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
     assert_true('identity' in entity, entity)

@@ -53,6 +53,32 @@ def error_handler(view_fn):
   return decorator
 
 
+@error_handler
+def search_entities(request):
+  response = {'status': -1}
+
+  api = NavigatorApi()
+  query_s = request.REQUEST.get('query_s')
+  offset = request.REQUEST.get('offset', 0)
+  limit = request.REQUEST.get('limit', 100)
+
+  if not query_s:
+    raise MetadataApiException("search_entities requires query_s search string")
+
+  entities = api.search_entities(query_s)
+
+  response = {
+    'entities': entities,
+    'count': len(entities),
+    'offset': offset,
+    'limit': limit,
+    'query_s': query_s,
+    'status': 0
+  }
+
+  return JsonResponse(response)
+
+
 @require_POST
 @error_handler
 def find_entity(request):

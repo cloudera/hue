@@ -20,6 +20,7 @@ from django.conf.urls import patterns, url
 
 # Navigator API
 urlpatterns = patterns('metadata.navigator_api',
+  url(r'^api/navigator/search_entities/?$', 'search_entities', name='search_entities'),
   url(r'^api/navigator/find_entity/?$', 'find_entity', name='find_entity'),
   url(r'^api/navigator/get_entity/?$', 'get_entity', name='get_entity'),
   url(r'^api/navigator/add_tags/?$', 'add_tags', name='add_tags'),
