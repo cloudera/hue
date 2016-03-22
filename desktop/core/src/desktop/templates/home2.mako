@@ -226,9 +226,15 @@ ${ fileBrowser.fileBrowser() }
 
     ko.options.deferUpdates = true;
 
+    var userGroups = [];
+    % for group in user.groups.all():
+      userGroups.push('${ group }');
+    % endfor
+
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
+        userGroups: userGroups,
         superuser: '${ user.is_superuser }' === 'True',
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',

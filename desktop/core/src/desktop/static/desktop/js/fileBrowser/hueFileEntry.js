@@ -47,6 +47,7 @@
     self.assistHelper = options.assistHelper;
     self.app = options.app;
     self.user = options.user;
+    self.userGroups = options.userGroups;
     self.superuser = options.superuser;
 
     self.document = ko.observable();
@@ -72,11 +73,33 @@
 
     self.isShared = ko.pureComputed(function () {
       var perms = self.definition().perms;
-      return perms && (perms.read.users.length || perms.read.groups.length || perms.write.users.length || perms.write.groups.length);
+      return perms && (perms.read.users.length > 0 || perms.read.groups.length > 0 || perms.write.users.length > 0 || perms.write.groups.length > 0);
     });
 
     self.isSharedWithMe = ko.pureComputed(function () {
       return self.user !== self.definition().owner;
+    });
+
+    self.canModify = ko.pureComputed(function () {
+      var perms = self.definition().perms;
+      return !self.isSharedWithMe() || self.superuser || (perms && (perms.write.users.filter(function (user) {
+            return user.username == self.user;
+          }).length > 0
+          || perms.write.groups.filter(function (writeGroup) {
+            return self.userGroups.indexOf(writeGroup) !== -1
+          }).length > 0));
+    });
+
+    self.canReshare = ko.pureComputed(function () {
+      if (! self.isSharedWithMe()) {
+        return true;
+      }
+      var activePerms = {};
+      var target = self;
+      while (target.parent && !target.isShared()) {
+        target = target.parent;
+      }
+      return target.canModify();
     });
 
     self.entriesToDelete = ko.observableArray();
