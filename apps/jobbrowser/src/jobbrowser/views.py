@@ -52,7 +52,7 @@ from jobbrowser.yarn_models import Application
 import urllib2
 
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def check_job_permission(view_func):
@@ -75,7 +75,7 @@ def check_job_permission(view_func):
       raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
     except Exception, e:
       msg = 'Could not find job %s.'
-      LOGGER.exception(msg % jobid)
+      LOG.exception(msg % jobid)
       raise PopupException(_(msg) % jobid, detail=e)
 
     if not SHARE_JOBS.get() and not request.user.is_superuser \
@@ -247,7 +247,7 @@ def kill_job(request, job):
   try:
     job.kill()
   except Exception, e:
-    LOGGER.exception('Killing job')
+    LOG.exception('Killing job')
     raise PopupException(e)
 
   cur_time = time.time()
@@ -266,6 +266,7 @@ def kill_job(request, job):
     time.sleep(1)
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))
+
 
 @check_job_permission
 def job_attempt_logs(request, job, attempt_index=0):
@@ -301,9 +302,9 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
     try:
       debug_info = '\nLog Link: %s' % log_link
       debug_info += '\nHTML Response: %s' % response
-      LOGGER.error(debug_info)
+      LOG.error(debug_info)
     except:
-      LOGGER.exception('failed to create debug info')
+      LOG.exception('failed to create debug info')
 
   response = {'log': LinkJobLogs._make_hdfs_links(log), 'debug': debug_info}
 

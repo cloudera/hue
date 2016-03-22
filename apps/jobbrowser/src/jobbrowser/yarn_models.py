@@ -327,7 +327,6 @@ class Attempt:
       for key, value in attrs.iteritems():
         setattr(self, key, value)
     self.is_mr2 = True
-
     self._fixup()
 
   def _fixup(self):
@@ -357,11 +356,43 @@ class Attempt:
     logs = []
     attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
-    # Get MR task logs
-    if self.assignedContainerId:
-      log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
-    if hasattr(self, 'nodeHttpAddress'):
-      log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
+
+    # Generate actual task log link from logsLink url
+    if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):
+      logs_path = '/node/containerlogs/'
+      node_url, tracking_path = log_link.split(logs_path)
+      container_id, user = tracking_path.strip('/').split('/')
+
+      # Replace log path tokens with actual container properties if available
+      if hasattr(self, 'nodeHttpAddress') and 'nodeId' in attempt:
+        node_url = '%s://%s:%s' % (node_url.split('://')[0], self.nodeHttpAddress.split(':')[0], attempt['nodeId'].split(':')[1])
+      container_id = self.assignedContainerId if hasattr(self, 'assignedContainerId') else container_id
+
+      log_link = '%(node_url)s/%(logs_path)s/%(container)s/%(user)s' % {
+        'node_url': node_url,
+        'logs_path': logs_path.strip('/'),
+        'container': container_id,
+        'user': user
+      }
+    else:  # Completed jobs
+      logs_path = '/jobhistory/logs/'
+      root_url, tracking_path = log_link.split(logs_path)
+      node_url, container_id, attempt_id, user = tracking_path.strip('/').split('/')
+
+      # Replace log path tokens with actual attempt properties if available
+      if hasattr(self, 'nodeHttpAddress') and 'nodeId' in attempt:
+        node_url = '%s:%s' % (self.nodeHttpAddress.split(':')[0], attempt['nodeId'].split(':')[1])
+      container_id = self.assignedContainerId if hasattr(self, 'assignedContainerId') else container_id
+      attempt_id = self.attemptId if hasattr(self, 'attemptId') else attempt_id
+
+      log_link = '%(root_url)s/%(logs_path)s/%(node)s/%(container)s/%(attempt)s/%(user)s' % {
+        'root_url': root_url,
+        'logs_path': logs_path.strip('/'),
+        'node': node_url,
+        'container': container_id,
+        'attempt': attempt_id,
+        'user': user
+      }
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
