@@ -326,7 +326,7 @@
           self.entries(newEntries);
           if (! self.parent && data.parent) {
             self.parent = self.createNewEntry({
-              definition: data.parent,
+              definition: data.parent.path === '/' && self.isSharedWithMe() ? { name: '/' } : data.parent,
               parent: null
             });
           }
