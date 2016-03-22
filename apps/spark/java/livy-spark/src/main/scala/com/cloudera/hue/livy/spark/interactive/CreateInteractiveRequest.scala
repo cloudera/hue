@@ -23,9 +23,9 @@ import com.cloudera.hue.livy.sessions.Kind
 case class CreateInteractiveRequest(
     kind: Kind,
     proxyUser: Option[String] = None,
-    jars: List[String] = List(),
+    jars: Option[String] = None,
     pyFiles: List[String] = List(),
-    files: List[String] = List(),
+    files: Option[String] = None,
     driverMemory: Option[String] = None,
     driverCores: Option[Int] = None,
     executorMemory: Option[String] = None,
