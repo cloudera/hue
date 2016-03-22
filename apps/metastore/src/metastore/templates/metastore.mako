@@ -376,7 +376,7 @@ ${ assist.assistPanel() }
 
       <!-- ko with: $root.optimizerEnabled() && optimizerStats()  -->
       <div class="span4 tile chart-container">
-        <h4>${ _('Navigator optimizer') }</h4>
+        <h4>${ _('Popular tables') }</h4>
 
         <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: [{'name': 'customers', 'total': 30}, {'name': 'sample_07', 'total': 10}, {'name': 'web_logs', 'total': 100}]}, fqs: ko.observableArray([]),
                       transformer: pieChartDataTransformer, maxWidth: 200, parentSelector: '.chart-container' }" class="chart"></div>
