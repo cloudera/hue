@@ -544,10 +544,12 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    ## <div class="span6 tile">
-    ##  <h4>${ _('Tagging') }</h4>
-    ##  <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
-    ## </div>
+    <!-- ko with: $root.optimizerEnabled -->
+    <div class="span6 tile">
+      <h4>${ _('Tagging') }</h4>
+      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
+    </div>
+    <!-- /ko -->
   </div>
 
   <div class="tile">
@@ -689,10 +691,12 @@ ${ assist.assistPanel() }
       <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
-    ## <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
-    ## <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
-    ## <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analyze')}</a></li>
-    ## <li><a href="#lineage" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-lineage'); }">${_('Lineage')}</a></li>
+    <!-- ko with: $root.optimizerEnabled -->
+      <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
+      <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
+      <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analysis')}</a></li>
+      <li><a href="#lineage" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-lineage'); }">${_('Lineage')}</a></li>
+    <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
 
