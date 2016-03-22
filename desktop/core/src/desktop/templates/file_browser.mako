@@ -315,7 +315,7 @@ from desktop.views import _ko
       <!-- ko with: document -->
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Sharing')} - <span data-bind="text: $parent.name"></span></h3>
+        <h3>${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h3>
       </div>
       <div class="modal-body" style="overflow-y: visible">
         <!-- ko with: definition -->
@@ -325,14 +325,12 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.read.users">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span><span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
           </div>
@@ -342,14 +340,12 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.write.users">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
           </div>
