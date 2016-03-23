@@ -369,6 +369,11 @@
       });
       return statement;
     });
+    this.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
+    this.delayedStatement.subscribe(function (val) {
+      self.getComplexity();
+    }, this);
+
     self.result = new Result(snippet, snippet.result);
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
     self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
@@ -420,6 +425,12 @@
     });
 
     self.is_redacted = ko.observable(typeof snippet.is_redacted != "undefined" && snippet.is_redacted != null ? snippet.is_redacted : false);
+
+    self.complexity = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
+    self.complexityLevel = ko.observable(typeof snippet.complexity_level != "undefined" && snippet.complexity_level != null ? snippet.complexity_level : '');
+    self.hasComplexity = ko.computed(function () {
+      return self.complexity().length > 0;
+    });
 
     self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
     self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
@@ -854,6 +865,22 @@
       });
     };
 
+    self.getComplexity = function () {
+      logGA('get_complexity');
+      self.complexity('');
+
+      $.post("/metadata/api/optimizer_api/query_complexity", {
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function(data) {
+        if (data.status == 0) {
+          self.complexity(data.query_complexity.comment);
+          self.complexityLevel(data.query_complexity.level);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
     self.autocompleter = new Autocompleter({
       snippet: self,
       user: vm.user
@@ -1283,6 +1310,7 @@
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url);
+    self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
 
     self.sqlSourceTypes = [];
 

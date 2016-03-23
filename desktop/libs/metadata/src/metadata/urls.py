@@ -36,4 +36,5 @@ urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer_api/table_details/?$', 'table_details', name='table_details'),
   url(r'^api/optimizer_api/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
   url(r'^api/optimizer_api/upload_history/?$', 'upload_history', name='upload_history'),
+  url(r'^api/optimizer_api/query_complexity/?$', 'query_complexity', name='query_complexity'),
 )

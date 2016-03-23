@@ -103,6 +103,31 @@ def query_compatibility(request):
 
 @require_POST
 @error_handler
+def query_complexity(request):
+  response = {'status': -1}
+
+  snippet = json.loads(request.POST.get('snippet'))
+
+  if 'join' in snippet['statement'].lower():
+    comment = 'Large join is happening'
+  elif 'large' in snippet['statement'].lower():
+    comment = 'Previously failed 5 times in a row'
+  elif 'partition' in snippet['statement'].lower():
+    comment = 'Has 50k partitions'
+  else:
+    comment = ''
+
+  response['query_complexity'] = {
+    'level': randome.choice(['LOW', 'MEDIUM', 'HIGH']),
+    'comment': comment
+  }
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def upload_history(request):
   response = {'status': -1}
 
