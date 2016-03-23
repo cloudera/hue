@@ -374,11 +374,11 @@ ${ assist.assistPanel() }
       </div>
       <!-- /ko -->
 
-      <!-- ko if: $root.optimizerEnabled() && optimizerStats()  -->
+      <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats().length > 0 -->
       <div class="span4 tile chart-container">
         <h4>${ _('Popular tables') }</h4>
 
-        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: [{'name': 'customers', 'total': 30}, {'name': 'sample_07', 'total': 10}, {'name': 'web_logs', 'total': 100}]}, fqs: ko.observableArray([]),
+        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: $root.database().optimizerStats().sort(function(a, b) { return -(a.popularity - b.popularity); }).slice(0, 5)}, fqs: ko.observableArray([]),
                       transformer: pieChartDataTransformer, maxWidth: 200, parentSelector: '.chart-container' }" class="chart"></div>
 
       </div>
@@ -456,7 +456,7 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
-              <!-- ko if: optimizerStats -->
+              <!-- ko if: $root.optimizerEnabled -->
                 <td>
                   <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
                     <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }, attr: {'title': optimizerStats().popularity} "></div>
@@ -464,10 +464,7 @@ ${ assist.assistPanel() }
                 </td>
                 <td data-bind="text: optimizerStats().column_count"></td>
               <!-- /ko -->
-              <!-- ko ifnot: optimizerStats -->
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              <!-- /ko -->
+
               <td class="center">
                 <!-- ko if: type == 'Table' -->
                   <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
@@ -836,7 +833,7 @@ ${ assist.assistPanel() }
     $(rawDatum.counts).each(function (cnt, item) {
       _data.push({
         label: item.name,
-        value: item.total,
+        value: item.popularity,
         obj: item
       });
     });

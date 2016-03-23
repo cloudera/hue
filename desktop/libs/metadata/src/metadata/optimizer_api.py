@@ -57,7 +57,7 @@ def top_tables(request):
   response = {'status': -1}
 
   database = request.POST.get('database', 'default')
-  len = request.POST.get('len', 500)
+  len = request.POST.get('len', 1000)
 
   api = OptimizerApi()
 
@@ -69,7 +69,7 @@ def top_tables(request):
     tables = [
       {'name': table, 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
       for table in db.get_tables(database=database)
-    ]
+    ][:len]
   else:
     tables = api.top_tables()
 
