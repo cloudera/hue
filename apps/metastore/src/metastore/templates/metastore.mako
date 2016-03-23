@@ -456,9 +456,17 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
-              <!-- ko if: $root.optimizerEnabled  -->
-                <td data-bind="text: Math.floor(Math.random() * 100) + 1"></td>
-                <td data-bind="text: Math.floor(Math.random() * 50) + 1"></td>
+              <!-- ko if: optimizerStats -->
+                <td>
+                  <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
+                    <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
+                  </div>
+                </td>
+                <td data-bind="text: optimizerStats().column_count"></td>
+              <!-- /ko -->
+              <!-- ko ifnot: optimizerStats -->
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
               <!-- /ko -->
               <td class="center">
                 <!-- ko if: type == 'Table' -->
