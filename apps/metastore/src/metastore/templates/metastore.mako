@@ -732,7 +732,177 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="permissions">
-      <div class="empty-message">${ _('Currently not available.') }</div>
+      <div class="acl-panel-content" style="height: 988px;">
+        <div class="pull-right">
+          <input class="input-medium no-margin" type="text" placeholder="Search privileges..."> &nbsp;
+          <a class="btn pointer">
+            <i class="fa fa-plus-circle"></i> Add role
+          </a>
+        </div>
+        <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
+
+      <div class="acl-block-title">
+        <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerFraud</span></a>
+      </div>
+      <div>
+      <div class="acl-block acl-block-airy">
+          <span class="muted" title="3 months ago">TABLE</span>
+          <span>
+            <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          </span>
+          <br>
+          server=<span>server1</span>
+            <span>
+              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+            </span>
+            <span>
+              <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+            </span>
+            <span style="display: none;">
+              <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+            </span>
+      
+          <i class="fa fa-long-arrow-right"></i> action=INSERT
+      </div>
+
+      <div class="acl-block acl-block-airy">
+        <span class="muted" title="3 months ago">TABLE</span>
+      
+        <span>
+          <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+        </span>
+        <br>
+      
+        server=server1
+      
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+          </span>
+          <span>
+            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+          </span>
+          <span style="display: none;">
+            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          </span>
+      
+          <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
+      </div>
+    </div>
+    <div class="acl-block acl-actions">
+      <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+      <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+      <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+      <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+    </div>
+ 
+    <div class="acl-block-title">
+      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerAccess</span></a>
+    </div>
+    <div>
+      <div class="acl-block acl-block-airy">
+        <span class="muted" title="3 months ago">TABLE</span>
+    
+        <span>
+          <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+        </span>
+        <br>
+    
+        server=server1
+    
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+          </span>
+          <span>
+            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+          </span>
+          <span style="display: none;">
+            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          </span>
+    
+        <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
+      </div>
+      <div class="acl-block acl-actions">
+        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+      </div>
+    </div>
+  </div>
+              
+    <style>
+    .acl-panel {
+      border-left: 1px solid #e5e5e5;
+      padding-top: 6px;
+      padding-left: 12px;
+    }
+    
+    .acl-panel .nav-tabs {
+      margin-bottom: 0;
+    }
+    
+    .acl-panel h4:not(:first-child) {
+      margin-top: 20px;
+    }
+    
+    .acl-panel-content {
+      padding: 6px;
+      overflow-y: scroll;
+    }
+    
+    .acl-block-title {
+      background-color: #eeeeee;
+      font-weight: bold;
+      padding: 3px;
+      margin-top: 14px;
+      margin-bottom: 4px;
+    }
+    
+    .acl-block {
+      background-color: #f6f6f6;
+      padding: 3px;
+      margin-bottom: 4px;
+    }
+    
+    .acl-block .checkbox, .acl-block .radio {
+      margin-left: 6px;
+    }
+    
+    .acl-block-airy {
+      padding: 6px;
+    }
+    
+    .acl-block-airy input {
+      margin-bottom: 0;
+    }
+    
+    .acl-block-section {
+      margin-top: 10px;
+    }
+    
+    .acl-block-section input {
+      margin-left: 14px;
+    }
+    
+    .span6 .acl-block input[type='text'] {
+      width: 25%;
+    }
+    
+    .span6 .acl-block input[type='text'] {
+      width: 21%;
+    }
+    
+    .acl-actions {
+      padding: 5px;
+      text-align: center;
+      color: #CCC;
+      font-size: 20px;
+    }
+    
+    .acl-actions span:hover {
+      color: #999;
+    }
+    </style>
     </div>
 
     <div class="tab-pane" id="queries">
