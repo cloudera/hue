@@ -374,7 +374,7 @@ ${ assist.assistPanel() }
       </div>
       <!-- /ko -->
 
-      <!-- ko with: $root.optimizerEnabled() && optimizerStats()  -->
+      <!-- ko if: $root.optimizerEnabled() && optimizerStats()  -->
       <div class="span4 tile chart-container">
         <h4>${ _('Popular tables') }</h4>
 
@@ -415,10 +415,10 @@ ${ assist.assistPanel() }
               </form>
             </div>
           % endif
-          <!-- ko with: $root.optimizerEnabled  -->
+          <!-- ko if: $root.optimizerEnabled  -->
           &nbsp;
           &nbsp;
-          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { location.href = $root.optimizerUrl() + 'optimizer/#/table/12'; }, disable: $parent.selectedTables().length !== 1">
+          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { location.href = $root.optimizerUrl() + 'optimizer/#/table/12'; }, disable: selectedTables().length !== 1">
             <i class="fa fa-eye"></i> ${_('View in Optimizer')}
           </button>          
           <!-- /ko -->
@@ -431,7 +431,7 @@ ${ assist.assistPanel() }
             <th>&nbsp;</th>
             <th>${ _('Table Name') }</th>
             <th width="50%">${ _('Comment') }</th>
-            <!-- ko with: $root.optimizerEnabled  -->
+            <!-- ko if: $root.optimizerEnabled  -->
             <th width="10%">${ _('Popularity') }</th>
             <th width="10%">${ _('Columns') }</th>
             <!-- /ko -->
@@ -456,7 +456,7 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
-              <!-- ko with: $root.optimizerEnabled  -->
+              <!-- ko if: $root.optimizerEnabled  -->
                 <td data-bind="text: Math.floor(Math.random() * 100) + 1"></td>
                 <td data-bind="text: Math.floor(Math.random() * 50) + 1"></td>
               <!-- /ko -->
@@ -467,7 +467,7 @@ ${ assist.assistPanel() }
                 <!-- ko if: type == 'View' -->
                   <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
                 <!-- /ko -->
-                <!-- ko with: $root.optimizerEnabled  -->
+                <!-- ko if: $root.optimizerEnabled  -->
                   <i class="fa fa-fw fa-calendar muted" data-bind="css: {'fa-database': Math.random() > 0.5 }" title="${ _('Fact table') }"></i>
                   ## Dimension table == fw fa-calendar
                 <!-- /ko -->
@@ -544,7 +544,7 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    <!-- ko with: $root.optimizerEnabled -->
+    <!-- ko if: $root.optimizerEnabled -->
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
@@ -691,7 +691,7 @@ ${ assist.assistPanel() }
       <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
-    <!-- ko with: $root.optimizerEnabled -->
+    <!-- ko if: $root.optimizerEnabled -->
       <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
       <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
       <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analysis')}</a></li>
