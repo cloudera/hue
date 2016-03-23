@@ -660,6 +660,10 @@ ${ require.config() }
   <div class="alert alert-gradient" data-bind="visible: is_redacted">
     ${ _('The current query has been redacted to hide sensitive information.') }
   </div>
+  <div class="alert alert-gradient" data-bind="visible: hasComplexity">
+    <span class="alert alert-error" data-bind="text: complexityLevel"></span>
+    <span data-bind="text: complexity"></span>
+  </div>
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
