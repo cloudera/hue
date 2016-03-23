@@ -298,6 +298,35 @@ from desktop.views import _ko
     .database-tree ul li {
       padding-left: 15px;
     }
+
+    .searchbar {
+      margin: 0 10px 10px 15px;
+    }
+
+    .searchbar input {
+      min-height: 20px;
+      height: 27px;
+      width: calc(100% - 65px);
+      margin: 0;
+      box-shadow: none;
+      border: 1px solid #DDD;
+      border-right: none;
+      border-bottom-left-radius: 2px;
+      border-top-left-radius: 2px;
+    }
+
+    .searchbar .add-on {
+      border-radius: 1.5em;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      border-left: none;
+    }
+
+    .searchbar .add-on i {
+      margin-top: -2px;
+      margin-lefT: -2px;
+      font-size: 14px;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -680,6 +709,12 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-panel-navigator-search">
+      <div class="searchbar">
+        <input id="appendedInput" placeholder="Search everywhere..." type="text" data-bind="hasFocus: searchInput() !== '', textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: performSearch"><i class="fa fa-search"></i></button>
+      </div>
+  </script>
+
   <script type="text/html" id="assist-panel-inner-header">
     <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
       <span data-bind="text: $parent.name"></span>
@@ -690,7 +725,9 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
+    <!-- ko if: searchInput() === '' -->
     <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
+      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
       <!-- ko foreach: visiblePanels -->
@@ -698,6 +735,13 @@ from desktop.views import _ko
       <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <!-- ko if: searchInput() !== '' -->
+    <div style="position:relative; height: 100%; overflow: hidden">
+      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
+      <div style="margin:10px; font-style: italic; ">${_('Select result...')}</div>
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -991,6 +1035,15 @@ from desktop.views import _ko
           i18n: i18n,
           user: params.user
         });
+
+        self.navigatorEnabled = ko.observable(true);
+
+        self.searchInput = ko.observable('');
+
+        self.performSearch = function () {
+
+        }
+
 
         self.onlySql = params.onlySql;
         self.loading = ko.observable(false);
