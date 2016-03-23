@@ -19,17 +19,25 @@
 import json
 import logging
 
+from django.contrib.auth.models import User
+from django.db.models import Q
+
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
-from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node
+from desktop.models import Document2
+
+from oozie.tests import save_temp_workflow, MockOozieApi
+from oozie.models2 import Workflow, Node, find_dollar_variables, find_dollar_braced_variables
+from oozie.tests import OozieMockBase
 
 
 LOG = logging.getLogger(__name__)
 
 
-class TestEditor():
+class TestEditor(OozieMockBase):
 
   def setUp(self):
+    super(TestEditor, self).setUp()
     self.wf = Workflow()
 
 
@@ -213,3 +221,63 @@ LIMIT $limit"""))
 
     assert_false("<java-opts>[{u&#39;value&#39;: u&#39;-debug -Da -Db=1&#39;}]</java-opts>" in xml, xml)
     assert_true("<java-opts>-debug -Da -Db=1</java-opts>" in xml, xml)
+
+  def test_workflow_dependencies(self):
+    wf_doc1 = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[5], self.user)
+
+    # Add history dependency
+    wf_doc1.is_history = True
+    wf_doc1.dependencies.add(wf_doc1)
+
+    # Add sub-workflow dependency
+    wf_doc2 = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[4], self.user)
+    wf_doc1.dependencies.add(wf_doc2)
+
+    # Add coordinator dependency
+    data = {
+          'id': None,
+          'uuid': None,
+          'name': 'My Coordinator',
+          'variables': [], # Aka workflow parameters
+          'properties': {
+              'description': '',
+              'deployment_dir': '',
+              'schema_version': 'uri:oozie:coordinator:0.2',
+              'frequency_number': 1,
+              'frequency_unit': 'days',
+              'cron_frequency': '0 0 * * *',
+              'cron_advanced': False,
+              'timezone': '',
+              'start': '${start_date}',
+              'end': '${end_date}',
+              'workflow': None,
+              'timeout': None,
+              'concurrency': None,
+              'execution': None,
+              'throttle': None,
+              'job_xml': '',
+              'credentials': [],
+              'parameters': [
+                  {'name': 'oozie.use.system.libpath', 'value': True},
+                  {'name': 'start_date', 'value': ''},
+                  {'name': 'end_date', 'value': ''}
+              ],
+              'sla': Workflow.SLA_DEFAULT
+          }
+      }
+    wf_doc3 = Document2.objects.create(name='test', type='oozie-coordinator2', owner=self.user, data=data)
+    wf_doc1.dependencies.add(wf_doc3)
+
+    assert_true(len(wf_doc1.dependencies.all()) == 3)
+
+    wf_doc1.save()
+
+    # Validating dependencies after saving the workflow
+    assert_true(len(wf_doc1.dependencies.all()) == 3)
+    assert_true(len(wf_doc1.dependencies.filter(type='oozie-coordinator2')) > 0)
+    assert_true(len(wf_doc1.dependencies.filter(Q(is_history=False) & Q(type='oozie-workflow2'))) > 0)
+    assert_true(len(wf_doc1.dependencies.filter(Q(is_history=True) & Q(type='oozie-workflow2'))) > 0)
+
+    wf_doc1.delete()
+    wf_doc2.delete()
+    wf_doc3.delete()
