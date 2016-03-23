@@ -29,23 +29,30 @@ User to remain a django.contrib.auth.models.User object.
 
 In Desktop, only one authentication backend may be specified.
 """
-from django.contrib.auth.models import User
-import django.contrib.auth.backends
+
+import ldap
 import logging
-import desktop.conf
-from django.utils.importlib import import_module
+import pam
+
+import django.contrib.auth.backends
+from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
+
+from django_auth_ldap.backend import LDAPBackend
+from django_auth_ldap.config import LDAPSearch
+
+import desktop.conf
+from desktop import metrics
+from liboauth.metrics import oauth_authentication_time
+
+from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 from useradmin.views import import_ldap_users
-from useradmin import ldap_access
-
-import pam
-from django_auth_ldap.backend import LDAPBackend
-import ldap
-from django_auth_ldap.config import LDAPSearch
 
 
 LOG = logging.getLogger(__name__)
+
 
 def load_augmentation_class():
   """
@@ -286,14 +293,21 @@ class PamBackend(DesktopBackendBase):
   Authentication backend that uses PAM to authenticate logins. The first user to
   login will become the superuser.
   """
-  def check_auth(self, username, password):
+
+  @metrics.pam_authentication_time
+  def authenticate(self, username, password):
+    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.count() == 0:
         is_super = True
 
       try:
-        user = User.objects.get(username=username)
+        if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+          user = User.objects.get(username__iexact=username)
+        else:
+          user = User.objects.get(username=username)
       except User.DoesNotExist:
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
