@@ -61,7 +61,7 @@ def top_tables(request):
   api = OptimizerApi()
 
   response['top_tables'] = api.top_tables() if not OPTIMIZER.MOCKING.get() else [
-      {'name': 'a', 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
+      {'name': 'customers', 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
     for i in xrange(0, len)
   ]
   response['status'] = 0

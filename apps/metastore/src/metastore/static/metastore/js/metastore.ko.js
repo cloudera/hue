@@ -93,7 +93,28 @@
         }));
         self.loaded(true);
         self.loading(false);
-        if (callback) {
+        if (optimizerEnabled) {
+          $.post('/metadata/api/optimizer_api/top_tables', function(data){
+            if (data && data.status == 0) {
+              var tableIndex = {};
+              data.top_tables.forEach(function (topTable) {
+                tableIndex[topTable.name] = topTable;
+              });
+              self.tables().forEach(function (table) {
+                table.optimizerStats(tableIndex[table.name]);
+              });
+              self.optimizerStats(ko.mapping.fromJS(data.top_tables));
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          }).always(function () {
+            if (callback) {
+              callback();
+            }
+          });
+        } else if (callback) {
           callback();
         }
       },
@@ -111,17 +132,6 @@
       }
     });
 
-    if (optimizerEnabled) {
-      $.post('/metadata/api/optimizer_api/top_tables', function(data){
-        if (data && data.status == 0) {
-          self.optimizerStats(ko.mapping.fromJS(data.top_tables));
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
 
     $.totalStorage('hue.metastore.lastdb', self.name);
   };
@@ -267,6 +277,8 @@
     self.i18n = options.i18n;
     self.name = options.name;
     self.type = options.type;
+
+    self.optimizerStats = ko.observable();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
