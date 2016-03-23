@@ -129,11 +129,6 @@ class HS2Api(Api):
     return response
 
 
-  def _get_statements(self, hql_query):
-    hql_query = strip_trailing_semicolon(hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
-
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
@@ -281,6 +276,24 @@ class HS2Api(Api):
     }
 
 
+  def _get_statements(self, hql_query):
+    hql_query = strip_trailing_semicolon(hql_query)
+    statements = []
+    for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query):
+      statements.append({
+        'start': {
+          'row': start_row,
+          'column': start_col
+        },
+        'end': {
+          'row': end_row,
+          'column': end_col
+        },
+        'statement': strip_trailing_semicolon(statement.strip())
+      })
+    return statements
+
+
   def _get_current_statement(self, db, snippet):
     # Multiquery, if not first statement or arrived to the last query
     statement_id = snippet['result']['handle'].get('statement_id', 0)
@@ -297,16 +310,18 @@ class HS2Api(Api):
       statement_id = 0
 
     statements = self._get_statements(snippet['statement'])
-    if statements_count != len(statements):
-      statement_id = 0
-    statement = statements[statement_id]
 
-    return {
+    resp = {
       'statement_id': statement_id,
-      'statement': statement,
       'has_more_statements': statement_id < len(statements) - 1,
       'statements_count': len(statements)
     }
+
+    if statements_count != len(statements):
+      statement_id = 0
+
+    resp.update(statements[statement_id])
+    return resp
 
 
   def _prepare_hql_query(self, snippet, statement):
@@ -333,9 +348,11 @@ class HS2Api(Api):
 
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    snippet['result']['handle'].pop('statement_id')
-    snippet['result']['handle'].pop('has_more_statements')
-    snippet['result']['handle'].pop('statements_count')
+
+    for key in snippet['result']['handle'].keys():
+      if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
+        snippet['result']['handle'].pop(key)
+
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
 
