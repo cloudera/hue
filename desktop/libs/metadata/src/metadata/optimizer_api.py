@@ -56,14 +56,24 @@ def error_handler(view_fn):
 def top_tables(request):
   response = {'status': -1}
 
+  database = request.POST.get('database', 'default')
   len = request.POST.get('len', 500)
 
   api = OptimizerApi()
 
-  response['top_tables'] = api.top_tables() if not OPTIMIZER.MOCKING.get() else [
-      {'name': 'customers', 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
-    for i in xrange(0, len)
-  ]
+  if OPTIMIZER.MOCKING.get():
+    from beeswax.server import dbms
+    from beeswax.server.dbms import get_query_server_config
+    
+    db = dbms.get(request.user)
+    tables = [
+      {'name': table, 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
+      for table in db.get_tables(database=database)
+    ]
+  else:
+    tables = api.top_tables()
+
+  response['top_tables'] = tables
   response['status'] = 0
 
   return JsonResponse(response)

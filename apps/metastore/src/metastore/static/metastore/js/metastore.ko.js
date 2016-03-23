@@ -94,7 +94,9 @@
         self.loaded(true);
         self.loading(false);
         if (optimizerEnabled) {
-          $.post('/metadata/api/optimizer_api/top_tables', function(data){
+          $.post('/metadata/api/optimizer_api/top_tables', {
+            database: self.name
+          }, function(data){
             if (data && data.status == 0) {
               var tableIndex = {};
               data.top_tables.forEach(function (topTable) {
