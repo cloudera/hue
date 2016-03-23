@@ -48,7 +48,7 @@
     self.loading = ko.observable(false);
     self.tables = ko.observableArray();
     self.stats = ko.observable();
-    self.optimizerStats = ko.observable();
+    self.optimizerStats = ko.observableArray();
 
     self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
@@ -105,7 +105,7 @@
               self.tables().forEach(function (table) {
                 table.optimizerStats(tableIndex[table.name]);
               });
-              self.optimizerStats(ko.mapping.fromJS(data.top_tables));
+              self.optimizerStats(data.top_tables);
             } else {
               $(document).trigger("error", data.message);
             }
