@@ -127,7 +127,7 @@ class HQLdesign(object):
   @property
   def statements(self):
     hql_query = strip_trailing_semicolon(self.hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
+    return [strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query)]
 
   @staticmethod
   def get_default_data_dict():
@@ -234,25 +234,37 @@ class HQLdesign(object):
 
 def split_statements(hql):
   """
-  Split statments at semicolons ignoring the ones inside
-  quotes and comments. The comment symbols that come
-  inside quotes should be ignored.
+  Split statements at semicolons ignoring the ones inside quotes and comments.
+  The comment symbols that come inside quotes should be ignored.
   """
-
   statements = []
   current = ''
   prev = ''
   between_quotes = None
   is_comment = None
+  start_row = 0
+  start_col = 0
+  end_row = 0
+  end_col = len(hql) - 1
 
   if hql.find(';') in (-1, len(hql) - 1):
-    return [hql]
+    return [((start_row, start_col), (end_row, end_col), hql)]
 
   lines = hql.splitlines()
 
-  for line in lines:
-    for c in line:
+  for row, line in enumerate(lines):
+    end_col = 0
+    end_row = row
+
+    if start_row == row and line.strip() == '':  # ignore leading whitespace rows
+      start_row += 1
+    elif current.strip() == '':  # reset start_row
+      start_row = row
+      start_col = 0
+
+    for col, c in enumerate(line):
       current += c
+
       if c in ('"', "'") and prev != '\\' and is_comment is None:
         if between_quotes == c:
           between_quotes = None
@@ -266,23 +278,26 @@ def split_statements(hql):
           # Strip off the trailing semicolon
           current = current[:-1]
           if len(current) > 1:
-            statements.append(current)
+            statements.append(((start_row, start_col), (row, col + 1), current))
+            start_col = col + 1
           current = ''
       # This character holds no significance if it was escaped within a string
       if prev == '\\' and between_quotes is not None:
         c = ''
       prev = c
+      end_col = col
+
     is_comment = None
     prev = os.linesep
+
     if current != '':
       current += os.linesep
 
   if current and current != ';':
     current = current.strip()
-    statements.append(current)
+    statements.append(((start_row, start_col), (end_row, end_col), current))
 
   return statements
-
 
 def normalize_form_dict(form, attr_list):
   """

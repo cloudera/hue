@@ -125,7 +125,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       {
         "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
         "id": 1234,
-        "sessions": [{"type": "hive", "properties": [], "id": null}]
+        "sessions": [{"type": "hive", "properties": [], "id": "1234"}],
+        "type": "query-hive",
+        "name": "Test Hiveserver2 Editor"
       }
     """
     self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
@@ -156,6 +158,74 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       owner=self.user,
       is_history=True,
       data=self.notebook_json)
+
+
+  def test_get_current_statement(self):
+    multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\\r\\nSELECT AVG(salary) FROM sample_07;"
+    snippet_json = """
+      {
+          "status": "running",
+          "database": "default",
+          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+          "result": {
+              "type": "table",
+              "handle": {},
+              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+          },
+          "statement": "%(statement)s",
+          "type": "hive",
+          "properties": {
+              "files": [],
+              "functions": [],
+              "settings": []
+          }
+      }
+    """ % {'statement': multi_statement}
+
+    response = self.client.post(reverse('notebook:execute'), {'notebook': self.notebook_json, 'snippet': snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_equal(0, data['handle']['statement_id'], data)
+    assert_equal(2, data['handle']['statements_count'], data)
+    assert_equal(True, data['handle']['has_more_statements'], data)
+    assert_equal({'row': 0, 'column': 0}, data['handle']['start'], data)
+    assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
+
+
+    snippet_json = """
+      {
+          "status": "running",
+          "database": "default",
+          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+          "result": {
+              "type": "table",
+              "handle": {
+                "statement_id": 0,
+                "statements_count": 2,
+                "has_more_statements": true
+              },
+              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+          },
+          "statement": "%(statement)s",
+          "type": "hive",
+          "properties": {
+              "files": [],
+              "functions": [],
+              "settings": []
+          }
+      }
+    """ % {'statement': multi_statement}
+
+    response = self.client.post(reverse('notebook:execute'), {'notebook': self.notebook_json, 'snippet': snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_equal(1, data['handle']['statement_id'], data)
+    assert_equal(2, data['handle']['statements_count'], data)
+    assert_equal(False, data['handle']['has_more_statements'], data)
+    assert_equal({'row': 1, 'column': 0}, data['handle']['start'], data)
+    assert_equal({'row': 1, 'column': 32}, data['handle']['end'], data)
 
 
   def test_explain(self):
