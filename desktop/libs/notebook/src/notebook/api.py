@@ -36,6 +36,9 @@ from notebook.models import escape_rows
 LOG = logging.getLogger(__name__)
 
 
+DEFAULT_HISTORY_NAME = _('Query history')
+
+
 @require_POST
 @check_document_access_permission()
 @api_error_handler
@@ -256,9 +259,10 @@ def save_notebook(request):
 
 def _historify(notebook, user):
   query_type = notebook['type']
+  name = notebook['name'] if notebook['name'] and notebook['name'].strip() != '' else DEFAULT_HISTORY_NAME
 
   history_doc = Document2.objects.create(
-    name=notebook['name'],
+    name=name,
     type=query_type,
     owner=user,
     is_history=True
