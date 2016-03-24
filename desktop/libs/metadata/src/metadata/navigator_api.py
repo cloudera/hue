@@ -62,8 +62,7 @@ def search_entities(request):
   offset = request.GET.get('offset', 0)
   limit = request.GET.get('limit', 100)
 
-  if not query_s:
-    raise MetadataApiException("search_entities requires query_s search string")
+  query_s = query_s.strip()
 
   entities = api.search_entities(query_s)
 
@@ -89,6 +88,8 @@ def find_entity(request):
   table = request.GET.get('table', '')
   name = request.GET.get('name', '')
   path = request.GET.get('path', '')
+
+  # TODO: support arbitrary optional filter params
 
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
