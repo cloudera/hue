@@ -374,7 +374,7 @@ ${ assist.assistPanel() }
       </div>
       <!-- /ko -->
 
-      <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats().length > 0 -->
+      <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats() && $root.database().optimizerStats().length > 0 -->
       <div class="span4 tile chart-container">
         <h4>${ _('Popular tables') }</h4>
 
@@ -420,7 +420,7 @@ ${ assist.assistPanel() }
           &nbsp;
           <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { location.href = $root.optimizerUrl() + 'optimizer/#/table/12'; }, disable: selectedTables().length !== 1">
             <i class="fa fa-eye"></i> ${_('View in Optimizer')}
-          </button>          
+          </button>
           <!-- /ko -->
         </div>
 
@@ -549,10 +549,23 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    <!-- ko if: $root.optimizerEnabled -->
+    <!-- ko if: $root.optimizerEnabled() && navigatorStats() -->
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
-      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
+      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
+        <!-- ko foreach: navigatorStats().tags() -->
+          <span class="badge badge-info" data-bind="text: $data"></span><i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+        <!-- /ko -->
+
+        <!-- ko if: navigatorStats().tags().length == 0 -->
+          ${ _('No tags') }
+        <!-- /ko -->
+        <div data-bind="visible: showAddTagName">
+          <input type="text" data-bind="value: addTagName, valueUpdate:'afterkeydown'">
+          <i class="fa fa-save pointer" data-bind="click: addTags, visible: addTagName" title="${ _('Save tag') }"></i>
+        </div>
+        <i class="fa fa-plus pointer" data-bind="click: function() { showAddTagName(true); }, visible: ! showAddTagName()" title="${ _('Add a tag') }"></i>
+      </div>
     </div>
     <!-- /ko -->
   </div>
@@ -700,7 +713,7 @@ ${ assist.assistPanel() }
       <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
       <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
       <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analysis')}</a></li>
-      <li><a href="#lineage" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-lineage'); }">${_('Lineage')}</a></li>
+      <li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')}</a></li>
     <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
@@ -761,20 +774,20 @@ ${ assist.assistPanel() }
             <span style="display: none;">
               <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
             </span>
-      
+
           <i class="fa fa-long-arrow-right"></i> action=INSERT
       </div>
 
       <div class="acl-block acl-block-airy">
         <span class="muted" title="3 months ago">TABLE</span>
-      
+
         <span>
           <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
         </span>
         <br>
-      
+
         server=server1
-      
+
           <span>
             <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
           </span>
@@ -784,7 +797,7 @@ ${ assist.assistPanel() }
           <span style="display: none;">
             <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
           </span>
-      
+
           <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
       </div>
     </div>
@@ -794,21 +807,21 @@ ${ assist.assistPanel() }
       <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
       <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
     </div>
- 
+
     <div class="acl-block-title">
       <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerAccess</span></a>
     </div>
     <div>
       <div class="acl-block acl-block-airy">
         <span class="muted" title="3 months ago">TABLE</span>
-    
+
         <span>
           <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
         </span>
         <br>
-    
+
         server=server1
-    
+
           <span>
             <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
           </span>
@@ -818,7 +831,7 @@ ${ assist.assistPanel() }
           <span style="display: none;">
             <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
           </span>
-    
+
         <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
       </div>
       <div class="acl-block acl-actions">
@@ -829,27 +842,27 @@ ${ assist.assistPanel() }
       </div>
     </div>
   </div>
-              
+
     <style>
     .acl-panel {
       border-left: 1px solid #e5e5e5;
       padding-top: 6px;
       padding-left: 12px;
     }
-    
+
     .acl-panel .nav-tabs {
       margin-bottom: 0;
     }
-    
+
     .acl-panel h4:not(:first-child) {
       margin-top: 20px;
     }
-    
+
     .acl-panel-content {
       padding: 6px;
       overflow-y: scroll;
     }
-    
+
     .acl-block-title {
       background-color: #eeeeee;
       font-weight: bold;
@@ -857,48 +870,48 @@ ${ assist.assistPanel() }
       margin-top: 14px;
       margin-bottom: 4px;
     }
-    
+
     .acl-block {
       background-color: #f6f6f6;
       padding: 3px;
       margin-bottom: 4px;
     }
-    
+
     .acl-block .checkbox, .acl-block .radio {
       margin-left: 6px;
     }
-    
+
     .acl-block-airy {
       padding: 6px;
     }
-    
+
     .acl-block-airy input {
       margin-bottom: 0;
     }
-    
+
     .acl-block-section {
       margin-top: 10px;
     }
-    
+
     .acl-block-section input {
       margin-left: 14px;
     }
-    
+
     .span6 .acl-block input[type='text'] {
       width: 25%;
     }
-    
+
     .span6 .acl-block input[type='text'] {
       width: 21%;
     }
-    
+
     .acl-actions {
       padding: 5px;
       text-align: center;
       color: #CCC;
       font-size: 20px;
     }
-    
+
     .acl-actions span:hover {
       color: #999;
     }
@@ -915,7 +928,7 @@ ${ assist.assistPanel() }
       <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
-    <div class="tab-pane" id="lineage">
+    <div class="tab-pane" id="relationships">
       <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
