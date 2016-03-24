@@ -44,12 +44,18 @@ def error_handler(view_fn):
     except Http404, e:
       raise e
     except Exception, e:
-      LOG.exception(str(e))
+      status = 500
+      message = str(e)
+      LOG.exception(message)
+
+      if 'Could not find' in message:
+        status = 200
+
       response = {
         'status': -1,
-        'message': force_unicode(str(e))
+        'message': force_unicode(message)
       }
-    return JsonResponse(response, status=500)
+    return JsonResponse(response, status=status)
   return decorator
 
 
@@ -117,6 +123,10 @@ def find_entity(request):
   else:
     raise MetadataApiException("type %s is unrecognized" % entity_type)
 
+  # Prevent nulls later
+  if 'tag' in response['entity'] and not response['entity']['tags']:
+    response['entity']['tags'] = []
+
   response['status'] = 0
   return JsonResponse(response)
 
@@ -131,7 +141,9 @@ def get_entity(request):
   if not entity_id:
     raise MetadataApiException("get_entity requires an 'id' parameter")
 
-  response['entity'] = api.get_entity(entity_id)
+  entity = api.get_entity(entity_id)
+
+  response['entity'] = entity
   response['status'] = 0
 
   return JsonResponse(response)

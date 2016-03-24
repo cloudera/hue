@@ -88,7 +88,8 @@
             type: tableMeta.type,
             comment: tableMeta.comment,
             assistHelper: self.assistHelper,
-            i18n: self.i18n
+            i18n: self.i18n,
+            optimizerEnabled: optimizerEnabled
           })
         }));
         self.loaded(true);
@@ -277,10 +278,12 @@
     self.database = options.database;
     self.assistHelper = options.assistHelper;
     self.i18n = options.i18n;
+    self.optimizerEnabled = options.optimizerEnabled;
     self.name = options.name;
     self.type = options.type;
 
     self.optimizerStats = ko.observable();
+    self.navigatorStats = ko.observable();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -301,6 +304,8 @@
     self.tableDetails = ko.observable();
     self.tableStats = ko.observable();
     self.refreshingTableStats = ko.observable(false);
+    self.showAddTagName = ko.observable(false);
+    self.addTagName = ko.observable('');
 
     //TODO: Fetch table comment async and don't set it from python
     self.comment = ko.observable(options.comment);
@@ -384,6 +389,21 @@
               self.partitions.loading(false);
               self.partitions.loaded(true);
             }
+            if (self.optimizerEnabled) {
+                $.get('/metadata/api/navigator/find_entity', {
+                  type: 'table',
+                  database: self.database.name,
+                  name: self.name
+                }, function(data){
+                  if (data && data.status == 0) {
+                    self.navigatorStats(ko.mapping.fromJS(data.entity));
+                  } else {
+                    $(document).trigger("info", data.message);
+                  }
+                }).fail(function (xhr, textStatus, errorThrown) {
+                  $(document).trigger("error", xhr.responseText);
+                });
+            }
           }
           else {
             self.refreshingTableStats(false);
@@ -397,6 +417,34 @@
         }
       })
     }
+
+    self.addTags = function () {
+      $.post('/metadata/api/navigator/add_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([self.addTagName()])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.push(self.addTagName());
+          self.addTagName('');
+          self.showAddTagName(false);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+    
+    self.deleteTags = function (tag) {console.log(tag);
+      $.post('/metadata/api/navigator/delete_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([tag])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.remove(tag);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
   }
 
   MetastoreTable.prototype.showImportData = function () {
