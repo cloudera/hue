@@ -124,7 +124,7 @@ def find_entity(request):
     raise MetadataApiException("type %s is unrecognized" % entity_type)
 
   # Prevent nulls later
-  if 'tag' in response['entity'] and not response['entity']['tags']:
+  if 'tags' in response['entity'] and not response['entity']['tags']:
     response['entity']['tags'] = []
 
   response['status'] = 0
