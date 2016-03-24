@@ -18,9 +18,12 @@
 
 import json
 import logging
+import re
 
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
+
+from hadoop.conf import HDFS_CLUSTERS
 
 from metadata.conf import NAVIGATOR
 
@@ -31,6 +34,15 @@ VERSION = 'v3'
 
 def is_navigator_enabled():
   return NAVIGATOR.API_URL.get()
+
+
+def get_filesystem_host():
+  host = None
+  hadoop_fs = HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()
+  match = re.search(r"^hdfs://(?P<host>[a-z0-9\.-]+):\d[4]", hadoop_fs)
+  if match:
+    host = match.group('host')
+  return host
 
 
 class NavigatorApiException(Exception):
@@ -111,6 +123,12 @@ class NavigatorApi(object):
       }
       for key, value in filters.items():
         query_filters[key] = value
+
+      # TODO: Uncomment following block after demo, b/c we really want the entities that current Hue knows about in HDFS
+      # hadoop_fs = get_filesystem_host()
+      hadoop_fs = re.search(r"^(http|https)://(?P<host>[a-z0-9\.-]+):.*", self._api_url).group('host')
+      if hadoop_fs:
+        query_filters['fileSystemPath'] = '*%(path)s*' % {'path': hadoop_fs}
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
 
