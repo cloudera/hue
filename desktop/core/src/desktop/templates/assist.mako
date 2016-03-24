@@ -327,6 +327,34 @@ from desktop.views import _ko
       margin-lefT: -2px;
       font-size: 14px;
     }
+
+    .result-entry {
+      clear: both;
+      width: calc(100% - 20px);
+      margin: 0px 10px 15px 10px;
+    }
+
+    .result-entry .doc-desc {
+      font-style: italic;
+      font-size: 12px;
+      line-height: 15px;
+    }
+
+    .result-entry .icon-col {
+      width: 30px;
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 6px;
+    }
+
+    .result-entry .doc-col {
+      width: calc(100% - 50px);
+      display: inline-block;
+    }
+
+    .result-entry .hue-icon {
+      font-size: 30px;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -738,8 +766,37 @@ from desktop.views import _ko
     <!-- /ko -->
     <!-- ko if: searchInput() !== '' -->
     <div style="position:relative; height: 100%; overflow: hidden">
-      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
-      <div style="margin:10px; font-style: italic; ">${_('Select result...')}</div>
+      <div class="assist-flex-panel">
+        <div style="flex: 1"></div>
+        <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
+        <div class="assist-flex-fill" style="overflow-x: none; overflow-y: scroll; outline: none;">
+          <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
+          <!-- ko if: !searching() -->
+          <!-- ko foreach: searchResult -->
+          <div class="result-entry">
+            <div class="icon-col" style="font-size: 17px;">
+              <!-- ko if: type === 'FILE' -->
+              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'DIRECTORY' -->
+              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'DATABASE' -->
+              <i class="fa fa-fw fa-database muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'SOURCE' -->
+              <i class="fa fa-fw fa-server muted valign-middle"></i>
+              <!-- /ko -->
+            </div>
+            <div class="doc-col">
+              <a data-bind="attr: { 'href': '#' }, text: originalName"></a>
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+            </div>
+          </div>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+      </div>
     </div>
     <!-- /ko -->
   </script>
@@ -1038,12 +1095,34 @@ from desktop.views import _ko
 
         self.navigatorEnabled = ko.observable(true);
 
-        self.searchInput = ko.observable('');
+        self.searchInput = ko.observable('').extend({ rateLimit: 500 });
+        self.searchResult = ko.observableArray();
+
+        self.searching = ko.observable(false);
+
+        self.searchInput.subscribe(function (newValue) {
+          self.performSearch(newValue);
+        });
+
+        var lastQuery = '';
 
         self.performSearch = function () {
-
-        }
-
+          if (self.searchInput() === lastQuery) {
+            return;
+          }
+          if (self.searching()) {
+            window.setTimeout(function() {
+              self.performSearch();
+            }, 100);
+          }
+          lastQuery = self.searchInput();
+          self.searching(true);
+          $.post('/metadata/api/navigator/search_entities?query_s=' + self.searchInput() )
+              .done(function (data) {
+                self.searchResult(data.entities);
+                self.searching(false);
+              })
+        };
 
         self.onlySql = params.onlySql;
         self.loading = ko.observable(false);
