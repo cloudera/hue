@@ -128,7 +128,7 @@ class TestOptimizerApi(object):
     resp = self.api.authenticate()
     token = resp['token']
 
-    resp = self.api.table_details(table_name='orders', token=token)
+    resp = self.api.table_details(table_name='store_sales', token=token)
 
     assert_equal('success', resp['status'], resp)
 
@@ -140,7 +140,7 @@ class TestOptimizerApi(object):
 
     resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
-    assert_equal('success', resp['status'], resp)
+    assert_equal('successs', resp['status'], resp)
 
     details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
 

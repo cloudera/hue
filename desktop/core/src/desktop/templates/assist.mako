@@ -792,6 +792,21 @@ from desktop.views import _ko
               <!-- ko if: type === 'SOURCE' -->
               <i class="fa fa-fw fa-server valign-middle"></i>
               <!-- /ko -->
+              <!-- ko if: type === 'SUB_OPERATION' -->
+              <i class="fa fa-fw fa-code-fork valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'FIELD' -->
+              <i class="fa fa-fw fa-code-columns valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'OPERATION_EXECUTION' -->
+              <i class="fa fa-fw fa-cog valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'OPERATION' -->
+              <i class="fa fa-fw fa-cogs valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'PARTITION' -->
+              <i class="fa fa-fw fa-th valign-middle"></i>
+              <!-- /ko -->
             </div>
             <div class="doc-col">
               <a data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
@@ -801,6 +816,9 @@ from desktop.views import _ko
               <!-- ko if: type === 'TABLE' -->
               <div class="doc-desc" data-bind="text: originalDescription"></div>
               <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'SUB_OPERATION' -->
+              <div class="doc-desc" data-bind="text: metaClassName"></div>
               <!-- /ko -->
               <!-- ko if: type === 'SOURCE' -->
               <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
@@ -1148,6 +1166,8 @@ from desktop.views import _ko
                     entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
                   } else if (entity.type === 'SOURCE') {
                     entity.link = entity.sourceUrl;
+                  } else if (entity.type === 'OPERATION_EXECUTION') {
+                    entity.link = '/jobbrowser/jobs/' + entity.jobID;
                   } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
                     entity.link = '/filebrowser/#' + entity.fileSystemPath;
                   } else {
