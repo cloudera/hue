@@ -44,6 +44,9 @@ except ImportError, e:
   LOG.exception('Hive and HiveServer2 interfaces are not enabled')
 
 
+DEFAULT_HIVE_ENGINE = 'mr'
+
+
 def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
@@ -239,12 +242,16 @@ class HS2Api(Api):
 
   @query_error_handler
   def get_jobs(self, notebook, snippet, logs):
-    job_ids = _parse_out_hadoop_jobs(logs)
+    jobs = []
 
-    jobs = [{
-      'name': job_id,
-      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
-    } for job_id in job_ids]
+    if snippet['type'] == 'hive':
+      engine = self._get_hive_execution_engine(notebook, snippet)
+      job_ids = _parse_out_hadoop_jobs(logs, engine=engine)
+
+      jobs = [{
+        'name': job_id,
+        'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
+      } for job_id in job_ids]
 
     return jobs
 
@@ -274,6 +281,22 @@ class HS2Api(Api):
       'explanation': explanation.textual,
       'statement': query.get_query_statement(0),
     }
+
+
+  def _get_hive_execution_engine(self, notebook, snippet):
+    # Get hive.execution.engine from snippet properties, if none, then get from session
+    properties = snippet['properties']
+    settings = properties.get('settings', [])
+
+    if not settings:
+      session = next((session for session in notebook['sessions'] if session['type'] == 'hive'), None)
+      if not session:
+        raise Exception(_('Cannot get jobs, failed to find active HS2 session for user: %s') % self.user.username)
+      settings = session['properties']
+
+    engine = next((setting['value'] for setting in settings if setting['key'] == 'hive.execution.engine'), DEFAULT_HIVE_ENGINE)
+
+    return engine
 
 
   def _get_statements(self, hql_query):

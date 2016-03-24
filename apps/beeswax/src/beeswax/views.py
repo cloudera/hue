@@ -54,6 +54,10 @@ from beeswax.server.dbms import expand_exception, get_query_server_config, Query
 
 LOG = logging.getLogger(__name__)
 
+# For scraping Job IDs from logs
+HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
+SPARK_APPLICATION_RE = re.compile("Running with YARN Application = (?P<application_id>application_\d+_\d+)")
+
 
 def index(request):
   return execute_query(request)
@@ -881,15 +885,20 @@ def parse_query_context(context):
   return pair
 
 
-HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
-
-def _parse_out_hadoop_jobs(log):
+def _parse_out_hadoop_jobs(log, engine='mr'):
   """
   Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
   """
   ret = []
 
-  for match in HADOOP_JOBS_RE.finditer(log):
+  if engine.lower() == 'mr':
+    pattern = HADOOP_JOBS_RE
+  elif engine.lower() == 'spark':
+    pattern = SPARK_APPLICATION_RE
+  else:
+    raise ValueError(_('Cannot parse job IDs for execution engine %(engine)s') % {'engine': engine})
+
+  for match in pattern.finditer(log):
     job_id = match.group(1)
     if job_id not in ret:
       ret.append(job_id)
