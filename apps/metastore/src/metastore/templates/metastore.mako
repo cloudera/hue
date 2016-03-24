@@ -371,6 +371,10 @@ ${ assist.assistPanel() }
           </div>
         </div>
         <!-- /ko -->
+      
+      <!-- ko if: $root.optimizerEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->  
+        <!-- ko template: { name: 'metastore-databases-tags', data: $root.database() }--><!-- /ko -->
+      <!-- /ko -->
       </div>
       <!-- /ko -->
 
@@ -493,6 +497,28 @@ ${ assist.assistPanel() }
     <!-- /ko -->
   </div>
 </script>
+
+
+<script type="text/html" id="metastore-databases-tags">
+  <div>
+      <h4>${ _('Tagging') }</h4>
+      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
+        <!-- ko foreach: $data.navigatorStats().tags() -->
+          <span class="badge badge-info" data-bind="text: $data"></span><i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+        <!-- /ko -->
+
+        <!-- ko if: $data.navigatorStats().tags().length == 0 -->
+          ${ _('No tags') }
+        <!-- /ko -->
+        <div data-bind="visible: $data.showAddTagName">
+          <input type="text" data-bind="value: $data.addTagName, valueUpdate:'afterkeydown'">
+          <i class="fa fa-save pointer" data-bind="click: $data.addTags, visible: $data.addTagName" title="${ _('Save tag') }"></i>
+        </div>
+        <i class="fa fa-plus pointer" data-bind="click: function() { $data.showAddTagName(true); }, visible: ! $data.showAddTagName()" title="${ _('Add a tag') }"></i>
+      </div>
+  </div>
+</script>
+
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">

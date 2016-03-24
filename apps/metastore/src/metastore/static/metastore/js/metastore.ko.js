@@ -49,6 +49,10 @@
     self.tables = ko.observableArray();
     self.stats = ko.observable();
     self.optimizerStats = ko.observableArray();
+    self.navigatorStats = ko.observable();
+
+    self.showAddTagName = ko.observable(false);
+    self.addTagName = ko.observable('');
 
     self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
@@ -68,6 +72,34 @@
     self.selectedTables = ko.observableArray();
 
     self.table = ko.observable(null);
+    
+    self.addTags = function () {
+      $.post('/metadata/api/navigator/add_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([self.addTagName()])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.push(self.addTagName());
+          self.addTagName('');
+          self.showAddTagName(false);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+      
+    self.deleteTags = function (tag) {
+      $.post('/metadata/api/navigator/delete_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([tag])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.remove(tag);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
   }
 
   MetastoreDatabase.prototype.load = function (callback, optimizerEnabled) {
@@ -95,6 +127,19 @@
         self.loaded(true);
         self.loading(false);
         if (optimizerEnabled) {
+          $.get('/metadata/api/navigator/find_entity', {
+            type: 'database',
+            name: self.name
+          }, function(data){
+            if (data && data.status == 0) {
+              self.navigatorStats(ko.mapping.fromJS(data.entity));
+            } else {
+              $(document).trigger("info", data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          });
+
           $.post('/metadata/api/optimizer_api/top_tables', {
             database: self.name
           }, function(data){
