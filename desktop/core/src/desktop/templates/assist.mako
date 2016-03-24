@@ -341,10 +341,12 @@ from desktop.views import _ko
     }
 
     .result-entry .icon-col {
-      width: 30px;
+      width: 35px;
       display: inline-block;
       vertical-align: top;
-      padding-top: 6px;
+      padding-top: 7px;
+      font-size: 20px;
+      color: #338bb8;
     }
 
     .result-entry .doc-col {
@@ -774,23 +776,31 @@ from desktop.views import _ko
           <!-- ko if: !searching() -->
           <!-- ko foreach: searchResult -->
           <div class="result-entry">
-            <div class="icon-col" style="font-size: 17px;">
+            <div class="icon-col">
               <!-- ko if: type === 'FILE' -->
-              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <i class="fa fa-fw fa-file-o valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: type === 'DIRECTORY' -->
-              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <i class="fa fa-fw fa-folder-o valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: type === 'DATABASE' -->
-              <i class="fa fa-fw fa-database muted valign-middle"></i>
+              <i class="fa fa-fw fa-database valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: type === 'SOURCE' -->
-              <i class="fa fa-fw fa-server muted valign-middle"></i>
+              <i class="fa fa-fw fa-server valign-middle"></i>
               <!-- /ko -->
             </div>
             <div class="doc-col">
-              <a data-bind="attr: { 'href': '#' }, text: originalName"></a>
+              <a data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+              <!-- ko if: type === 'DATABASE' -->
               <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'SOURCE' -->
+              <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
+              <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
             </div>
           </div>
           <!-- /ko -->
@@ -1123,6 +1133,18 @@ from desktop.views import _ko
           self.searching(true);
           $.post('/metadata/api/navigator/search_entities?query_s=' + self.searchInput() )
               .done(function (data) {
+                console.log(data);
+                data.entities.forEach(function (entity) {
+                  if (entity.type === 'DATABASE') {
+                    entity.link = '/metastore/tables/' + entity.originalName;
+                  } else if (entity.type === 'SOURCE') {
+                    entity.link = entity.sourceUrl;
+                  } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
+                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  } else {
+                    entity.link = '#';
+                  }
+                });
                 self.searchResult(data.entities);
                 self.searching(false);
               })
