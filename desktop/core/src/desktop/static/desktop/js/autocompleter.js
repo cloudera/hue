@@ -35,6 +35,8 @@
   function Autocompleter(options) {
     var self = this;
     self.snippet = options.snippet;
+    
+    self.topTables = {};
 
     var initializeAutocompleter = function () {
       var hdfsAutocompleter = new HdfsAutocompleter({
@@ -75,6 +77,12 @@
       callback(null, result);
     }, editor);
   };
+
+  Autocompleter.prototype.getDocTooltip = function (item) {
+    var self = this;
+    return self.autocompleter.getDocTooltip(item);
+  };
+
 
   Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
     var self = this;
