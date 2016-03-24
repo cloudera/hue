@@ -219,3 +219,19 @@ def delete_properties(request):
     response['status'] = 0
 
   return JsonResponse(response)
+
+
+@error_handler
+def get_lineage(request):
+  response = {'status': -1}
+
+  api = NavigatorApi()
+  entity_id = request.REQUEST.get('id')
+
+  if not entity_id:
+    raise MetadataApiException("get_lineage requires an 'id' parameter")
+
+  response['lineage'] = api.get_lineage(entity_id)
+  response['status'] = 0
+
+  return JsonResponse(response)
