@@ -222,6 +222,26 @@ class NavigatorApi(object):
     return self.update_entity(entity_id, properties=new_props)
 
 
+  def get_lineage(self, entity_id):
+    """
+    GET /api/v3/lineage/entityIds=:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_lineage.html
+    """
+    try:
+      params = self.__params
+
+      params += (
+        ('entityIds', entity_id),
+      )
+
+      return self._root.get('lineage', headers=self.__headers, params=params)
+    except RestException, e:
+      msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
+
+
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
 
