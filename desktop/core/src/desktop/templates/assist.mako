@@ -753,7 +753,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <!-- ko if: searchInput() === '' -->
+    <!-- ko if: searchInput() === '' || ! navigatorEnabled() -->
     <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
@@ -764,7 +764,7 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
     <!-- /ko -->
-    <!-- ko if: searchInput() !== '' -->
+    <!-- ko if: searchInput() !== '' && navigatorEnabled()-->
     <div style="position:relative; height: 100%; overflow: hidden">
       <div class="assist-flex-panel">
         <div style="flex: 1"></div>
@@ -1094,6 +1094,10 @@ from desktop.views import _ko
         });
 
         self.navigatorEnabled = ko.observable(true);
+
+        huePubSub.subscribe('meta.optimizer.enabled', function (newValue) {
+          self.navigatorEnabled(newValue);
+        });
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();

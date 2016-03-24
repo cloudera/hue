@@ -519,6 +519,11 @@
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
+
+    self.optimizerEnabled.subscribe(function (newValue) {
+      huePubSub.publish('meta.optimizer.enabled', newValue);
+    });
+
     self.optimizerUrl = ko.observable(options.optimizer_url);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
