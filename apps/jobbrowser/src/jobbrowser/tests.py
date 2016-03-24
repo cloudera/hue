@@ -345,6 +345,9 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_true(len(response.context['page'].object_list), 1)
 
   def test_job_single_logs(self):
+    if not is_live_cluster():
+      raise SkipTest
+
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/single_logs?format=json' % (TestJobBrowserWithHadoop.hadoop_job_id))
     json_resp = json.loads(response.content)
 
