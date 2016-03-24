@@ -19,15 +19,15 @@
 
 <%block name="specs">
   <script type="text/javascript" charset="utf-8">
-  require(['jasmine-boot', 'jasmine'], function () {
-    // Add specs below
-    require([
-      'desktop/spec/sqlAutocompleterSpec',
-      'desktop/spec/hdfsAutocompleterSpec'
-    ], function() {
-      window.onload();
+    require(['jasmine-boot', 'jasmine', 'knockout'], function (boot, jasmine, ko) {
+      window.ko = ko;
+      $.when(
+        $.getScript('${ static('oozie/js/workflow-editor.ko.js') }'),
+        $.getScript('${ static('oozie/js/workflow-editor.utils.js') }'),
+        $.getScript('${ static('oozie/spec/workflowEditorSpec.js') }')
+      ).done(function () {
+        window.onload();
+      });
     });
-  });
   </script>
 </%block>
-

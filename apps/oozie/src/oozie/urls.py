@@ -145,3 +145,8 @@ urlpatterns += patterns(
 
   url(r'^list_oozie_sla/$', 'list_oozie_sla', name='list_oozie_sla'),
 )
+
+urlpatterns += patterns(
+  'oozie.views.common',
+  url(r'^jasmine', 'jasmine', name='jasmine'),
+)
