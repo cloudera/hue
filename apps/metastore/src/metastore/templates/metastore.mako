@@ -461,12 +461,18 @@ ${ assist.assistPanel() }
               </td>
               <td data-bind="text: comment"></td>
               <!-- ko if: $root.optimizerEnabled -->
+                <!-- ko if: optimizerStats() -->
                 <td>
                   <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
                     <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }, attr: {'title': optimizerStats().popularity} "></div>
                   </div>
                 </td>
                 <td data-bind="text: optimizerStats().column_count"></td>
+              <!-- /ko -->
+              <!-- ko ifnot: optimizerStats() -->
+                <td></td>
+                <td></td>
+              <!-- /ko -->
               <!-- /ko -->
 
               <td class="center">

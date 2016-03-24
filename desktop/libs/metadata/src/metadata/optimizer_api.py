@@ -64,14 +64,26 @@ def top_tables(request):
   if OPTIMIZER.MOCKING.get():
     from beeswax.server import dbms
     from beeswax.server.dbms import get_query_server_config
-    
     db = dbms.get(request.user)
     tables = [
       {'name': table, 'popularity': random.randint(1, 100) , 'column_count': random.randint(1, 100), 'is_fact': bool(random.getrandbits(1))}
       for table in db.get_tables(database=database)
     ][:len]
   else:
-    tables = api.top_tables()
+    """
+    Get back:
+    # u'details': [{u'columnCount': 28, u'name': u'date_dim', u'patternCount': 136, u'workloadPercent': 89, u'total': 92, u'type': u'Dimension', u'eid': u'19'},
+    """    
+    tables = [{
+        'id': table['eid'],
+        'name': table['name'],
+        'popularity': table['workloadPercent'],
+        'column_count': table['columnCount'],
+        'patternCount': table['patternCount'],
+        'total': table['total'],
+        'is_fact': table['type'] != 'Dimension'
+        } for table in api.top_tables()['details']
+    ]
 
   response['top_tables'] = tables
   response['status'] = 0

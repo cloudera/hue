@@ -106,7 +106,7 @@ OPTIMIZER = ConfigSection(
     MOCKING = Config(
       key="mocking",
       help=_t("Use mock data"),
-      default=True,
+      default=False,
       type=coerce_bool
     )
   )
