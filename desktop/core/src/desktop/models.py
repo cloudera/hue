@@ -835,7 +835,7 @@ class Document2Manager(models.Manager):
 
   def get_home_directory(self, user):
     try:
-      return self.get(owner=user, parent_directory=None, name='', type='directory')
+      return self.get(owner=user, parent_directory=None, name=Document2.HOME_DIR, type='directory')
     except Document2.DoesNotExist:
       return self.create_user_directories(user)
 
@@ -864,10 +864,10 @@ class Document2Manager(models.Manager):
     :param user: User object
     """
     # Edge-case if the user has a legacy home directory with path-name
-    Directory.objects.filter(name='/', owner=user).update(name='')
+    Directory.objects.filter(name='/', owner=user).update(name=Document2.HOME_DIR)
 
     # Get or create home and Trash directories for all users
-    home_dir, created = Directory.objects.get_or_create(name='', owner=user)
+    home_dir, created = Directory.objects.get_or_create(name=Document2.HOME_DIR, owner=user)
 
     if created:
       LOG.info('Successfully created home directory for user: %s' % user.username)
@@ -890,6 +890,7 @@ class Document2Manager(models.Manager):
 
 class Document2(models.Model):
 
+  HOME_DIR = ''
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
@@ -947,7 +948,7 @@ class Document2(models.Model):
 
   @property
   def is_home_directory(self):
-    return self.is_directory and self.parent_directory == None and self.name == ''
+    return self.is_directory and self.parent_directory == None and self.name == self.HOME_DIR
 
   @property
   def is_trash_directory(self):
@@ -1063,7 +1064,7 @@ class Document2(models.Model):
         self.name = '%s %s' % (self.name, timestamp)
 
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
-    if self.name in ['', Document2.TRASH_DIR] and \
+    if self.name in [Document2.HOME_DIR, Document2.TRASH_DIR] and self.type == 'directory' and \
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
       raise FilesystemException(_('Cannot create or modify directory with name: %s') % self.name)
 
