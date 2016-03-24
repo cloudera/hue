@@ -111,6 +111,7 @@ def query_compatibility(request):
   return JsonResponse(response)
 
 
+# Mocked
 @require_POST
 @error_handler
 def query_complexity(request):
@@ -128,7 +129,7 @@ def query_complexity(request):
     comment = ''
 
   response['query_complexity'] = {
-    'level': randome.choice(['LOW', 'MEDIUM', 'HIGH']),
+    'level': random.choice(['LOW', 'MEDIUM', 'HIGH']),
     'comment': comment
   }
   response['status'] = 0
