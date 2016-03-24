@@ -783,6 +783,9 @@ from desktop.views import _ko
               <!-- ko if: type === 'DIRECTORY' -->
               <i class="fa fa-fw fa-folder-o valign-middle"></i>
               <!-- /ko -->
+              <!-- ko if: type === 'TABLE' -->
+              <i class="fa fa-fw fa-table valign-middle"></i>
+              <!-- /ko -->              
               <!-- ko if: type === 'DATABASE' -->
               <i class="fa fa-fw fa-database valign-middle"></i>
               <!-- /ko -->
@@ -794,6 +797,10 @@ from desktop.views import _ko
               <a data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
               <!-- ko if: type === 'DATABASE' -->
               <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'TABLE' -->
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <div class="doc-desc" data-bind="text: parentPath"></div>
               <!-- /ko -->
               <!-- ko if: type === 'SOURCE' -->
               <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
@@ -1137,6 +1144,8 @@ from desktop.views import _ko
                 data.entities.forEach(function (entity) {
                   if (entity.type === 'DATABASE') {
                     entity.link = '/metastore/tables/' + entity.originalName;
+                  } else if (entity.type === 'TABLE') {
+                    entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
                   } else if (entity.type === 'SOURCE') {
                     entity.link = entity.sourceUrl;
                   } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
