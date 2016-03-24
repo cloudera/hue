@@ -36,12 +36,27 @@
     self.hdfsAutocompleter = options.hdfsAutocompleter;
     self.oldEditor = options.oldEditor || false;
 
+    self.topTablesPerDb = {};
+
     // Speed up by caching the databases
     var initDatabases = function () {
       self.snippet.getAssistHelper().loadDatabases({
         sourceType: self.snippet.type(),
         silenceErrors: true,
-        successCallback: $.noop
+        successCallback: function () {
+          $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
+            $.post('/metadata/api/optimizer_api/top_tables', {
+              database: db
+            }, function(data){
+              if (! self.topTablesPerDb[db]) {
+                self.topTablesPerDb[db] = {};
+              }
+              data.top_tables.forEach(function (table) {
+                self.topTablesPerDb[db][table.name] = table;
+              });
+            });
+          });
+        }
       });
     };
     self.snippet.type.subscribe(function() {
@@ -268,7 +283,7 @@
     }
   };
 
-  SqlAutocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
+  SqlAutocompleter.prototype.extractFields = function (data, database, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
     var self = this;
     var fields = [];
     var result = [];
@@ -323,7 +338,7 @@
 
     fields.forEach(function(field, idx) {
       if (field.name != "") {
-        result.push({value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name, score: 1000 - idx, meta: field.type});
+        result.push({value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name, score: 1000 - idx, meta: field.type, database: database });
       }
     });
     return result;
@@ -457,7 +472,7 @@
             }
             fromKeyword += " ";
           }
-          var result = self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
+          var result = self.extractFields(data, database, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
           if (partialTableOrDb !== null) {
             callback($.grep(result, function (suggestion) {
               return suggestion.value.indexOf(partialTableOrDb) === 0;
@@ -545,7 +560,7 @@
           var tableRefs = [{
             value: tableName,
             score: 1000,
-            meta: 'table'
+            meta: 'tables'
           }];
           self.getValueReferences(conditionMatch, database, fromReferences, tableRefs, callback);
           return;
@@ -572,9 +587,9 @@
             editor: editor,
             successCallback: function (data) {
               if (fields.length == 0) {
-                callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
+                callback(self.extractFields(data, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
               } else {
-                callback(self.extractFields(data, "", !fieldTermBefore));
+                callback(self.extractFields(data, database, "", !fieldTermBefore));
               }
             },
             silenceErrors: true,
@@ -588,7 +603,7 @@
           if (hiveSyntax) {
             if (viewReferences.index[part]) {
               if (viewReferences.index[part].references && remainingParts.length == 0) {
-                callback(self.extractFields([], "", true, viewReferences.index[part].references));
+                callback(self.extractFields([], database, "", true, viewReferences.index[part].references));
                 return;
               }
               if (fields.length == 0 && viewReferences.index[part].leadingPath.length > 0) {
@@ -662,7 +677,7 @@
                     extraFields.push({ name: "items", type: "items" });
                   }
                 }
-                callback(self.extractFields(data, "", false, extraFields));
+                callback(self.extractFields(data, database, "", false, extraFields));
                 return;
               }
               getFields(database, remainingParts, fields);
@@ -689,6 +704,26 @@
       getFields(database, parts, []);
     } else {
       onFailure();
+    }
+  };
+  
+  SqlAutocompleter.prototype.getDocTooltip = function (item) {
+    var self = this;
+    if (item.meta === 'table' && !item.docHTML) {
+      var table = item.value;
+      if (table.lastIndexOf(' ') > -1) {
+        table = table.substring(table.lastIndexOf(' ') + 1);
+      }
+      if (self.topTablesPerDb[item.database] && self.topTablesPerDb[item.database][table]) {
+        var optData = self.topTablesPerDb[item.database][table];
+        item.docHTML = '<table style="margin:10px;">' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Table:</td><td style="width: 100px;">' + optData.name + '</td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #338bb8; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Columns:</td><td style="width: 100px;">' + optData.column_count + '</td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Fact:</td><td style="width: 100px;">' + optData.is_fact + '</td></tr>' +
+            '</table>';
+
+      }
     }
   };
 

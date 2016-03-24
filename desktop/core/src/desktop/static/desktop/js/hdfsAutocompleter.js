@@ -107,5 +107,8 @@
     }
   };
 
+  HdfsAutocompleter.prototype.getDocTooltip = function (item) {
+  };
+
   return HdfsAutocompleter;
 }));

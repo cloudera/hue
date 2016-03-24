@@ -2556,3 +2556,30 @@ body {
   width: 1em!important;
   height: 1em!important;
 }
+
+.autocomplete-tooltip {
+  background-color: #FFF;
+  margin-left: -1px !important;
+  border-top: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  border-radius: 1px;
+  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  color: black;
+  max-width: 100%;
+  padding: 3px 4px;
+  position: fixed;
+  z-index: 999999;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: default;
+  white-space: pre;
+  word-wrap: break-word;
+  line-height: normal;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  pointer-events: none;
+  height: 130px;
+}
