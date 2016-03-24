@@ -37,6 +37,16 @@
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
+    self.statement_range = ko.observable(typeof result.statement_range != "undefined" && result.statement_range != null ? result.statement_range : {
+      start: {
+        row: 0,
+        column: 0
+      },
+      end: {
+        row: 0,
+        column: 0
+      }
+    });
     self.statements_count = ko.observable(typeof result.statements_count != "undefined" && result.statements_count != null ? result.statements_count : 1);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
@@ -535,6 +545,7 @@
 
       if (self.result.fetchedOnce()) {
         self.close();
+        self.statusForButtons('executed');
       }
 
       $.post("/notebook/api/execute", {
@@ -552,6 +563,13 @@
           if (data.handle.statement_id != null) {
             self.result.statement_id(data.handle.statement_id);
           }
+          if (data.handle.start != null && data.handle.end != null) {
+            self.result.statement_range({
+              start: data.handle.start,
+              end: data.handle.end
+            });
+          }
+
           if (data.handle.sync) {
             self.loadData(data.handle, 100);
             self.status('success');
@@ -568,11 +586,22 @@
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
         self.status('failed');
+        self.statusForButtons('executed');
       });
     };
 
     self.reexecute = function () {
       self.result.handle()['statement_id'] = 0;
+      self.result.handle()['statement_range'] = {
+        start: {
+          row: 0,
+          column: 0
+        },
+        end: {
+          row: 0,
+          column: 0
+        }
+      };
       self.result.handle()['has_more_statements'] = false;
 
       self.execute();
@@ -755,6 +784,7 @@
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+        self.statusForButtons('canceled');
         self.status('failed');
       });
     };

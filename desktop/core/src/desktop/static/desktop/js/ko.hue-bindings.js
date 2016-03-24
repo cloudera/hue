@@ -2431,9 +2431,14 @@
       snippet.errors.subscribe(function(newErrors) {
         editor.clearErrors();
         var offset = 0;
-        if (snippet.isSqlDialect() && editor.getSelectedText()) {
-          var selectionRange = editor.getSelectionRange();
-          offset = Math.min(selectionRange.start.row, selectionRange.end.row);
+        if (snippet.isSqlDialect()) {
+          if (editor.getSelectedText()){
+            var selectionRange = editor.getSelectionRange();
+            offset = Math.min(selectionRange.start.row, selectionRange.end.row);
+          }
+          if (snippet.result && snippet.result.statements_count() > 1){
+            offset = snippet.result.statement_range().start.row;
+          }
         }
         if (newErrors.length > 0) {
           newErrors.forEach(function (err, cnt) {
@@ -2903,7 +2908,23 @@
       var snippet = options.snippet;
       if (snippet.ace()) {
         var editor = snippet.ace();
+        var range = options.highlightedRange();
         editor.session.setMode(snippet.getAceMode());
+        if (range) {
+          if (editor.session.$backMarkers) {
+            for (var marker in editor.session.$backMarkers) {
+              if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+                editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+              }
+            }
+          }
+          editor.session.addMarker(new AceRange(range.start.row, range.start.column, range.end.row, range.end.column), 'highlighted', 'line');
+          ace.require('ace/lib/dom').importCssString('.highlighted {\
+              background-color: #E3F7FF;\
+              position: absolute;\
+          }');
+          editor.scrollToLine(range.start.row, true, true, function () {});
+        }
       }
     }
   };
