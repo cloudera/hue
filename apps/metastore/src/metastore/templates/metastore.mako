@@ -969,7 +969,6 @@ ${ assist.assistPanel() }
       <!-- ko if: $root.database() && $root.database().table() -->
         <span data-bind="text: $root.database().table().optimizerDetails()"></span>
         
-        ## show top 5 most important
         ## top stats above tags
         
         ## joined tables --> relationsips
