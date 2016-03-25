@@ -104,10 +104,9 @@ def table_details(request):
 
   if data['status'] == 'success':
     response['status'] = 0
-  response['details'] = data['details']
-  
-#   if 'No table with that name' in response['details']:
-#     response['status'] = -1
+    response['details'] = data['details']
+  else:
+    response['message'] = 'Optimizer: %s' % data['details']
 
   return JsonResponse(response)
 
