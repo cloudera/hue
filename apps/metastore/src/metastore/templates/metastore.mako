@@ -422,8 +422,8 @@ ${ assist.assistPanel() }
           <!-- ko if: $root.optimizerEnabled  -->
           &nbsp;
           &nbsp;
-          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { location.href = $root.optimizerUrl() + 'optimizer/#/table/12'; }, disable: selectedTables().length !== 1">
-            <i class="fa fa-eye"></i> ${_('View in Optimizer')}
+          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { window.open($root.optimizerUrl() + '#/table/' + selectedTables()[0].optimizerStats().eid, '_blank'); }, disable: selectedTables().length !== 1">
+            <i class="fa fa-skyatlas"></i> ${_('View in Optimizer')}
           </button>
           <!-- /ko -->
         </div>
@@ -550,6 +550,9 @@ ${ assist.assistPanel() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     <!-- ko with: database -->
     <!-- ko with: table -->
+    <!-- ko if: $root.optimizerEnabled && $root.database().table().optimizerStats() -->
+      <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
+    <!-- /ko -->    
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
