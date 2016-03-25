@@ -191,6 +191,24 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
+  def popular_filter_values(self, table_name, column_name=None, token=None, email=None):
+    if token is None:
+      token = self._authenticate()
+
+    try:
+      data = {
+          'email': email if email is not None else self._email,
+          'token': token,
+          'tableName': table_name
+      }
+      if column_name:
+        data['columnName'] = column_name
+      return self._root.post('/api/getPopularFilterValues', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
   if queries and len(queries[0]) == 3:

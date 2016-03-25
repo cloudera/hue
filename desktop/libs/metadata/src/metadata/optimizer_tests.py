@@ -133,6 +133,16 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
+  def test_table_details(self):  # Requires test_upload to run before
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    resp = self.api.popular_values(table_name='Part', token=token)
+    resp = self.api.popular_values(table_name='Part', column_name='partkey', token=token)
+
+    assert_equal('success', resp['status'], resp)
+
+
   def test_query_compatibility(self):
     source_platform = 'MySQL'
     target_platform = 'Hive'
