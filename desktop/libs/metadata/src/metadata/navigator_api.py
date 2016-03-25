@@ -239,13 +239,14 @@ def get_lineage(request):
   # TODO: This is a cheat way to do to this for demo using filtering but we should really traverse relationships
   parent_operation = next((entity for entity in lineage['entities'] if entity.get('outputs', []) == [entity_name]), None)
   if parent_operation:
-    response['inputs'] = parent_operation['inputs']
+    response['inputs'] = [input.lower() for input in parent_operation['inputs']]
     response['source_query'] = parent_operation.get('queryText', '')
 
   children = [entity for entity in lineage['entities'] if entity.get('inputs') is not None and entity_name in entity.get('inputs')]
   if children is not None:
     response['target_queries'] = [child['queryText'] for child in children if child.get('queryText') is not None]
-    response['targets'] = [child['outputs'] for child in children if child.get('outputs') is not None]
+    outputs = [child['outputs'] for child in children if child.get('outputs') is not None]
+    response['targets'] = [target.lower() for output in outputs for target in output]
 
   response['status'] = 0
 
