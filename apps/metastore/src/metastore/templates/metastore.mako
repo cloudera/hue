@@ -131,8 +131,8 @@ ${ assist.assistPanel() }
           <td data-bind="text: type"></td>
           <!-- ko if: $root.optimizerEnabled  -->
           <td>
-            <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
-              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : popularity() + '%' }, attr: { 'title': popularity() } "></div>
+            <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: { 'title': popularity() }">
+              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : popularity() + '%' }"></div>
             </div>
           </td>
           <!-- /ko -->
@@ -474,8 +474,8 @@ ${ assist.assistPanel() }
               <!-- ko if: $root.optimizerEnabled -->
                 <!-- ko if: optimizerStats() -->
                 <td>
-                  <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
-                    <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }, attr: {'title': optimizerStats().popularity} "></div>
+                  <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
+                    <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
                   </div>
                 </td>
                 <td data-bind="text: optimizerStats().column_count"></td>
@@ -993,8 +993,8 @@ ${ assist.assistPanel() }
           <tbody data-bind="hueach: {data: joinedtables(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
-            <td style="height: 10px; width: 70px; margin-top:5px;">
-              <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }, attr: {'title': joinpercent()}"></div>
+            <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
+              <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
             </td>            
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
             <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
