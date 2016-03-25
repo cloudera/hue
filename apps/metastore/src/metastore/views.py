@@ -81,6 +81,7 @@ def databases(request):
     'partitions': [],
     'has_write_access': has_write_access(request.user),
     'is_optimizer_enabled': has_optimizer(),
+    'optimizer_url': get_optimizer_url(),
   })
 
 
@@ -253,7 +254,8 @@ def describe_table(request, database, table):
       'partitions': partitions,
       'database': database,
       'has_write_access': has_write_access(request.user),
-      'is_optimizer_enabled': has_optimizer()
+      'is_optimizer_enabled': has_optimizer(),
+      'optimizer_url': get_optimizer_url()
     })
 
 

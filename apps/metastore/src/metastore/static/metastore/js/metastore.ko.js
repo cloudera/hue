@@ -48,7 +48,7 @@
     self.loading = ko.observable(false);
     self.tables = ko.observableArray();
     self.stats = ko.observable();
-    self.optimizerStats = ko.observableArray();
+    self.optimizerStats = ko.observableArray(); // TODO to plugify, duplicates similar MetastoreTable
     self.navigatorStats = ko.observable();
 
     self.showAddTagName = ko.observable(false);
@@ -355,6 +355,7 @@
     self.refreshingTableStats = ko.observable(false);
     self.showAddTagName = ko.observable(false);
     self.addTagName = ko.observable('');
+    self.loadingQueries = ko.observable(true);
 
     //TODO: Fetch table comment async and don't set it from python
     self.comment = ko.observable(options.comment);
@@ -443,7 +444,7 @@
                 type: 'table',
                 database: self.database.name,
                 name: self.name
-              }, function(data){
+              }, function(data) {
                 if (data && data.status == 0) {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
                 } else {
@@ -452,16 +453,19 @@
               }).fail(function (xhr, textStatus, errorThrown) {
                 $(document).trigger("error", xhr.responseText);
               });
+
               $.post('/metadata/api/optimizer_api/table_details', {
                 tableName: self.name
-                }, function(data){
-                  if (data && data.status == 0) {
-                    self.optimizerDetails(ko.mapping.fromJS(data.table_details));
-                  } else {
-                    $(document).trigger("info", data.message);
-                  }
+              }, function(data){
+                self.loadingQueries(false);
+                if (data && data.status == 0) {
+                  self.optimizerDetails(ko.mapping.fromJS(data.details));
+                  console.log(self.optimizerDetails());
+                } else {
+                  $(document).trigger("info", data.message);
+                }
               }).fail(function (xhr, textStatus, errorThrown) {
-                  $(document).trigger("error", xhr.responseText);
+                $(document).trigger("error", xhr.responseText);
               });
             }
           }
@@ -584,7 +588,7 @@
       huePubSub.publish('meta.optimizer.enabled', newValue);
     });
 
-    self.optimizerUrl = ko.observable(options.optimizer_url);
+    self.optimizerUrl = ko.observable(options.optimizerUrl);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
@@ -746,11 +750,6 @@
         hueUtils.changeURL('/metastore/databases');
       }
     });
-
-    // TODO: Move queries into MetastoreTable
-    self.loadingQueries = ko.observable(false);
-    self.queries = ko.observableArray([]);
-
 
     function loadURL() {
       var path = window.location.pathname.split('/');
