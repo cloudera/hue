@@ -87,6 +87,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
+      <br/>
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
@@ -94,7 +95,10 @@ ${ assist.assistPanel() }
         <th width="2%" class="no-sort">&nbsp;</th>
   ##       <th width="1%">&nbsp;</th>
         <th width="17%">${_('Name')}</th>
-        <th width="29%">${_('Type')}</th>
+        <th width="15%">${_('Type')}</th>
+        <!-- ko if: $root.optimizerEnabled  -->
+          <th width="15%">${_('Popularity')}</th>
+        <!-- /ko -->
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
@@ -125,6 +129,13 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </td>
           <td data-bind="text: type"></td>
+          <!-- ko if: $root.optimizerEnabled  -->
+          <td>
+            <div class="progress" style="height: 10px; width: 70px; margin-top:5px;">
+              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : popularity() + '%' }, attr: { 'title': popularity() } "></div>
+            </div>
+          </td>
+          <!-- /ko -->
           <td>
             <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
               ${ _('Add a comment...') }</span>
@@ -687,6 +698,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-queries-tab">
+  <br/>
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
   <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length > 0" class="table table-condensed">
     <thead>

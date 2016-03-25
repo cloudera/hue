@@ -100,8 +100,14 @@ def table_details(request):
 
   api = OptimizerApi()
 
-  response['details'] = api.table_details(table_name=table_name)['details']
-  response['status'] = 0
+  data = api.table_details(table_name=table_name)
+
+  if data['status'] == 'success':
+    response['status'] = 0
+  response['details'] = data['details']
+  
+#   if 'No table with that name' in response['details']:
+#     response['status'] = -1
 
   return JsonResponse(response)
 

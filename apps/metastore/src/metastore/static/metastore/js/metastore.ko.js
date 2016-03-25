@@ -408,7 +408,7 @@
               table: self
             })
           }));
-          self.favouriteColumns(self.columns().slice(0, 3));
+          self.favouriteColumns(self.columns().slice(0, 5));
         },
         errorCallback: function () {
           self.loadingColumns(false);
@@ -469,6 +469,15 @@
                       })
                     );
                   }
+                  // Column popularity, stats
+                  $.each(self.optimizerDetails().sortedTotal(), function(index, optimizerCol) {
+                    var metastoreCol = $.grep(self.columns(), function(col) {
+                      return col.name() == optimizerCol.columnName();
+                    })
+                    if (metastoreCol.length > 0) {
+                      metastoreCol[0].popularity(optimizerCol.totalCount())
+                    }
+                  });
                 } else {
                   $(document).trigger("info", data.message);
                 }
@@ -551,6 +560,7 @@
     ko.mapping.fromJS(options.extendedColumn, {}, self);
 
     self.favourite = ko.observable(false);
+    self.popularity = ko.observable();
 
     self.comment.subscribe(function (newValue) {
       $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
