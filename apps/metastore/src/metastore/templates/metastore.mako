@@ -1013,57 +1013,62 @@ ${ assist.assistPanel() }
     <div class="tab-pane" id="relationships">
       <!-- ko if: $root.currentTab() == 'table-relationships' && $root.database().table().relationshipsDetails() -->
       <!-- ko with: $root.database().table().relationshipsDetails() -->
-       <h4>${ _('Inputs') }</h4>
-       <div class="row-fluid">
-          <!-- ko foreach: inputs -->
-            <div data-bind="text: $data"></div>
-          <!-- /ko -->
-        <!-- ko if: inputs().length == 0 -->
-          ${ _('Not inputs') }
-        <!-- /ko -->
-       </div>
+        <h4>${ _('Inputs') }</h4>
+        <div class="row-fluid">
+           <!-- ko foreach: inputs -->
+             <div data-bind="text: $data"></div>
+           <!-- /ko -->
+         <!-- ko if: inputs().length == 0 -->
+           ${ _('Not inputs') }
+         <!-- /ko -->
+        </div>
 
-       </br>
+        </br>
 
-       <h4>${ _('Targets') }</h4>
-       <div class="row-fluid">
-        <!-- ko foreach: targets -->
-          <div data-bind="text: $data"></div>
-        <!-- /ko -->
-        <!-- ko if: targets().length == 0 -->
-          ${ _('Not targets') }
-        <!-- /ko -->
-       </div>
+        <h4>${ _('Targets') }</h4>
+        <div class="row-fluid">
+         <!-- ko foreach: targets -->
+           <div data-bind="text: $data"></div>
+         <!-- /ko -->
+         <!-- ko if: targets().length == 0 -->
+           ${ _('Not targets') }
+         <!-- /ko -->
+        </div>
 
-       </br>
+        </br>
 
        <h4>${ _('Source query') }</h4>
        <div class="row-fluid">
-          <code data-bind="text: source_query"></code>
-       </div>
+          <!-- ko if: source_query().length > 0 -->
+            <code data-bind="text: source_query"></code>
+          <!-- /ko -->
+          <!-- ko if: source_query().length == 0 -->
+            ${ _('No source query') }
+          <!-- /ko -->
+        </div>
 
-       </br>
+        </br>
 
-       <h4>${ _('Target queries') }</h4>
-       <div class="row-fluid">
+        <h4>${ _('Target queries') }</h4>
+        <div class="row-fluid">
           <!-- ko foreach: target_queries -->
             <div>
               <code data-bind="text: $data"></code>
             </div>
           <!-- /ko -->
-        <!-- ko if: target_queries().length == 0 -->
+          <!-- ko if: target_queries().length == 0 -->
           ${ _('Not target queries') }
-        <!-- /ko -->
-       </div>
+         <!-- /ko -->
+        </div>
 
-      </br>
+        </br>
 
-      <h4>${ _('Lineage') }</h4>
-      <div class="row-fluid">
-        <button class="btn toolbarBtn" title="${_('Open in Navigator ')}" data-bind="click: function () { window.open($root.navigatorUrl() + '?view=detailsView&id=' + id() + '&b=rFlCX&tab=lineage', '_blank'); }">
-          <i class="fa fa-skyatlas"></i> ${_('View in Navigator')}
-        </button>
-      </div>
+        <h4>${ _('Lineage') }</h4>
+        <div class="row-fluid">
+          <button class="btn toolbarBtn" title="${_('Open in Navigator ')}" data-bind="click: function () { window.open($root.navigatorUrl() + '?view=detailsView&id=' + id() + '&b=rFlCX&tab=lineage', '_blank'); }">
+            <i class="fa fa-skyatlas"></i> ${_('View in Navigator')}
+          </button>
+        </div>
       <!-- /ko -->
       <!-- /ko -->
     </div>
