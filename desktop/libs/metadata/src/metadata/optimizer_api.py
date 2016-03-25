@@ -121,9 +121,14 @@ def query_compatibility(request):
   query = request.POST.get('query')
 
   api = OptimizerApi()
-
-  response['query_compatibility'] = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
-  response['status'] = 0
+  
+  data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
+  
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['query_compatibility'] = json.loads(data['details'])
+  else:
+    response['message'] = 'Optimizer: %s' % data['details']
 
   return JsonResponse(response)
 
