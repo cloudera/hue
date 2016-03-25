@@ -80,6 +80,7 @@ def databases(request):
     'databases': databases,
     'partitions': [],
     'has_write_access': has_write_access(request.user),
+    'is_optimizer_enabled': has_optimizer(),
   })
 
 

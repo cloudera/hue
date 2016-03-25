@@ -510,7 +510,7 @@ ${ assist.assistPanel() }
       <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
         <!-- ko foreach: $data.navigatorStats().tags() -->
-          <span class="badge badge-info" data-bind="text: $data"></span><i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
         <!-- /ko -->
 
         <!-- ko if: $data.navigatorStats().tags().length == 0 -->
@@ -586,7 +586,7 @@ ${ assist.assistPanel() }
       <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
         <!-- ko foreach: navigatorStats().tags() -->
-          <span class="badge badge-info" data-bind="text: $data"></span><i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
         <!-- /ko -->
 
         <!-- ko if: navigatorStats().tags().length == 0 -->
