@@ -981,7 +981,9 @@ ${ assist.assistPanel() }
           <tbody data-bind="hueach: {data: joinedtables(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
-            <td data-bind="text: joinpercent"></td>
+            <td class="progress" style="height: 10px; width: 70px; margin-top:5px;">
+              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }, attr: {'title': joinpercent()}"></div>
+            </td>            
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
             <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
             <td data-bind="text: joincount"></td>
