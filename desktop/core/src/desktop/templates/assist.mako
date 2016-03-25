@@ -741,7 +741,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-panel-navigator-search">
       <div class="searchbar">
-        <input id="appendedInput" placeholder="Search everywhere..." type="text" data-bind="hasFocus: searchInput() !== '', textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: performSearch"><i class="fa fa-search"></i></button>
+        <input id="appendedInput" placeholder="Search everywhere..." type="text" data-bind="hasFocus: searchHasFocus, textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }"><i class="fa" data-bind="css: { 'fa-search': searchInput() === '' && ! searchHasFocus(), 'fa-times' : searchInput() !== '' || searchHasFocus() }"></i></button>
       </div>
   </script>
 
@@ -755,7 +755,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <!-- ko if: searchInput() === '' || ! navigatorEnabled() -->
+    <!-- ko if: (searchInput() === '' && !searchHasFocus()) || ! navigatorEnabled() -->
     <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
@@ -766,7 +766,7 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
     <!-- /ko -->
-    <!-- ko if: searchInput() !== '' && navigatorEnabled()-->
+    <!-- ko if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled()-->
     <div style="position:relative; height: 100%; overflow: hidden">
       <div class="assist-flex-panel">
         <div style="flex: 1"></div>
@@ -1137,13 +1137,20 @@ from desktop.views import _ko
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
 
+        self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
 
         self.searchInput.subscribe(function (newValue) {
           self.performSearch(newValue);
         });
 
-        var lastQuery = '';
+        var lastQuery = -1;
+
+        self.searchHasFocus.subscribe(function (newValue) {
+          if (newValue && lastQuery !== self.searchInput()) {
+            window.setTimeout(self.performSearch, 200);
+          }
+        });
 
         self.performSearch = function () {
           if (self.searchInput() === lastQuery) {
