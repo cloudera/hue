@@ -753,7 +753,7 @@ ${ assist.assistPanel() }
     <!-- ko if: $root.optimizerEnabled -->
       <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
       <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
-      <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analysis')}</a></li>
+      <li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')}</a></li>
       <li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')}</a></li>
     <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
@@ -965,20 +965,41 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="analysis">
+    <div class="tab-pane" id="joins">
+      <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerDetails() -->
+      <!-- ko with: $root.database().table().optimizerDetails().table_donut -->
+        <table data-bind="visible: joinedtables().length > 0" class="table table-condensed">
+          <thead>
+          <tr>
+            <th width="10%">${ _('Id') }</th>
+            <th width="10%">${ _('Join Percentage') }</th>
+            <th width="30%">${ _('Table Name') }</th>
+            <th>${ _('Join Column') }</th>
+            <th width="10%">${ _('Join counts') }</th>
+          </tr>
+          </thead>
+          <tbody data-bind="hueach: {data: joinedtables(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+          <tr>
+            <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
+            <td data-bind="text: joinpercent"></td>
+            <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
+            <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
+            <td data-bind="text: joincount"></td>
+          </tr>
+          </tbody>
+        </table>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="relationships">
       <!-- ko if: $root.database() && $root.database().table() -->
         <span data-bind="text: $root.database().table().optimizerDetails()"></span>
         
         ## top stats above tags
         
-        ## joined tables --> relationsips
-        
         ## col stats, nb# joins on ....
       <!-- /ko -->
-    </div>
-
-    <div class="tab-pane" id="relationships">
-      <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
     <div class="tab-pane" id="details">
