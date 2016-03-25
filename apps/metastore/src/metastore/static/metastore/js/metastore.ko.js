@@ -448,14 +448,13 @@
               }, function(data) {
                 if (data && data.status == 0) {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
+                  self.getRelationships();
                 } else {
                   $(document).trigger("info", data.message);
                 }
               }).fail(function (xhr, textStatus, errorThrown) {
                 $(document).trigger("error", xhr.responseText);
               });
-
-              self.getRelationships();
 
               $.post('/metadata/api/optimizer_api/table_details', {
                 tableName: self.name
@@ -539,6 +538,8 @@
         } else {
           $(document).trigger("error", data.message);
         }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("info", xhr.responseText);
       });
     };
   }
