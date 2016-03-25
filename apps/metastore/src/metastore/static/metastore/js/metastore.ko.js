@@ -532,8 +532,7 @@
     
     self.getRelationships = function () {
       $.post('/metadata/api/navigator/lineage', {
-        //id: ko.mapping.toJSON(self.navigatorStats().identity)
-    	  id: 'ffacc341a00159f5fd4aa454c28a9e42'
+        id: ko.mapping.toJSON(self.navigatorStats().identity)
       }, function(data) {
         if (data && data.status == 0) {
           self.relationshipsDetails(ko.mapping.fromJS(data));
