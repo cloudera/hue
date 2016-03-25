@@ -100,7 +100,7 @@ def table_details(request):
 
   api = OptimizerApi()
 
-  response['table_details'] = api.table_details(table_name=table_name)
+  response['details'] = api.table_details(table_name=table_name)['details']
   response['status'] = 0
 
   return JsonResponse(response)

@@ -685,23 +685,29 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-queries-tab">
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-  <table data-bind="visible: !$root.loadingQueries() && $root.queries().length > 0" class="table table-condensed">
+  <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length > 0" class="table table-condensed">
     <thead>
     <tr>
-      <th width="20%">${ _('Name') }</th>
-      <th>${ _('Query') }</th>
-      <th width="20%">${ _('Owner') }</th>
+      <th width="10%">${ _('Id') }</th>
+      <th width="10%">${ _('Count') }</th>
+      <th>${ _('Character') }</th>
+      <th width="20%">${ _('Complexity') }</th>
+      <th width="10%">${ _('Hive Compatible') }</th>
+      <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $root.queries, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
-    <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
-      <td data-bind="text: doc.name"></td>
-      <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
-      <td><code data-bind="text: doc.owner"></code></td>
+    <tbody data-bind="hueach: {data: $data.optimizerDetails().FullQueryList(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+    <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + eid(), '_blank'); }">
+      <td data-bind="text: eid"></td>
+      <td data-bind="text: instanceCount"></td>
+      <td><code data-bind="text: character"></code></td>
+      <td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
+      <td data-bind="text: compatibility.hive"></td>
+      <td data-bind="text: compatibility.impala"></td>
     </tr>
     </tbody>
   </table>
-  <div data-bind="visible: !$root.loadingQueries() && $root.queries().length == 0" class="empty-message">
+  <div data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length == 0" class="empty-message">
     ${ _('No queries found for the current table.') }
   </div>
 </script>
@@ -951,8 +957,8 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="queries">
-      <!-- ko if: $root.currentTab() == 'table-queries' -->
-      <!-- ko template: 'metastore-queries-tab' --><!-- /ko -->
+      <!-- ko if: $root.optimizerEnabled() && $root.currentTab() == 'table-queries' -->
+        <!-- ko template: {name: 'metastore-queries-tab', data: $root.database().table()} --><!-- /ko -->
       <!-- /ko -->
     </div>
 
@@ -960,15 +966,12 @@ ${ assist.assistPanel() }
       <!-- ko if: $root.database() && $root.database().table() -->
         <span data-bind="text: $root.database().table().optimizerDetails()"></span>
         
-        ## top cols
+        ## show top 5 most important
+        ## top stats above tags
         
-        ## joined tables
+        ## joined tables --> relationsips
         
-        ## col stats
-        
-        ## query lists
-        
-        ## link to optimizer
+        ## col stats, nb# joins on ....
       <!-- /ko -->
     </div>
 
@@ -1096,7 +1099,8 @@ ${ assist.assistPanel() }
           errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
           errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
         },
-        optimizerEnabled: '${is_optimizer_enabled}' === 'True'
+        optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
+        optimizerUrl: '${ optimizer_url }'
       };
 
       var viewModel = new MetastoreViewModel(options);
@@ -1107,13 +1111,6 @@ ${ assist.assistPanel() }
       });
 
       viewModel.currentTab.subscribe(function(tab){
-        if (tab == 'table-queries') {
-          viewModel.loadingQueries(true);
-          $.getJSON('/metastore/table/' + viewModel.database().name + '/' + viewModel.database().table().name + '/queries', function (data) {
-            viewModel.queries(data.queries);
-            viewModel.loadingQueries(false);
-          });
-        }
         if (tab == 'table-sample') {
           var selector = '#sample .sample-table';
           if ($(selector).parents('.dataTables_wrapper').length == 0){
