@@ -1372,11 +1372,12 @@
       var autoExpandTimeout = window.setInterval(function () {
         var chunks = Math.floor((Math.max(ace().session.getLength(), 4) - lastEditorHeight) / 4);
         if (chunks !== 0) {
-          if (ace().session.getLength() < 2000) {
+          var maxAutoLines = Math.floor(($(window).height() - 200) / 16);
+          if (ace().session.getLength() < maxAutoLines) {
             $target.height($target.height() + 64 * chunks);
           }
           else {
-            $target.height(2000 * 16); // height of 2000 lines
+            $target.height(maxAutoLines * 16); // height of maxAutoLines
           }
           ace().resize();
           lastEditorHeight += 4 * chunks;
