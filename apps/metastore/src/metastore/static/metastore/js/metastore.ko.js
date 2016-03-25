@@ -331,8 +331,9 @@
     self.type = options.type;
 
     self.optimizerStats = ko.observable();
-    self.navigatorStats = ko.observable();
     self.optimizerDetails = ko.observable();
+
+    self.navigatorStats = ko.observable();
     self.relationshipsDetails = ko.observable();
 
     self.loaded = ko.observable(false);
@@ -531,7 +532,7 @@
     
     self.getRelationships = function () {
       $.post('/metadata/api/navigator/lineage', {
-        id: ko.mapping.toJSON(self.navigatorStats().identity)
+        id: self.navigatorStats().identity
       }, function(data) {
         if (data && data.status == 0) {
           self.relationshipsDetails(ko.mapping.fromJS(data));
