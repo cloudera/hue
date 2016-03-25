@@ -382,8 +382,8 @@ ${ assist.assistPanel() }
           </div>
         </div>
         <!-- /ko -->
-      
-      <!-- ko if: $root.optimizerEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->  
+
+      <!-- ko if: $root.optimizerEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->
         <!-- ko template: { name: 'metastore-databases-tags', data: $root.database() }--><!-- /ko -->
       <!-- /ko -->
       </div>
@@ -563,7 +563,7 @@ ${ assist.assistPanel() }
     <!-- ko with: table -->
     <!-- ko if: $root.optimizerEnabled && $root.database().table().optimizerStats() -->
       <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
-    <!-- /ko -->    
+    <!-- /ko -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
@@ -762,11 +762,15 @@ ${ assist.assistPanel() }
       <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
-    <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerDetails() -->
+    <!-- ko if: $root.optimizerEnabled() -->
+      <!-- ko if: $root.database().table().optimizerDetails() -->
       <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
       <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().total"></span>)</a></li>
       <li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
-      <li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')}</a></li>
+      <!-- /ko -->
+      <!-- ko if: $root.database().table().relationshipsDetails() -->
+      <li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')} (<span data-bind="text: $root.database().table().relationshipsDetails().inputs().length + $root.database().table().relationshipsDetails().targets().length"></span>)</a></li>
+      <!-- /ko -->
     <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
@@ -995,7 +999,7 @@ ${ assist.assistPanel() }
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
               <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
-            </td>            
+            </td>
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
             <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
             <td data-bind="text: joincount"></td>
@@ -1007,12 +1011,60 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="relationships">
-      <!-- ko if: $root.database() && $root.database().table() -->
-        <span data-bind="text: $root.database().table().optimizerDetails()"></span>
-        
-        ## top stats above tags
-        
-        ## col stats, nb# joins on ....
+      <!-- ko if: $root.currentTab() == 'table-relationships' && $root.database().table().relationshipsDetails() -->
+      <!-- ko with: $root.database().table().relationshipsDetails() -->
+       <h4>${ _('Inputs') }</h4>
+       <div class="row-fluid">
+          <!-- ko foreach: inputs -->
+            <div data-bind="text: $data"></div>
+          <!-- /ko -->
+        <!-- ko if: inputs().length == 0 -->
+          ${ _('Not inputs') }
+        <!-- /ko -->
+       </div>
+
+       </br>
+
+       <h4>${ _('Targets') }</h4>
+       <div class="row-fluid">
+        <!-- ko foreach: targets -->
+          <div data-bind="text: $data"></div>
+        <!-- /ko -->
+        <!-- ko if: targets().length == 0 -->
+          ${ _('Not targets') }
+        <!-- /ko -->
+       </div>
+
+       </br>
+
+       <h4>${ _('Source query') }</h4>
+       <div class="row-fluid">
+          <code data-bind="text: source_query"></code>
+       </div>
+
+       </br>
+
+       <h4>${ _('Target queries') }</h4>
+       <div class="row-fluid">
+          <!-- ko foreach: target_queries -->
+            <div>
+              <code data-bind="text: $data"></code>
+            </div>
+          <!-- /ko -->
+        <!-- ko if: target_queries().length == 0 -->
+          ${ _('Not target queries') }
+        <!-- /ko -->
+       </div>
+
+      </br>
+
+      <h4>${ _('Lineage') }</h4>
+      <div class="row-fluid">
+        <button class="btn toolbarBtn" title="${_('Open in Navigator ')}" data-bind="click: function () { window.open($root.navigatorUrl() + '?view=detailsView&id=' + id() + '&b=rFlCX&tab=lineage', '_blank'); }">
+          <i class="fa fa-skyatlas"></i> ${_('View in Navigator')}
+        </button>
+      </div>
+      <!-- /ko -->
       <!-- /ko -->
     </div>
 
@@ -1137,7 +1189,8 @@ ${ assist.assistPanel() }
           errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
         },
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
-        optimizerUrl: '${ optimizer_url }'
+        optimizerUrl: '${ optimizer_url }',
+        navigatorUrl: '${ navigator_url }'
       };
 
       var viewModel = new MetastoreViewModel(options);
@@ -1148,7 +1201,9 @@ ${ assist.assistPanel() }
       });
 
       viewModel.currentTab.subscribe(function(tab){
-        if (tab == 'table-sample') {
+        if (tab == 'table-relationships') {
+          // viewModel.database().table().getRelationships();
+        } else if (tab == 'table-sample') {
           var selector = '#sample .sample-table';
           if ($(selector).parents('.dataTables_wrapper').length == 0){
             hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){

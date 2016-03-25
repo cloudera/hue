@@ -333,6 +333,7 @@
     self.optimizerStats = ko.observable();
     self.navigatorStats = ko.observable();
     self.optimizerDetails = ko.observable();
+    self.relationshipsDetails = ko.observable();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -454,6 +455,8 @@
                 $(document).trigger("error", xhr.responseText);
               });
 
+              self.getRelationships();
+
               $.post('/metadata/api/optimizer_api/table_details', {
                 tableName: self.name
               }, function(data){
@@ -521,6 +524,19 @@
       }, function(data) {
         if (data && data.status == 0) {
           self.navigatorStats().tags.remove(tag);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+    
+    self.getRelationships = function () {
+      $.post('/metadata/api/navigator/lineage', {
+        //id: ko.mapping.toJSON(self.navigatorStats().identity)
+    	  id: 'ffacc341a00159f5fd4aa454c28a9e42'
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.relationshipsDetails(ko.mapping.fromJS(data));
         } else {
           $(document).trigger("error", data.message);
         }
@@ -607,6 +623,7 @@
     });
 
     self.optimizerUrl = ko.observable(options.optimizerUrl);
+    self.navigatorUrl = ko.observable(options.navigatorUrl);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
