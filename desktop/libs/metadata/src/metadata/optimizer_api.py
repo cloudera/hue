@@ -121,9 +121,9 @@ def query_compatibility(request):
   query = request.POST.get('query')
 
   api = OptimizerApi()
-  
+
   data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
-  
+
   if data['status'] == 'success':
     response['status'] = 0
     response['query_compatibility'] = json.loads(data['details'])
@@ -349,12 +349,13 @@ def popular_values(request):
     data = api.popular_filter_values(table_name=table_name, column_name=column_name)
 
     if data['status'] == 'success':
-      values = data['details']
+      if 'status' in data['details']:
+        response['values'] = [] # Bug in Opt API
+      else:
+        response['values'] = data['details']
+        response['status'] = 0
     else:
       response['message'] = 'Optimizer: %s' % data['details']
-
-  response['values'] = values
-  response['status'] = 0
 
   return JsonResponse(response)
 
