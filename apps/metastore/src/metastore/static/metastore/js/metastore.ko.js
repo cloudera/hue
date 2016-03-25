@@ -463,7 +463,7 @@
                   
                   // Bump the most important columns first
                   var topCol = self.optimizerDetails().table_donut.topColumns().slice(0, 5);
-                  if (self.favouriteColumns().length > 0) { 
+                  if (topCol.length >= 3 && self.favouriteColumns().length > 0) { 
                     self.favouriteColumns($.grep(self.columns(), function(col) {
                         return topCol.indexOf(col.name()) != -1;
                       })
