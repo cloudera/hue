@@ -67,6 +67,13 @@
     initDatabases();
   }
 
+  var fixScore = function (suggestions) {
+    $.each(suggestions, function (idx, value) {
+      value.score = 1000 - idx;
+    });
+    return suggestions;
+  };
+
   SqlAutocompleter.prototype.getFromReferenceIndex = function (statement) {
     var self = this;
     var result = {
@@ -236,13 +243,6 @@
       tableName = tableAndComplexRefs[0].value;
     }
     if (tableName) {
-      var fixScore = function (suggestions) {
-        $.each(suggestions, function (idx, value) {
-          value.score = 1000 - idx;
-        });
-        return suggestions;
-      };
-
       var completeFields = [];
       // For impala we need to check each part with the API, it could be a map or array in which case we need to add
       // either "value" or "item" in between.
@@ -302,7 +302,8 @@
                 return {
                   meta: "popular",
                   score: 1000 - index,
-                  value: value
+                  value: value,
+                  caption: value.length > 28 ? value.substring(0, 25) + '...' : null
                 };
               })
             }
@@ -595,13 +596,13 @@
         if (tableRef.database !== null) {
           database = tableRef.database;
         }
-
         if (conditionMatch) {
           var tableRefs = [{
             value: tableName,
             score: 1000,
             meta: 'tables'
           }];
+
           self.getValueReferences(conditionMatch, database, fromReferences, tableRefs, callback);
           return;
         }
@@ -626,10 +627,43 @@
             fields: fields,
             editor: editor,
             successCallback: function (data) {
+              var suggestions = [];
               if (fields.length == 0) {
-                callback(self.extractFields(data, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
+                suggestions = self.extractFields(data, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences);
               } else {
-                callback(self.extractFields(data, database, "", !fieldTermBefore));
+                suggestions = self.extractFields(data, database, "", !fieldTermBefore);
+              }
+
+              var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S*)$/);
+              if (keywordBeforeCursor === "WHERE" && startedMatch) {
+                $.post('/metadata/api/optimizer_api/popular_values', {
+                  database: database,
+                  tableName: tableName
+                }).done(function (data) {
+                  var popular = [];
+                  if (data.status === 0) {
+                    $.each(data.values, function (idx, colValue) {
+                      $.each(colValue.values, function (idx, value) {
+                        var suggestion = '';
+                        if (colValue.tableName !== tableName) {
+                          suggestion += colValue.tableName + ".";
+                        }
+                        suggestion += colValue.columnName + ' = ' + value;
+                        popular.push({
+                          meta: "popular",
+                          score: 1000,
+                          value: suggestion,
+                          caption: suggestion.length > 28 ? suggestion.substring(0, 25) + '...' : null
+                        });
+                      });
+                    });
+                  }
+                  callback(fixScore(popular.concat(suggestions)));
+                }).fail(function () {
+                  callback(suggestions);
+                });
+              } else {
+                callback(suggestions);
               }
             },
             silenceErrors: true,
@@ -764,6 +798,9 @@
             '</table>';
 
       }
+    }
+    if (item.value.length > 28 && !item.docHTML) {
+      item.docHTML = '<div style="margin:10px; width: 220px; overflow-y: auto;"><div style="font-size: 15px; margin-bottom: 6px;">Popular</div><div style="text-wrap: normal; white-space: pre-wrap; font-family: monospace;">' + item.value + '</div></div>';
     }
   };
 
