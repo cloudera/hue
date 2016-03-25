@@ -219,7 +219,6 @@
 
   SqlAutocompleter.prototype.getValueReferences = function (conditionMatch, database, fromReferences, tableAndComplexRefs, callback, editor) {
     var self = this;
-
     var fields = conditionMatch[1].split(".");
     var tableName = null;
     if (fields[0] in fromReferences.complex) {
@@ -237,10 +236,17 @@
       tableName = tableAndComplexRefs[0].value;
     }
     if (tableName) {
+      var fixScore = function (suggestions) {
+        $.each(suggestions, function (idx, value) {
+          value.score = 1000 - idx;
+        });
+        return suggestions;
+      };
+
       var completeFields = [];
       // For impala we need to check each part with the API, it could be a map or array in which case we need to add
       // either "value" or "item" in between.
-      var fetchImpalaFields = function (remainingParts) {
+      var fetchImpalaFields = function (remainingParts, topValues) {
         completeFields.push(remainingParts.shift());
         if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
           fetchImpalaFields(remainingParts);
@@ -267,19 +273,53 @@
                     value: isString ? "'" + value + "'" : new String(value)
                   }
                 });
-                callback(tableAndComplexRefs.concat(values));
+                callback(fixScore(topValues.concat(tableAndComplexRefs).concat(values)));
               } else {
-                callback(tableAndComplexRefs);
+                callback(fixScore(topValues.concat(tableAndComplexRefs)));
               }
             },
             silenceErrors: true,
             errorCallback: function () {
-              callback(tableAndComplexRefs);
+              callback(fixScore(topValues.concat(tableAndComplexRefs)));
             }
           });
         }
       };
-      fetchImpalaFields(fields);
+
+      if (fields.length === 1) {
+        $.post('/metadata/api/optimizer_api/popular_values', {
+          database: database,
+          tableName: tableName,
+          columnName: fields[0]
+        }).done(function(data){
+          if (data.status === 0) {
+            var foundCol = data.values.filter(function (col) {
+              return col.columnName === fields[0];
+            });
+            var topValues = [];
+            if (foundCol.length === 1) {
+              topValues = $.map(foundCol[0].values, function (value, index) {
+                return {
+                  meta: "popular",
+                  score: 1000 - index,
+                  value: value
+                };
+              })
+            }
+            if (self.snippet.type() === "impala") {
+              fetchImpalaFields(fields, topValues);
+            } else {
+              callback(fixScore(topValues.concat(tableAndComplexRefs)));
+            }
+          }
+        }).fail(function () {
+          if (self.snippet.type() === "impala") {
+            fetchImpalaFields(fields, []);
+          }
+        });
+      } else if (self.snippet.type() === "impala") {
+        fetchImpalaFields(fields, []);
+      }
     }
   };
 
@@ -556,7 +596,7 @@
           database = tableRef.database;
         }
 
-        if (conditionMatch && impalaSyntax) {
+        if (conditionMatch) {
           var tableRefs = [{
             value: tableName,
             score: 1000,
