@@ -326,7 +326,7 @@
     }
   };
 
-  SqlAutocompleter.prototype.extractFields = function (data, database, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
+  SqlAutocompleter.prototype.extractFields = function (data, tableName, database, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
     var self = this;
     var fields = [];
     var result = [];
@@ -381,13 +381,56 @@
 
     fields.forEach(function(field, idx) {
       if (field.name != "") {
-        result.push({value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name, score: 1000 - idx, meta: field.type, database: database });
+        result.push({
+          value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name,
+          score: 1000 - idx,
+          meta: field.type,
+          database: database,
+          tableName: tableName
+        });
       }
     });
     return result;
   };
 
-  SqlAutocompleter.prototype.autocomplete = function(beforeCursor, upToNextStatement, callback, editor) {
+  SqlAutocompleter.prototype.autocomplete = function(beforeCursor, upToNextStatement, realCallback, editor) {
+    var callback = function (values) {
+      if (values.length > 0) {
+        var foundTables = {};
+        values.forEach(function (value) {
+          if (value.meta === 'column' && value.tableName) {
+            if (! foundTables[value.tableName]) {
+              foundTables[value.tableName] = [];
+            }
+            foundTables[value.tableName].push(value)
+          }
+        });
+        if (Object.keys(foundTables).length === 1) {
+          $.post('/metadata/api/optimizer_api/popular_values', {
+            database: database,
+            tableName: tableName
+          }).done(function (data) {
+            var valueByColumn = {};
+            data.values.forEach(function (colValue) {
+              valueByColumn[colValue.columnName] = colValue.values;
+            });
+            foundTables[Object.keys(foundTables)[0]].forEach(function (colSuggestion) {
+              if (valueByColumn[colSuggestion.value]) {
+                colSuggestion.popularValues = valueByColumn[colSuggestion.value];
+              }
+            });
+            realCallback(values);
+          }).fail(function () {
+            realCallback(values);
+          });
+        } else {
+          realCallback(values);
+        }
+      } else {
+        realCallback([]);
+      }
+    };
+
     var onFailure = function() {
       callback([]);
     };
@@ -515,7 +558,7 @@
             }
             fromKeyword += " ";
           }
-          var result = self.extractFields(data, database, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
+          var result = self.extractFields(data, null, database, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
           if (partialTableOrDb !== null) {
             callback($.grep(result, function (suggestion) {
               return suggestion.value.indexOf(partialTableOrDb) === 0;
@@ -631,9 +674,9 @@
             successCallback: function (data) {
               var suggestions = [];
               if (fields.length == 0) {
-                suggestions = self.extractFields(data, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences);
+                suggestions = self.extractFields(data, tableName, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences);
               } else {
-                suggestions = self.extractFields(data, database, "", !fieldTermBefore);
+                suggestions = self.extractFields(data, tableName, database, "", !fieldTermBefore);
               }
 
               var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S*)$/);
@@ -679,7 +722,7 @@
           if (hiveSyntax) {
             if (viewReferences.index[part]) {
               if (viewReferences.index[part].references && remainingParts.length == 0) {
-                callback(self.extractFields([], database, "", true, viewReferences.index[part].references));
+                callback(self.extractFields([], tableName, database, "", true, viewReferences.index[part].references));
                 return;
               }
               if (fields.length == 0 && viewReferences.index[part].leadingPath.length > 0) {
@@ -753,7 +796,7 @@
                     extraFields.push({ name: "items", type: "items" });
                   }
                 }
-                callback(self.extractFields(data, database, "", false, extraFields));
+                callback(self.extractFields(data, tableName, database, "", false, extraFields));
                 return;
               }
               getFields(database, remainingParts, fields);
@@ -800,6 +843,12 @@
             '</table>';
 
       }
+    } else if (item.meta === 'column' && item.popularValues && !item.docHTML) {
+      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table table-striped"><tbody>';
+      item.popularValues.forEach(function (value) {
+        item.docHTML += '<tr><td><div style=" width: 360px; overflow-x: hidden; font-family: monospace; white-space: nowrap; text-overflow: ellipsis" title="' + value + '">' + value + '</div></td></tr>';
+      });
+      item.docHTML += '</tbody></table></div>';
     }
     if (item.value.length > 28 && !item.docHTML) {
       item.docHTML = '<div style="margin:10px; width: 220px; overflow-y: auto;"><div style="font-size: 15px; margin-bottom: 6px;">Popular</div><div style="text-wrap: normal; white-space: pre-wrap; font-family: monospace;">' + item.value + '</div></div>';
