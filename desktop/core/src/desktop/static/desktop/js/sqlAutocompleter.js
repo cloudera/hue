@@ -45,16 +45,18 @@
         silenceErrors: true,
         successCallback: function () {
           $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
-            $.post('/metadata/api/optimizer_api/top_tables', {
-              database: db
-            }, function(data){
-              if (! self.topTablesPerDb[db]) {
-                self.topTablesPerDb[db] = {};
-              }
-              data.top_tables.forEach(function (table) {
-                self.topTablesPerDb[db][table.name] = table;
+            if (db === 'default') {
+              $.post('/metadata/api/optimizer_api/top_tables', {
+                database: db
+              }, function(data){
+                if (! self.topTablesPerDb[db]) {
+                  self.topTablesPerDb[db] = {};
+                }
+                data.top_tables.forEach(function (table) {
+                  self.topTablesPerDb[db][table.name] = table;
+                });
               });
-            });
+            }
           });
         }
       });
