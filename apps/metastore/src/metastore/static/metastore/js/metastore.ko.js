@@ -460,7 +460,6 @@
                 self.loadingQueries(false);
                 if (data && data.status == 0) {
                   self.optimizerDetails(ko.mapping.fromJS(data.details));
-                  console.log(self.optimizerDetails());
                 } else {
                   $(document).trigger("info", data.message);
                 }

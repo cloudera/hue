@@ -75,7 +75,7 @@ def top_tables(request):
     # u'details': [{u'columnCount': 28, u'name': u'date_dim', u'patternCount': 136, u'workloadPercent': 89, u'total': 92, u'type': u'Dimension', u'eid': u'19'},
     """    
     tables = [{
-        'id': table['eid'],
+        'eid': table['eid'],
         'name': table['name'],
         'popularity': table['workloadPercent'],
         'column_count': table['columnCount'],
