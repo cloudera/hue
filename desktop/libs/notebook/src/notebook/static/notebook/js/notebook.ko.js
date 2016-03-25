@@ -372,6 +372,7 @@
     this.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
     this.delayedStatement.subscribe(function (val) {
       self.getComplexity();
+      self.hasSuggestion(false);
     }, this);
 
     self.result = new Result(snippet, snippet.result);
@@ -431,6 +432,9 @@
     self.hasComplexity = ko.computed(function () {
       return self.complexity().length > 0;
     });
+
+    self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
+    self.hasSuggestion = ko.observable(false);
 
     self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
     self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
@@ -664,13 +668,17 @@
     }
 
     self.queryCompatibility = function () {
+      logGA('compatibility');
+      self.suggestion(false);
+
       $.post("/metadata/api/optimizer_api/query_compatibility", {
         query: self.statement(),
         sourcePlatform: self.type(),
         targetPlatform: 'impala'
       }, function(data) {
         if (data.status == 0) {
-       	 $(document).trigger("info", data.query_compatibility);
+         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));	
+         self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
         }

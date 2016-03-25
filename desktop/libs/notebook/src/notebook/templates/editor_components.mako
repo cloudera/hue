@@ -674,7 +674,39 @@ ${ hueIcons.symbols() }
         <use xlink:href="#hi-warning"></use>
       </svg>
     </div>
-    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;"><span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span><span data-bind="text: complexity"></span></div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
+      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span><span data-bind="text: complexity"></span>
+    </div>
+  </div>
+  <div class="alert" data-bind="visible: hasSuggestion">
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
+      <!-- ko if: hasSuggestion -->
+      <!-- ko with: suggestion() -->
+      <!-- ko if: queryStatus() == 'SUCCESS' -->
+        ${ _('The query is compatible! Click to') } <a href="">${ _('execute') }</a> ${ _('with Impala') }.
+      <!-- /ko -->
+      <!-- ko if: errorDetail.errorString -->
+        ${ _('Query is not compatible with Impala') }.
+        </br>
+        <span style="font-weight: bold;"></span><span data-bind="text: errorDetail.errorString"></span>
+      <!-- /ko -->
+      <!-- ko if: clauseStatus.From -->
+        </br>
+        <!-- ko if: clauseStatus.From.category -->
+          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.category"></span>
+        <!-- /ko -->
+        <!-- ko if: clauseStatus.From.suggestedFix -->
+          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.suggestedFix"></span>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
   </div>
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
