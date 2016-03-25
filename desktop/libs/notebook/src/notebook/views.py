@@ -68,9 +68,9 @@ def notebook(request):
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.PROPERTIES,
+          'is_optimizer_enabled': has_optimizer(),
       }),
       'is_yarn_mode': is_yarn_mode,
-      'is_optimizer_enabled': has_optimizer(),
   })
 
 
@@ -94,9 +94,9 @@ def editor(request):
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
+          'is_optimizer_enabled': has_optimizer(),
       }),
       'editor_type': editor_type,
-      'is_optimizer_enabled': has_optimizer(),
   })
 
 

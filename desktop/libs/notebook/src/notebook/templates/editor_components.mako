@@ -998,7 +998,7 @@ ${ require.config() }
     </a>
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
-        <i class="fa fa-fw fa-code-fork fa-rotate-90"></i>
+        <i class="fa fa-fw fa-map-o"></i>
       </a>
       <!-- ko if: isSqlDialect -->
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '' }">
@@ -1008,7 +1008,7 @@ ${ require.config() }
       <ul class="dropdown-menu less-padding">
         <li>
           <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
-            <i class="fa fa-fw fa-code-fork fa-rotate-90"></i> ${_('Explain')}
+            <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
         <li>
@@ -1019,6 +1019,11 @@ ${ require.config() }
         <li>
           <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: queryCompatibility, visible: $root.isOptimizerEnabled" title="${ _('Get Impala compatibility hints') }">
+            <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
           </a>
         </li>
       </ul>

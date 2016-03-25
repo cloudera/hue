@@ -663,6 +663,22 @@
       });
     }
 
+    self.queryCompatibility = function () {
+      $.post("/metadata/api/optimizer_api/query_compatibility", {
+        query: self.statement(),
+        sourcePlatform: self.type(),
+        targetPlatform: 'impala'
+      }, function(data) {
+        if (data.status == 0) {
+       	 $(document).trigger("info", data.query_compatibility);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
     self.fetchResult = function (rows, startOver) {
       if (typeof startOver == "undefined") {
         startOver = true;

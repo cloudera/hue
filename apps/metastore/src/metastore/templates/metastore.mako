@@ -957,7 +957,19 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="analysis">
-      <div class="empty-message">${ _('Currently not available.') }</div>
+      <!-- ko if: $root.database() && $root.database().table() -->
+        <span data-bind="text: $root.database().table().optimizerDetails()"></span>
+        
+        ## top cols
+        
+        ## joined tables
+        
+        ## col stats
+        
+        ## query lists
+        
+        ## link to optimizer
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="relationships">
