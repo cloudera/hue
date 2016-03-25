@@ -223,7 +223,7 @@ def delete_properties(request):
 
 @error_handler
 def get_lineage(request):
-  response = {'status': -1}
+  response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
 
   api = NavigatorApi()
   entity_id = request.REQUEST.get('id')
