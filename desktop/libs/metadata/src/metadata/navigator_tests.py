@@ -114,6 +114,11 @@ class TestNavigatorApi(object):
     assert_equal(entity['properties'], json_resp['entity']['properties'])
 
 
+  def test_lineage(self):
+    # TODO: write me
+    pass
+
+
   def _format_json_body(self, post_dict):
     json_dict = {}
     for key, value in post_dict.items():
