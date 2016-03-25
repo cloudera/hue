@@ -796,7 +796,7 @@ from desktop.views import _ko
               <i class="fa fa-fw fa-code-fork valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: type === 'FIELD' -->
-              <i class="fa fa-fw fa-code-columns valign-middle"></i>
+              <i class="fa fa-fw fa-columns valign-middle"></i>
               <!-- /ko -->
               <!-- ko if: type === 'OPERATION_EXECUTION' -->
               <i class="fa fa-fw fa-cog valign-middle"></i>
