@@ -2510,6 +2510,13 @@
         snippet.inFocus(true);
         $(".ace-editor").data("last-active-editor", false);
         $el.data("last-active-editor", true);
+        if (editor.session.$backMarkers) {
+          for (var marker in editor.session.$backMarkers) {
+            if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+              editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+            }
+          }
+        }
       });
 
       editor.selection.on("changeSelection", function () {

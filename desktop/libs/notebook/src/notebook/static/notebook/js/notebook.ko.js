@@ -542,6 +542,16 @@
       self.progress(0);
       self.jobs([]);
       self.result.logs('');
+      self.result.statement_range ({
+        start: {
+          row: 0,
+          column: 0
+        },
+        end: {
+          row: 0,
+          column: 0
+        }
+      });
 
       if (self.result.fetchedOnce()) {
         self.close();
@@ -559,15 +569,15 @@
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.statements_count != null) {
             self.result.statements_count(data.handle.statements_count);
+            if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
+              self.result.statement_range({
+                start: data.handle.start,
+                end: data.handle.end
+              });
+            }
           }
           if (data.handle.statement_id != null) {
             self.result.statement_id(data.handle.statement_id);
-          }
-          if (data.handle.start != null && data.handle.end != null) {
-            self.result.statement_range({
-              start: data.handle.start,
-              end: data.handle.end
-            });
           }
 
           if (data.handle.sync) {
@@ -592,15 +602,13 @@
 
     self.reexecute = function () {
       self.result.handle()['statement_id'] = 0;
-      self.result.handle()['statement_range'] = {
-        start: {
-          row: 0,
-          column: 0
-        },
-        end: {
-          row: 0,
-          column: 0
-        }
+      self.result.handle()['start'] = {
+        row: 0,
+        column: 0
+      };
+      self.result.handle()['end'] = {
+        row: 0,
+        column: 0
       };
       self.result.handle()['has_more_statements'] = false;
 
