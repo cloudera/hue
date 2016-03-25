@@ -243,7 +243,7 @@
       successCallback: function (data) {
         self.keys(data.partition_keys_json);
         self.values(data.partition_values_json);
-        self.preview.values(self.values().slice(0, 3));
+        self.preview.values(self.values().slice(0, 5));
         self.preview.keys(self.keys());
         self.loading(false);
         self.loaded(true);
@@ -460,6 +460,15 @@
                 self.loadingQueries(false);
                 if (data && data.status == 0) {
                   self.optimizerDetails(ko.mapping.fromJS(data.details));
+                  
+                  // Bump the most important columns first
+                  var topCol = self.optimizerDetails().table_donut.topColumns().slice(0, 5);
+                  if (self.favouriteColumns().length > 0) { 
+                    self.favouriteColumns($.grep(self.columns(), function(col) {
+                        return topCol.indexOf(col.name()) != -1;
+                      })
+                    );
+                  }
                 } else {
                   $(document).trigger("info", data.message);
                 }
