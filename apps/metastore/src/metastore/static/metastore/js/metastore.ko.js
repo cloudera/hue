@@ -303,7 +303,10 @@
     });
   };
 
-
+  function MetastoreTableDetails(details) {
+	var self = this;
+  }
+  
   /**
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
@@ -329,6 +332,7 @@
 
     self.optimizerStats = ko.observable();
     self.navigatorStats = ko.observable();
+    self.optimizerDetails = ko.observable();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -435,19 +439,30 @@
               self.partitions.loaded(true);
             }
             if (self.optimizerEnabled) {
-                $.get('/metadata/api/navigator/find_entity', {
-                  type: 'table',
-                  database: self.database.name,
-                  name: self.name
+              $.get('/metadata/api/navigator/find_entity', {
+                type: 'table',
+                database: self.database.name,
+                name: self.name
+              }, function(data){
+                if (data && data.status == 0) {
+                  self.navigatorStats(ko.mapping.fromJS(data.entity));
+                } else {
+                  $(document).trigger("info", data.message);
+                }
+              }).fail(function (xhr, textStatus, errorThrown) {
+                $(document).trigger("error", xhr.responseText);
+              });
+              $.post('/metadata/api/optimizer_api/table_details', {
+                tableName: self.name
                 }, function(data){
                   if (data && data.status == 0) {
-                    self.navigatorStats(ko.mapping.fromJS(data.entity));
+                    self.optimizerDetails(ko.mapping.fromJS(data.table_details));
                   } else {
                     $(document).trigger("info", data.message);
                   }
-                }).fail(function (xhr, textStatus, errorThrown) {
+              }).fail(function (xhr, textStatus, errorThrown) {
                   $(document).trigger("error", xhr.responseText);
-                });
+              });
             }
           }
           else {
