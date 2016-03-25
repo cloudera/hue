@@ -22,6 +22,7 @@ from desktop.views import _ko
 %>
 
 <%namespace name="require" file="/require.mako" />
+<%namespace name="hueIcons" file="/hue_icons.mako" />
 
 <%def name="includes()">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
@@ -123,6 +124,8 @@ ${ require.config() }
   }
 % endif
 </style>
+
+${ hueIcons.symbols() }
 
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
@@ -658,11 +661,20 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="alert alert-gradient" data-bind="visible: is_redacted">
-    ${ _('The current query has been redacted to hide sensitive information.') }
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">${ _('The current query has been redacted to hide sensitive information.') }</div>
   </div>
-  <div class="alert alert-gradient" data-bind="visible: hasComplexity">
-    <span class="alert alert-error" data-bind="text: complexityLevel"></span>
-    <span data-bind="text: complexity"></span>
+  <div class="alert alert-error alert-error-gradient" data-bind="visible: hasComplexity">
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;"><span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span><span data-bind="text: complexity"></span></div>
   </div>
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
