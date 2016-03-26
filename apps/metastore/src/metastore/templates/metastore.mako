@@ -561,7 +561,7 @@ ${ assist.assistPanel() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     <!-- ko with: database -->
     <!-- ko with: table -->
-    <!-- ko if: $root.optimizerEnabled && $root.database().table().optimizerStats() -->
+    <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
       <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
     <!-- /ko -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
