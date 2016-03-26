@@ -369,7 +369,7 @@
       });
       return statement;
     });
-    this.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
+    this.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
     this.delayedStatement.subscribe(function (val) {
       self.getComplexity();
       self.hasSuggestion(false);
