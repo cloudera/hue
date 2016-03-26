@@ -78,6 +78,7 @@ class NavigatorApi(object):
     :param filters: TODO: IMPLEMENT ME, required to support property search
     """
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
+    entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'OPERATION')
 
     try:
       params = self.__params
@@ -88,9 +89,12 @@ class NavigatorApi(object):
       for term in search_terms:
         query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
 
-      filter_query = '*.*'
+      filter_query = '(originalName:*.*)'
       if search_terms:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
+
+      type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in entity_types])
+      filter_query = '%sAND(%s)' % (filter_query, type_filter_clause)
 
       params += (
         ('query', filter_query),
