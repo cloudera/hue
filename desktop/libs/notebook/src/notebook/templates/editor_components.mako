@@ -688,7 +688,7 @@ ${ hueIcons.symbols() }
       <!-- ko if: hasSuggestion -->
       <!-- ko with: suggestion() -->
       <!-- ko if: queryStatus() == 'SUCCESS' -->
-        ${ _('The query is compatible! Click to') } <a href="">${ _('execute') }</a> ${ _('with Impala') }.
+        ${ _('The query is compatible! Click to') } <a href="/notebook/editor?type=impala">${ _('execute') }</a> ${ _('with Impala') }.
       <!-- /ko -->
       <!-- ko if: errorDetail.errorString -->
         ${ _('Query is not compatible with Impala') }.
