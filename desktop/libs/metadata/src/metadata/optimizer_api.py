@@ -106,6 +106,7 @@ def table_details(request):
   if data['status'] == 'success':
     response['status'] = 0
     response['details'] = data['details']
+    print [c['columnName'] for c in data['details']['sortedTotal']]
   else:
     response['message'] = 'Optimizer: %s' % data['details']
 
