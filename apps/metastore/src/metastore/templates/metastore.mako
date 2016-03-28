@@ -1259,6 +1259,7 @@ ${ assist.assistPanel() }
       });
 
       ko.applyBindings(viewModel);
+      viewModel.optimizerEnabled(false);
 
       if (location.getParameter('refresh') === 'true') {
         huePubSub.publish('assist.db.refresh', 'hive');
