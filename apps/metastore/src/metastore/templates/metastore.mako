@@ -494,8 +494,14 @@ ${ assist.assistPanel() }
                   <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
                 <!-- /ko -->
                 <!-- ko if: $root.optimizerEnabled  -->
-                  <i class="fa fa-fw fa-calendar muted" data-bind="css: {'fa-database': Math.random() > 0.5 }" title="${ _('Fact table') }"></i>
-                  ## Dimension table == fw fa-calendar
+                  <!-- ko if: optimizerStats() -->
+                    <!-- ko if: optimizerStats().is_fact -->
+                      <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
+                    <!-- /ko -->
+                    <!-- ko ifnot: optimizerStats().is_fact -->
+                      <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
+                    <!-- /ko -->
+                  <!-- /ko -->
                 <!-- /ko -->
               </td>
             </tr>
