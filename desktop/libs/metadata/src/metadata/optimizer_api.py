@@ -59,8 +59,6 @@ def top_tables(request):
   database = request.POST.get('database', 'default')
   len = request.POST.get('len', 1000)
 
-  api = OptimizerApi()
-
   if OPTIMIZER.MOCKING.get():
     from beeswax.server import dbms
     from beeswax.server.dbms import get_query_server_config
@@ -74,6 +72,9 @@ def top_tables(request):
     Get back:
     # u'details': [{u'columnCount': 28, u'name': u'date_dim', u'patternCount': 136, u'workloadPercent': 89, u'total': 92, u'type': u'Dimension', u'eid': u'19'},
     """
+    api = OptimizerApi()
+    data = api.top_tables()
+
     tables = [{
         'eid': table['eid'],
         'name': table['name'],
@@ -82,7 +83,7 @@ def top_tables(request):
         'patternCount': table['patternCount'],
         'total': table['total'],
         'is_fact': table['type'] != 'Dimension'
-        } for table in api.top_tables()['details']
+        } for table in data['details']
     ]
 
   response['top_tables'] = tables
