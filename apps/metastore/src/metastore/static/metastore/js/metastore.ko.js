@@ -65,18 +65,21 @@
         });
       }
       return returned.sort(function (a, b) {
-        if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
-          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-            if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
-              return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    	if (options.optimizerEnabled()) {
+          if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
+            if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
+              if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+              }
+              return  b.optimizerStats().popularity - a.optimizerStats().popularity;
             }
-            return  b.optimizerStats().popularity - a.optimizerStats().popularity;
+            return -1
           }
-          return -1
+          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
+            return 1;
+          }
         }
-        if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
-          return 1;
-        }
+
         return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
       });
     });
@@ -678,7 +681,8 @@
             return new MetastoreDatabase({
               name: name,
               assistHelper: self.assistHelper,
-              i18n: self.i18n
+              i18n: self.i18n,
+              optimizerEnabled: self.optimizerEnabled
             })
           }));
           self.loading(false);
