@@ -626,7 +626,7 @@ from desktop.views import _ko
     <div class="assist-flex-fill">
       <ul class="assist-tables" data-bind="foreach: sources">
         <li class="assist-table pointer">
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedSource($data); }"><i class="fa fa-fw fa-server muted valign-middle"></i> <span data-bind="text: name"></span></a>
         </li>
       </ul>
     </div>
@@ -692,7 +692,7 @@ from desktop.views import _ko
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
         <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data) }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span data-bind="text: definition.name"></span></a>
         </li>
       </ul>
     </div>
