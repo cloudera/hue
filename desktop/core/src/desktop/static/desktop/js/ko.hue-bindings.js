@@ -3544,4 +3544,12 @@
     }
   };
 
+
+  ko.bindingHandlers.plotly = {
+    init: function (element, valueAccessor, allBindings) {
+      var options = valueAccessor() || {};
+      Plotly.plot(element, options.data || [], options.layout || {}, {displaylogo: false});
+    }
+  };
+
 }));
