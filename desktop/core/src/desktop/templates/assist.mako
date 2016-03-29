@@ -740,9 +740,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-navigator-search">
+    % if is_optimizer_enabled:
       <div class="searchbar">
-        <input id="appendedInput" placeholder="Search everywhere..." type="text" data-bind="hasFocus: searchHasFocus, textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }"><i class="fa" data-bind="css: { 'fa-search': searchInput() === '' && ! searchHasFocus(), 'fa-times' : searchInput() !== '' || searchHasFocus() }"></i></button>
+        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="hasFocus: searchHasFocus, textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }"><i class="fa" data-bind="css: { 'fa-search': searchInput() === '' && ! searchHasFocus(), 'fa-times' : searchInput() !== '' || searchHasFocus() }"></i></button>
       </div>
+    % endif
   </script>
 
   <script type="text/html" id="assist-panel-inner-header">
