@@ -155,3 +155,16 @@ class TestOptimizerApi(object):
     details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
 
     assert_equal('FAIL', details['platformCompilationStatus']['Hive']['queryStatus'], resp)
+
+
+  def test_similar_queries(self):
+    source_platform = 'Hive'
+    query = 'Select * from (Select item.id from item)'
+
+    resp = self.api.similar_queries(source_platform=source_platform, query=query)
+
+    assert_equal('successs', resp['status'], resp)
+
+    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+
+    assert_equal([], details['details']['similarQueries'], resp)
