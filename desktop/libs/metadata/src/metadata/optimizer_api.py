@@ -106,7 +106,6 @@ def table_details(request):
   if data['status'] == 'success':
     response['status'] = 0
     response['details'] = data['details']
-    print [c['columnName'] for c in data['details']['sortedTotal']]
   else:
     response['message'] = 'Optimizer: %s' % data['details']
 
@@ -157,6 +156,27 @@ def query_complexity(request):
     'comment': comment
   }
   response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def simiar_queries(request):
+  response = {'status': -1}
+
+  source_platform = request.POST.get('sourcePlatform')
+  query = request.POST.get('query')
+
+  api = OptimizerApi()
+
+  data = api.similar_queries(source_platform=source_platform, query=query)
+
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['similar_queries'] = json.loads(data['details']['similarQueries'])
+  else:
+    response['message'] = 'Optimizer: %s' % data['details']
 
   return JsonResponse(response)
 
