@@ -143,7 +143,7 @@ def query_complexity(request):
 
   snippet = json.loads(request.POST.get('snippet'))
 
-  if 'join' in snippet['statement'].lower():
+  if 'select * from tsqc_date t join atd_au_dtl a on (t.date = a.date)' in snippet['statement'].lower():
     comment = 'Large join is happening'
   elif 'large' in snippet['statement'].lower():
     comment = 'Previously failed 5 times in a row'
