@@ -302,6 +302,10 @@ from desktop.views import _ko
     .fb-search-container input {
       width: 300px;
     }
+
+    .typeahead .active {
+      padding: 0;
+    }
   </style>
 
   <script type="text/html" id="fb-template">
@@ -361,8 +365,8 @@ from desktop.views import _ko
           <div class="input-append">
             <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
             <div class="btn-group" style="overflow:visible">
-              <a class="btn" data-bind="click: handleTypeAheadSelection"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+              <a class="btn" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a class="btn dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a data-bind="click: function () { selectedPerm('read') }" href="javascript:void(0)">${ _('Read') }</a></li>
                 <li><a data-bind="click: function () { selectedPerm('write') }" href="javascript:void(0)">${ _('Modify') }</a></li>
@@ -372,7 +376,12 @@ from desktop.views import _ko
         </div>
       </div>
       <div class="modal-footer">
+        <!-- ko if: selectedUserOrGroup()  -->
+        <a class="btn btn-primary" data-bind="click: handleTypeAheadSelection" href="javascript:void(0)">${ _('Add') }</a>
+        <!-- /ko -->
+        <!-- ko ifnot: selectedUserOrGroup() -->
         <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Close')}</a>
+        <!-- /ko -->
       </div>
       <!-- /ko -->
       <!-- /ko -->
