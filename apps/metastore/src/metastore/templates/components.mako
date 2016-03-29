@@ -31,11 +31,13 @@
                 </a>
               </li>              
             </ul>
+            % if is_optimizer_enabled:
             <div class="pull-right">
               <a class="pointer" data-bind="click: function() { optimizerEnabled(! optimizerEnabled()); }">
                 <i class="fa" data-bind="css: {'fa-toggle-off': ! optimizerEnabled(), 'fa-toggle-on': optimizerEnabled() }" style="margin-top:15px"></i> Enrich
               </a>
             </div>
+            % endif
           </div>
         </div>
       </div>
