@@ -443,7 +443,8 @@ def describe_partitions(request, database, table):
         'partition_keys_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
         'partition_values_json': json.dumps(massaged_partitions),
         'request': request,
-        'has_write_access': has_write_access(request.user)
+        'has_write_access': has_write_access(request.user),
+        'is_optimizer_enabled': has_optimizer(),
     })
 
 
