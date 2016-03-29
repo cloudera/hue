@@ -447,7 +447,7 @@ ${ hueIcons.symbols() }
       <ul class="nav nav-tabs">
         <li class="active" data-bind="click: function(){ currentQueryTab('queryHistory'); }">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
-            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
