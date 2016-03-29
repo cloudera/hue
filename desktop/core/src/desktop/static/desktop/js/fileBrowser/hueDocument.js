@@ -71,7 +71,11 @@
           process(dropdown);
         },
         matcher: function (item) {
-          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+          if (item.toLowerCase() === this.query.trim().toLowerCase()) {
+            self.selectedUserOrGroup(usermap[item] ? usermap[item] : groupmap[item]);
+            return true;
+          } else if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+            self.selectedUserOrGroup(undefined);
             return true;
           }
         },
