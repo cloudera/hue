@@ -201,7 +201,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
   <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
-  <script src="${ static('desktop/ext/js/plotly.js') }"></script>
 
   <script type="text/javascript" charset="utf-8">
 
