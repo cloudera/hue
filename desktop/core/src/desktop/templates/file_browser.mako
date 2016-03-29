@@ -577,7 +577,10 @@ from desktop.views import _ko
                   <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
                   <use xlink:href="#hi-file"></use>
                   <!-- /ko -->
-                  <!-- ko if: isSharedWithMe -->
+                  <!-- ko if: isSharedWithMe() && selected() -->
+                  <use xlink:href="#hi-share-addon-selected"></use>
+                  <!-- /ko -->
+                  <!-- ko if: isSharedWithMe() && !selected() -->
                   <use xlink:href="#hi-share-addon"></use>
                   <!-- /ko -->
                 </svg>
