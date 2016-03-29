@@ -2552,3 +2552,7 @@ body {
   filter: blur(5px);
 }
 
+.modebar-group svg {
+  width: 1em!important;
+  height: 1em!important;
+}
