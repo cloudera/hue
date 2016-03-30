@@ -107,8 +107,20 @@ def check_status(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
-  response['status'] = 0
+  try:
+    response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
+    response['status'] = 0
+  finally:
+    if response['status'] == 0 and snippet['status'] != response['query_status']:
+      status = response['query_status']['status']
+    else:
+      status = 'failed'
+    nb_doc = Document2.objects.get(id=notebook['id'])
+    nb_doc.can_write_or_exception(request.user)
+    nb = Notebook(document=nb_doc).get_data()
+    nb['snippets'][0]['status'] = status
+    nb_doc.update_data(nb)
+    nb_doc.save()
 
   return JsonResponse(response)
 
@@ -276,7 +288,7 @@ def get_history(request):
       'id': doc.id,
       'data': Notebook(document=doc).get_data(),
       'absoluteUrl': doc.get_absolute_url()
-      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)[:25]]
+      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:25]]
   response['message'] = _('History fetched')
 
   return JsonResponse(response)

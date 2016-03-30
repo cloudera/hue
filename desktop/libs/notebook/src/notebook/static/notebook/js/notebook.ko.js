@@ -369,11 +369,13 @@
       });
       return statement;
     });
-    this.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-    this.delayedStatement.subscribe(function (val) {
-      self.getComplexity();
-      self.hasSuggestion(false);
-    }, this);
+    if (vm.isOptimizerEnabled()) {
+      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+      self.delayedStatement.subscribe(function (val) {
+        self.getComplexity();
+        self.hasSuggestion(false);
+      }, self);
+    }
 
     self.result = new Result(snippet, snippet.result);
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
@@ -605,8 +607,9 @@
         } else {
           self._ajaxError(data, self.execute);
         }
-        if (vm.editorMode && data.history_id){
+        if (vm.editorMode && data.history_id) {
           hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
+          self.id(data.history_id);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
