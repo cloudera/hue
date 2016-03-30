@@ -495,9 +495,9 @@ if USE_NEW_EDITOR.get():
        % endif
        % if 'beeswax' in apps:
         <%
-          from desktop.conf import USE_NEW_EDITOR
+          from notebook.conf import SHOW_NOTEBOOKS
         %>
-        % if USE_NEW_EDITOR.get():
+        % if SHOW_NOTEBOOKS.get():
          <% from desktop.models import Document2, Document %>
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
