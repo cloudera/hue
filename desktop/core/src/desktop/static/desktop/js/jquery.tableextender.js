@@ -236,13 +236,15 @@
 
     clonedCellVisibleContainer.appendTo($(plugin.element).parent());
 
-    window.setInterval(function () {
+    window.clearInterval($(plugin.element).data('firstcol_interval'));
+    var firstColInt = window.setInterval(function () {
       if ($(plugin.element).parent().height() != $(plugin.element).parent().data("h")) {
         clonedTableContainer.height($(plugin.element).parent().get(0).scrollHeight);
         clonedTableVisibleContainer.height($(plugin.element).parent().height());
         $(plugin.element).parent().data("h", clonedTableVisibleContainer.height());
       }
     }, 250);
+    $(plugin.element).data('firstcol_interval', firstColInt);
 
     $(plugin.element).parent().resize(function () {
       clonedTableContainer.height($(plugin.element).parent().get(0).scrollHeight);
@@ -320,7 +322,8 @@
 
     $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
 
-    window.setInterval(function () {
+    window.clearInterval($(plugin.element).data('header_interval'));
+    var headerInt = window.setInterval(function () {
       if ($(plugin.element).parent().width() != $(plugin.element).parent().data("w")) {
         clonedTableVisibleContainer.width($(plugin.element).parent().width());
         $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
@@ -329,6 +332,7 @@
         });
       }
     }, 250);
+    $(plugin.element).data('header_interval', headerInt);
 
     $(plugin.element).parent().resize(function () {
       clonedTableVisibleContainer.width($(this).width());
