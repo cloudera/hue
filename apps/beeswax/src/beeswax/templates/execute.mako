@@ -1106,7 +1106,7 @@ editorViewModelOptions.languages.push({
 
 var i18n = {
   errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
-}
+};
 
 var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
 var notebook = editorViewModel.newNotebook();
@@ -1115,7 +1115,8 @@ var assistHelper = snippet.getAssistHelper();
 var autocompleter = new Autocompleter({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
-  oldEditor: true
+  oldEditor: true,
+  optEnabled: false
 });
 
 var totalStorageUserPrefix = assistHelper.getTotalStorageUserPrefix(snippetType);

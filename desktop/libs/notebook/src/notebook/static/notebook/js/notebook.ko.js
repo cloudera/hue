@@ -907,7 +907,8 @@
 
     self.autocompleter = new Autocompleter({
       snippet: self,
-      user: vm.user
+      user: vm.user,
+      optEnabled: false
     });
 
     self.init = function () {
