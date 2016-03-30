@@ -86,6 +86,8 @@ def execute(request):
     response['handle'] = get_api(request, snippet).execute(notebook, snippet)
   finally:
     if notebook['type'].startswith('query-'):
+      _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
+      _snippet['result']['handle'] = response['handle']
       history = _historify(notebook, request.user)
       response['history_id'] = history.id
 

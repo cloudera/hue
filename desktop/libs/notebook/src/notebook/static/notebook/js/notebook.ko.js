@@ -287,7 +287,7 @@
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
-    self.statusForButtons = ko.observable(typeof snippet.statusForButtons != "undefined" && snippet.statusForButtons != null ? snippet.statusForButtons : '');
+    self.statusForButtons = ko.observable('executed');
 
     self.properties = ko.observable(ko.mapping.fromJS(typeof snippet.properties != "undefined" && snippet.properties != null ? snippet.properties : getDefaultSnippetProperties(self.type())));
     self.hasProperties = ko.computed(function() {
@@ -580,6 +580,10 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
+        if (vm.editorMode && data.history_id) {
+          hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
+          notebook.id(data.history_id);
+        }
         if (data.status == 0) {
           self.result.clear();
           self.result.handle(data.handle);
@@ -606,10 +610,6 @@
           }
         } else {
           self._ajaxError(data, self.execute);
-        }
-        if (vm.editorMode && data.history_id) {
-          hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
-          self.id(data.history_id);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
@@ -915,7 +915,7 @@
     });
 
     self.init = function () {
-      if (self.status() == 'running') {
+      if (self.status() == 'running' || self.status() == 'available') {
         self.checkStatus();
       }
       else if (self.status() == 'loading') {
