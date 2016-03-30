@@ -88,6 +88,7 @@ def execute(request):
     if notebook['type'].startswith('query-'):
       _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
       _snippet['result']['handle'] = response['handle']
+      _snippet['result']['statements_count'] = response['handle']['statements_count']
       history = _historify(notebook, request.user)
       response['history_id'] = history.id
 
