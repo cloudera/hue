@@ -1369,28 +1369,32 @@
       var $target = $(options.target);
       var $resizer = $(element);
 
-      var lastEditorHeight = 7;
+      var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 128;
+      var editorHeight = Math.floor(lastEditorSize / 16);
+      $target.height(lastEditorSize);
+      var autoExpand = true;
 
-      var autoExpandTimeout = window.setInterval(function () {
-        var chunks = Math.floor((Math.max(ace().session.getLength(), 4) - lastEditorHeight) / 4);
-        if (chunks !== 0) {
+      ace().on('change', function () {
+        if (autoExpand) {
           var maxAutoLines = Math.floor(($(window).height() - 200) / 16);
-          if (ace().session.getLength() < maxAutoLines) {
-            $target.height($target.height() + 64 * chunks);
+          if (ace().session.getLength() > editorHeight) {
+            if (ace().session.getLength() < maxAutoLines) {
+              $target.height((ace().session.getLength() + 1) * 16);
+            }
+            else {
+              $target.height(maxAutoLines * 16); // height of maxAutoLines
+            }
+            ace().resize();
+            editorHeight = ace().session.getLength();
           }
-          else {
-            $target.height(maxAutoLines * 16); // height of maxAutoLines
-          }
-          ace().resize();
-          lastEditorHeight += 4 * chunks;
         }
-      }, 300);
+      });
 
       $resizer.draggable({
         axis: "y",
         start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
-          clearInterval(autoExpandTimeout);
+          autoExpand = false;
           var currentHeight = ui.offset.top - 120;
           $target.css("height", currentHeight + "px");
           ace().resize();
@@ -1400,6 +1404,7 @@
         stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
+          $.totalStorage('hue.editor.editor.size', $target.height());
           $(document).trigger("editorSizeChanged");
         }
       });
