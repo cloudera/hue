@@ -1142,7 +1142,7 @@
       var checkForElements = function () {
         var $allPanels = $container.children('.assist-inner-panel');
         var $allExtras = $container.children('.assist-fixed-height');
-        if (panelDefinitions().length == $allPanels.length && $allExtras.length > 0) {
+        if (panelDefinitions().length == $allPanels.length && ($allExtras.length > 0 || options.noFixedHeights)) {
           ko.bindingHandlers.assistVerticalResizer.updateWhenRendered(element, valueAccessor);
         } else {
           timeout = window.setTimeout(checkForElements, 10);
