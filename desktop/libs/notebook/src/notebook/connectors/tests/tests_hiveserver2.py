@@ -162,7 +162,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
   def test_get_current_statement(self):
     multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\\r\\nSELECT AVG(salary) FROM sample_07;"
-    snippet_json = """
+    snippet_json = json.loads("""
       {
           "status": "running",
           "database": "default",
@@ -181,8 +181,11 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
           }
       }
     """ % {'statement': multi_statement}
+    )
 
-    response = self.client.post(reverse('notebook:execute'), {'notebook': self.notebook_json, 'snippet': snippet_json})
+    notebook_json = json.loads(self.notebook_json)
+    notebook_json['snippets'] = [snippet_json]
+    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -193,7 +196,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
 
 
-    snippet_json = """
+    snippet_json = json.loads("""
       {
           "status": "running",
           "database": "default",
@@ -216,8 +219,11 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
           }
       }
     """ % {'statement': multi_statement}
+    )
 
-    response = self.client.post(reverse('notebook:execute'), {'notebook': self.notebook_json, 'snippet': snippet_json})
+    notebook_json = json.loads(self.notebook_json)
+    notebook_json['snippets'] = [snippet_json]
+    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
