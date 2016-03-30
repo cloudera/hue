@@ -25,12 +25,14 @@ from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
+from desktop.lib.test_utils import add_permission, remove_from_group
 from desktop.models import Document2
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
+from desktop.lib.django_test_util import make_logged_in_client
 
 
 LOG = logging.getLogger(__name__)
@@ -360,6 +362,34 @@ LIMIT $limit"""))
     wf_doc1.delete()
     wf_doc2.delete()
     wf_doc3.delete()
+
+  def test_editor_access_permissions(self):
+    group = 'no_editor'
+
+    try:
+      # Block editor section
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      response = self.c.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+
+      add_permission('test', 'no_editor', 'disable_editor_access', 'oozie')
+
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 401)
+      response = self.c.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+
+      # Admin are not affected
+      admin = make_logged_in_client('admin', 'admin', is_superuser=True, recreate=True, groupname=group)
+
+      response = admin.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      response = admin.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+    finally:
+      remove_from_group("test", group)
+
 
 class TestExternalWorkflowGraph():
 

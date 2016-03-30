@@ -561,6 +561,7 @@ if USE_NEW_EDITOR.get():
                <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
+           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
            <% from oozie.conf import ENABLE_V2 %>
            % if not ENABLE_V2.get():
            <li class="dropdown-submenu">
@@ -580,6 +581,7 @@ if USE_NEW_EDITOR.get():
                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
+           % endif
            % endif
          </ul>
        </li>

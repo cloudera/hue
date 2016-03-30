@@ -24,4 +24,5 @@ IS_URL_NAMESPACED = True
 
 PERMISSION_ACTIONS = (
   ("dashboard_jobs_access", "Oozie Dashboard read-only user for all jobs"),
+  ("disable_editor_access", "Disable Oozie Editor access"),
 )
