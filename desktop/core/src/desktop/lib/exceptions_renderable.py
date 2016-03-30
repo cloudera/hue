@@ -45,7 +45,7 @@ class PopupException(Exception):
     self.traceback = traceback.extract_tb(tb)
 
   def response(self, request):
-    data = dict(title=force_unicode(self.title), message=force_unicode(self.message), detail=force_unicode(self.detail), traceback=self.traceback)
+    data = dict(title=force_unicode(self.title), message=force_unicode(self.message), detail=force_unicode(self.detail) if self.detail else None, traceback=self.traceback)
     if not request.ajax:
       data['request'] = request
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
