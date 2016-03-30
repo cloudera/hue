@@ -43,25 +43,26 @@ ${ layout.menubar(section='query') }
     </ul>
     <div class="tab-content" style=" overflow: hidden;">
       <div class="tab-pane active" id="navigatorTab">
-        <div class="card card-small card-tab" style="margin-bottom: 0;">
-          <div class="card-body" style="margin-top: 0; height: 100%;">
-            <div class="assist" data-bind="component: {
-              name: 'assist-panel',
-              params: {
-                user: HIVE_AUTOCOMPLETE_USER,
-                onlySql: true,
-                sql: {
-                  sourceTypes: editorViewModel.sqlSourceTypes,
-                  activeSourceType: snippetType,
-                  navigationSettings: {
-                    openItem: false,
-                    showPreview: true,
-                    showStats: true
-                  }
-                },
-                visibleAssistPanels: ['sql']
-              }
-            }"></div>
+        <div id="assistSticky" style="height: 100%; overflow-y:hidden;">
+          <div class="card card-small card-tab" style="margin-bottom: 0;">
+            <div class="card-body" style="margin-top: 0; height: 100%;">
+              <div class="assist" data-bind="component: {
+                name: 'assist-panel',
+                params: {
+                  user: HIVE_AUTOCOMPLETE_USER,
+                  onlySql: true,
+                  sql: {
+                    sourceTypes: editorViewModel.sqlSourceTypes,
+                    activeSourceType: snippetType,
+                    navigationSettings: {
+                      openItem: false,
+                      showStats: true
+                    }
+                  },
+                  visibleAssistPanels: ['sql']
+                }
+              }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1303,7 +1304,7 @@ $(document).ready(function () {
     });
   });
 
-  var lastWindowHeight = -1
+  var lastWindowHeight = -1;
   var resizeNavigator = function () {
     var newHeight = $(window).height();
     if (lastWindowHeight !== newHeight) {
@@ -1314,7 +1315,14 @@ $(document).ready(function () {
   };
 
   resizeNavigator();
-  $(window).on("scroll", resizeNavigator);
+  $(window).on("scroll", function () {
+    var scrollTop = $(window).scrollTop();
+    if (scrollTop > 50) {
+      $('#assistSticky').css('margin-top', (scrollTop - 50) + 'px');
+    } else {
+      $('#assistSticky').css('margin-top', 0);
+    }
+  });
   $(window).on("resize", resizeNavigator);
   window.setInterval(resizeNavigator, 500);
 

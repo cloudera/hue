@@ -1173,8 +1173,8 @@
       if (panelDefinitions().length === 1) {
         var adjustHeightSingle = function () {
           $allPanels.height($container.innerHeight() - allExtrasHeight);
-        }
-        window.setTimeout(adjustHeightSingle, 200);
+        };
+        window.setInterval(adjustHeightSingle, 800);
         $(window).resize(adjustHeightSingle);
         huePubSub.subscribe('assist.forceRender', function () {
           window.setTimeout(adjustHeightSingle, 200);
