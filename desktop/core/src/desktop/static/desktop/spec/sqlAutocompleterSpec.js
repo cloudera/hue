@@ -88,7 +88,7 @@ define([
 
     beforeEach(function(done) {
       changeType("genericSqlType", done);
-      subject = new SqlAutocompleter({ snippet: snippet });
+      subject = new SqlAutocompleter({ snippet: snippet, optEnabled: false });
       ajaxHelper.responseForUrls = {};
     });
 
@@ -341,7 +341,8 @@ define([
                 ])
               }
             },
-            snippet: snippet
+            snippet: snippet,
+            optEnabled: false
           });
         });
 
@@ -681,7 +682,8 @@ define([
                 ])
               }
             },
-            snippet: snippet
+            snippet: snippet,
+            optEnabled: false
           });
         });
 

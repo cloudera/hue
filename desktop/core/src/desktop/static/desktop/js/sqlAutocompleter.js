@@ -35,6 +35,7 @@
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
     self.oldEditor = options.oldEditor || false;
+    self.optEnabled = options.optEnabled || false;
 
     self.topTablesPerDb = {};
 
@@ -44,20 +45,22 @@
         sourceType: self.snippet.type(),
         silenceErrors: true,
         successCallback: function () {
-          $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
-            if (db === 'default') {
-              $.post('/metadata/api/optimizer_api/top_tables', {
-                database: db
-              }, function(data){
-                if (! self.topTablesPerDb[db]) {
-                  self.topTablesPerDb[db] = {};
-                }
-                data.top_tables.forEach(function (table) {
-                  self.topTablesPerDb[db][table.name] = table;
+          if (self.optEnabled) {
+            $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
+              if (db === 'default') {
+                $.post('/metadata/api/optimizer_api/top_tables', {
+                  database: db
+                }, function(data){
+                  if (! self.topTablesPerDb[db]) {
+                    self.topTablesPerDb[db] = {};
+                  }
+                  data.top_tables.forEach(function (table) {
+                    self.topTablesPerDb[db][table.name] = table;
+                  });
                 });
-              });
-            }
-          });
+              }
+            });
+          }
         }
       });
     };
@@ -251,7 +254,7 @@
       var fetchImpalaFields = function (remainingParts, topValues) {
         completeFields.push(remainingParts.shift());
         if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
-          fetchImpalaFields(remainingParts);
+          fetchImpalaFields(remainingParts, topValues);
         } else {
           self.snippet.getAssistHelper().fetchFields({
             sourceType: self.snippet.type(),
@@ -262,10 +265,10 @@
             successCallback: function (data) {
               if (data.type === "map") {
                 completeFields.push("value");
-                fetchImpalaFields(remainingParts);
+                fetchImpalaFields(remainingParts, topValues);
               } else if (data.type === "array") {
                 completeFields.push("item");
-                fetchImpalaFields(remainingParts);
+                fetchImpalaFields(remainingParts, topValues);
               } else if (remainingParts.length == 0 && data.sample) {
                 var isString = data.type === "string";
                 var values = $.map(data.sample.sort(), function(value, index) {
@@ -288,7 +291,7 @@
         }
       };
 
-      if (fields.length === 1) {
+      if (fields.length === 1 && self.optEnabled) {
         $.post('/metadata/api/optimizer_api/popular_values', {
           database: database,
           tableName: tableName,
@@ -394,7 +397,12 @@
   };
 
   SqlAutocompleter.prototype.autocomplete = function(beforeCursor, upToNextStatement, realCallback, editor) {
+    var self = this;
     var callback = function (values) {
+      if (! self.optEnabled) {
+        realCallback(values);
+        return;
+      }
       if (values.length > 0) {
         var foundTables = {};
         values.forEach(function (value) {
@@ -437,7 +445,6 @@
 
     var allStatements = beforeCursor.split(';');
 
-    var self = this;
 
     var hiveSyntax = self.snippet.type() === "hive";
     var impalaSyntax = self.snippet.type() === "impala";
@@ -680,7 +687,7 @@
               }
 
               var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S*)$/);
-              if (keywordBeforeCursor === "WHERE" && startedMatch) {
+              if (self.optEnabled && keywordBeforeCursor === "WHERE" && startedMatch) {
                 $.post('/metadata/api/optimizer_api/popular_values', {
                   database: database,
                   tableName: tableName
@@ -828,6 +835,9 @@
   
   SqlAutocompleter.prototype.getDocTooltip = function (item) {
     var self = this;
+    if (! self.optEnabled) {
+      return;
+    }
     if (item.meta === 'table' && !item.docHTML) {
       var table = item.value;
       if (table.lastIndexOf(' ') > -1) {

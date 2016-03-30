@@ -29,6 +29,7 @@
    * @param options {object}
    * @param options.snippet
    * @param options.user
+   * @param options.optEnabled
    *
    * @constructor
    */
@@ -47,7 +48,8 @@
         self.autocompleter = new SqlAutocompleter({
           hdfsAutocompleter: hdfsAutocompleter,
           snippet: options.snippet,
-          oldEditor: options.oldEditor
+          oldEditor: options.oldEditor,
+          optEnabled: options.optEnabled
         })
       } else {
         self.autocompleter = hdfsAutocompleter;
