@@ -758,7 +758,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-panel-template">
     <!-- ko if: (searchInput() === '' && !searchHasFocus()) || ! navigatorEnabled() -->
-    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
+    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper, noFixedHeights: onlySql }">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
