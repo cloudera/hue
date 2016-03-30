@@ -92,6 +92,14 @@ def check_document_modify_permission():
   return inner
 
 
+def check_editor_access_permission(view_func):
+
+  def decorate(request, *args, **kwargs):
+    if not request.user.is_superuser and request.user.has_hue_permission(action="disable_editor_access", app="oozie"):
+      raise PopupException(_('Missing permission to access the Oozie Editor'), error_code=401)
+    return view_func(request, *args, **kwargs)
+  return wraps(view_func)(decorate)
+
 
 ## Oozie v1 below
 
