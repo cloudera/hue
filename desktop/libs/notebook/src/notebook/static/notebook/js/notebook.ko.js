@@ -1140,7 +1140,8 @@
      return {
          id: self.id,
          uuid: self.uuid,
-         sessions: self.sessions
+         sessions: self.sessions,
+         type: self.type
       };
     };
 
