@@ -251,7 +251,7 @@ ${ hueIcons.symbols() }
           <li class="query-name">
             <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
           </li>
-          <li>
+          <li data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
               <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
             </a>
