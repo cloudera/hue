@@ -26,7 +26,13 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Notebooks') }</h1>
+  % if editor_type == 'impala':
+    <h1 class="card-heading simple">${ _('Impala Queries') }</h1>
+  % elif editor_type == 'hive':
+    <h1 class="card-heading simple">${ _('Hive Queries') }</h1>
+  % else:
+    <h1 class="card-heading simple">${ _('Notebooks') }</h1>
+  % endif
 
   <%actionbar:render>
     <%def name="search()">
@@ -152,14 +158,14 @@ ${ commonshare() | n,unicode }
 
     self.handleSelect = function(notebook) {
       notebook.isSelected(! notebook.isSelected());
-    }
+    };
 
     self.selectAll = function() {
       self.allSelected(! self.allSelected());
       ko.utils.arrayForEach(self.jobs(), function (job) {
         job.isSelected(self.allSelected());
       });
-    }
+    };
 
     self.datatable = null;
 
