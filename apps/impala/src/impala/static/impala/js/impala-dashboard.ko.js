@@ -141,7 +141,7 @@ var Dashboard = function (vm, dashboard) {
 	}
   });  
 
-  self.dropdownTables = ko.observableArray([]);
+  self.dropdownTables = ko.observableArray(["customers", "sample_07", "sample_08", "web_logs"]);
   self.selectedDropdownTable = ko.observable("");
   self.selectedDropdownTable.subscribe(function(value) {
 	self.properties()[0].table(self.selectedDropdownTable());
@@ -259,6 +259,9 @@ var ImpalaDashboardViewModel = function (query_json, dashboard_json, initial_jso
     self.results_cols = ko.observableArray([]);
 
     self.inited = ko.observable(self.columns().length > 0);
+
+    self.selectedQDefinition = ko.observable();
+    self.isNested = ko.observable(false);
 
     self.init = function(callback) {
       if (self.inited()){

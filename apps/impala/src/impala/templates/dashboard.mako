@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -98,8 +98,8 @@ ${ commonheader(None, "impala", user) | n,unicode }
   <form class="form-search" style="margin: 0" data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a database and a table') }
     <!-- ko if: columns().length == 0 -->
-    <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium chosen-select chosen-server hide" data-placeholder="${_('Choose a database...')}"></select>
-    <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium chosen-select chosen-table hide" data-placeholder="${_('Choose a table...')}"></select>
+    <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium chosen-select chosen-server" data-placeholder="${_('Choose a database...')}"></select>
+    <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium chosen-select chosen-table" data-placeholder="${_('Choose a table...')}"></select>
 
     <a title="${_('Manually refresh the dropdowns')}" rel="tooltip" data-placement="bottom" class="pointer" data-bind="click: resetDropdownsCache"><i class="fa fa-refresh"></i></a>
     <!-- /ko -->
@@ -108,7 +108,7 @@ ${ commonheader(None, "impala", user) | n,unicode }
   <form class="form-search" style="margin: 0" data-bind="submit: search, visible: columns().length != 0">
     <strong>${_("Search")}</strong>
     <!-- ko if: $root.dashboard.properties().length > 0 -->
-    <span data-bind="text: $root.dashboard.properties()[0].database"></span>.<span data-bind="text: $root.dashboard.properties()[0].table"></span>
+    <a href="javascript:void(0)"><span data-bind="editable: $root.dashboard.properties()[0].database, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Database name...')}'}"></span></a>.<a href="javascript:void(0)"><span data-bind="editable: $root.dashboard.properties()[0].table, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Table name...')}'}"></span></a></span>
     <!-- /ko -->
     <div class="input-append">
       <span data-bind="foreach: query.qs">
