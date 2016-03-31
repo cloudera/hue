@@ -66,6 +66,7 @@ from desktop.views import _ko
       position: relative;
       padding: 0 0 0 10px;
       overflow: hidden;
+      margin-right: 1px;
     }
 
     .assist-inner-header {
@@ -154,6 +155,8 @@ from desktop.views import _ko
       padding-top: 2px;
       padding-bottom: 2px;
       padding-left: 4px;
+      margin-right: 15px;
+      overflow-x: hidden;
     }
 
     .assist-tables > li.selected {
@@ -203,12 +206,19 @@ from desktop.views import _ko
       color: #737373;
     }
 
-    .assist-db-header-actions,
-    .assist-actions  {
+    .assist-db-header-actions {
       position:absolute;
       top: 0;
       right: 0;
-      padding-right: 17px;
+      padding-left:4px;
+      padding-right: 13px;
+      background-color: #FFF;
+    }
+
+    .assist-actions {
+      position:absolute;
+      top: 0;
+      right: 0;
       padding-left:4px;
       background-color: #FFF;
     }
