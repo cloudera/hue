@@ -933,6 +933,10 @@ define([
             "/notebook/api/autocomplete/database_one/testTable/id" : {
               sample: [1, 2, 3],
               type: "int"
+            },
+            "/notebook/api/sample/database_one/testTable/id": {
+              status: 0,
+              headers: []
             }
           },
           beforeCursor: "SELECT * FROM testTable WHERE id =",
@@ -957,6 +961,68 @@ define([
           expectedSuggestions: ["t.", "m.", "1", "2", "3"]
         });
       })
+    });
+
+    describe("value completion", function () {
+      it("should suggest numeric sample values for columns in conditions", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/sample/database_one/testTable/id": {
+              status: 0,
+              headers: ['id'],
+              rows: [[1], [2], [3]]
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable WHERE id =",
+          afterCursor: "",
+          expectedSuggestions: ['1', '2', '3']
+        });
+      });
+
+      it("should suggest string sample values for columns in conditions with started value", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/sample/database_one/testTable/string": {
+              status: 0,
+              headers: ['id'],
+              rows: [['abc'], ['def'], ['ghi']]
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable WHERE string = 'd",
+          afterCursor: "",
+          expectedSuggestions: ["'abc'", "'def'", "'ghi'"]
+        });
+      });
+
+      it("should suggest string sample values for columns in conditions with started value after AND", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/sample/database_one/testTable/string": {
+              status: 0,
+              headers: ['id'],
+              rows: [['abc'], ['def'], ['ghi']]
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable WHERE id = 1 AND string =",
+          afterCursor: "",
+          expectedSuggestions: ["'abc'", "'def'", "'ghi'"]
+        });
+      });
+
+      it("should suggest string sample values for columns in conditions with started value after OR", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/sample/database_one/testTable/string": {
+              status: 0,
+              headers: ['id'],
+              rows: [['ab'], ['cd'], ['ef']]
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable WHERE id = 1 OR string =",
+          afterCursor: "",
+          expectedSuggestions: ["'ab'", "'cd'", "'ef'"]
+        });
+      });
     });
 
     describe("field completion", function() {

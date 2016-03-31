@@ -291,7 +291,39 @@
         }
       };
 
-      if (fields.length === 1 && self.optEnabled) {
+      if (fields.length === 1 && !self.optEnabled) {
+        self.snippet.getAssistHelper().fetchTableSample({
+          sourceType: self.snippet.type(),
+          databaseName: database,
+          tableName: tableName,
+          columnName: fields.length === 1 ? fields[0] : null,
+          successCallback: function (data) {
+            if (data.status === 0 && data.headers.length === 1) {
+              var values = $.map(data.rows, function (row, index) {
+                return {
+                  meta: 'value',
+                  score: 1000 - index,
+                  value: typeof row[0] === 'string' ? "'" + row[0] + "'" :  '' + row[0]
+                }
+              });
+              if (self.snippet.type() === 'impala') {
+                fetchImpalaFields(fields, values);
+              } else {
+                callback(values);
+              }
+            } else {
+              if (self.snippet.type() === 'impala') {
+                fetchImpalaFields(fields, []);
+              }
+            }
+          },
+          errorCallback: function () {
+            if (self.snippet.type() === 'impala') {
+              fetchImpalaFields(fields, []);
+            }
+          }
+        });
+      } else if (fields.length === 1 && self.optEnabled) {
         $.post('/metadata/api/optimizer_api/popular_values', {
           database: database,
           tableName: tableName,
@@ -590,7 +622,7 @@
 
       var fromReferences = self.getFromReferenceIndex(beforeCursor + upToNextStatement);
       var viewReferences = self.getViewReferenceIndex(beforeCursor + upToNextStatement, hiveSyntax);
-      var conditionMatch = beforeCursor.match(/(\S+)\s*=\s*$/);
+      var conditionMatch = beforeCursor.match(/(\S+)\s*=\s*([^\s;]+)?$/);
 
       var tableName = "";
 
@@ -633,7 +665,7 @@
           };
         });
 
-        if (conditionMatch && impalaSyntax) {
+        if (conditionMatch) {
           self.getValueReferences(conditionMatch, database, fromReferences, tableRefs.concat(complexRefs), callback, editor);
         } else {
           callback(tableRefs.concat(complexRefs));
@@ -686,7 +718,7 @@
                 suggestions = self.extractFields(data, tableName, database, "", !fieldTermBefore);
               }
 
-              var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S*)$/);
+              var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S+)$/);
               if (self.optEnabled && keywordBeforeCursor === "WHERE" && startedMatch) {
                 $.post('/metadata/api/optimizer_api/popular_values', {
                   database: database,
