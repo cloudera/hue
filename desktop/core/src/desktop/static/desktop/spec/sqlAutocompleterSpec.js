@@ -69,14 +69,24 @@ define([
         }
         response.called = true;
         response.status = 0;
-        options.success(response);
-        return({
+        if (typeof options.success === 'function') {
+          options.success(response);
+        }
+
+        var functions = {
           fail: function() {
-            return {
-              always: $.noop
-            }
+            return functions;
+          },
+          done: function(success) {
+            success(response);
+            return functions;
+          },
+          always: function() {
+            return functions;
           }
-        })
+        };
+
+        return functions;
       });
     });
 
@@ -936,7 +946,8 @@ define([
             },
             "/notebook/api/sample/database_one/testTable/id": {
               status: 0,
-              headers: []
+              headers: [],
+              rows: []
             }
           },
           beforeCursor: "SELECT * FROM testTable WHERE id =",
