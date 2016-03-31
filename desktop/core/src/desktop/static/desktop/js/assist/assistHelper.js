@@ -590,10 +590,11 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
+   * @param {string} [options.columnName]
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
-    var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName;
+    var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
 
     $.post(url, {
       notebook: {},
