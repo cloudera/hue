@@ -1171,6 +1171,8 @@
         allExtrasHeight += $(extra).outerHeight(true);
       });
 
+      window.clearInterval($container.data('height_interval'));
+
       if (panelDefinitions().length === 0) {
         $allExtras.show();
         return;
@@ -1180,8 +1182,8 @@
           $allPanels.height($container.innerHeight() - allExtrasHeight);
         };
 
-        window.clearInterval($container.data('height_interval'));
         var heightAdjustInterval = window.setInterval(adjustHeightSingle, 800);
+        adjustHeightSingle();
         $container.data('height_interval', heightAdjustInterval);
 
         $(window).resize(adjustHeightSingle);
