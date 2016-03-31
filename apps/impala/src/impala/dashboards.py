@@ -66,7 +66,7 @@ def query(request):
     table = dashboard['properties'][0]['table']
 
     if fqs:
-      filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
+      filters = ' AND '.join(['%s = %s' % (fq['field'], _get_escaped_value(value, fq['field'], dashboard)) for fq in fqs for value in fq['filter']])
     else:
       filters = ''
 
@@ -135,6 +135,17 @@ def query(request):
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
+
+
+
+def _get_field_type(name, dashboard):
+  return [f for f in dashboard['properties'][0]['fields'] if f['name'] == name][0]['type']
+
+def _get_escaped_value(value, field_name, dashboard):
+  if _get_field_type(field_name, dashboard) == 'string':
+    return "'%s'" % value
+  else:
+    return value
 
 
 def new_facet(request):

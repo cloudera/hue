@@ -30,7 +30,7 @@ urlpatterns = patterns('impala.api',
 urlpatterns += patterns('impala.dashboards',
   url(r'^dashboard/$', 'dashboard', name='dashboard'),
   url(r'^dashboard/query', 'query', name='query'),
-  
+
   url(r'^dashboard/new_facet$', 'new_facet', name='new_facet'),
   url(r'^dashboard/new_search$', 'new_search', name='new_search'),
   url(r'^dashboard/save$', 'save', name='save'),
