@@ -50,6 +50,18 @@
             $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left / (scrollbarRail.width() - $(this).width())))
           }
         });
+        $(el).parents('.dataTables_wrapper').bind('mousewheel DOMMouseScroll wheel', function (e) {
+          var _e = e.originalEvent,
+            _deltaX = _e.wheelDeltaX || -_e.deltaX,
+            _deltaY = _e.wheelDeltaY || -_e.deltaY;
+          if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
+            this.scrollLeft += -_deltaX / 2;
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
+          }
+          e.preventDefault();
+        });
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
         scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
         scrollbarRail.css("marginLeft", (colWidth) + "px");
