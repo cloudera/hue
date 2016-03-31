@@ -1179,7 +1179,11 @@
         var adjustHeightSingle = function () {
           $allPanels.height($container.innerHeight() - allExtrasHeight);
         };
-        window.setInterval(adjustHeightSingle, 800);
+
+        window.clearInterval($container.data('height_interval'));
+        var heightAdjustInterval = window.setInterval(adjustHeightSingle, 800);
+        $container.data('height_interval', heightAdjustInterval);
+
         $(window).resize(adjustHeightSingle);
         huePubSub.subscribe('assist.forceRender', function () {
           window.setTimeout(adjustHeightSingle, 200);
