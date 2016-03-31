@@ -591,23 +591,45 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} [options.columnName]
+   * @param {Object} [options.editor] - Ace editor
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
     var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
 
-    $.post(url, {
-      notebook: {},
-      snippet: ko.mapping.toJSON({
-        type: options.sourceType
-      }),
-    }, function (data) {
-      if (! self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    }).fail(self.assistErrorCallback(options));
+    var fetchFunction = function (storeInCache) {
+      $.post(url, {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: options.sourceType
+        })
+      })
+      .done(function (data) {
+        if (! self.successResponseIsError(data)) {
+          if (data.rows.length > 0) {
+            storeInCache(data);
+          }
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    if (options.columnName) {
+      fetchCached.bind(self)($.extend({}, options, {
+        url: url,
+        fetchFunction: fetchFunction
+      }));
+    } else {
+      fetchFunction($.noop);
+    }
   };
 
 

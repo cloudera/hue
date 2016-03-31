@@ -297,6 +297,7 @@
           databaseName: database,
           tableName: tableName,
           columnName: fields.length === 1 ? fields[0] : null,
+          editor: editor,
           successCallback: function (data) {
             if (data.status === 0 && data.headers.length === 1) {
               var values = $.map(data.rows, function (row, index) {
