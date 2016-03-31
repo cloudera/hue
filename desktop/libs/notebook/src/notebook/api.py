@@ -93,6 +93,8 @@ def execute(request):
       if 'handle' in response: # No failure
         _snippet['result']['handle'] = response['handle']
         _snippet['result']['statements_count'] = response['handle']['statements_count']
+      else:
+        _snippet['status'] = 'failed'
       history = _historify(notebook, request.user)
       response['history_id'] = history.id
 
@@ -311,12 +313,11 @@ def clear_history(request):
   notebook = json.loads(request.POST.get('notebook'), '{}')
   doc_type = request.POST.get('doc_type')
 
-  response['status'] = 0
   history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
-  if notebook.get('id'):
-    history = history.exclude(id=notebook.get('id'))
+
   response['updated'] = history.delete()
   response['message'] = _('History cleared !')
+  response['status'] = 0
 
   return JsonResponse(response)
 

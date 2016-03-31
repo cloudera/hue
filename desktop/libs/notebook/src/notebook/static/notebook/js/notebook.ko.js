@@ -961,6 +961,7 @@
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
+    self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
     self.creatingSessionLocks = ko.observableArray();
@@ -1260,11 +1261,15 @@
         notebook: ko.mapping.toJSON(self.getContext()),
         doc_type: self.selectedSnippet()
       }, function (data) {
-          self.history.removeAll();
-          self.showHistory(false);
-        }).fail(function (xhr) {
-           $(document).trigger("error", xhr.responseText);
-        });
+        self.history.removeAll();
+        self.showHistory(false);
+        if (self.isHistory()) {
+          self.id(null);
+          self.uuid(UUID());
+        }
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
       $(document).trigger("hideHistoryModal");
     };
 
