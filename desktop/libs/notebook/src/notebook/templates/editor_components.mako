@@ -904,7 +904,7 @@ ${ hueIcons.symbols() }
                       transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                      transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+                      transformer: multiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
@@ -1731,8 +1731,10 @@ ${ hueIcons.symbols() }
       rawDatum.snippet.chartYMulti().forEach(function (col) {
         var _idxValue = -1;
         var _idxLabel = -1;
+        var _isXDate = false;
         rawDatum.snippet.result.meta().forEach(function (icol, idx) {
           if (icol.name == rawDatum.snippet.chartX()) {
+            _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
             _idxLabel = idx;
           }
           if (icol.name == col) {
@@ -1745,7 +1747,7 @@ ${ hueIcons.symbols() }
           $(rawDatum.counts()).each(function (cnt, item) {
             _data.push({
               series: _plottedSerie,
-              x: hueUtils.html2text(item[_idxLabel]),
+              x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
               y: item[_idxValue],
               obj: item
             });
