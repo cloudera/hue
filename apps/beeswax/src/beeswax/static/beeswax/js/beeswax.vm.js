@@ -76,10 +76,13 @@ function BeeswaxViewModel(server, assistHelper) {
 
   var type = server === "beeswax" ? "hive" : "impala";
   huePubSub.subscribe("assist.db.panel.ready", function () {
-    huePubSub.publish('assist.set.database', {
-      source: type,
-      name: self.database()
-    });
+    // Defer to let the db be set
+    window.setTimeout(function () {
+      huePubSub.publish('assist.set.database', {
+        source: type,
+        name: self.database()
+      });
+    }, 0);
   });
 
   huePubSub.subscribe("assist.database.selected", function (database) {
