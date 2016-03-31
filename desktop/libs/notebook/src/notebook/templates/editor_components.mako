@@ -214,7 +214,7 @@ ${ hueIcons.symbols() }
         </a>
         % endif
 
-        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:notebooks') }?type=${ editor_type }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
       </div>
