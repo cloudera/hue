@@ -66,7 +66,7 @@ ${ layout.menubar(section='query') }
       </div>
       <div class="tab-pane" id="settingsTab">
         <div class="card card-small card-tab">
-          <div class="card-body">
+          <div class="card-body" style="overflow-y: auto; height: 100%;">
             <div id="advanced-settings">
             <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
                 ${ csrf_token(request) | n,unicode }
@@ -1058,6 +1058,14 @@ ${ tableStats.tableStats() }
     padding: 0 10px;
   }
 
+  .left-panel {
+    position: fixed !important;
+  }
+
+  .resizer {
+    margin-left: 15px;
+    position: fixed !important;
+  }
 </style>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
