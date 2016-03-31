@@ -195,6 +195,13 @@ function BeeswaxViewModel(server, assistHelper) {
     self.design.name(design.name);
     self.design.description(design.desc);
     self.database(design.database);
+    if (typeof design.database !== 'undefined' && design.database !== null) {
+      huePubSub.publish('assist.set.database', {
+        source: type,
+        name: design.database
+      });
+    }
+
     self.design.isParameterized(design.is_parameterized);
     self.design.email(design.email_notify);
     self.design.isRedacted(design.is_redacted);
