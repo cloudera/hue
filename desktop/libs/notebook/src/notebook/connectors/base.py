@@ -71,6 +71,7 @@ class Notebook(object):
 
     if self.document is not None:
       _data['id'] = self.document.id
+      _data['is_history'] = self.document.is_history
 
     return _data
 
