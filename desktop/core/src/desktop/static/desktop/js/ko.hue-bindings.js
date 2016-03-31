@@ -3179,6 +3179,8 @@
           cursorborder: "1px solid #CCC",
           cursoropacitymin: 0,
           cursoropacitymax: 0.75,
+          scrollspeed: 100,
+          mousescrollstep: 60,
           cursorminheight: options.cursorminheight || 20,
           horizrailenabled: options.horizrailenabled || false
         });
@@ -3548,6 +3550,8 @@
           cursorborder: "1px solid #CCC",
           cursoropacitymin: 0,
           cursoropacitymax: 0.75,
+          scrollspeed: 100,
+          mousescrollstep: 60,
           cursorminheight: options.cursorminheight || 20,
           horizrailenabled: options.horizrailenabled || true
         });
