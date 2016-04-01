@@ -1840,7 +1840,7 @@ class HiveDocumentAction(Action):
   FIELDS = {
      'uuid': {
           'name': 'uuid',
-          'label': _('UUID of a Hive query'),
+          'label': _('Hive query'),
           'value': '',
           'help_text': _('Select a saved Hive query you want to schedule.'),
           'type': 'hive'
@@ -1922,11 +1922,6 @@ class HiveDocumentAction(Action):
   @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['uuid']]
-
-
-
-def _generate_hive_script():
-  self._create_file(deployment_dir, self.job.XML_FILE_NAME, oozie_xml)
 
 
 class DecisionNode(Action):
