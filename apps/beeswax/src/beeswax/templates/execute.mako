@@ -812,11 +812,22 @@ ${ tableStats.tableStats() }
   }
 
   .left-panel {
-    position: absolute;
+    position: fixed !important;
+    z-index: 1030;
+  }
+
+  .mega-popover .popover-content {
+    min-height: 190px !important;
+  }
+
+  .mega-popover .content {
+    height: auto !important;
+    max-height: 280px;
   }
 
   .resizer {
-    position: absolute;
+    position: fixed !important;
+    margin-left: 15px;
     width: 20px;
     text-align: center;
     z-index: 1000;
@@ -1056,15 +1067,6 @@ ${ tableStats.tableStats() }
 
   .query-right-actions h4 {
     padding: 0 10px;
-  }
-
-  .left-panel {
-    position: fixed !important;
-  }
-
-  .resizer {
-    margin-left: 15px;
-    position: fixed !important;
   }
 </style>
 
