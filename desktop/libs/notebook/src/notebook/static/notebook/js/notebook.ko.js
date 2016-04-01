@@ -647,8 +647,10 @@
     };
 
     self.clear = function () {
-      self.ace().setValue('', 1);
       logGA('clear');
+      self.ace().setValue('', 1);
+      self.result.clear();
+      notebook.showHistory(true);
     };
 
     self.explain = function () {
