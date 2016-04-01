@@ -718,6 +718,24 @@ class TestDocument2Permissions(object):
     assert_equal(doc2.uuid, data['document']['uuid'], data)
 
 
+  def test_inherit_parent_permissions(self):
+    # Tests that when saving a document to a shared directory, the doc/dir inherits same permissions
+
+    dir1 = Directory.objects.create(name='dir1', owner=self.user, parent_directory=self.home_dir)
+
+    dir1.share(user=self.user, name='read', users=[], groups=[self.default_group])
+    dir1.share(user=self.user, name='write', users=[self.user_not_me], groups=[])
+
+    doc1 = Document2.objects.create(name='doc1', owner=self.user, parent_directory=dir1)
+
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
+    data = json.loads(response.content)
+    assert_equal([{'id': self.default_group.id, 'name': self.default_group.name}],
+                 data['document']['perms']['read']['groups'], data)
+    assert_equal([{'id': self.user_not_me.id, 'username': self.user_not_me.username}],
+                 data['document']['perms']['write']['users'], data)
+
+
   def test_search_documents(self):
     owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     owned_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir)
