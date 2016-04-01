@@ -157,7 +157,7 @@
       <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon">
       <!-- /ko -->
 
-      <!-- ko if: widgetType() == 'hive2-widget' -->
+      <!-- ko if: widgetType() == 'hive2-widget' || widgetType() == 'hive-document-widget' -->
       <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
       <!-- /ko -->
 
@@ -926,6 +926,65 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="hive-document-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <span data-bind='text: properties.uuid'></span>
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <span data-bind='text: properties.uuid'></span>
+
+        <div class="row-fluid">
+          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
+          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
+          <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
+          <br/>
+          <span data-bind="text: $root.workflow_properties.password.label"></span>
+          <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
+          <br/>
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+          <br/>
+          <br/>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
   <!-- /ko -->
 </script>

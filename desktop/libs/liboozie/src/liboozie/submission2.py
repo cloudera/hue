@@ -184,6 +184,12 @@ class Submission(object):
 
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
+        elif action.data['type'] == 'hive-document':
+          from notebook.models import Notebook
+          notebook = Notebook(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['uuid']))
+          
+          self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_data()['snippets'][0]['statement'])
+          #self.data['properties']['script_path'] = _generate_hive_script(self.data['uuid']) #'workspace_%s' % workflow.uui
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
@@ -348,12 +354,12 @@ class Submission(object):
     return Coordinator.PROPERTY_APP_PATH in self.properties
 
   def _create_file(self, deployment_dir, file_name, data, do_as=False):
-   file_path = self.fs.join(deployment_dir, file_name)
-   if do_as:
-     self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0644, data=smart_str(data))
-   else:
-     self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
-   LOG.debug("Created/Updated %s" % (file_path,))
+    file_path = self.fs.join(deployment_dir, file_name)
+    if do_as:
+      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0644, data=smart_str(data))
+    else:
+      self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
+    LOG.debug("Created/Updated %s" % (file_path,))
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories

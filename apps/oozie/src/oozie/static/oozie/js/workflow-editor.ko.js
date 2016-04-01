@@ -516,6 +516,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
+  self.hiveQueries = ko.observableArray([{"uuid": "c73171ec-acff-4c30-b350-3df0c31689a9", "name": "show tables"}]);
   self.history = ko.mapping.fromJS(history_json);
 
   self.getSubWorkflow = function (uuid) {
@@ -1227,6 +1228,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableDistCpAction = ko.observable(bareWidgetBuilder("Distcp", "distcp-widget"));
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
+  self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
 
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
