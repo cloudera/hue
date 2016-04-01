@@ -476,10 +476,10 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
+          <a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
           <!-- ko if: app === 'documents' -->
             <span class="dropdown">
-              <a class="inactive-action fb-action" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+              <a class="inactive-action fb-action" title="${_('New document')}" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
               <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
                 % if 'beeswax' in apps:
                   <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
@@ -501,15 +501,15 @@ from desktop.views import _ko
               </ul>
             </span>
           <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+          <a class="inactive-action fb-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed() || (sharedWithMeSelected() && superuser)) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
+          <a class="inactive-action fb-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
+          <a class="inactive-action fb-action" title="${_('Download')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
+          <a class="inactive-action fb-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" style="margin-left: 20px;" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
+          <a class="inactive-action fb-action" title="${_('Show trash')}" style="margin-left: 20px;" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
           <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -590,7 +590,7 @@ from desktop.views import _ko
                 <div class="pull-right">
                   <!-- ko with: definition -->
                   <div class="fb-attr-col fb-type" data-bind="text: type"></div>
-                  <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
+                  <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                   <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
                   <!-- /ko -->
                 </div>
