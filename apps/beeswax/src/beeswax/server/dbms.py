@@ -315,7 +315,11 @@ class HiveServer2Dbms(object):
     result = None
     hql = None
 
-    if self.server_name == 'impala':
+    # Filter on max # of partitions for partitioned tables
+    column = '`%s`' % column if column else '*'
+    if table.partition_keys:
+      hql = self._get_sample_partition_query(database, table, column, limit)
+    elif self.server_name == 'impala':
       if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
@@ -323,14 +327,8 @@ class HiveServer2Dbms(object):
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
     else:
-      # Filter on max # of partitions for partitioned tables
-      # Impala's SHOW PARTITIONS is different from Hive, so we only support Hive for now
-      column = '`%s`' % column if column else '*'
-      if table.partition_keys:
-        hql = self._get_sample_partition_query(database, table, column, limit)
-      else:
-        hql = "SELECT %s FROM `%s`.`%s` LIMIT %s" % (column, database, table.name, limit)
-        # TODO: Add nested select support for HS2
+      hql = "SELECT %s FROM `%s`.`%s` LIMIT %s" % (column, database, table.name, limit)
+      # TODO: Add nested select support for HS2
 
     if hql:
       query = hql_query(hql)

@@ -1733,7 +1733,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(1)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(baz='baz_one' AND boom='boom_two')"
+      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
@@ -1744,7 +1744,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(baz='baz_one' AND boom='boom_two') OR (baz='baz_foo' AND boom='boom_bar')"
+      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two') OR (`baz`='baz_foo' AND `boom`='boom_bar')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
