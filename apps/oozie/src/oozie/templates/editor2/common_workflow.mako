@@ -939,7 +939,7 @@
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
       <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
-        <span data-bind='text: name'></span>
+        <a data-bind="attr: {href: absoluteUrl()}" target="_blank"><span data-bind='text: name'></span></a>
         </br>
         <span data-bind='text: description'></span>
       <!-- /ko -->
