@@ -1047,6 +1047,9 @@ class Document2(models.Model):
 
     super(Document2, self).save(*args, **kwargs)
 
+    # Inherit shared permissions from parent directory, must be done after save b/c new doc needs ID
+    self.inherit_permissions()
+
   def validate(self):
     # Validate document name
     invalid_chars = re.compile(r"[<>/{}[\]~`]");
@@ -1062,6 +1065,14 @@ class Document2(models.Model):
     if self._contains_cycle():
       raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
                                 (self.name, self.parent_directory.uuid))
+
+
+  def inherit_permissions(self):
+    if self.parent_directory is not None:
+      parent_perms = Document2Permission.objects.filter(doc=self.parent_directory)
+      for perm in parent_perms:
+        self.share(self.owner, name=perm.perms, users=perm.users.all(), groups=perm.groups.all())
+
 
   def move(self, directory, user):
     if not directory.is_directory:
