@@ -217,17 +217,17 @@ from desktop.views import _ko
           } else {
             $popover.hide();
           }
-        }
+        };
 
-        if (self.enabled) {
-          window.setInterval(function () {
-            if (self.analysisStats() == null) {
-              return;
-            }
+        var refreshInterval = -1;
 
-            self.refreshPopoverPosition();
-          }, 200);
-        }
+        self.analysisStats.subscribe(function (newValue) {
+          if (newValue && self.enabled) {
+            refreshInterval = window.setInterval(self.refreshPopoverPosition, 200);
+          } else {
+            window.clearInterval(refreshInterval);
+          }
+        });
 
         self.analysisStats.subscribe(function (newValue) {
           if (newValue) {
