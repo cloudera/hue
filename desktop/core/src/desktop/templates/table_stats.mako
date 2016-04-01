@@ -34,7 +34,7 @@ from desktop.views import _ko
   </style>
 
   <script type="text/html" id="table-stats">
-    <div class="content">
+    <div class="content" data-bind="niceScroll">
       <!-- ko if: statRows().length -->
       <table class="table table-striped">
         <tbody data-bind="foreach: statRows">
@@ -107,7 +107,7 @@ from desktop.views import _ko
           <div class="tab-pane" id="sampleTab" data-bind="css: { 'active' : activeTab() === 'sample' }">
             <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
             <!-- ko ifnot: loadingSamples -->
-            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;">
+            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;" data-bind="niceScroll">
               <!-- ko with: samples -->
               <!-- ko if: rows.length == 0 -->
               <div class="alert">${ _('The selected table has no data.') }</div>
