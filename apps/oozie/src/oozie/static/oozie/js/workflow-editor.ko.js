@@ -491,6 +491,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
+
+    $.get('/desktop/api2/docs/?type=query-hive&page=1&limit=25', function(data) {
+      $.each(data.documents, function(index, query) {
+        self.hiveQueries.push(ko.mapping.fromJS(query));
+      });
+    });
   };
 
   self.addActionProperties = ko.observableArray([]);
@@ -516,10 +522,10 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
-  self.hiveQueries = ko.observableArray([{"uuid": "c73171ec-acff-4c30-b350-3df0c31689a9", "name": "show tables"}]);
+  self.hiveQueries = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
-  //AssistHelper.getInstance(vm);
-  
+
+
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
       return wf.value == uuid;
@@ -1230,7 +1236,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
   self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
-
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 
