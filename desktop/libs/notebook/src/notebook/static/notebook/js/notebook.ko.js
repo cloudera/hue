@@ -1160,6 +1160,7 @@
     };
 
     self.save = function () {
+      logGA('save');
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode
@@ -1183,6 +1184,7 @@
     };
 
     self.close = function () {
+      logGA('close');
       $.post("/notebook/api/notebook/close", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode
@@ -1267,7 +1269,19 @@
       }
     });
 
+    self.schedule = function() {
+      logGA('schedule');
+      $.post("/oozie/editor/document/schedule/", {
+        uuid: self.uuid()
+      }, function (data) {
+        window.location.href = data.url;
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
     self.clearHistory = function (type) {
+      logGA('clearHistory');
       $.post("/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
         doc_type: self.selectedSnippet()

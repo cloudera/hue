@@ -202,6 +202,12 @@ ${ hueIcons.symbols() }
           <i class="fa fa-cogs"></i>
         </a>
 
+        % if mode == 'editor':
+        <a class="btn pointer" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().schedule() }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
+          <i class="fa fa-fw fa-calendar"></i>
+        </a>
+        % endif
+
         <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
           <i class="fa fa-expand"></i>
         </a>
