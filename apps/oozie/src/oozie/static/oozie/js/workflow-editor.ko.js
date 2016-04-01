@@ -518,7 +518,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
   self.hiveQueries = ko.observableArray([{"uuid": "c73171ec-acff-4c30-b350-3df0c31689a9", "name": "show tables"}]);
   self.history = ko.mapping.fromJS(history_json);
-
+  //AssistHelper.getInstance(vm);
+  
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
       return wf.value == uuid;

@@ -188,7 +188,7 @@ class Submission(object):
           from notebook.models import Notebook
           notebook = Notebook(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['uuid']))
           
-          self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_data()['snippets'][0]['statement'])
+          self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_str())
           #self.data['properties']['script_path'] = _generate_hive_script(self.data['uuid']) #'workspace_%s' % workflow.uui
 
     oozie_xml = self.job.to_xml(self.properties)

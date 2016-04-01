@@ -36,6 +36,8 @@ from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
+from notebook.models import Notebook
+
 from oozie.decorators import check_document_access_permission, check_document_modify_permission,\
   check_editor_access_permission
 from oozie.forms import ParameterForm
@@ -327,6 +329,9 @@ def action_parameters(request):
           parameters = parameters.union(set(find_dollar_braced_variables(data)))
         elif node_data['type'] == 'pig':
           parameters = parameters.union(set(find_dollar_variables(data)))
+    elif node_data['type'] == 'hive-document':
+      notebook = Notebook(document=Document2.objects.get_by_uuid(uuid=node_data['properties']['uuid']))          
+      parameters = parameters.union(set(find_dollar_braced_variables(notebook.get_str())))
 
     response['status'] = 0
     response['parameters'] = list(parameters)
