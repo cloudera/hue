@@ -937,12 +937,24 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <span data-bind='text: properties.uuid'></span>
+      <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
+      <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
+        <span data-bind='text: name'></span>
+        </br>
+        <span data-bind='text: description'></span>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <span data-bind='text: properties.uuid'></span>
+        <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
+        <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
+          <span data-bind='text: name'></span>
+          </br>
+          <span data-bind='text: description'></span>
+        <!-- /ko -->
+        <!-- /ko -->
 
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>

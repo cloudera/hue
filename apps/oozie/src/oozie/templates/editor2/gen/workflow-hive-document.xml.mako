@@ -32,7 +32,7 @@
             % if node['properties']['password']:
             <password>${ node['properties']['password'] }</password>
             % endif
-            <script>${'${'}oozie.wf.application.path}/${ node['name'] }.sql</script>
+            <script>${'${wf:appPath()}'}/${ node['name'] }.sql</script>
 
             % for param in node['properties']['parameters']:
               <param>${ param['value'] }</param>

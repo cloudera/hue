@@ -640,7 +640,7 @@ class Node():
     if workflow_mapping is None:
       workflow_mapping = {}
 
-    if self.data['type'] == 'hive2' and not self.data['properties']['jdbc_url']:
+    if self.data['type'] in ('hive2', 'hive-document') and not self.data['properties']['jdbc_url']:
       self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
 
     if self.data['type'] == 'fork':

@@ -492,7 +492,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
 
-    $.get('/desktop/api2/docs/?type=query-hive&page=1&limit=25', function(data) {
+    $.get('/desktop/api2/docs/?type=query-hive&limit=50', function(data) {
       $.each(data.documents, function(index, query) {
         self.hiveQueries.push(ko.mapping.fromJS(query));
       });
@@ -525,6 +525,16 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.hiveQueries = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
+  self.getHiveQueryById = function (uuid) {
+    var _query = null;
+    $.each(self.hiveQueries(), function (index, query) {
+      if (query.uuid() == uuid) {
+        _query = query;
+        return false;
+      }
+    });
+    return _query;
+  };
 
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
