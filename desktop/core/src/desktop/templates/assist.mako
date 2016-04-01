@@ -256,15 +256,19 @@ from desktop.views import _ko
 
     .assist-flex-panel {
       position: relative;
+      display: -ms-flexbox;
       display: flex;
+      -ms-flex-flow: column nowrap;
       flex-flow: column nowrap;
       align-items: stretch;
       height:100%;
+      min-height: 100vh;
     }
 
     .assist-flex-header {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 25px;
       flex: 0 0 25px;
       white-space: nowrap;
     }
@@ -272,6 +276,7 @@ from desktop.views import _ko
     .assist-flex-table-search {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 65px;
       flex: 0 0 65px;
       white-space: nowrap;
     }
@@ -279,12 +284,14 @@ from desktop.views import _ko
     .assist-flex-search {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 43px;
       flex: 0 0 43px;
       white-space: nowrap;
     }
 
     .assist-flex-fill {
       position: relative;
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
       white-space: nowrap;
       overflow-x: hidden;
