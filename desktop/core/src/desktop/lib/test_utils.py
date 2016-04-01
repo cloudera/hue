@@ -58,7 +58,7 @@ def remove_from_group(username, groupname):
     user = User.objects.get(username=username)
     group, created = Group.objects.get_or_create(name=groupname)
 
-    if not user.groups.filter(name=group.name).exists():
+    if user.groups.filter(name=group.name).exists():
         user.groups.remove(group)
         user.save()
 
