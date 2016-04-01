@@ -706,13 +706,14 @@
         rows: rows,
         startOver: startOver
       }, function (data) {
+        data = JSON.bigdataParse(data);
         if (data.status == 0) {
           self.loadData(data, rows);
         } else {
           self._ajaxError(data);
           $(document).trigger("renderDataError", {snippet: self});
         }
-      }).fail(function (xhr, textStatus, errorThrown) {
+      }, 'text').fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
     };

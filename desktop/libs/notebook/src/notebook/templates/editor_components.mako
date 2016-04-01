@@ -38,6 +38,7 @@ from desktop.views import _ko
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 
+<script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
