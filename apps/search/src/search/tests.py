@@ -114,7 +114,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true('denied' in data['message'], response.content)
 
     # Admin
-    c = make_logged_in_client(username='admin', is_superuser=True)
+    c = make_logged_in_client(username='admin', is_superuser=True, recreate=True)
     response = c.post(reverse('search:update_document'), {
         'collection': json.dumps(self._get_collection_param(self.collection)),
         'document': json.dumps({'hasChanged': False})
