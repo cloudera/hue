@@ -1835,6 +1835,100 @@ class ForkNode(Action):
     return []
 
 
+class HiveDocumentAction(Action):
+  TYPE = 'hive-document'
+  FIELDS = {
+     'uuid': {
+          'name': 'uuid',
+          'label': _('UUID of a Hive query'),
+          'value': '',
+          'help_text': _('Select a saved Hive query you want to schedule.'),
+          'type': 'hive'
+     },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
+     },
+     # Common
+     'jdbc_url': {
+          'name': 'jdbc_url',
+          'label': _('HiveServer2 URL'),
+          'value': "",
+          'help_text': _('e.g. jdbc:hive2://localhost:10000/default. JDBC URL for the Hive Server 2.'),
+          'type': ''
+     },
+     'password': {
+          'name': 'password',
+          'label': _('Password'),
+          'value': '',
+          'help_text': _('The password element must contain the password of the current user. However, the password is only used if Hive Server 2 is backed by '
+                         'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
+          'type': ''
+     },
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Files put in the running directory.'),
+          'type': ''
+     },
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production'),
+          'type': ''
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.'),
+          'type': ''
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': '',
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
+
+
+
+def _generate_hive_script():
+  self._create_file(deployment_dir, self.job.XML_FILE_NAME, oozie_xml)
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -1865,7 +1959,8 @@ NODES = {
   'fork-widget': ForkNode,
   'decision-widget': DecisionNode,
   'spark-widget': SparkAction,
-  'generic-widget': GenericAction
+  'generic-widget': GenericAction,
+  'hive-document-widget': HiveDocumentAction
 }
 
 
