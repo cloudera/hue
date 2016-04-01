@@ -940,7 +940,7 @@
       <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
       <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
         <a data-bind="attr: {href: absoluteUrl()}" target="_blank"><span data-bind='text: name'></span></a>
-        </br>
+        <br/>
         <span data-bind='text: description'></span>
       <!-- /ko -->
       <!-- /ko -->
@@ -951,7 +951,7 @@
         <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
         <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
           <span data-bind='text: name'></span>
-          </br>
+          <br/>
           <span data-bind='text: description'></span>
         <!-- /ko -->
         <!-- /ko -->
