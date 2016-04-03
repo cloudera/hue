@@ -20,7 +20,9 @@ import logging
 import sys
 
 from django.core.management.base import NoArgsCommand
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
+from django.db.utils import OperationalError
 
 
 LOG = logging.getLogger(__name__)
@@ -69,8 +71,48 @@ class Command(NoArgsCommand):
     try:
       db_conn = connections['default']
       db_conn.cursor()
+    except ImproperlyConfigured: # Connector not found
+      sys.exit(3)
+    except OperationalError, e:
+      self.stdout.write('Error accessing DB: %s' % e)
+      # MySql
+      if e.args[0] == 2005: # "Unknown MySQL server host 'laaaocalhost' (111)"
+        sys.exit(5)
+      elif e.args[0] == 2002: # Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+        sys.exit(6)
+      elif e.args[0] == 1049: # "Unknown database 'huea'"
+        sys.exit(7)
+      elif e.args[0] == 1045: # "Access denied for user 'root'@'localhost' (using password: YES)"
+        sys.exit(8)
+      else: # Any connection error that we can't make sense of
+        sys.exit(4)
     except Exception, e:
       self.stdout.write('Error accessing DB: %s' % e)
-      sys.exit(-1)
+      error = str(e)
+
+      # Oracle
+      if 'ORA-12545' in error: # Connect failed because target host or object does not exist
+        sys.exit(5)
+      elif 'ORA-12541' in error: # TNS:no listener
+        sys.exit(6)
+      elif 'ORA-12505' in error: # TNS:listener does not currently know of SID given in connect descriptor
+        sys.exit(7)
+      elif 'ORA-01017' in error: # invalid username/password; logon denied
+        sys.exit(8)
+      elif 'ORA' in error: # Any connection error that we can't make sense of
+        sys.exit(4)
+      # PostGreSQL
+      elif 'could not translate host name' in error: # could not translate host name "alocalhost" to address: Name or service not known
+        sys.exit(5)
+      elif 'could not connect to server' in error: # could not connect to server: Connection refused Is the server running on host "localhost" (127.0.0.1) and accepting TCP/IP connections on port 5432?
+        sys.exit(6)
+      elif 'does not exist' in error: # FATAL:  database "DB_NAMEaa" does not exist
+        sys.exit(7)
+      elif 'password authentication failed' in error: # password authentication failed for user "root"
+        sys.exit(8)
+      elif 'FATAL' in error:
+        sys.exit(4)
+
+      sys.exit(1)
 
     self.stdout.write('Database was accessed successfully')
