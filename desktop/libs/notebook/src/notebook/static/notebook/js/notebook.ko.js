@@ -388,6 +388,12 @@
     self.progress = ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
     self.jobs = ko.observableArray(typeof snippet.jobs != "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
+    self.ddlNotification = ko.observable();
+    self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+    self.delayedDDLNotification.subscribe(function (val) {
+      huePubSub.publish('assist.db.refresh', self.type());
+    });
+
     self.progress.subscribe(function (val) {
       $(document).trigger("progress", {data: val, snippet: self});
     });
@@ -788,7 +794,7 @@
             self.fetchResult(100);
             self.progress(100);
             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
-              huePubSub.publish('assist.db.refresh', self.type());
+              self.ddlNotification(Math.random());
               if (self.result.handle().has_more_statements) {
                 setTimeout(function () {
                   self.execute(); // Execute next, need to wait as we disabled fast click
