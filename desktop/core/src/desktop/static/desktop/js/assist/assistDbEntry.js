@@ -247,6 +247,9 @@
       }
 
       newEntries.sort(function (a, b) {
+        if (a.definition.isColumn && b.definition.isColumn) {
+          return 0;
+        }
         return a.definition.name.localeCompare(b.definition.name);
       });
 
