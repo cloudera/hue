@@ -123,14 +123,13 @@ from desktop.views import _ko
       padding: 4px 0;
     }
 
-    .fb-list ul {
+    .fb-entries {
       list-style: none;
       margin: 0;
     }
 
-    .fb-list li {
+    .fb-entries > li {
       clear: both;
-      height: 42px;
       line-height: 42px;
       border: 1px solid transparent;
       margin: 1px;
@@ -139,7 +138,7 @@ from desktop.views import _ko
       cursor: pointer;
     }
 
-    .fb-list li:hover {
+    .fb-entries > li:hover:not(.fb-selected) {
       background-color: #E8F5FE;
     }
 
@@ -548,7 +547,7 @@ from desktop.views import _ko
 
 
       <div class="fb-list" data-bind="with: activeEntry">
-        <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
+        <ul class="fb-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
