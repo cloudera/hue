@@ -1053,16 +1053,6 @@ class Document2(models.Model):
     if invalid_chars.search(self.name):
       raise FilesystemException(_('Document %s contains an invalid character.') % self.name)
 
-    # If different document with same name and same path (parent) exists, rename current document with datetime
-    if Document2.objects.filter(
-            owner=self.owner,
-            name=self.name,
-            type=self.type,
-            parent_directory=self.parent_directory
-            ).exclude(pk=self.pk).exists():
-        timestamp = str(datetime.now()).split('.', 1)[0]
-        self.name = '%s %s' % (self.name, timestamp)
-
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in [Document2.HOME_DIR, Document2.TRASH_DIR] and self.type == 'directory' and \
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
