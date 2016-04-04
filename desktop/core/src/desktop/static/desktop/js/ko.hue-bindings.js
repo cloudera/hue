@@ -2938,7 +2938,7 @@
       var snippet = options.snippet;
       if (snippet.ace()) {
         var editor = snippet.ace();
-        var range = options.highlightedRange();
+        var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
         if (range) {
           if (editor.session.$backMarkers) {

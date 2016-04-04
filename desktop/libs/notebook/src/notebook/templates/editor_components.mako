@@ -931,9 +931,9 @@ ${ hueIcons.symbols() }
 
 
 <script type="text/html" id="markdown-snippet-body">
-  <!-- ko if: $root.isEditing() -->
+  <!-- ko ifnot: $root.isPlayerMode() -->
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6" data-bind="clickForAceFocus: ace">
       <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
         snippet: $data,
         updateOnInput: true
@@ -944,7 +944,7 @@ ${ hueIcons.symbols() }
     </div>
   </div>
   <!-- /ko -->
-  <!-- ko ifnot: $root.isEditing() -->
+  <!-- ko if: $root.isPlayerMode() -->
   <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
   <!-- /ko -->
 </script>
