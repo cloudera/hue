@@ -76,8 +76,9 @@
     _el.empty();
     _el.addClass("jHueHdfsTree");
 
+    var _homeLink;
     if (_this.options.home != "") {
-      var _homeLink = $("<a>").html('<i class="fa fa-home"></i> ' + _this.options.labels.HOME).click(function () {
+        _homeLink = $("<a>").html('<i class="fa fa-home"></i> ' + _this.options.labels.HOME).click(function () {
         var _path = _this.options.home;
         _this.options.onPathChange(_path);
         _this.lastPath = _path;
@@ -97,11 +98,11 @@
       _homeLink.css({
         "cursor": "pointer",
         "position": "fixed",
-        "margin-top": "-10px",
-        "margin-left": "12px",
+        "padding-bottom": '4px',
         "font-size": "16px",
+        "border-bottom": "1px solid #FFF",
         "background-color": "#FFF",
-        "width": "560px"
+        "width": (560 - hueUtils.scrollbarWidth()) + "px"
       })
     }
 
@@ -110,6 +111,18 @@
 
     if (_this.options.home != "") {
       _homeLink.appendTo(_el);
+      _el.parent().on('scroll', function(){
+        if (_el.parent().scrollTop() > 0){
+          _homeLink.css({
+            "border-bottom": "1px solid #EEE"
+          });
+        }
+        else {
+          _homeLink.css({
+            "border-bottom": "1px solid #FFF"
+          });
+        }
+      });
     }
     _tree.appendTo(_el);
 

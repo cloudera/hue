@@ -202,6 +202,18 @@ Array.prototype.diff = function (a) {
     }
   }
 
+  /**
+   * @constructor
+   */
+  hueUtils.scrollbarWidth = function () {
+    var $parent, $children, width;
+    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    $children = $parent.children();
+    width = $children.innerWidth() - $children.height(99).innerWidth();
+    $parent.remove();
+    return width;
+  }
+
 
 }(hueUtils = window.hueUtils || {}));
 
