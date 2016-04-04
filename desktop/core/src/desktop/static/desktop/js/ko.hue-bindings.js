@@ -494,9 +494,16 @@
       var hidePopover = function () {
         $element.popover('hide');
         visible = false;
+        $(document).off('click', hideOnClickOutside)
       };
 
       huePubSub.subscribe('close.popover', hidePopover);
+
+      var hideOnClickOutside = function (event) {
+        if (visible && $element.data('popover') && ! $.contains($element.data('popover').$tip[0], event.target)) {
+          hidePopover();
+        }
+      }
 
       var showPopover = function () {
         ko.renderTemplate(options.contentTemplate, viewModel, {
@@ -516,6 +523,7 @@
                 }
                 $content.empty();
                 $title.empty();
+                $(document).on('click', hideOnClickOutside)
                 visible = true;
               }
             }, $title.get(0), 'replaceChildren');
@@ -524,12 +532,13 @@
       };
 
       if (clickTrigger) {
-        $element.click(function () {
+        $element.click(function (e) {
           if (visible) {
             hidePopover();
           } else {
             showPopover();
           }
+          e.stopPropagation();
         });
       } else {
         $element.mouseenter(showPopover);
