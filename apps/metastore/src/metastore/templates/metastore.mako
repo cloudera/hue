@@ -295,7 +295,7 @@ ${ assist.assistPanel() }
 </a>
 
 <script type="text/html" id="metastore-databases">
-  <div class="actionbar-actions">
+  <div class="actionbar-actions" data-bind="dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
@@ -405,7 +405,7 @@ ${ assist.assistPanel() }
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions" data-bind="visible: tables().length > 0">
+        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
