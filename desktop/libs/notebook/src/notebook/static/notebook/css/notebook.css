@@ -868,3 +868,23 @@ h4.header {
   border-bottom: 1px solid #DDD;
   padding-bottom: 3px;
 }
+
+.history-table tbody tr {
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+}
+
+.history-table tbody tr:hover {
+  border-left: 2px solid #CCC;
+  border-right: 2px solid #CCC;
+}
+
+.history-table tbody tr:hover td, .history-table tbody tr:hover th {
+  background-color: #f7f7f9;
+}
+
+code.history-item {
+  white-space: normal;
+  border: none;
+  color: #666;
+}

@@ -459,14 +459,14 @@ ${ hueIcons.symbols() }
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
           <!-- /ko -->
           <!-- ko if: $parent.history().length > 0 -->
-          <table class="table table-condensed margin-top-10">
+          <table class="table table-condensed margin-top-10 history-table">
             <tbody data-bind="foreach: $parent.history">
               <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { location.href=url; } }">
                 <td style="width: 100px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
                 <td style="width: 25px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}">
                   <i class="fa fa-fw fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
                 </td>
-                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><code data-bind="text: query" style="white-space: normal"></code></td>
+                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><code data-bind="text: query" class="history-item"></code></td>
               </tr>
             </tbody>
           </table>
