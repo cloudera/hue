@@ -2583,3 +2583,9 @@ body {
   pointer-events: none;
   height: 130px;
 }
+
+.dockable {
+  background-color: #FFF;
+  z-index: 10000;
+  padding-bottom: 2px;
+}

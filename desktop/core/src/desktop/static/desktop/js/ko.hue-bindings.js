@@ -3515,6 +3515,8 @@
 
 
       $parent.parents(scrollable).off('scroll');
+      huePubSub.publish('scrollable.scroll.off', scrollable);
+
       $parent.parents(scrollable).on('scroll', render);
 
       if ($parent.parents('.hueach').length > 0) {
@@ -3566,6 +3568,7 @@
           cursorminheight: options.cursorminheight || 20,
           horizrailenabled: options.horizrailenabled || true
         });
+        $(element).addClass('nicescrollified');
       }
     }
   };
@@ -3577,6 +3580,61 @@
       if (Plotly){
         Plotly.plot(element, options.data || [], options.layout || {}, {displaylogo: false});
       }
+    }
+  };
+
+  ko.bindingHandlers.dockable = {
+    init: function (element, valueAccessor, allBindings) {
+      var options = valueAccessor() || {};
+      var scrollable = options.scrollable ? options.scrollable : window;
+
+      $(element).addClass('dockable');
+
+      var initialTopPosition = -1;
+      var initialSize = {
+        w: $(element).width(),
+        h: $(element).outerHeight() + (options.jumpCorrection || 0)
+      };
+
+      var ghost = $('<div>').css({'display': 'none', 'height': initialSize.h}).insertBefore($(element));
+
+      function dock() {
+        if (initialTopPosition == -1) {
+          initialTopPosition = $(element).position().top;
+        }
+        if ($(scrollable).scrollTop() > initialTopPosition) {
+          $(element).css({
+            'position': 'fixed',
+            'top': '82px',
+            'width': initialSize.w + 'px'
+          });
+          ghost.show();
+        }
+        else {
+          $(element).removeAttr('style');
+          ghost.hide();
+        }
+      }
+
+      if (options.nicescroll) {
+        var checkForNicescrollInit = -1;
+        checkForNicescrollInit = window.setInterval(function () {
+          if ($(scrollable).hasClass('nicescrollified')) {
+            window.clearTimeout(checkForNicescrollInit);
+            $(scrollable).on('scroll', dock);
+          }
+        }, 200);
+      }
+      else {
+        $(scrollable).on('scroll', dock);
+      }
+
+      huePubSub.subscribe('scrollable.scroll.off', function (scrollElement) {
+        if (scrollElement === scrollable) {
+          $(scrollable).on('scroll', dock);
+        }
+      });
+
     }
   };
 
