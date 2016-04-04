@@ -241,7 +241,7 @@ def save_notebook(request):
   if notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
-    notebook_doc = Document2.objects.create(name=notebook['name'], type=notebook_type, owner=request.user)
+    notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
 
   notebook_doc1 = notebook_doc.doc.get()
