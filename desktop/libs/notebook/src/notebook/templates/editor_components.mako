@@ -346,7 +346,7 @@ ${ hueIcons.symbols() }
       }"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll: { enable: $root.editorMode }">
+  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -422,7 +422,7 @@ ${ hueIcons.symbols() }
       <i class="fa fa-ellipsis-h"></i>
     </div>
   </div>
-  <div class="snippet-log-container">
+  <div class="snippet-log-container margin-bottom-10">
     <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
@@ -721,7 +721,7 @@ ${ hueIcons.symbols() }
             showLineNumbers: $root.editorMode,
             showGutter: $root.editorMode,
             maxLines: $root.editorMode ? null : 25,
-            minLines: $root.editorMode ? null : 1
+            minLines: $root.editorMode ? null : 3
           }
         }"></div>
       </div>
@@ -1485,6 +1485,7 @@ ${ hueIcons.symbols() }
             fixedHeader: true,
             fixedFirstColumn: true,
             includeNavigator: false,
+            mainScrollable: '.right-panel',
             parentId: 'snippet_' + snippet.id(),
             clonedContainerPosition: "absolute"
           });
@@ -1522,12 +1523,14 @@ ${ hueIcons.symbols() }
     else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
         maxHeight: DATATABLES_MAX_HEIGHT,
-        heightAfterCorrection: 0
+        heightAfterCorrection: 0,
+        enableNiceScroll: true
       });
       $(el).jHueTableExtender({
         fixedHeader: true,
         fixedFirstColumn: true,
         includeNavigator: false,
+        mainScrollable: '.right-panel',
         parentId: 'snippet_' + snippet.id(),
         clonedContainerPosition: "absolute"
       });
@@ -1561,7 +1564,7 @@ ${ hueIcons.symbols() }
       scrollElement = $('.right-panel');
     }
 
-    scrollElement.on("scroll", function () {
+    scrollElement.on('scroll', function () {
       var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
       scrollElement.data("scrollPosition", scrollElement.scrollTop());
@@ -1998,6 +2001,7 @@ ${ hueIcons.symbols() }
                 fixedHeader: true,
                 fixedFirstColumn: true,
                 includeNavigator: false,
+                mainScrollable: '.right-panel',
                 parentId: 'snippet_' + snippet.id(),
                 clonedContainerPosition: "absolute"
               });

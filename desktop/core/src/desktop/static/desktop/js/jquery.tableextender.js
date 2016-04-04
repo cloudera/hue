@@ -257,6 +257,7 @@
 
     clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
 
+
     function positionClones() {
       if (plugin.options.stickToTopPosition > -1) {
         if ($(plugin.element).offset().top < plugin.options.stickToTopPosition) {
@@ -268,15 +269,22 @@
         clonedTableVisibleContainer.css("top", $(plugin.element).offset().top + "px");
       }
       else {
-        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
-        clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+        if (plugin.options.clonedContainerPosition == 'absolute') {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+          clonedCellVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+        }
+        else {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+          clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+        }
       }
     }
 
     positionClones();
 
-    $(mainScrollable).scroll(function () {
-      positionClones();
+    $(mainScrollable).on('scroll', function () {
+      window.clearTimeout($(plugin.element).data('throttleColumn'));
+      $(plugin.element).data('throttleColumn', window.setTimeout(positionClones, 10));
     });
   }
 
@@ -305,7 +313,8 @@
     var topPosition;
     if (plugin.options.clonedContainerPosition == 'absolute') {
       topPosition = $(plugin.element).parent().position().top - $(mainScrollable).scrollTop();
-    } else {
+    }
+    else {
       topPosition = $(plugin.element).parent().offset().top - $(mainScrollable).scrollTop();
     }
     var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
@@ -348,14 +357,20 @@
         }
       }
       else {
-        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+        if (plugin.options.clonedContainerPosition == 'absolute') {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+        }
+        else {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+        }
       }
     }
 
     positionClones();
 
-    $(mainScrollable).scroll(function () {
-      positionClones();
+    $(mainScrollable).on('scroll', function () {
+      window.clearTimeout($(plugin.element).data('throttleHeader'));
+      $(plugin.element).data('throttleHeader', window.setTimeout(positionClones, 10));
     });
   }
 

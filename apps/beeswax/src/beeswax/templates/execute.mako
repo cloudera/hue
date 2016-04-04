@@ -1169,14 +1169,16 @@ function placeResizePanelHandle() {
 function reinitializeTableExtenders() {
   if (viewModel.design.results.columns().length > 0 && viewModel.design.results.columns().length < 500) {
     $("#resultTable").jHueTableExtender({
-       fixedHeader: true,
-       fixedFirstColumn: true,
-       includeNavigator: false
+      fixedHeader: true,
+      fixedFirstColumn: true,
+      includeNavigator: false,
+      clonedContainerPosition: "absolute"
     });
   }
   $("#recentQueries").jHueTableExtender({
-     fixedHeader: true,
-     includeNavigator: false
+    fixedHeader: true,
+    includeNavigator: false,
+    clonedContainerPosition: "absolute"
   });
 }
 var CURRENT_CODEMIRROR_SIZE = 100;
