@@ -29,15 +29,15 @@ from desktop.lib import i18n
 
 
 LOG = logging.getLogger(__name__)
-MAX_XLS_ROWS = 65000
-MAX_XLS_COLS = 5000
 
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
-def format(row, encoding=None):
+
+def encode_row(row, encoding=None):
   return [smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace') for cell in row]
+
 
 def dataset(headers, data, encoding=None):
   """
@@ -48,10 +48,10 @@ def dataset(headers, data, encoding=None):
   dataset = tablib.Dataset()
 
   if headers:
-    dataset.headers = format(headers, encoding)
+    dataset.headers = encode_row(headers, encoding)
 
   for row in data:
-    dataset.append(format(row, encoding))
+    dataset.append(encode_row(row, encoding))
 
   return dataset
 
@@ -61,22 +61,10 @@ class XlsWrapper():
     self.xls = xls
 
 
-def xls_dataset(headers, data, encoding=None):
+def xls_dataset(workbook):
   output = StringIO.StringIO()
-
-  workbook = openpyxl.Workbook(write_only=True)
-  worksheet = workbook.create_sheet()
-
-  if headers:
-    worksheet.append(format(headers, encoding))
-
-  for row in data:
-    worksheet.append(format(row, encoding))
-
   workbook.save(output)
-
   output.seek(0)
-
   return XlsWrapper(output.read())
 
 
@@ -86,34 +74,26 @@ def create_generator(content_generator, format, encoding=None):
     for headers, data in content_generator:
       yield dataset(show_headers and headers or None, data, encoding).csv
       show_headers = False
-
   elif format == 'xls':
-    headers = None
-    data = []
+    workbook = openpyxl.Workbook(write_only=True)
+    worksheet = workbook.create_sheet()
+    row_ctr = 0
+
     for _headers, _data in content_generator:
-      # Forced limit on size from tablib
-      if len(data) > MAX_XLS_ROWS:
-        LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % MAX_XLS_ROWS)
-        break
+      # Write headers to workbook once
+      if _headers and row_ctr == 0:
+        worksheet.append(encode_row(_headers, encoding))
+        row_ctr += 1
 
-      if _headers and len(_headers) > MAX_XLS_COLS:
-        LOG.warn('The query results exceeded the maximum column limit of %d. Data has been truncated.' % MAX_XLS_COLS)
-        _headers = _headers[:MAX_XLS_COLS]
-
-      headers = _headers
-
+      # Write row data to workbook
       for row in _data:
-        if len(row) >= MAX_XLS_COLS:
-          row = row[:MAX_XLS_COLS]
+        worksheet.append(encode_row(row, encoding))
+        row_ctr += 1
 
-        data.append(row)
-
-    if len(data) > MAX_XLS_ROWS:
-      LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % MAX_XLS_ROWS)
-      data = data[:MAX_XLS_ROWS]
-
-    yield xls_dataset(headers, data, encoding).xls
+    yield xls_dataset(workbook).xls
     gc.collect()
+  else:
+    raise Exception("Unknown format: %s" % format)
 
 
 def make_response(generator, format, name, encoding=None):

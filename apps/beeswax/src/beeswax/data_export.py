@@ -41,7 +41,9 @@ def download(handle, format, db):
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  content_generator = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get())
+  max_cells = conf.DOWNLOAD_CELL_LIMIT.get()
+
+  content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
   generator = export_csvxls.create_generator(content_generator, format)
   return export_csvxls.make_response(generator, format, 'query_result')
 
@@ -57,17 +59,16 @@ def upload(path, handle, user, db, fs):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, -1, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_cells=-1, start_over=True)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
 
 
-def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
+def HS2DataAdapter(handle, db, max_cells=-1, start_over=True):
   """
   HS2DataAdapter(query_model, db) -> headers, 2D array of data.
   """
-
   results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
   while not results.ready:
@@ -75,25 +76,33 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
     results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
   headers = results.cols()
+  num_cols = len(headers)
 
-  num_rows_seen = 0
-  limit_rows = max_rows > -1
+  # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
+  if num_cols > 100:
+    LOG.warn('The query results contain %d columns and may take an extremely long time to download, will reduce fetch size to 100.' % num_cols)
+    fetch_size = 100
+  else:
+    fetch_size = FETCH_SIZE
+
+  row_ctr = 1
+  limit_cells = max_cells > -1
 
   while results is not None:
     data = []
     for row in results.rows():
-      num_rows_seen += 1
-      if limit_rows and num_rows_seen > max_rows:
-        LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % max_rows)
+      row_ctr += 1
+      if limit_cells and (row_ctr * num_cols) > max_cells:
+        LOG.warn('The query results exceeded the maximum cell limit of %d. Data has been truncated to first %d rows.' % (max_cells, row_ctr))
         break
       data.append(row)
 
     yield headers, data
 
-    if limit_rows and num_rows_seen > max_rows:
+    if limit_cells and (row_ctr * num_cols) > max_cells:
       break
 
     if results.has_more:
-      results = db.fetch(handle, start_over=False, rows=FETCH_SIZE)
+      results = db.fetch(handle, start_over=False, rows=fetch_size)
     else:
       results = None
