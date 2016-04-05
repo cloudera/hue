@@ -689,7 +689,7 @@
         targetPlatform: 'impala'
       }, function(data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));	
+         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));  
          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
@@ -1252,7 +1252,8 @@
               url: nbk.absoluteUrl,
               query: nbk.data.snippets[0].statement_raw.substring(0, 1000) + (nbk.data.snippets[0].statement_raw.length > 1000 ? '...' : ''),
               lastExecuted: nbk.data.snippets[0].lastExecuted,
-              status: nbk.data.snippets[0].status
+              status: nbk.data.snippets[0].status,
+              uuid: nbk.uuid
             });
           });
         }
@@ -1487,6 +1488,18 @@
           snippet.statement_raw.valueHasMutated();
         });
       }
+    };
+
+    self.openNotebook = function (uuid) {
+      $.get('/desktop/api2/doc/', {
+        uuid: uuid,
+        data: true
+   	  }, function(data) {
+   		self.notebooks.removeAll();
+   	    self.loadNotebook(data.data);
+   	    self.selectedNotebook(self.notebooks()[0]);
+   	    hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+      });  
     };
 
     self.newNotebook = function () {

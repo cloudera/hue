@@ -298,6 +298,7 @@ def get_history(request):
   response['history'] = [{
       'name': doc.name,
       'id': doc.id,
+      'uuid': doc.uuid,
       'data': Notebook(document=doc).get_data(),
       'absoluteUrl': doc.get_absolute_url()
       } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:25]]
