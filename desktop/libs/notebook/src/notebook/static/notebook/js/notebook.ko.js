@@ -1488,12 +1488,6 @@
       }
     };
 
-    self.openNotebook = function (uuid) {
-    	// fetch
-    	self.notebooks.removeAll();
-    	self.loadNotebook()
-    };
-
     self.newNotebook = function () {
       var notebook = new Notebook(self, {});
       self.notebooks.push(notebook);

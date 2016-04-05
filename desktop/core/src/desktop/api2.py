@@ -36,7 +36,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException, uuid_default
+from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default
 
 
 LOG = logging.getLogger(__name__)
@@ -117,9 +117,11 @@ def get_document(request):
                   Accepts the form "-last_modified", which sorts in descending order.
                   Default to "-last_modified".
     text=<frag> - Search for fragment "frag" in names and descriptions.
+    data=<false|true> - Return all the data of the document. Default to false.
   """
   path = request.GET.get('path', '/')
   uuid = request.GET.get('uuid')
+  with_data = request.GET.get('data', 'false').lower() == 'true'
 
   if uuid:
     document = Document2.objects.get_by_uuid(uuid)
@@ -132,8 +134,12 @@ def get_document(request):
   response = {
     'document': document.to_dict(),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
-    'children': []
+    'children': [],
+    'data': ''
   }
+
+  if with_data:
+    response['data'] = json.loads(document.data)
 
   # Get children documents if this is a directory
   if document.is_directory:

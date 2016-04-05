@@ -345,6 +345,28 @@ class TestDocument2(object):
     assert_true('circular dependency' in data['message'], data)
 
 
+  def test_api_get_data(self):
+    doc_data = json.dumps({'info': 'hello'})
+    doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=doc_data)
+
+    response = self.client.get('/desktop/api2/doc/', {
+        'uuid': doc.uuid,
+    })
+    data = json.loads(response.content)
+
+    assert_true('document' in data, data)
+    assert_false(data['data'], data)
+
+    response = self.client.get('/desktop/api2/doc/', {
+        'uuid': doc.uuid,
+        'data': 'true'
+    })
+    data = json.loads(response.content)
+
+    assert_true('data' in data, data)
+    assert_equal(data['data'], json.loads(doc_data))
+
+
 class TestDocument2Permissions(object):
 
   def setUp(self):
