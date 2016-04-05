@@ -809,6 +809,7 @@ for x in sys.stdin:
     resp = download(handle, 'xls', self.db)
 
     sheet_data = _read_xls_sheet_data(resp)
+    num_cols = len(sheet_data[0])
     # It should have 257 lines (256 + header)
     assert_equal(len(sheet_data), 257, sheet_data)
 
@@ -821,6 +822,19 @@ for x in sys.stdin:
     csv_data = [[int(col) if col.isdigit() else col for col in row.split(',')] for row in csv_resp.strip().split('\r\n')]
 
     assert_equal(sheet_data, csv_data)
+
+    # Test max cell limit truncation
+    finish = conf.DOWNLOAD_CELL_LIMIT.set_for_testing(num_cols*5)
+    try:
+      hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
+      query = hql_query(hql)
+      handle = self.db.execute_and_wait(query)
+      resp = download(handle, 'xls', self.db)
+      sheet_data = _read_xls_sheet_data(resp)
+      # It should have 5 lines
+      assert_equal(len(sheet_data), 5, sheet_data)
+    finally:
+      finish()
 
 
   def test_data_upload(self):

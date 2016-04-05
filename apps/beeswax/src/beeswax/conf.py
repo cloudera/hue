@@ -96,11 +96,13 @@ LIST_PARTITIONS_LIMIT = Config(
   type=int,
   help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
-DOWNLOAD_ROW_LIMIT = Config(
-  key='download_row_limit',
-  default=1000000,
+DOWNLOAD_CELL_LIMIT = Config(
+  key='download_cell_limit',
+  default=10000000,
   type=int,
-  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 30,000 is applied to XLS downloads.'))
+  help=_t('A limit to the number of cells (rows * columns) that can be downloaded from a query '
+          '(e.g. - 10K rows * 1K columns = 10M cells.) '
+          'A value of -1 means there will be no limit.'))
 
 APPLY_NATURAL_SORT_MAX = Config(
   key="apply_natural_sort_max",
