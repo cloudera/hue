@@ -589,6 +589,7 @@
         if (vm.editorMode && data.history_id) {
           hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
           notebook.id(data.history_id);
+          notebook.uuid(data.history_uuid);
         }
         if (data.status == 0) {
           self.result.clear();

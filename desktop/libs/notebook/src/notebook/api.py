@@ -97,6 +97,7 @@ def execute(request):
         _snippet['status'] = 'failed'
       history = _historify(notebook, request.user)
       response['history_id'] = history.id
+      response['history_uuid'] = history.uuid
 
   # Materialize and HTML escape results
   if response['handle'].get('sync') and response['handle']['result'].get('data'):
@@ -278,6 +279,7 @@ def _historify(notebook, user):
     extra=query_type
   )
 
+  notebook['uuid'] = history_doc.uuid
   history_doc.update_data(notebook)
   history_doc.save()
 
