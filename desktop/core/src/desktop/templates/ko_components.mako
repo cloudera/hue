@@ -643,6 +643,10 @@ from desktop.views import _ko
       };
 
       DownloadResultsViewModel.prototype.download = function (format) {
+        if (typeof trackOnGA == 'function') {
+          trackOnGA('notebook/download/' + format);
+        }
+
         var self = this;
         self.$downloadForm.find('input[name=\'format\']').val(format);
         self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
