@@ -1,0 +1,11 @@
+cloudera:
+    image: gethue/hue:latest
+    hostname: hue
+    container_name: development_hue
+    dns: 8.8.8.8
+    ports:
+     - "8888:8888"
+    command: ./build/env/bin/hue runserver_plus 0.0.0.0:8888
+    volumes:
+      - ../../../:/external
+
