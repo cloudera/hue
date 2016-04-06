@@ -38,6 +38,17 @@ This opens a bash to the root of the project. From there you can run the develop
 ./build/env/bin/hue runserver_plus 0.0.0.0:8888
 ```
 
+or
+
+## Running with docker-compose
+```
+cd tools/docker/hue-base
+cp docker-compose.yml.sample docker-compose.yml
+cp ../../../hue/desktop/conf.dist/hue.ini
+docker-compose up -d
+docker exec -ti development_hue bash
+```
+
 Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://192.168.99.100:8888](http://192.168.99.100:8888).
 
 **Note**
