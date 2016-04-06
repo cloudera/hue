@@ -2500,7 +2500,8 @@
       editor.completer.exactMatch = ! snippet.isSqlDialect();
 
       var langTools = ace.require("ace/ext/language_tools")
-      langTools.addCompleter(snippet.autocompleter);
+      langTools.textCompleter.setSqlMode(snippet.isSqlDialect())
+      langTools.setCompleters([snippet.autocompleter, langTools.snippetCompleter, langTools.textCompleter, langTools.keyWordCompleter])
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
