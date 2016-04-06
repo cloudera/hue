@@ -2391,6 +2391,76 @@ class MockHiveServerTable(HiveServerTable):
         ]
 
 
+class MockHiveServerTableForPartitions(HiveServerTable):
+
+  def __init__(self, describe=None):
+    if describe is not None:
+      self.describe = describe
+    else:
+      self.describe = [
+        {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+        {'comment': 'NULL', 'col_name': '', 'data_type': 'NULL'},
+        {'comment': 'from deserializer', 'col_name': 'f1', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f2', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f3', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f4', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f5', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f6', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f7', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f8', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f9', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f10', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f11', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f12', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f13', 'data_type': 'bigint'},
+        {'comment': 'from deserializer', 'col_name': 'f14', 'data_type': 'int'},
+        {'comment': 'from deserializer', 'col_name': 'f15', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f16', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f17', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f18', 'data_type': 'timestamp'},
+        {'comment': 'from deserializer', 'col_name': 'f19', 'data_type': 'int'},
+        {'comment': 'from deserializer', 'col_name': 'f20', 'data_type': 'int'},
+        {'comment': 'from deserializer', 'col_name': 'f21', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f22', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f23', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f24', 'data_type': 'string'},
+        {'comment': 'from deserializer', 'col_name': 'f25', 'data_type': 'timestamp'},
+        {'comment': 'from deserializer', 'col_name': 'f26', 'data_type': 'int'},
+        {'comment': 'from deserializer', 'col_name': 'f27', 'data_type': 'binary'},
+        {'comment': 'NULL', 'col_name': '', 'data_type': 'NULL'},
+        {'comment': 'NULL', 'col_name': '# Partition Information', 'data_type': 'NULL'},
+        {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+        {'comment': 'NULL', 'col_name': '', 'data_type': 'NULL'},
+        {'comment': '', 'col_name': 'import_date', 'data_type': 'string'},
+        {'comment': '', 'col_name': 'import_id', 'data_type': 'int'},
+        {'comment': 'NULL', 'col_name': '', 'data_type': 'NULL'},
+        {'comment': 'NULL', 'col_name': '# Detailed Table Information', 'data_type': 'NULL'},
+        {'comment': 'NULL', 'col_name': 'Database:           ', 'data_type': 'my_db           '},
+        {'comment': 'NULL', 'col_name': 'Owner:              ', 'data_type': 'hive                '},
+        {'comment': 'NULL', 'col_name': 'CreateTime:         ', 'data_type': 'Wed Feb 10 14:29:49 UTC 2016'},
+        {'comment': 'NULL', 'col_name': 'LastAccessTime:     ', 'data_type': 'UNKNOWN             '},
+        {'comment': 'NULL', 'col_name': 'Protect Mode:       ', 'data_type': 'None                '},
+        {'comment': 'NULL', 'col_name': 'Retention:          ', 'data_type': '0                   '},
+        {'comment': 'NULL', 'col_name': 'Location:           ', 'data_type': 'hdfs://nameservice1/folder/folder'},
+        {'comment': 'NULL', 'col_name': 'Table Type:         ', 'data_type': 'EXTERNAL_TABLE      '},
+        {'comment': 'NULL', 'col_name': 'Table Parameters:', 'data_type': 'NULL'},
+        {'comment': 'TRUE                ', 'col_name': '', 'data_type': 'EXTERNAL            '},
+        {'comment': '1455114589          ', 'col_name': '', 'data_type': 'transient_lastDdlTime'},
+        {'comment': 'NULL', 'col_name': '', 'data_type': 'NULL'},
+        {'comment': 'NULL', 'col_name': '# Storage Information', 'data_type': 'NULL'},
+        {'comment': 'NULL', 'col_name': 'SerDe Library:      ', 'data_type': 'com.x.y.z.a.MyDeserializer'},
+        {'comment': 'NULL', 'col_name': 'InputFormat:        ', 'data_type': 'com.x.y.z.a.MyInputFormat'},
+        {'comment': 'NULL', 'col_name': 'OutputFormat:       ', 'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+        {'comment': 'NULL', 'col_name': 'Compressed:         ', 'data_type': 'No                  '},
+        {'comment': 'NULL', 'col_name': 'Num Buckets:        ', 'data_type': '-1                  '},
+        {'comment': 'NULL', 'col_name': 'Bucket Columns:     ', 'data_type': '[]                  '},
+        {'comment': 'NULL', 'col_name': 'Sort Columns:       ', 'data_type': '[]                  '},
+        {'comment': 'NULL', 'col_name': 'Storage Desc Params:', 'data_type': 'NULL'},
+        {'comment': '1       ', 'col_name': '', 'data_type': 'serialization.format'},
+  ]
+
+
+
 class TestHiveServer2API():
 
   def test_parsing_partition_values(self):
@@ -2452,6 +2522,16 @@ class TestHiveServer2API():
     assert_equal([PartitionKeyCompatible('baz', 'string', ''),
                   PartitionKeyCompatible('boom', 'string', '')
                  ], table.partition_keys)
+
+
+  def test_hiveserver_table_for_partitions(self):
+    table = MockHiveServerTableForPartitions()
+
+    assert_equal([
+        PartitionKeyCompatible('import_date', 'string', ''),
+        PartitionKeyCompatible('import_id', 'int', '')
+      ], table.partition_keys
+    )
 
 
   def test_hiveserver_has_complex(self):
