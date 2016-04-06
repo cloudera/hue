@@ -248,7 +248,7 @@ ${ hueIcons.symbols() }
                 Notebook
             % endif
           </li>
-          <!-- ko foreach: notebooks -->
+          <!-- ko with: selectedNotebook -->
           <li class="query-name">
             <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
           </li>
@@ -316,37 +316,37 @@ ${ hueIcons.symbols() }
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }" >
-    <div class="vertical-full" data-bind="foreach: notebooks">
-      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
+    <div class="vertical-full">
+      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook'}">
       </div>
     </div>
   </div>
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; $root.isLeftPanelVisible(false) }">
+  <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: {
         name: 'assist-panel',
         params: {
-          user: $root.user,
+          user: user,
           sql: {
-            sourceTypes: $root.sqlSourceTypes,
-            activeSourceType: $root.activeSqlSourceType,
+            sourceTypes: sqlSourceTypes,
+            activeSourceType: activeSqlSourceType,
             navigationSettings: {
               openDatabase: false,
               openItem: false,
               showStats: true
             },
           },
-          visibleAssistPanels: $root.editorMode ? ['sql'] : []
+          visibleAssistPanels: editorMode ? ['sql'] : []
         }
       }"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll">
+  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -1955,7 +1955,7 @@ ${ hueIcons.symbols() }
     var viewModel;
 
     var importExternalNotebook = function (notebook) {
-      var currentNotebook = viewModel.notebooks()[0];
+      var currentNotebook = viewModel.selectedNotebook();
       currentNotebook.name(notebook.name);
       currentNotebook.description(notebook.description);
       currentNotebook.selectedSnippet(notebook.selectedSnippet);
@@ -1981,32 +1981,33 @@ ${ hueIcons.symbols() }
 
     var redrawFixedHeaders = function (timeout) {
       var renderer = function() {
-        viewModel.notebooks().forEach(function (notebook) {
-          notebook.snippets().forEach(function (snippet) {
-            var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-            if (viewModel.editorMode) {
-              _el.jHueTableExtender({
-                fixedHeader: true,
-                fixedFirstColumn: true,
-                includeNavigator: false,
-                mainScrollable: '.right-panel',
-                stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
-                parentId: 'snippet_' + snippet.id(),
-                clonedContainerPosition: "fixed"
-              });
-              _el.jHueHorizontalScrollbar();
-            }
-            else {
-              _el.jHueTableExtender({
-                fixedHeader: true,
-                fixedFirstColumn: true,
-                includeNavigator: false,
-                mainScrollable: '.right-panel',
-                parentId: 'snippet_' + snippet.id(),
-                clonedContainerPosition: "absolute"
-              });
-            }
-          });
+        if (! viewModel.selectedNotebook()) {
+          return;
+        }
+        viewModel.selectedNotebook().snippets().forEach(function (snippet) {
+          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+          if (viewModel.editorMode) {
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              mainScrollable: '.right-panel',
+              stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "fixed"
+            });
+            _el.jHueHorizontalScrollbar();
+          }
+          else {
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              mainScrollable: '.right-panel',
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "absolute"
+            });
+          }
         });
       }
       if (timeout){
@@ -2029,7 +2030,7 @@ ${ hueIcons.symbols() }
     window.redrawFixedHeaders = redrawFixedHeaders;
 
     function addAce (content, snippetType) {
-      var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
+      var snip = viewModel.selectedNotebook().addSnippet({type: snippetType, result: {}}, true);
       snip.statement_raw(content);
       aceChecks++;
       snip.checkForAce = window.setInterval(function () {
@@ -2044,7 +2045,7 @@ ${ hueIcons.symbols() }
     }
 
     function replaceAce(content) {
-      var snip = viewModel.notebooks()[0].snippets()[0];
+      var snip = viewModel.selectedNotebook().snippets()[0];
       if (snip) {
         snip.statement_raw(content);
         snip.ace().setValue(content);
@@ -2053,7 +2054,7 @@ ${ hueIcons.symbols() }
     }
 
     function addMarkdown (content) {
-      var snip = viewModel.notebooks()[0].addSnippet({type: "markdown", result: {}}, true);
+      var snip = viewModel.selectedNotebook().addSnippet({type: "markdown", result: {}}, true);
       snip.statement_raw(content);
     }
 
@@ -2119,7 +2120,7 @@ ${ hueIcons.symbols() }
 
           if (loaded.paragraphs) { //zeppelin
             if (loaded.name) {
-              viewModel.notebooks()[0].name(loaded.name);
+              viewModel.selectedNotebook().name(loaded.name);
             }
             loaded.paragraphs.forEach(function (paragraph) {
               if (paragraph.text) {
@@ -2476,8 +2477,8 @@ ${ hueIcons.symbols() }
       });
 
       function forceChartDraws() {
-        viewModel.notebooks().forEach(function (notebook) {
-          notebook.snippets().forEach(function (snippet) {
+        if (viewModel.selectedNotebook()) {
+          viewModel.selectedNotebook().snippets().forEach(function (snippet) {
             if (snippet.result.data().length > 0) {
               var _elCheckerInterval = -1;
               _elCheckerInterval = window.setInterval(function () {
@@ -2497,7 +2498,7 @@ ${ hueIcons.symbols() }
               }, 200)
             }
           });
-        });
+        };
       }
 
       forceChartDraws();
