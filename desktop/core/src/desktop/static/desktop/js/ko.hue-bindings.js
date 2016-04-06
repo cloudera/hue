@@ -3638,4 +3638,44 @@
     }
   };
 
+  ko.bindingHandlers.autogrowInput = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var o = $.extend({
+        minWidth: 0,
+        maxWidth: 1000,
+        comfortZone: 70
+      }, valueAccessor());
+      var minWidth = o.minWidth || $(element).width(),
+        val = '',
+        input = $(element),
+        testSubject = $('<tester/>').css({
+          position: 'absolute',
+          top: -9999,
+          left: -9999,
+          width: 'auto',
+          fontSize: input.css('fontSize'),
+          fontFamily: input.css('fontFamily'),
+          fontWeight: input.css('fontWeight'),
+          letterSpacing: input.css('letterSpacing'),
+          whiteSpace: 'nowrap'
+        }),
+        check = function () {
+          if (val === (val = input.val())) {
+            return;
+          }
+          var escaped = val.replace(/&/g, '&amp;').replace(/\s/g, ' ').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          testSubject.html(escaped);
+          var testerWidth = testSubject.width(),
+            newWidth = (testerWidth + o.comfortZone) >= minWidth ? testerWidth + o.comfortZone : minWidth,
+            currentWidth = input.width(),
+            isValidWidthChange = (newWidth < currentWidth && newWidth >= minWidth) || (newWidth > minWidth && newWidth < o.maxWidth);
+          if (isValidWidthChange) {
+            input.width(newWidth);
+          }
+        };
+      testSubject.insertAfter(element);
+      ko.utils.registerEventHandler(element, 'keyup keydown blur update', check);
+    }
+  };
+
 }));

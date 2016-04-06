@@ -730,7 +730,7 @@ ${ hueIcons.symbols() }
         <li>
           <div class="input-prepend margin-top-10">
             <span class="muted add-on" data-bind="text: name"></span>
-            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value">
+            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
           </div>
         </li>
       </ul>
