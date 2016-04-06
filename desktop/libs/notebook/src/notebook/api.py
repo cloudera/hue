@@ -27,7 +27,8 @@ from django.views.decorators.http import require_GET, require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired
+from notebook.connectors.base import get_api, Notebook, QueryExpired,\
+  SessionExpired
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
@@ -120,9 +121,17 @@ def check_status(request):
   try:
     response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
     response['status'] = 0
+  except SessionExpired:
+    response['status'] = 'expired'
+    raise
+  except QueryExpired:
+    response['status'] = 'expired'
+    raise
   finally:
     if response['status'] == 0 and snippet['status'] != response['query_status']:
       status = response['query_status']['status']
+    elif response['status'] == 'expired':
+      status = 'expired'
     else:
       status = 'failed'
     nb_doc = Document2.objects.get(id=notebook['id'])
