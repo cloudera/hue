@@ -773,6 +773,38 @@ class TestDocument2ImportExport(object):
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
     self.not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
 
+  def test_export_documents(self):
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
+    workflow.dependencies.add(query1)
+    workflow.dependencies.add(query2)
+
+    # Test that exporting workflow should export all dependencies
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id]), 'format': 'json'})
+    documents = json.loads(response.content)
+    documents = json.loads(documents)
+
+    assert_equal(3, len(documents))
+    assert_true('test.wf' in [doc['fields']['name'] for doc in documents])
+    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
+    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+
+    # Test that exporting multiple workflows with overlapping dependencies works
+    workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
+    workflow2.dependencies.add(query1)
+
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id]), 'format': 'json'})
+    documents = json.loads(response.content)
+    documents = json.loads(documents)
+
+    assert_equal(4, len(documents))
+    assert_true('test.wf' in [doc['fields']['name'] for doc in documents])
+    assert_true('test2.wf' in [doc['fields']['name'] for doc in documents])
+    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
+    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+
+
   def test_import_owned_document(self):
     owned_query = Document2.objects.create(
       name='query.sql',

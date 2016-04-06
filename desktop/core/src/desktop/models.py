@@ -908,7 +908,7 @@ class Document2(models.Model):
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
 
-  dependencies = models.ManyToManyField('self', db_index=True)
+  dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 

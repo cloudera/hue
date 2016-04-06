@@ -317,7 +317,12 @@ def export_documents(request):
   if not request.user.is_superuser:
     docs = docs.filter(owner=request.user)
   docs = docs.filter(id__in=selection).order_by('-id')
-  doc_ids = docs.values_list('id', flat=True)
+
+  # Add any dependencies to the set of exported documents
+  export_doc_set = _get_dependencies(docs)
+
+  # Get PKs of documents to export
+  doc_ids = [doc.pk for doc in export_doc_set]
 
   f = StringIO.StringIO()
 
@@ -411,6 +416,26 @@ def import_documents(request):
     return redirect(request.POST.get('redirect'))
   else:
     return JsonResponse({'message': stdout.getvalue()})
+
+
+def _get_dependencies(documents):
+  """
+  Given a list of Document2 objects, perform a depth-first search and return a set of documents with all
+   dependencies included
+  :param doc_set:
+  """
+  doc_set = set()
+
+  for doc in documents:
+    stack = [doc]
+    while stack:
+      curr_doc = stack.pop()
+      if curr_doc not in doc_set:
+        doc_set.add(curr_doc)
+        deps_set = set(curr_doc.dependencies.all())
+        stack.extend(deps_set - doc_set)
+
+  return doc_set
 
 
 def _filter_documents(request, queryset, flatten=True):
