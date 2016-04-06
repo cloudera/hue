@@ -1350,7 +1350,6 @@
     var self = this;
     self.i18n = i18n;
     self.user = options.user;
-    self.notebooks = ko.observableArray();
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
@@ -1369,8 +1368,10 @@
       }
     });
 
-    if (self.sqlSourceTypes.length === 1) {
+    if (self.sqlSourceTypes.length > 0) {
       self.activeSqlSourceType = self.sqlSourceTypes[0].type;
+    } else {
+      self.activeSqlSourceType = null;
     }
 
     self.displayCombinedContent = function () {
@@ -1468,26 +1469,23 @@
     };
 
     self.init = function () {
-      $.each(notebooks, function (index, notebook) {
-        self.loadNotebook(notebook);
-        if (self.selectedNotebook() == null) {
-          self.selectedNotebook(self.notebooks()[0]);
+      if (notebooks.length > 0) {
+        self.loadNotebook(notebooks[0]);
+        if (self.selectedNotebook().snippets().length === 0 && self.editorMode) { // Add snippet in new Editor
+          self.selectedNotebook().newSnippet();
         }
-      });
-      if (self.selectedNotebook().snippets().length === 0 && self.editorMode) { // Add snippet in new Editor
-        self.selectedNotebook().newSnippet();
       }
     };
 
     self.loadNotebook = function (notebook) {
       var notebook = new Notebook(self, notebook);
-      self.notebooks.push(notebook);
       if (notebook.snippets().length > 0) {
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
         notebook.snippets().forEach(function(snippet){
           snippet.statement_raw.valueHasMutated();
         });
       }
+      self.selectedNotebook(notebook);
     };
 
     self.openNotebook = function (uuid) {
@@ -1495,16 +1493,13 @@
         uuid: uuid,
         data: true
        }, function(data) {
-         self.notebooks.removeAll();
          self.loadNotebook(data.data);
-         self.selectedNotebook(self.notebooks()[0]);
          hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
       });
     };
 
     self.newNotebook = function () {
       var notebook = new Notebook(self, {});
-      self.notebooks.push(notebook);
       self.selectedNotebook(notebook);
       return notebook;
     };
