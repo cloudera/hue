@@ -1494,12 +1494,12 @@
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true
-   	  }, function(data) {
-   		self.notebooks.removeAll();
-   	    self.loadNotebook(data.data);
-   	    self.selectedNotebook(self.notebooks()[0]);
-   	    hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
-      });  
+       }, function(data) {
+         self.notebooks.removeAll();
+         self.loadNotebook(data.data);
+         self.selectedNotebook(self.notebooks()[0]);
+         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+      });
     };
 
     self.newNotebook = function () {

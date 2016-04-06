@@ -493,7 +493,7 @@ ${ hueIcons.symbols() }
             </thead>
             <tbody data-bind="foreach: queries">
             <tr>
-              <td style="width: 16%"><a data-bind="text: name, attr: { 'href': absoluteUrl }"></a></td>
+              <td style="width: 16%"><a href="javascript: void(0);" data-bind="text: name, click: function() { $root.openNotebook(uuid) }"></a></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
               <td style="width: 16%"><span data-bind="text: last_modified"></span></td>
