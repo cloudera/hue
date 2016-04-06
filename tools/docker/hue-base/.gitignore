@@ -1,1 +1,2 @@
-*.yml
+docker-compose.yml
+hue.ini

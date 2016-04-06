@@ -5,7 +5,9 @@ cloudera:
     dns: 8.8.8.8
     ports:
      - "8888:8888"
-    command: ./build/env/bin/hue runserver_plus 0.0.0.0:8888
+    #command: ./build/env/bin/hue runserver_plus 0.0.0.0:8888
+    command: tail -f /dev/null
     volumes:
-      - ../../../:/external
+      - ../../../hue/apps/hbase/src:/hue/hue/apps/hbase/src
+      - ./hue.ini:/hue/desktop/conf/hue.ini
 
