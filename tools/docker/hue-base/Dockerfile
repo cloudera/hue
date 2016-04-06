@@ -24,6 +24,7 @@ RUN apt-get install --fix-missing -q -y \
   libtidy-0.99-0 \
   libxml2-dev \
   libxslt-dev \
+  libffi-dev \
   make \
   maven \
   libldap2-dev \
