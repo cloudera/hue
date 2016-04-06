@@ -511,7 +511,7 @@ from desktop.views import _ko
       <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
         <i class="fa fa-fw fa-download"></i>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu less-padding">
         <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
@@ -522,9 +522,9 @@ from desktop.views import _ko
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
-        <liv>
+        <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to HDFS or a new table') }">
-            <i class="fa fa-save"></i> ${ _('Export') }
+            <i class="fa fa-fw fa-save"></i> ${ _('Export') }
           </a>
         </li>
       </ul>

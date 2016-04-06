@@ -1086,7 +1086,7 @@ ${ hueIcons.symbols() }
   <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
       <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
-        <i class="fa  fa-fw fa-th"></i>
+        <i class="fa fa-fw fa-th"></i>
       </a>
     </div>
 
