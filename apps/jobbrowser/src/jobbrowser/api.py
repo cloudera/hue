@@ -175,7 +175,7 @@ class YarnApi(JobBrowserApi):
     self.user = user
     self.resource_manager_api = resource_manager_api.get_resource_manager(user.username)
     self.mapreduce_api = mapreduce_api.get_mapreduce_api(user.username)
-    self.history_server_api = history_server_api.get_history_server_api()
+    self.history_server_api = history_server_api.get_history_server_api(user.username)
     self.spark_history_server_api = spark_history_server_api.get_history_server_api()
 
   def get_job_link(self, job_id):

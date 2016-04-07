@@ -403,7 +403,7 @@ class TestMapReduce2NoHadoop:
 
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
-    history_server_api.get_history_server_api = lambda: HistoryServerApi()
+    history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
