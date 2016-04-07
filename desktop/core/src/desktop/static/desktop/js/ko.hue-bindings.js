@@ -2189,8 +2189,7 @@
       self.attr("autocomplete", "off");
       self.jHueHdfsAutocomplete({
         skipKeydownEvents: true,
-        skipScrollEvent: true,
-        zIndex: 990
+        skipScrollEvent: true
       });
     }
   };
@@ -2232,12 +2231,12 @@
         });
       }
 
-      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon));
+      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal));
     }
   };
 
 
-  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon) {
+  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon, isNestedModal) {
     var _btn;
     if (isAddon) {
       _btn = $("<span>").addClass("add-on muted pointer").text("..");
@@ -2246,16 +2245,18 @@
     }
     _btn.click(function (e) {
       e.preventDefault();
-      $("html").addClass("modal-open");
+      if (!isNestedModal) {
+        $("body").addClass("modal-open");
+      }
       // check if it's a relative path
       callFileChooser();
 
       function callFileChooser() {
         var _initialPath = $.trim(inputElement.val()) != "" ? inputElement.val() : "/";
-        if ((allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)){
+        if ((allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)) {
           _initialPath = "";
         }
-        if (inputElement.data("fullPath")){
+        if (inputElement.data("fullPath")) {
           _initialPath = inputElement.data("fullPath");
         }
         if (_initialPath.indexOf("hdfs://") > -1) {
@@ -2268,13 +2269,17 @@
             handleChoice(filePath, stripHdfsPrefix);
             if (selectFolder) {
               $("#chooseFile").modal("hide");
-              $(".modal-backdrop").remove();
+              if (!isNestedModal) {
+                $(".modal-backdrop").remove();
+              }
             }
           },
           onFileChoose: function (filePath) {
             handleChoice(filePath, stripHdfsPrefix);
             $("#chooseFile").modal("hide");
-            $(".modal-backdrop").remove();
+            if (!isNestedModal) {
+              $(".modal-backdrop").remove();
+            }
           },
           createFolder: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
           uploadFile: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
@@ -2286,35 +2291,37 @@
           filterExtensions: allBindingsAccessor && allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
         });
         $("#chooseFile").modal("show");
-        $("#chooseFile").on("hidden", function(){
-          $("html").removeClass("modal-open");
-          $(".modal-backdrop").remove();
-        });
+        if (!isNestedModal) {
+          $("#chooseFile").on("hidden", function () {
+            $("body").removeClass("modal-open");
+            $(".modal-backdrop").remove();
+          });
+        }
       }
 
       function handleChoice(filePath, stripHdfsPrefix) {
-        if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator){
+        if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator) {
           filePath = inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] + '=' + filePath;
         }
-        if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.deploymentDir){
+        if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.deploymentDir) {
           inputElement.data("fullPath", filePath);
           inputElement.attr("data-original-title", filePath);
-          if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) == 0){
+          if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) == 0) {
             filePath = filePath.substr(allBindingsAccessor().filechooserOptions.deploymentDir.length + 1);
           }
         }
-        if (stripHdfsPrefix){
+        if (stripHdfsPrefix) {
           inputElement.val(filePath);
         }
         else {
           inputElement.val("hdfs://" + filePath);
         }
         inputElement.change();
-        if (valueAccessor){
+        if (valueAccessor) {
           if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
-            if (valueAccessor().value){
+            if (valueAccessor().value) {
               valueAccessor().value(inputElement.val());
-              if (valueAccessor().displayJustLastBit){
+              if (valueAccessor().displayJustLastBit) {
                 inputElement.data("fullPath", inputElement.val());
                 inputElement.attr("data-original-title", inputElement.val());
                 var _val = inputElement.val();
@@ -2331,7 +2338,7 @@
         }
       }
     });
-    if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled){
+    if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled) {
       _btn.addClass("disabled").attr("disabled", "disabled");
     }
     return _btn;
