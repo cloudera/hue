@@ -2511,9 +2511,9 @@
       }
       editor.completer.exactMatch = ! snippet.isSqlDialect();
 
-      var langTools = ace.require("ace/ext/language_tools")
-      langTools.textCompleter.setSqlMode(snippet.isSqlDialect())
-      langTools.setCompleters([snippet.autocompleter, langTools.snippetCompleter, langTools.textCompleter, langTools.keyWordCompleter])
+      var langTools = ace.require("ace/ext/language_tools");
+      langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
+      langTools.addCompleter(snippet.autocompleter);
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
