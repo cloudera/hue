@@ -84,12 +84,18 @@ def search_documents(request):
 
   perms = request.GET.get('perms', 'both').lower()
   include_history = json.loads(request.GET.get('include_history', 'false'))
+  include_trashed = json.loads(request.GET.get('include_trashed', 'true'))
   flatten = json.loads(request.GET.get('flatten', 'true'))
 
   if perms not in ['owned', 'shared', 'both']:
     raise PopupException(_('Invalid value for perms, acceptable values are: owned, shared, both.'))
 
-  documents = Document2.objects.documents(user=request.user, perms=perms, include_history=include_history)
+  documents = Document2.objects.documents(
+    user=request.user,
+    perms=perms,
+    include_history=include_history,
+    include_trashed=include_trashed
+  )
 
   # Refine results
   response.update(_filter_documents(request, queryset=documents, flatten=flatten))
@@ -450,8 +456,7 @@ def _filter_documents(request, queryset, flatten=True):
   sort = request.GET.get('sort', '-last_modified')
   search_text = request.GET.get('text', None)
 
-  documents = Document2.objects.refine_documents(
-      documents=queryset,
+  documents = queryset.search_documents(
       types=type_filters,
       search_text=search_text,
       order_by=sort)

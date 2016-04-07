@@ -393,6 +393,28 @@ LIMIT $limit"""))
       remove_from_group("test", group)
 
 
+  def test_list_editor_workflows(self):
+    wf_doc = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[5], self.user)
+    reset = ENABLE_V2.set_for_testing(True)
+    try:
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      data = json.loads(response.context['workflows_json'])
+      uuids = [doc['uuid'] for doc in data]
+      assert_true(wf_doc.uuid in uuids, data)
+
+      # Trash workflow and verify it no longer appears in list
+      response = self.c.post('/desktop/api2/doc/delete', {'uuid': json.dumps(wf_doc.uuid)})
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      data = json.loads(response.context['workflows_json'])
+      uuids = [doc['uuid'] for doc in data]
+      assert_false(wf_doc.uuid in uuids, data)
+    finally:
+      reset()
+      wf_doc.delete()
+
+
 class TestExternalWorkflowGraph():
 
   def setUp(self):

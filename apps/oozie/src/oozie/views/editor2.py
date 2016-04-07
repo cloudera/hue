@@ -51,7 +51,11 @@ LOG = logging.getLogger(__name__)
 
 @check_editor_access_permission
 def list_editor_workflows(request):
-  workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+  if USE_NEW_EDITOR.get():
+    docs = Document2.objects.documents(user=request.user).search_documents(types=['oozie-workflow2'])
+    workflows = [doc.to_dict() for doc in docs]
+  else:
+    workflows = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
 
   workflows_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldWorklow, request.user) if job.managed]
   if workflows_v1:
@@ -263,14 +267,23 @@ def new_node(request):
 
 
 def _get_workflows(user):
-  return [{
-        'name': workflow.name,
-        'owner': workflow.owner.username,
-        'value': workflow.uuid,
-        'id': workflow.id
-      } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
+  if USE_NEW_EDITOR.get():
+    workflows = [{
+          'name': workflow.name,
+          'owner': workflow.owner.username,
+          'value': workflow.uuid,
+          'id': workflow.id
+        } for workflow in [doc for doc in Document2.objects.documents(user).search_documents(types=['oozie-workflow2']).order_by('-id')]
+      ]
+  else:
+    workflows = [{
+          'name': workflow.name,
+          'owner': workflow.owner.username,
+          'value': workflow.uuid,
+          'id': workflow.id
+        } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
     ]
-
+  return workflows
 
 @check_editor_access_permission
 def add_node(request):
@@ -435,7 +448,11 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
 
 @check_editor_access_permission
 def list_editor_coordinators(request):
-  coordinators = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
+  if USE_NEW_EDITOR.get():
+    docs = Document2.objects.documents(user=request.user).search_documents(types=['oozie-coordinator2'])
+    coordinators = [doc.to_dict() for doc in docs]
+  else:
+    coordinators = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   coordinators_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldCoordinator, request.user)]
   if coordinators_v1:
@@ -476,8 +493,12 @@ def edit_coordinator(request):
   except Exception, e:
     LOG.error(smart_str(e))
 
-  workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
-                    for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
+  if USE_NEW_EDITOR.get():
+    workflows = [dict([('uuid', d.uuid), ('name', d.name)])
+                      for d in Document2.objects.documents(request.user).search_documents(types=['oozie-workflow2'])]
+  else:
+    workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
+                      for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
@@ -646,7 +667,11 @@ def _submit_coordinator(request, coordinator, mapping):
 
 @check_editor_access_permission
 def list_editor_bundles(request):
-  bundles = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
+  if USE_NEW_EDITOR.get():
+    docs = Document2.objects.documents(request.user).search_documents(types=['oozie-bundle2'])
+    bundles = [doc.to_dict() for doc in docs]
+  else:
+    bundles = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='bundle2')]
 
   bundles_v1 = [job.doc.get().to_dict() for job in Document.objects.available(OldBundle, request.user)]
   if bundles_v1:
@@ -670,7 +695,11 @@ def edit_bundle(request):
     bundle = Bundle()
     bundle.set_workspace(request.user)
 
-  coordinators = [dict([('id', d.content_object.id), ('uuid', d.content_object.uuid), ('name', d.content_object.name)])
+  if USE_NEW_EDITOR.get():
+    coordinators = [dict([('id', d.id), ('uuid', d.uuid), ('name', d.name)])
+                      for d in Document2.objects.documents(request.user).search_documents(types=['oozie-coordinator2'])]
+  else:
+    coordinators = [dict([('id', d.content_object.id), ('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
   return render('editor2/bundle_editor.mako', request, {
