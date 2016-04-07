@@ -89,7 +89,7 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <ul class="nav nav-tabs">
-          <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }, visible: column === null">
+          <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }">
             <a class="inactive-action" href="#sampleTab" data-toggle="tab">${_('Sample')}</a>
           </li>
           <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }">

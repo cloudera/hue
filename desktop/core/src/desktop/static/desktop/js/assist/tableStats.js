@@ -59,7 +59,7 @@
     self.termsTabActive = ko.observable(false);
     self.prefixFilter = ko.observable().extend({'throttle': 500});
 
-    self.activeTab = ko.observable(self.column === null ? 'sample' : 'analysis');
+    self.activeTab = ko.observable('sample');
     self.loadingSamples = ko.observable(false);
     self.samples = ko.observable(null);
 
@@ -79,11 +79,7 @@
       }
     });
 
-    if (typeof self.column === 'undefined' || self.column === null) {
-      self.fetchSamples();
-    } else {
-      self.fetchData();
-    }
+    self.fetchSamples();
   }
 
   TableStats.prototype.fetchData = function () {
@@ -207,6 +203,7 @@
       sourceType: self.sourceType,
       databaseName: ko.isObservable(self.database) ? self.database() : self.database,
       tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       successCallback: function(data) {
         if (! data.rows) {
           data.rows = [];
