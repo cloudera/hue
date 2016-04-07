@@ -16,13 +16,12 @@
 # limitations under the License.
 
 import calendar
-import logging
 import json
+import logging
 import os
 import re
 import uuid
 
-from datetime import datetime
 from itertools import chain
 
 from django.contrib.auth import models as auth_models
@@ -32,6 +31,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -756,45 +756,49 @@ class FilesystemException(Exception):
   pass
 
 
-class Document2Manager(models.Manager):
+class Document2QueryMixin(object):
 
-  # TODO prevent get
-  def document(self, user, doc_id):
-    return self.documents(user).get(id=doc_id)
-
-  def documents(self, user, perms='both', include_history=False):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
     :param include_history: boolean flag to return history documents. Defaults to False.
+    :param include_trashed: boolean flag to return trashed documents. Defaults to True.
     """
     if perms == 'both':
-      docs = Document2.objects.filter(
+      docs = self.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
         Q(document2permission__groups__in=user.groups.all())
       )
     elif perms == 'shared':
-      docs = Document2.objects.filter(
+      docs = self.filter(
         Q(document2permission__users=user) |
         Q(document2permission__groups__in=user.groups.all())
       )
     else:  # only return documents owned by the user
-      docs = Document2.objects.filter(owner=user)
+      docs = self.filter(owner=user)
 
     if not include_history:
       docs = docs.exclude(is_history=True)
 
+    if not include_trashed:
+      # Since the Trash folder can have multiple directory levels, we need to check full path and exclude those IDs
+      trashed_ids = [doc.id for doc in docs if Document2.TRASH_DIR in doc.path]
+      docs = docs.exclude(id__in=trashed_ids)
+
     return docs.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
 
-  def refine_documents(self, documents, types=None, search_text=None, order_by=None):
+
+  def search_documents(self, types=None, search_text=None, order_by=None):
     """
-    Refines a queryset of document objects by type filters, search_text or order_by
-    :param documents: queryset of Document2 objects
+    Search for documents based on type filters, search_text or order_by and return a queryset of document objects
     :param types: list of Document2 types (e.g. - query-hive, directory, etc)
     :param search_text: text to search on in the name and description fields
     :param order_by: order by field (e.g. -last_modified, type)
     """
+    documents = self
+
     if types and isinstance(types, list):
       documents = documents.filter(type__in=types)
 
@@ -805,6 +809,20 @@ class Document2Manager(models.Manager):
       documents = documents.order_by(order_by)
 
     return documents
+
+
+class Document2QuerySet(QuerySet, Document2QueryMixin):
+    pass
+
+
+class Document2Manager(models.Manager, Document2QueryMixin):
+
+  def get_query_set(self):
+    return Document2QuerySet(self.model, using=self._db)
+
+  # TODO prevent get
+  def document(self, user, doc_id):
+    return self.documents(user, include_trashed=True).get(id=doc_id)
 
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)

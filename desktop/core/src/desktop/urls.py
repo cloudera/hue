@@ -34,11 +34,11 @@ desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
 from django.conf.urls import include, patterns
-from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
 from desktop.conf import METRICS, USE_NEW_EDITOR
+
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
