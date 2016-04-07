@@ -17,16 +17,19 @@
 # limitations under the License.
 
 import datetime
+import json
 
-from nose.tools import assert_true, assert_equal, assert_not_equal, assert_raises
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
+from desktop.lib import django_util, exceptions
 from desktop.lib.django_test_util import configure_django_for_test, create_tables
 from desktop.lib.django_util import reverse_with_get, timesince, humanize_duration
 configure_django_for_test()
 
-from desktop.lib import django_util, exceptions
-from django.db import models
+from nose.tools import assert_true, assert_equal, assert_not_equal, assert_raises
+
 
 class TestModel(models.Model):
   class Meta:
@@ -140,6 +143,30 @@ class TestDjangoUtil(object):
       assert_equal(msg, e.message)
       assert_equal(the_file, e.data['filename'])
       assert_true(msg in str(e))
+
+  def test_binary_strings(self):
+    hbase_hue_thrift = {'limit': 50, 'data': [
+        {'columns': {
+            'a:\x01': {'timestamp': 1445742065279, 'value':'AQAIARAKGGQgvKSwsQUovKSwsQUwCjgK'},
+            'r:\x00\x00\x04\xcc': {'timestamp': 1445742065279, 'value': '\x01\x00\x01\x00\x00\x00\x00\n'}},
+            'row': 'AAAAAQAACwAQSAYgtwMBBAETAQAAAQeW'},
+        {'columns': {
+            'a:\x01': {'timestamp': 1446966066949, 'value': 'AQAIARALGHkgpIP7sQUopIP7sQUwCzgL'},
+            'r:\x00\x00\x06\xf4': {'timestamp': 1446966066949, 'value': '\x01\x00\x01\x00\x00\x00\x00\x0b'}},
+            'row': 'AAAAAQAACwAQSAYiCwMBBAETAQAAAQGE'}
+    ], 'truncated': True}
+
+    hbase_hue_thrift_str = '{"data": [{"columns": {"a:\\u0001": {"timestamp": 1445742065279, "value": ' \
+                           '"AQAIARAKGGQgvKSwsQUovKSwsQUwCjgK"}, "r:\\u0000\\u0000\\u0004\\u00cc": {"timestamp": ' \
+                           '1445742065279, "value": "\\u0001\\u0000\\u0001\\u0000\\u0000\\u0000\\u0000\\n"}}, ' \
+                           '"row": "AAAAAQAACwAQSAYgtwMBBAETAQAAAQeW"}, {"columns": {"a:\\u0001": {"timestamp": ' \
+                           '1446966066949, "value": "AQAIARALGHkgpIP7sQUopIP7sQUwCzgL"}, ' \
+                           '"r:\\u0000\\u0000\\u0006\\u00f4": {"timestamp": 1446966066949, "value": ' \
+                           '"\\u0001\\u0000\\u0001\\u0000\\u0000\\u0000\\u0000\\u000b"}}, "row": ' \
+                           '"AAAAAQAACwAQSAYiCwMBBAETAQAAAQGE"}], "limit": 50, "truncated": true}'
+
+    data = json.dumps(hbase_hue_thrift, cls=DjangoJSONEncoder)
+    self.assertEqual(data, hbase_hue_thrift_str)
 
 
 def test_popup_injection():
