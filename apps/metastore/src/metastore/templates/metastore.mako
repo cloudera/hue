@@ -137,7 +137,7 @@ ${ assist.assistPanel() }
           </td>
           <!-- /ko -->
           <td>
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}" class="editable editable-click editable-empty">
               ${ _('Add a comment...') }</span>
           </td>
         </tr>
@@ -757,7 +757,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-describe-table">
   <div class="clearfix"></div>
 
-  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: '${ _ko('Add a description...') }' }" class="editable editable-click editable-empty">
+  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'bottom', emptytext: '${ _ko('Add a description...') }', inputclass:'input-xxlarge', rows: 10 }" class="editable editable-click editable-empty" data-type="textarea">
     ${ _('Add a description...') }
   </span>
 
