@@ -441,7 +441,7 @@
 
   HueFileEntry.prototype.upload = function () {
     var self = this;
-    if (self.app === 'documents') {
+    if (document.getElementById("importDocumentInput").files.length > 0 && self.app === 'documents') {
       self.uploading(true);
       self.uploadComplete(false);
       self.uploadFailed(false);
@@ -496,7 +496,7 @@
       if (self.selectedEntries().length > 0) {
         var ids = self.selectedEntries().map(function (entry) {
           return entry.definition().id;
-        })
+        });
         window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON(ids);
       } else {
         self.downloadThis();
@@ -506,7 +506,7 @@
 
   HueFileEntry.prototype.createDirectory = function (name) {
     var self = this;
-    if (self.app === 'documents') {
+    if (name && self.app === 'documents') {
       self.assistHelper.createDocumentsFolder({
         successCallback: self.load.bind(self),
         parentUuid: self.definition().uuid,
