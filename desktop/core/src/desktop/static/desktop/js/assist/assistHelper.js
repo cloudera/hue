@@ -143,7 +143,18 @@
     return function (errorResponse) {
       var errorMessage = 'Unknown error occurred';
       if (errorResponse !== 'undefined') {
-        if (typeof errorResponse.message !== 'undefined') {
+        if (typeof errorResponse.responseText !== 'undefined') {
+          try {
+            var errorJs = JSON.parse(errorResponse.responseText);
+            if (typeof errorJs.message !== 'undefined') {
+              errorMessage = errorJs.message;
+            } else {
+              errorMessage = errorResponse.responseText;
+            }
+          } catch(err) {
+            errorMessage = errorResponse.responseText;
+          }
+        } else if (typeof errorResponse.message !== 'undefined') {
           errorMessage = errorResponse.message;
         } else if (typeof errorResponse.statusText !== 'undefined') {
           errorMessage = errorResponse.statusText;
