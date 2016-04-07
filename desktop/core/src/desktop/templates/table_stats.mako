@@ -92,7 +92,7 @@ from desktop.views import _ko
           <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }">
             <a class="inactive-action" href="#sampleTab" data-toggle="tab">${_('Sample')}</a>
           </li>
-          <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }">
+          <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }, visible: showAnalysis">
             <a class="inactive-action" href="#analysisTab" data-toggle="tab"><span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>${_('Analysis')} </a>
           </li>
           <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
