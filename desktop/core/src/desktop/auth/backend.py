@@ -83,9 +83,12 @@ def rewrite_user(user):
   We currently only re-write specific attributes,
   though this could be generalized.
   """
-  augment = get_user_augmentation_class()(user)
-  for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
-    setattr(user, attr, getattr(augment, attr))
+  if user is None:
+    LOG.warn('Failed to rewrite user, user is None.')
+  else:
+    augment = get_user_augmentation_class()(user)
+    for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
+      setattr(user, attr, getattr(augment, attr))
   return user
 
 class DefaultUserAugmentor(object):
