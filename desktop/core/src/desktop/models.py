@@ -260,6 +260,9 @@ class DocumentManager(models.Manager):
     def find_jobs_with_no_doc(model):
       return model.objects.filter(doc__isnull=True).select_related('owner')
 
+    def find_oozie_jobs_with_no_doc(model):
+      return model.objects.filter(doc__isnull=True).exclude(name__exact='').select_related('owner')
+
     table_names = connection.introspection.table_names()
 
     try:
@@ -271,9 +274,9 @@ class DocumentManager(models.Manager):
           Bundle._meta.db_table in table_names:
         with transaction.atomic():
           for job in chain(
-              find_jobs_with_no_doc(Workflow),
-              find_jobs_with_no_doc(Coordinator),
-              find_jobs_with_no_doc(Bundle)):
+              find_oozie_jobs_with_no_doc(Workflow),
+              find_oozie_jobs_with_no_doc(Coordinator),
+              find_oozie_jobs_with_no_doc(Bundle)):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
 
             if job.is_trashed:
