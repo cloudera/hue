@@ -1915,7 +1915,7 @@ def find_dollar_variables(text):
 def find_dollar_braced_variables(text):
   vars = set()
 
-  for var in re.findall('\$\{(.+)\}', text, re.MULTILINE):
+  for var in re.findall('\$\{([A-Za-z0-9:_-]+)\}', text, re.MULTILINE):
     if ':' in var:
       var = var.split(':', 1)[1]
     vars.add(var)
