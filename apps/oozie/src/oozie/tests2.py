@@ -69,6 +69,8 @@ LIMIT $limit"""))
     LIMIT ${hiveconf:LIMIT}
     """))
 
+    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}"))
+
 
   def test_workflow_gen_xml(self):
     assert_equal([
