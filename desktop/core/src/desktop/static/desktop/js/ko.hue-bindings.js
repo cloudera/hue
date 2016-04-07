@@ -122,17 +122,19 @@
       var $element  = $(element);
 
       var selector = options.selector;
+      var showTimeout = -1;
       var hideTimeout = -1;
       ko.utils.domData.set(element, 'visibleOnHover.override', ko.utils.unwrapObservable(options.override) || false)
       var inside = false;
 
       var show = function () {
         $element.find(selector).fadeTo("fast", 1);
-        clearTimeout(hideTimeout);
+        window.clearTimeout(hideTimeout);
       };
 
       var hide = function () {
         if (! inside) {
+          window.clearTimeout(showTimeout);
           hideTimeout = window.setTimeout(function () {
             $element.find(selector).fadeTo("fast", 0);
           }, 10);
@@ -147,11 +149,14 @@
       }
 
       $element.mouseenter(function () {
-        inside = true;
-        show();
+        showTimeout = window.setTimeout(function () {
+          inside = true;
+          show();
+        }, 300);
       });
 
       $element.mouseleave(function () {
+        window.clearTimeout(showTimeout);
         inside = false;
         if (! ko.utils.domData.get(element, 'visibleOnHover.override')) {
           hide();
