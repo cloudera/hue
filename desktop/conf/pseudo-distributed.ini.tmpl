@@ -270,9 +270,12 @@
     # Supported in remoteUserDjangoBackend and SpnegoDjangoBackend
     ## ignore_username_case=true
 
-    # Ignore the case of usernames when searching for existing users to authenticate with.
+    # Forcibly cast usernames to lowercase, takes precedence over force_username_uppercase
     # Supported in remoteUserDjangoBackend and SpnegoDjangoBackend
     ## force_username_lowercase=true
+
+    # Forcibly cast usernames to uppercase, cannot be combined with force_username_lowercase
+    ## force_username_uppercase=false
 
     # Users will expire after they have not logged in for 'n' amount of seconds.
     # A negative number means that users will never expire.
@@ -351,7 +354,11 @@
     ## ignore_username_case=true
 
     # Force usernames to lowercase when creating new users from LDAP.
+    # Takes precedence over force_username_uppercase
     ## force_username_lowercase=true
+
+    # Force usernames to uppercase, cannot be combined with force_username_lowercase
+    ## force_username_uppercase=false
 
     # Use search bind authentication.
     ## search_bind_authentication=true
