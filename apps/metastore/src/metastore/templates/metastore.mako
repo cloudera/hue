@@ -470,7 +470,7 @@ ${ assist.assistPanel() }
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
-              <td data-bind="text: comment"></td>
+              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: comment, attr: {title: comment}"></td>
               <!-- ko if: $root.optimizerEnabled -->
                 <!-- ko if: optimizerStats() -->
                 <td>
