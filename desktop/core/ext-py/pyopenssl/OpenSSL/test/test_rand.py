@@ -2,36 +2,28 @@
 # See LICENSE for details.
 
 """
-Unit tests for :py:obj:`OpenSSL.rand`.
+Unit tests for L{OpenSSL.rand}.
 """
 
 from unittest import main
 import os
 import stat
-import sys
 
-from OpenSSL.test.util import NON_ASCII, TestCase, b
+from OpenSSL.test.util import TestCase, b
 from OpenSSL import rand
 
 
 class RandTests(TestCase):
     def test_bytes_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.bytes` raises :py:obj:`TypeError` if called with the wrong
-        number of arguments or with a non-:py:obj:`int` argument.
+        L{OpenSSL.rand.bytes} raises L{TypeError} if called with the wrong
+        number of arguments or with a non-C{int} argument.
         """
         self.assertRaises(TypeError, rand.bytes)
         self.assertRaises(TypeError, rand.bytes, None)
         self.assertRaises(TypeError, rand.bytes, 3, None)
 
-
-    def test_insufficientMemory(self):
-        """
-        :py:obj:`OpenSSL.rand.bytes` raises :py:obj:`MemoryError` if more bytes
-        are requested than will fit in memory.
-        """
-        self.assertRaises(MemoryError, rand.bytes, sys.maxsize)
-
+    # XXX Test failure of the malloc() in rand_bytes.
 
     def test_bytes(self):
         """
@@ -52,7 +44,7 @@ class RandTests(TestCase):
     def test_add_wrong_args(self):
         """
         When called with the wrong number of arguments, or with arguments not of
-        type :py:obj:`str` and :py:obj:`int`, :py:obj:`OpenSSL.rand.add` raises :py:obj:`TypeError`.
+        type C{str} and C{int}, L{OpenSSL.rand.add} raises L{TypeError}.
         """
         self.assertRaises(TypeError, rand.add)
         self.assertRaises(TypeError, rand.add, b("foo"), None)
@@ -62,15 +54,15 @@ class RandTests(TestCase):
 
     def test_add(self):
         """
-        :py:obj:`OpenSSL.rand.add` adds entropy to the PRNG.
+        L{OpenSSL.rand.add} adds entropy to the PRNG.
         """
         rand.add(b('hamburger'), 3)
 
 
     def test_seed_wrong_args(self):
         """
-        When called with the wrong number of arguments, or with a non-:py:obj:`str`
-        argument, :py:obj:`OpenSSL.rand.seed` raises :py:obj:`TypeError`.
+        When called with the wrong number of arguments, or with a non-C{str}
+        argument, L{OpenSSL.rand.seed} raises L{TypeError}.
         """
         self.assertRaises(TypeError, rand.seed)
         self.assertRaises(TypeError, rand.seed, None)
@@ -79,14 +71,14 @@ class RandTests(TestCase):
 
     def test_seed(self):
         """
-        :py:obj:`OpenSSL.rand.seed` adds entropy to the PRNG.
+        L{OpenSSL.rand.seed} adds entropy to the PRNG.
         """
         rand.seed(b('milk shake'))
 
 
     def test_status_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.status` raises :py:obj:`TypeError` when called with any
+        L{OpenSSL.rand.status} raises L{TypeError} when called with any
         arguments.
         """
         self.assertRaises(TypeError, rand.status, None)
@@ -94,8 +86,8 @@ class RandTests(TestCase):
 
     def test_status(self):
         """
-        :py:obj:`OpenSSL.rand.status` returns :py:obj:`True` if the PRNG has sufficient
-        entropy, :py:obj:`False` otherwise.
+        L{OpenSSL.rand.status} returns C{True} if the PRNG has sufficient
+        entropy, C{False} otherwise.
         """
         # It's hard to know what it is actually going to return.  Different
         # OpenSSL random engines decide differently whether they have enough
@@ -105,8 +97,8 @@ class RandTests(TestCase):
 
     def test_egd_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.egd` raises :py:obj:`TypeError` when called with the wrong
-        number of arguments or with arguments not of type :py:obj:`str` and :py:obj:`int`.
+        L{OpenSSL.rand.egd} raises L{TypeError} when called with the wrong
+        number of arguments or with arguments not of type C{str} and C{int}.
         """
         self.assertRaises(TypeError, rand.egd)
         self.assertRaises(TypeError, rand.egd, None)
@@ -117,8 +109,8 @@ class RandTests(TestCase):
 
     def test_egd_missing(self):
         """
-        :py:obj:`OpenSSL.rand.egd` returns :py:obj:`0` or :py:obj:`-1` if the
-        EGD socket passed to it does not exist.
+        L{OpenSSL.rand.egd} returns C{0} or C{-1} if the EGD socket passed
+        to it does not exist.
         """
         result = rand.egd(self.mktemp())
         expected = (-1, 0)
@@ -127,22 +119,9 @@ class RandTests(TestCase):
             "%r not in %r" % (result, expected))
 
 
-    def test_egd_missing_and_bytes(self):
-        """
-        :py:obj:`OpenSSL.rand.egd` returns :py:obj:`0` or :py:obj:`-1` if the
-        EGD socket passed to it does not exist even if a size argument is
-        explicitly passed.
-        """
-        result = rand.egd(self.mktemp(), 1024)
-        expected = (-1, 0)
-        self.assertTrue(
-            result in expected,
-            "%r not in %r" % (result, expected))
-
-
     def test_cleanup_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.cleanup` raises :py:obj:`TypeError` when called with any
+        L{OpenSSL.rand.cleanup} raises L{TypeError} when called with any
         arguments.
         """
         self.assertRaises(TypeError, rand.cleanup, None)
@@ -150,16 +129,16 @@ class RandTests(TestCase):
 
     def test_cleanup(self):
         """
-        :py:obj:`OpenSSL.rand.cleanup` releases the memory used by the PRNG and returns
-        :py:obj:`None`.
+        L{OpenSSL.rand.cleanup} releases the memory used by the PRNG and returns
+        C{None}.
         """
         self.assertIdentical(rand.cleanup(), None)
 
 
     def test_load_file_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.load_file` raises :py:obj:`TypeError` when called the wrong
-        number of arguments or arguments not of type :py:obj:`str` and :py:obj:`int`.
+        L{OpenSSL.rand.load_file} raises L{TypeError} when called the wrong
+        number of arguments or arguments not of type C{str} and C{int}.
         """
         self.assertRaises(TypeError, rand.load_file)
         self.assertRaises(TypeError, rand.load_file, "foo", None)
@@ -169,54 +148,34 @@ class RandTests(TestCase):
 
     def test_write_file_wrong_args(self):
         """
-        :py:obj:`OpenSSL.rand.write_file` raises :py:obj:`TypeError` when called with the
-        wrong number of arguments or a non-:py:obj:`str` argument.
+        L{OpenSSL.rand.write_file} raises L{TypeError} when called with the
+        wrong number of arguments or a non-C{str} argument.
         """
         self.assertRaises(TypeError, rand.write_file)
         self.assertRaises(TypeError, rand.write_file, None)
         self.assertRaises(TypeError, rand.write_file, "foo", None)
 
-    def _read_write_test(self, path):
-        """
-        Verify that ``rand.write_file`` and ``rand.load_file`` can be used.
-        """
-        # Create the file so cleanup is more straightforward
-        with open(path, "w"):
-            pass
 
+    def test_files(self):
+        """
+        Test reading and writing of files via rand functions.
+        """
+        # Write random bytes to a file
+        tmpfile = self.mktemp()
+        # Make sure it exists (so cleanup definitely succeeds)
+        fObj = open(tmpfile, 'w')
+        fObj.close()
         try:
-            # Write random bytes to a file
-            rand.write_file(path)
-
+            rand.write_file(tmpfile)
             # Verify length of written file
-            size = os.stat(path)[stat.ST_SIZE]
-            self.assertEqual(1024, size)
-
+            size = os.stat(tmpfile)[stat.ST_SIZE]
+            self.assertEquals(size, 1024)
             # Read random bytes from file
-            rand.load_file(path)
-            rand.load_file(path, 4)  # specify a length
+            rand.load_file(tmpfile)
+            rand.load_file(tmpfile, 4)  # specify a length
         finally:
             # Cleanup
-            os.unlink(path)
-
-
-    def test_bytes_paths(self):
-        """
-        Random data can be saved and loaded to files with paths specified as
-        bytes.
-        """
-        path = self.mktemp()
-        path += NON_ASCII.encode(sys.getfilesystemencoding())
-        self._read_write_test(path)
-
-
-    def test_unicode_paths(self):
-        """
-        Random data can be saved and loaded to files with paths specified as
-        unicode.
-        """
-        path = self.mktemp().decode('utf-8') + NON_ASCII
-        self._read_write_test(path)
+            os.unlink(tmpfile)
 
 
 if __name__ == '__main__':

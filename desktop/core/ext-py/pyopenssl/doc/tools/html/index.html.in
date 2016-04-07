@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <title>Python @RELEASE@ Documentation - @DATE@</title>
+    <link rel="STYLESHEET" href="lib/lib.css" type="text/css">
+    <meta name="description"
+          content="Top-level index to the standard documentation for
+                   Python @RELEASE@.">
+    <style type="text/css">
+      a.title { font-weight: bold; font-size: 110%; }
+      ul { margin-left: 1em; padding: 0pt; border: 0pt; }
+    </style>
+  </head>
+  <body>
+	<div class="navigation">
+	<table align="center" width="100%" cellpadding="0" cellspacing="2">
+	<tr>
+	  <td><img width="32" height="32" align="bottom" border="0" alt=""
+	      src="icons/blank.gif"></td>
+	  <td><img width="32" height="32" align="bottom" border="0" alt=""
+	      src="icons/blank.gif"></td>
+	  <td><img width="32" height="32" align="bottom" border="0" alt=""
+	      src="icons/blank.gif"></td>
+	  <td align="center" width="100%">
+	    <b class="title">Python Documentation</b></td>
+	  <td><img width="32" height="32" align="bottom" border="0" alt=""
+	      src="icons/blank.gif"></td>
+	  <td><a href="modindex.html"><img width="32" height="32"
+		align="bottom" border="0" alt="Module Index"
+		src="icons/modules.gif"></a></td>
+	  <td><img width="32" height="32" align="bottom" border="0" alt=""
+	      src="icons/blank.gif"></A></td>
+	</tr>
+	</table>
+        <hr>
+	</div>
+    <div align="center" class="titlepage">
+      <h1>Python Documentation</h1>
+
+      <p>
+	<strong>Release @RELEASE@</strong>
+	<br>
+	<strong>@DATE@</strong>
+      </p>
+    </div>
+
+    <table align="center">
+      <tbody>
+      <tr><td>
+	  <ul>
+	    <li> <a href="tut/tut.html" class="title">Tutorial</a>
+	      <br>(start here)
+
+	    <li> <a href="modindex.html" class="title">Global Module Index</a>
+	      <br>(for quick access to all documentation)
+
+	    <li> <a href="lib/lib.html" class="title">Library Reference</a>
+	      <br>(keep this under your pillow)
+
+	    <li> <a href="mac/mac.html" class="title">Macintosh Module
+		Reference</a>
+	      <br>(this too, if you use a Macintosh)
+
+	    <li> <a href="inst/inst.html" class="title">Installing
+		Python Modules</a>
+	      <br>(for administrators)
+	  </ul>
+	  </td>
+	  <td>
+	  <ul>
+	    <li> <a href="ref/ref.html" class="title">Language Reference</a>
+	      <br>(for language lawyers)
+
+	    <li> <a href="ext/ext.html" class="title">Extending and
+		Embedding</a>
+	      <br>(tutorial for C/C++ programmers)
+
+	    <li> <a href="api/api.html" class="title">Python/C API</a>
+	      <br>(reference for C/C++ programmers)
+
+	    <li> <a href="doc/doc.html" class="title">Documenting Python</a>
+	      <br>(information for documentation authors)
+
+	    <li> <a href="dist/dist.html" class="title">Distributing
+		Python Modules</a>
+	      <br>(for developers and packagers)
+	  </ul>
+	  </td>
+	</tr>
+        <tr>
+          <td>
+          &nbsp;
+          <ul>
+            <li> <a href="http://www.python.org/doc/" class="title"
+                >Documentation Central</a>
+              <br>(for everyone)
+          </ul>
+          </td>
+          <td>
+          &nbsp;
+          <ul>
+            <li> <a href="http://www.python.org/doc/howto/" class="title"
+                >Python How-To Guides</a>
+              <br>(special topics)
+          </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+
+    <address>
+      <hr>
+      See <i><a href="about.html">About the Python Documentation</a></i>
+      for information on suggesting changes.
+    </address>
+  </body>
+</html>
