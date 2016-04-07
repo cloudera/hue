@@ -2581,6 +2581,6 @@ body {
 
 .dockable {
   background-color: #FFF;
-  z-index: 10000;
+  z-index: 1000;
   padding-bottom: 2px;
 }
