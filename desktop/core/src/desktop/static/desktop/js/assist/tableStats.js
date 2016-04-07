@@ -63,6 +63,25 @@
     self.loadingSamples = ko.observable(false);
     self.samples = ko.observable(null);
 
+    self.showAnalysis = ko.observable(false);
+
+    if (self.column === null) {
+      self.assistHelper.fetchTableDetails({
+        tableName: ko.isObservable(self.table) ? self.table() : self.table,
+        databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+        sourceType: self.sourceType,
+        successCallback: function (data) {
+          self.showAnalysis(data.partition_keys.length === 0);
+        },
+        silenceErrors: true,
+        errorCallback: function () {
+          self.showAnalysis(true);
+        }
+      });
+    } else {
+      self.showAnalysis(true);
+    }
+
     self.activeTab.subscribe(function (newValue) {
       if (newValue === 'analysis' && self.statRows().length === 0) {
         self.fetchData();
