@@ -473,6 +473,23 @@ class TestUserAdminLdap(BaseUserAdminTests):
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
       assert_false(User.objects.filter(username='Rock').exists())
       assert_true(User.objects.filter(username='rock').exists())
+
+      # Test upper case
+      User.objects.filter(username__iexact='rock').delete()
+      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'rock', sync_groups=False, import_by_dn=False)
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_true(User.objects.filter(username='ROCK').exists())
+
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.set_for_testing(True))
+
+      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_true(User.objects.filter(username='ROCK').exists())
+
+      User.objects.filter(username='Rock').delete()
+      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_true(User.objects.filter(username='ROCK').exists())
     finally:
       for finish in done:
         finish()
@@ -530,6 +547,17 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_true('/useradmin/users' in response['Location'], response)
       assert_false(User.objects.filter(username='Rock').exists())
       assert_true(User.objects.filter(username='rock').exists())
+
+      # Test upper case
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.set_for_testing(True))
+      User.objects.filter(username__iexact='Rock').delete()
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_false(User.objects.filter(username='ROCK').exists())
+      response = c.post(URL, dict(server='nonsense', username_pattern='ROCK', password1='test', password2='test'))
+      assert_true('Location' in response, response)
+      assert_true('/useradmin/users' in response['Location'], response)
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_true(User.objects.filter(username='ROCK').exists())
 
       # Test regular with spaces (should fail)
       response = c.post(URL, dict(server='nonsense', username_pattern='user with space', password1='test', password2='test'))

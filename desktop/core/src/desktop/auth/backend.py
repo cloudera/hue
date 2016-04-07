@@ -139,6 +139,12 @@ def ensure_has_a_group(user):
     user.groups.add(default_group)
     user.save()
 
+def force_username_case(username):
+  if desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get():
+    username = username.lower()
+  elif desktop.conf.AUTH.FORCE_USERNAME_UPPERCASE.get():
+    username = username.upper()
+  return username
 
 class DesktopBackendBase(object):
   """
@@ -303,7 +309,7 @@ class PamBackend(DesktopBackendBase):
 
   @metrics.pam_authentication_time
   def authenticate(self, username, password):
-    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+    username = force_username_case(username)
 
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
@@ -346,7 +352,8 @@ class LdapBackend(object):
     # Delegate to django_auth_ldap.LDAPBackend
     class _LDAPBackend(LDAPBackend):
       def get_or_create_user(self, username, ldap_user):
-        username = desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+        username = force_username_case(username)
+
         if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
           try:
             return User.objects.get(username__iexact=username), False
@@ -493,7 +500,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
-    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+    username = force_username_case(username)
     is_super = False
     if User.objects.count() == 0:
       is_super = True
@@ -538,7 +545,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
   """
   def authenticate(self, remote_user=None):
     username = self.clean_username(remote_user)
-    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+    username = force_username_case(username)
     is_super = False
     if User.objects.count() == 0:
       is_super = True
