@@ -312,7 +312,7 @@ from desktop.views import _ko
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
-    <div id="shareDocumentModal" class="modal hide fade">
+    <div id="shareDocumentModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
@@ -387,53 +387,55 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
+    <div id="importDocumentsModal" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">&times;</a>
         <h3>${_('Import Hue documents')}</h3>
       </div>
-        <div class="modal-body form-horizontal">
-          <form id="importDocumentsForm" style="display: inline" enctype="multipart/form-data">
-            <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
-              <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
-              <div class="controls">
-                <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
+        <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
+          <div class="modal-body">
+              <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
+                <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
+                <div class="controls">
+                  <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
+                </div>
               </div>
-            </div>
-            <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
-            <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
-            <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
-            ${ csrf_token(request) | n,unicode }
-            <input type="hidden" name="path" data-bind="value: definition().path" />
-          </form>
+              <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
+              <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
+              <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
+              ${ csrf_token(request) | n,unicode }
+              <input type="hidden" name="path" data-bind="value: definition().path" />
+          </div>
+          <div class="modal-footer">
+            <!-- ko ifnot: uploading() || uploadComplete() -->
+            <input type="button" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
+            <input type="submit" class="btn btn-danger" data-bind="click: upload" value="${ _('Import') }" />
+            <!-- /ko -->
+            <!-- ko if: uploading() || uploadComplete() -->
+            <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
+            <!-- /ko -->
+          </div>
+        </form>
+
+      <!-- /ko -->
+    </div>
+
+    <div id="createDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+      <!-- ko with: activeEntry -->
+      <form class="form-horizontal">
+        <div class="modal-body ">
+          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
         </div>
         <div class="modal-footer">
-          <!-- ko ifnot: uploading() || uploadComplete() -->
-          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Cancel') }</a>
-          <a herf="#" class="btn btn-danger" data-bind="click: upload">${ _('Import') }</a>
-          <!-- /ko -->
-          <!-- ko if: uploading() || uploadComplete() -->
-          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
-          <!-- /ko -->
+          <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+          <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
         </div>
-
+      </form>
       <!-- /ko -->
     </div>
 
-    <div id="createDirectoryModal" class="modal hide fade">
-      <!-- ko with: activeEntry -->
-      <div class="modal-body form-horizontal">
-        <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
-      </div>
-      <div class="modal-footer">
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="button" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
-      </div>
-      <!-- /ko -->
-    </div>
-
-    <div id="deleteEntriesModal" class="modal hide fade">
+    <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times</a>
