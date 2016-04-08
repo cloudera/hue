@@ -1,0 +1,63 @@
+#column li {
+    color: blue;
+    text-decoration: underline;
+    list-style: none;
+}
+#column li:hover {
+    cursor: pointer;
+}
+#queryBuilder {
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+}
+#queryBuilder {} .databaseAndTable {
+    color: #999;
+    min-width: 10em;
+}
+#queryBuilder {} .queryBuilderRow {
+    border-collapse: separate;
+    border-spacing-bottom: 10px;
+    cursor: default;
+}
+#queryBuilder {} .column {
+    font-family: monospace;
+    padding-left: 0.5em;
+}
+#queryBuilder {} .rule {
+    padding-left: 1em;
+}
+#queryBuilder {} .input {
+    padding-left: 1em;
+}
+#queryBuilder {} .deleteRule {
+    color: #999;
+    padding-left: 1em;
+}
+.deleteRule:hover {
+    color: #333;
+    cursor: pointer;
+}
+#queryBuilder {} .container {
+    width: 80%;
+    margin: auto;
+    min-width: 1100px;
+    max-width: 1300px;
+    position: relative;
+}
+#queryBuilder {} .ruleInputPlain {
+    margin-left: 1em;
+}
+#queryBuilder {} .noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#queryBuilder {} .button-panel {
+    margin: auto;
+    text-align: center;
+    margin-top: 1em;
+}
