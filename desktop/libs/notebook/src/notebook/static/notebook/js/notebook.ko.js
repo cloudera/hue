@@ -317,7 +317,7 @@
       }, 100);
     });
 
-    self.variables = ko.observableArray([]);
+    self.variables = ko.mapping.fromJS(typeof snippet.variables != "undefined" && snippet.variables != null ? snippet.variables : []);
     self.variableNames = ko.computed(function () {
       var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
 
