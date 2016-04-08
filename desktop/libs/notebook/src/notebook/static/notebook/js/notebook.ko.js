@@ -595,19 +595,6 @@
           self.result.clear();
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
-          if (data.handle.statements_count != null) {
-            self.result.statements_count(data.handle.statements_count);
-            if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
-              self.result.statement_range({
-                start: data.handle.start,
-                end: data.handle.end
-              });
-            }
-          }
-          if (data.handle.statement_id != null) {
-            self.result.statement_id(data.handle.statement_id);
-          }
-
           if (data.handle.sync) {
             self.loadData(data.handle, 100);
             self.status('success');
@@ -618,12 +605,25 @@
         } else {
           self._ajaxError(data, self.execute);
         }
+
+        if (data.handle.statements_count != null) {
+          self.result.statements_count(data.handle.statements_count);
+          self.result.statement_id(data.handle.statement_id);
+
+          if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
+            self.result.statement_range({
+              start: data.handle.start,
+              end: data.handle.end
+            });
+          }
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
         self.status('failed');
         self.statusForButtons('executed');
       });
     };
+
 
     self.reexecute = function () {
       self.result.handle()['statement_id'] = 0;
@@ -689,7 +689,7 @@
         targetPlatform: 'impala'
       }, function(data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));  
+         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));
          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);

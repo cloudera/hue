@@ -39,8 +39,9 @@ class AuthenticationRequired(Exception):
   pass
 
 class QueryError(Exception):
-  def __init__(self, message):
+  def __init__(self, message, handle=None):
     self.message = message
+    self.handle = handle
 
   def __str__(self):
     return force_unicode(str(self.message))
