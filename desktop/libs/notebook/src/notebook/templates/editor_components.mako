@@ -2369,6 +2369,10 @@ ${ hueIcons.symbols() }
         window.setTimeout(forceChartDraws, 50);
       });
 
+      $(document).on("redrawResults", function () {
+        window.setTimeout(forceChartDraws, 50);
+      });
+
       $(document).on("executeStarted", function (e, snippet) {
         var _el = $("#snippet_" + snippet.id()).find(".resultTable");
         $("#snippet_" + snippet.id()).find(".progress").animate({
