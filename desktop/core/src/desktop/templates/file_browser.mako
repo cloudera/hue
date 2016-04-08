@@ -491,13 +491,19 @@ from desktop.views import _ko
                 % if 'pig' in apps:
                   <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
                 % endif
-                % if 'spark' in apps:
-                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                <%
+                from notebook.conf import SHOW_NOTEBOOKS
+                %>
+                % if SHOW_NOTEBOOKS.get():
+                  <li><a href="${ url('notebook:index') }"><i class="fa fa-fw fa-file-text-o"></i> ${_('Notebook')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                   <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>
                   <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Oozie Coordinator')}</a></li>
                   <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Oozie Bundle')}</a></li>
+                % endif
+                % if 'search' in apps:
+                  <li><a title="${_('Solr Search')}" href="${ url('search:index') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/>${_('Search Dashboard')}</a></li>
                 % endif
               </ul>
             </span>
