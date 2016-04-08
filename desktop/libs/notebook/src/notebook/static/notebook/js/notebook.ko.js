@@ -119,6 +119,7 @@
       self.startTime(new Date());
       self.endTime(new Date());
       self.explanation('');
+      self.logLines = 0;
     };
   };
 
@@ -561,7 +562,7 @@
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
-      self.result.logLines = 0;
+      self.result.clear();
       self.progress(0);
       self.jobs([]);
       self.result.logs('');
@@ -592,7 +593,6 @@
           notebook.uuid(data.history_uuid);
         }
         if (data.status == 0) {
-          self.result.clear();
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.sync) {
@@ -1484,6 +1484,9 @@
         notebook.snippets().forEach(function(snippet){
           snippet.statement_raw.valueHasMutated();
         });
+        if (notebook.snippets()[0].result.data().length > 0) {
+          $(document).trigger("redrawResults");
+        }
       }
       self.selectedNotebook(notebook);
     };
