@@ -27,8 +27,7 @@ from django.views.decorators.http import require_GET, require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired,\
-  SessionExpired
+from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
@@ -93,7 +92,6 @@ def execute(request):
       _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
       if 'handle' in response: # No failure
         _snippet['result']['handle'] = response['handle']
-        _snippet['result']['statements_count'] = response['handle']['statements_count']
       else:
         _snippet['status'] = 'failed'
       history = _historify(notebook, request.user)

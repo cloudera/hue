@@ -108,26 +108,27 @@ class HS2Api(Api):
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
 
-    response = self._get_current_statement(db, snippet)
+    statement = self._get_current_statement(db, snippet)
 
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
+    query = self._prepare_hql_query(snippet, statement.pop('statement'))
 
     try:
       db.use(query.database)
       handle = db.client.query(query)
     except QueryServerException, ex:
-      raise QueryError(ex.message)
+      raise QueryError(ex.message, handle=statement)
 
     # All good
     server_id, server_guid = handle.get()
-    response.update({
+    response = {
       'secret': server_id,
       'guid': server_guid,
       'operation_type': handle.operation_type,
       'has_result_set': handle.has_result_set,
       'modified_row_count': handle.modified_row_count,
       'log_context': handle.log_context,
-    })
+    }
+    response.update(statement)
 
     return response
 
