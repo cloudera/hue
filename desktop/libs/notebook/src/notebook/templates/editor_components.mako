@@ -57,7 +57,6 @@ from desktop.views import _ko
   });
   function generateQuery() {
       var result = QueryBuilder.buildHiveQuery();
-      console.log(result);
       if (result.status == "fail") {
           $("#invalidQueryBuilder").modal("show");
       } else {

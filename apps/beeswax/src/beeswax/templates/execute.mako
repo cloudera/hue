@@ -814,7 +814,6 @@ ${ commonshare() | n,unicode }
   });
   function generateQuery() {
       var result = QueryBuilder.buildHiveQuery();
-      console.log(result);
       if (result.status == "fail") {
           $("#invalidQueryBuilder").modal("show");
       } else {
