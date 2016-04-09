@@ -17,14 +17,14 @@
 # limitations under the License.
 
 import json
-import re
 
 from nose.tools import assert_equal, assert_false, assert_true
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import import_saved_beeswax_query, Directory, Document2
+from desktop.models import Directory, Document2
+from notebook.models import import_saved_beeswax_query
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
