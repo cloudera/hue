@@ -91,3 +91,33 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
   
   return editor
 
+
+def import_saved_beeswax_query(bquery):
+  design = bquery.get_design()
+
+  return make_notebook(
+      name=bquery.name,
+      description=bquery.desc,
+      editor_type=_convert_type(bquery.type, bquery.data),
+      statement=design.hql_query,
+      status='ready',
+      files=design.file_resources,
+      functions=design.functions,
+      settings=design.settings
+  )
+
+
+def _convert_type(btype, bdata):
+  from beeswax.models import HQL, IMPALA, RDBMS, SPARK
+
+  if btype == HQL:
+    return 'hive'
+  elif btype == IMPALA:
+    return 'impala'
+  elif btype == RDBMS:
+    data = json.loads(bdata)
+    return data['query']['server']
+  elif btype == SPARK: # We should not import
+    return 'spark'
+  else:
+    return 'hive'

@@ -21,7 +21,8 @@ import logging
 from django.db import transaction
 
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
-    FilesystemException, import_saved_beeswax_query
+    FilesystemException
+from notebook.models import import_saved_beeswax_query
 
 
 LOG = logging.getLogger(__name__)
