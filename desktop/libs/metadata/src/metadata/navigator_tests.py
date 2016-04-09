@@ -57,13 +57,18 @@ class TestNavigatorApi(object):
     cls.user.save()
 
 
+  def test_search_entities(self):
+    # TODO: write me
+    pass
+
+
   def test_find_entity(self):
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
     assert_true('identity' in entity, entity)
 
 
   def test_api_find_entity(self):
-    resp = self.client.post(reverse('metadata:find_entity'), self._format_json_body({'type': 'database', 'name': 'default'}))
+    resp = self.client.get(reverse('metadata:find_entity'), {'type': 'database', 'name': 'default'})
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'])
     assert_true('entity' in json_resp, json_resp)
@@ -105,7 +110,13 @@ class TestNavigatorApi(object):
     resp = self.client.post(reverse('metadata:delete_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
+    del props['hue']
     assert_equal(entity['properties'], json_resp['entity']['properties'])
+
+
+  def test_lineage(self):
+    # TODO: write me
+    pass
 
 
   def _format_json_body(self, post_dict):

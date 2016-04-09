@@ -71,7 +71,11 @@
           process(dropdown);
         },
         matcher: function (item) {
-          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+          if (item.toLowerCase() === this.query.trim().toLowerCase()) {
+            self.selectedUserOrGroup(usermap[item] ? usermap[item] : groupmap[item]);
+            return true;
+          } else if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+            self.selectedUserOrGroup(undefined);
             return true;
           }
         },
@@ -223,12 +227,12 @@
 
   HueDocument.prototype.removeGroupReadShare = function (group) {
     var self = this;
-    self.updateSharePerm(self.definition().perms.read.groups, group.id);
+    self.removeFromPerms(self.definition().perms.read.groups, group.id);
   };
 
   HueDocument.prototype.removeGroupWriteShare = function (group) {
     var self = this;
-    self.updateSharePerm(self.definition().perms.write.groups, group.id);
+    self.removeFromPerms(self.definition().perms.write.groups, group.id);
   };
 
   return HueDocument;

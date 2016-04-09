@@ -31,6 +31,8 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 
+from metadata.conf import has_optimizer, get_optimizer_url, get_navigator_url
+
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
@@ -78,6 +80,9 @@ def databases(request):
     'databases': databases,
     'partitions': [],
     'has_write_access': has_write_access(request.user),
+    'is_optimizer_enabled': has_optimizer(),
+    'optimizer_url': get_optimizer_url(),
+    'navigator_url': get_navigator_url(),
   })
 
 
@@ -113,7 +118,7 @@ def get_database_metadata(request, database):
     response['data'] = db_metadata
   except Exception, ex:
     response['status'] = 1
-    response['data'] = _("Cannot get metadata for database: %s") % (database,)
+    response['data'] = _("Cannot get metadata for database %s: %s") % (database, ex)
 
   return JsonResponse(response)
 
@@ -177,6 +182,9 @@ def show_tables(request, database=None):
     'database': None,
     'partitions': [],
     'has_write_access': has_write_access(request.user),
+    'is_optimizer_enabled': has_optimizer(),
+    'optimizer_url': get_optimizer_url(),
+    'navigator_url': get_navigator_url(),
     })
 
   return resp
@@ -248,6 +256,9 @@ def describe_table(request, database, table):
       'partitions': partitions,
       'database': database,
       'has_write_access': has_write_access(request.user),
+      'is_optimizer_enabled': has_optimizer(),
+      'optimizer_url': get_optimizer_url(),
+      'navigator_url': get_navigator_url(),
     })
 
 
@@ -432,7 +443,8 @@ def describe_partitions(request, database, table):
         'partition_keys_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
         'partition_values_json': json.dumps(massaged_partitions),
         'request': request,
-        'has_write_access': has_write_access(request.user)
+        'has_write_access': has_write_access(request.user),
+        'is_optimizer_enabled': has_optimizer(),
     })
 
 

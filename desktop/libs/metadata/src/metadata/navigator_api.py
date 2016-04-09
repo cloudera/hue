@@ -25,7 +25,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
-from metadata.navigator import NavigatorApi, is_navigator_enabled
+from metadata.navigator_client import NavigatorApi, is_navigator_enabled
 
 LOG = logging.getLogger(__name__)
 
@@ -44,49 +44,88 @@ def error_handler(view_fn):
     except Http404, e:
       raise e
     except Exception, e:
-      LOG.exception(str(e))
+      status = 500
+      message = str(e)
+      LOG.exception(message)
+
+      if 'Could not find' in message:
+        status = 200
+
       response = {
         'status': -1,
-        'message': force_unicode(str(e))
+        'message': force_unicode(message)
       }
-    return JsonResponse(response, status=500)
+    return JsonResponse(response, status=status)
   return decorator
 
 
-@require_POST
+@error_handler
+def search_entities(request):
+  response = {'status': -1}
+
+  api = NavigatorApi()
+  query_s = request.GET.get('query_s')
+  offset = request.GET.get('offset', 0)
+  limit = request.GET.get('limit', 100)
+
+  query_s = query_s.strip()
+
+  entities = api.search_entities(query_s)
+
+  response = {
+    'entities': entities,
+    'count': len(entities),
+    'offset': offset,
+    'limit': limit,
+    'query_s': query_s,
+    'status': 0
+  }
+
+  return JsonResponse(response)
+
+
 @error_handler
 def find_entity(request):
   response = {'status': -1}
 
   api = NavigatorApi()
-  entity_type = json.loads(request.POST.get('type', ''))
+  entity_type = request.GET.get('type', '')
+  database = request.GET.get('database', '')
+  table = request.GET.get('table', '')
+  name = request.GET.get('name', '')
+  path = request.GET.get('path', '')
+
+  # TODO: support arbitrary optional filter params
 
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
 
   if entity_type.lower() == 'database':
-    name = json.loads(request.POST.get('name', ''))
     if not name:
       raise MetadataApiException('get_database requires name param')
     response['entity'] = api.get_database(name)
   elif entity_type.lower() == 'table':
-    database = json.loads(request.POST.get('database', ''))
-    name = request.POST.get('name', '')
     if not database or not name:
       raise MetadataApiException('get_table requires database and name param')
     response['entity'] = api.get_table(database, name)
+  elif entity_type.lower() == 'field':
+    if not database or not table or not name:
+      raise MetadataApiException('get_field requires database, table, and name params')
+    response['entity'] = api.get_field(database, table, name)
   elif entity_type.lower() == 'directory':
-    path = json.loads(request.POST.get('path', ''))
     if not path:
       raise MetadataApiException('get_directory requires path param')
     response['entity'] = api.get_directory(path)
   elif entity_type.lower() == 'file':
-    path = json.loads(request.POST.get('path', ''))
     if not path:
       raise MetadataApiException('get_file requires path param')
     response['entity'] = api.get_file(path)
   else:
     raise MetadataApiException("type %s is unrecognized" % entity_type)
+
+  # Prevent nulls later
+  if 'tags' in response['entity'] and not response['entity']['tags']:
+    response['entity']['tags'] = []
 
   response['status'] = 0
   return JsonResponse(response)
@@ -102,7 +141,9 @@ def get_entity(request):
   if not entity_id:
     raise MetadataApiException("get_entity requires an 'id' parameter")
 
-  response['entity'] = api.get_entity(entity_id)
+  entity = api.get_entity(entity_id)
+
+  response['entity'] = entity
   response['status'] = 0
 
   return JsonResponse(response)
@@ -176,5 +217,37 @@ def delete_properties(request):
   else:
     response['entity'] = api.delete_properties(entity_id, keys)
     response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@error_handler
+def get_lineage(request):
+  response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
+
+  api = NavigatorApi()
+  entity_id = request.REQUEST.get('id')
+
+  if not entity_id:
+    raise MetadataApiException("get_lineage requires an 'id' parameter")
+
+  lineage = api.get_lineage(entity_id)
+  entity_name = api.get_entity(entity_id)['originalName'].upper()
+
+  response['id'] = entity_id
+
+  # TODO: This is a cheat way to do to this for demo using filtering but we should really traverse relationships
+  parent_operation = next((entity for entity in lineage['entities'] if entity.get('outputs', []) == [entity_name]), None)
+  if parent_operation:
+    response['inputs'] = [input.lower() for input in parent_operation['inputs']]
+    response['source_query'] = parent_operation.get('queryText', '')
+
+  children = [entity for entity in lineage['entities'] if entity.get('inputs') is not None and entity_name in entity.get('inputs')]
+  if children is not None:
+    response['target_queries'] = [child['queryText'] for child in children if child.get('queryText') is not None]
+    outputs = [child['outputs'] for child in children if child.get('outputs') is not None]
+    response['targets'] = [target.lower() for output in outputs for target in output]
+
+  response['status'] = 0
 
   return JsonResponse(response)

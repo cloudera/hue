@@ -19,14 +19,20 @@
 import json
 import logging
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+
+from desktop.lib.test_utils import add_permission, remove_from_group
+from desktop.models import Document2
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
+from desktop.lib.django_test_util import make_logged_in_client
 
 
 LOG = logging.getLogger(__name__)
@@ -62,6 +68,8 @@ LIMIT $limit"""))
     FROM ${hivevar:tablename}
     LIMIT ${hiveconf:LIMIT}
     """))
+
+    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}"))
 
 
   def test_workflow_gen_xml(self):
@@ -296,6 +304,93 @@ LIMIT $limit"""))
   def test_list_bundles_page(self):
     response = self.c.get(reverse('oozie:list_editor_bundles'))
     assert_true('bundles_json' in response.context, response.context)
+
+  def test_workflow_dependencies(self):
+    wf_doc1 = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[5], self.user)
+
+    # Add history dependency
+    wf_doc1.is_history = True
+    wf_doc1.dependencies.add(wf_doc1)
+
+    # Add sub-workflow dependency
+    wf_doc2 = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[4], self.user)
+    wf_doc1.dependencies.add(wf_doc2)
+
+    # Add coordinator dependency
+    data = {
+          'id': None,
+          'uuid': None,
+          'name': 'My Coordinator',
+          'variables': [], # Aka workflow parameters
+          'properties': {
+              'description': '',
+              'deployment_dir': '',
+              'schema_version': 'uri:oozie:coordinator:0.2',
+              'frequency_number': 1,
+              'frequency_unit': 'days',
+              'cron_frequency': '0 0 * * *',
+              'cron_advanced': False,
+              'timezone': '',
+              'start': '${start_date}',
+              'end': '${end_date}',
+              'workflow': None,
+              'timeout': None,
+              'concurrency': None,
+              'execution': None,
+              'throttle': None,
+              'job_xml': '',
+              'credentials': [],
+              'parameters': [
+                  {'name': 'oozie.use.system.libpath', 'value': True},
+                  {'name': 'start_date', 'value': ''},
+                  {'name': 'end_date', 'value': ''}
+              ],
+              'sla': Workflow.SLA_DEFAULT
+          }
+      }
+    wf_doc3 = Document2.objects.create(name='test', type='oozie-coordinator2', owner=User.objects.get(username='test'), data=data)
+    wf_doc1.dependencies.add(wf_doc3)
+
+    assert_true(len(wf_doc1.dependencies.all()) == 3)
+
+    wf_doc1.save()
+
+    # Validating dependencies after saving the workflow
+    assert_true(len(wf_doc1.dependencies.all()) == 3)
+    assert_true(len(wf_doc1.dependencies.filter(type='oozie-coordinator2')) > 0)
+    assert_true(len(wf_doc1.dependencies.filter(Q(is_history=False) & Q(type='oozie-workflow2'))) > 0)
+    assert_true(len(wf_doc1.dependencies.filter(Q(is_history=True) & Q(type='oozie-workflow2'))) > 0)
+
+    wf_doc1.delete()
+    wf_doc2.delete()
+    wf_doc3.delete()
+
+  def test_editor_access_permissions(self):
+    group = 'no_editor'
+
+    try:
+      # Block editor section
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      response = self.c.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+
+      add_permission('test', 'no_editor', 'disable_editor_access', 'oozie')
+
+      response = self.c.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 401)
+      response = self.c.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+
+      # Admin are not affected
+      admin = make_logged_in_client('admin', 'admin', is_superuser=True, recreate=True, groupname=group)
+
+      response = admin.get(reverse('oozie:list_editor_workflows'))
+      assert_equal(response.status_code, 200)
+      response = admin.get(reverse('oozie:list_workflows'))
+      assert_equal(response.status_code, 200)
+    finally:
+      remove_from_group("test", group)
 
 
 class TestExternalWorkflowGraph():

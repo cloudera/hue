@@ -66,6 +66,7 @@ from desktop.views import _ko
       position: relative;
       padding: 0 0 0 10px;
       overflow: hidden;
+      margin-right: 1px;
     }
 
     .assist-inner-header {
@@ -154,6 +155,8 @@ from desktop.views import _ko
       padding-top: 2px;
       padding-bottom: 2px;
       padding-left: 4px;
+      margin-right: 15px;
+      overflow-x: hidden;
     }
 
     .assist-tables > li.selected {
@@ -203,12 +206,19 @@ from desktop.views import _ko
       color: #737373;
     }
 
-    .assist-db-header-actions,
-    .assist-actions  {
+    .assist-db-header-actions {
       position:absolute;
       top: 0;
       right: 0;
-      padding-right: 17px;
+      padding-left:4px;
+      padding-right: 13px;
+      background-color: #FFF;
+    }
+
+    .assist-actions {
+      position:absolute;
+      top: 0;
+      right: 0;
       padding-left:4px;
       background-color: #FFF;
     }
@@ -256,15 +266,19 @@ from desktop.views import _ko
 
     .assist-flex-panel {
       position: relative;
+      display: -ms-flexbox;
       display: flex;
+      -ms-flex-flow: column nowrap;
       flex-flow: column nowrap;
       align-items: stretch;
       height:100%;
+      min-height: 100vh;
     }
 
     .assist-flex-header {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 25px;
       flex: 0 0 25px;
       white-space: nowrap;
     }
@@ -272,6 +286,7 @@ from desktop.views import _ko
     .assist-flex-table-search {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 65px;
       flex: 0 0 65px;
       white-space: nowrap;
     }
@@ -279,12 +294,14 @@ from desktop.views import _ko
     .assist-flex-search {
       overflow: hidden;
       position: relative;
+      -ms-flex: 0 0 43px;
       flex: 0 0 43px;
       white-space: nowrap;
     }
 
     .assist-flex-fill {
       position: relative;
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
       white-space: nowrap;
       overflow-x: hidden;
@@ -297,6 +314,65 @@ from desktop.views import _ko
 
     .database-tree ul li {
       padding-left: 15px;
+    }
+
+    .searchbar {
+      margin: 0 10px 10px 15px;
+    }
+
+    .searchbar input {
+      min-height: 20px;
+      height: 27px;
+      width: calc(100% - 65px);
+      margin: 0;
+      box-shadow: none;
+      border: 1px solid #DDD;
+      border-right: none;
+      border-bottom-left-radius: 2px;
+      border-top-left-radius: 2px;
+    }
+
+    .searchbar .add-on {
+      border-radius: 1.5em;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      border-left: none;
+    }
+
+    .searchbar .add-on i {
+      margin-top: -2px;
+      margin-lefT: -2px;
+      font-size: 14px;
+    }
+
+    .result-entry {
+      clear: both;
+      width: calc(100% - 20px);
+      margin: 0px 10px 15px 10px;
+    }
+
+    .result-entry .doc-desc {
+      font-style: italic;
+      font-size: 12px;
+      line-height: 15px;
+    }
+
+    .result-entry .icon-col {
+      width: 35px;
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 7px;
+      font-size: 20px;
+      color: #338bb8;
+    }
+
+    .result-entry .doc-col {
+      width: calc(100% - 50px);
+      display: inline-block;
+    }
+
+    .result-entry .hue-icon {
+      font-size: 30px;
     }
   </style>
 
@@ -567,7 +643,7 @@ from desktop.views import _ko
     <div class="assist-flex-fill">
       <ul class="assist-tables" data-bind="foreach: sources">
         <li class="assist-table pointer">
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedSource($data); }"><i class="fa fa-fw fa-server muted valign-middle"></i> <span data-bind="text: name"></span></a>
         </li>
       </ul>
     </div>
@@ -633,7 +709,7 @@ from desktop.views import _ko
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
         <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data) }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span data-bind="text: definition.name"></span></a>
         </li>
       </ul>
     </div>
@@ -680,6 +756,14 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-panel-navigator-search">
+    % if is_optimizer_enabled:
+      <div class="searchbar">
+        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="hasFocus: searchHasFocus, textinput: searchInput"><button class="btn btn-primary add-on" data-bind="enabled: !searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }"><i class="fa" data-bind="css: { 'fa-search': searchInput() === '' && ! searchHasFocus(), 'fa-times' : searchInput() !== '' || searchHasFocus() }"></i></button>
+      </div>
+    % endif
+  </script>
+
   <script type="text/html" id="assist-panel-inner-header">
     <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
       <span data-bind="text: $parent.name"></span>
@@ -690,7 +774,9 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
+    <!-- ko if: (searchInput() === '' && !searchHasFocus()) || ! navigatorEnabled() -->
+    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper, noFixedHeights: onlySql }">
+      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
       <!-- ko foreach: visiblePanels -->
@@ -698,6 +784,75 @@ from desktop.views import _ko
       <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <!-- ko if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled()-->
+    <div style="position:relative; height: 100%; overflow: hidden">
+      <div class="assist-flex-panel">
+        <div style="flex: 1"></div>
+        <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
+        <div class="assist-flex-fill" style="overflow-x: none; overflow-y: scroll; outline: none;">
+          <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
+          <!-- ko if: !searching() -->
+          <!-- ko foreach: searchResult -->
+          <div class="result-entry">
+            <div class="icon-col">
+              <!-- ko if: type === 'FILE' -->
+              <i class="fa fa-fw fa-file-o valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'DIRECTORY' -->
+              <i class="fa fa-fw fa-folder-o valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'TABLE' -->
+              <i class="fa fa-fw fa-table valign-middle"></i>
+              <!-- /ko -->              
+              <!-- ko if: type === 'DATABASE' -->
+              <i class="fa fa-fw fa-database valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'SOURCE' -->
+              <i class="fa fa-fw fa-server valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'SUB_OPERATION' -->
+              <i class="fa fa-fw fa-code-fork valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'FIELD' -->
+              <i class="fa fa-fw fa-columns valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'OPERATION_EXECUTION' -->
+              <i class="fa fa-fw fa-cog valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'OPERATION' -->
+              <i class="fa fa-fw fa-cogs valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: type === 'PARTITION' -->
+              <i class="fa fa-fw fa-th valign-middle"></i>
+              <!-- /ko -->
+            </div>
+            <div class="doc-col">
+              <a data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+              <!-- ko if: type === 'DATABASE' -->
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'TABLE' -->
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'SUB_OPERATION' -->
+              <div class="doc-desc" data-bind="text: metaClassName"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'SOURCE' -->
+              <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
+              <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
+            </div>
+          </div>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+      </div>
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -991,6 +1146,64 @@ from desktop.views import _ko
           i18n: i18n,
           user: params.user
         });
+
+        self.navigatorEnabled = ko.observable(true);
+
+        huePubSub.subscribe('meta.optimizer.enabled', function (newValue) {
+          self.navigatorEnabled(newValue);
+        });
+
+        self.searchInput = ko.observable('').extend({ rateLimit: 500 });
+        self.searchResult = ko.observableArray();
+
+        self.searchHasFocus = ko.observable(false);
+        self.searching = ko.observable(false);
+
+        self.searchInput.subscribe(function (newValue) {
+          self.performSearch(newValue);
+        });
+
+        var lastQuery = -1;
+
+        self.searchHasFocus.subscribe(function (newValue) {
+          if (newValue && lastQuery !== self.searchInput()) {
+            window.setTimeout(self.performSearch, 200);
+          }
+        });
+
+        self.performSearch = function () {
+          if (self.searchInput() === lastQuery) {
+            return;
+          }
+          if (self.searching()) {
+            window.setTimeout(function() {
+              self.performSearch();
+            }, 100);
+          }
+          lastQuery = self.searchInput();
+          self.searching(true);
+          $.post('/metadata/api/navigator/search_entities?query_s=' + self.searchInput() )
+              .done(function (data) {
+                console.log(data);
+                data.entities.forEach(function (entity) {
+                  if (entity.type === 'DATABASE') {
+                    entity.link = '/metastore/tables/' + entity.originalName;
+                  } else if (entity.type === 'TABLE') {
+                    entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
+                  } else if (entity.type === 'SOURCE') {
+                    entity.link = entity.sourceUrl;
+                  } else if (entity.type === 'OPERATION_EXECUTION') {
+                    entity.link = '/jobbrowser/jobs/' + entity.jobID;
+                  } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
+                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  } else {
+                    entity.link = '#';
+                  }
+                });
+                self.searchResult(data.entities);
+                self.searching(false);
+              })
+        };
 
         self.onlySql = params.onlySql;
         self.loading = ko.observable(false);

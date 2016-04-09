@@ -34,7 +34,7 @@ from desktop.views import _ko
   </style>
 
   <script type="text/html" id="table-stats">
-    <div class="content">
+    <div class="content" data-bind="niceScroll">
       <!-- ko if: statRows().length -->
       <table class="table table-striped">
         <tbody data-bind="foreach: statRows">
@@ -89,11 +89,11 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <ul class="nav nav-tabs">
-          <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }, visible: column === null">
+          <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }">
             <a class="inactive-action" href="#sampleTab" data-toggle="tab">${_('Sample')}</a>
           </li>
-          <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }">
-            <a class="inactive-action" href="#analysisTab" data-toggle="tab">${_('Analysis')} <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span></a>
+          <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }, visible: showAnalysis">
+            <a class="inactive-action" href="#analysisTab" data-toggle="tab"><span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>${_('Analysis')} </a>
           </li>
           <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
           <li class="pull-right">
@@ -107,7 +107,7 @@ from desktop.views import _ko
           <div class="tab-pane" id="sampleTab" data-bind="css: { 'active' : activeTab() === 'sample' }">
             <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
             <!-- ko ifnot: loadingSamples -->
-            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;">
+            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;" data-bind="niceScroll">
               <!-- ko with: samples -->
               <!-- ko if: rows.length == 0 -->
               <div class="alert">${ _('The selected table has no data.') }</div>
@@ -217,17 +217,17 @@ from desktop.views import _ko
           } else {
             $popover.hide();
           }
-        }
+        };
 
-        if (self.enabled) {
-          window.setInterval(function () {
-            if (self.analysisStats() == null) {
-              return;
-            }
+        var refreshInterval = -1;
 
-            self.refreshPopoverPosition();
-          }, 200);
-        }
+        self.analysisStats.subscribe(function (newValue) {
+          if (newValue && self.enabled) {
+            refreshInterval = window.setInterval(self.refreshPopoverPosition, 200);
+          } else {
+            window.clearInterval(refreshInterval);
+          }
+        });
 
         self.analysisStats.subscribe(function (newValue) {
           if (newValue) {

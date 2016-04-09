@@ -1423,7 +1423,7 @@ msgstr "XLS 형식으로 결과 다운로드"
 
 #: src/beeswax/templates/execute.mako:318
 msgid "Recent queries"
-msgstr "취근 쿼리"
+msgstr "최근 쿼리"
 
 #: src/beeswax/templates/execute.mako:321
 #: src/beeswax/templates/watch_results.mako:147

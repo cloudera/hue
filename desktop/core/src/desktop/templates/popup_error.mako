@@ -39,7 +39,7 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
 
     </div>
 
-              <div class="details">
+    <div class="details">
       % if traceback:
         <a href="javascript:toggleDisplay('#traceback');"><i class="fa fa-share"></i> ${_('More Info')}</a>
         &nbsp;

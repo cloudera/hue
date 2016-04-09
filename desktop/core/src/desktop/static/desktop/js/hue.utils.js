@@ -183,6 +183,37 @@ Array.prototype.diff = function (a) {
     return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
   }
 
+  /**
+   * @param {string} selector
+   * @param {Function} condition
+   * @param {Function} callback
+   * @param {number} [timeout]
+   * @constructor
+   */
+  hueUtils.waitForRendered = function (selector, condition, callback, timeout) {
+    var $el = $(selector);
+    if (condition($el)) {
+      callback($el);
+    }
+    else {
+      window.setTimeout(function () {
+        hueUtils.waitForRendered(selector, condition, callback);
+      }, timeout || 100)
+    }
+  }
+
+  /**
+   * @constructor
+   */
+  hueUtils.scrollbarWidth = function () {
+    var $parent, $children, width;
+    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    $children = $parent.children();
+    width = $children.innerWidth() - $children.height(99).innerWidth();
+    $parent.remove();
+    return width;
+  }
+
 
 }(hueUtils = window.hueUtils || {}));
 

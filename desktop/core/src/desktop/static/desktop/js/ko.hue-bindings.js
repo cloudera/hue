@@ -122,17 +122,19 @@
       var $element  = $(element);
 
       var selector = options.selector;
+      var showTimeout = -1;
       var hideTimeout = -1;
       ko.utils.domData.set(element, 'visibleOnHover.override', ko.utils.unwrapObservable(options.override) || false)
       var inside = false;
 
       var show = function () {
         $element.find(selector).fadeTo("fast", 1);
-        clearTimeout(hideTimeout);
+        window.clearTimeout(hideTimeout);
       };
 
       var hide = function () {
         if (! inside) {
+          window.clearTimeout(showTimeout);
           hideTimeout = window.setTimeout(function () {
             $element.find(selector).fadeTo("fast", 0);
           }, 10);
@@ -147,11 +149,14 @@
       }
 
       $element.mouseenter(function () {
-        inside = true;
-        show();
+        showTimeout = window.setTimeout(function () {
+          inside = true;
+          show();
+        }, 300);
       });
 
       $element.mouseleave(function () {
+        window.clearTimeout(showTimeout);
         inside = false;
         if (! ko.utils.domData.get(element, 'visibleOnHover.override')) {
           hide();
@@ -494,9 +499,16 @@
       var hidePopover = function () {
         $element.popover('hide');
         visible = false;
+        $(document).off('click', hideOnClickOutside)
       };
 
       huePubSub.subscribe('close.popover', hidePopover);
+
+      var hideOnClickOutside = function (event) {
+        if (visible && $element.data('popover') && ! $.contains($element.data('popover').$tip[0], event.target)) {
+          hidePopover();
+        }
+      }
 
       var showPopover = function () {
         ko.renderTemplate(options.contentTemplate, viewModel, {
@@ -516,6 +528,7 @@
                 }
                 $content.empty();
                 $title.empty();
+                $(document).on('click', hideOnClickOutside)
                 visible = true;
               }
             }, $title.get(0), 'replaceChildren');
@@ -524,12 +537,13 @@
       };
 
       if (clickTrigger) {
-        $element.click(function () {
+        $element.click(function (e) {
           if (visible) {
             hidePopover();
           } else {
             showPopover();
           }
+          e.stopPropagation();
         });
       } else {
         $element.mouseenter(showPopover);
@@ -1141,7 +1155,8 @@
       var timeout = -1;
       var checkForElements = function () {
         var $allPanels = $container.children('.assist-inner-panel');
-        if (panelDefinitions().length == $allPanels.length) {
+        var $allExtras = $container.children('.assist-fixed-height');
+        if (panelDefinitions().length == $allPanels.length && ($allExtras.length > 0 || options.noFixedHeights)) {
           ko.bindingHandlers.assistVerticalResizer.updateWhenRendered(element, valueAccessor);
         } else {
           timeout = window.setTimeout(checkForElements, 10);
@@ -1170,14 +1185,21 @@
         allExtrasHeight += $(extra).outerHeight(true);
       });
 
+      window.clearInterval($container.data('height_interval'));
+
       if (panelDefinitions().length === 0) {
         $allExtras.show();
+        return;
       }
       if (panelDefinitions().length === 1) {
         var adjustHeightSingle = function () {
           $allPanels.height($container.innerHeight() - allExtrasHeight);
-        }
-        window.setTimeout(adjustHeightSingle, 200);
+        };
+
+        var heightAdjustInterval = window.setInterval(adjustHeightSingle, 800);
+        adjustHeightSingle();
+        $container.data('height_interval', heightAdjustInterval);
+
         $(window).resize(adjustHeightSingle);
         huePubSub.subscribe('assist.forceRender', function () {
           window.setTimeout(adjustHeightSingle, 200);
@@ -1252,6 +1274,7 @@
             }
           });
         }
+        $('.assist-flex-fill').getNiceScroll().resize();
       };
 
       resizeByRatio();
@@ -1352,7 +1375,7 @@
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
             assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
-            $('.ps-container').perfectScrollbar('update');
+            $('.assist-flex-fill').getNiceScroll().resize();
           }
         });
       });
@@ -1366,27 +1389,32 @@
       var $target = $(options.target);
       var $resizer = $(element);
 
-      var lastEditorHeight = 7;
+      var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 128;
+      var editorHeight = Math.floor(lastEditorSize / 16);
+      $target.height(lastEditorSize);
+      var autoExpand = true;
 
-      var autoExpandTimeout = window.setInterval(function () {
-        var chunks = Math.floor((Math.max(ace().session.getLength(), 4) - lastEditorHeight) / 4);
-        if (chunks !== 0) {
-          if (ace().session.getLength() < 2000) {
-            $target.height($target.height() + 64 * chunks);
+      ace().on('change', function () {
+        if (autoExpand) {
+          var maxAutoLines = Math.floor(($(window).height() - 200) / 16);
+          if (ace().session.getLength() > editorHeight) {
+            if (ace().session.getLength() < maxAutoLines) {
+              $target.height((ace().session.getLength() + 1) * 16);
+            }
+            else {
+              $target.height(maxAutoLines * 16); // height of maxAutoLines
+            }
+            ace().resize();
+            editorHeight = ace().session.getLength();
           }
-          else {
-            $target.height(2000 * 16); // height of 2000 lines
-          }
-          ace().resize();
-          lastEditorHeight += 4 * chunks;
         }
-      }, 300);
+      });
 
       $resizer.draggable({
         axis: "y",
         start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
-          clearInterval(autoExpandTimeout);
+          autoExpand = false;
           var currentHeight = ui.offset.top - 120;
           $target.css("height", currentHeight + "px");
           ace().resize();
@@ -1396,6 +1424,7 @@
         stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
+          $.totalStorage('hue.editor.editor.size', $target.height());
           $(document).trigger("editorSizeChanged");
         }
       });
@@ -2160,8 +2189,7 @@
       self.attr("autocomplete", "off");
       self.jHueHdfsAutocomplete({
         skipKeydownEvents: true,
-        skipScrollEvent: true,
-        zIndex: 990
+        skipScrollEvent: true
       });
     }
   };
@@ -2203,12 +2231,12 @@
         });
       }
 
-      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon));
+      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal));
     }
   };
 
 
-  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon) {
+  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon, isNestedModal) {
     var _btn;
     if (isAddon) {
       _btn = $("<span>").addClass("add-on muted pointer").text("..");
@@ -2217,16 +2245,18 @@
     }
     _btn.click(function (e) {
       e.preventDefault();
-      $("html").addClass("modal-open");
+      if (!isNestedModal) {
+        $("body").addClass("modal-open");
+      }
       // check if it's a relative path
       callFileChooser();
 
       function callFileChooser() {
         var _initialPath = $.trim(inputElement.val()) != "" ? inputElement.val() : "/";
-        if ((allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)){
+        if ((allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.skipInitialPathIfEmpty && inputElement.val() == "") || (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)) {
           _initialPath = "";
         }
-        if (inputElement.data("fullPath")){
+        if (inputElement.data("fullPath")) {
           _initialPath = inputElement.data("fullPath");
         }
         if (_initialPath.indexOf("hdfs://") > -1) {
@@ -2239,13 +2269,17 @@
             handleChoice(filePath, stripHdfsPrefix);
             if (selectFolder) {
               $("#chooseFile").modal("hide");
-              $(".modal-backdrop").remove();
+              if (!isNestedModal) {
+                $(".modal-backdrop").remove();
+              }
             }
           },
           onFileChoose: function (filePath) {
             handleChoice(filePath, stripHdfsPrefix);
             $("#chooseFile").modal("hide");
-            $(".modal-backdrop").remove();
+            if (!isNestedModal) {
+              $(".modal-backdrop").remove();
+            }
           },
           createFolder: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
           uploadFile: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
@@ -2257,35 +2291,37 @@
           filterExtensions: allBindingsAccessor && allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : ""
         });
         $("#chooseFile").modal("show");
-        $("#chooseFile").on("hidden", function(){
-          $("html").removeClass("modal-open");
-          $(".modal-backdrop").remove();
-        });
+        if (!isNestedModal) {
+          $("#chooseFile").on("hidden", function () {
+            $("body").removeClass("modal-open");
+            $(".modal-backdrop").remove();
+          });
+        }
       }
 
       function handleChoice(filePath, stripHdfsPrefix) {
-        if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator){
+        if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator) {
           filePath = inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] + '=' + filePath;
         }
-        if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.deploymentDir){
+        if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.deploymentDir) {
           inputElement.data("fullPath", filePath);
           inputElement.attr("data-original-title", filePath);
-          if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) == 0){
+          if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) == 0) {
             filePath = filePath.substr(allBindingsAccessor().filechooserOptions.deploymentDir.length + 1);
           }
         }
-        if (stripHdfsPrefix){
+        if (stripHdfsPrefix) {
           inputElement.val(filePath);
         }
         else {
           inputElement.val("hdfs://" + filePath);
         }
         inputElement.change();
-        if (valueAccessor){
+        if (valueAccessor) {
           if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
-            if (valueAccessor().value){
+            if (valueAccessor().value) {
               valueAccessor().value(inputElement.val());
-              if (valueAccessor().displayJustLastBit){
+              if (valueAccessor().displayJustLastBit) {
                 inputElement.data("fullPath", inputElement.val());
                 inputElement.attr("data-original-title", inputElement.val());
                 var _val = inputElement.val();
@@ -2302,7 +2338,7 @@
         }
       }
     });
-    if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled){
+    if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled) {
       _btn.addClass("disabled").attr("disabled", "disabled");
     }
     return _btn;
@@ -2430,9 +2466,14 @@
       snippet.errors.subscribe(function(newErrors) {
         editor.clearErrors();
         var offset = 0;
-        if (snippet.isSqlDialect() && editor.getSelectedText()) {
-          var selectionRange = editor.getSelectionRange();
-          offset = Math.min(selectionRange.start.row, selectionRange.end.row);
+        if (snippet.isSqlDialect()) {
+          if (editor.getSelectedText()){
+            var selectionRange = editor.getSelectionRange();
+            offset = Math.min(selectionRange.start.row, selectionRange.end.row);
+          }
+          if (snippet.result && snippet.result.statements_count() > 1){
+            offset = snippet.result.statement_range().start.row;
+          }
         }
         if (newErrors.length > 0) {
           newErrors.forEach(function (err, cnt) {
@@ -2470,7 +2511,8 @@
       }
       editor.completer.exactMatch = ! snippet.isSqlDialect();
 
-      var langTools = ace.require("ace/ext/language_tools")
+      var langTools = ace.require("ace/ext/language_tools");
+      langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
       langTools.addCompleter(snippet.autocompleter);
 
       var placeHolderElement = null;
@@ -2504,6 +2546,13 @@
         snippet.inFocus(true);
         $(".ace-editor").data("last-active-editor", false);
         $el.data("last-active-editor", true);
+        if (editor.session.$backMarkers) {
+          for (var marker in editor.session.$backMarkers) {
+            if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+              editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+            }
+          }
+        }
       });
 
       editor.selection.on("changeSelection", function () {
@@ -2902,7 +2951,23 @@
       var snippet = options.snippet;
       if (snippet.ace()) {
         var editor = snippet.ace();
+        var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
+        if (range) {
+          if (editor.session.$backMarkers) {
+            for (var marker in editor.session.$backMarkers) {
+              if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+                editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+              }
+            }
+          }
+          editor.session.addMarker(new AceRange(range.start.row, range.start.column, range.end.row, range.end.column), 'highlighted', 'line');
+          ace.require('ace/lib/dom').importCssString('.highlighted {\
+              background-color: #E3F7FF;\
+              position: absolute;\
+          }');
+          editor.scrollToLine(range.start.row, true, true, function () {});
+        }
       }
     }
   };
@@ -3133,32 +3198,20 @@
           'width': '100%'
         }).appendTo($wrapper);
 
-        $container.perfectScrollbar({
-          minScrollbarLength: options.minScrollbarLength || 20,
-          suppressScrollX: options.suppressScrollX || true,
-          scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
-        });
-        $container.on('ps-scroll-x', function () {
-          $(element).trigger('scroll');
-        });
-        $container.on('ps-scroll-y', function () {
-          $(element).trigger('scroll');
+        $container.niceScroll({
+          cursorcolor: "#CCC",
+          cursorborder: "1px solid #CCC",
+          cursoropacitymin: 0,
+          cursoropacitymax: 0.75,
+          scrollspeed: 100,
+          mousescrollstep: 60,
+          cursorminheight: options.cursorminheight || 20,
+          horizrailenabled: options.horizrailenabled || false
         });
       }
       else {
         window.setTimeout(function(){
-          $container.perfectScrollbar('destroy');
-          $container.perfectScrollbar({
-            minScrollbarLength: options.minScrollbarLength || 20,
-            suppressScrollX: options.suppressScrollX || true,
-            scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
-          });
-          $container.on('ps-scroll-x', function () {
-            $(element).trigger('scroll');
-          });
-          $container.on('ps-scroll-y', function () {
-            $(element).trigger('scroll');
-          });
+          $container.getNiceScroll().resize();
         }, 200);
       }
 
@@ -3181,7 +3234,7 @@
           totalHeight += height;
         });
         $wrapper.height(totalHeight + 'px');
-        $container.perfectScrollbar('update');
+        $container.getNiceScroll().resize();
       };
       resizeWrapper();
 
@@ -3360,9 +3413,6 @@
         $parentFVOwnerElement.data('disposalFunction', null);
       });
 
-      ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], function () {
-        $container.perfectScrollbar('destroy')
-      });
       ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
       setStartAndEndFromScrollTop();
@@ -3478,6 +3528,8 @@
 
 
       $parent.parents(scrollable).off('scroll');
+      huePubSub.publish('scrollable.scroll.off', scrollable);
+
       $parent.parents(scrollable).on('scroll', render);
 
       if ($parent.parents('.hueach').length > 0) {
@@ -3515,21 +3567,127 @@
     }
   };
 
-  ko.bindingHandlers.perfectScrollbar = {
+  ko.bindingHandlers.niceScroll = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       if (typeof options.enable === 'undefined' || options.enable) {
-        $(element).perfectScrollbar({
-          minScrollbarLength: options.minScrollbarLength || 20,
-          suppressScrollX: options.suppressScrollX || true
+        $(element).niceScroll({
+          cursorcolor: "#CCC",
+          cursorborder: "1px solid #CCC",
+          cursoropacitymin: 0,
+          cursoropacitymax: 0.75,
+          scrollspeed: 100,
+          mousescrollstep: 60,
+          cursorminheight: options.cursorminheight || 20,
+          horizrailenabled: options.horizrailenabled || true
         });
-        $(element).on('ps-scroll-x', function () {
-          $(element).trigger('scroll');
-        });
-        $(element).on('ps-scroll-y', function () {
-          $(element).trigger('scroll');
-        });
+        $(element).addClass('nicescrollified');
       }
+    }
+  };
+
+
+  ko.bindingHandlers.plotly = {
+    init: function (element, valueAccessor, allBindings) {
+      var options = valueAccessor() || {};
+      if (Plotly){
+        Plotly.plot(element, options.data || [], options.layout || {}, {displaylogo: false});
+      }
+    }
+  };
+
+  ko.bindingHandlers.dockable = {
+    init: function (element, valueAccessor, allBindings) {
+      var options = valueAccessor() || {};
+      var scrollable = options.scrollable ? options.scrollable : window;
+
+      $(element).addClass('dockable');
+
+      var initialTopPosition = -1;
+      var initialSize = {
+        w: $(element).width(),
+        h: $(element).outerHeight() + (options.jumpCorrection || 0)
+      };
+
+      var ghost = $('<div>').css({'display': 'none', 'height': initialSize.h}).insertBefore($(element));
+
+      function dock() {
+        if (initialTopPosition == -1) {
+          initialTopPosition = $(element).position().top;
+        }
+        if ($(scrollable).scrollTop() > initialTopPosition) {
+          $(element).css({
+            'position': 'fixed',
+            'top': '82px',
+            'width': initialSize.w + 'px'
+          });
+          ghost.show();
+        }
+        else {
+          $(element).removeAttr('style');
+          ghost.hide();
+        }
+      }
+
+      if (options.nicescroll) {
+        var checkForNicescrollInit = -1;
+        checkForNicescrollInit = window.setInterval(function () {
+          if ($(scrollable).hasClass('nicescrollified')) {
+            window.clearTimeout(checkForNicescrollInit);
+            $(scrollable).on('scroll', dock);
+          }
+        }, 200);
+      }
+      else {
+        $(scrollable).on('scroll', dock);
+      }
+
+      huePubSub.subscribe('scrollable.scroll.off', function (scrollElement) {
+        if (scrollElement === scrollable) {
+          $(scrollable).on('scroll', dock);
+        }
+      });
+
+    }
+  };
+
+  ko.bindingHandlers.autogrowInput = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var o = $.extend({
+        minWidth: 0,
+        maxWidth: 1000,
+        comfortZone: 70
+      }, valueAccessor());
+      var minWidth = o.minWidth || $(element).width(),
+        val = '',
+        input = $(element),
+        testSubject = $('<tester/>').css({
+          position: 'absolute',
+          top: -9999,
+          left: -9999,
+          width: 'auto',
+          fontSize: input.css('fontSize'),
+          fontFamily: input.css('fontFamily'),
+          fontWeight: input.css('fontWeight'),
+          letterSpacing: input.css('letterSpacing'),
+          whiteSpace: 'nowrap'
+        }),
+        check = function () {
+          if (val === (val = input.val())) {
+            return;
+          }
+          var escaped = val.replace(/&/g, '&amp;').replace(/\s/g, ' ').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          testSubject.html(escaped);
+          var testerWidth = testSubject.width(),
+            newWidth = (testerWidth + o.comfortZone) >= minWidth ? testerWidth + o.comfortZone : minWidth,
+            currentWidth = input.width(),
+            isValidWidthChange = (newWidth < currentWidth && newWidth >= minWidth) || (newWidth > minWidth && newWidth < o.maxWidth);
+          if (isValidWidthChange) {
+            input.width(newWidth);
+          }
+        };
+      testSubject.insertAfter(element);
+      ko.utils.registerEventHandler(element, 'keyup keydown blur update', check);
     }
   };
 

@@ -193,8 +193,8 @@ class IndexController(object):
 
 
   def _format_flags(self, fields):
-    for field_name, field in fields.items():
-      for index in range(0, len(FLAGS)):
-        flags = FLAGS[index]
-        field[flags[1]] = field['flags'][index] == FLAGS[index][0]
+    for name, properties in fields.items():
+      for (code, value) in FLAGS:
+        if code in properties['flags']:
+          properties[value] = True  # Add a new key-value boolean for the decoded flag
     return fields

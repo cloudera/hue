@@ -511,7 +511,7 @@ from desktop.views import _ko
       <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
         <i class="fa fa-fw fa-download"></i>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu less-padding">
         <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
@@ -522,9 +522,9 @@ from desktop.views import _ko
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
-        <liv>
+        <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to HDFS or a new table') }">
-            <i class="fa fa-save"></i> ${ _('Export') }
+            <i class="fa fa-fw fa-save"></i> ${ _('Export') }
           </a>
         </li>
       </ul>
@@ -551,39 +551,40 @@ from desktop.views import _ko
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
                   &nbsp;${ _('In HDFS (small csv)') }
                 </label>
-                <span data-bind="visible: saveTarget() == 'hdfs-file'">
-                  <input data-bind="value: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser">
-                </span>
+                <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
+                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
+                </div>
                 <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
                   <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
                   ${ _('Overwrite') }
                 </label>
               </div>
+            </div>
+            <div class="control-group">
               <div class="controls" data-bind="visible: snippet.type() == 'hive'">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
                   &nbsp;${ _('In HDFS (large file)') }
                 </label>
-                <span data-bind="visible: saveTarget() == 'hdfs-directory'">
-                  <input data-bind="value: savePath" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="folderChooser">
-                  <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
-                </span>
+                <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
+                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="pathChooser margin-left-10">
+                  <i class="fa fa-question-circle muted" title="${ _("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }"></i>
+                </div>
               </div>
+            </div>
+            <div class="control-group">
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
                   &nbsp;${ _('A new table') }
                 </label>
-                <span data-bind="visible: saveTarget() == 'hive-table'">
-                  <input data-bind="value: savePath" type="text" name="target_table" class="input-xlarge" placeholder="${_('Table name or <database>.<table>')}">
-                </span>
+                <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
+                  <input data-bind="hivechooser: savePath" type="text" name="target_table" class="input-xlarge margin-left-10" placeholder="${_('Table name or <database>.<table>')}">
+                </div>
               </div>
             </div>
           </fieldset>
         </form>
-        <div id="hdfs-directory-help-content" class="hide">
-          <p>${ _("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }</p>
-        </div>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
@@ -643,6 +644,10 @@ from desktop.views import _ko
       };
 
       DownloadResultsViewModel.prototype.download = function (format) {
+        if (typeof trackOnGA == 'function') {
+          trackOnGA('notebook/download/' + format);
+        }
+
         var self = this;
         self.$downloadForm.find('input[name=\'format\']').val(format);
         self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));

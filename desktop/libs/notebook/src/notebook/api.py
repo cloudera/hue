@@ -27,13 +27,17 @@ from django.views.decorators.http import require_GET, require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired
+from notebook.connectors.base import get_api, Notebook, QueryExpired,\
+  SessionExpired
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
 
 
 LOG = logging.getLogger(__name__)
+
+
+DEFAULT_HISTORY_NAME = _('Query history')
 
 
 @require_POST
@@ -82,7 +86,19 @@ def execute(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+  try:
+    response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+  finally:
+    if notebook['type'].startswith('query-'):
+      _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
+      if 'handle' in response: # No failure
+        _snippet['result']['handle'] = response['handle']
+        _snippet['result']['statements_count'] = response['handle']['statements_count']
+      else:
+        _snippet['status'] = 'failed'
+      history = _historify(notebook, request.user)
+      response['history_id'] = history.id
+      response['history_uuid'] = history.uuid
 
   # Materialize and HTML escape results
   if response['handle'].get('sync') and response['handle']['result'].get('data'):
@@ -102,8 +118,28 @@ def check_status(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
-  response['status'] = 0
+  try:
+    response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
+    response['status'] = 0
+  except SessionExpired:
+    response['status'] = 'expired'
+    raise
+  except QueryExpired:
+    response['status'] = 'expired'
+    raise
+  finally:
+    if response['status'] == 0 and snippet['status'] != response['query_status']:
+      status = response['query_status']['status']
+    elif response['status'] == 'expired':
+      status = 'expired'
+    else:
+      status = 'failed'
+    nb_doc = Document2.objects.get(id=notebook['id'])
+    nb_doc.can_write_or_exception(request.user)
+    nb = Notebook(document=nb_doc).get_data()
+    nb['snippets'][0]['status'] = status
+    nb_doc.update_data(nb)
+    nb_doc.save()
 
   return JsonResponse(response)
 
@@ -207,17 +243,22 @@ def save_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
+  parent_uuid = notebook.get('parent_uuid', None)
+  parent = Document2.objects.get_home_directory(request.user)
+  if parent_uuid:
+    parent = Document2.objects.get_by_uuid(parent_uuid)
 
   if notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
-    notebook_doc = Document2.objects.create(name=notebook['name'], type=notebook_type, owner=request.user)
+    notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
 
   notebook_doc1 = notebook_doc.doc.get()
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
   notebook_doc.description = notebook_doc1.description = notebook['description']
+  notebook_doc.parent_directory = parent
   notebook_doc.save()
   notebook_doc1.save()
 
@@ -228,19 +269,15 @@ def save_notebook(request):
   return JsonResponse(response)
 
 
-@require_POST
-@api_error_handler
-@check_document_access_permission()
-def historify(request):
-  response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+def _historify(notebook, user):
   query_type = notebook['type']
+  name = notebook['name'] if notebook['name'] and notebook['name'].strip() != '' else DEFAULT_HISTORY_NAME
 
   history_doc = Document2.objects.create(
-    name=notebook['name'],
+    name=name,
     type=query_type,
-    owner=request.user,
+    owner=user,
     is_history=True
   )
   Document.objects.link(
@@ -251,14 +288,11 @@ def historify(request):
     extra=query_type
   )
 
+  notebook['uuid'] = history_doc.uuid
   history_doc.update_data(notebook)
   history_doc.save()
 
-  response['status'] = 0
-  response['id'] = history_doc.id
-  response['message'] = _('Query notebook history saved !')
-
-  return JsonResponse(response)
+  return history_doc
 
 
 @require_GET
@@ -273,9 +307,10 @@ def get_history(request):
   response['history'] = [{
       'name': doc.name,
       'id': doc.id,
+      'uuid': doc.uuid,
       'data': Notebook(document=doc).get_data(),
       'absoluteUrl': doc.get_absolute_url()
-      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)[:25]]
+      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:25]]
   response['message'] = _('History fetched')
 
   return JsonResponse(response)
@@ -290,12 +325,11 @@ def clear_history(request):
   notebook = json.loads(request.POST.get('notebook'), '{}')
   doc_type = request.POST.get('doc_type')
 
-  response['status'] = 0
   history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
-  if notebook.get('id'):
-    history = history.exclude(id=notebook.get('id'))
+
   response['updated'] = history.delete()
   response['message'] = _('History cleared !')
+  response['status'] = 0
 
   return JsonResponse(response)
 
@@ -378,14 +412,14 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def get_sample_data(request, server=None, database=None, table=None):
+def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column)
   response.update(sample_data)
 
   response['status'] = 0

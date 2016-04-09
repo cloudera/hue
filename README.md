@@ -71,12 +71,13 @@ __Ubuntu:__
 * ant
 * gcc
 * g++
+* libffi-dev
 * libkrb5-dev
 * libmysqlclient-dev
-* libssl-dev
 * libsasl2-dev
 * libsasl2-modules-gssapi-mit
 * libsqlite3-dev
+* libssl-dev
 * libtidy-0.99-0 (for unit tests only)
 * libxml2-dev
 * libxslt-dev
@@ -98,6 +99,7 @@ __CentOS/RHEL:__
 * gcc
 * gcc-c++
 * krb5-devel
+* libffi-devel
 * libtidy (for unit tests only)
 * libxml2-devel
 * libxslt-devel

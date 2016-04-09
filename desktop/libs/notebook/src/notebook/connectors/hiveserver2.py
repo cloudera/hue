@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax import data_export
-  from beeswax.api import _autocomplete, _get_sample_data, explain_directly
+  from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
@@ -42,6 +42,9 @@ try:
   from beeswax.views import _parse_out_hadoop_jobs
 except ImportError, e:
   LOG.exception('Hive and HiveServer2 interfaces are not enabled')
+
+
+DEFAULT_HIVE_ENGINE = 'mr'
 
 
 def query_error_handler(func):
@@ -127,11 +130,6 @@ class HS2Api(Api):
     })
 
     return response
-
-
-  def _get_statements(self, hql_query):
-    hql_query = strip_trailing_semicolon(hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
 
   @query_error_handler
@@ -244,12 +242,16 @@ class HS2Api(Api):
 
   @query_error_handler
   def get_jobs(self, notebook, snippet, logs):
-    job_ids = _parse_out_hadoop_jobs(logs)
+    jobs = []
 
-    jobs = [{
-      'name': job_id,
-      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
-    } for job_id in job_ids]
+    if snippet['type'] == 'hive':
+      engine = self._get_hive_execution_engine(notebook, snippet)
+      job_ids = _parse_out_hadoop_jobs(logs, engine=engine)
+
+      jobs = [{
+        'name': job_id,
+        'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
+      } for job_id in job_ids]
 
     return jobs
 
@@ -261,9 +263,9 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None):
     db = self._get_db(snippet)
-    return _get_sample_data(db, database, table)
+    return _get_sample_data(db, database, table, column)
 
 
   @query_error_handler
@@ -279,6 +281,40 @@ class HS2Api(Api):
       'explanation': explanation.textual,
       'statement': query.get_query_statement(0),
     }
+
+
+  def _get_hive_execution_engine(self, notebook, snippet):
+    # Get hive.execution.engine from snippet properties, if none, then get from session
+    properties = snippet['properties']
+    settings = properties.get('settings', [])
+
+    if not settings:
+      session = next((session for session in notebook['sessions'] if session['type'] == 'hive'), None)
+      if not session:
+        raise Exception(_('Cannot get jobs, failed to find active HS2 session for user: %s') % self.user.username)
+      settings = session['properties']
+
+    engine = next((setting['value'] for setting in settings if setting['key'] == 'hive.execution.engine'), DEFAULT_HIVE_ENGINE)
+
+    return engine
+
+
+  def _get_statements(self, hql_query):
+    hql_query = strip_trailing_semicolon(hql_query)
+    statements = []
+    for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query):
+      statements.append({
+        'start': {
+          'row': start_row,
+          'column': start_col
+        },
+        'end': {
+          'row': end_row,
+          'column': end_col
+        },
+        'statement': strip_trailing_semicolon(statement.strip())
+      })
+    return statements
 
 
   def _get_current_statement(self, db, snippet):
@@ -297,16 +333,18 @@ class HS2Api(Api):
       statement_id = 0
 
     statements = self._get_statements(snippet['statement'])
-    if statements_count != len(statements):
-      statement_id = 0
-    statement = statements[statement_id]
 
-    return {
+    resp = {
       'statement_id': statement_id,
-      'statement': statement,
       'has_more_statements': statement_id < len(statements) - 1,
       'statements_count': len(statements)
     }
+
+    if statements_count != len(statements):
+      statement_id = 0
+
+    resp.update(statements[statement_id])
+    return resp
 
 
   def _prepare_hql_query(self, snippet, statement):
@@ -333,9 +371,11 @@ class HS2Api(Api):
 
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    snippet['result']['handle'].pop('statement_id')
-    snippet['result']['handle'].pop('has_more_statements')
-    snippet['result']['handle'].pop('statements_count')
+
+    for key in snippet['result']['handle'].keys():
+      if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
+        snippet['result']['handle'].pop(key)
+
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
 

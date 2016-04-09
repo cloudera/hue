@@ -34,8 +34,18 @@ def get_auth_password():
     return password
   return DEFAULT_AUTH_PASSWORD.get()
 
+
 def get_optimizer_url():
   return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
+
+def has_optimizer():
+  return bool(get_optimizer_url())
+
+def get_navigator_url():
+  return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
+
+def has_navigator():
+  return bool(get_navigator_url())
 
 
 OPTIMIZER = ConfigSection(
@@ -97,6 +107,13 @@ OPTIMIZER = ConfigSection(
       help=_t("In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"),
       dynamic_default=default_ssl_validate,
       type=coerce_bool
+    ),
+
+    MOCKING = Config(
+      key="mocking",
+      help=_t("Use mock data"),
+      default=False,
+      type=coerce_bool
     )
   )
 )
@@ -108,7 +125,7 @@ NAVIGATOR = ConfigSection(
   members=dict(
     API_URL=Config(
       key='api_url',
-      help=_t('Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)'),
+      help=_t('Base URL to Navigator API (e.g. - http://localhost:7187/api)'),
       default=None),
     AUTH_USERNAME=Config(
       key="auth_username",

@@ -100,7 +100,7 @@
         if (!newValue.hasEntries() && !newValue.loading()) {
           newValue.loadEntries()
         }
-        $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix(), newValue.definition.name);
+        self.assistHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', newValue.definition.name)
         huePubSub.publish("assist.database.set", {
           source: self.sourceType,
           name: newValue.definition.name
@@ -144,11 +144,9 @@
         self.selectedDatabase(dbIndex[databaseName]);
         return;
       }
-      var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix());
+      var lastSelectedDb = self.assistHelper.getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
       if (lastSelectedDb && dbIndex[lastSelectedDb]) {
         self.selectedDatabase(dbIndex[lastSelectedDb]);
-      } else if (dbIndex["default"]) {
-        self.selectedDatabase(dbIndex["default"]);
       } else if (self.databases().length > 0) {
         self.selectedDatabase(self.databases()[0]);
       }

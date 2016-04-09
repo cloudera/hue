@@ -48,6 +48,11 @@
     self.loading = ko.observable(false);
     self.tables = ko.observableArray();
     self.stats = ko.observable();
+    self.optimizerStats = ko.observableArray(); // TODO to plugify, duplicates similar MetastoreTable
+    self.navigatorStats = ko.observable();
+
+    self.showAddTagName = ko.observable(false);
+    self.addTagName = ko.observable('');
 
     self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
@@ -60,6 +65,21 @@
         });
       }
       return returned.sort(function (a, b) {
+    	if (options.optimizerEnabled()) {
+          if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
+            if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
+              if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+              }
+              return  b.optimizerStats().popularity - a.optimizerStats().popularity;
+            }
+            return -1
+          }
+          if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
+            return 1;
+          }
+        }
+
         return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
       });
     });
@@ -67,9 +87,37 @@
     self.selectedTables = ko.observableArray();
 
     self.table = ko.observable(null);
+    
+    self.addTags = function () {
+      $.post('/metadata/api/navigator/add_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([self.addTagName()])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.push(self.addTagName());
+          self.addTagName('');
+          self.showAddTagName(false);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+      
+    self.deleteTags = function (tag) {
+      $.post('/metadata/api/navigator/delete_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([tag])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.remove(tag);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
   }
 
-  MetastoreDatabase.prototype.load = function (callback) {
+  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled) {
     var self = this;
     if (self.loading()) {
       return;
@@ -87,12 +135,49 @@
             type: tableMeta.type,
             comment: tableMeta.comment,
             assistHelper: self.assistHelper,
-            i18n: self.i18n
+            i18n: self.i18n,
+            optimizerEnabled: optimizerEnabled
           })
         }));
         self.loaded(true);
         self.loading(false);
-        if (callback) {
+        if (optimizerEnabled) {
+          $.get('/metadata/api/navigator/find_entity', {
+            type: 'database',
+            name: self.name
+          }, function(data){
+            if (data && data.status == 0) {
+              self.navigatorStats(ko.mapping.fromJS(data.entity));
+            } else {
+              $(document).trigger("info", data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          });
+
+          $.post('/metadata/api/optimizer_api/top_tables', {
+            database: self.name
+          }, function(data){
+            if (data && data.status == 0) {
+              var tableIndex = {};
+              data.top_tables.forEach(function (topTable) {
+                tableIndex[topTable.name] = topTable;
+              });
+              self.tables().forEach(function (table) {
+                table.optimizerStats(tableIndex[table.name]);
+              });
+              self.optimizerStats(data.top_tables);
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          }).always(function () {
+            if (callback) {
+              callback();
+            }
+          });
+        } else if (callback) {
           callback();
         }
       },
@@ -109,6 +194,7 @@
         self.stats(data.data);
       }
     });
+
 
     $.totalStorage('hue.metastore.lastdb', self.name);
   };
@@ -172,7 +258,7 @@
       successCallback: function (data) {
         self.keys(data.partition_keys_json);
         self.values(data.partition_values_json);
-        self.preview.values(self.values().slice(0, 3));
+        self.preview.values(self.values().slice(0, 5));
         self.preview.keys(self.keys());
         self.loading(false);
         self.loaded(true);
@@ -232,7 +318,10 @@
     });
   };
 
-
+  function MetastoreTableDetails(details) {
+	var self = this;
+  }
+  
   /**
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
@@ -252,8 +341,15 @@
     self.database = options.database;
     self.assistHelper = options.assistHelper;
     self.i18n = options.i18n;
+    self.optimizerEnabled = options.optimizerEnabled;
     self.name = options.name;
     self.type = options.type;
+
+    self.optimizerStats = ko.observable();
+    self.optimizerDetails = ko.observable();
+
+    self.navigatorStats = ko.observable();
+    self.relationshipsDetails = ko.observable();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -274,6 +370,9 @@
     self.tableDetails = ko.observable();
     self.tableStats = ko.observable();
     self.refreshingTableStats = ko.observable(false);
+    self.showAddTagName = ko.observable(false);
+    self.addTagName = ko.observable('');
+    self.loadingQueries = ko.observable(true);
 
     //TODO: Fetch table comment async and don't set it from python
     self.comment = ko.observable(options.comment);
@@ -326,7 +425,7 @@
               table: self
             })
           }));
-          self.favouriteColumns(self.columns().slice(0, 3));
+          self.favouriteColumns(self.columns().slice(0, 5));
         },
         errorCallback: function () {
           self.loadingColumns(false);
@@ -357,6 +456,53 @@
               self.partitions.loading(false);
               self.partitions.loaded(true);
             }
+            if (self.optimizerEnabled) {
+              $.get('/metadata/api/navigator/find_entity', {
+                type: 'table',
+                database: self.database.name,
+                name: self.name
+              }, function(data) {
+                if (data && data.status == 0) {
+                  self.navigatorStats(ko.mapping.fromJS(data.entity));
+                  self.getRelationships();
+                } else {
+                  $(document).trigger("info", data.message);
+                }
+              }).fail(function (xhr, textStatus, errorThrown) {
+                $(document).trigger("error", xhr.responseText);
+              });
+
+              $.post('/metadata/api/optimizer_api/table_details', {
+                tableName: self.name
+              }, function(data){
+                self.loadingQueries(false);
+                if (data && data.status == 0) {
+                  self.optimizerDetails(ko.mapping.fromJS(data.details));
+                  
+                  // Bump the most important columns first
+                  var topCol = self.optimizerDetails().table_donut.topColumns().slice(0, 5);
+                  if (topCol.length >= 3 && self.favouriteColumns().length > 0) { 
+                    self.favouriteColumns($.grep(self.columns(), function(col) {
+                        return topCol.indexOf(col.name()) != -1;
+                      })
+                    );
+                  }
+                  // Column popularity, stats
+                  $.each(self.optimizerDetails().sortedTotal(), function(index, optimizerCol) {
+                    var metastoreCol = $.grep(self.columns(), function(col) {
+                      return col.name() == optimizerCol.columnName();
+                    })
+                    if (metastoreCol.length > 0) {
+                      metastoreCol[0].popularity(optimizerCol.totalCount())
+                    }
+                  });
+                } else {
+                  $(document).trigger("info", data.message);
+                }
+              }).fail(function (xhr, textStatus, errorThrown) {
+                $(document).trigger("error", xhr.responseText);
+              });
+            }
           }
           else {
             self.refreshingTableStats(false);
@@ -370,6 +516,48 @@
         }
       })
     }
+
+    self.addTags = function () {
+      $.post('/metadata/api/navigator/add_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([self.addTagName()])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.push(self.addTagName());
+          self.addTagName('');
+          self.showAddTagName(false);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+    
+    self.deleteTags = function (tag) {console.log(tag);
+      $.post('/metadata/api/navigator/delete_tags', {
+        id: ko.mapping.toJSON(self.navigatorStats().identity),
+        tags: ko.mapping.toJSON([tag])
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.remove(tag);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+    
+    self.getRelationships = function () {
+      $.post('/metadata/api/navigator/lineage', {
+        id: self.navigatorStats().identity
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.relationshipsDetails(ko.mapping.fromJS(data));
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("info", xhr.responseText);
+      });
+    };
   }
 
   MetastoreTable.prototype.showImportData = function () {
@@ -404,6 +592,7 @@
     ko.mapping.fromJS(options.extendedColumn, {}, self);
 
     self.favourite = ko.observable(false);
+    self.popularity = ko.observable();
 
     self.comment.subscribe(function (newValue) {
       $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
@@ -443,6 +632,14 @@
     self.assistHelper = AssistHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
+
+    self.optimizerEnabled.subscribe(function (newValue) {
+      huePubSub.publish('meta.optimizer.enabled', newValue);
+    });
+
+    self.optimizerUrl = ko.observable(options.optimizerUrl);
+    self.navigatorUrl = ko.observable(options.navigatorUrl);
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
@@ -484,7 +681,8 @@
             return new MetastoreDatabase({
               name: name,
               assistHelper: self.assistHelper,
-              i18n: self.i18n
+              i18n: self.i18n,
+              optimizerEnabled: self.optimizerEnabled
             })
           }));
           self.loading(false);
@@ -605,11 +803,6 @@
       }
     });
 
-    // TODO: Move queries into MetastoreTable
-    self.loadingQueries = ko.observable(false);
-    self.queries = ko.observableArray([]);
-
-
     function loadURL() {
       var path = window.location.pathname.split('/');
       switch (path[2]) {
@@ -660,7 +853,7 @@
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback);
+      metastoreDatabase.load(callback, self.optimizerEnabled());
     } else if (callback) {
       callback();
     }

@@ -473,6 +473,34 @@ class TestUserAdminLdap(BaseUserAdminTests):
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
       assert_false(User.objects.filter(username='Rock').exists())
       assert_true(User.objects.filter(username='rock').exists())
+
+    finally:
+      for finish in done:
+        finish()
+
+
+  def test_useradmin_ldap_force_uppercase(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
+
+    done = []
+
+    # Set to nonsensical value just to force new config usage.
+    # Should continue to use cached connection.
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+
+    try:
+      # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+      ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+      # Test upper case
+      User.objects.filter(username__iexact='Rock').delete()
+      done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(False))
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(False))
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.set_for_testing(True))
+
+      import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
+      assert_true(User.objects.filter(username='ROCK').exists())
     finally:
       for finish in done:
         finish()
@@ -545,6 +573,44 @@ class TestUserAdminLdap(BaseUserAdminTests):
       response = c.post(URL, dict(server='nonsense', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
       assert_true(User.objects.filter(username='spaceless').exists())
 
+    finally:
+      for finish in done:
+        finish()
+
+
+  def test_add_ldap_users_force_uppercase(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
+
+    done = []
+
+    # Set to nonsensical value just to force new config usage.
+    # Should continue to use cached connection.
+    done.append(desktop.conf.LDAP.LDAP_SERVERS.set_for_testing(get_nonsense_config()))
+
+    try:
+      URL = reverse(add_ldap_users)
+
+      # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+      ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+      c = make_logged_in_client('test', is_superuser=True)
+
+      assert_true(c.get(URL))
+
+      # Test upper case
+      done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(False))
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(False))
+      done.append(desktop.conf.LDAP.FORCE_USERNAME_UPPERCASE.set_for_testing(True))
+
+      User.objects.filter(username='rock').delete()
+      assert_false(User.objects.filter(username='Rock').exists())
+      assert_false(User.objects.filter(username='ROCK').exists())
+
+      response = c.post(URL, dict(server='nonsense', username_pattern='Rock', password1='test', password2='test'))
+      assert_true('Location' in response, response)
+      assert_true('/useradmin/users' in response['Location'], response)
+      assert_true(User.objects.filter(username='ROCK').exists())
     finally:
       for finish in done:
         finish()

@@ -58,7 +58,6 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/fileuploader.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/perfect-scrollbar.min.css') }" rel="stylesheet">
 
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -186,6 +185,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/jquery.rowselector.js') }"></script>
   <script src="${ static('desktop/js/jquery.notify.js') }"></script>
   <script src="${ static('desktop/js/jquery.titleupdater.js') }"></script>
+  <script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
   <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
   <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
   <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
@@ -194,7 +194,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
-  <script src="${ static('desktop/js/perfect-scrollbar.jquery.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/floatlabels.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
@@ -232,6 +232,22 @@ if USE_NEW_EDITOR.get():
       else {
         top.location = self.location;
       }
+
+      %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
+      var idleTimer;
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function () {
+          // Check if logged out
+          $.get('/desktop/debug/is_idle');
+        }, (${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000) + 1000);
+      }
+
+      $(document).on('mousemove', resetIdleTimer);
+      $(document).on('keydown', resetIdleTimer);
+      $(document).on('click', resetIdleTimer);
+      resetIdleTimer();
+      %endif
 
       $("input, textarea").placeholder();
       $(".submitter").keydown(function (e) {
@@ -380,13 +396,24 @@ if USE_NEW_EDITOR.get():
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i><span class="hideable">&nbsp;${_('File Browser')}&nbsp;</span></a></li>
+    <li class="hide1380"><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
+    <li class="hideMoreThan1380"><a title="${_('File Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i></a></li>
     % endif
     % if 'jobbrowser' in apps:
-    <li><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i><span class="hideable">&nbsp;${_('Job Browser')}&nbsp;</span><span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li class="hide1380"><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li class="hideMoreThan1380"><a title="${_('Job Browser')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
     % endif
+    <%
+      view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
+    %>
     <li class="dropdown">
-      <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span><b class="caret"></b></a>
+      <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+        <i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span>
+        % if view_profile:
+          <b class="caret"></b>
+        % endif
+      </a>
+      % if view_profile:
       <ul class="dropdown-menu pull-right">
         <li>
           <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
@@ -401,6 +428,7 @@ if USE_NEW_EDITOR.get():
           <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
         % endif
       </ul>
+    % endif
     </li>
     % if 'help' in apps:
     <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
@@ -467,9 +495,9 @@ if USE_NEW_EDITOR.get():
        % endif
        % if 'beeswax' in apps:
         <%
-          from desktop.conf import USE_NEW_EDITOR
+          from notebook.conf import SHOW_NOTEBOOKS
         %>
-        % if USE_NEW_EDITOR.get():
+        % if SHOW_NOTEBOOKS.get():
          <% from desktop.models import Document2, Document %>
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
@@ -533,6 +561,7 @@ if USE_NEW_EDITOR.get():
                <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
+           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
            <% from oozie.conf import ENABLE_V2 %>
            % if not ENABLE_V2.get():
            <li class="dropdown-submenu">
@@ -552,6 +581,7 @@ if USE_NEW_EDITOR.get():
                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
+           % endif
            % endif
          </ul>
        </li>

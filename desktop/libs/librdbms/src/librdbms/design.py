@@ -92,7 +92,7 @@ class SQLdesign(object):
   @property
   def statements(self):
     sql_query = strip_trailing_semicolon(self.sql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(sql_query)]
+    return [strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(sql_query)]
 
   @staticmethod
   def loads(data):

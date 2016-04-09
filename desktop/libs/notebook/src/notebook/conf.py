@@ -23,7 +23,7 @@ except ImportError:
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
-  coerce_json_dict, coerce_string
+  coerce_json_dict, coerce_string, coerce_bool
 
 
 def get_interpreters(user=None):  
@@ -39,6 +39,14 @@ def get_interpreters(user=None):
       "options": interpreters[i].OPTIONS.get()}
       for i in interpreters
   ]
+
+
+SHOW_NOTEBOOKS = Config(
+    key="show_notebooks",
+    help=_t("Show the notebook menu or not"),
+    type=coerce_bool,
+    default=True
+)
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
@@ -101,6 +109,7 @@ GITHUB_CLIENT_SECRET = Config(
     type=coerce_string,
     default=""
 )
+
 
 def _default_interpreters():
   INTERPRETERS.set_for_testing(OrderedDict((

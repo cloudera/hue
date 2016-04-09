@@ -30,6 +30,10 @@
   <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 
+  <script src="${ static('desktop/js/ace/ace.js') }"></script>
+  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+  <script src="${ static('desktop/js/ace.extended.js') }"></script>
+
   ${ require.config() }
 
   <script type="text/javascript" charset="utf-8">

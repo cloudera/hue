@@ -153,9 +153,9 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- rename modal -->
-  <div id="renameModal" class="modal hide fade">
-    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path | n,unicode }" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
+  <form id="renameForm" action="/filebrowser/rename?next=${current_request_path | n,unicode }" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="renameModal" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Renaming:')} <span id="renameFileName">file name</span></h3>
@@ -174,17 +174,17 @@ from django.utils.translation import ugettext as _
         <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Rename')}" class="btn btn-primary" />
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
   <!-- chown modal -->
   % if is_fs_superuser:
-  <div id="changeOwnerModal" class="modal hide fade">
+  <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="changeOwnerModal" class="modal hide fade">
     <%
       select_filter = is_fs_superuser and 'SelectWithOther' or ''
     %>
-    <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Change Owner/Group')}</h3>
@@ -209,14 +209,14 @@ from django.utils.translation import ugettext as _
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
   % endif
 
   <!-- chmod modal -->
-  <div id="changePermissionModal" class="modal hide fade">
-    <form action="/filebrowser/chmod" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix" id="chmodForm">
-      ${ csrf_token(request) | n,unicode }
+  <form action="/filebrowser/chmod" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix" id="chmodForm">
+    ${ csrf_token(request) | n,unicode }
+    <div id="changePermissionModal" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Change Permissions:')} </h3>
@@ -274,19 +274,19 @@ from django.utils.translation import ugettext as _
         <a class="btn" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
   <!-- move modal -->
-  <div id="moveModal" class="modal hide fade">
-    <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
+  <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="moveModal" class="modal hide fade">
       <div class="modal-header" style="padding-bottom: 10px">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Move to')}</h3>
       </div>
       <div class="modal-body">
-        <div id="moveHdfsTree" style="padding-left: 15px;"></div>
+        <div id="moveHdfsTree"></div>
       </div>
       <div class="modal-footer">
         <div>
@@ -296,13 +296,13 @@ from django.utils.translation import ugettext as _
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary disable-enter" type="submit" value="${_('Move')}"/>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
   <!-- copy modal -->
-  <div id="copyModal" class="modal hide fade">
-    <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
+  <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="copyModal" class="modal hide fade">
       <div class="modal-header" style="padding-bottom: 10px">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Copy to')}</h3>
@@ -318,8 +318,8 @@ from django.utils.translation import ugettext as _
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary disable-enter" type="submit" value="${_('Copy')}"/>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
   <!-- upload file modal -->
   <div id="uploadFileModal" class="modal hide fade" data-backdrop="static">
@@ -354,9 +354,9 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- new directory modal -->
-  <div id="createDirectoryModal" class="modal hide fade">
-    <form id="createDirectoryForm" data-bind="submit: createDirectory" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
+  <form id="createDirectoryForm" data-bind="submit: createDirectory" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Create Directory')}</h3>
@@ -375,33 +375,33 @@ from django.utils.translation import ugettext as _
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
   <!-- new file modal -->
-  <div id="createFileModal" class="modal hide fade">
-    <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-      ${ csrf_token(request) | n,unicode }
-      <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Create File')}</h3>
-      </div>
-      <div class="modal-body">
-        <label>${_('File Name')} <input id="newFileNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
-        <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
-      </div>
-      <div class="modal-footer">
-         <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10px;">
-          <span class="label label-important">${_('File name is required.')}</span>
+  <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="createFileModal" class="modal hide fade">
+        <div class="modal-header">
+          <a href="#" class="close" data-dismiss="modal">&times;</a>
+          <h3>${_('Create File')}</h3>
         </div>
-        <div id="fileNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
-          <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
+        <div class="modal-body">
+          <label>${_('File Name')} <input id="newFileNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+          <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
         </div>
-        <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
-        <input class="btn btn-primary" type="submit" value="${_('Create')}" />
-      </div>
-    </form>
-  </div>
+        <div class="modal-footer">
+           <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10px;">
+            <span class="label label-important">${_('File name is required.')}</span>
+          </div>
+          <div id="fileNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
+            <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
+          </div>
+          <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
+          <input class="btn btn-primary" type="submit" value="${_('Create')}" />
+        </div>
+    </div>
+  </form>
 
   <!-- content summary modal -->
   <div id="contentSummaryModal" class="modal hide fade">
@@ -501,7 +501,7 @@ from django.utils.translation import ugettext as _
 </div>
 
   <script id="fileTemplate" type="text/html">
-    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file', value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected() }">
+    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file', value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -759,10 +759,12 @@ from django.utils.translation import ugettext as _
           mtime: file.mtime
         },
         selected: ko.observable(false),
+        highlighted: ko.observable(file.highlighted || false),
         handleSelect: function (row, e) {
           e.preventDefault();
           e.stopPropagation();
           this.selected(! this.selected());
+          this.highlighted(false);
           viewModel.allSelected(false);
         },
         // display the context menu when an item is right/context clicked
@@ -828,6 +830,7 @@ from django.utils.translation import ugettext as _
       self.searchQuery = ko.observable("");
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.pendingUploads = ko.observable(0);
+      self.lastUploadBatch = ko.observableArray([]);
 
       self.fileNameSorting = function (l, r) {
         if (l.name == "..") {
@@ -984,8 +987,10 @@ from django.utils.translation import ugettext as _
         self.page(new Page(page));
 
         self.files(ko.utils.arrayMap(files, function (file) {
+          file.highlighted = self.lastUploadBatch.indexOf(file.path) > -1;
           return new File(file);
         }));
+        self.lastUploadBatch([]);
         if (self.sortBy() == "name"){
           self.files.sort(self.fileNameSorting);
         }
@@ -1384,6 +1389,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              self.lastUploadBatch.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadFileModal').modal('hide');
@@ -1455,6 +1461,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              self.lastUploadBatch.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadArchiveModal').modal('hide');
@@ -1663,6 +1670,7 @@ from django.utils.translation import ugettext as _
                   }
                   else {
                     $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                    viewModel.lastUploadBatch.push(response.path);
                   }
                 }
               }
@@ -1943,10 +1951,12 @@ from django.utils.translation import ugettext as _
         viewModel.filter();
       }, 500);
 
-      $("#editBreadcrumb").click(function () {
-        $(this).hide();
-        $(".hueBreadcrumb").hide();
-        $("#hueBreadcrumbText").show().focus();
+      $("#editBreadcrumb").click(function (e) {
+        if ($(e.target).is('ul')){
+          $(this).hide();
+          $(".hueBreadcrumb").hide();
+          $("#hueBreadcrumbText").show().focus();
+        }
       });
 
       $("#hueBreadcrumbText").jHueHdfsAutocomplete({

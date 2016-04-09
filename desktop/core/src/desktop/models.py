@@ -29,7 +29,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.template.defaultfilters import urlencode
@@ -279,6 +279,9 @@ class DocumentManager(models.Manager):
     def find_jobs_with_no_doc(model):
       return model.objects.filter(doc__isnull=True).select_related('owner')
 
+    def find_oozie_jobs_with_no_doc(model):
+      return model.objects.filter(doc__isnull=True).exclude(name__exact='').select_related('owner')
+
     table_names = connection.introspection.table_names()
 
     try:
@@ -290,9 +293,9 @@ class DocumentManager(models.Manager):
           Bundle._meta.db_table in table_names:
         with transaction.atomic():
           for job in chain(
-              find_jobs_with_no_doc(Workflow),
-              find_jobs_with_no_doc(Coordinator),
-              find_jobs_with_no_doc(Bundle)):
+              find_oozie_jobs_with_no_doc(Workflow),
+              find_oozie_jobs_with_no_doc(Coordinator),
+              find_oozie_jobs_with_no_doc(Bundle)):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
 
             if job.is_trashed:
@@ -835,7 +838,7 @@ class Document2Manager(models.Manager):
 
   def get_home_directory(self, user):
     try:
-      return self.get(owner=user, parent_directory=None, name='', type='directory')
+      return self.get(owner=user, parent_directory=None, name=Document2.HOME_DIR, type='directory')
     except Document2.DoesNotExist:
       return self.create_user_directories(user)
 
@@ -864,10 +867,10 @@ class Document2Manager(models.Manager):
     :param user: User object
     """
     # Edge-case if the user has a legacy home directory with path-name
-    Directory.objects.filter(name='/', owner=user).update(name='')
+    Directory.objects.filter(name='/', owner=user).update(name=Document2.HOME_DIR)
 
     # Get or create home and Trash directories for all users
-    home_dir, created = Directory.objects.get_or_create(name='', owner=user)
+    home_dir, created = Directory.objects.get_or_create(name=Document2.HOME_DIR, owner=user)
 
     if created:
       LOG.info('Successfully created home directory for user: %s' % user.username)
@@ -890,6 +893,7 @@ class Document2Manager(models.Manager):
 
 class Document2(models.Model):
 
+  HOME_DIR = ''
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
@@ -907,7 +911,7 @@ class Document2(models.Model):
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
 
-  dependencies = models.ManyToManyField('self', db_index=True)
+  dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
@@ -947,7 +951,7 @@ class Document2(models.Model):
 
   @property
   def is_home_directory(self):
-    return self.is_directory and self.parent_directory == None and self.name == ''
+    return self.is_directory and self.parent_directory == None and self.name == self.HOME_DIR
 
   @property
   def is_trash_directory(self):
@@ -975,24 +979,29 @@ class Document2(models.Model):
     self.data = json.dumps(data_dict)
 
   def get_absolute_url(self):
-    if self.type == 'oozie-coordinator2':
-      return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
-    elif self.type == 'oozie-bundle2':
-      return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
-    elif self.type.startswith('query'):
-      return reverse('notebook:editor') + '?editor=' + str(self.id)
-    elif self.type == 'directory':
-      return '/home2' + '?uuid=' + self.uuid
-    elif self.type == 'notebook':
-      return reverse('notebook:notebook') + '?notebook=' + str(self.id)
-    elif self.type == 'search-dashboard':
-      return reverse('search:index') + '?collection=' + str(self.id)
-    elif self.type == 'link-pigscript':
-      return reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
-    elif self.type == 'link-workflow':
-      return '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
-    else:
-      return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    url = None
+    try:
+      if self.type == 'oozie-coordinator2':
+        url = reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
+      elif self.type == 'oozie-bundle2':
+        url = reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
+      elif self.type.startswith('query'):
+        url = reverse('notebook:editor') + '?editor=' + str(self.id)
+      elif self.type == 'directory':
+        url = '/home2' + '?uuid=' + self.uuid
+      elif self.type == 'notebook':
+        url = reverse('notebook:notebook') + '?notebook=' + str(self.id)
+      elif self.type == 'search-dashboard':
+        url = reverse('search:index') + '?collection=' + str(self.id)
+      elif self.type == 'link-pigscript':
+        url = reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
+      elif self.type == 'link-workflow':
+        url = '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
+      else:
+        url = reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    except NoReverseMatch, e:
+      LOG.warn('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
+    return url
 
   def to_dict(self):
     return {
@@ -1003,6 +1012,7 @@ class Document2(models.Model):
       'uuid': self.uuid,
       'id': self.id,
       'doc1_id': self.doc.get().id if self.doc.exists() else -1,
+      'parent_uuid': self.parent_directory.uuid if self.parent_directory else None,
       'type': self.type,
       'perms': self._massage_permissions(),
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
@@ -1040,26 +1050,32 @@ class Document2(models.Model):
 
     super(Document2, self).save(*args, **kwargs)
 
+    # Inherit shared permissions from parent directory, must be done after save b/c new doc needs ID
+    self.inherit_permissions()
+
   def validate(self):
     # Validate document name
     invalid_chars = re.compile(r"[<>/{}[\]~`]");
     if invalid_chars.search(self.name):
       raise FilesystemException(_('Document %s contains an invalid character.') % self.name)
 
-    # If different document with same name and same path (parent) exists, rename current document with datetime
-    if Document2.objects.filter(
-            owner=self.owner,
-            name=self.name,
-            type=self.type,
-            parent_directory=self.parent_directory
-            ).exclude(pk=self.pk).exists():
-        timestamp = str(datetime.now()).split('.', 1)[0]
-        self.name = '%s %s' % (self.name, timestamp)
-
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
-    if self.name in ['', Document2.TRASH_DIR] and \
+    if self.name in [Document2.HOME_DIR, Document2.TRASH_DIR] and self.type == 'directory' and \
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
       raise FilesystemException(_('Cannot create or modify directory with name: %s') % self.name)
+
+    # Validate that parent directory does not create cycle
+    if self._contains_cycle():
+      raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
+                                (self.name, self.parent_directory.uuid))
+
+
+  def inherit_permissions(self):
+    if self.parent_directory is not None:
+      parent_perms = Document2Permission.objects.filter(doc=self.parent_directory)
+      for perm in parent_perms:
+        self.share(self.owner, name=perm.perms, users=perm.users.all(), groups=perm.groups.all())
+
 
   def move(self, directory, user):
     if not directory.is_directory:
@@ -1114,7 +1130,14 @@ class Document2(models.Model):
     return self
 
   def update_permission(self, user, name='read', users=None, groups=None):
-    # TODO check in settings if user can sync, re-share, which perms...
+    # Check if user has access to grant permissions
+    if users or groups:
+      if name == 'read':
+        self.can_read_or_exception(user)
+      elif name == 'write':
+        self.can_write_or_exception(user)
+      else:
+        raise ValueError(_('Invalid permission type: %s') % name)
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
 
@@ -1164,6 +1187,32 @@ class Document2(models.Model):
             snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
             snippet['is_redacted'] = True
       self.data = json.dumps(data_dict)
+
+  def _contains_cycle(self):
+    """
+    Uses Floyd's cycle-detection algorithm to detect a cycle (aka Tortoise and Hare)
+    https://en.wikipedia.org/wiki/Cycle_detection#Tortoise_and_hare
+    """
+    slow = self
+    fast = self
+    while True:
+      slow = slow.parent_directory
+      if slow and slow.uuid == self.uuid:
+        slow = self
+
+      if fast.parent_directory is not None:
+        if fast.parent_directory.uuid == self.uuid:
+          fast = self.parent_directory.parent_directory
+        else:
+          fast = fast.parent_directory.parent_directory
+      else:
+        return False
+
+      if slow is None or fast is None:
+        return False
+
+      if slow == fast:
+        return True
 
 
 class DirectoryManager(Document2Manager):
@@ -1269,33 +1318,3 @@ def get_data_link(meta):
     link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
 
   return link
-
-
-def import_saved_beeswax_query(bquery):
-  design = bquery.get_design()
-
-  return make_notebook(
-      name=bquery.name,
-      description=bquery.desc,
-      editor_type=_convert_type(bquery.type, bquery.data),
-      statement=design.hql_query,
-      status='ready',
-      files=design.file_resources,
-      functions=design.functions,
-      settings=design.settings
-  )
-
-def _convert_type(btype, bdata):
-  from beeswax.models import HQL, IMPALA, RDBMS, SPARK
-
-  if btype == HQL:
-    return 'hive'
-  elif btype == IMPALA:
-    return 'impala'
-  elif btype == RDBMS:
-    data = json.loads(bdata)
-    return data['query']['server']
-  elif btype == SPARK: # We should not import
-    return 'spark'
-  else:
-    return 'hive'

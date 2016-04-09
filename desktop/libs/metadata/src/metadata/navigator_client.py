@@ -18,18 +18,31 @@
 
 import json
 import logging
+import re
 
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
+
+from hadoop.conf import HDFS_CLUSTERS
 
 from metadata.conf import NAVIGATOR
 
 
 LOG = logging.getLogger(__name__)
+VERSION = 'v3'
 
 
 def is_navigator_enabled():
   return NAVIGATOR.API_URL.get()
+
+
+def get_filesystem_host():
+  host = None
+  hadoop_fs = HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()
+  match = re.search(r"^hdfs://(?P<host>[a-z0-9\.-]+):\d[4]", hadoop_fs)
+  if match:
+    host = match.group('host')
+  return host
 
 
 class NavigatorApiException(Exception):
@@ -38,11 +51,11 @@ class NavigatorApiException(Exception):
 
 class NavigatorApi(object):
   """
-  http://cloudera.github.io/navigator/apidocs/v2/index.html
+  http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
 
   def __init__(self, api_url=None, user=None, password=None):
-    self._api_url = (api_url or NAVIGATOR.API_URL.get()).strip('/')
+    self._api_url = '%s/%s' % ((api_url or NAVIGATOR.API_URL.get()).strip('/'), VERSION)
     self._username = user or NAVIGATOR.AUTH_USERNAME.get()
     self._password = password or NAVIGATOR.AUTH_PASSWORD.get()
 
@@ -54,10 +67,54 @@ class NavigatorApi(object):
     self.__params = ()
 
 
+  def search_entities(self, query_s, limit=100, offset=0, **filters):
+    """
+    GET /api/v3/entities?query=()
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
+    :param query_s: a query string of search terms (e.g. - sales quarterly);
+      Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist
+      of search_fields.
+      TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
+    :param filters: TODO: IMPLEMENT ME, required to support property search
+    """
+    search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
+    entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'OPERATION')
+
+    try:
+      params = self.__params
+
+      search_terms = [term.lower() for term in query_s.strip().split()]
+
+      query_clauses = []
+      for term in search_terms:
+        query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+
+      filter_query = '(originalName:*.*)'
+      if search_terms:
+        filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
+
+      type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in entity_types])
+      filter_query = '%sAND(%s)' % (filter_query, type_filter_clause)
+
+      params += (
+        ('query', filter_query),
+        ('offset', offset),
+        ('limit', limit),
+      )
+
+      response = self._root.get('entities', headers=self.__headers, params=params)
+
+      return response
+    except RestException, e:
+      msg = 'Failed to search for entities with search query: %s' % query_s
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
+
   def find_entity(self, source_type, type, name, **filters):
     """
-    GET /api/v2/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities.html
+    GET /api/v3/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
     """
     try:
       params = self.__params
@@ -70,6 +127,12 @@ class NavigatorApi(object):
       }
       for key, value in filters.items():
         query_filters[key] = value
+
+      # TODO: Uncomment following block after demo, b/c we really want the entities that current Hue knows about in HDFS
+      # hadoop_fs = get_filesystem_host()
+      hadoop_fs = re.search(r"^(http|https)://(?P<host>[a-z0-9\.-]+):.*", self._api_url).group('host')
+      if hadoop_fs:
+        query_filters['fileSystemPath'] = '*%(path)s*' % {'path': hadoop_fs}
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
 
@@ -95,8 +158,8 @@ class NavigatorApi(object):
 
   def get_entity(self, entity_id):
     """
-    GET /api/v2/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    GET /api/v3/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
@@ -108,8 +171,8 @@ class NavigatorApi(object):
 
   def update_entity(self, entity_id, **metadata):
     """
-    PUT /api/v2/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    PUT /api/v3/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
       # TODO: Check permissions of entity
@@ -128,6 +191,15 @@ class NavigatorApi(object):
   def get_table(self, database_name, table_name):
     parent_path = '\/%s' % database_name
     return self.find_entity(source_type='HIVE', type='TABLE', name=table_name, parentPath=parent_path)
+
+
+  def get_field(self, database_name, table_name, field_name):
+    parent_path = '\/%s\/%s' % (database_name, table_name)
+    return self.find_entity(source_type='HIVE', type='FIELD', name=field_name, parentPath=parent_path)
+
+
+  def get_partition(self, database_name, table_name, partition_spec):
+    raise NotImplementedError
 
 
   def get_directory(self, path):
@@ -170,6 +242,26 @@ class NavigatorApi(object):
       if key in new_props:
         del new_props[key]
     return self.update_entity(entity_id, properties=new_props)
+
+
+  def get_lineage(self, entity_id):
+    """
+    GET /api/v3/lineage/entityIds=:id
+    http://cloudera.github.io/navigator/apidocs/v3/path__v3_lineage.html
+    """
+    try:
+      params = self.__params
+
+      params += (
+        ('entityIds', entity_id),
+      )
+
+      return self._root.get('lineage', headers=self.__headers, params=params)
+    except RestException, e:
+      msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
 
 
   def _clean_path(self, path):

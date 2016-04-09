@@ -19,13 +19,14 @@ import logging
 import posixpath
 import threading
 
+from desktop.conf import DEFAULT_USER
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from hadoop import cluster
 
 
 LOG = logging.getLogger(__name__)
-DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
@@ -33,18 +34,26 @@ _JSON_CONTENT_TYPE = 'application/json'
 _api_cache = None
 _api_cache_lock = threading.Lock()
 
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
-def get_history_server_api():
-  global _api_cache
-  if _api_cache is None:
-    _api_cache_lock.acquire()
+
+def get_history_server_api(username):
+  global API_CACHE
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
     try:
-      if _api_cache is None:
+      if API_CACHE is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-        _api_cache = HistoryServerApi(yarn_cluster.HISTORY_SERVER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        if yarn_cluster is None:
+          raise PopupException(_('YARN cluster is not available.'))
+        API_CACHE = HistoryServerApi(yarn_cluster.HISTORY_SERVER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
-      _api_cache_lock.release()
-  return _api_cache
+      API_CACHE_LOCK.release()
+
+  API_CACHE.setuser(username)  # Set the correct user
+
+  return API_CACHE
 
 
 class HistoryServerApi(object):
@@ -54,6 +63,7 @@ class HistoryServerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
+    self._thread_local = threading.local()  # To store user info
 
     if self._security_enabled:
       self._client.set_kerberos_auth()
@@ -63,37 +73,63 @@ class HistoryServerApi(object):
   def __str__(self):
     return "HistoryServerApi at %s" % (self._url,)
 
+  def _get_params(self):
+    params = {}
+
+    if self.username != DEFAULT_USER.get():  # We impersonate if needed
+      params['doAs'] = self.username
+      if not self._security_enabled:
+        params['user.name'] = DEFAULT_USER.get()
+
+    return params
+
   @property
   def url(self):
     return self._url
 
+  @property
+  def user(self):
+    return self.username  # Backward compatibility
+
+  @property
+  def username(self):
+    try:
+      return self._thread_local.user
+    except AttributeError:
+      return DEFAULT_USER.get()
+
+  def setuser(self, user):
+    curr = self.user
+    self._thread_local.user = user
+    return curr
+
   def job(self, user, job_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s' % {'job_id': job_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def counters(self, job_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/counters' % {'job_id': job_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/counters' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def conf(self, job_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/conf' % {'job_id': job_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/conf' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def job_attempts(self, job_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/jobattempts' % {'job_id': job_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/jobattempts' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def tasks(self, job_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks' % {'job_id': job_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def task(self, job_id, task_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s' % {'job_id': job_id, 'task_id': task_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s' % {'job_id': job_id, 'task_id': task_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def task_attempts(self, job_id, task_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts' % {'job_id': job_id, 'task_id': task_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts' % {'job_id': job_id, 'task_id': task_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def task_counters(self, job_id, task_id):
     job_id = job_id.replace('application', 'job')
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/counters' % {'job_id': job_id, 'task_id': task_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/counters' % {'job_id': job_id, 'task_id': task_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def task_attempt(self, job_id, task_id, attempt_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s' % {'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s' % {'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
   def task_attempt_counters(self, job_id, task_id, attempt_id):
-    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s/counters' % {'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s/counters' % {'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})

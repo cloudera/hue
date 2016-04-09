@@ -66,7 +66,7 @@ ${ layout.menubar(section='query') }
       </div>
       <div class="tab-pane" id="settingsTab">
         <div class="card card-small card-tab">
-          <div class="card-body">
+          <div class="card-body" style="overflow-y: auto; height: 100%;">
             <div id="advanced-settings">
             <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
                 ${ csrf_token(request) | n,unicode }
@@ -812,11 +812,22 @@ ${ tableStats.tableStats() }
   }
 
   .left-panel {
-    position: absolute;
+    position: fixed !important;
+    z-index: 1030;
+  }
+
+  .mega-popover .popover-content {
+    min-height: 190px !important;
+  }
+
+  .mega-popover .content {
+    height: auto !important;
+    max-height: 280px;
   }
 
   .resizer {
-    position: absolute;
+    position: fixed !important;
+    margin-left: 15px;
     width: 20px;
     text-align: center;
     z-index: 1000;
@@ -1057,7 +1068,6 @@ ${ tableStats.tableStats() }
   .query-right-actions h4 {
     padding: 0 10px;
   }
-
 </style>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
@@ -1106,7 +1116,7 @@ editorViewModelOptions.languages.push({
 
 var i18n = {
   errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
-}
+};
 
 var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
 var notebook = editorViewModel.newNotebook();
@@ -1115,7 +1125,8 @@ var assistHelper = snippet.getAssistHelper();
 var autocompleter = new Autocompleter({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
-  oldEditor: true
+  oldEditor: true,
+  optEnabled: false
 });
 
 var totalStorageUserPrefix = assistHelper.getTotalStorageUserPrefix(snippetType);
@@ -1158,14 +1169,16 @@ function placeResizePanelHandle() {
 function reinitializeTableExtenders() {
   if (viewModel.design.results.columns().length > 0 && viewModel.design.results.columns().length < 500) {
     $("#resultTable").jHueTableExtender({
-       fixedHeader: true,
-       fixedFirstColumn: true,
-       includeNavigator: false
+      fixedHeader: true,
+      fixedFirstColumn: true,
+      includeNavigator: false,
+      clonedContainerPosition: "absolute"
     });
   }
   $("#recentQueries").jHueTableExtender({
-     fixedHeader: true,
-     includeNavigator: false
+    fixedHeader: true,
+    includeNavigator: false,
+    clonedContainerPosition: "absolute"
   });
 }
 var CURRENT_CODEMIRROR_SIZE = 100;
@@ -1302,7 +1315,7 @@ $(document).ready(function () {
     });
   });
 
-  var lastWindowHeight = -1
+  var lastWindowHeight = -1;
   var resizeNavigator = function () {
     var newHeight = $(window).height();
     if (lastWindowHeight !== newHeight) {

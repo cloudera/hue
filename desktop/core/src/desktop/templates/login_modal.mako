@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 
-<div id="login-modal" class="modal fade hide" data-backdrop="true" style="padding: 0px!important;box-shadow: none;background: transparent;">
+<div id="login-modal" class="modal fade hide" data-backdrop="static" data-keyboard="false" style="padding: 0px!important;box-shadow: none;background: transparent;">
   <div class="login-box">
     <form method="POST" action="${action}">
     <input type="hidden" name="csrfmiddlewaretoken" value="">

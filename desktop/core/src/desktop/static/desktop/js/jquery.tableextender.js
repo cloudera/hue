@@ -25,6 +25,7 @@
       fixedHeader: false,
       fixedFirstColumn: false,
       firstColumnTooltip: false,
+      classToRemove: 'resultTable',
       hintElement: null,
       includeNavigator: true,
       mainScrollable: window,
@@ -53,7 +54,6 @@
     }
     this._defaults = defaults;
     this._name = pluginName;
-    this.previousPath = "";
     this.init();
   }
 
@@ -198,7 +198,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").remove();
     var clonedCell = $(plugin.element).clone();
     clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedCell.removeAttr("id").removeClass("resultTable").find("tbody").remove();
+    clonedCell.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
     clonedCell.find("thead>tr th:not(:eq(0))").remove();
     clonedCell.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
     clonedCell.find("thead>tr th:eq(0)").click(function () {
@@ -218,7 +218,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerColumn").remove();
     var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass("resultTable");
+    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove);
     clonedTable.find("thead>tr th:not(:eq(0))").remove();
     clonedTable.find("tbody>tr").each(function () {
       $(this).find("td:not(:eq(0))").remove();
@@ -236,13 +236,15 @@
 
     clonedCellVisibleContainer.appendTo($(plugin.element).parent());
 
-    window.setInterval(function () {
+    window.clearInterval($(plugin.element).data('firstcol_interval'));
+    var firstColInt = window.setInterval(function () {
       if ($(plugin.element).parent().height() != $(plugin.element).parent().data("h")) {
         clonedTableContainer.height($(plugin.element).parent().get(0).scrollHeight);
         clonedTableVisibleContainer.height($(plugin.element).parent().height());
         $(plugin.element).parent().data("h", clonedTableVisibleContainer.height());
       }
     }, 250);
+    $(plugin.element).data('firstcol_interval', firstColInt);
 
     $(plugin.element).parent().resize(function () {
       clonedTableContainer.height($(plugin.element).parent().get(0).scrollHeight);
@@ -255,9 +257,10 @@
 
     clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
 
-    $(mainScrollable).scroll(function () {
-      if (plugin.options.stickToTopPosition > -1){
-        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+
+    function positionClones() {
+      if (plugin.options.stickToTopPosition > -1) {
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition) {
           clonedCellVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
         }
         else {
@@ -266,11 +269,23 @@
         clonedTableVisibleContainer.css("top", $(plugin.element).offset().top + "px");
       }
       else {
-        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
-        clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+        if (plugin.options.clonedContainerPosition == 'absolute') {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+          clonedCellVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+        }
+        else {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+          clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+        }
       }
-    });
+    }
 
+    positionClones();
+
+    $(mainScrollable).on('scroll', function () {
+      window.clearTimeout($(plugin.element).data('throttleColumn'));
+      $(plugin.element).data('throttleColumn', window.setTimeout(positionClones, 10));
+    });
   }
 
 
@@ -282,7 +297,7 @@
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass("resultTable").find("tbody").remove();
+    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
     $(plugin.element).find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");
@@ -298,7 +313,8 @@
     var topPosition;
     if (plugin.options.clonedContainerPosition == 'absolute') {
       topPosition = $(plugin.element).parent().position().top - $(mainScrollable).scrollTop();
-    } else {
+    }
+    else {
       topPosition = $(plugin.element).parent().offset().top - $(mainScrollable).scrollTop();
     }
     var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
@@ -315,7 +331,8 @@
 
     $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
 
-    window.setInterval(function () {
+    window.clearInterval($(plugin.element).data('header_interval'));
+    var headerInt = window.setInterval(function () {
       if ($(plugin.element).parent().width() != $(plugin.element).parent().data("w")) {
         clonedTableVisibleContainer.width($(plugin.element).parent().width());
         $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
@@ -324,14 +341,15 @@
         });
       }
     }, 250);
+    $(plugin.element).data('header_interval', headerInt);
 
     $(plugin.element).parent().resize(function () {
       clonedTableVisibleContainer.width($(this).width());
     });
 
-    $(mainScrollable).scroll(function () {
-      if (plugin.options.stickToTopPosition > -1){
-        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+    function positionClones() {
+      if (plugin.options.stickToTopPosition > -1) {
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition) {
           clonedTableVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
         }
         else {
@@ -339,8 +357,20 @@
         }
       }
       else {
-        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+        if (plugin.options.clonedContainerPosition == 'absolute') {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().position().top) + "px");
+        }
+        else {
+          clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top) + "px");
+        }
       }
+    }
+
+    positionClones();
+
+    $(mainScrollable).on('scroll', function () {
+      window.clearTimeout($(plugin.element).data('throttleHeader'));
+      $(plugin.element).data('throttleHeader', window.setTimeout(positionClones, 10));
     });
   }
 

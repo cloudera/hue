@@ -27,25 +27,30 @@ In addition, the User classes they return must support:
 Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 """
-from django.contrib.auth.models import User
-import django.contrib.auth.backends
+
+import ldap
 import logging
+import pam
+
+import django.contrib.auth.backends
+from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
+
+from django_auth_ldap.backend import LDAPBackend
+from django_auth_ldap.config import LDAPSearch
+
 import desktop.conf
 from desktop import metrics
-from django.utils.importlib import import_module
-from django.core.exceptions import ImproperlyConfigured
+from liboauth.metrics import oauth_authentication_time
+
+from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 from useradmin.views import import_ldap_users
-from useradmin import ldap_access
-
-import pam
-from django_auth_ldap.backend import LDAPBackend
-import ldap
-from django_auth_ldap.config import LDAPSearch
-from liboauth.metrics import oauth_authentication_time
 
 
 LOG = logging.getLogger(__name__)
+
 
 def load_augmentation_class():
   """
@@ -78,9 +83,12 @@ def rewrite_user(user):
   We currently only re-write specific attributes,
   though this could be generalized.
   """
-  augment = get_user_augmentation_class()(user)
-  for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
-    setattr(user, attr, getattr(augment, attr))
+  if user is None:
+    LOG.warn('Failed to rewrite user, user is None.')
+  else:
+    augment = get_user_augmentation_class()(user)
+    for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
+      setattr(user, attr, getattr(augment, attr))
   return user
 
 class DefaultUserAugmentor(object):
@@ -131,6 +139,12 @@ def ensure_has_a_group(user):
     user.groups.add(default_group)
     user.save()
 
+def force_username_case(username):
+  if desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get():
+    username = username.lower()
+  elif desktop.conf.AUTH.FORCE_USERNAME_UPPERCASE.get():
+    username = username.upper()
+  return username
 
 class DesktopBackendBase(object):
   """
@@ -294,14 +308,19 @@ class PamBackend(DesktopBackendBase):
   """
 
   @metrics.pam_authentication_time
-  def check_auth(self, username, password):
+  def authenticate(self, username, password):
+    username = force_username_case(username)
+
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.count() == 0:
         is_super = True
 
       try:
-        user = User.objects.get(username=username)
+        if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+          user = User.objects.get(username__iexact=username)
+        else:
+          user = User.objects.get(username=username)
       except User.DoesNotExist:
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
@@ -333,7 +352,8 @@ class LdapBackend(object):
     # Delegate to django_auth_ldap.LDAPBackend
     class _LDAPBackend(LDAPBackend):
       def get_or_create_user(self, username, ldap_user):
-        username = desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+        username = force_username_case(username)
+
         if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
           try:
             return User.objects.get(username__iexact=username), False
@@ -480,7 +500,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
-    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+    username = force_username_case(username)
     is_super = False
     if User.objects.count() == 0:
       is_super = True
@@ -525,7 +545,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
   """
   def authenticate(self, remote_user=None):
     username = self.clean_username(remote_user)
-    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
+    username = force_username_case(username)
     is_super = False
     if User.objects.count() == 0:
       is_super = True

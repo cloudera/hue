@@ -29,12 +29,15 @@
    * @param options {object}
    * @param options.snippet
    * @param options.user
+   * @param options.optEnabled
    *
    * @constructor
    */
   function Autocompleter(options) {
     var self = this;
     self.snippet = options.snippet;
+    
+    self.topTables = {};
 
     var initializeAutocompleter = function () {
       var hdfsAutocompleter = new HdfsAutocompleter({
@@ -45,7 +48,8 @@
         self.autocompleter = new SqlAutocompleter({
           hdfsAutocompleter: hdfsAutocompleter,
           snippet: options.snippet,
-          oldEditor: options.oldEditor
+          oldEditor: options.oldEditor,
+          optEnabled: options.optEnabled
         })
       } else {
         self.autocompleter = hdfsAutocompleter;
@@ -75,6 +79,12 @@
       callback(null, result);
     }, editor);
   };
+
+  Autocompleter.prototype.getDocTooltip = function (item) {
+    var self = this;
+    return self.autocompleter.getDocTooltip(item);
+  };
+
 
   Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
     var self = this;

@@ -1470,10 +1470,20 @@ a#advanced-btn:hover {
   padding-top: 0 !important;
 }
 
+.hideMoreThan950, .hideMoreThan1180, .hideMoreThan1380 {
+  display: none;
+}
+
 @media (max-width: 1180px) {
   .navigator .nav-tabs > li > a, .navigator .nav-pills > li > a {
     padding-right: 6px;
     padding-left: 6px;
+  }
+  .hide1180 {
+    display: none;
+  }
+  .hideMoreThan1180 {
+    display: block;
   }
 }
 
@@ -1481,11 +1491,23 @@ a#advanced-btn:hover {
   .navigator .hideable {
     display: none;
   }
+  .hide1380 {
+    display: none;
+  }
+  .hideMoreThan1380 {
+    display: block;
+  }
 }
 
 @media (max-width: 950px) {
   .brand {
     display: none;
+  }
+  .hide950 {
+    display: none;
+  }
+  .hideMoreThan950 {
+    display: block;
   }
 }
 
@@ -1938,11 +1960,6 @@ input.no-margin, select.no-margin {
 .modal-header .close {
   position: inherit;
   margin-top: -10px;
-}
-
-form.form-inline .modal-header .close {
-  margin-top: 0;
-  margin-right: -10px;
 }
 
 .margin-top-10 {
@@ -2478,41 +2495,37 @@ body {
 }
 
 .dataTables_wrapper:hover > .hue-scrollbar-x-rail {
-  opacity: 0.9
+  opacity: 0.75
 }
 
 .hue-scrollbar-x-rail {
-  background-color: #eee;
   opacity: 0;
   position: fixed;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   -webkit-transition: background-color .2s linear, opacity .2s linear;
   -moz-transition: background-color .2s linear, opacity .2s linear;
   -o-transition: background-color .2s linear, opacity .2s linear;
   transition: background-color .2s linear, opacity .2s linear;
   bottom: 3px;
-  height: 8px;
+  height: 10px;
 }
 
 
 .hue-scrollbar-x-rail > .hue-scrollbar-x {
   position: absolute;
-  background-color: #aaa;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  background-color: #CCC;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   -webkit-transition: background-color .2s linear;
   -moz-transition: background-color .2s linear;
   -o-transition: background-color .2s linear;
   transition: background-color .2s linear;
   bottom: 0;
-  height: 8px;
-}
-
-.hue-scrollbar-x:hover {
-  background-color: #999;
+  height: 10px;
+  z-index: 10000;
 }
 
 .dropdown-menu.less-padding > li > a {
@@ -2524,4 +2537,50 @@ body {
   width: 1em;
   height: 1em;
   fill: currentColor;
+}
+
+.blurred {
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+}
+
+.modebar-group svg {
+  width: 1em!important;
+  height: 1em!important;
+}
+
+.autocomplete-tooltip {
+  background-color: #FFF;
+  margin-left: -1px !important;
+  border-top: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  border-radius: 1px;
+  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  color: black;
+  max-width: 100%;
+  padding: 3px 4px;
+  position: fixed;
+  z-index: 999999;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: default;
+  white-space: pre;
+  word-wrap: break-word;
+  line-height: normal;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  pointer-events: none;
+  height: 130px;
+}
+
+.dockable {
+  background-color: #FFF;
+  z-index: 1000;
+  padding-bottom: 2px;
 }

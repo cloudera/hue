@@ -20,7 +20,7 @@ import itertools
 import json
 import re
 
-from itertools import imap
+from itertools import imap, izip
 from operator import itemgetter
 
 from django.utils.translation import ugettext as _
@@ -467,8 +467,10 @@ class HiveServerClient:
     self.user = user
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
-    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
-             use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username))
+    LOG.info(
+        '%s: use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
+        self.query_server['server_name'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
+    )
 
     self.use_sasl = use_sasl
     self.kerberos_principal_short_name = kerberos_principal_short_name
@@ -861,14 +863,39 @@ class HiveServerClient:
     table = self.get_table(database, table_name)
 
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
-    if partition_spec:
+    if self.query_server['server_name'] == 'beeswax' and partition_spec:
       query += ' PARTITION(%s)' % partition_spec
 
     # We fetch N partitions then reverse the order later and get the max_parts. Use partition_spec to refine more the initial list.
     # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
-    partition_table = self.execute_query_statement(query, max_rows=10000)
+    partition_table = self.execute_query_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
 
-    partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
+    if self.query_server['server_name'] == 'impala':
+      try:
+        # Fetch all partition key names, which are listed before the #Rows column
+        cols = [col.name for col in partition_table.cols()]
+        stop = cols.index('#Rows')
+        partition_keys = cols[:stop]
+        num_parts = len(partition_keys)
+
+        # Get all partition values
+        rows = partition_table.rows()
+        partition_values = [partition[:num_parts] for partition in rows]
+
+        # Truncate last row which is the Total
+        partition_values = partition_values[:-1]
+        partitions_formatted = []
+
+        # Format partition key and values into Hive format: [key1=val1/key2=value2]
+        for values in partition_values:
+          zipped_parts = izip(partition_keys, values)
+          partitions_formatted.append(['/'.join(['%s=%s' % (part[0], part[1]) for part in zipped_parts])])
+
+        partitions = [PartitionValueCompatible(partition, table) for partition in partitions_formatted]
+      except Exception, e:
+        raise ValueError(_('Failed to determine partition keys for Impala table: `%s`.`%s`') % (database, table_name))
+    else:
+      partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
 
     if reverse_sort:
       partitions.reverse()
@@ -965,7 +992,7 @@ class PartitionValueCompatible:
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
     partition = partition_row[0]
     parts = partition.split('/')
-    self.partition_spec = ','.join(["%s='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
+    self.partition_spec = ','.join(["`%s`='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
     self.values = [pv[1] for pv in [part.split('=') for part in parts]]
     self.sd = type('Sd', (object,), properties,)
 

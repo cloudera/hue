@@ -123,20 +123,23 @@ from desktop.views import _ko
       padding: 4px 0;
     }
 
-    .fb-list ul {
+    .fb-entries {
       list-style: none;
       margin: 0;
     }
 
-    .fb-list li {
+    .fb-entries > li {
       clear: both;
-      height: 35px;
-      line-height: 35px;
+      line-height: 42px;
       border: 1px solid transparent;
       margin: 1px;
       color: #444;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
+    }
+
+    .fb-entries > li:hover:not(.fb-selected) {
+      background-color: #E8F5FE;
     }
 
     .fb-selected {
@@ -151,8 +154,7 @@ from desktop.views import _ko
 
     .fb-list .hi {
       color: #338BB8;
-      font-size: 20px;
-      width: 1.28571429em
+      font-size: 24px;
     }
 
     .fb-action {
@@ -169,7 +171,7 @@ from desktop.views import _ko
 
     .fb-primary-col {
       flex: 1;
-      height: 30px;
+      height: 42px;
       vertical-align: middle;
       padding-left: 8px;
       white-space: nowrap;
@@ -299,6 +301,10 @@ from desktop.views import _ko
     .fb-search-container input {
       width: 300px;
     }
+
+    .typeahead .active {
+      padding: 0;
+    }
   </style>
 
   <script type="text/html" id="fb-template">
@@ -306,13 +312,13 @@ from desktop.views import _ko
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
-    <div id="shareDocumentModal" class="modal hide fade">
+    <div id="shareDocumentModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Sharing')} - <span data-bind="text: $parent.name"></span></h3>
+        <h3>${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h3>
       </div>
       <div class="modal-body" style="overflow-y: visible">
         <!-- ko with: definition -->
@@ -322,14 +328,12 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.read.users">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
           </div>
@@ -339,14 +343,12 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.write.users">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
               <li>
-                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
-                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
           </div>
@@ -358,12 +360,12 @@ from desktop.views import _ko
         <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && ! loading()">
           ${ _('There was an error loading the document.')}
         </div>
-        <div style="margin-top: 20px" data-bind="visible: ! hasErrors() && ! loading()">
+        <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
           <div class="input-append">
             <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
             <div class="btn-group" style="overflow:visible">
-              <a class="btn" data-bind="click: handleTypeAheadSelection"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+              <a class="btn" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a class="btn dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a data-bind="click: function () { selectedPerm('read') }" href="javascript:void(0)">${ _('Read') }</a></li>
                 <li><a data-bind="click: function () { selectedPerm('write') }" href="javascript:void(0)">${ _('Modify') }</a></li>
@@ -373,60 +375,67 @@ from desktop.views import _ko
         </div>
       </div>
       <div class="modal-footer">
+        <!-- ko if: selectedUserOrGroup()  -->
+        <a class="btn btn-primary" data-bind="click: handleTypeAheadSelection" href="javascript:void(0)">${ _('Add') }</a>
+        <!-- /ko -->
+        <!-- ko ifnot: selectedUserOrGroup() -->
         <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Close')}</a>
+        <!-- /ko -->
       </div>
       <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
     </div>
 
-    <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
+    <div id="importDocumentsModal" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">&times;</a>
         <h3>${_('Import Hue documents')}</h3>
       </div>
-        <div class="modal-body form-horizontal">
-          <form id="importDocumentsForm" style="display: inline" enctype="multipart/form-data">
-            <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
-              <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
-              <div class="controls">
-                <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
+        <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
+          <div class="modal-body">
+              <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
+                <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
+                <div class="controls">
+                  <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
+                </div>
               </div>
-            </div>
-            <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
-            <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
-            <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
-            ${ csrf_token(request) | n,unicode }
-            <input type="hidden" name="path" data-bind="value: definition().path" />
-          </form>
+              <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
+              <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
+              <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
+              ${ csrf_token(request) | n,unicode }
+              <input type="hidden" name="path" data-bind="value: definition().path" />
+          </div>
+          <div class="modal-footer">
+            <!-- ko ifnot: uploading() || uploadComplete() -->
+            <input type="button" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
+            <input type="submit" class="btn btn-danger" data-bind="click: upload" value="${ _('Import') }" />
+            <!-- /ko -->
+            <!-- ko if: uploading() || uploadComplete() -->
+            <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
+            <!-- /ko -->
+          </div>
+        </form>
+
+      <!-- /ko -->
+    </div>
+
+    <div id="createDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+      <!-- ko with: activeEntry -->
+      <form class="form-horizontal">
+        <div class="modal-body ">
+          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
         </div>
         <div class="modal-footer">
-          <!-- ko ifnot: uploading() || uploadComplete() -->
-          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Cancel') }</a>
-          <a herf="#" class="btn btn-danger" data-bind="click: upload">${ _('Import') }</a>
-          <!-- /ko -->
-          <!-- ko if: uploading() || uploadComplete() -->
-          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
-          <!-- /ko -->
+          <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+          <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
         </div>
-
+      </form>
       <!-- /ko -->
     </div>
 
-    <div id="createDirectoryModal" class="modal hide fade">
-      <!-- ko with: activeEntry -->
-      <div class="modal-body form-horizontal">
-        <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
-      </div>
-      <div class="modal-footer">
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="button" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
-      </div>
-      <!-- /ko -->
-    </div>
-
-    <div id="deleteEntriesModal" class="modal hide fade">
+    <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times</a>
@@ -468,16 +477,16 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
+          <a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
           <!-- ko if: app === 'documents' -->
             <span class="dropdown">
-              <a class="inactive-action fb-action" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+              <a class="inactive-action fb-action" title="${_('New document')}" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
               <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
                 % if 'beeswax' in apps:
-                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                  <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+                  <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
                   <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
@@ -493,15 +502,15 @@ from desktop.views import _ko
               </ul>
             </span>
           <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed()) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 || sharedWithMeSelected() }"><i class="fa fa-fw fa-times"></i></a>
+          <a class="inactive-action fb-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed() || (sharedWithMeSelected() && superuser)) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
+          <a class="inactive-action fb-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
+          <a class="inactive-action fb-action" title="${_('Download')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
+          <a class="inactive-action fb-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" style="margin-left: 20px;" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
+          <a class="inactive-action fb-action" title="${_('Show trash')}" style="margin-left: 20px;" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
           <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -540,7 +549,7 @@ from desktop.views import _ko
 
 
       <div class="fb-list" data-bind="with: activeEntry">
-        <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list', scrollYFixedTop: true }">
+        <ul class="fb-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
@@ -548,11 +557,11 @@ from desktop.views import _ko
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
-                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-file-o"></i> ${ _('Open') }</a></li>
-                <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Remove') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Sharing') }</a> </li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
+                <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: ! $altDown() && !($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown() || ($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>
               <div class="fb-primary-col">
@@ -569,17 +578,20 @@ from desktop.views import _ko
                   <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
                   <use xlink:href="#hi-file"></use>
                   <!-- /ko -->
-                  <!-- ko if: isSharedWithMe -->
+                  <!-- ko if: isSharedWithMe() && selected() -->
+                  <use xlink:href="#hi-share-addon-selected"></use>
+                  <!-- /ko -->
+                  <!-- ko if: isSharedWithMe() && !selected() -->
                   <use xlink:href="#hi-share-addon"></use>
                   <!-- /ko -->
                 </svg>
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="fb-attr-group">
                 <div class="pull-right">
                   <!-- ko with: definition -->
                   <div class="fb-attr-col fb-type" data-bind="text: type"></div>
-                  <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
+                  <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                   <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
                   <!-- /ko -->
                 </div>

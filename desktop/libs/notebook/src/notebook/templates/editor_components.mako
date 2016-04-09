@@ -22,6 +22,7 @@ from desktop.views import _ko
 %>
 
 <%namespace name="require" file="/require.mako" />
+<%namespace name="hueIcons" file="/hue_icons.mako" />
 
 <%def name="includes()">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
@@ -37,6 +38,7 @@ from desktop.views import _ko
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 
+<script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
@@ -93,6 +95,9 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 
+<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     showProcessingMessages: false,
@@ -124,6 +129,8 @@ ${ require.config() }
 % endif
 </style>
 
+${ hueIcons.symbols() }
+
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
 </div>
@@ -134,7 +141,9 @@ ${ require.config() }
       <div class="pull-right">
 
         <div class="btn-group">
-          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook"><i class="fa fa-save"></i></a>
+          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { saveNotebook() } else { $('#saveAsModal').modal('show');} }"><i class="fa fa-save"></i></a>
+
+          <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
@@ -143,6 +152,7 @@ ${ require.config() }
               </a>
             </li>
           </ul>
+          <!-- /ko -->
         </div>
 
 
@@ -208,7 +218,7 @@ ${ require.config() }
         </a>
         % endif
 
-        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:notebooks') }?type=${ editor_type }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
       </div>
@@ -241,11 +251,11 @@ ${ require.config() }
                 Notebook
             % endif
           </li>
-          <!-- ko foreach: notebooks -->
+          <!-- ko with: selectedNotebook -->
           <li class="query-name">
-            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right'}"></span></a>
+            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
           </li>
-          <li>
+          <li data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
               <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
             </a>
@@ -309,37 +319,37 @@ ${ require.config() }
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }" >
-    <div class="vertical-full" data-bind="foreach: notebooks">
-      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
+    <div class="vertical-full">
+      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook'}">
       </div>
     </div>
   </div>
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; $root.isLeftPanelVisible(false) }">
+  <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: {
         name: 'assist-panel',
         params: {
-          user: $root.user,
+          user: user,
           sql: {
-            sourceTypes: $root.sqlSourceTypes,
-            activeSourceType: $root.activeSqlSourceType,
+            sourceTypes: sqlSourceTypes,
+            activeSourceType: activeSqlSourceType,
             navigationSettings: {
-              openDatabase: true,
+              openDatabase: false,
               openItem: false,
               showStats: true
             },
           },
-          visibleAssistPanels: $root.editorMode ? ['sql'] : []
+          visibleAssistPanels: editorMode ? ['sql'] : []
         }
       }"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, perfectScrollbar: { enable: $root.editorMode }">
+  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -415,12 +425,12 @@ ${ require.config() }
       <i class="fa fa-ellipsis-h"></i>
     </div>
   </div>
-  <div class="snippet-log-container">
+  <div class="snippet-log-container margin-bottom-10">
     <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
 
-    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass" style="display:none;">
+    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
     </div>
 
@@ -441,7 +451,7 @@ ${ require.config() }
       <ul class="nav nav-tabs">
         <li class="active" data-bind="click: function(){ currentQueryTab('queryHistory'); }">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
-            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
@@ -452,14 +462,14 @@ ${ require.config() }
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
           <!-- /ko -->
           <!-- ko if: $parent.history().length > 0 -->
-          <table class="table table-condensed margin-top-10">
+          <table class="table table-condensed margin-top-10 history-table">
             <tbody data-bind="foreach: $parent.history">
-              <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { location.href=url; } }">
+              <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid) } }">
                 <td style="width: 100px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
                 <td style="width: 25px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}">
-                  <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
+                  <i class="fa fa-fw fa-bolt inactive-action" data-bind="css: {'fa-unlink': status == 'expired', 'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
                 </td>
-                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><code data-bind="text: query" style="white-space: normal"></code></td>
+                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><code data-bind="text: query" class="history-item"></code></td>
               </tr>
             </tbody>
           </table>
@@ -486,8 +496,8 @@ ${ require.config() }
             </thead>
             <tbody data-bind="foreach: queries">
             <tr>
-              <td style="width: 16%"><a data-bind="text: name, attr: { 'href': absoluteUrl }"></a></td>
-              <td style="width: 50%"><span data-bind="text: description"></span></td>
+              <td style="width: 16%"><a href="javascript: void(0);" data-bind="text: name, click: function() { $root.openNotebook(uuid) }"></a></td>
+              <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
               <td style="width: 16%"><span data-bind="text: last_modified"></span></td>
             </tr>
@@ -513,18 +523,18 @@ ${ require.config() }
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
     <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
-    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
-    <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
   </div>
 </script>
 
 <script type="text/html" id="editor-snippet-header">
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;">
-    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 -->
-    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"></span> <i class="fa fa-caret-down"></i></a>
+    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"  title="${ _('Selected database') }"></span> <i class="fa fa-caret-down"></i></a>
     <div class="dropdown-menu" style="overflow-y: scroll; height: 200px;">
       <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: availableDatabases, minHeight: 34, container: '.dropdown-menu' }">
         <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a></li>
@@ -532,7 +542,7 @@ ${ require.config() }
     </div>
     <!-- /ko -->
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
-    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
   </div>
 </script>
 
@@ -655,7 +665,52 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="alert alert-gradient" data-bind="visible: is_redacted">
-    ${ _('The current query has been redacted to hide sensitive information.') }
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">${ _('The current query has been redacted to hide sensitive information.') }</div>
+  </div>
+  <div class="alert alert-error alert-error-gradient" data-bind="visible: hasComplexity">
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
+      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span><span data-bind="text: complexity"></span>
+    </div>
+  </div>
+  <div class="alert" data-bind="visible: hasSuggestion">
+    <div style="float:left;">
+      <svg class="hi" style="height: 20px; width: 20px;">
+        <use xlink:href="#hi-warning"></use>
+      </svg>
+    </div>
+    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
+      <!-- ko if: hasSuggestion -->
+      <!-- ko with: suggestion() -->
+      <!-- ko if: queryStatus() == 'SUCCESS' -->
+        ${ _('The query is compatible! Click to') } <a href="/notebook/editor?type=impala">${ _('execute') }</a> ${ _('with Impala') }.
+      <!-- /ko -->
+      <!-- ko if: errorDetail.errorString -->
+        ${ _('Query is not compatible with Impala') }.
+        </br>
+        <span style="font-weight: bold;"></span><span data-bind="text: errorDetail.errorString"></span>
+      <!-- /ko -->
+      <!-- ko if: clauseStatus.From -->
+        </br>
+        <!-- ko if: clauseStatus.From.category -->
+          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.category"></span>
+        <!-- /ko -->
+        <!-- ko if: clauseStatus.From.suggestedFix -->
+          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.suggestedFix"></span>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
   </div>
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
@@ -664,11 +719,12 @@ ${ require.config() }
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
           onBlur: saveTemporarySnippet,
+          highlightedRange: result.statement_range,
           aceOptions: {
             showLineNumbers: $root.editorMode,
             showGutter: $root.editorMode,
             maxLines: $root.editorMode ? null : 25,
-            minLines: $root.editorMode ? null : 1
+            minLines: $root.editorMode ? null : 3
           }
         }"></div>
       </div>
@@ -677,7 +733,7 @@ ${ require.config() }
         <li>
           <div class="input-prepend margin-top-10">
             <span class="muted add-on" data-bind="text: name"></span>
-            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value">
+            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
           </div>
         </li>
       </ul>
@@ -792,11 +848,19 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-results">
+  <!-- ko if: result.explanation().length > 0 -->
+    <div class="snippet-row">
+      <div class="result-body">
+        <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
+      </div>
+    </div>
+  <!-- /ko -->
+
   <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
     <div class="snippet-left-bar">
       <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls' }--><!-- /ko -->
     </div>
-    <div class="result-body ">
+    <div class="result-body">
       <div class="row-fluid" data-bind="visible: result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
         <!-- ko if: result.data().length != 0 && result.data()[0][1] != "" -->
         <pre data-bind="text: result.data()[0][1]" class="no-margin-bottom"></pre>
@@ -844,7 +908,7 @@ ${ require.config() }
                       transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                      transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+                      transformer: multiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
@@ -863,14 +927,16 @@ ${ require.config() }
   </div>
 </script>
 
+
 <script type="text/html" id="text-snippet-body">
   <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
 </script>
 
+
 <script type="text/html" id="markdown-snippet-body">
-  <!-- ko if: $root.isEditing() -->
+  <!-- ko ifnot: $root.isPlayerMode() -->
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6" data-bind="clickForAceFocus: ace">
       <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
         snippet: $data,
         updateOnInput: true
@@ -881,7 +947,7 @@ ${ require.config() }
     </div>
   </div>
   <!-- /ko -->
-  <!-- ko ifnot: $root.isEditing() -->
+  <!-- ko if: $root.isPlayerMode() -->
   <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
   <!-- /ko -->
 </script>
@@ -932,6 +998,11 @@ ${ require.config() }
         <li data-bind="text: message"></li>
       </ul>
     </div>
+    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: status() == 'canceled'">
+      <ul class="unstyled">
+        <li>${ _("The statement was canceled.") }</li>
+      </ul>
+    </div>
   </div>
 </script>
 
@@ -961,21 +1032,21 @@ ${ require.config() }
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
-      <i class="fa fa-fw fa-stop"></i>
-    </a>
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
       <i class="fa fa-fw fa-repeat"></i>
     </a>
-    <span data-bind="visible: $root.editorMode && result.statements_count() > 1">
-      <span data-bind="text: result.statement_id() + 1"></span> / <span data-bind="text: result.statements_count()"></span>
-    </span>
-    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Execute or CTRL + ENTER') }">
-      <i class="fa fa-fw fa-play"></i>
+    <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode && result.statements_count() > 1">
+      <span data-bind="text: result.statement_id() + 1"></span>/<span data-bind="text: result.statements_count()"></span>
+    </div>
+    <a class="snippet-side-btn blue" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Stop the currently running statement') }">
+      <i class="fa fa-fw fa-stop" data-bind="css: {'fa-spin': statusForButtons() == 'canceling'}"></i>
+    </a>
+    <a class="snippet-side-btn" data-bind="attr: {'title': $root.editorMode && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }">
+      <i class="fa fa-fw fa-play" data-bind="css: {'fa-spin': statusForButtons() == 'executing'}"></i>
     </a>
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
-        <i class="fa fa-fw fa-code-fork fa-rotate-90"></i>
+        <i class="fa fa-fw fa-map-o"></i>
       </a>
       <!-- ko if: isSqlDialect -->
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '' }">
@@ -985,7 +1056,7 @@ ${ require.config() }
       <ul class="dropdown-menu less-padding">
         <li>
           <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
-            <i class="fa fa-fw fa-code-fork fa-rotate-90"></i> ${_('Explain')}
+            <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
         <li>
@@ -996,6 +1067,11 @@ ${ require.config() }
         <li>
           <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: queryCompatibility, visible: $root.isOptimizerEnabled" title="${ _('Get Impala compatibility hints') }">
+            <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
           </a>
         </li>
       </ul>
@@ -1013,7 +1089,7 @@ ${ require.config() }
   <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
       <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
-        <i class="fa  fa-fw fa-th"></i>
+        <i class="fa fa-fw fa-th"></i>
       </a>
     </div>
 
@@ -1197,14 +1273,16 @@ ${ require.config() }
 <div id="saveAsModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    % if mode == 'editor':
+    <!-- ko if: $root.editorMode -->
       <h3>${_('Save query as...')}</h3>
-    %else:
+    <!-- /ko -->
+    <!-- ko ifnot: $root.editorMode -->
       <h3>${_('Save notebook as...')}</h3>
-    %endif
+    <!-- /ko -->
   </div>
+
+  <!-- ko if: $root.selectedNotebook() -->
   <div class="modal-body">
-    <!-- ko if: $root.selectedNotebook() -->
     <form class="form-horizontal">
       <div class="control-group">
         <label class="control-label">${_('Name')}</label>
@@ -1215,16 +1293,16 @@ ${ require.config() }
       <div class="control-group">
         <label class="control-label">${_('Description')}</label>
         <div class="controls">
-          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('No description') }"/>
+          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('(optional)') }"/>
         </div>
       </div>
     </form>
-    <!-- /ko -->
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: saveAsNotebook">${_('Save')}</a>
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"></input>
   </div>
+  <!-- /ko -->
 </div>
 
 
@@ -1371,51 +1449,6 @@ ${ require.config() }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
-  $.scrollbarWidth = function() {
-    var _parent, _child, _width;
-    _parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
-    _child = _parent.children();
-    _width = _child.innerWidth() - _child.height(99).innerWidth();
-    _parent.remove();
-    return _width;
-  };
-
-  function createXScrollbar(el) {
-    if ($(el).parents('.dataTables_wrapper').length > 0) {
-      var scrollingRatio = function() { return ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width(); };
-      if ($(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').length == 0 && $(el).parents('.dataTables_wrapper').width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
-        var scrollbarRail = $('<div>');
-        var scrollbar = $('<div>').addClass('hue-scrollbar-x');
-        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
-        scrollbar.appendTo(scrollbarRail);
-        scrollbar.draggable({
-          axis: 'x',
-          containment: 'parent',
-          drag: function () {
-            $(el).parents('.dataTables_wrapper').scrollLeft($(this).position().left * scrollingRatio())
-          }
-        });
-        scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
-        scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
-        scrollbarRail.css("marginLeft", (colWidth) + "px");
-        $(el).parents('.dataTables_wrapper').off('mousewheel');
-        $(el).parents('.dataTables_wrapper').on('mousewheel', function (e) {
-          if (e.deltaY > -2 && e.deltaY < 2) {
-            e.preventDefault();
-          }
-          $(el).parents('.dataTables_wrapper').scrollLeft($(el).parents('.dataTables_wrapper').scrollLeft() + e.deltaX * scrollingRatio());
-          $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').css('left', $(el).parents('.dataTables_wrapper').scrollLeft() / scrollingRatio());
-        });
-      }
-      else {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
-        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
-        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
-      }
-    }
-  }
-
   function createDatatable(el, snippet, vm) {
     $(el).addClass("dt");
     var DATATABLES_MAX_HEIGHT = 330;
@@ -1444,7 +1477,7 @@ ${ require.config() }
             stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
             clonedContainerPosition: "fixed"
           });
-          createXScrollbar(el);
+          $(el).jHueHorizontalScrollbar();
         }
         else {
           $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -1455,6 +1488,7 @@ ${ require.config() }
             fixedHeader: true,
             fixedFirstColumn: true,
             includeNavigator: false,
+            mainScrollable: '.right-panel',
             parentId: 'snippet_' + snippet.id(),
             clonedContainerPosition: "absolute"
           });
@@ -1487,17 +1521,19 @@ ${ require.config() }
         stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
         clonedContainerPosition: "fixed"
       });
-      createXScrollbar(el);
+      $(el).jHueHorizontalScrollbar();
     }
     else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
         maxHeight: DATATABLES_MAX_HEIGHT,
-        heightAfterCorrection: 0
+        heightAfterCorrection: 0,
+        enableNiceScroll: true
       });
       $(el).jHueTableExtender({
         fixedHeader: true,
         fixedFirstColumn: true,
         includeNavigator: false,
+        mainScrollable: '.right-panel',
         parentId: 'snippet_' + snippet.id(),
         clonedContainerPosition: "absolute"
       });
@@ -1531,7 +1567,7 @@ ${ require.config() }
       scrollElement = $('.right-panel');
     }
 
-    scrollElement.on("scroll", function () {
+    scrollElement.on('scroll', function () {
       var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
       scrollElement.data("scrollPosition", scrollElement.scrollTop());
@@ -1693,8 +1729,10 @@ ${ require.config() }
       rawDatum.snippet.chartYMulti().forEach(function (col) {
         var _idxValue = -1;
         var _idxLabel = -1;
+        var _isXDate = false;
         rawDatum.snippet.result.meta().forEach(function (icol, idx) {
           if (icol.name == rawDatum.snippet.chartX()) {
+            _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
             _idxLabel = idx;
           }
           if (icol.name == col) {
@@ -1707,7 +1745,7 @@ ${ require.config() }
           $(rawDatum.counts()).each(function (cnt, item) {
             _data.push({
               series: _plottedSerie,
-              x: hueUtils.html2text(item[_idxLabel]),
+              x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
               y: item[_idxValue],
               obj: item
             });
@@ -1920,7 +1958,7 @@ ${ require.config() }
     var viewModel;
 
     var importExternalNotebook = function (notebook) {
-      var currentNotebook = viewModel.notebooks()[0];
+      var currentNotebook = viewModel.selectedNotebook();
       currentNotebook.name(notebook.name);
       currentNotebook.description(notebook.description);
       currentNotebook.selectedSnippet(notebook.selectedSnippet);
@@ -1946,31 +1984,33 @@ ${ require.config() }
 
     var redrawFixedHeaders = function (timeout) {
       var renderer = function() {
-        viewModel.notebooks().forEach(function (notebook) {
-          notebook.snippets().forEach(function (snippet) {
-            var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-            if (viewModel.editorMode) {
-              _el.jHueTableExtender({
-                fixedHeader: true,
-                fixedFirstColumn: true,
-                includeNavigator: false,
-                mainScrollable: '.right-panel',
-                stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
-                parentId: 'snippet_' + snippet.id(),
-                clonedContainerPosition: "fixed"
-              });
-              createXScrollbar(_el);
-            }
-            else {
-              _el.jHueTableExtender({
-                fixedHeader: true,
-                fixedFirstColumn: true,
-                includeNavigator: false,
-                parentId: 'snippet_' + snippet.id(),
-                clonedContainerPosition: "absolute"
-              });
-            }
-          });
+        if (! viewModel.selectedNotebook()) {
+          return;
+        }
+        viewModel.selectedNotebook().snippets().forEach(function (snippet) {
+          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+          if (viewModel.editorMode) {
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              mainScrollable: '.right-panel',
+              stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "fixed"
+            });
+            _el.jHueHorizontalScrollbar();
+          }
+          else {
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              mainScrollable: '.right-panel',
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "absolute"
+            });
+          }
         });
       }
       if (timeout){
@@ -1982,10 +2022,18 @@ ${ require.config() }
       $('.right-panel').jHueScrollUp();
     };
 
+    var splitDraggableTimeout = -1;
+    huePubSub.subscribe('split.draggable.position', function(){
+      window.clearTimeout(splitDraggableTimeout);
+      splitDraggableTimeout = window.setTimeout(function(){
+        redrawFixedHeaders(100);
+      }, 200);
+    });
+
     window.redrawFixedHeaders = redrawFixedHeaders;
 
     function addAce (content, snippetType) {
-      var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
+      var snip = viewModel.selectedNotebook().addSnippet({type: snippetType, result: {}}, true);
       snip.statement_raw(content);
       aceChecks++;
       snip.checkForAce = window.setInterval(function () {
@@ -2000,7 +2048,7 @@ ${ require.config() }
     }
 
     function replaceAce(content) {
-      var snip = viewModel.notebooks()[0].snippets()[0];
+      var snip = viewModel.selectedNotebook().snippets()[0];
       if (snip) {
         snip.statement_raw(content);
         snip.ace().setValue(content);
@@ -2009,7 +2057,7 @@ ${ require.config() }
     }
 
     function addMarkdown (content) {
-      var snip = viewModel.notebooks()[0].addSnippet({type: "markdown", result: {}}, true);
+      var snip = viewModel.selectedNotebook().addSnippet({type: "markdown", result: {}}, true);
       snip.statement_raw(content);
     }
 
@@ -2075,7 +2123,7 @@ ${ require.config() }
 
           if (loaded.paragraphs) { //zeppelin
             if (loaded.name) {
-              viewModel.notebooks()[0].name(loaded.name);
+              viewModel.selectedNotebook().name(loaded.name);
             }
             loaded.paragraphs.forEach(function (paragraph) {
               if (paragraph.text) {
@@ -2254,7 +2302,7 @@ ${ require.config() }
       };
       $(window).data('beforeunload', window.onbeforeunload);
 
-      $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
+      $(".preview-sample").css("right", (10 + hueUtils.scrollbarWidth()) + "px");
 
       $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
         e.preventDefault();
@@ -2432,8 +2480,8 @@ ${ require.config() }
       });
 
       function forceChartDraws() {
-        viewModel.notebooks().forEach(function (notebook) {
-          notebook.snippets().forEach(function (snippet) {
+        if (viewModel.selectedNotebook()) {
+          viewModel.selectedNotebook().snippets().forEach(function (snippet) {
             if (snippet.result.data().length > 0) {
               var _elCheckerInterval = -1;
               _elCheckerInterval = window.setInterval(function () {
@@ -2453,7 +2501,7 @@ ${ require.config() }
               }, 200)
             }
           });
-        });
+        };
       }
 
       forceChartDraws();

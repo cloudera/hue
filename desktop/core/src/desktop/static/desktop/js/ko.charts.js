@@ -309,6 +309,14 @@
       if (_chart) {
         window.setTimeout(function () {
           var _d3 = d3.select($(element).find("svg")[0]);
+          if (_datum.length > 0 && _datum[0].values.length > 0 && typeof _datum[0].values[0].x.isValid === 'function'){
+            _chart.xAxis.tickFormat(function(d) { return d3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
+            _chart.onChartUpdate(function () {
+              _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+                insertLinebreaks(d, this);
+              });
+            });
+          }
           _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
@@ -851,7 +859,11 @@
         var _chart = nv.models.lineWithBrushChart();
         $(element).data("chart", _chart);
         _chart.transitionDuration(0);
-        if (_datum.length > 0 && _datum[0].values.length > 10) {
+        var enableSelection = true;
+        if (typeof options.enableSelection !== 'undefined') {
+          enableSelection = options.enableSelection;
+        }
+        if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
           _chart.enableSelection();
         }
         if (options.showControls != null) {

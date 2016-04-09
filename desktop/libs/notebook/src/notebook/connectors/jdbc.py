@@ -154,14 +154,14 @@ class JdbcApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None):
     if self.db is None:
       raise AuthenticationRequired()
 
     assist = Assist(self.db)
     response = {'status': -1}
 
-    sample_data, description = assist.get_sample_data(database, table)
+    sample_data, description = assist.get_sample_data(database, table, column)
 
     if sample_data:
       response['status'] = 0
@@ -194,5 +194,6 @@ class Assist():
     columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
     return columns
 
-  def get_sample_data(self, database, table):
-    return query_and_fetch(self.db, 'SELECT * FROM %s.%s' % (database, table))
+  def get_sample_data(self, database, table, column=None):
+    column = column or '*'
+    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s' % (column, database, table))

@@ -311,24 +311,24 @@ class HiveServer2Dbms(object):
     return resp
 
 
-  def get_sample(self, database, table, column=None, nested=None):
+  def get_sample(self, database, table, column=None, nested=None, limit=100):
     result = None
     hql = None
 
-    limit = 100
-
-    if column or nested: # Could do column for any type, then nested with partitions
-      if self.server_name == 'impala':
+    # Filter on max # of partitions for partitioned tables
+    column = '`%s`' % column if column else '*'
+    if table.partition_keys:
+      hql = self._get_sample_partition_query(database, table, column, limit)
+    elif self.server_name == 'impala':
+      if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
         hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
-    else:
-      # Filter on max # of partitions for partitioned tables
-      # Impala's SHOW PARTITIONS is different from Hive, so we only support Hive for now
-      if self.server_name != 'impala' and table.partition_keys:
-        hql = self._get_sample_partition_query(database, table, limit)
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
+    else:
+      hql = "SELECT %s FROM `%s`.`%s` LIMIT %s" % (column, database, table.name, limit)
+      # TODO: Add nested select support for HS2
 
     if hql:
       query = hql_query(hql)
@@ -341,7 +341,7 @@ class HiveServer2Dbms(object):
     return result
 
 
-  def _get_sample_partition_query(self, database, table, limit):
+  def _get_sample_partition_query(self, database, table, column='*', limit=100):
     max_parts = QUERY_PARTITIONS_LIMIT.get()
     partitions = self.get_partitions(database, table, partition_spec=None, max_parts=max_parts)
 
@@ -353,8 +353,8 @@ class HiveServer2Dbms(object):
     else:
       partition_clause = ''
 
-    return "SELECT * FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
-      {'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
+    return "SELECT %(column)s FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
+      {'column': column, 'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
 
 
   def analyze_table(self, database, table):

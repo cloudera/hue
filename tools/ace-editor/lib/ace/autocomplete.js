@@ -363,7 +363,7 @@ var Autocomplete = function() {
     this.showDocTooltip = function(item) {
         if (!this.tooltipNode) {
             this.tooltipNode = dom.createElement("div");
-            this.tooltipNode.className = "ace_tooltip ace_doc-tooltip";
+            this.tooltipNode.className = "autocomplete-tooltip";
             this.tooltipNode.style.margin = 0;
             this.tooltipNode.style.pointerEvents = "auto";
             this.tooltipNode.tabIndex = -1;

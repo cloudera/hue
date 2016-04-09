@@ -128,6 +128,43 @@ class TestOptimizerApi(object):
     resp = self.api.authenticate()
     token = resp['token']
 
-    resp = self.api.table_details(table_name='orders', token=token)
+    resp = self.api.table_details(table_name='store_sales', token=token)
 
     assert_equal('success', resp['status'], resp)
+
+
+  def test_table_details(self):  # Requires test_upload to run before
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    resp = self.api.popular_values(table_name='Part', token=token)
+    resp = self.api.popular_values(table_name='Part', column_name='partkey', token=token)
+
+    assert_equal('success', resp['status'], resp)
+
+
+  def test_query_compatibility(self):
+    source_platform = 'MySQL'
+    target_platform = 'Hive'
+    query = 'Select * from (Select item.id from item)'
+
+    resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
+
+    assert_equal('successs', resp['status'], resp)
+
+    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+
+    assert_equal('FAIL', details['platformCompilationStatus']['Hive']['queryStatus'], resp)
+
+
+  def test_similar_queries(self):
+    source_platform = 'Hive'
+    query = 'Select * from (Select item.id from item)'
+
+    resp = self.api.similar_queries(source_platform=source_platform, query=query)
+
+    assert_equal('successs', resp['status'], resp)
+
+    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+
+    assert_equal([], details['details']['similarQueries'], resp)

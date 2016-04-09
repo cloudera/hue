@@ -83,7 +83,7 @@
 }
 
 .ace_gutter > .ace_layer {
-  width: 30px !important;
+  min-width: 24px !important;
   border-left: 1px solid #DBE8F1;
   color: #737373;
 }

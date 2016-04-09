@@ -59,7 +59,6 @@ urlpatterns += patterns('notebook.api',
 
   url(r'^api/explain/?$', 'explain', name='explain'),
 
-  url(r'^api/historify/?$', 'historify', name='historify'),
   url(r'^api/get_history/?', 'get_history', name='get_history'),
   url(r'^api/clear_history/?', 'clear_history', name='clear_history'),
 
@@ -79,11 +78,13 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'autocomplete', name='api_autocomplete_column'),
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$', 'autocomplete', name='api_autocomplete_nested'),
   url(r'^api/sample/(?P<database>\w+)/(?P<table>\w+)/?$', 'get_sample_data', name='api_sample_data'),
+  url(r'^api/sample/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'get_sample_data', name='api_sample_data_column'),
 
   # SQLite
   url(r'^api/autocomplete/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/?$', 'autocomplete', name='api_autocomplete_tables'),
   url(r'^api/autocomplete/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', 'autocomplete', name='api_autocomplete_columns'),
   url(r'^api/sample/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', 'get_sample_data', name='api_sample_data'),
+  url(r'^api/sample/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'get_sample_data', name='api_sample_data_column'),
 )
 
 # Github

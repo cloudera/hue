@@ -26,8 +26,9 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
-from desktop.models import Directory, Document, Document2, Document2Permission, import_saved_beeswax_query
+from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
+from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, install_sample_user
 
 import beeswax.conf

@@ -47,6 +47,8 @@
     self.assistHelper = options.assistHelper;
     self.app = options.app;
     self.user = options.user;
+    self.userGroups = options.userGroups;
+    self.superuser = options.superuser;
 
     self.document = ko.observable();
 
@@ -71,11 +73,33 @@
 
     self.isShared = ko.pureComputed(function () {
       var perms = self.definition().perms;
-      return perms && (perms.read.users.length || perms.read.groups.length || perms.write.users.length || perms.write.groups.length);
+      return perms && (perms.read.users.length > 0 || perms.read.groups.length > 0 || perms.write.users.length > 0 || perms.write.groups.length > 0);
     });
 
     self.isSharedWithMe = ko.pureComputed(function () {
       return self.user !== self.definition().owner;
+    });
+
+    self.canModify = ko.pureComputed(function () {
+      var perms = self.definition().perms;
+      return !self.isSharedWithMe() || self.superuser || (perms && (perms.write.users.filter(function (user) {
+            return user.username == self.user;
+          }).length > 0
+          || perms.write.groups.filter(function (writeGroup) {
+            return self.userGroups.indexOf(writeGroup) !== -1
+          }).length > 0));
+    });
+
+    self.canReshare = ko.pureComputed(function () {
+      if (! self.isSharedWithMe()) {
+        return true;
+      }
+      var activePerms = {};
+      var target = self;
+      while (target.parent && !target.isShared()) {
+        target = target.parent;
+      }
+      return target.canModify();
     });
 
     self.entriesToDelete = ko.observableArray();
@@ -196,6 +220,18 @@
     moveNext();
   };
 
+  HueFileEntry.prototype.createNewEntry = function (options) {
+    var self = this;
+    return new HueFileEntry($.extend({
+      activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
+      assistHelper: self.assistHelper,
+      app: self.app,
+      user: self.user,
+      superuser: self.superuser
+    }, options));
+  };
+
   HueFileEntry.prototype.search = function (query) {
     var self = this;
 
@@ -208,16 +244,11 @@
       return;
     }
 
-    var resultEntry = new HueFileEntry({
-      activeEntry: self.activeEntry,
-      trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
+    var resultEntry = self.createNewEntry({
       definition: {
         isSearchResult: true,
         name: '"' + query + '"'
       },
-      app: self.app,
-      user: self.user,
       parent: owner
     });
 
@@ -233,13 +264,8 @@
         var newEntries = [];
 
         $.each(data.documents, function (idx, definition) {
-          var entry = new HueFileEntry({
-            activeEntry: self.activeEntry,
-            trashEntry: self.trashEntry,
-            assistHelper: self.assistHelper,
+          var entry = self.createNewEntry({
             definition: definition,
-            app: self.app,
-            user: self.user,
             parent: self
           });
           if (!entry.isTrash()) {
@@ -300,13 +326,8 @@
           var newEntries = [];
 
           $.each(data.children, function (idx, definition) {
-            var entry = new HueFileEntry({
-              activeEntry: self.activeEntry,
-              trashEntry: self.trashEntry,
-              assistHelper: self.assistHelper,
+            var entry = self.createNewEntry({
               definition: definition,
-              app: self.app,
-              user: self.user,
               parent: self
             });
             if (entry.isTrash()) {
@@ -327,13 +348,8 @@
           });
           self.entries(newEntries);
           if (! self.parent && data.parent) {
-            self.parent = new HueFileEntry({
-              activeEntry: self.activeEntry,
-              trashEntry: self.trashEntry,
-              assistHelper: self.assistHelper,
-              definition: data.parent,
-              app: self.app,
-              user: self.user,
+            self.parent = self.createNewEntry({
+              definition: data.parent.path === '/' && self.isSharedWithMe() ? { name: '/' } : data.parent,
               parent: null
             });
           }
@@ -365,15 +381,15 @@
 
   HueFileEntry.prototype.moveToTrash = function () {
     var self = this;
-    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
+    if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
     }
-  }
+  };
 
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
-    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
+    if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       $('#deleteEntriesModal').modal('show');
     }
@@ -425,7 +441,7 @@
 
   HueFileEntry.prototype.upload = function () {
     var self = this;
-    if (self.app === 'documents') {
+    if (document.getElementById("importDocumentInput").files.length > 0 && self.app === 'documents') {
       self.uploading(true);
       self.uploadComplete(false);
       self.uploadFailed(false);
@@ -480,7 +496,7 @@
       if (self.selectedEntries().length > 0) {
         var ids = self.selectedEntries().map(function (entry) {
           return entry.definition().id;
-        })
+        });
         window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON(ids);
       } else {
         self.downloadThis();
@@ -490,7 +506,7 @@
 
   HueFileEntry.prototype.createDirectory = function (name) {
     var self = this;
-    if (self.app === 'documents') {
+    if (name && self.app === 'documents') {
       self.assistHelper.createDocumentsFolder({
         successCallback: self.load.bind(self),
         parentUuid: self.definition().uuid,

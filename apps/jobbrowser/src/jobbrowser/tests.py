@@ -18,6 +18,7 @@
 
 import json
 import logging
+import re
 import time
 import unittest
 
@@ -342,15 +343,23 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (TestJobBrowserWithHadoop.hadoop_job_id,))
     assert_true(len(response.context['page'].object_list), 1)
 
-  def test_job_single_logs_page(self):
-    raise SkipTest
+  def test_job_single_logs(self):
+    if not is_live_cluster():
+      raise SkipTest
 
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/single_logs' % (TestJobBrowserWithHadoop.hadoop_job_id))
-    assert_true('syslog' in response.content, response.content)
-    assert_true('<div class="tab-pane active" id="logsSysLog">' in response.content or
-                '<div class="tab-pane active" id="logsStdErr">' in response.content or # Depending on Hadoop
-                '<div class="tab-pane active" id="logsStdOut">' in response.content, # For jenkins
-                response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/single_logs?format=json' % (TestJobBrowserWithHadoop.hadoop_job_id))
+    json_resp = json.loads(response.content)
+
+    assert_true('logs' in json_resp)
+    assert_true('Log Type: stdout' in json_resp['logs'][1])
+    assert_true('Log Type: stderr' in json_resp['logs'][2])
+    assert_true('Log Type: syslog' in json_resp['logs'][3])
+
+    # Verify that syslog contains log information for a completed oozie job
+    match = re.search(r"^Log Type: syslog(.+)Log Length: (?P<log_length>\d+)(.+)$", json_resp['logs'][3], re.DOTALL)
+    assert_true(match and match.group(2), 'Failed to parse log length from syslog')
+    log_length = match.group(2)
+    assert_true(log_length > 0, 'Log Length is 0, expected content in syslog.')
 
 
 class TestMapReduce1NoHadoop:
@@ -397,7 +406,7 @@ class TestMapReduce2NoHadoop:
 
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
-    history_server_api.get_history_server_api = lambda: HistoryServerApi()
+    history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),

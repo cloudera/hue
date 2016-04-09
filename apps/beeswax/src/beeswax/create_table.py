@@ -486,4 +486,10 @@ def load_after_create(request, database):
 
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': tablename})
 
-  return execute_directly(request, query, on_success_url=on_success_url)
+  try:
+    return execute_directly(request, query, on_success_url=on_success_url)
+  except Exception, e:
+    message = 'The table data could not be loaded'
+    LOG.exception(message)
+    detail = e.message if hasattr(e, 'message') and e.message else None
+    raise PopupException(_(message), detail=detail)

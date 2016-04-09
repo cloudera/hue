@@ -26,6 +26,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
+from metadata.conf import has_optimizer
+
 from notebook.conf import get_interpreters
 from notebook.connectors.base import Notebook, get_api
 from notebook.connectors.spark_shell import SparkApi
@@ -38,10 +40,16 @@ LOG = logging.getLogger(__name__)
 
 
 def notebooks(request):
-  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history]
+  editor_type = request.GET.get('type')
+
+  if editor_type:
+    notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type]
+  else:
+    notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history]
 
   return render('notebooks.mako', request, {
-      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
+      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML),
+      'editor_type': editor_type
   })
 
 
@@ -66,8 +74,9 @@ def notebook(request):
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.PROPERTIES,
+          'is_optimizer_enabled': has_optimizer(),
       }),
-      'is_yarn_mode': is_yarn_mode
+      'is_yarn_mode': is_yarn_mode,
   })
 
 
@@ -82,7 +91,7 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'Untitled %s Query' % editor_type.title()
+    data['name'] = ''
     data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
     editor.data = json.dumps(data)
 
@@ -91,6 +100,7 @@ def editor(request):
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
+          'is_optimizer_enabled': has_optimizer(),
       }),
       'editor_type': editor_type,
   })

@@ -110,26 +110,59 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def setup_class(cls):
     super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
 
-  def setUp(self):
-    self.user = User.objects.get(username='test')
 
+  def setUp(self):
+    self.client.post('/beeswax/install_examples')
+
+    self.user = User.objects.get(username='test')
     grant_access("test", "test", "notebook")
 
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.api = HS2Api(self.user)
 
-
-  def test_explain(self):
-    notebook_json = """
+    self.notebook_json = """
       {
         "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
         "id": 1234,
-        "sessions": [{"type": "hive", "properties": [], "id": null}]
+        "sessions": [{"type": "hive", "properties": [], "id": "1234"}],
+        "type": "query-hive",
+        "name": "Test Hiveserver2 Editor"
       }
     """
-    statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
-    snippet_json = """
+    self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
+    self.snippet_json = """
+      {
+          "status": "running",
+          "database": "%(database)s",
+          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+          "result": {
+              "type": "table",
+              "handle": {},
+              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+          },
+          "statement": "%(statement)s",
+          "type": "hive",
+          "properties": {
+              "files": [],
+              "functions": [],
+              "settings": []
+          }
+      }
+    """ % {'database': self.db_name, 'statement': self.statement}
+
+    doc, created = Document2.objects.get_or_create(
+      id=1234,
+      name='Test Hive Query',
+      type='query-hive',
+      owner=self.user,
+      is_history=True,
+      data=self.notebook_json)
+
+
+  def test_get_current_statement(self):
+    multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\\r\\nSELECT AVG(salary) FROM sample_07;"
+    snippet_json = json.loads("""
       {
           "status": "running",
           "database": "default",
@@ -147,13 +180,87 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
               "settings": []
           }
       }
-    """ % {'statement': statement}
+    """ % {'statement': multi_statement}
+    )
 
-    Document2.objects.create(id=1234, name='Test Hive Query', type='query-hive', owner=self.user, is_history=True, data=notebook_json)
+    notebook_json = json.loads(self.notebook_json)
+    notebook_json['snippets'] = [snippet_json]
+    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+    data = json.loads(response.content)
 
-    response = self.client.post(reverse('notebook:explain'), {'notebook': notebook_json, 'snippet': snippet_json})
+    assert_equal(0, data['status'], data)
+    assert_equal(0, data['handle']['statement_id'], data)
+    assert_equal(2, data['handle']['statements_count'], data)
+    assert_equal(True, data['handle']['has_more_statements'], data)
+    assert_equal({'row': 0, 'column': 0}, data['handle']['start'], data)
+    assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
+
+
+    snippet_json = json.loads("""
+      {
+          "status": "running",
+          "database": "default",
+          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+          "result": {
+              "type": "table",
+              "handle": {
+                "statement_id": 0,
+                "statements_count": 2,
+                "has_more_statements": true
+              },
+              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+          },
+          "statement": "%(statement)s",
+          "type": "hive",
+          "properties": {
+              "files": [],
+              "functions": [],
+              "settings": []
+          }
+      }
+    """ % {'statement': multi_statement}
+    )
+
+    notebook_json = json.loads(self.notebook_json)
+    notebook_json['snippets'] = [snippet_json]
+    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_equal(1, data['handle']['statement_id'], data)
+    assert_equal(2, data['handle']['statements_count'], data)
+    assert_equal(False, data['handle']['has_more_statements'], data)
+    assert_equal({'row': 1, 'column': 0}, data['handle']['start'], data)
+    assert_equal({'row': 1, 'column': 32}, data['handle']['end'], data)
+
+
+  def test_explain(self):
+    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': self.snippet_json})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
     assert_true('STAGE DEPENDENCIES' in data['explanation'], data)
-    assert_equal(statement, data['statement'], data)
+    assert_equal(self.statement, data['statement'], data)
+
+
+  def test_get_sample(self):
+    response = self.client.post(reverse('notebook:api_sample_data',
+      kwargs={'database': 'default', 'table': 'sample_07'}),
+      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_true('headers' in data)
+    assert_true('rows' in data)
+    assert_true(len(data['rows']) > 0)
+
+    response = self.client.post(reverse('notebook:api_sample_data_column',
+      kwargs={'database': 'default', 'table': 'sample_07', 'column': 'code'}),
+      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_true('headers' in data)
+    assert_equal(['code'], data['headers'])
+    assert_true('rows' in data)
+    assert_true(len(data['rows']) > 0)

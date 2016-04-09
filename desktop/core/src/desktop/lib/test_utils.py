@@ -54,6 +54,14 @@ def add_to_group(username, groupname=None):
         user.groups.add(group)
         user.save()
 
+def remove_from_group(username, groupname):
+    user = User.objects.get(username=username)
+    group, created = Group.objects.get_or_create(name=groupname)
+
+    if user.groups.filter(name=group.name).exists():
+        user.groups.remove(group)
+        user.save()
+
 
 def reformat_json(json_obj):
     if isinstance(json_obj, basestring):

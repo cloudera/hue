@@ -40,10 +40,15 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
+<script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -82,6 +87,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
+      <br/>
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
@@ -89,7 +95,10 @@ ${ assist.assistPanel() }
         <th width="2%" class="no-sort">&nbsp;</th>
   ##       <th width="1%">&nbsp;</th>
         <th width="17%">${_('Name')}</th>
-        <th width="29%">${_('Type')}</th>
+        <th width="15%">${_('Type')}</th>
+        <!-- ko if: $root.optimizerEnabled  -->
+          <th width="15%">${_('Popularity')}</th>
+        <!-- /ko -->
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
@@ -120,8 +129,15 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </td>
           <td data-bind="text: type"></td>
+          <!-- ko if: $root.optimizerEnabled  -->
           <td>
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
+            <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: { 'title': popularity() }">
+              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : popularity() + '%' }"></div>
+            </div>
+          </td>
+          <!-- /ko -->
+          <td>
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}" class="editable editable-click editable-empty">
               ${ _('Add a comment...') }</span>
           </td>
         </tr>
@@ -135,7 +151,7 @@ ${ assist.assistPanel() }
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 10px"></th>
+          <th style="width: 1%">&nbsp;</th>
           <th>${_('Name')}</th>
           <th>${_('Type')}</th>
         </tr>
@@ -158,7 +174,7 @@ ${ assist.assistPanel() }
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 10px"></th>
+          <th style="width: 1%">&nbsp;</th>
           <th>${_('Values')}</th>
           <th>${_('Spec')}</th>
           <th>${_('Browse')}</th>
@@ -182,28 +198,26 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped table-condensed table-nowrap">
-      <thead>
+  <table class="table table-striped table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: headers -->
+        <th data-bind="text: $data"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: rows -->
         <tr>
-          <th style="width: 10px"></th>
-          <!-- ko foreach: headers -->
-          <th data-bind="text: $data"></th>
+          <td data-bind="text: $index()+1"></td>
+          <!-- ko foreach: $data -->
+            <td data-bind="text: $data"></td>
           <!-- /ko -->
         </tr>
-      </thead>
-      <tbody>
-        <!-- ko foreach: rows -->
-          <tr>
-            <td data-bind="text: $index()+1"></td>
-            <!-- ko foreach: $data -->
-              <td data-bind="text: $data"></td>
-            <!-- /ko -->
-          </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
-  </div>
+      <!-- /ko -->
+    </tbody>
+  </table>
 
   <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -281,7 +295,7 @@ ${ assist.assistPanel() }
 </a>
 
 <script type="text/html" id="metastore-databases">
-  <div class="actionbar-actions">
+  <div class="actionbar-actions" data-bind="dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
@@ -325,9 +339,16 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables">
-    <!-- ko with: stats  -->
     <div class="row-fluid">
-      <div class="span12 tile">
+      <!-- ko with: stats  -->
+      <div class="
+      %if is_optimizer_enabled:
+        span8
+      %else:
+        span12
+      %endif
+       tile">
+
         <h4>${ _('Stats') }</h4>
         <div class="row-fluid">
           <div class="span6">
@@ -361,13 +382,30 @@ ${ assist.assistPanel() }
           </div>
         </div>
         <!-- /ko -->
+
+      <!-- ko if: $root.optimizerEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->
+        <!-- ko template: { name: 'metastore-databases-tags', data: $root.database() }--><!-- /ko -->
+      <!-- /ko -->
       </div>
+      <!-- /ko -->
+
+      <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats() && $root.database().optimizerStats().length > 0 -->
+      <div class="span4 tile chart-container">
+        <h4>${ _('Popular tables') }</h4>
+
+        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: $root.database().optimizerStats().sort(function(a, b) { return -(a.popularity - b.popularity); }).slice(0, 5)}, fqs: ko.observableArray([]),
+                      transformer: pieChartDataTransformer, maxWidth: 200, parentSelector: '.chart-container' }" class="chart"></div>
+
+      </div>
+      <!-- /ko -->
+
     </div>
-    <!-- /ko -->
+
+
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions" data-bind="visible: tables().length > 0">
+        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
@@ -392,6 +430,13 @@ ${ assist.assistPanel() }
               </form>
             </div>
           % endif
+          <!-- ko if: $root.optimizerEnabled  -->
+          &nbsp;
+          &nbsp;
+          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { window.open($root.optimizerUrl() + '#/table/' + selectedTables()[0].optimizerStats().eid, '_blank'); }, disable: selectedTables().length !== 1">
+            <i class="fa fa-skyatlas"></i> ${_('View in Optimizer')}
+          </button>
+          <!-- /ko -->
         </div>
 
         <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
@@ -401,6 +446,10 @@ ${ assist.assistPanel() }
             <th>&nbsp;</th>
             <th>${ _('Table Name') }</th>
             <th width="50%">${ _('Comment') }</th>
+            <!-- ko if: $root.optimizerEnabled  -->
+            <th width="10%">${ _('Popularity') }</th>
+            <th width="10%">${ _('Columns') }</th>
+            <!-- /ko -->
             <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
@@ -421,13 +470,38 @@ ${ assist.assistPanel() }
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
-              <td data-bind="text: comment"></td>
+              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: comment, attr: {title: comment}"></td>
+              <!-- ko if: $root.optimizerEnabled -->
+                <!-- ko if: optimizerStats() -->
+                <td>
+                  <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
+                    <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
+                  </div>
+                </td>
+                <td data-bind="text: optimizerStats().column_count"></td>
+              <!-- /ko -->
+              <!-- ko ifnot: optimizerStats() -->
+                <td></td>
+                <td></td>
+              <!-- /ko -->
+              <!-- /ko -->
+
               <td class="center">
                 <!-- ko if: type == 'Table' -->
                   <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
                 <!-- /ko -->
                 <!-- ko if: type == 'View' -->
                   <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
+                <!-- /ko -->
+                <!-- ko if: $root.optimizerEnabled  -->
+                  <!-- ko if: optimizerStats() -->
+                    <!-- ko if: optimizerStats().is_fact -->
+                      <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
+                    <!-- /ko -->
+                    <!-- ko ifnot: optimizerStats().is_fact -->
+                      <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
+                    <!-- /ko -->
+                  <!-- /ko -->
                 <!-- /ko -->
               </td>
             </tr>
@@ -446,6 +520,28 @@ ${ assist.assistPanel() }
     <!-- /ko -->
   </div>
 </script>
+
+
+<script type="text/html" id="metastore-databases-tags">
+  <div>
+      <h4>${ _('Tagging') }</h4>
+      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
+        <!-- ko foreach: $data.navigatorStats().tags() -->
+          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+        <!-- /ko -->
+
+        <!-- ko if: $data.navigatorStats().tags().length == 0 -->
+          ${ _('No tags') }
+        <!-- /ko -->
+        <div data-bind="visible: $data.showAddTagName">
+          <input type="text" data-bind="value: $data.addTagName, valueUpdate:'afterkeydown'">
+          <i class="fa fa-save pointer" data-bind="click: $data.addTags, visible: $data.addTagName" title="${ _('Save tag') }"></i>
+        </div>
+        <i class="fa fa-plus pointer" data-bind="click: function() { $data.showAddTagName(true); }, visible: ! $data.showAddTagName()" title="${ _('Add a tag') }"></i>
+      </div>
+  </div>
+</script>
+
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
@@ -471,6 +567,9 @@ ${ assist.assistPanel() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     <!-- ko with: database -->
     <!-- ko with: table -->
+    <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
+      <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
+    <!-- /ko -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
@@ -502,10 +601,25 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    ## <div class="span6 tile">
-    ##  <h4>${ _('Tagging') }</h4>
-    ##  <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
-    ## </div>
+    <!-- ko if: $root.optimizerEnabled() && navigatorStats() -->
+    <div class="span6 tile">
+      <h4>${ _('Tagging') }</h4>
+      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
+        <!-- ko foreach: navigatorStats().tags() -->
+          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
+        <!-- /ko -->
+
+        <!-- ko if: navigatorStats().tags().length == 0 -->
+          ${ _('No tags') }
+        <!-- /ko -->
+        <div data-bind="visible: showAddTagName">
+          <input type="text" data-bind="value: addTagName, valueUpdate:'afterkeydown'">
+          <i class="fa fa-save pointer" data-bind="click: addTags, visible: addTagName" title="${ _('Save tag') }"></i>
+        </div>
+        <i class="fa fa-plus pointer" data-bind="click: function() { showAddTagName(true); }, visible: ! showAddTagName()" title="${ _('Add a tag') }"></i>
+      </div>
+    </div>
+    <!-- /ko -->
   </div>
 
   <div class="tile">
@@ -590,24 +704,31 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-queries-tab">
+  <br/>
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-  <table data-bind="visible: !$root.loadingQueries() && $root.queries().length > 0" class="table table-condensed">
+  <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length > 0" class="table table-condensed">
     <thead>
     <tr>
-      <th width="20%">${ _('Name') }</th>
-      <th>${ _('Query') }</th>
-      <th width="20%">${ _('Owner') }</th>
+      <th width="10%">${ _('Id') }</th>
+      <th width="10%">${ _('Count') }</th>
+      <th>${ _('Character') }</th>
+      <th width="20%">${ _('Complexity') }</th>
+      <th width="10%">${ _('Hive Compatible') }</th>
+      <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $root.queries, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
-    <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
-      <td data-bind="text: doc.name"></td>
-      <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
-      <td><code data-bind="text: doc.owner"></code></td>
+    <tbody data-bind="hueach: {data: $data.optimizerDetails().FullQueryList(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+    <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + eid(), '_blank'); }">
+      <td data-bind="text: eid"></td>
+      <td data-bind="text: instanceCount"></td>
+      <td><code data-bind="text: character"></code></td>
+      <td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
+      <td data-bind="text: compatibility.hive"></td>
+      <td data-bind="text: compatibility.impala"></td>
     </tr>
     </tbody>
   </table>
-  <div data-bind="visible: !$root.loadingQueries() && $root.queries().length == 0" class="empty-message">
+  <div data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length == 0" class="empty-message">
     ${ _('No queries found for the current table.') }
   </div>
 </script>
@@ -636,7 +757,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-describe-table">
   <div class="clearfix"></div>
 
-  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: '${ _ko('Add a description...') }' }" class="editable editable-click editable-empty">
+  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'bottom', emptytext: '${ _ko('Add a description...') }', inputclass:'input-xxlarge', rows: 10 }" class="editable editable-click editable-empty" data-type="textarea">
     ${ _('Add a description...') }
   </span>
 
@@ -647,10 +768,16 @@ ${ assist.assistPanel() }
       <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
-    ## <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
-    ## <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
-    ## <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analyze')}</a></li>
-    ## <li><a href="#lineage" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-lineage'); }">${_('Lineage')}</a></li>
+    <!-- ko if: $root.optimizerEnabled() -->
+      <!-- ko if: $root.database().table().optimizerDetails() -->
+      <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
+      <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().total"></span>)</a></li>
+      <li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
+      <!-- /ko -->
+      <!-- ko if: $root.database().table().relationshipsDetails() -->
+      <li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')} (<span data-bind="text: $root.database().table().relationshipsDetails().inputs().length + $root.database().table().relationshipsDetails().targets().length"></span>)</a></li>
+      <!-- /ko -->
+    <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
 
@@ -681,21 +808,275 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="permissions">
-      <div class="empty-message">${ _('Currently not available.') }</div>
+      <div class="acl-panel-content" style="height: 988px;">
+        <div class="pull-right">
+          <input class="input-medium no-margin" type="text" placeholder="Search privileges..."> &nbsp;
+          <a class="btn pointer">
+            <i class="fa fa-plus-circle"></i> Add role
+          </a>
+        </div>
+        <h4 style="margin-top: 4px;">Privileges &nbsp;</h4>
+
+      <div class="acl-block-title">
+        <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerFraud</span></a>
+      </div>
+      <div>
+      <div class="acl-block acl-block-airy">
+          <span class="muted" title="3 months ago">TABLE</span>
+          <span>
+            <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+          </span>
+          <br>
+          server=<span>server1</span>
+            <span>
+              <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+            </span>
+            <span>
+              <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+            </span>
+            <span style="display: none;">
+              <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+            </span>
+
+          <i class="fa fa-long-arrow-right"></i> action=INSERT
+      </div>
+
+      <div class="acl-block acl-block-airy">
+        <span class="muted" title="3 months ago">TABLE</span>
+
+        <span>
+          <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+        </span>
+        <br>
+
+        server=server1
+
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+          </span>
+          <span>
+            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+          </span>
+          <span style="display: none;">
+            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          </span>
+
+          <i class="fa fa-long-arrow-right"></i> action=<span>SELECT</span>
+      </div>
+    </div>
+    <div class="acl-block acl-actions">
+      <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+      <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+      <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+      <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+    </div>
+
+    <div class="acl-block-title">
+      <i class="fa fa-cube muted"></i> <a class="pointer"><span>customerAccess</span></a>
+    </div>
+    <div>
+      <div class="acl-block acl-block-airy">
+        <span class="muted" title="3 months ago">TABLE</span>
+
+        <span>
+          <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+        </span>
+        <br>
+
+        server=server1
+
+          <span>
+            <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" title="Browse db privileges"><span data-bind="text: $root.database().name"></span></a>
+          </span>
+          <span>
+            <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" title="Browse table privileges"><span data-bind="text: name"></span></a>
+          </span>
+          <span style="display: none;">
+            <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" title="Browse column privileges"><span></span></a>
+          </span>
+
+        <i class="fa fa-long-arrow-right"></i> action=<span>ALL</span>
+      </div>
+      <div class="acl-block acl-actions">
+        <span class="pointer" title="Show 50 more..." style="display: none;"><i class="fa fa-ellipsis-h"></i></span>
+        <span class="pointer" title="Add privilege"><i class="fa fa-plus"></i></span>
+        <span class="pointer" title="Undo" style="display: none;"> &nbsp; <i class="fa fa-undo"></i></span>
+        <span class="pointer" title="Save" style="display: none;"> &nbsp; <i class="fa fa-save"></i></span>
+      </div>
+    </div>
+  </div>
+
+    <style>
+    .acl-panel {
+      border-left: 1px solid #e5e5e5;
+      padding-top: 6px;
+      padding-left: 12px;
+    }
+
+    .acl-panel .nav-tabs {
+      margin-bottom: 0;
+    }
+
+    .acl-panel h4:not(:first-child) {
+      margin-top: 20px;
+    }
+
+    .acl-panel-content {
+      padding: 6px;
+      overflow-y: scroll;
+    }
+
+    .acl-block-title {
+      background-color: #eeeeee;
+      font-weight: bold;
+      padding: 3px;
+      margin-top: 14px;
+      margin-bottom: 4px;
+    }
+
+    .acl-block {
+      background-color: #f6f6f6;
+      padding: 3px;
+      margin-bottom: 4px;
+    }
+
+    .acl-block .checkbox, .acl-block .radio {
+      margin-left: 6px;
+    }
+
+    .acl-block-airy {
+      padding: 6px;
+    }
+
+    .acl-block-airy input {
+      margin-bottom: 0;
+    }
+
+    .acl-block-section {
+      margin-top: 10px;
+    }
+
+    .acl-block-section input {
+      margin-left: 14px;
+    }
+
+    .span6 .acl-block input[type='text'] {
+      width: 25%;
+    }
+
+    .span6 .acl-block input[type='text'] {
+      width: 21%;
+    }
+
+    .acl-actions {
+      padding: 5px;
+      text-align: center;
+      color: #CCC;
+      font-size: 20px;
+    }
+
+    .acl-actions span:hover {
+      color: #999;
+    }
+    </style>
     </div>
 
     <div class="tab-pane" id="queries">
-      <!-- ko if: $root.currentTab() == 'table-queries' -->
-      <!-- ko template: 'metastore-queries-tab' --><!-- /ko -->
+      <!-- ko if: $root.optimizerEnabled() && $root.currentTab() == 'table-queries' -->
+        <!-- ko template: {name: 'metastore-queries-tab', data: $root.database().table()} --><!-- /ko -->
       <!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="analysis">
-      <div class="empty-message">${ _('Currently not available.') }</div>
+    <div class="tab-pane" id="joins">
+      <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerDetails() -->
+      <!-- ko with: $root.database().table().optimizerDetails().table_donut -->
+        <table data-bind="visible: joinedtables().length > 0" class="table table-condensed">
+          <thead>
+          <tr>
+            <th width="10%">${ _('Id') }</th>
+            <th width="10%">${ _('Join Percentage') }</th>
+            <th width="30%">${ _('Table Name') }</th>
+            <th>${ _('Join Column') }</th>
+            <th width="10%">${ _('Join counts') }</th>
+          </tr>
+          </thead>
+          <tbody data-bind="hueach: {data: joinedtables(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+          <tr>
+            <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
+            <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
+              <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
+            </td>
+            <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
+            <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
+            <td data-bind="text: joincount"></td>
+          </tr>
+          </tbody>
+        </table>
+        <!-- /ko -->
+        <!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="lineage">
-      <div class="empty-message">${ _('Currently not available.') }</div>
+    <div class="tab-pane" id="relationships">
+      <!-- ko if: $root.currentTab() == 'table-relationships' && $root.database().table().relationshipsDetails() -->
+      <!-- ko with: $root.database().table().relationshipsDetails() -->
+        <h4>${ _('Inputs') }</h4>
+        <div class="row-fluid">
+           <!-- ko foreach: inputs -->
+             <div data-bind="text: $data"></div>
+           <!-- /ko -->
+         <!-- ko if: inputs().length == 0 -->
+           ${ _('Not inputs') }
+         <!-- /ko -->
+        </div>
+
+        </br>
+
+        <h4>${ _('Targets') }</h4>
+        <div class="row-fluid">
+         <!-- ko foreach: targets -->
+           <div data-bind="text: $data"></div>
+         <!-- /ko -->
+         <!-- ko if: targets().length == 0 -->
+           ${ _('Not targets') }
+         <!-- /ko -->
+        </div>
+
+        </br>
+
+       <h4>${ _('Source query') }</h4>
+       <div class="row-fluid">
+          <!-- ko if: source_query().length > 0 -->
+            <code data-bind="text: source_query"></code>
+          <!-- /ko -->
+          <!-- ko if: source_query().length == 0 -->
+            ${ _('No source query') }
+          <!-- /ko -->
+        </div>
+
+        </br>
+
+        <h4>${ _('Target queries') }</h4>
+        <div class="row-fluid">
+          <!-- ko foreach: target_queries -->
+            <div>
+              <code data-bind="text: $data"></code>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: target_queries().length == 0 -->
+          ${ _('Not target queries') }
+         <!-- /ko -->
+        </div>
+
+        </br>
+
+        <h4>${ _('Lineage') }</h4>
+        <div class="row-fluid">
+          <button class="btn toolbarBtn" title="${_('Open in Navigator ')}" data-bind="click: function () { window.open($root.navigatorUrl() + '?view=detailsView&id=' + id() + '&b=rFlCX&tab=lineage', '_blank'); }">
+            <i class="fa fa-skyatlas"></i> ${_('View in Navigator')}
+          </button>
+        </div>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="details">
@@ -724,7 +1105,7 @@ ${ assist.assistPanel() }
                 }],
                 navigationSettings: {
                   openItem: true,
-                  showStats: false
+                  showStats: true
                 }
               },
               visibleAssistPanels: ['sql']
@@ -732,7 +1113,7 @@ ${ assist.assistPanel() }
           }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-      <div class="right-panel" data-bind="perfectScrollbar">
+      <div class="right-panel" data-bind="niceScroll">
         <div class="metastore-main">
           <h3>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
@@ -777,6 +1158,22 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
 
+  function pieChartDataTransformer(rawDatum) {
+    var _data = [];
+    $(rawDatum.counts).each(function (cnt, item) {
+      _data.push({
+        label: item.name,
+        value: item.popularity,
+        obj: item
+      });
+    });
+    _data.sort(function (a, b) {
+      return a.value - b.value
+    });
+
+    return _data;
+  }
+
   require([
     'knockout',
     'metastore/js/metastore.ko',
@@ -801,34 +1198,79 @@ ${ assist.assistPanel() }
           errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
           errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
           errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-        }
+        },
+        optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
+        optimizerUrl: '${ optimizer_url }',
+        navigatorUrl: '${ navigator_url }'
       };
 
       var viewModel = new MetastoreViewModel(options);
 
       huePubSub.subscribe('metastore.scroll.to.top', function () {
         $(".right-panel").scrollTop(0);
-        $('.right-panel').perfectScrollbar('update');
+        $('.right-panel').getNiceScroll().resize();
+      });
+
+      viewModel.currentTab.subscribe(function(tab){
+        if (tab == 'table-relationships') {
+          // viewModel.database().table().getRelationships();
+        } else if (tab == 'table-sample') {
+          var selector = '#sample .sample-table';
+          if ($(selector).parents('.dataTables_wrapper').length == 0){
+            hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){
+              $(selector).dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bDestroy": true,
+                "bFilter": false,
+                "bAutoWidth": false,
+                "oLanguage": {
+                  "sEmptyTable": "${_('No data available')}",
+                  "sZeroRecords": "${_('No matching records')}"
+                },
+                "fnDrawCallback": function (oSettings) {
+                  $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+                  $(selector).jHueTableExtender({
+                    fixedHeader: true,
+                    fixedFirstColumn: true,
+                    includeNavigator: false,
+                    parentId: 'sample',
+                    classToRemove: 'sample-table',
+                    mainScrollable: '.right-panel',
+                    stickToTopPosition: 73,
+                    clonedContainerPosition: "fixed"
+                  });
+                  $(selector).jHueHorizontalScrollbar();
+                },
+                "aoColumnDefs": [
+                  {
+                    "sType": "numeric",
+                    "aTargets": [ "sort-numeric" ]
+                  },
+                  {
+                    "sType": "string",
+                    "aTargets": [ "sort-string" ]
+                  },
+                  {
+                    "sType": "date",
+                    "aTargets": [ "sort-date" ]
+                  }
+                ]
+              });
+            });
+          }
+        }
+        $('.right-panel').getNiceScroll().resize();
       });
 
       ko.applyBindings(viewModel);
+      viewModel.optimizerEnabled(false);
 
       if (location.getParameter('refresh') === 'true') {
         huePubSub.publish('assist.db.refresh', 'hive');
         hueUtils.replaceURL('?');
       }
-
-      // TODO: Use ko for this and the put the queries in the MetastoreTable
-      $('a[data-toggle="tab"]').on('shown', function (e) {
-        if ($(e.target).attr("href") == "#queries") {
-          viewModel.loadingQueries(true);
-          $.getJSON('/metastore/table/' + viewModel.database().name + '/' + viewModel.database().table().name + '/queries', function (data) {
-            viewModel.queries(data.queries);
-            viewModel.loadingQueries(false);
-          });
-        }
-        $('.right-panel').perfectScrollbar('update');
-      });
 
       window.scrollToColumn = function (col) {
         if (!col.table.samples.loading()) {

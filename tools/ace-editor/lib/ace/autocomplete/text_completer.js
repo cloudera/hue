@@ -33,9 +33,18 @@ define(function(require, exports, module) {
     
     var splitRegex = /[^a-zA-Z_0-9\$\-\u00C0-\u1FFF\u2C00-\uD7FF\w]+/;
 
+    var ignoreSqlCommentLines = false;
+
+    function stripSqlComments(txt) {
+        if (ignoreSqlCommentLines) {
+            return txt.replace(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/, '').replace(/--.*/g, '');
+        }
+        return txt;
+    }
+
     function getWordIndex(doc, pos) {
         var textBefore = doc.getTextRange(Range.fromPoints({row: 0, column:0}, pos));
-        return textBefore.split(splitRegex).length - 1;
+        return stripSqlComments(textBefore).split(splitRegex).length - 1;
     }
 
     /**
@@ -44,7 +53,7 @@ define(function(require, exports, module) {
      */
     function wordDistance(doc, pos) {
         var prefixPos = getWordIndex(doc, pos);
-        var words = doc.getValue().split(splitRegex);
+        var words = stripSqlComments(doc.getValue()).split(splitRegex);
         var wordScores = Object.create(null);
         
         var currentWord = words[prefixPos];
@@ -62,6 +71,10 @@ define(function(require, exports, module) {
         });
         return wordScores;
     }
+
+    exports.setSqlMode = function(sqlMode) {
+        ignoreSqlCommentLines = sqlMode;
+    };
 
     exports.getCompletions = function(editor, session, pos, prefix, callback) {
         var wordScore = wordDistance(session, pos, prefix);

@@ -809,6 +809,7 @@ for x in sys.stdin:
     resp = download(handle, 'xls', self.db)
 
     sheet_data = _read_xls_sheet_data(resp)
+    num_cols = len(sheet_data[0])
     # It should have 257 lines (256 + header)
     assert_equal(len(sheet_data), 257, sheet_data)
 
@@ -821,6 +822,19 @@ for x in sys.stdin:
     csv_data = [[int(col) if col.isdigit() else col for col in row.split(',')] for row in csv_resp.strip().split('\r\n')]
 
     assert_equal(sheet_data, csv_data)
+
+    # Test max cell limit truncation
+    finish = conf.DOWNLOAD_CELL_LIMIT.set_for_testing(num_cols*5)
+    try:
+      hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
+      query = hql_query(hql)
+      handle = self.db.execute_and_wait(query)
+      resp = download(handle, 'xls', self.db)
+      sheet_data = _read_xls_sheet_data(resp)
+      # It should have 5 lines
+      assert_equal(len(sheet_data), 5, sheet_data)
+    finally:
+      finish()
 
 
   def test_data_upload(self):
@@ -1733,7 +1747,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(1)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(baz='baz_one' AND boom='boom_two')"
+      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
@@ -1744,7 +1758,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(baz='baz_one' AND boom='boom_two') OR (baz='baz_foo' AND boom='boom_bar')"
+      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two') OR (`baz`='baz_foo' AND `boom`='boom_bar')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))

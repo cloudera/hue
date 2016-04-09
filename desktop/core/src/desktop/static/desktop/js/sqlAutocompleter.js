@@ -35,13 +35,33 @@
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
     self.oldEditor = options.oldEditor || false;
+    self.optEnabled = options.optEnabled || false;
+
+    self.topTablesPerDb = {};
 
     // Speed up by caching the databases
     var initDatabases = function () {
       self.snippet.getAssistHelper().loadDatabases({
         sourceType: self.snippet.type(),
         silenceErrors: true,
-        successCallback: $.noop
+        successCallback: function () {
+          if (self.optEnabled) {
+            $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
+              if (db === 'default') {
+                $.post('/metadata/api/optimizer_api/top_tables', {
+                  database: db
+                }, function(data){
+                  if (! self.topTablesPerDb[db]) {
+                    self.topTablesPerDb[db] = {};
+                  }
+                  data.top_tables.forEach(function (table) {
+                    self.topTablesPerDb[db][table.name] = table;
+                  });
+                });
+              }
+            });
+          }
+        }
       });
     };
     self.snippet.type.subscribe(function() {
@@ -51,6 +71,13 @@
     });
     initDatabases();
   }
+
+  var fixScore = function (suggestions) {
+    $.each(suggestions, function (idx, value) {
+      value.score = 1000 - idx;
+    });
+    return suggestions;
+  };
 
   SqlAutocompleter.prototype.getFromReferenceIndex = function (statement) {
     var self = this;
@@ -204,7 +231,6 @@
 
   SqlAutocompleter.prototype.getValueReferences = function (conditionMatch, database, fromReferences, tableAndComplexRefs, callback, editor) {
     var self = this;
-
     var fields = conditionMatch[1].split(".");
     var tableName = null;
     if (fields[0] in fromReferences.complex) {
@@ -225,10 +251,10 @@
       var completeFields = [];
       // For impala we need to check each part with the API, it could be a map or array in which case we need to add
       // either "value" or "item" in between.
-      var fetchImpalaFields = function (remainingParts) {
+      var fetchImpalaFields = function (remainingParts, topValues) {
         completeFields.push(remainingParts.shift());
         if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
-          fetchImpalaFields(remainingParts);
+          fetchImpalaFields(remainingParts, topValues);
         } else {
           self.snippet.getAssistHelper().fetchFields({
             sourceType: self.snippet.type(),
@@ -239,10 +265,10 @@
             successCallback: function (data) {
               if (data.type === "map") {
                 completeFields.push("value");
-                fetchImpalaFields(remainingParts);
+                fetchImpalaFields(remainingParts, topValues);
               } else if (data.type === "array") {
                 completeFields.push("item");
-                fetchImpalaFields(remainingParts);
+                fetchImpalaFields(remainingParts, topValues);
               } else if (remainingParts.length == 0 && data.sample) {
                 var isString = data.type === "string";
                 var values = $.map(data.sample.sort(), function(value, index) {
@@ -252,23 +278,91 @@
                     value: isString ? "'" + value + "'" : new String(value)
                   }
                 });
-                callback(tableAndComplexRefs.concat(values));
+                callback(fixScore(topValues.concat(tableAndComplexRefs).concat(values)));
               } else {
-                callback(tableAndComplexRefs);
+                callback(fixScore(topValues.concat(tableAndComplexRefs)));
               }
             },
             silenceErrors: true,
             errorCallback: function () {
-              callback(tableAndComplexRefs);
+              callback(fixScore(topValues.concat(tableAndComplexRefs)));
             }
           });
         }
       };
-      fetchImpalaFields(fields);
+
+      if (fields.length === 1 && !self.optEnabled) {
+        self.snippet.getAssistHelper().fetchTableSample({
+          sourceType: self.snippet.type(),
+          databaseName: database,
+          tableName: tableName,
+          columnName: fields.length === 1 ? fields[0] : null,
+          editor: editor,
+          successCallback: function (data) {
+            if (data.status === 0 && data.headers.length === 1) {
+              var values = $.map(data.rows, function (row, index) {
+                return {
+                  meta: 'value',
+                  score: 1000 - index,
+                  value: typeof row[0] === 'string' ? "'" + row[0] + "'" :  '' + row[0]
+                }
+              });
+              if (self.snippet.type() === 'impala') {
+                fetchImpalaFields(fields, values);
+              } else {
+                callback(values);
+              }
+            } else {
+              if (self.snippet.type() === 'impala') {
+                fetchImpalaFields(fields, []);
+              }
+            }
+          },
+          errorCallback: function () {
+            if (self.snippet.type() === 'impala') {
+              fetchImpalaFields(fields, []);
+            }
+          }
+        });
+      } else if (fields.length === 1 && self.optEnabled) {
+        $.post('/metadata/api/optimizer_api/popular_values', {
+          database: database,
+          tableName: tableName,
+          columnName: fields[0]
+        }).done(function(data){
+          if (data.status === 0) {
+            var foundCol = data.values.filter(function (col) {
+              return col.columnName === fields[0];
+            });
+            var topValues = [];
+            if (foundCol.length === 1) {
+              topValues = $.map(foundCol[0].values, function (value, index) {
+                return {
+                  meta: "popular",
+                  score: 1000 - index,
+                  value: value,
+                  caption: value.length > 28 ? value.substring(0, 25) + '...' : null
+                };
+              })
+            }
+            if (self.snippet.type() === "impala") {
+              fetchImpalaFields(fields, topValues);
+            } else {
+              callback(fixScore(topValues.concat(tableAndComplexRefs)));
+            }
+          }
+        }).fail(function () {
+          if (self.snippet.type() === "impala") {
+            fetchImpalaFields(fields, []);
+          }
+        });
+      } else if (self.snippet.type() === "impala") {
+        fetchImpalaFields(fields, []);
+      }
     }
   };
 
-  SqlAutocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
+  SqlAutocompleter.prototype.extractFields = function (data, tableName, database, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
     var self = this;
     var fields = [];
     var result = [];
@@ -323,20 +417,67 @@
 
     fields.forEach(function(field, idx) {
       if (field.name != "") {
-        result.push({value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name, score: 1000 - idx, meta: field.type});
+        result.push({
+          value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name,
+          score: 1000 - idx,
+          meta: field.type,
+          database: database,
+          tableName: tableName
+        });
       }
     });
     return result;
   };
 
-  SqlAutocompleter.prototype.autocomplete = function(beforeCursor, upToNextStatement, callback, editor) {
+  SqlAutocompleter.prototype.autocomplete = function(beforeCursor, upToNextStatement, realCallback, editor) {
+    var self = this;
+    var callback = function (values) {
+      if (! self.optEnabled) {
+        realCallback(values);
+        return;
+      }
+      if (values.length > 0) {
+        var foundTables = {};
+        values.forEach(function (value) {
+          if (value.meta === 'column' && value.tableName) {
+            if (! foundTables[value.tableName]) {
+              foundTables[value.tableName] = [];
+            }
+            foundTables[value.tableName].push(value)
+          }
+        });
+        if (Object.keys(foundTables).length === 1) {
+          $.post('/metadata/api/optimizer_api/popular_values', {
+            database: database,
+            tableName: tableName
+          }).done(function (data) {
+            var valueByColumn = {};
+            data.values.forEach(function (colValue) {
+              valueByColumn[colValue.columnName] = colValue.values;
+            });
+            foundTables[Object.keys(foundTables)[0]].forEach(function (colSuggestion) {
+              if (valueByColumn[colSuggestion.value]) {
+                colSuggestion.popularValues = valueByColumn[colSuggestion.value];
+              }
+            });
+            realCallback(values);
+          }).fail(function () {
+            realCallback(values);
+          });
+        } else {
+          realCallback(values);
+        }
+      } else {
+        realCallback([]);
+      }
+    };
+
     var onFailure = function() {
       callback([]);
     };
 
     var allStatements = beforeCursor.split(';');
 
-    var self = this;
 
     var hiveSyntax = self.snippet.type() === "hive";
     var impalaSyntax = self.snippet.type() === "impala";
@@ -457,7 +598,7 @@
             }
             fromKeyword += " ";
           }
-          var result = self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
+          var result = self.extractFields(data, null, database, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
           if (partialTableOrDb !== null) {
             callback($.grep(result, function (suggestion) {
               return suggestion.value.indexOf(partialTableOrDb) === 0;
@@ -482,7 +623,7 @@
 
       var fromReferences = self.getFromReferenceIndex(beforeCursor + upToNextStatement);
       var viewReferences = self.getViewReferenceIndex(beforeCursor + upToNextStatement, hiveSyntax);
-      var conditionMatch = beforeCursor.match(/(\S+)\s*=\s*$/);
+      var conditionMatch = beforeCursor.match(/(\S+)\s*=\s*([^\s;]+)?$/);
 
       var tableName = "";
 
@@ -525,7 +666,7 @@
           };
         });
 
-        if (conditionMatch && impalaSyntax) {
+        if (conditionMatch) {
           self.getValueReferences(conditionMatch, database, fromReferences, tableRefs.concat(complexRefs), callback, editor);
         } else {
           callback(tableRefs.concat(complexRefs));
@@ -540,13 +681,13 @@
         if (tableRef.database !== null) {
           database = tableRef.database;
         }
-
-        if (conditionMatch && impalaSyntax) {
+        if (conditionMatch) {
           var tableRefs = [{
             value: tableName,
             score: 1000,
-            meta: 'table'
+            meta: 'tables'
           }];
+
           self.getValueReferences(conditionMatch, database, fromReferences, tableRefs, callback);
           return;
         }
@@ -571,10 +712,43 @@
             fields: fields,
             editor: editor,
             successCallback: function (data) {
+              var suggestions = [];
               if (fields.length == 0) {
-                callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
+                suggestions = self.extractFields(data, tableName, database, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences);
               } else {
-                callback(self.extractFields(data, "", !fieldTermBefore));
+                suggestions = self.extractFields(data, tableName, database, "", !fieldTermBefore);
+              }
+
+              var startedMatch = beforeCursorU.match(/.* (WHERE|AND|OR)\s+(\S+)$/);
+              if (self.optEnabled && keywordBeforeCursor === "WHERE" && startedMatch) {
+                $.post('/metadata/api/optimizer_api/popular_values', {
+                  database: database,
+                  tableName: tableName
+                }).done(function (data) {
+                  var popular = [];
+                  if (data.status === 0) {
+                    $.each(data.values, function (idx, colValue) {
+                      $.each(colValue.values, function (idx, value) {
+                        var suggestion = '';
+                        if (colValue.tableName !== tableName) {
+                          suggestion += colValue.tableName + ".";
+                        }
+                        suggestion += colValue.columnName + ' = ' + value;
+                        popular.push({
+                          meta: "popular",
+                          score: 1000,
+                          value: suggestion,
+                          caption: suggestion.length > 28 ? suggestion.substring(0, 25) + '...' : null
+                        });
+                      });
+                    });
+                  }
+                  callback(fixScore(popular.concat(suggestions)));
+                }).fail(function () {
+                  callback(suggestions);
+                });
+              } else {
+                callback(suggestions);
               }
             },
             silenceErrors: true,
@@ -588,7 +762,7 @@
           if (hiveSyntax) {
             if (viewReferences.index[part]) {
               if (viewReferences.index[part].references && remainingParts.length == 0) {
-                callback(self.extractFields([], "", true, viewReferences.index[part].references));
+                callback(self.extractFields([], tableName, database, "", true, viewReferences.index[part].references));
                 return;
               }
               if (fields.length == 0 && viewReferences.index[part].leadingPath.length > 0) {
@@ -662,7 +836,7 @@
                     extraFields.push({ name: "items", type: "items" });
                   }
                 }
-                callback(self.extractFields(data, "", false, extraFields));
+                callback(self.extractFields(data, tableName, database, "", false, extraFields));
                 return;
               }
               getFields(database, remainingParts, fields);
@@ -689,6 +863,38 @@
       getFields(database, parts, []);
     } else {
       onFailure();
+    }
+  };
+  
+  SqlAutocompleter.prototype.getDocTooltip = function (item) {
+    var self = this;
+    if (! self.optEnabled) {
+      return;
+    }
+    if (item.meta === 'table' && !item.docHTML) {
+      var table = item.value;
+      if (table.lastIndexOf(' ') > -1) {
+        table = table.substring(table.lastIndexOf(' ') + 1);
+      }
+      if (self.topTablesPerDb[item.database] && self.topTablesPerDb[item.database][table]) {
+        var optData = self.topTablesPerDb[item.database][table];
+        item.docHTML = '<table style="margin:10px;">' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Table:</td><td style="width: 100px;">' + optData.name + '</td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #338bb8; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Columns:</td><td style="width: 100px;">' + optData.column_count + '</td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Fact:</td><td style="width: 100px;">' + optData.is_fact + '</td></tr>' +
+            '</table>';
+
+      }
+    } else if (item.meta === 'column' && item.popularValues && !item.docHTML) {
+      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table table-striped"><tbody>';
+      item.popularValues.forEach(function (value) {
+        item.docHTML += '<tr><td><div style=" width: 360px; overflow-x: hidden; font-family: monospace; white-space: nowrap; text-overflow: ellipsis" title="' + value + '">' + value + '</div></td></tr>';
+      });
+      item.docHTML += '</tbody></table></div>';
+    }
+    if (item.value.length > 28 && !item.docHTML) {
+      item.docHTML = '<div style="margin:10px; width: 220px; overflow-y: auto;"><div style="font-size: 15px; margin-bottom: 6px;">Popular</div><div style="text-wrap: normal; white-space: pre-wrap; font-family: monospace;">' + item.value + '</div></div>';
     }
   };
 
