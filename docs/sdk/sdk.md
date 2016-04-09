@@ -786,6 +786,16 @@ like this (in your mako template):
     <!-- show a trash icon in a link -->
     <a href="#something"><i class="icon-trash"></i> Trash</a>
 
+Static files
+------------
+
+For better performances, Hue uses the Django staticfiles app. If in production mode, if you edit
+some static files, you would need to run this command or `make apps`. No actions are needed in
+development mode.
+<pre>
+./build/env/bin/hue collectstatic
+</pre>
+
 Adding Interactive Elements to Your UI
 --------------------------------------
 
