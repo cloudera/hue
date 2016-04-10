@@ -238,9 +238,10 @@ function RdbmsViewModel() {
     data.server = self.server().name();
     var request = {
       url: '/rdbms/api/execute/',
-      dataType: 'json',
+      dataType: 'text',
       type: 'POST',
       success: function(data) {
+        data = JSON.bigdataParse(data);
         self.query.errors.removeAll();
         if (data.status === 0) {
           $(document).trigger('execute.query', data);
