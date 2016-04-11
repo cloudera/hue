@@ -45,7 +45,7 @@ SHOW_NOTEBOOKS = Config(
     key="show_notebooks",
     help=_t("Show the notebook menu or not"),
     type=coerce_bool,
-    default=True
+    default=False
 )
 
 INTERPRETERS = UnspecifiedConfigSection(
