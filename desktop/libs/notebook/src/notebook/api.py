@@ -50,12 +50,6 @@ def create_session(request):
 
   properties = session.get('properties', [])
 
-  # If not properties look for previously used notebook session
-  if not properties:
-    old_session = [_session for _session in notebook['sessions'] if _session['type'] == session['type']]
-    if any(old_session) and 'properties' in old_session[0]:
-      properties = old_session[0]['properties']
-
   response['session'] = get_api(request, session).create_session(lang=session['type'], properties=properties)
   response['status'] = 0
 
@@ -341,6 +335,15 @@ def open_notebook(request):
 
   notebook_id = request.GET.get('notebook')
   notebook = Notebook(document=Document2.objects.get(id=notebook_id))
+
+  # Check session properties format and upgrade if necessary
+  data = notebook.get_data()
+  for session in data['sessions']:
+    api = get_api(request, session)
+    if 'type' in session and hasattr(api, 'upgrade_properties'):
+      properties = session.get('properties', None)
+      session['properties'] = api.upgrade_properties(session['type'], properties)
+  notebook.data = json.dumps(data)
 
   response['status'] = 0
   response['notebook'] = notebook.get_json()

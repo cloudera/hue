@@ -51,8 +51,27 @@ def escape_rows(rows, nulls_only=False):
   return data
 
 
-def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready', files=None, functions=None, settings=None):
+def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
+                  files=None, functions=None, settings=None):
+
+  from notebook.connectors.hiveserver2 import HS2Api
+
   editor = Notebook()
+
+  properties = HS2Api.get_properties(editor_type)
+
+  if editor_type == 'hive':
+    if files is not None:
+      _update_property_value(properties, 'files', files)
+
+    if functions is not None:
+      _update_property_value(properties, 'functions', functions)
+
+    if settings is not None:
+      _update_property_value(properties, 'settings', settings)
+  elif editor_type == 'impala':
+    if settings is not None:
+      _update_property_value(properties, 'files', files)
 
   editor.data = json.dumps({
     'name': name,
@@ -60,9 +79,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'sessions': [
       {
          'type': editor_type,
-         'properties': [
-
-         ],
+         'properties': properties,
          'id': None
       }
     ],
@@ -121,3 +138,12 @@ def _convert_type(btype, bdata):
     return 'spark'
   else:
     return 'hive'
+
+
+def _update_property_value(properties, key, value):
+  """
+  Update property dict in list of properties where prop has "key": key, set "value": value
+  """
+  for prop in properties:
+    if prop['key'] == key:
+      prop.update({'value': value})

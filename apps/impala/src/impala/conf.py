@@ -22,7 +22,7 @@ import socket
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
   AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
-from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_password_from_script
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 
 from impala.settings import NICE_NAME
@@ -89,6 +89,13 @@ SESSION_TIMEOUT_S = Config(
           " (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."),
   type=int,
   default=12 * 60 * 60
+)
+
+CONFIG_WHITELIST = Config(
+  key='config_whitelist',
+  default='debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s',
+  type=coerce_csv,
+  help=_t('A comma-separated list of white-listed Impala configuration properties that users are authorized to set.')
 )
 
 SSL = ConfigSection(

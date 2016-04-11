@@ -26,6 +26,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
 
+from notebook.connectors.hiveserver2 import HiveConfiguration, ImpalaConfiguration
+
 
 LOG = logging.getLogger(__name__)
 
@@ -49,14 +51,28 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_configurable_apps(request):
-  # TODO: dynamically register apps that are configurable and return here
-  app_configs = []
-  try:
-    from notebook.connectors.hiveserver2 import HS2Api
-    app_configs.append(HS2Api.HIVE_PROPERTIES)
-    app_configs.append(HS2Api.IMPALA_PROPERTIES)
-  except ImportError, e:
-    LOG.error('Failed to import notebook libs')
+  # TODO: Use metaclasses to self-register configurable apps
+  app_configs = {}
+  config_classes = [HiveConfiguration, ImpalaConfiguration]
+
+  for config_cls in config_classes:
+    if not hasattr(config_cls, 'APP_NAME') or not hasattr(config_cls, 'PROPERTIES'):
+      LOG.exception('Configurable classes must define APP_NAME and PROPERTIES.')
+    app_name = config_cls.APP_NAME
+    app_configs[app_name] = {
+      'properties': config_cls.PROPERTIES
+    }
+
+    # Get default config
+    if DefaultConfiguration.objects.filter(app=app_name, is_default=True).exists():
+      default_config = DefaultConfiguration.objects.get(app=app_name, is_default=True)
+      app_configs[app_name].update({'default': default_config.properties_list})
+
+    # Get group configs
+    if DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).exists():
+      app_configs[app_name].update({'groups': {}})
+      for grp_config in DefaultConfiguration.objects.filter(app=app_name, group_isnull=False).all():
+        app_configs[app_name]['groups'].update({grp_config.group.id: grp_config.properties_list})
 
   return JsonResponse({
     'status': 0,

@@ -104,6 +104,70 @@ class TestHiveserver2Api(object):
     assert_true("CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements)
 
 
+  def test_upgrade_properties(self):
+    properties = None
+    # Verify that upgrade will return defaults if current properties not formatted as settings
+    upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
+    assert_equal(upgraded_props, self.api.get_properties(lang='hive'))
+
+    # Verify that upgrade will save old properties and new settings
+    properties = [
+        {
+            'key': 'hive.execution.engine',
+            'value': 'mr'
+        },
+        {
+            'key': 'hive.exec.compress.output',
+            'value': False
+        }
+    ]
+    upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
+    settings = next((prop for prop in upgraded_props if prop['key'] == 'settings'), None)
+    assert_equal(settings['value'], properties)
+
+    # Verify that already upgraded properties will be unchanged
+    properties = [
+        {
+            "multiple": True,
+            "value": [],
+            "nice_name": "Files",
+            "key": "files",
+            "help_text": "Add one or more files, jars, or archives to the list of resources.",
+            "type": "hdfs-files"
+        },
+        {
+            "multiple": True,
+            "value": [],
+            "nice_name": "Functions",
+            "key": "functions",
+            "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
+            "type": "functions"
+        },
+        {
+            "multiple": True,
+            "value": [
+                {
+                    "key": "hive.execution.engine",
+                    "value": "spark"
+                }
+            ],
+            "nice_name": "Settings",
+            "key": "settings",
+            "help_text": "Hive and Hadoop configuration properties.",
+            "type": "settings",
+            "options": [
+                "hive.map.aggr",
+                "hive.exec.compress.output",
+                "hive.exec.parallel",
+                "hive.execution.engine",
+                "mapreduce.job.queuename"
+            ]
+        }
+    ]
+    upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
+    assert_equal(upgraded_props, properties)
+
+
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
   @classmethod
