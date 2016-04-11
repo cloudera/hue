@@ -96,9 +96,48 @@ class TestDefaultConfiguration(object):
 
   def test_get_default_configurations(self):
     app = 'hive'
-    properties = {
-        'settings': [{'key': 'hive.execution.engine', 'value': 'spark'}]
-    }
+    properties = [
+        {
+            "multiple": True,
+            "value": [{
+                "path": "/user/test/myudfs.jar",
+                "type": "jar"
+            }],
+            "nice_name": "Files",
+            "key": "files",
+            "help_text": "Add one or more files, jars, or archives to the list of resources.",
+            "type": "hdfs-files"
+        },
+        {
+            "multiple": True,
+            "value": [{
+                "class_name": "org.hue.udf.MyUpper",
+                "name": "myUpper"
+            }],
+            "nice_name": "Functions",
+            "key": "functions",
+            "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
+            "type": "functions"
+        },
+        {
+            "multiple": True,
+            "value": [{
+                "key": "mapreduce.job.queuename",
+                "value": "mr"
+            }],
+            "nice_name": "Settings",
+            "key": "settings",
+            "help_text": "Hive and Hadoop configuration properties.",
+            "type": "settings",
+            "options": [
+                "hive.map.aggr",
+                "hive.exec.compress.output",
+                "hive.exec.parallel",
+                "hive.execution.engine",
+                "mapreduce.job.queuename"
+            ]
+        }
+    ]
 
     # No configurations returns null
     response = self.client.get("/desktop/api/configurations/user", {
