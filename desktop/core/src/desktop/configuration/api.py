@@ -48,6 +48,34 @@ def api_error_handler(func):
 
   return decorator
 
+def get_configurable():
+  # TODO: Use metaclasses to self-register configurable apps
+  app_configs = {}
+  config_classes = [HiveConfiguration, ImpalaConfiguration]
+
+  for config_cls in config_classes:
+    if not hasattr(config_cls, 'APP_NAME') or not hasattr(config_cls, 'PROPERTIES'):
+      LOG.exception('Configurable classes must define APP_NAME and PROPERTIES.')
+    app_name = config_cls.APP_NAME
+    app_configs[app_name] = {
+      'properties': config_cls.PROPERTIES
+    }
+
+    # Get default config
+    if DefaultConfiguration.objects.filter(app=app_name, is_default=True).exists():
+      default_config = DefaultConfiguration.objects.get(app=app_name, is_default=True)
+      app_configs[app_name].update({'default': default_config.properties_list})
+
+    # Get group configs
+    if DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).exists():
+      app_configs[app_name].update({'groups': {}})
+      for grp_config in DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).all():
+        app_configs[app_name]['groups'].update({grp_config.group.id: grp_config.properties_list})
+
+  return {
+    'status': 0,
+    'apps': app_configs
+  }
 
 @api_error_handler
 def get_configurable_apps(request):
@@ -71,7 +99,7 @@ def get_configurable_apps(request):
     # Get group configs
     if DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).exists():
       app_configs[app_name].update({'groups': {}})
-      for grp_config in DefaultConfiguration.objects.filter(app=app_name, group_isnull=False).all():
+      for grp_config in DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).all():
         app_configs[app_name]['groups'].update({grp_config.group.id: grp_config.properties_list})
 
   return JsonResponse({
