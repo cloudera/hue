@@ -198,7 +198,7 @@
 
   <repositories>
     <repository>
-      <id>cloudera.repos</id>
+      <id>cdh.releases.repo</id>
       <url>https://repository.cloudera.com/content/groups/cdh-releases-rcs</url>
       <name>Cloudera Public Repositories</name>
       <snapshots>
@@ -206,7 +206,7 @@
       </snapshots>
     </repository>
     <repository>
-      <id>cloudera.snapshots.repo</id>
+      <id>cdh.snapshots.repo</id>
       <url>https://repository.cloudera.com/content/repositories/snapshots</url>
       <name>Cloudera Snapshots Repository</name>
       <snapshots>
