@@ -2954,19 +2954,28 @@
         var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
         if (range) {
+          var conflictingWithErrorMarkers = false;
           if (editor.session.$backMarkers) {
             for (var marker in editor.session.$backMarkers) {
+              if (editor.session.$backMarkers[marker].clazz === 'ace_error-line') {
+                var errorRange = editor.session.$backMarkers[marker].range;
+                if (range.start.row <= errorRange.end.row && range.end.row >= errorRange.start.row) {
+                  conflictingWithErrorMarkers = true;
+                }
+              }
               if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
                 editor.session.removeMarker(editor.session.$backMarkers[marker].id);
               }
             }
           }
-          editor.session.addMarker(new AceRange(range.start.row, range.start.column, range.end.row, range.end.column), 'highlighted', 'line');
-          ace.require('ace/lib/dom').importCssString('.highlighted {\
-              background-color: #E3F7FF;\
-              position: absolute;\
-          }');
-          editor.scrollToLine(range.start.row, true, true, function () {});
+          if (!conflictingWithErrorMarkers) {
+            editor.session.addMarker(new AceRange(range.start.row, range.start.column, range.end.row, range.end.column), 'highlighted', 'line');
+            ace.require('ace/lib/dom').importCssString('.highlighted {\
+                background-color: #E3F7FF;\
+                position: absolute;\
+            }');
+            editor.scrollToLine(range.start.row, true, true, function () {});
+          }
         }
       }
     }
