@@ -435,7 +435,7 @@ from desktop.views import _ko
           <!-- ko if: definition.isView -->
             <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
+          <span draggable="true" data-bind="css: {'query-builder-menu': definition.isColumn}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
         <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->

@@ -358,6 +358,7 @@ ${ layout.menubar(section='query') }
         <ul class="nav nav-tabs">
           <li class="active recentLi"><a href="#recentTab" data-toggle="tab">${_('Recent queries')}</a></li>
           <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+          <li><a href="#queryBuilderTab" data-toggle="tab">${_('Query builder')}</a></li>
           <!-- ko if: !design.explain() -->
           <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
           <!-- /ko -->
@@ -393,6 +394,15 @@ ${ layout.menubar(section='query') }
           <div class="tab-pane" id="query">
             <pre data-bind="visible: viewModel.design.statement() == ''">${_('There is currently no query to visualize.')}</pre>
             <pre data-bind="visible: viewModel.design.statement() != '', text: viewModel.design.statement()"></pre>
+          </div>
+
+          <div class="tab-pane" id="queryBuilderTab">
+            <form onsubmit="generateQuery(); return false;">
+              <table id="queryBuilder"></table>
+              <div class="button-panel">
+                <button class="btn btn-primary disable-feedback">${_('Build query')}</button>
+              </div>
+            </form>
           </div>
 
           <!-- ko if: design.explain() -->
@@ -754,6 +764,18 @@ ${ layout.menubar(section='query') }
   </div>
 </div>
 
+<div id="invalidQueryBuilder" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Invalid Query')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Query requires a select or an aggregate.')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Ok')}</a>
+  </div>
+</div>
 
 ${ commonshare() | n,unicode }
 
@@ -777,6 +799,30 @@ ${ commonshare() | n,unicode }
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
+
+<!-- For query builder -->
+<link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/queryBuilder.css') }">
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
+<script src="${ static('desktop/js/queryBuilder.js') }"></script>
+<script>
+  // query-builder-menu is the class to use
+  // Callback will run after each rule add, just focus to the queryBuilder tab
+  QueryBuilder.bindMenu('.query-builder-menu', function() {
+    $("a[href='#queryBuilderTab']").click();
+  });
+  function generateQuery() {
+      var result = QueryBuilder.buildHiveQuery();
+      if (result.status == "fail") {
+          $("#invalidQueryBuilder").modal("show");
+      } else {
+          codeMirror.setValue(result.query);
+          codeMirror.focus();
+      }
+  }
+</script>
+<!-- End query builder imports -->
 
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">

@@ -43,6 +43,29 @@ from desktop.views import _ko
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
+<!-- For query builder -->
+<link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/queryBuilder.css') }">
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
+<script src="${ static('desktop/js/queryBuilder.js') }"></script>
+<script>
+  // query-builder-menu is the class to use
+  // Callback will run after each rule add, just focus to the queryBuilder tab
+  QueryBuilder.bindMenu('.query-builder-menu', function() {
+    $("a[href='#queryBuilderTab']").click();
+  });
+  function generateQuery() {
+      var result = QueryBuilder.buildHiveQuery();
+      if (result.status == "fail") {
+          $("#invalidQueryBuilder").modal("show");
+      } else {
+          replaceAce(result.query);
+      }
+  }
+</script>
+<!-- End query builder imports -->
+
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
@@ -312,6 +335,19 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+<div id="invalidQueryBuilder" class="modal hide">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Invalid Query')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Query requires a select or an aggregate.')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Ok')}</a>
+  </div>
+</div>
+
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { wasAssistVisible = true; $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
@@ -455,6 +491,7 @@ ${ hueIcons.symbols() }
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
       </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane active" id="queryHistory">
@@ -511,6 +548,15 @@ ${ hueIcons.symbols() }
             </ul>
           </div>
           <!-- /ko -->
+        </div>
+
+        <div class="tab-pane" id="queryBuilderTab">
+          <!--form onsubmit="generateQuery(); return false;"-->
+            <table id="queryBuilder"></table>
+            <div class="button-panel">
+              <button class="btn btn-primary disable-feedback" onclick="generateQuery()">${_('Build query')}</button>
+            </div>
+          <!--/form-->
         </div>
       </div>
 
@@ -2051,10 +2097,11 @@ ${ hueIcons.symbols() }
       var snip = viewModel.selectedNotebook().snippets()[0];
       if (snip) {
         snip.statement_raw(content);
-        snip.ace().setValue(content);
+        snip.ace().setValue(content, 1);
       }
       hideHoverMsg(viewModel);
     }
+    window.replaceAce = replaceAce;
 
     function addMarkdown (content) {
       var snip = viewModel.selectedNotebook().addSnippet({type: "markdown", result: {}}, true);
