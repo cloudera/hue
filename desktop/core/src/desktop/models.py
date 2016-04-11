@@ -39,7 +39,6 @@ from desktop import appmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.redaction import global_redaction_engine
-from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -106,7 +105,7 @@ class DefaultConfiguration(models.Model):
   Can be designated as default for all users by is_default flag, or for a specific group or user
   """
   app = models.CharField(max_length=32, null=False, db_index=True, help_text=_t('App that this configuration belongs to.'))
-  properties = models.TextField(default='{}', help_text=_t('JSON-formatted default properties values.'))
+  properties = models.TextField(default='[]', help_text=_t('JSON-formatted default properties values.'))
 
   is_default = models.BooleanField(default=False, db_index=True)
   group = models.ForeignKey(auth_models.Group, blank=True, null=True, db_index=True)
@@ -120,15 +119,15 @@ class DefaultConfiguration(models.Model):
 
 
   @property
-  def properties_dict(self):
+  def properties_list(self):
     if not self.properties:
-      self.properties = json.dumps({})
+      self.properties = json.dumps([])
     return json.loads(self.properties)
 
   def to_dict(self):
     return {
       'app': self.app,
-      'properties': self.properties_dict,
+      'properties': self.properties_list,
       'is_default': self.is_default,
       'group': self.group.name if self.group else None,
       'user': self.user.username if self.user else None

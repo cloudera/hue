@@ -50,9 +50,17 @@ class TestDefaultConfiguration(object):
   def test_save_default_configuration(self):
     app = 'hive'
     is_default = True
-    properties = {
-        'settings': [{'key': 'hive.execution.engine', 'value': 'spark'}]
-    }
+    properties = [
+        {
+          "multiple": True,
+          "value": [],
+          "nice_name": "Settings",
+          "key": "settings",
+          "help_text": "Impala configuration properties.",
+          "type": "settings",
+          "options": []
+        }
+    ]
 
     # Create new default configuration
     configs = DefaultConfiguration.objects.filter(app=app, is_default=is_default)
@@ -67,7 +75,7 @@ class TestDefaultConfiguration(object):
     assert_true('configuration' in content, content)
 
     config = DefaultConfiguration.objects.get(app=app, is_default=is_default)
-    assert_equal(config.properties_dict, properties, config.properties_dict)
+    assert_equal(config.properties_list, properties, config.properties_list)
 
     # Update same default configuration
     properties = {
@@ -83,7 +91,7 @@ class TestDefaultConfiguration(object):
     assert_true('configuration' in content, content)
 
     config = DefaultConfiguration.objects.get(app=app, is_default=is_default)
-    assert_equal(config.properties_dict, properties, config.properties_dict)
+    assert_equal(config.properties_list, properties, config.properties_list)
 
 
   def test_get_default_configurations(self):

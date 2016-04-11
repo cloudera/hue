@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import logging
 import re
 import sys
@@ -28,6 +29,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from desktop.models import DefaultConfiguration
 
 from notebook.connectors.base import Api, QueryError, QueryExpired
 
@@ -38,6 +40,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import data_export
   from beeswax.api import _autocomplete, _get_sample_data
+  from beeswax.conf import CONFIG_WHITELIST as hive_settings
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
@@ -47,6 +50,12 @@ try:
   from beeswax.views import _parse_out_hadoop_jobs
 except ImportError, e:
   LOG.exception('Hive and HiveServer2 interfaces are not enabled')
+
+try:
+  from impala.conf import CONFIG_WHITELIST as impala_settings
+except ImportError, e:
+  LOG.warn("Impala app is not enabled")
+  impala_settings = None
 
 
 DEFAULT_HIVE_ENGINE = 'mr'
@@ -65,7 +74,60 @@ def query_error_handler(func):
   return decorator
 
 
+class HiveConfiguration(object):
+
+  APP_NAME = 'hive'
+
+  PROPERTIES = [
+    {
+      "multiple": True,
+      "value": [],
+      "nice_name": _("Files"),
+      "key": "files",
+      "help_text": _("Add one or more files, jars, or archives to the list of resources."),
+      "type": "hdfs-files"
+    }, {
+      "multiple": True,
+      "value": [],
+      "nice_name": _("Functions"),
+      "key": "functions",
+      "help_text": _("Add one or more registered UDFs (requires function name and fully-qualified class name)."),
+      "type": "functions"
+    }, {
+      "multiple": True,
+      "value": [],
+      "nice_name": _("Settings"),
+      "key": "settings",
+      "help_text": _("Hive and Hadoop configuration properties."),
+      "type": "settings",
+      "options": [config.lower() for config in hive_settings.get()]
+    }
+  ]
+
+
+class ImpalaConfiguration(object):
+
+  APP_NAME = 'impala'
+
+  PROPERTIES = [
+    {
+      "multiple": True,
+      "value": [],
+      "nice_name": _("Settings"),
+      "key": "settings",
+      "help_text": _("Impala configuration properties."),
+      "type": "settings",
+      "options": [config.lower() for config in impala_settings.get()] if impala_settings is not None else []
+    }
+  ]
+
+
 class HS2Api(Api):
+
+  @staticmethod
+  def get_properties(lang='hive'):
+    return ImpalaConfiguration.PROPERTIES if lang == 'impala' else HiveConfiguration.PROPERTIES
+
 
   @query_error_handler
   def create_session(self, lang='hive', properties=None):
@@ -76,10 +138,17 @@ class HS2Api(Api):
     if session is None:
       session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
 
+    if not properties:
+      config = DefaultConfiguration.objects.get_configuration_for_user(app=lang, user=self.user)
+      if config is not None:
+        properties = config.properties_list
+      else:
+        properties = self.get_properties(lang)
+
     return {
         'type': lang,
         'id': session.id,
-        'properties': session.get_formatted_properties()
+        'properties': properties
     }
 
 
@@ -289,6 +358,81 @@ class HS2Api(Api):
     }
 
 
+  @query_error_handler
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    db = self._get_db(snippet)
+
+    handle = self._get_handle(snippet)
+
+    upload(target_file, handle, self.request.user, db, self.request.fs)
+
+    return '/filebrowser/view=%s' % target_file
+
+
+  def export_data_as_table(self, snippet, destination):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
+
+    if not query.hql_query.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+
+    database = snippet.get('database') or 'default'
+    table = destination
+
+    if '.' in table:
+      database, table = table.split('.', 1)
+
+    db.use(query.database)
+
+    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, query.hql_query)
+    success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
+
+    return hql, success_url
+
+
+  def export_large_data_to_hdfs(self, snippet, destination):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
+
+    if not query.hql_query.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+
+    db.use(query.database)
+
+    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
+    success_url = '/filebrowser/view=%s' % destination
+
+    return hql, success_url
+
+
+  def upgrade_properties(self, lang='hive', properties=None):
+    upgraded_properties = copy.deepcopy(self.get_properties(lang))
+
+    # Check that current properties is a list of dictionary objects with 'key' and 'value' keys
+    if not isinstance(properties, list) or \
+      not all(isinstance(prop, dict) for prop in properties) or \
+      not all('key' in prop for prop in properties) or not all('value' in prop for prop in properties):
+      LOG.warn('Current properties are not formatted correctly, will replace with defaults.')
+      return upgraded_properties
+
+    valid_props_dict = dict((prop["key"], prop) for prop in upgraded_properties)
+    curr_props_dict = dict((prop['key'], prop) for prop in properties)
+
+    # Upgrade based on valid properties as needed
+    if set(valid_props_dict.keys()) != set(curr_props_dict.keys()):
+      settings = next((prop for prop in upgraded_properties if prop['key'] == 'settings'), None)
+      if settings is not None and isinstance(properties, list):
+        settings['value'] = properties
+    else:  # No upgrade needed so return existing properties
+      upgraded_properties = properties
+
+    return upgraded_properties
+
+
   def _get_hive_execution_engine(self, notebook, snippet):
     # Get hive.execution.engine from snippet properties, if none, then get from session
     properties = snippet['properties']
@@ -396,55 +540,3 @@ class HS2Api(Api):
       name = 'spark-sql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
-
-
-  @query_error_handler
-  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
-    db = self._get_db(snippet)
-
-    handle = self._get_handle(snippet)
-
-    upload(target_file, handle, self.request.user, db, self.request.fs)
-
-    return '/filebrowser/view=%s' % target_file
-
-
-  def export_data_as_table(self, snippet, destination):
-    db = self._get_db(snippet)
-
-    response = self._get_current_statement(db, snippet)
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
-
-    if not query.hql_query.strip().lower().startswith('select'):
-      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
-
-    database = snippet.get('database') or 'default'
-    table = destination
-
-    if '.' in table:
-      database, table = table.split('.', 1)
-
-    db.use(query.database)
-
-    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, query.hql_query)
-    success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
-
-    return hql, success_url
-
-
-  def export_large_data_to_hdfs(self, snippet, destination):
-    db = self._get_db(snippet)
-
-    response = self._get_current_statement(db, snippet)
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
-
-    if not query.hql_query.strip().lower().startswith('select'):
-      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
-
-    db.use(query.database)
-
-    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
-    success_url = '/filebrowser/view=%s' % destination
-
-    return hql, success_url
-
