@@ -577,6 +577,66 @@ h1.empty {
   background-color: #338bb8;
 }
 
+.progress-starting .bar {
+  background-color: #CCC;
+}
+
+@-webkit-keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-o-keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulsate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.progress-starting {
+  -webkit-animation: pulsate 2s infinite;
+  -moz-animation: pulsate 2s infinite;
+  -o-animation: pulsate 2s infinite;
+  animation: pulsate 2s infinite;
+  opacity: 0;
+}
+
 .progress-success .bar, .progress .bar-success {
   background-color: #b5cf6b;
 }
