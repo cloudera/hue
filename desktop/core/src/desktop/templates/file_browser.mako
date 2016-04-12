@@ -499,7 +499,7 @@ from desktop.views import _ko
                 from notebook.conf import SHOW_NOTEBOOKS
                 %>
                 % if SHOW_NOTEBOOKS.get():
-                  <li><a href="${ url('notebook:index') }"><i class="fa fa-fw fa-file-text-o"></i> ${_('Notebook')}</a></li>
+                  <li><a href="${ url('notebook:index') }"><i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #338BB8;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                   <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>
