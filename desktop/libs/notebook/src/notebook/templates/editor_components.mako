@@ -1963,6 +1963,12 @@ ${ hueIcons.symbols() }
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        solr: {
+          placeHolder: '${ _("Example: SELECT * FROM collectionname, or press CTRL + space") }',
+          aceMode: 'ace/mode/mysql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         py : {
           snippetIcon: 'fa-file-code-o'
         },
