@@ -114,7 +114,9 @@ class SolrApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    assist = Assist(solr)
+    from search.conf import SOLR_URL
+    api = NativeSolrApi(SOLR_URL.get(), self.user.username)
+    assist = Assist(self.user, api)
     response = {'status': -1}
 
     if database is None:
@@ -135,6 +137,7 @@ class SolrApi(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None):
+    from search.conf import SOLR_URL
     db = NativeSolrApi(SOLR_URL.get(), self.user)
 
     assist = Assist(self.user, db)
@@ -165,7 +168,7 @@ class Assist():
     return self.db.collections2()
 
   def get_columns(self, database, table):
-    return self.db.fields(table)
+    return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
 
   def get_sample_data(self, database, table, column=None):
     from search.models import Collection2
