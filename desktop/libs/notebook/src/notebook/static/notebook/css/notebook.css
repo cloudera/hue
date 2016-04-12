@@ -948,3 +948,7 @@ code.history-item {
   border: none;
   color: #666;
 }
+
+.player-toolbar img {
+  margin-top: 12px;
+}
