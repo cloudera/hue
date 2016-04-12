@@ -50,9 +50,14 @@ class SolrApi(Api):
   @query_error_handler
   def execute(self, notebook, snippet):
     from search.conf import SOLR_URL
-    collection = self.options.get('collection') or snippet.get('database') or 'default'
 
-    response = NativeSolrApi(SOLR_URL.get(), self.user.username).sql(collection, snippet['statement'])
+    api = NativeSolrApi(SOLR_URL.get(), self.user.username)
+
+    collection = self.options.get('collection') or snippet.get('database')
+    if collection == 'default':
+      collection = api.collections2()[0]
+
+    response = api.sql(collection, snippet['statement'])
 
     info = response['result-set']['docs'].pop(-1) # EOF, RESPONSE_TIME
 
