@@ -44,7 +44,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
         %if first_login_ever:
           <h2>${_('Create your Hue account')}</h2>
         %else:
-          <h2>${_('Sign in to continue to your dashboard')}</h2>
+          <h2>${_('Please sign in to continue')}</h2>
         %endif
       </div>
 
