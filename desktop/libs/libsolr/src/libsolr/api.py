@@ -729,6 +729,9 @@ class SolrApi(object):
 
   def sql(self, collection, statement):
     try:
+      if 'limit' not in statement.lower(): # rows is not supported
+        statement = statement + ' LIMIT 100'
+
       params = self._get_params() + (
           ('wt', 'json'),
           ('rows', 0),
