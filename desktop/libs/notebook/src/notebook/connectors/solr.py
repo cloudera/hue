@@ -47,7 +47,7 @@ class SolrApi(Api):
   @query_error_handler
   def execute(self, notebook, snippet):
     from search.conf import SOLR_URL
-    collection = 'gettingstarted' #self.options['collection']
+    collection = self.options.get('collection') or snippet.get('database') or 'default'
 
     response = NativeSolrApi(SOLR_URL.get(), self.user.username).sql(collection, snippet['statement'])
 
@@ -69,7 +69,10 @@ class SolrApi(Api):
           'comment': ''
         } for col in response['result-set']['docs'][0].keys()] if has_result_set else [],
         'type': 'table'
-      }
+      },
+      'statement_id': 0,
+      'has_more_statements': False,
+      'statements_count': 1
     }
 
 
@@ -120,7 +123,7 @@ class SolrApi(Api):
     response = {'status': -1}
 
     if database is None:
-      response['databases'] = ['gettingstarted']
+      response['databases'] = [self.options.get('collection') or snippet.get('database') or 'default']
     elif table is None:
       tables_meta = []
       for t in assist.get_tables(database):
@@ -162,7 +165,7 @@ class Assist():
     self.db = db
 
   def get_databases(self):
-    return self.db.collections2()
+    return self.options['collection'].get('collection') or ['default']
 
   def get_tables(self, database, table_names=[]):
     return self.db.collections2()
@@ -176,4 +179,4 @@ class Assist():
     collection = Collection2(user=self.user.username, name=table)
     query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-    return self.db.query(collection, query)
+    return self.db.query(collection, query) # TODO execute with all fields as * not supported
