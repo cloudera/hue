@@ -17,12 +17,15 @@
 
 import logging
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from libsolr.api import SolrApi as NativeSolrApi
 
 from notebook.connectors.base import Api, QueryError
+from notebook.models import escape_rows
 
 
 LOG = logging.getLogger(__name__)
@@ -143,15 +146,15 @@ class SolrApi(Api):
     from search.conf import SOLR_URL
     db = NativeSolrApi(SOLR_URL.get(), self.user)
 
-    assist = Assist(self.user, db)
+    assist = Assist(self, self.user, db)
     response = {'status': -1}
 
     sample_data = assist.get_sample_data(database, table, column)
 
     if sample_data:
       response['status'] = 0
-      response['headers'] = sample_data.columns
-      response['rows'] = list(sample_data.rows())
+      response['headers'] = sample_data['headers']
+      response['rows'] = sample_data['rows']
     else:
       response['message'] = _('Failed to get sample data.')
 
@@ -160,7 +163,8 @@ class SolrApi(Api):
 
 class Assist():
 
-  def __init__(self, user, db):
+  def __init__(self, api, user, db):
+    self.api = api
     self.user = user
     self.db = db
 
@@ -174,9 +178,22 @@ class Assist():
     return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
 
   def get_sample_data(self, database, table, column=None):
-    from search.models import Collection2
+    if column is None:
+      column = ', '.join([col['name'] for col in self.get_columns(database, table)])
 
-    collection = Collection2(user=self.user.username, name=table)
-    query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
+    snippet = {
+        'database': table,
+        'statement': 'SELECT %s FROM %s LIMIT 250' % (column, table)
+    }
+    res = self.api.execute(None, snippet)
 
-    return self.db.query(collection, query) # TODO execute with all fields as * not supported
+    response = {'status': -1}
+
+    if res:
+      response['status'] = 0
+      response['headers'] = [col['name'] for col in res['result']['meta']]
+      response['rows'] = escape_rows(res['result']['data'], nulls_only=True)
+    else:
+      response['message'] = _('Failed to get sample data.')
+
+    return response
