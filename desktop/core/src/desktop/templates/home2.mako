@@ -147,16 +147,6 @@ ${ fileBrowser.fileBrowser() }
             </a>
            </li>
         </ul>
-        </div>
-      <div class="nav-collapse pull-right">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="${ url('desktop.views.home') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
-              ${ _('Old home') }
-            </a>
-           </li>
-        </ul>
       </div>
     </div>
   </div>
