@@ -64,7 +64,7 @@ class SolrApi(Api):
       raise QueryError(info['EXCEPTION'])
 
     data = [[cell for cell in doc.values()] for doc in response['result-set']['docs']]
-    has_result_set = data is not None
+    has_result_set = bool(data)
 
     return {
       'sync': True,
