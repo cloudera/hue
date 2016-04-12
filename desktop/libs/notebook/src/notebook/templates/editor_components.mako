@@ -1964,7 +1964,7 @@ ${ hueIcons.symbols() }
           sqlDialect: true
         },
         solr: {
-          placeHolder: '${ _("Example: SELECT * FROM collectionname, or press CTRL + space") }',
+          placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
           aceMode: 'ace/mode/mysql',
           snippetIcon: 'fa-database',
           sqlDialect: true
