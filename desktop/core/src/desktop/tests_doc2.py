@@ -791,7 +791,7 @@ class TestDocument2ImportExport(object):
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
     self.not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
 
-  def test_export_documents(self):
+  def test_export_documents_with_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -821,6 +821,36 @@ class TestDocument2ImportExport(object):
     assert_true('test2.wf' in [doc['fields']['name'] for doc in documents])
     assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
     assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+
+
+  def test_export_directories_with_children(self):
+    # Test that exporting a directory exports children docs
+    # /
+    #   dir1/
+    #     query1.sql
+    #   dir2/
+    #     dir3/
+    #       query2.sql
+    #   query3.sql
+
+    dir1 = Directory.objects.create(name='dir1', owner=self.user, parent_directory=self.home_dir)
+    doc1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir1)
+    dir2 = Directory.objects.create(name='dir2', owner=self.user, parent_directory=self.home_dir)
+    dir3 = Directory.objects.create(name='dir3', owner=self.user, parent_directory=dir2)
+    doc2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir3)
+    doc3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([dir1.id, dir2.id, doc3.id]), 'format': 'json'})
+    documents = json.loads(response.content)
+    documents = json.loads(documents)
+
+    assert_equal(6, len(documents))
+    assert_true('dir1' in [doc['fields']['name'] for doc in documents])
+    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
+    assert_true('dir2' in [doc['fields']['name'] for doc in documents])
+    assert_true('dir3' in [doc['fields']['name'] for doc in documents])
+    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+    assert_true('query3.sql' in [doc['fields']['name'] for doc in documents])
 
 
   def test_import_owned_document(self):
