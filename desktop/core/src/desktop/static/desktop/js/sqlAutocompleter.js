@@ -88,7 +88,7 @@
     var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
     if (fromMatch) {
       var refsRaw = fromMatch[1];
-      var upToMatch = refsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP BY|SORT|ORDER BY\b/i);
+      var upToMatch = refsRaw.match(/\s+(LATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP BY|SORT|ORDER BY)\s+/i);
       if (upToMatch) {
         refsRaw = $.trim(refsRaw.substring(0, upToMatch.index));
       }
