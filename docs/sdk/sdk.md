@@ -302,7 +302,7 @@ should see something like:
 
 Integrate external Web applications in any language
 ===================================================
-Use the [create_proxy_app command](http://gethue.tumblr.com/post/66367939672/integrate-external-web-applications-in-any-language)
+Use the [create_proxy_app command](http://gethue.com/integrate-external-web-applications-in-any-language)
 
 
 A Look at Three Existing Apps
