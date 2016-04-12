@@ -94,7 +94,7 @@
       //update observable on save
       if (ko.isObservable(value)) {
         $editable.on('save.ko', function (e, params) {
-          value(params.newValue);
+          value(params.newValue.replace(/<(?:.|\n)*?>/gm, ''));
         })
       }
       ;
