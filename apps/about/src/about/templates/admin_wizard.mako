@@ -224,8 +224,14 @@ ${ header.menubar() }
           ${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>.
           <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
+            <%
+              home_url = url('desktop.views.home')
+              from desktop.conf import USE_NEW_EDITOR
+              if USE_NEW_EDITOR.get():
+                home_url = url('desktop.views.home2')
+            %>
             <br/>
-            <a href="${ reverse('desktop.views.home') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ home_url }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
           % endif
         </p>
        </div>
