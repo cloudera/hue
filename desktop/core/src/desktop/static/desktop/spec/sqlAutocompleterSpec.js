@@ -1102,6 +1102,32 @@ define([
         });
       });
 
+      it("should suggest columns for tables with where keyword in name", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_one/testwhere" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT ",
+          afterCursor: " FROM testwhere",
+          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+        });
+      });
+
+      it("should suggest columns for tables with on keyword in name", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_one/teston" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT ",
+          afterCursor: " FROM teston",
+          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+        });
+      });
+
       it("should suggest columns for table with database prefix", function() {
         assertAutoComplete({
           serverResponses: {
