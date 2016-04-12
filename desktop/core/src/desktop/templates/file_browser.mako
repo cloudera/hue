@@ -424,11 +424,15 @@ from desktop.views import _ko
     <div id="createDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" aria-hidden="true">&times;</button>
+          <h3>${_('Create Directory')}</h3>
+        </div>
         <div class="modal-body ">
-          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
+          <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
         </div>
         <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" value="${ _('Cancel') }">
           <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
         </div>
       </form>

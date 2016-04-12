@@ -512,6 +512,7 @@
         parentUuid: self.definition().uuid,
         name: name
       });
+      $('#newDirectoryName').val(null)
     }
   };
 

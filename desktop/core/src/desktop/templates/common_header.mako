@@ -195,7 +195,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/floatlabels.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
