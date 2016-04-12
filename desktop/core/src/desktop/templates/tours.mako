@@ -84,7 +84,7 @@ $.jHueTour({
       "desc": "${_("Submit Oozie jobs directly from HDFS")}",
       "path": "/(oozie|filebrowser)",
       "video": "http://player.vimeo.com/video/80749790",
-      "blog": "http://gethue.tumblr.com/post/68781982681/hadoop-tutorial-submit-any-oozie-jobs-directly-from"
+      "blog": "http://gethue.com/hadoop-tutorial-submit-any-oozie-jobs-directly-from"
     },
     {
       "name": "jbyarn",

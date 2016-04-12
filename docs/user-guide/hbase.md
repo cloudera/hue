@@ -4,7 +4,7 @@
 HBase Browser
 =============
 
-We'll take a look at the new [HBase Browser App](http://gethue.tumblr.com/post/59071544309/the-web-ui-for-hbase-hbase-browser)
+We'll take a look at the new [HBase Browser App](http://gethue.com/the-web-ui-for-hbase-hbase-browser)
 added in Hue 2.5 and improved significantly since.
 
 Prerequisites before using the app:
@@ -55,7 +55,7 @@ operations:
 
 If you need some sample data to get started and explore, check out this
 howto create [HBase table
-tutorial](http://gethue.tumblr.com/post/58181985680/hadoop-tutorial-how-to-create-example-tables-in-hbase).
+tutorial](http://gethue.com/hadoop-tutorial-how-to-create-example-tables-in-hbase).
 
 
 ### Smart Searchbar

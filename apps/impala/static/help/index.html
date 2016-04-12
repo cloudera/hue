@@ -26,19 +26,19 @@
 <span>Hue, </span><a href="http://gethue.com"><span>the Hadoop UI</span></a><span>, has been supporting </span><a href="https://github.com/cloudera/impala"><span>Impala</span></a><span> closely since its first version and brings fast interactive queries within your browser. If not familiar with </span><a href="http://blog.cloudera.com/blog/2012/10/cloudera-impala-real-time-queries-in-apache-hadoop-for-real/"><span>Impala</span></a><span>, we recommend you to check the documentation of the fastest </span><a href="http://www.cloudera.com/content/support/en/documentation/cloudera-impala/cloudera-impala-documentation-v1-latest.html"><span>SQL engine</span></a><span> for Hadoop.</span></p>
 
 <h1><span>Impala App</span></h1>
-<p><span>Most of Hive SQL is compatible with Impala and we are going to compare the queries of </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> in both Hive and Impala applications. Notice that this comparison is not 100% scientific but it demonstrates what would happen in common cases.</span></p>
+<p><span>Most of Hive SQL is compatible with Impala and we are going to compare the queries of </span><a href="http://gethue.com/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> in both Hive and Impala applications. Notice that this comparison is not 100% scientific but it demonstrates what would happen in common cases.</span></p>
 <p><br/><span></span></p>
 <p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/90961050" width="900"></iframe></p>
 <p><span>Using Impala through the Hue app is easier in many ways than using it through the command-line impala-shell. For example, table names, databases, columns, built-in functions are auto-completable and the syntax highlighting shows the potential typos in your queries. Multiple queries or a selected portion of a query can be executed from the editor. Parameterized queries are supported and the user will be prompted for values at submission time. Impala queries can be saved and shared between users or deleted and then restored from trash in case of mistakes. </span></p>
 <p><br/><span></span></p>
-<p><span>Impala uses the same Metastore as Hive so you can browse tables with the </span><a href="http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with"><span>Metastore app</span></a><span>. You can also pick a database with a drop-down in the editor. After submission, progress and logs are reported and you can browse the result with infinite scroll or download the data with your browser.</span></p>
+<p><span>Impala uses the same Metastore as Hive so you can browse tables with the </span><a href="http://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with"><span>Metastore app</span></a><span>. You can also pick a database with a drop-down in the editor. After submission, progress and logs are reported and you can browse the result with infinite scroll or download the data with your browser.</span></p>
 
 <h1><span>Query speed comparison </span></h1>
 <p><span>Let’s start with the Hue examples as they are easily accessible. They are very small but show the lightning speed of Impala and the inefficiency of the series of MapReduce jobs created by Hive.</span></p>
 
 <p><span>Make sure the Hive and Impala examples are installed in Hue and then in each app, go to ‘</span><span>Saved Queries</span><span>’, copy the query ‘</span><span>Sample: Top salaries</span><span>’ and submit it.</span></p>
 
-<p><span>Then we are back to our Yelp data. Let’s take the query from </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> and execute it in both apps:</span></p>
+<p><span>Then we are back to our Yelp data. Let’s take the query from </span><a href="http://gethue.com/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> and execute it in both apps:</span></p>
 
 <pre class="code">SELECT r.business_id, name, SUM(cool) AS coolness
 FROM review r JOIN business b
