@@ -327,6 +327,9 @@ def export_documents(request):
   # Add any dependencies to the set of exported documents
   export_doc_set = _get_dependencies(docs)
 
+  # For directories, add any children docs to the set of exported documents
+  export_doc_set.update(_get_dependencies(docs, deps_mode=False))
+
   # Get PKs of documents to export
   doc_ids = [doc.pk for doc in export_doc_set]
 
@@ -424,11 +427,12 @@ def import_documents(request):
     return JsonResponse({'message': stdout.getvalue()})
 
 
-def _get_dependencies(documents):
+def _get_dependencies(documents, deps_mode=True):
   """
   Given a list of Document2 objects, perform a depth-first search and return a set of documents with all
    dependencies included
-  :param doc_set:
+  :param doc_set: set of Document2 objects to include
+  :param deps_mode: traverse dependencies relationship, otherwise traverse children relationship
   """
   doc_set = set()
 
@@ -438,7 +442,10 @@ def _get_dependencies(documents):
       curr_doc = stack.pop()
       if curr_doc not in doc_set:
         doc_set.add(curr_doc)
-        deps_set = set(curr_doc.dependencies.all())
+        if deps_mode:
+          deps_set = set(curr_doc.dependencies.all())
+        else:
+          deps_set = set(curr_doc.children.all())
         stack.extend(deps_set - doc_set)
 
   return doc_set
