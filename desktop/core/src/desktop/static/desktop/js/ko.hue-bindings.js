@@ -3570,12 +3570,6 @@
     }
   };
 
-  ko.bindingHandlers.floatlabel = {
-    init: function (element, valueAccessor, allBindings) {
-      $(element).floatlabel();
-    }
-  };
-
   ko.bindingHandlers.niceScroll = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
