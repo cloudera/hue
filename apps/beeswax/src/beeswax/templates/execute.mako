@@ -836,7 +836,6 @@ ${ commonshare() | n,unicode }
 
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
@@ -1313,8 +1312,6 @@ $(document).ready(function () {
     $("#recentLoader").show();
     $("#recentQueries").hide();
     recentQueries.fnClearTable();
-    var locale = window.navigator.userLanguage || window.navigator.language;
-    moment.locale(locale);
     $.getJSON("${ url(app_name + ':list_query_history') }?format=json&recent=true", function(data) {
       if (data && data.queries) {
         var _rows = [];

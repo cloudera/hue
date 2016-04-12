@@ -89,7 +89,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
         <td data-bind="text: name"></td>
         <td data-bind="text: description"></td>
         <td data-bind="text: owner"></td>
-        <td data-bind="text: last_modified, attr: { 'data-sort-value': last_modified_ts }" data-type="date"></td>
+        <td data-bind="text: localeFormat(last_modified), attr: { 'data-sort-value': last_modified_ts }" data-type="date"></td>
       </tr>
     </tbody>
   </table>
