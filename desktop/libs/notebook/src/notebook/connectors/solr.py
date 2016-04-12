@@ -59,7 +59,9 @@ class SolrApi(Api):
 
     response = api.sql(collection, snippet['statement'])
 
-    info = response['result-set']['docs'].pop(-1) # EOF, RESPONSE_TIME
+    info = response['result-set']['docs'].pop(-1) # EOF, RESPONSE_TIME, EXCEPTION
+    if info.get('EXCEPTION'):
+      raise QueryError(info['EXCEPTION'])
 
     data = [[cell for cell in doc.values()] for doc in response['result-set']['docs']]
     has_result_set = data is not None
