@@ -105,8 +105,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/nv.d3.scatter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.scatterChart.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <!--[if IE 9]>
@@ -536,7 +534,7 @@ ${ hueIcons.symbols() }
               <td style="width: 16%"><a href="javascript: void(0);" data-bind="text: name, click: function() { $root.openNotebook(uuid) }"></a></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
-              <td style="width: 16%"><span data-bind="text: last_modified"></span></td>
+              <td style="width: 16%"><span data-bind="text: localeFormat(last_modified)"></span></td>
             </tr>
             </tbody>
           </table>

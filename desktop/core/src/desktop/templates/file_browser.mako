@@ -602,7 +602,7 @@ from desktop.views import _ko
                   <!-- ko with: definition -->
                   <div class="fb-attr-col fb-type" data-bind="text: type"></div>
                   <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
-                  <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
+                  <div class="fb-attr-col fb-modified" data-bind="text: localeFormat(last_modified)"></div>
                   <!-- /ko -->
                 </div>
               </div>

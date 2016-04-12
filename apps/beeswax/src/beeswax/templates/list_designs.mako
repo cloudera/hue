@@ -144,7 +144,6 @@ ${ layout.menubar(section='saved queries') }
 </div>
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
@@ -155,8 +154,6 @@ ${ layout.menubar(section='saved queries') }
 
     ko.applyBindings(viewModel);
 
-    var locale = window.navigator.userLanguage || window.navigator.language;
-    moment.locale(locale);
     $("[data-sort-value]").each(function(){
       $(this).text(moment($(this).attr("data-sort-value")*1000).format("L LTS"));
     });

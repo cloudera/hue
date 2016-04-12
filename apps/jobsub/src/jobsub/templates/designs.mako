@@ -32,7 +32,6 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.models.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.node-fields.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('jobsub/js/jobsub.templates.js') }" type="text/javascript" charset="utf-8"></script>
