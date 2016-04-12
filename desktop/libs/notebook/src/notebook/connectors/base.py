@@ -109,7 +109,7 @@ def get_api(request, snippet):
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
-    return SolrApi(request.user, interpreter=interpreter)  
+    return SolrApi(request.user, interpreter=interpreter)
   elif interface == 'pig':
     return PigApi(user=request.user, request=request)
   else:
