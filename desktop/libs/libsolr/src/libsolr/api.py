@@ -727,6 +727,21 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+  def sql(self, collection, statement):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('rows', 0),
+          ('stmt', statement),
+          ('rows', 100),
+          ('start', 0),
+      )
+
+      response = self._root.get('%(collection)s/sql' % {'collection': collection}, params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
   def get(self, core, doc_id):
     try:
       params = self._get_params() + (

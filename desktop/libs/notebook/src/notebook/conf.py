@@ -137,6 +137,9 @@ def _default_interpreters():
       ('pig', {
           'name': 'Pig', 'interface': 'pig', 'options': {}
       }),
+      ('solr', {
+          'name': 'Solr', 'interface': 'solr', 'options': {}
+      }),
       ('text', {
           'name': 'Text', 'interface': 'text', 'options': {}
       }),

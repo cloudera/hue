@@ -85,6 +85,7 @@ def get_api(request, snippet):
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
   from notebook.connectors.pig_batch import PigApi
+  from notebook.connectors.solr import SolrApi
   from notebook.connectors.spark_shell import SparkApi
   from notebook.connectors.spark_batch import SparkBatchApi
   from notebook.connectors.text import TextApi
@@ -107,6 +108,8 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
+  elif interface == 'solr':
+    return SolrApi(request.user, interpreter=interpreter)  
   elif interface == 'pig':
     return PigApi(user=request.user, request=request)
   else:
