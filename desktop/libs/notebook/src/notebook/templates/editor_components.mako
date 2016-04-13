@@ -1076,12 +1076,12 @@ ${ hueIcons.symbols() }
         <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(1,progress())) + '%'}"></div>
       </div>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: errors().length > 0">
+    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
       <ul class="unstyled" data-bind="foreach: errors">
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: status() == 'canceled'">
+    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: status() == 'canceled'">
       <ul class="unstyled">
         <li>${ _("The statement was canceled.") }</li>
       </ul>
