@@ -586,29 +586,27 @@ var Assist = function (vm, initial) {
     // load root first
     self.fetchHivePath("", function () {
       Object.keys(self.treeAdditionalData).forEach(function (path) {
-        if (path.indexOf(".") == -1 && path != "") {
-          if (typeof force == "boolean" && force) {
-            self.fetchHivePath(path);
-          }
-          else {
-            if (self.treeAdditionalData[path].loaded) {
-              self.fetchHivePath(path, function () {
-                self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
-                var _withTable = false;
-                Object.keys(self.treeAdditionalData).forEach(function (ipath) {
-                  if (ipath.split(".").length == 2 && ipath.split(".")[0] == path) {
-                    self.fetchHivePath(ipath, function () {
-                      _withTable = true;
-                      self.updatePathProperty(self.growingTree(), ipath, "isExpanded", self.treeAdditionalData[ipath].expanded);
-                      self.loadData(self.growingTree());
-                    });
-                  }
-                });
-                if (! _withTable){
-                  self.loadData(self.growingTree());
+        if (typeof force == "boolean" && force) {
+          self.fetchHivePath(path);
+        }
+        else {
+          if (self.treeAdditionalData[path].loaded) {
+            self.fetchHivePath(path, function () {
+              self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
+              var _withTable = false;
+              Object.keys(self.treeAdditionalData).forEach(function (ipath) {
+                if (ipath.split(".").length == 2 && ipath.split(".")[0] == path) {
+                  self.fetchHivePath(ipath, function () {
+                    _withTable = true;
+                    self.updatePathProperty(self.growingTree(), ipath, "isExpanded", self.treeAdditionalData[ipath].expanded);
+                    self.loadData(self.growingTree());
+                  });
                 }
               });
-            }
+              if (! _withTable){
+                self.loadData(self.growingTree());
+              }
+            });
           }
         }
       });
