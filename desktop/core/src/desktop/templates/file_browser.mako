@@ -581,36 +581,16 @@ from desktop.views import _ko
                   <!-- /ko -->
                   <!-- ko ifnot: isDirectory -->
                   <!-- ko switch: definition().type -->
-                  <!-- ko case: 'query-hive' -->
-                  <use xlink:href="#hi-file-hive"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'query-impala' -->
-                  <use xlink:href="#hi-file-impala"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'link-workflow' -->
-                  <use xlink:href="#hi-file-job-designer"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'notebook' -->
-                  <use xlink:href="#hi-file-notebook"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'oozie-bundle2' -->
-                  <use xlink:href="#hi-file-oozie-bundle"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'oozie-coordinator2' -->
-                  <use xlink:href="#hi-file-oozie-coordinator"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'oozie-workflow2' -->
-                  <use xlink:href="#hi-file-oozie-workflow"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'link-pigscript' -->
-                  <use xlink:href="#hi-file-pig"></use>
-                  <!-- /ko -->
-                  <!-- ko case: 'search-dashboard' -->
-                  <use xlink:href="#hi-file-search"></use>
-                  <!-- /ko -->
-                  <!-- ko case: $default -->
-                  <use xlink:href="#hi-file"></use>
-                  <!-- /ko -->
+                  <!-- ko case: 'link-pigscript' --><use xlink:href="#hi-file-pig"></use><!-- /ko -->
+                  <!-- ko case: 'link-workflow' --><use xlink:href="#hi-file-job-designer"></use><!-- /ko -->
+                  <!-- ko case: 'notebook' --><use xlink:href="#hi-file-notebook"></use><!-- /ko -->
+                  <!-- ko case: 'oozie-bundle2' --><use xlink:href="#hi-file-oozie-bundle"></use><!-- /ko -->
+                  <!-- ko case: 'oozie-coordinator2' --><use xlink:href="#hi-file-oozie-coordinator"></use><!-- /ko -->
+                  <!-- ko case: 'oozie-workflow2' --><use xlink:href="#hi-file-oozie-workflow"></use><!-- /ko -->
+                  <!-- ko case: 'query-hive' --><use xlink:href="#hi-file-hive"></use><!-- /ko -->
+                  <!-- ko case: 'query-impala' --><use xlink:href="#hi-file-impala"></use><!-- /ko -->
+                  <!-- ko case: 'search-dashboard' --><use xlink:href="#hi-file-search"></use><!-- /ko -->
+                  <!-- ko case: $default --><use xlink:href="#hi-file"></use><!-- /ko -->
                   <!-- /ko -->
                   <!-- /ko -->
 
@@ -626,7 +606,23 @@ from desktop.views import _ko
               <div class="fb-attr-group">
                 <div class="pull-right">
                   <!-- ko with: definition -->
-                  <div class="fb-attr-col fb-type" data-bind="text: type"></div>
+                  <div class="fb-attr-col fb-type">
+                    <!-- ko switch: type -->
+                    <!-- ko case: 'directory' -->${ _('Directory')}<!-- /ko -->
+                    <!-- ko case: 'link-pigscript' -->${ _('Pig Script')}<!-- /ko -->
+                    <!-- ko case: 'link-workflow' -->${ _('Job Design')}<!-- /ko -->
+                    <!-- ko case: 'notebook' -->${ _('Notebook')}<!-- /ko -->
+                    <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle')}<!-- /ko -->
+                    <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator')}<!-- /ko -->
+                    <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow')}<!-- /ko -->
+                    <!-- ko case: 'query-hive' -->${ _('Hive Query')}<!-- /ko -->
+                    <!-- ko case: 'query-impala' -->${ _('Impala Query')}<!-- /ko -->
+                    <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard')}<!-- /ko -->
+                    <!-- ko case: $default -->
+                    <!-- ko text: $value --><!-- /ko -->
+                    <!-- /ko -->
+                    <!-- /ko -->
+                  </div>
                   <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                   <div class="fb-attr-col fb-modified" data-bind="text: localeFormat(last_modified)"></div>
                   <!-- /ko -->
