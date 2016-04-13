@@ -405,7 +405,7 @@
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               }
               if (LeafletGlobals) {
-                tileLayerOptions = LeafletGlobals
+                tileLayerOptions = LeafletGlobals;
               }
               L.tileLayer(tileLayerOptions.layer, {
                 attribution: $(element).width() > 300 ? tileLayerOptions.attribution : ''
@@ -485,14 +485,16 @@
               }
             });
 
-            _map.addLayer(_clusterGroup);
-            if (! $("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
-              _map.fitBounds(_clusterGroup.getBounds());
-            }
+            window.setTimeout(function(){
+              _map.addLayer(_clusterGroup);
+              if (! $("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
+                _map.fitBounds(_clusterGroup.getBounds());
+              }
+              if (_options.onComplete != null) {
+                _options.onComplete();
+              }
+            }, 0);
 
-            if (_options.onComplete != null) {
-              _options.onComplete();
-            }
           }
           catch (err) {
             $.jHueNotify.error(err.message);
