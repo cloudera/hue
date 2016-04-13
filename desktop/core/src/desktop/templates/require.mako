@@ -40,6 +40,7 @@ DEBUG = DJANGO_DEBUG_MODE.get()
         "knockout-mapping" : "desktop/ext/js/knockout-mapping.min",
         "knockout-sortable" : "desktop/ext/js/knockout-sortable.min",
         "ko.editable" : "desktop/js/ko.editable",
+        "ko.switch-case" : "desktop/js/ko.switch-case",
         "ko.hue-bindings" : "desktop/js/ko.hue-bindings"
       },
       shim: {
@@ -47,6 +48,7 @@ DEBUG = DJANGO_DEBUG_MODE.get()
         "knockout-mapping": { deps: ["knockout"] },
         "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
         "ko.editable": { deps: ["knockout"] },
+        "ko.switch-case": { deps: ["knockout"] },
         "ace.extended": { deps: ["ace"] },
         "ace.ext-language-tools": { deps: ["ace"] }
       },
