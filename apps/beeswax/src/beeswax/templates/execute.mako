@@ -18,6 +18,7 @@
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from django.utils.translation import ugettext as _
+  from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
@@ -358,7 +359,9 @@ ${ layout.menubar(section='query') }
         <ul class="nav nav-tabs">
           <li class="active recentLi"><a href="#recentTab" data-toggle="tab">${_('Recent queries')}</a></li>
           <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+          %if ENABLE_QUERY_BUILDER.get():
           <li><a href="#queryBuilderTab" data-toggle="tab">${_('Query builder')}</a></li>
+          %endif
           <!-- ko if: !design.explain() -->
           <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
           <!-- /ko -->
@@ -395,25 +398,24 @@ ${ layout.menubar(section='query') }
             <pre data-bind="visible: viewModel.design.statement() == ''">${_('There is currently no query to visualize.')}</pre>
             <pre data-bind="visible: viewModel.design.statement() != '', text: viewModel.design.statement()"></pre>
           </div>
-
+          %if ENABLE_QUERY_BUILDER.get():
           <div class="tab-pane" id="queryBuilderTab">
-            <form onsubmit="generateQuery(); return false;">
-              <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
-              <table id="queryBuilder" class="table table-condensed">
-                <thead>
-                  <tr>
-                    <th width="10%">${ _('Table') }</th>
-                    <th>${ _('Column') }</th>
-                    <th width="10%">${ _('Operation') }</th>
-                    <th width="1%">&nbsp;</th>
-                  </tr>
-                </thead>
-              </table>
-              <div class="button-panel">
-                <button class="btn btn-primary disable-feedback">${_('Build query')}</button>
-              </div>
-            </form>
+            <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
+            <table id="queryBuilder" class="table table-condensed">
+              <thead>
+                <tr>
+                  <th width="10%">${ _('Table') }</th>
+                  <th>${ _('Column') }</th>
+                  <th width="10%">${ _('Operation') }</th>
+                  <th width="1%">&nbsp;</th>
+                </tr>
+              </thead>
+            </table>
+            <div class="button-panel">
+              <button class="btn btn-primary disable-feedback" onclick="generateQuery()">${_('Build query')}</button>
+            </div>
           </div>
+          %endif
 
           <!-- ko if: design.explain() -->
           <div class="tab-pane" id="explanation">
@@ -774,6 +776,7 @@ ${ layout.menubar(section='query') }
   </div>
 </div>
 
+%if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -786,6 +789,7 @@ ${ layout.menubar(section='query') }
     <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
+%endif
 
 ${ commonshare() | n,unicode }
 
@@ -809,7 +813,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
-
+%if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/queryBuilder.css') }">
@@ -827,7 +831,8 @@ ${ commonshare() | n,unicode }
     if (result.status == "fail") {
       $("#invalidQueryBuilder").modal("show");
     } else {
-      replaceAce(result.query);
+      codeMirror.setValue(result.query);
+      codeMirror.focus();
     }
   }
 
@@ -847,6 +852,7 @@ ${ commonshare() | n,unicode }
 </script>
 
 <!-- End query builder imports -->
+%endif
 
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
