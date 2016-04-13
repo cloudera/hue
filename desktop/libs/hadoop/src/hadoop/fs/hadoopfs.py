@@ -44,6 +44,7 @@ from hadoop.api.common.ttypes import RequestContext, IOException
 import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
+from useradmin.conf import HOME_DIR_PERMISSIONS
 
 
 LOG = logging.getLogger(__name__)
@@ -220,23 +221,39 @@ class Hdfs(object):
     path = url[i:]
     return (schema, netloc, normpath(path), '', '')
 
-  def exists(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+  def listdir_recursive(self, path, glob=None):
+    """
+    listdir_recursive(path, glob=None) -> [ entry names ]
 
-  def do_as_user(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'do_as_user'})
+    Get directory entry names without stats, recursively.
+    """
+    paths = [path]
+    while paths:
+      path = paths.pop()
+      if self.isdir(path):
+        hdfs_paths = self.listdir_stats(path, glob)
+        paths[:0] = [x.path for x in hdfs_paths]
+      yield path
 
-  def create(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+  def create_home_dir(self, home_path=None):
+    if home_path is None:
+      home_path = self.get_home_dir()
 
-  def append(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'append'})
-
-  def mkdir(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'mkdir'})
-
-  def isdir(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
+    mode = int(HOME_DIR_PERMISSIONS.get(), 8)
+    if not self.exists(home_path):
+      user = self.user
+      try:
+        try:
+          self.setuser(self.superuser)
+          self.mkdir(home_path)
+          self.chmod(home_path, mode)
+          self.chown(home_path, user, user)
+        except IOError:
+          msg = 'Failed to create home dir ("%s") as superuser %s' % (home_path, self.superuser)
+          LOG.exception(msg)
+          raise
+      finally:
+        self.setuser(user)
 
   def copyFromLocal(self, local_src, remote_dst, mode=0755):
     remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst
@@ -266,7 +283,7 @@ class Hdfs(object):
         LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
         return
       else:
-        LOG.info(_('%(remote_dst)s does not exist. Trying to copy') % {'remote_dst': remote_dst})
+        LOG.info(_('%(remote_dst)s does not exist. Trying to copy.') % {'remote_dst': remote_dst})
 
       src = file(local_src)
       try:
@@ -276,14 +293,68 @@ class Hdfs(object):
           while chunk:
             self.append(remote_dst, chunk)
             chunk = src.read(chunk_size)
-          LOG.info(_('Copied %s -> %s') % (local_src, remote_dst))
+          LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
         except:
-          LOG.error(_('Copying %s -> %s failed') % (local_src, remote_dst))
+          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
         src.close()
     else:
-      LOG.info(_('Skipping %s (not a file)') % local_src)
+      LOG.info(_('Skipping %s (not a file).') % local_src)
+
+
+  @_coerce_exceptions
+  def mktemp(self, subdir='', prefix='tmp', basedir=None):
+    """
+    mktemp(prefix) ->  <temp_dir or basedir>/<subdir>/prefix.<rand>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(basedir or self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    while True:
+      name = prefix + '.' + str(random.getrandbits(RANDOM_BITS))
+      candidate = self.join(base, name)
+      if not self.exists(candidate):
+        return candidate
+
+  def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
+    """
+    mkswap(filename, suffix) ->  <temp_dir or basedir>/<subdir>/filename.<suffix>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(basedir or self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    candidate = self.join(base, "%s.%s" % (filename, suffix))
+    return candidate
+
+  def exists(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+
+  def do_as_user(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'do_as_user'})
+
+  def create(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+
+  def append(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'append'})
+
+  def mkdir(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'mkdir'})
+
+  def isdir(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
+
+  def listdir_stats(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'listdir_stats'})
 
 
 """
@@ -527,24 +598,6 @@ class HadoopFileSystem(Hdfs):
   def chown(self, path, user, group):
     path = encode_fs_path(path)
     self.nn_client.chown(self.request_context, normpath(path), user, group)
-
-  @_coerce_exceptions
-  def mktemp(self, subdir='', prefix='tmp'):
-    """
-    mktemp(prefix) ->  <temp_dir>/subdir/prefix.<rand>
-    Return a unique temporary filename with prefix in the cluster's temp dir.
-    """
-    RANDOM_BITS = 64
-
-    base = self.join(self._temp_dir, subdir)
-    if not self.isdir(base):
-      self.mkdir(base)
-
-    while True:
-      name = prefix + '.' + str(random.getrandbits(RANDOM_BITS))
-      candidate = self.join(base, name)
-      if not self.exists(candidate):
-        return candidate
 
   @_coerce_exceptions
   def get_namenode_info(self):

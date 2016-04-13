@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Impala Query UI</title>
+</head>
+<body id="topic_5"><a name="topic_5"><!-- --></a>
+
+
+
+  <h1 class="title topictitle1">Impala Query UI </h1>
+
+
+  <div class="body conbody">
+
+    <p class="p"> The Impala Query UI application enables you to perform queries
+      on Apache Hadoop data stored in HDFS or HBase using Impala. For information about
+      Impala, see <a class="xref" href="http://impala.io" target="_blank">Installing and
+        Using Impala</a>. You can create, run, and manage queries, and download the
+      results in a Microsoft Office Excel worksheet file or a comma-separated values file. </p>
+  </div>
+
+<span>Hue, </span><a href="http://gethue.com"><span>the Hadoop UI</span></a><span>, has been supporting </span><a href="https://github.com/cloudera/impala"><span>Impala</span></a><span> closely since its first version and brings fast interactive queries within your browser. If not familiar with </span><a href="http://blog.cloudera.com/blog/2012/10/cloudera-impala-real-time-queries-in-apache-hadoop-for-real/"><span>Impala</span></a><span>, we recommend you to check the documentation of the fastest </span><a href="http://www.cloudera.com/content/support/en/documentation/cloudera-impala/cloudera-impala-documentation-v1-latest.html"><span>SQL engine</span></a><span> for Hadoop.</span></p>
+
+<h1><span>Impala App</span></h1>
+<p><span>Most of Hive SQL is compatible with Impala and we are going to compare the queries of </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> in both Hive and Impala applications. Notice that this comparison is not 100% scientific but it demonstrates what would happen in common cases.</span></p>
+<p><br/><span></span></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/90961050" width="900"></iframe></p>
+<p><span>Using Impala through the Hue app is easier in many ways than using it through the command-line impala-shell. For example, table names, databases, columns, built-in functions are auto-completable and the syntax highlighting shows the potential typos in your queries. Multiple queries or a selected portion of a query can be executed from the editor. Parameterized queries are supported and the user will be prompted for values at submission time. Impala queries can be saved and shared between users or deleted and then restored from trash in case of mistakes. </span></p>
+<p><br/><span></span></p>
+<p><span>Impala uses the same Metastore as Hive so you can browse tables with the </span><a href="http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with"><span>Metastore app</span></a><span>. You can also pick a database with a drop-down in the editor. After submission, progress and logs are reported and you can browse the result with infinite scroll or download the data with your browser.</span></p>
+
+<h1><span>Query speed comparison </span></h1>
+<p><span>Let’s start with the Hue examples as they are easily accessible. They are very small but show the lightning speed of Impala and the inefficiency of the series of MapReduce jobs created by Hive.</span></p>
+
+<p><span>Make sure the Hive and Impala examples are installed in Hue and then in each app, go to ‘</span><span>Saved Queries</span><span>’, copy the query ‘</span><span>Sample: Top salaries</span><span>’ and submit it.</span></p>
+
+<p><span>Then we are back to our Yelp data. Let’s take the query from </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> and execute it in both apps:</span></p>
+
+<pre class="code">SELECT r.business_id, name, SUM(cool) AS coolness
+FROM review r JOIN business b
+ON (r.business_id = b.business_id)
+WHERE categories LIKE '%Restaurants%'
+AND `date` = '$date'
+GROUP BY r.business_id, name
+ORDER BY coolness DESC
+LIMIT 10
+</pre>
+<p><span> </span></p>
+<p><span>Again, you can see the benefits of Impala’s </span><a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html"><span>architecture and optimization</span></a><span>.</span></p>
+<p><span> </span></p>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_5_1"><a name="topic_5_1"><!-- --></a>
+
+    <h2 class="title topictitle2">Impala Query UI and Installation and Configuration
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p"> The Impala Query UI application is one of the applications
+        installed as part of Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span></p>
+
+
+      <p class="p"> The Impala Query UI assumes an existing Impala
+        installation. The Hue installation instructions include the configuration necessary for
+        Impala. You can view the current configuration from the <strong class="ph b">Settings</strong> tab. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_5_2"><a name="topic_5_2"><!-- --></a>
+
+    <h2 class="title topictitle2">Starting Impala Query UI
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">Impala Query UI</strong>
+        icon (<img class="image" src="/static/impala/art/icon_impala_24.png"/>) in the navigation bar at the top of the Hue browser page. </p>
+
+
+    </div>
+
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_kv5_j13_dk"><a name="concept_kv5_j13_dk"><!-- --></a>
+    <h2 class="title topictitle2">Managing Databases, Tables, and Partitions</h2>
+
+    <div class="body conbody">
+      <p class="p">You can create databases, tables, partitions, and load data by executing
+          <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/hive/language_manual/data-manipulation-statements.html" target="_blank">Hive data manipulation
+          statements</a> in the Beeswax application.</p>
+
+      <p class="p">You can also use the <a class="xref" href="metastoremanager.html#xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9b">Metastore Manager</a> application to manage the
+        databases, tables, and partitions and load data.</p>
+
+      <p class="p"> When you change the metastore using one of these applications, you must click the
+          <span class="ph uicontrol">Refresh</span> button under METASTORE CATALOG in the pane to the left of
+        the Query Editor to make the metastore update visible to the Impala server. </p>
+
+    </div>
+
+  </div>
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_2_1"><a name="topic_4_2_1"><!-- --></a>
+    <h2 class="title topictitle2">Installing Example Queries and
+      Tables</h2>
+
+    <div class="body conbody">
+      <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> You must be a superuser to perform this task.</div>
+
+      <a name="topic_4_2_1__ol_kss_btp_wj"><!-- --></a><ol class="ol" id="topic_4_2_1__ol_kss_btp_wj">
+        <li class="li">Click <a name="topic_4_2_1__d104e102"><!-- --></a><img class="image" id="topic_4_2_1__d104e102" src="/static/desktop/art/hue-logo-mini.png"/>. The Quick Start Wizard opens.</li>
+<li class="li">Click <strong class="ph b">Step 2:
+            Examples</strong>.</li>
+
+        <li class="li">Click <strong class="ph b">Impala Query
+          UI</strong>.</li>
+
+      </ol>
+
+    </div>
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_5_3"><a name="topic_5_3"><!-- --></a>
+
+    <h2 class="title topictitle2">Queries </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p"> The Query Editor view lets you create queries in the Impala
+        Query Language, which is based on the Hive Standard Query Language (HiveQL) and described in
+        the Impala Language Reference topic in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/Installing-and-Using-Impala.html" target="_blank">Installing and
+          Using Impala</a>. </p>
+
+      <p class="p">You can name and save your queries to use later. </p>
+
+      <p class="p">When you submit a query, you can either wait for the query to complete,
+        or return later to find the queries in the <strong class="ph b">History</strong> view. </p>
+
+      <p class="p">In the box to the left of the Query field, you can select a database,
+        override the default Impala settings, enable users to enter parameters at run-time.
+        See <a class="xref" href="#topic_5_3_2">Advanced Query Settings</a> for details on using these settings. </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_5_3_1"><a name="topic_5_3_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating Queries </h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+          <li class="li">In the Query Editor window, type a query or
+            multiple queries separated by a semicolon ";".  To be presented with a drop-down of
+            autocomplete options, type <span class="ph uicontrol">CTRL+spacebar</span> when entering a query.  </li>
+
+          <li class="li">To save your query and advanced settings to use
+            again later, click <strong class="ph b">Save As</strong>, enter a name and
+            description, and then click <strong class="ph b">OK</strong>. To save changes to an
+            existing query, click <strong class="ph b">Save.</strong>
+          </li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" id="id_esc_5sb_zj"><a name="id_esc_5sb_zj"><!-- --></a>
+      <h3 class="title topictitle3">Loading Queries into the Query Editor</h3>
+
+      <div class="body conbody">
+        <a name="id_esc_5sb_zj__d104e186"><!-- --></a><ol class="ol" id="id_esc_5sb_zj__d104e186">
+          <li class="li">Do one of the following:<a name="id_esc_5sb_zj__d104e190"><!-- --></a><ul class="ul" id="id_esc_5sb_zj__d104e190">
+              <li class="li">Click the <span class="ph uicontrol">My Queries</span>  tab.<a name="id_esc_5sb_zj__d104e197"><!-- --></a><ol class="ol" type="a" id="id_esc_5sb_zj__d104e197">
+                  <li class="li">Click the <span class="ph uicontrol">Recent Saved Queries</span> or <span class="ph uicontrol">Recent Run
+                      Queries</span> tab to display the respective queries. </li>
+
+                </ol>
+</li>
+
+              <li class="li">Click the <span class="ph uicontrol">Saved Queries</span> tab.</li>
+
+            </ul>
+</li>
+
+          <li class="li">Click a query name. The query is loaded into the Query Editor.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_pcv_fpb_zj"><a name="concept_pcv_fpb_zj"><!-- --></a>
+      <h3 class="title topictitle3">Running Queries</h3>
+
+      <div class="body conbody">
+        <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> To run a query, you must be logged in to
+          Hue as a user that also has a Unix user account on the remote server. </div>
+
+        <a name="concept_pcv_fpb_zj__ol_ofq_xpb_zj"><!-- --></a><ol class="ol" id="concept_pcv_fpb_zj__ol_ofq_xpb_zj">
+          <li class="li">To execute a portion of the query, highlight one or more query
+            statements.</li>
+
+          <li class="li">Click <strong class="ph b">Execute</strong>. The Query Results
+            window appears with the results of your query. <a name="concept_pcv_fpb_zj__d104e242"><!-- --></a><ul class="ul" id="concept_pcv_fpb_zj__d104e242">
+              <li class="li">To view a log of the query execution, click <strong class="ph b">Log</strong> at the top of the results display. You can use
+                the information in this tab to debug your query.</li>
+
+              <li class="li">To view the query that generated these results, click <strong class="ph b">Query</strong> at the top of the results display.</li>
+
+              <li class="li">To view the columns of the query, click <strong class="ph b">Columns</strong>.</li>
+
+              <li class="li">To return to the query in the Query Editor, click <strong class="ph b">Unsaved Query</strong>.</li>
+
+            </ul>
+</li>
+
+          <li class="li">If there are multiple statements in the query, click <span class="ph uicontrol">Next</span> in
+            the Multi-statement query pane to execute the remaining statements.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_5_3_2"><a name="topic_5_3_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Advanced Query Settings
+      </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">
+          The pane to the left of the Query Editor lets you specify the following options:
+        </p>
+
+
+        
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d7221e304">
+                  <p class="p">
+                    <strong class="ph b">Option</strong>
+                  </p>
+
+                </th>
+
+                <th class="entry" valign="top" width="75%" id="d7221e313">
+                  <p class="p">
+                    <strong class="ph b">Description</strong>
+                  </p>
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e304 ">
+                  <p class="p"><strong class="ph b">DATABASE</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e313 ">
+                  <p class="p">The database containing the table definitions. </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e304 ">
+                  <p class="p"><strong class="ph b">SETTINGS</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e313 ">
+                  <div class="p">Override Impala default settings. To configure a
+                    new setting: <a name="topic_5_3_2__ol_k5v_hcc_zj"><!-- --></a><ol class="ol" id="topic_5_3_2__ol_k5v_hcc_zj">
+                      <li class="li">Click <strong class="ph b">Add</strong>.</li>
+
+                      <li class="li">For <strong class="ph b">Key</strong>, enter a Impala
+                        configuration variable name. </li>
+
+                      <li class="li">For <strong class="ph b">Value</strong>, enter the value you want to
+                        use for the variable. </li>
+
+                    </ol>
+</div>
+
+                  <p class="p">To view the default settings, click the <strong class="ph b">Settings</strong> tab at the top of the page. </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e304 ">
+                  <p class="p"><strong class="ph b">PARAMETERIZATION</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e313 ">
+                  <p class="p">Indicate that a dialog box should display to enter parameter
+                    values when a query containing the string $<var class="keyword varname">parametername</var> is
+                    executed. Enabled by default. </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e304 ">
+                  <p class="p"><strong class="ph b">METASTORE CATALOG</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e313 ">
+                  <p class="p">Refresh metadata. It is best to  refresh  metadata after making changes to
+                    databases such as adding or dropping a table.  </p>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="id_bqm_lxh_dk"><a name="id_bqm_lxh_dk"><!-- --></a>
+
+      <h3 class="title topictitle3">Viewing Query History </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can view the history of queries that you have run previously.
+          Results for these queries are available for one week or until Hue is restarted. </p>
+
+
+        <ol class="ol">
+
+          <li class="li">Click <strong class="ph b">History</strong>. A list of your
+            saved and unsaved queries displays in the Query History window.</li>
+
+
+          <li class="li">To display the queries for all users, click <strong class="ph b">Show everyone's queries</strong>.
+						To display your queries only, click <strong class="ph b">Show my queries</strong>.</li>
+
+
+          <li class="li">To display the automatically generated actions performed on a
+            user's behalf, click <strong class="ph b">Show auto actions</strong>. To display
+            user queries again, click <strong class="ph b">Show user queries</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="id_qcp_cxk_xj"><a name="id_qcp_cxk_xj"><!-- --></a>
+
+      <h3 class="title topictitle3">Viewing, Editing, Copying, and Deleting
+        Saved Queries </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can view a list of saved queries of all users by clicking <strong class="ph b">My
+            Queries</strong> and then selecting either  <span class="ph uicontrol">Recent Saved Queries</span> or
+            <span class="ph uicontrol">Recent Run Queries</span> tab to display the respective queries or
+          clicking <strong class="ph b">Saved Queries</strong>. You can copy any query, but you
+          can edit, delete, and view the history of only your own queries. </p>
+
+        
+<div class="tablenoborder"><a name="id_qcp_cxk_xj__d104e691"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="id_qcp_cxk_xj__d104e691" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d7221e501">Saved Query</th>
+
+                <th class="entry" valign="top" width="75%" id="d7221e504">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e501 ">
+                  <p class="p">
+                    <strong class="ph b">Edit</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e504 ">
+                  <div class="p">
+                    <a name="id_qcp_cxk_xj__d104e728"><!-- --></a><ol class="ol" id="id_qcp_cxk_xj__d104e728">
+                      <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                        The Queries window displays.</li>
+
+                      <li class="li">Check the checkbox next to the query and click <strong class="ph b">Edit</strong>. The query displays in the Query
+                        Editor window.</li>
+
+                      <li class="li">Change the query and then click <strong class="ph b">Save.</strong> You can also click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save a copy of the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e501 ">
+                  <p class="p">
+                    <strong class="ph b">Copy</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e504 ">
+                  <div class="p">
+                    <a name="id_qcp_cxk_xj__d104e773"><!-- --></a><ol class="ol" id="id_qcp_cxk_xj__d104e773">
+                      <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                        The Queries window displays.</li>
+
+                      <li class="li">Check the checkbox next to the query and click <strong class="ph b">Copy</strong>. The query displays in the Query
+                        Editor window.</li>
+
+                      <li class="li">Change the query as necessary and then click <strong class="ph b">Save.</strong> You can also click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save a copy of the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e501 ">
+                  <p class="p">
+                    <strong class="ph b">Copy in Query History</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e504 ">
+                  <div class="p">
+                    <a name="id_qcp_cxk_xj__d104e818"><!-- --></a><ol class="ol" id="id_qcp_cxk_xj__d104e818">
+                      <li class="li">Click <strong class="ph b">History</strong>. The
+                        Query History window displays.</li>
+
+                      <li class="li">To display the queries for all users, click <strong class="ph b">Show everyone's queries</strong>. The queries for
+                        all users display in the History window.</li>
+
+                      <li class="li">Click the query you want to copy. A copy of the query
+                        displays in the Query Editor window.</li>
+
+                      <li class="li">Change the query, if necessary, and then click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d7221e501 ">
+                  <p class="p">
+                    <strong class="ph b">Delete</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d7221e504 ">
+                  <a name="id_qcp_cxk_xj__d104e861"><!-- --></a><ol class="ol" id="id_qcp_cxk_xj__d104e861">
+                    <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                      The Queries window displays.</li>
+
+                    <li class="li">Check the checkbox next to the query and click <strong class="ph b">Delete</strong>.</li>
+
+                    <li class="li">Click <strong class="ph b">Yes</strong> to confirm
+                      the deletion.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+<workflow-app name="test-workflow">
+    <start to="done"/>
+    <end name="done"/>
+</workflow-app>

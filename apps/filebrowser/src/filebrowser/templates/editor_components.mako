@@ -125,7 +125,7 @@
         <option>${choice}</option>
       % endif
     % endfor
-    % if is_superuser:
+    % if is_fs_superuser:
       % if seen or not current_value:
         <option value="__other__">Other</option>
       % else:
@@ -134,7 +134,7 @@
     % endif
 
     </select>
-    % if is_superuser:
+    % if is_fs_superuser:
       % if seen or not current_value:
         <input name="${other_key}" class="hide">
       % else:

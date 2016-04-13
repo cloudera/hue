@@ -1,0 +1,1424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Oozie Editor and Dashboard</title>
+</head>
+<body id="topic_9"><a name="topic_9"><!-- --></a>
+
+
+
+  <h1 class="title topictitle1">Oozie Editor and Dashboard </h1>
+
+
+  <div class="body conbody">
+
+    <p class="p">The Oozie Editor/Dashboard application allows you to define Oozie
+      workflow, coordinator, and bundle applications, run workflow, coordinator, and bundle jobs,
+      and view the status of jobs. For information about Oozie, see <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/" target="_blank">Oozie Documentation</a>. </p>
+
+                    <p id="docs-internal-guid--8202e43-0da7-b45c-578a-06e670bbcee9"><span>In the </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>previous</span></a><span> episode, we saw how to to transfer some file data into Apache Hadoop. In order to interrogate easily the data, the next step is to create some Hive tables. This will enable quick interaction with high level languages like SQL and </span><a href="http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3"><span>Pig</span></a><span>.</span></p>
+<p><span> </span></p>
+<p><span>We experiment with the SQL queries, then parameterize them and insert them into a workflow in order to run them together in parallel. Including Hive queries in an Oozie workflow is a pretty common use case with recurrent pitfalls as seen on the user group. We can do it with </span><a href="http://gethue.com">Hue</a><span> in a few clicks.</span></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/74215175" width="900"></iframe></p>
+</p>
+
+    <div class="p">A <dfn class="term">workflow application</dfn> is a collection of actions arranged in
+      a directed acyclic graph (DAG). It includes two types of nodes:<a name="topic_9__ul_fyv_mnr_2k"><!-- --></a><ul class="ul" id="topic_9__ul_fyv_mnr_2k">
+        <li class="li">Control flow - start, end, fork, join, decision, and kill</li>
+
+        <li class="li">Action - <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_lvq_ch3_zj">MapReduce</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_zrd_gh3_zj">Streaming</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_abl_hh3_zj">Java</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_tvm_3h3_zj">Pig</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_lxq_3h3_zj">Hive</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_xb5_3h3_zj">Sqoop</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_xvw_3h3_zj">Shell</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_tnz_3h3_zj">Ssh</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_qsc_jh3_zj">DistCp</a>, <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_hx4_lh3_zj">Fs</a>, and <a class="xref" href="jobsub#concept_gt5_bh3_zj__section_qjt_lh3_zj">Email</a>) <p class="p">In order to run DistCp, Streaming, Pig, Sqoop, and Hive
+      jobs, Oozie must be configured to use the Oozie ShareLib. See Oozie Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>. </p>
+</li>
+
+      </ul>
+</div>
+
+
+    <p class="p">A <dfn class="term">coordinator application</dfn> allows you to define and execute
+      recurrent and interdependent workflow jobs. The coordinator application defines the conditions
+      under which the execution of workflows can occur. </p>
+
+    <p class="p">A <dfn class="term">bundle application</dfn> allows you to batch a set of
+      coordinator applications. </p>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_1"><a name="topic_9_1"><!-- --></a>
+
+    <h2 class="title topictitle2">Oozie Editor/Dashboard Installation and
+      Configuration </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Oozie Editor/Dashboard is one of the applications installed as part of
+        Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span></p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_2"><a name="topic_9_2"><!-- --></a>
+
+    <h2 class="title topictitle2">Starting Oozie Editor/Dashboard </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">Oozie Editor</strong> icon
+          (<img class="image" src="/static/oozie/art/icon_oozie_editor_24.png"/>) <strong class="ph b">Oozie Dashboard</strong> icon
+          (<img class="image" src="/static/oozie/art/icon_oozie_dashboard_24.png"/>) in the navigation bar at the top of the Hue browser page. <strong class="ph b">Oozie Editor/Dashboard</strong> opens with the following screens: </p>
+
+
+      <ul class="ul">
+        <li class="li"><a class="xref" href="#topic_9_6">Dashboard</a> - shows
+          the running and completed workflow, coordinator, and bundle jobs and information about
+          Oozie instrumentation and configuration. The screen is selected and opened to the
+          Workflows page.</li>
+
+        <li class="li"><a class="xref" href="#topic_9_7">Workflow Manager</a> - shows
+          available workflows and allows you to create and import workflows.</li>
+
+        <li class="li"><a class="xref" href="#topic_9_8">Coordinator Manager</a> - shows
+          available coordinators and allows you to create coordinators.</li>
+
+        <li class="li"><a class="xref" href="#concept_crd_ttp_wj">Bundle Manager</a> - shows available bundles and allows you to create bundles.</li>
+
+      </ul>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_3"><a name="topic_9_3"><!-- --></a>
+
+    <h2 class="title topictitle2">Installing Oozie Editor/Dashboard
+      Examples </h2>
+
+
+    <div class="body conbody">
+      <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> You must be a superuser to perform this task.</div>
+
+
+      <a name="topic_9_3__ol_ugf_hjt_yj"><!-- --></a><ol class="ol" id="topic_9_3__ol_ugf_hjt_yj">
+        <li class="li">Click <a name="topic_9_3__d104e102"><!-- --></a><img class="image" id="topic_9_3__d104e102" src="/static/desktop/art/hue-logo-mini.png"/>. The Quick Start Wizard opens.</li>
+<li class="li">Click <strong class="ph b">Step 2:
+            Examples</strong>.</li>
+
+        <li class="li">Click <strong class="ph b">Oozie Editor/Dashboard</strong>.</li>
+
+      </ol>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_4"><a name="topic_9_4"><!-- --></a>
+
+    <h2 class="title topictitle2">Filtering Lists in Oozie Editor/Dashboard </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Many screens contain lists. When you type in the Filter field on
+        screens, the lists are dynamically filtered to display only those rows containing text that
+        matches the specified substring. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_5"><a name="topic_9_5"><!-- --></a>
+
+    <h2 class="title topictitle2">Permissions in Oozie Editor/Dashboard
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">In the Dashboard workflows, coordinators, and bundles can only be
+        viewed, submitted, and modified by their owner or a superuser. </p>
+
+
+      <p class="p">Editor permissions for performing actions on workflows, coordinators,
+        and bundles are summarized in the following table: </p>
+
+
+      
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
+          
+          
+          
+          <thead class="thead" align="left">
+            <tr class="row">
+              <th class="entry" valign="top" width="33.33333333333333%" id="d15249e233">
+        <p class="p">       <strong class="ph b">Action</strong>
+                </p>
+
+              </th>
+
+              <th class="entry" valign="top" width="33.33333333333333%" id="d15249e242">
+        <p class="p">       <strong class="ph b">Superuser or Owner</strong>
+                </p>
+
+              </th>
+
+              <th class="entry" valign="top" width="33.33333333333333%" id="d15249e251">
+        <p class="p">       <strong class="ph b">All</strong>
+                </p>
+
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody class="tbody">
+            <tr class="row">
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e233 ">
+                <p class="p">View </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e242 ">
+                <p class="p">Y </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e251 ">
+                <p class="p">Only if "Is shared" is set </p>
+
+              </td>
+
+            </tr>
+
+            <tr class="row">
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e233 ">
+                <p class="p">Submit </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e242 ">
+                <p class="p">Y </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e251 ">
+                <p class="p">Only if "Is shared" is set </p>
+
+              </td>
+
+            </tr>
+
+            <tr class="row">
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e233 ">
+                <p class="p">Modify </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e242 ">
+                <p class="p">Y </p>
+
+              </td>
+
+              <td class="entry" valign="top" width="33.33333333333333%" headers="d15249e251 ">
+                <p class="p">N </p>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+</div>
+
+
+    </div>
+
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_ms2_rzj_2k"><a name="concept_ms2_rzj_2k"><!-- --></a>
+    <h2 class="title topictitle2">Deleting and Restoring Workflows, Coordinators, and Bundles</h2>
+
+    <div class="body conbody">
+      <p class="p">You can move workflows, coordinators, and bundles to the trash and later restore or
+        permanently delete them.</p>
+
+      <div class="section" id="concept_ms2_rzj_2k__section_bvz_wzj_2k"><a name="concept_ms2_rzj_2k__section_bvz_wzj_2k"><!-- --></a><h3 class="title sectiontitle">Deleting Workflows, Coordinators, and Bundles</h3>
+        
+        <a name="concept_ms2_rzj_2k__ol_wkz_yzj_2k"><!-- --></a><ol class="ol" id="concept_ms2_rzj_2k__ol_wkz_yzj_2k">
+          <li class="li">In a Manager screen, check the checkbox next to one or more workflows, coordinators or
+            bundles.</li>
+
+          <li class="li" id="concept_ms2_rzj_2k__li_dty_3gr_2k"><a name="concept_ms2_rzj_2k__li_dty_3gr_2k"><!-- --></a>Choose one of the following:<ul class="ul">
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Move to trash</span></span></li>
+
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Delete forever</span></span></li>
+
+            </ul>
+</li>
+
+        </ol>
+
+      </div>
+
+      <div class="section" id="concept_ms2_rzj_2k__section_ecf_xzj_2k"><a name="concept_ms2_rzj_2k__section_ecf_xzj_2k"><!-- --></a><h3 class="title sectiontitle">Restoring Workflows, Coordinators, and Bundles</h3>
+        
+        <a name="concept_ms2_rzj_2k__ol_ujf_dbk_2k"><!-- --></a><ol class="ol" id="concept_ms2_rzj_2k__ol_ujf_dbk_2k">
+          <li class="li" id="concept_ms2_rzj_2k__li_msc_mgr_2k"><a name="concept_ms2_rzj_2k__li_msc_mgr_2k"><!-- --></a>In a Manager screen, click <a name="concept_ms2_rzj_2k__image_e35_2bk_2k"><!-- --></a><img class="image" id="concept_ms2_rzj_2k__image_e35_2bk_2k" src="/static/desktop/art/help/trash.png"/>
+            <strong class="ph b">Trash</strong>.</li>
+
+          <li class="li">Check the checkbox next to one or more workflows, coordinators or bundles.</li>
+
+          <li class="li" id="concept_ms2_rzj_2k__li_ndg_mgr_2k"><a name="concept_ms2_rzj_2k__li_ndg_mgr_2k"><!-- --></a>Click <span class="ph uicontrol">Restore</span>.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_6"><a name="topic_9_6"><!-- --></a>
+
+    <h2 class="title topictitle2">Dashboard </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">The Dashboard shows a summary of the running and completed workflow,
+        coordinator, and bundle jobs. </p>
+
+
+      <p class="p">
+        You can view jobs for a period up to the last 30 days.
+      </p>
+
+
+      <p class="p">
+        You can filter the list by date (1, 7, 15, or 30 days) or status (Succeeded, Running, or Killed). The date and
+        status buttons are toggles.
+      </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_6_1"><a name="topic_9_6_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Workflows</h3>
+
+      <div class="body conbody">
+
+<p class="p">Click the <strong class="ph b">Workflows</strong> tab to view the running and completed workflow jobs for the filters you have
+          specified.
+        </p>
+
+
+<p class="p">Click a workflow row in the Running or Completed table to view detailed information about that workflow job.
+        </p>
+
+        <p class="p">In the left pane contains a link to the workflow and the variable values specified.<br/><a name="topic_9_6_1__image_xq2_stz_2k"><!-- --></a><img class="image" id="topic_9_6_1__image_xq2_stz_2k" src="/static/desktop/art/help/workflow.jpg"/><br/>
+        </p>
+
+
+<p class="p">For the selected job, the following information is available in the right
+          area. </p>
+
+
+        <ul class="ul">
+
+          <li class="li"><strong class="ph b">Graph</strong> tab shows the workflow
+            DAG.</li>
+
+
+          <li class="li">
+            <strong class="ph b">Actions</strong> tab shows you details about the actions that
+            make up the workflow.<a name="topic_9_6_1__ul_pgz_3nt_4j"><!-- --></a><ul class="ul" id="topic_9_6_1__ul_pgz_3nt_4j">
+              <li class="li">Click the <strong class="ph b">Id</strong> link to see
+                additional details about the action.</li>
+
+              <li class="li">Click the <strong class="ph b">External Id</strong> link
+                to view the job in the Job Browser.</li>
+
+            </ul>
+
+          </li>
+
+
+          <li class="li"><strong class="ph b">Details</strong> tab shows job statistics
+            including start and end times.</li>
+
+
+          <li class="li"><strong class="ph b">Configuration</strong> tab shows selected
+            job configuration settings.</li>
+
+
+          <li class="li"><strong class="ph b">Logs</strong> tab shows log output
+            generated by the workflow job.</li>
+
+
+          <li class="li"><strong class="ph b">Definition</strong> tab shows the Oozie
+            workflow definition, as it appears in the <samp class="ph codeph">workflow.xml</samp> file (also linked under the application path properties in the
+              <strong class="ph b">Details</strong> tab and the <strong class="ph b">Configuration</strong> tab).</li>
+
+
+        </ul>
+
+        <p class="p">For each action in the workflow you can:</p>
+
+        <a name="topic_9_6_1__ul_v4y_htz_2k"><!-- --></a><ul class="ul" id="topic_9_6_1__ul_v4y_htz_2k">
+          <li class="li">
+            <div class="p">Click the <a name="topic_9_6_1__image_u3d_ssz_2k"><!-- --></a><img class="image" id="topic_9_6_1__image_u3d_ssz_2k" src="/static/desktop/art/help/eye.png"/> icon to view the
+              action screen, which contains:<a name="topic_9_6_1__ul_edm_5sz_2k"><!-- --></a><ul class="ul" id="topic_9_6_1__ul_edm_5sz_2k">
+                <li class="li"><strong class="ph b">Details</strong> tab shows job statistics including start and end times.</li>
+
+                <li class="li"><strong class="ph b">Configuration</strong> tab shows the action configuration settings.</li>
+
+                <li class="li"><strong class="ph b">Child Jobs</strong> tab lists jobs generated by the action.</li>
+
+              </ul>
+
+            </div>
+
+          </li>
+
+          <li class="li">
+            <p class="p">Click the <a name="topic_9_6_1__image_hwj_ktz_2k"><!-- --></a><img class="image" id="topic_9_6_1__image_hwj_ktz_2k" src="/static/desktop/art/help/log.png"/> icon to view the log
+              in the Job Browser. </p>
+
+          </li>
+
+        </ul>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_6_2"><a name="topic_9_6_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Coordinators</h3>
+
+      <div class="body conbody">
+
+<p class="p">Click the <strong class="ph b">Coordinators</strong> tab to view the running and completed coordinator jobs for the filters you have
+          specified.
+        </p>
+
+
+<p class="p">For the selected job, the following information is available.
+        </p>
+
+
+        <ul class="ul">
+
+          <li class="li">The <strong class="ph b">Calendar</strong> tab shows the timestamp of the job. Click the timestamp
+						to open the workflow DAG. </li>
+
+
+          <li class="li">The <strong class="ph b">Actions</strong> tab shows you details about the actions that make up the coordinator.<a name="topic_9_6_2__ul_nld_3nt_4j"><!-- --></a><ul class="ul" id="topic_9_6_2__ul_nld_3nt_4j">
+
+              <li class="li">Click the <strong class="ph b">Id</strong> link to see additional details about the
+								action.</li>
+
+
+              <li class="li">Click the <strong class="ph b">External Id</strong> link to view the job in the Job
+								Browser.</li>
+
+
+            </ul>
+
+          </li>
+
+
+          <li class="li">The <strong class="ph b">Configuration</strong> tab shows selected job configuration settings.</li>
+
+
+          <li class="li">The <strong class="ph b">Logs</strong> tab shows log output generated by the coordinator.</li>
+
+
+          <li class="li">The <strong class="ph b">Definition</strong> tab shows the Oozie coordinator definition, as it
+						appears in the <samp class="ph codeph">coordinator.xml</samp> file (also linked under the
+						<samp class="ph codeph">oozie.coord.application.path</samp> property in the
+						 <strong class="ph b">Configuration</strong> tab).</li>
+
+
+        </ul>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_h1s_rtp_wj"><a name="concept_h1s_rtp_wj"><!-- --></a>
+      <h3 class="title topictitle3">Bundles</h3>
+
+      <div class="body conbody">
+        <p class="p">Click the <strong class="ph b">Bundles</strong> tab to view the
+          running and completed bundle jobs for the filters you have specified. </p>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_hvm_5vd_2k"><a name="concept_hvm_5vd_2k"><!-- --></a>
+      <h3 class="title topictitle3">Oozie</h3>
+
+      <div class="body conbody">
+        <p class="p">The Oozie tab provides subtabs that give you access to Oozie instrumentation and
+          configuration settings.</p>
+
+        <div class="section" id="concept_hvm_5vd_2k__section_rbd_fwd_2k"><a name="concept_hvm_5vd_2k__section_rbd_fwd_2k"><!-- --></a><h4 class="title sectiontitle">Instrumentation</h4>
+          
+          <p class="p">For information on the instrumentation metrics supported by Oozie, see <a class="xref" href="http://oozie.apache.org/docs/3.3.0/AG_Monitoring.html" target="_blank">Oozie Monitoring</a>.</p>
+
+        </div>
+
+        <div class="section" id="concept_hvm_5vd_2k__section_zlh_cwd_2k"><a name="concept_hvm_5vd_2k__section_zlh_cwd_2k"><!-- --></a><h4 class="title sectiontitle">Configuration</h4>
+          
+          <p class="p">For information on the configuration properties supported by Oozie, see <a class="xref" href="http://oozie.apache.org/docs/3.3.0/AG_Install.html#Oozie_Configuration" target="_blank">Oozie Configuration</a>.</p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_7"><a name="topic_9_7"><!-- --></a>
+
+    <h2 class="title topictitle2">Workflow Manager
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">In Workflow Manager you create Oozie workflows and submit them for
+        execution. </p>
+
+
+      <p class="p">
+        Click the <strong class="ph b">Workflows</strong> tab to open the Workflow Manager.
+      </p>
+
+
+      <p class="p">
+        Each row shows a workflow: its name, description, timestamp of its last modification. It also shows:
+      </p>
+
+
+      <ul class="ul">
+
+        <li class="li"><strong class="ph b">Steps</strong> - the number of steps in the
+          workflow execution path. This is the number of execution steps between the start and end
+          of the workflow. This will not necessarily be the same as the number of actions in the
+          workflow, if there are control flow nodes in the control path.</li>
+
+
+        <li class="li"><strong class="ph b">Status</strong> - who can run the
+            workflow. <strong class="ph b">shared</strong> means users other than the owner can
+          access the workflow. <strong class="ph b">personal</strong> means only the owner can
+          modify or submit the workflow. The default is personal.</li>
+
+
+        <li class="li"><strong class="ph b">Owner</strong> - the user that created the
+          workflow.</li>
+
+
+      </ul>
+
+
+      <p class="p">
+        In Workflow Editor you edit workflows that include MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh,
+        DistCp, Fs, Email, Sub-workflow, and Generic actions. You can configure these actions in the Workflow Editor, or
+        you can import job designs from Job Designer to be used as actions in your workflow. For information about
+        defining workflows, see the
+        <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/WorkflowFunctionalSpec.html" target="_blank">Workflow
+        Specification</a>.
+      </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_2"><a name="topic_9_7_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Opening a Workflow</h3>
+
+      <div class="body conbody">
+
+<p class="p">To open a workflow, in Workflow Manager, click the workflow. Proceed
+          with <a class="xref" href="#topic_9_7_7">Editing a Workflow</a>.
+        </p>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_3"><a name="topic_9_7_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating a Workflow</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Click the <strong class="ph b">Create</strong> button at the top right.</li>
+
+
+          <li class="li">In the Name field, type a name.</li>
+
+          <li class="li">Check the <span class="ph uicontrol">Is shared</span> checkbox to allow all users to access the
+            workflow.</li>
+
+
+          <li class="li">Click <strong class="ph b">advanced</strong> to specify the
+            deployment directory or a job.xml file.</li>
+
+
+          <li class="li">Click <strong class="ph b">Save</strong>. The Workflow Editor opens. Proceed with <a class="xref" href="#topic_9_7_7">Editing a Workflow</a>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_4"><a name="topic_9_7_4"><!-- --></a>
+
+      <h3 class="title topictitle3">Importing a Workflow</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Click the <strong class="ph b">Import</strong> button at the top right.</li>
+
+
+          <li class="li">In the Name field, type a name.</li>
+
+
+          <li class="li">In the <strong class="ph b">Local workflow.xml file</strong> field, click <strong class="ph b">Choose File</strong> and
+						select a workflow file.</li>
+
+
+          <li class="li">Click <strong class="ph b">advanced</strong> to specify whether the workflow is shared, the
+						deployment directory, or a job.xml file.</li>
+
+
+          <li class="li">Click <strong class="ph b">Save</strong>. The Workflow Editor opens. Proceed with <a class="xref" href="#topic_9_7_7">Editing a Workflow</a>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_5"><a name="topic_9_7_5"><!-- --></a>
+
+      <h3 class="title topictitle3">Submitting a Workflow</h3>
+
+      <div class="body conbody">
+
+<p class="p">To submit a workflow for execution, do one of the following:
+        </p>
+
+
+        <ul class="ul">
+
+          <li class="li">In the Workflow Manager, click the radio button next to the workflow, and
+						click the <strong class="ph b">Submit</strong> button.</li>
+
+
+          <li class="li">In the Workflow Editor, click the <strong class="ph b">Submit</strong> button.</li>
+
+
+        </ul>
+
+
+<p class="p">The workflow job is submitted and the Dashboard displays the workflow job.
+        </p>
+
+
+<p class="p">To view the output of the job, click
+
+          <img class="image" src="/static/desktop/art/help/log.png"/>
+
+          <strong class="ph b">View the logs</strong>.
+        </p>
+
+
+        <div class="section"><h4 class="title sectiontitle">Suspending a Running Job</h4>
+
+          
+
+  <p class="p"> In the pane on the left, click the <strong class="ph b">Suspend</strong> button.
+          </p>
+
+
+          <ol class="ol">
+
+            <li class="li">Verify that you want to suspend the job.</li>
+
+
+          </ol>
+
+
+        </div>
+
+
+        <div class="section"><h4 class="title sectiontitle">Resuming a Suspended Job</h4>
+
+          
+
+  <p class="p"> In the pane on the left, click the <strong class="ph b">Resume</strong> button.
+          </p>
+
+
+          <ol class="ol">
+
+            <li class="li">Verify that you want to resume the job.</li>
+
+
+          </ol>
+
+
+        </div>
+
+
+        <div class="section"><h4 class="title sectiontitle">Rerunning a Workflow</h4>
+
+          
+
+  <p class="p"> In the pane on the left, click the <strong class="ph b">Rerun</strong> button.
+          </p>
+
+
+          <ol class="ol">
+
+            <li class="li">Check the checkboxes next to the actions to rerun.</li>
+
+
+            <li class="li">Specify required variables.</li>
+
+
+            <li class="li">Click <strong class="ph b">Submit</strong>.</li>
+
+
+          </ol>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_6"><a name="topic_9_7_6"><!-- --></a>
+
+      <h3 class="title topictitle3">Scheduling a Workflow</h3>
+
+      <div class="body conbody">
+
+<p class="p">To schedule a workflow for recurring execution, do one of the following:
+        </p>
+
+
+        <ul class="ul">
+
+          <li class="li">In the Workflow Manager, check the checkbox next to the workflow
+            and click the <strong class="ph b">Schedule</strong> button.</li>
+
+
+          <li class="li">In the Workflow Editor, click the <strong class="ph b">Schedule</strong> button.</li>
+
+
+        </ul>
+
+
+        <p class="p" id="topic_9_7_6__p_102"><a name="topic_9_7_6__p_102"><!-- --></a>
+          A coordinator is created and opened in the Coordinator Editor. Proceed
+          with <a class="xref" href="#topic_9_8_4">Editing a Coordinator</a>.
+        </p>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_7"><a name="topic_9_7_7"><!-- --></a>
+
+      <h3 class="title topictitle3">Editing a Workflow</h3>
+
+      <div class="body conbody">
+
+<p class="p">In the Workflow Editor you can easily perform operations on Oozie action and control nodes.
+        </p>
+
+
+        <div class="section"><h4 class="title sectiontitle">Action Nodes</h4>
+
+          
+
+  <p class="p"> The Workflow Editor supports dragging and dropping action nodes. As you move the action over other actions
+            and forks, highlights indicate active areas. If there are actions in the workflow, the active areas are the
+            actions themselves and the areas above and below the actions. If you drop an action on an existing action, a
+            fork and join is added to the workflow.
+          </p>
+
+
+          <ul class="ul">
+
+            <li class="li">Add actions to the workflow by clicking an action <a name="topic_9_7_7__image_kpj_dnt_4j"><!-- --></a><img class="image" id="topic_9_7_7__image_kpj_dnt_4j" src="/static/desktop/art/help/action.png"/> button and drop the action on the workflow. The Edit Node
+              screen displays. <a name="topic_9_7_7__ol_l3q_dnt_4j"><!-- --></a><ol class="ol" id="topic_9_7_7__ol_l3q_dnt_4j">
+                <li class="li">Set the action properties and click <strong class="ph b">Done</strong>. Each action in a workflow must have a
+                  unique name.</li>
+
+              </ol>
+</li>
+
+
+          </ul>
+
+
+          <ul class="ul">
+
+            <li class="li">Copy an action by clicking the <img class="image" src="/static/desktop/art/help/copy.png"/>
+              <strong class="ph b">Copy</strong> button.</li>
+
+
+          </ul>
+
+
+          <a name="topic_9_7_7__ol_bjq_r55_yj"><!-- --></a><ol class="ol" id="topic_9_7_7__ol_bjq_r55_yj">
+            <li class="li">The action is opened in the Edit Node screen.</li>
+
+            <li class="li">Edit the action properties and click <strong class="ph b">Done</strong>. The action is added to the end of the
+              workflow.</li>
+
+          </ol>
+
+
+          <ul class="ul">
+
+            <li class="li">Delete an action by clicking the <img class="image" src="/static/desktop/art/help/trash.png"/> button.</li>
+
+
+            <li class="li">Edit an action by clicking the <img class="image" src="/static/desktop/art/help/edit.png"/> button.</li>
+
+
+            <li class="li">Change the position of an action by left-clicking and dragging an action
+							to a new location.</li>
+
+
+          </ul>
+
+
+        </div>
+
+
+        <div class="section"><h4 class="title sectiontitle">Control Nodes</h4>
+
+          
+
+          <ul class="ul">
+
+            <li class="li">Create a fork and join by dropping an action on top of another
+							action.</li>
+
+
+            <li class="li">Remove a fork and join by dragging a forked action and dropping it above
+							the fork.</li>
+
+
+            <li class="li">Convert a fork to a decision by clicking the <img class="image" src="/static/desktop/art/help/convert.png"/>
+							button.</li>
+
+
+            <li class="li">To edit a decision: <a name="topic_9_7_7__ol_dcc_fnt_4j"><!-- --></a><ol class="ol" id="topic_9_7_7__ol_dcc_fnt_4j">
+                <li class="li">Click the <a name="topic_9_7_7__image_lcc_fnt_4j"><!-- --></a><img class="image" id="topic_9_7_7__image_lcc_fnt_4j" src="/static/desktop/art/help/edit.png"/> button.</li>
+
+                <li class="li">Fill in the predicates that determine which action to
+                  perform and select the default action from the drop-down list.</li>
+
+                <li class="li">Click <strong class="ph b">Done</strong>.</li>
+
+              </ol>
+</li>
+
+
+          </ul>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_8"><a name="topic_9_7_8"><!-- --></a>
+
+      <h3 class="title topictitle3">Uploading Workflow Files</h3>
+
+      <div class="body conbody">
+
+<p class="p">In the Workflow Editor, click the <strong class="ph b">Upload</strong>
+          button. </p>
+
+        <p class="p">The workspace of the workflow is opened in the File Browser
+          application. Follow the procedure in <a class="xref" href="filebrowser.html#topic_6_3_4">Uploading Files</a> to upload the files. You must put JAR files in a
+            <span class="ph filepath">lib</span> directory in the
+          workspace.</p>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_9"><a name="topic_9_7_9"><!-- --></a>
+
+      <h3 class="title topictitle3">Editing Workflow Properties</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the Workflow Editor, click the link under the Name or Description fields
+						in the left pane.</li>
+
+
+          <li class="li">To share the workflow with all users, check the <strong class="ph b">Is shared</strong> checkbox.</li>
+
+
+          <li class="li">To set advanced execution options, click <strong class="ph b">advanced</strong> and edit the
+						deployment directory, add parameters and job properties, or specify a
+						job.xml file.</li>
+
+
+          <li class="li">Click <strong class="ph b">Save</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_7_10"><a name="topic_9_7_10"><!-- --></a>
+
+      <h3 class="title topictitle3">Displaying the History of a Workflow</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+          <li class="li">Click the <strong class="ph b">Dashboard</strong> tab.</li>
+
+          <li class="li">Click the <strong class="ph b">Workflows</strong> tab. </li>
+
+          <li class="li">Click a workflow.</li>
+
+          <li class="li">Click the <strong class="ph b">Actions</strong> tab.</li>
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_9_8"><a name="topic_9_8"><!-- --></a>
+
+    <h2 class="title topictitle2">Coordinator Manager
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">
+        In Coordinator Manager you create Oozie coordinator applications and submit them for execution.
+      </p>
+
+
+      <p class="p">
+        Click the <strong class="ph b">Coordinators</strong> tab to open the Coordinator Manager.
+      </p>
+
+
+      <p class="p">
+        Each row shows a coordinator: its name, description, timestamp of its last modification. It also shows:
+      </p>
+
+
+      <ul class="ul">
+
+        <li class="li"><strong class="ph b">Workflow</strong> - the workflow that will
+          be run by the coordinator.</li>
+
+
+        <li class="li"><strong class="ph b">Frequency</strong> - how often the workflow
+          referenced by the coordinator will be run.</li>
+
+
+        <li class="li"><strong class="ph b">Status</strong> - who can run the
+          coordinator. <strong class="ph b">shared</strong> means users other than the owner can
+          access the workflow. <strong class="ph b">personal</strong> means only the owner can
+          modify or submit the workflow. The default is personal.</li>
+
+
+        <li class="li"><strong class="ph b">Owner</strong> - the user that created the
+          coordinator.</li>
+
+
+      </ul>
+
+
+      <p class="p">
+        In Coordinator Editor, you edit coordinators and the datasets required by the coordinators. For information
+        about defining coordinators and datasets, see the
+        <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html" target="_blank">Coordinator
+        Specification</a>.
+      </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_1"><a name="topic_9_8_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Opening a Coordinator</h3>
+
+      <div class="body conbody">
+
+<p class="p">To open a coordinator, in Coordinator Manager, click the coordinator. Proceed with
+          <a class="xref" href="#topic_9_8_4">Editing a Coordinator</a>.
+        </p>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_2"><a name="topic_9_8_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating a Coordinator</h3>
+
+      <div class="body conbody">
+
+<p class="p">To create a coordinator, in Coordinator Manager:
+        </p>
+
+
+        <ol class="ol">
+
+          <li class="li">Click the <strong class="ph b">Create</strong> button at the top right. The Coordinator wizard
+						opens. Proceed with <a class="xref" href="#topic_9_8_4">Editing a
+							Coordinator</a>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_3"><a name="topic_9_8_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Submitting a Coordinator</h3>
+
+      <div class="body conbody">
+
+        <p class="p" id="topic_9_8_3__p_110"><a name="topic_9_8_3__p_110"><!-- --></a> To submit a coordinator for execution, check the checkbox
+          next to the coordinator and click the <strong class="ph b">Submit</strong> button. </p>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_4"><a name="topic_9_8_4"><!-- --></a>
+
+      <h3 class="title topictitle3">Editing a Coordinator</h3>
+
+      <div class="body conbody">
+
+<p class="p">In the Coordinator Editor you specify coordinator properties and the datasets
+          on which the workflow scheduled by the coordinator will operate by stepping through
+          screens in a wizard. <span class="ph" id="topic_9_8_4__wizard"><a name="topic_9_8_4__wizard"><!-- --></a>You can also advance to particular steps and revisit
+            steps by clicking the Step "tabs" above the screens. The following instructions walk you
+            through the wizard. </span></p>
+
+
+        <ol class="ol">
+
+          <li class="li">Type a name, select the workflow, check the <strong class="ph b">Is shared
+              checkbox</strong> to share the job, and click <strong class="ph b">Next</strong>. If
+            the Coordinator Editor was opened after scheduling a workflow, the workflow will be
+            set.</li>
+
+
+          <li class="li">Select how many times the coordinator will run for each specified
+            unit, the start and end times of the coordinator, the timezone of the start and end
+            times, and click <strong class="ph b">Next</strong>. <span class="ph">Times must be expressed as
+              UTC times. For example, to run at 10 pm PST, specify a start time of 6 am UTC of the
+              following day (+8 hours) and set the Timezone field to America/Los_Angeles.</span></li>
+
+
+          <li class="li">Click <strong class="ph b">Add</strong> to select an input dataset and click <strong class="ph b">Next</strong>. If no
+						datasets exist, follow the procedure in <a class="xref" href="#topic_9_8_5">Creating a Dataset</a>.</li>
+
+
+          <li class="li">Click <strong class="ph b">Add</strong> to select an output dataset. Click <strong class="ph b">Save coordinator</strong>
+						or click <strong class="ph b">Next</strong> to specify advanced settings.</li>
+
+
+          <li class="li">To share the coordinator with all users, check the <strong class="ph b">Is</strong><strong class="ph b"> shared</strong>
+						checkbox.</li>
+
+
+          <li class="li">Fill in parameters to pass to Oozie, properties that determine how long a
+						coordinator will wait before timing out, how many coordinators can run and
+						wait concurrently, and the coordinator execution policy.</li>
+
+
+          <li class="li" id="topic_9_8_4__li_120"><a name="topic_9_8_4__li_120"><!-- --></a>Click <strong class="ph b">Save coordinator</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_5"><a name="topic_9_8_5"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating a Dataset</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the Coordinator Editor, do one of the following: <a name="topic_9_8_5__ul_ynh_gnt_4j"><!-- --></a><ul class="ul" id="topic_9_8_5__ul_ynh_gnt_4j">
+              <li class="li">Click <strong class="ph b">here</strong> in the Inputs or
+                Outputs pane at the top of the editor.</li>
+
+              <li class="li">In the pane at the left, click the <strong class="ph b">Create new</strong> link. Proceed with <a class="xref" href="#topic_9_8_7">Editing a
+                Dataset</a>.</li>
+
+            </ul>
+</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_6"><a name="topic_9_8_6"><!-- --></a>
+
+      <h3 class="title topictitle3">Displaying Datasets</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the Coordinator Editor, click <strong class="ph b">Show existing</strong> in pane at the
+						left.</li>
+
+
+          <li class="li" id="topic_9_8_6__li_121"><a name="topic_9_8_6__li_121"><!-- --></a>To edit a dataset, click the dataset name in the Existing
+						datasets table. Proceed with <a class="xref" href="#topic_9_8_7">Editing
+							a Dataset</a>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_7"><a name="topic_9_8_7"><!-- --></a>
+
+      <h3 class="title topictitle3">Editing a Dataset</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Type a name for the dataset.</li>
+
+
+          <li class="li">In the Start and Frequency fields, specify when and how often the dataset
+						will be available.</li>
+
+
+          <li class="li">In the URI field, specify a URI template for the location of the
+            dataset. To construct URIs and URI paths containing dates and timestamps, you can
+            specify the variables <samp class="ph codeph">${YEAR}</samp><samp class="ph codeph">,$</samp><samp class="ph codeph">{MONTH},${DAY},${HOUR},${MINUTE}</samp>. For example:<samp class="ph codeph">
+              hdfs://foo:9000/usr/app/stats/${YEAR}/${MONTH}/data</samp>.</li>
+
+
+          <li class="li">In the Instance field, click a button to choose a default, single, or range
+						of data instances. For example, if frequency==DAY, a window of the last
+						rolling 5 days (not including today) would be expressed as start: -5 and
+						end: -1. Check the advanced checkbox to display a field where you can
+						specify a coordinator <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html" target="_blank">EL function</a>.</li>
+
+
+          <li class="li">Specify the timezone of the start date.</li>
+
+
+          <li class="li">In the Done flag field, specify the flag that identifies when input datasets
+						are no longer ready.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_9_8_8"><a name="topic_9_8_8"><!-- --></a>
+
+      <h3 class="title topictitle3">Displaying the History of a Coordinator</h3>
+
+      <div class="body conbody">
+
+        <ol class="ol">
+          <li class="li">Click the <strong class="ph b">Dashboard</strong> tab.</li>
+
+          <li class="li">Click the <strong class="ph b">Coordinators</strong> tab. </li>
+
+          <li class="li">Click a coordinator.</li>
+
+          <li class="li">Click the <strong class="ph b">Actions</strong> tab.</li>
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_crd_ttp_wj"><a name="concept_crd_ttp_wj"><!-- --></a>
+    <h2 class="title topictitle2">Bundle Manager</h2>
+
+    <div class="body conbody">
+      <p class="p">In Bundle Manager you create Oozie bundle applications and submit them
+        for execution. </p>
+
+      <p class="p">Click the <strong class="ph b">Bundle</strong> tab to open the
+        Bundle Manager. </p>
+
+      <p class="p">Each row shows a bundle: its name, description, timestamp of its last
+        modification. It also shows: </p>
+
+      <a name="concept_crd_ttp_wj__ul_skt_5kj_2k"><!-- --></a><ul class="ul" id="concept_crd_ttp_wj__ul_skt_5kj_2k">
+        <li class="li"><strong class="ph b">Coordinators</strong> -  the coordinators
+          that will be run by the bundle.</li>
+
+        <li class="li"><strong class="ph b">Kick off</strong> - the UTC time when the
+          coordinators referenced by the bundle will be started.  </li>
+
+        <li class="li"><strong class="ph b">Status</strong> - who can run the bundle.
+            <strong class="ph b">shared</strong> means users other than the owner can access the
+          workflow. <strong class="ph b">personal</strong> means only the owner can modify or
+          submit the workflow. The default is personal.</li>
+
+        <li class="li"><strong class="ph b">Owner</strong> - the user that created the
+          bundle.</li>
+
+      </ul>
+
+      <p class="p">For information about defining bundles, see the <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/BundleFunctionalSpec.html" target="_blank"> Bundle
+          Specification</a>.</p>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_t5k_wqj_2k"><a name="concept_t5k_wqj_2k"><!-- --></a>
+      <h3 class="title topictitle3">Opening a Bundle</h3>
+
+      <div class="body conbody">
+        <p class="p">To open a bundle, in Bundle Manager, click the bundle. Proceed with
+            <a class="xref" href="#concept_ur1_gmj_2k">Editing a Bundle</a>. </p>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_rvt_gmj_2k"><a name="concept_rvt_gmj_2k"><!-- --></a>
+      <h3 class="title topictitle3">Creating a Bundle</h3>
+
+      <div class="body conbody">
+        <a name="concept_rvt_gmj_2k__ol_wgk_jmj_2k"><!-- --></a><ol class="ol" id="concept_rvt_gmj_2k__ol_wgk_jmj_2k">
+          <li class="li">Click the <strong class="ph b">Create</strong> button at the
+            top right.</li>
+
+          <li class="li">In the Name field, type a name.</li>
+
+          <li class="li">In the Kick off time field, choose a kick off time.  </li>
+
+          <li class="li">Check the <span class="ph uicontrol">Is
+              shared</span> checkbox to allow all users to access the workflow.</li>
+
+          <li class="li">Click <strong class="ph b">Save</strong>. The Bundle Editor
+            opens. Proceed with <a class="xref" href="#concept_ur1_gmj_2k">Editing a Bundle</a>.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_fcd_1rj_2k"><a name="concept_fcd_1rj_2k"><!-- --></a>
+      <h3 class="title topictitle3">Submitting a Bundle</h3>
+
+      <div class="body conbody">
+        <p class="p">To submit a bundle for execution, check the checkbox next to the
+          bundle and click the <strong class="ph b">Submit</strong> button. </p>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_ur1_gmj_2k"><a name="concept_ur1_gmj_2k"><!-- --></a>
+      <h3 class="title topictitle3">Editing a Bundle</h3>
+
+      <div class="body conbody">
+        <p class="p">In the Bundle Editor, you specify properties by stepping through
+          screens in a wizard. <span class="ph">You can also advance to particular steps and revisit
+            steps by clicking the Step "tabs" above the screens. The following instructions walk you
+            through the wizard. </span>
+        </p>
+
+        <a name="concept_ur1_gmj_2k__ol_evj_rmj_2k"><!-- --></a><ol class="ol" id="concept_ur1_gmj_2k__ol_evj_rmj_2k">
+          <li class="li">Click <strong class="ph b">Add</strong> to select a
+            coordinator that the bundle will kick off.</li>
+
+          <li class="li">Choose the kick off time.  The time must be expressed as a UTC
+            time. For example, to run at 10 pm PST, specify a start time of 6 am UTC of the
+            following day (+8 hours).</li>
+
+          <li class="li">To share the bundle with all users, check the <strong class="ph b">Is shared</strong> checkbox.</li>
+
+          <li class="li">Click <strong class="ph b">Next</strong> to specify advanced
+            settings or click <strong class="ph b">Save bundle</strong>.</li>
+
+          <li class="li">Fill in parameters to pass to Oozie.</li>
+
+          <li class="li">Click <strong class="ph b">Save bundle</strong>.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_alh_gqj_2k"><a name="concept_alh_gqj_2k"><!-- --></a>
+    <h2 class="title topictitle2">Displaying the History of a Bundle</h2>
+
+    <div class="body conbody">
+      <a name="concept_alh_gqj_2k__ol_rdg_hqj_2k"><!-- --></a><ol class="ol" id="concept_alh_gqj_2k__ol_rdg_hqj_2k">
+        <li class="li">Click the <strong class="ph b">Dashboard</strong> tab.</li>
+
+        <li class="li">Click the <strong class="ph b">Bundles</strong> tab. </li>
+
+        <li class="li">Click a bundle.</li>
+
+        <li class="li">Click the <strong class="ph b">Actions</strong> tab.</li>
+
+      </ol>
+
+    </div>
+
+  </div>
+
+
+
+</body>
+</html>

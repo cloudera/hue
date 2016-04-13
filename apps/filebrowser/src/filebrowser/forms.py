@@ -15,19 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import urllib
+
 from django import forms
+from django.contrib.auth.models import User, Group
 from django.forms import FileField, CharField, BooleanField, Textarea
-from django.forms.formsets import formset_factory, BaseFormSet, ManagementForm
+from django.forms.formsets import formset_factory, BaseFormSet
 
 from desktop.lib import i18n
-from filebrowser.lib import rwx
 from hadoop.fs import normpath
-from django.contrib.auth.models import User, Group
+from filebrowser.lib import rwx
 
 from django.utils.translation import ugettext_lazy as _
 
-import logging
+
 logger = logging.getLogger(__name__)
+
 
 class FormSet(BaseFormSet):
   def __init__(self, data=None, prefix=None, *args, **kwargs):
@@ -58,10 +62,17 @@ class PathField(CharField):
   def clean(self, value):
     return normpath(CharField.clean(self, value))
 
+
 class EditorForm(forms.Form):
   path = PathField(label=_("File to edit"))
   contents = CharField(widget=Textarea, label=_("Contents"), required=False)
   encoding = CharField(label=_('Encoding'), required=False)
+
+  def clean_path(self):
+    return urllib.unquote(self.cleaned_data.get('path', ''))
+
+  def clean_contents(self):
+    return self.cleaned_data.get('contents', '').replace('\r\n', '\n')
 
   def clean_encoding(self):
     encoding = self.cleaned_data.get('encoding', '').strip()
@@ -78,6 +89,16 @@ class BaseRenameFormSet(FormSet):
   op = "rename"
 
 RenameFormSet = formset_factory(RenameForm, formset=BaseRenameFormSet, extra=0)
+
+class CopyForm(forms.Form):
+  op = "copy"
+  src_path = CharField(label=_("File to copy"), help_text=_("The file to copy."))
+  dest_path = CharField(label=_("Destination location"), help_text=_("Copy the file to:"))
+
+class BaseCopyFormSet(FormSet):
+  op = "copy"
+
+CopyFormSet = formset_factory(CopyForm, formset=BaseCopyFormSet, extra=0)
 
 class UploadFileForm(forms.Form):
   op = "upload"
@@ -106,6 +127,18 @@ class BaseRmTreeFormset(FormSet):
   op = "rmtree"
 
 RmTreeFormSet = formset_factory(RmTreeForm, formset=BaseRmTreeFormset, extra=0)
+
+class RestoreForm(forms.Form):
+  op = "rmtree"
+  path = PathField(label=_("Path to restore"))
+
+class BaseRestoreFormset(FormSet):
+  op = "restore"
+
+RestoreFormSet = formset_factory(RestoreForm, formset=BaseRestoreFormset, extra=0)
+
+class TrashPurgeForm(forms.Form):
+  op = "purge_trash"
 
 class MkDirForm(forms.Form):
   op = "mkdir"

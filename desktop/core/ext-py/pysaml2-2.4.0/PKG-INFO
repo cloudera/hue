@@ -1,0 +1,15 @@
+Metadata-Version: 1.1
+Name: pysaml2
+Version: 2.4.0
+Summary: Python implementation of SAML Version 2
+Home-page: https://github.com/rohe/pysaml2
+Author: Roland Hedberg
+Author-email: roland.hedberg@adm.umu.se
+License: Apache 2.0
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7

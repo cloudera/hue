@@ -16,6 +16,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from oozie.models import DATASET_FREQUENCY
 %>
 
 
@@ -23,23 +24,38 @@
 
 
 <fieldset>
-  ${ utils.render_field(dataset_form['name']) }
-  ${ utils.render_field(dataset_form['description']) }
-  ${ utils.render_field(dataset_form['start']) }
+  ${ utils.render_field_no_popover(dataset_form['name']) }
+  ${ utils.render_field_no_popover(dataset_form['description']) }
+  <div class="row-fluid">
+    <div class="alert alert-warning">
+      ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+    </div>
+  </div>
+  ${ utils.render_field_no_popover(dataset_form['start']) }
+  ${ utils.render_field_no_popover(dataset_form['timezone']) }
+
   <div class="row-fluid">
     <div class="span6">
-      ${ utils.render_field(dataset_form['frequency_number']) }
+      ${ utils.render_field_no_popover(dataset_form['frequency_number']) }
     </div>
     <div class="span6">
-      ${ utils.render_field(dataset_form['frequency_unit']) }
+      ${ utils.render_field_no_popover(dataset_form['frequency_unit']) }
     </div>
   </div>
 
   <div class="alert alert-info">
-    ${ _('You can parameterize the values using') } <code>${"${"}MINUTE}</code>, <code>${"${"}DAY}</code>, <code>${"${"}MONTH}</code> ${ _('and') } <code>${"${"}YEAR}</code>.
+    ${ _('You can parameterize the values using') }
+    % for frequency in DATASET_FREQUENCY:
+      <code>${"${"}${ frequency }}</code>
+      % if not loop.last:
+        ,
+      % endif
+    % endfor
+    .
   </div>
-  ${ utils.render_field(dataset_form['uri']) }
+  ${ utils.render_field_no_popover(dataset_form['uri']) }
 
-  ${ utils.render_field(dataset_form['timezone']) }
-  ${ utils.render_field(dataset_form['done_flag']) }
+  <%include file="dataset_utils.mako" args="base_id='#id_create-'"/>
+
+  ${ utils.render_field_no_popover(dataset_form['done_flag']) }
 </fieldset>

@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 
 class Command(BaseCommand):
   help = _("""
-  Runs pylint on desktop code.
+  Runs pylint on desktop and app code.
 
   With no arguments, or with "all", this will run pylint on all
   installed apps.  Otherwise, specify modules to run, as well

@@ -190,7 +190,7 @@ def shutdown(sups):
   for pid in CHILD_PIDS:
     try:
       os.kill(pid, signal.SIGINT)
-    except:
+    except OSError:
       pass
 
   LOG.warn("Waiting for children to exit for %d seconds..." % WAIT_FOR_DEATH)
@@ -209,7 +209,7 @@ def shutdown(sups):
     for pid in CHILD_PIDS:
       try:
         os.kill(pid, signal.SIGKILL)
-      except:
+      except OSError:
         pass
 
   sys.exit(1)
@@ -230,6 +230,10 @@ def parse_args():
                     help='Command NOT to run from supervisor. May be included more than once.')
   parser.add_option('-s', '--show', dest='show_supervisees',
                     action='store_true', default=False)
+  parser.add_option('-u', '--user', dest='user',
+                    action='store', default=SETUID_USER)
+  parser.add_option('-g', '--group', dest='group',
+                    action='store', default=SETGID_GROUP)
   (options, args) = parser.parse_args()
   return options
 
@@ -270,13 +274,13 @@ def drop_privileges():
 
   try:
     pw = pwd.getpwnam(SETUID_USER)
-  except:
+  except KeyError:
     print >>sys.stderr, "[ERROR] Couldn't get user information for user " + SETUID_USER
     raise
 
   try:
     gr = grp.getgrnam(SETGID_GROUP)
-  except:
+  except KeyError:
     print >>sys.stderr, "[ERROR] Couldn't get group information for group " + SETGID_GROUP
     raise
 
@@ -293,7 +297,10 @@ def _init_log(log_dir):
 
 
 def main():
+  global SETUID_USER, SETGID_GROUP
   options = parse_args()
+  SETUID_USER = options.user
+  SETGID_GROUP = options.group
   root = desktop.lib.paths.get_run_root()
   log_dir = os.path.join(root, options.log_dir)
 

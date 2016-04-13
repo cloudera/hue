@@ -1,0 +1,212 @@
+<huetemplates>
+  <template>
+    <id>1</id>
+    <title>Twitter</title>
+    <img>/search/static/templates/twitter.jpg</img>
+    <source>
+      <![CDATA[
+<div class="row-fluid">
+  <div class="row-fluid">
+    <div class="row-fluid">
+      <div class="span1">
+        <img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" class="avatar" />
+      </div>
+      <div class="span11">
+        <a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" class="btn openTweet">
+          <i class="fa fa-twitter"></i>
+        </a>
+        <b>{{user_name}}</b>
+        <br/>
+        {{text}}
+        <br/>
+        <div class="created">{{#fromnow}}{{created_at}}{{/fromnow}}</div>
+      </div>
+    </div>
+    <br/>
+  </div>
+</div>
+      ]]>
+    </source>
+    <additional>
+      <![CDATA[
+<style type="text/css">
+em {
+  font-weight: bold;
+  background-color: yellow;
+}
+.avatar {
+  margin: 10px;
+}
+.created {
+  margin-top: 10px;
+  color: #CCC;
+}
+.openTweet {
+  float: right;
+  margin: 10px;
+}
+</style>
+      ]]>
+    </additional>
+  </template>
+  <template>
+    <id>2</id>
+    <title>Restaurant</title>
+    <img>/search/static/templates/restaurant.jpg</img>
+    <source>
+      <![CDATA[
+<div class="row-fluid">
+  <div class="row-fluid">
+    <div class="span1">
+      <img class="placeMap" data-name="{{name}}" data-address="{{full_address}}" data-lat="{{latitude}}" data-lng="{{longitude}}" src="http://maps.googleapis.com/maps/api/staticmap?center={{latitude}},{{longitude}}&amp;zoom=14&amp;size=100x100&amp;sensor=false&amp;markers=color:red%7Ccolor:red%7C{{latitude}},{{longitude}}&amp;">
+    </div>
+    <div class="span11">
+      <h4>{{name}} <span class="muted">- {{full_address}}</span></h4><h5><span class="stars" data-stars="{{stars}}"></span> <span class="muted"> out of {{review_count}} reviews</span></h5>{{date}} <br><div class="review hellipsify">{{text}}</div><span class="label label-success">{{useful}} find this useful</span> <span class="label label-info">{{cool}} find this cool</span> <span class="label label-warning">{{funny}} find this funny</span>
+    </div>
+  </div>
+  <br>
+</div>
+      ]]>
+    </source>
+    <additional>
+      <![CDATA[
+<style type="text/css">
+em {
+  background-color: #eeeeee;
+  padding: 3px;
+  font-weight:bold;
+}
+.placeMap {
+  cursor: pointer;
+}
+.stars {
+  color: #F9B049;
+}
+.result-row h4 {
+  margin-top: 0;
+}
+.result-row {
+  margin-bottom: 20px;
+}
+.review {
+  padding-bottom: 10px;
+}
+</style>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    $('#mapModal').modal({
+      show: false
+    });
+    $(document).on("click", ".placeMap", function(){
+   	  var _detMap = "http://maps.googleapis.com/maps/api/staticmap?center="+ $(this).data("lat") +","+ $(this).data("lng") +"&zoom=14&size=540x360&sensor=false&markers=color:red%7Ccolor:red%7C"+ $(this).data("lat") +","+ $(this).data("lng") +"&";
+  	  $("#mapModal").find("h3").text($(this).data("name"));
+      $("#mapModal").find("p").html("<div class='muted'>"+ $(this).data("address") + "</div><img src='"+ _detMap +"'>");
+      $("#mapModal").modal("show");
+    });
+    $(".stars").each(function(){
+  	  var _h = "";
+  	  for (var i=0;i<$(this).data("stars")*1;i++){
+        _h += '<i class="fa fa-star"></i>';
+  	  }
+  	  for (var i=$(this).data("stars")*1;i<5;i++){
+        _h += '<i class="fa fa-star-o"></i>';
+  	  }
+  	  $(this).html(_h);
+    });
+    hellipsify();
+  });
+
+  function hellipsify() {
+  var MAX_LENGTH = 255;
+  $(".hellipsify").each(function () {
+    var _this = $(this);
+    if (_this.text().length > MAX_LENGTH) {
+      var _oText = _this.text();
+      $(this).html(_oText.substr(0, MAX_LENGTH - 1) + "...");
+      $("<a>").text("read more").css("cursor", "pointer").click(function(){
+  	    _this.html(_oText);
+  	  }).appendTo($(this));
+      }
+  });
+}
+</script>
+
+
+<div id="mapModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3></h3>
+  </div>
+  <div class="modal-body">
+    <p></p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+  </div>
+</div>
+]]>
+    </additional>
+  </template>
+  <template>
+    <id>3</id>
+    <title>Logs</title>
+    <img>/search/static/templates/logs.jpg</img>
+    <source>
+      <![CDATA[
+<div class="row-fluid">
+  <div class="span12">
+    <span class="timestamp">{{timestamp}}</span>
+    <span class="host">{{host}}</span>
+    <span class="label log{{status}}">{{status}}</span>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12 syslog">
+    {{log_content}}
+  </div>
+</div>
+      ]]>
+    </source>
+    <additional>
+      <![CDATA[
+<style type="text/css">
+em {
+  background-color: yellow;
+  font-weight: bold;
+}
+.result-row {
+  padding: 10px!important;
+}
+.result-row:nth-child(odd) {
+  background-color: #F9F9F9!important;
+}
+.label {
+  margin-left: 10px;
+}
+.syslog {
+  font-family: monospace;
+}
+.timestamp, .host {
+  color:#999;
+}
+.host {
+  padding-left: 10px;
+  font-weight: bold;
+}
+.logalert, .logerror, .logcrit, .logemerg {
+  background-color:#B9484A;
+}
+.logwarn {
+  background-color:#F89406;
+}
+.loginfo, .lognotice {
+  background-color:#3A87AD;
+}
+</style>
+      ]]>
+    </additional>
+  </template>
+</huetemplates>
+

@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import desktop.lib.eventlet_util
-
 import sys
 import os
 from desktop.supervisor import DjangoCommandSupervisee

@@ -1,54 +1,27 @@
 # encoding: utf-8
-import datetime
 from south.db import db
 from south.v2 import DataMigration
+from django.db import connection
 from django.db import models
-
-from desktop.lib.classes import classproperty
 
 from useradmin.models import UserProfile
 
+
 class Migration(DataMigration):
-    depends_on = (
-      # List of dependencies filled by the depends_on classproperty
-    )
 
-    def _depends_on(cls):
-      """
-      Ensure useradmin is migrated last by placing its migrations after all other migrations
-      """
-      from desktop.appmanager import DESKTOP_MODULES
-      import pkgutil
-
-      dependent_migrations = []
-      for module in DESKTOP_MODULES:
-        if module.name not in __name__:
-          try:
-            package = module.module.migrations
-            for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
-              dependent_migrations.append((module.name, modname))
-          except AttributeError:
-            # No migrations for this iteration
-            pass
-
-      return tuple(dependent_migrations)
-
-    depends_on = classproperty(_depends_on)
-    
     def forwards(self, orm):
         """
         This migration has been customized to support upgrades from Cloudera
         Enterprise 3.5, as well as Hue 1.2
         """
-        try:
-          # These will be removed if upgrading from a previous version of
-          # Cloudera Enterprise
+        # These will be removed if upgrading from a previous version of
+        # Cloudera Enterprise
+        if 'userman_groupadministrator' in connection.introspection.table_names():
           db.delete_table('userman_groupadministrator')
+        if 'userman_grouprelations' in connection.introspection.table_names():
           db.delete_table('userman_grouprelations')
-        except Exception:
-         pass
-        
-        try:
+
+        if 'userman_userprofile' in connection.introspection.table_names():
           db.rename_table('userman_userprofile', 'useradmin_userprofile')
           db.delete_column('useradmin_userprofile', 'primary_group_id')
           db.create_index('useradmin_userprofile', ['user_id'])
@@ -63,10 +36,7 @@ class Migration(DataMigration):
             elif up.creation_method == '0':
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()
-        except Exception:
-          db.rollback_transaction()  
-          db.start_transaction()
-
+        else:
           # Adding model 'UserProfile'
           db.create_table('useradmin_userprofile', (
               ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
@@ -77,15 +47,12 @@ class Migration(DataMigration):
           db.start_transaction()
           db.send_create_signal('useradmin', ['UserProfile'])
 
-        try:
+        if 'userman_grouppermission' in connection.introspection.table_names():
           db.rename_table('userman_grouppermission', 'useradmin_grouppermission')
           db.rename_column('useradmin_grouppermission', 'desktop_permission_id', 'hue_permission_id')
           db.create_index('useradmin_grouppermission', ['group_id'])
           db.create_index('useradmin_grouppermission', ['hue_permission_id'])
-        except Exception:
-          db.rollback_transaction()  
-          db.start_transaction()
-
+        else:
           # Adding model 'GroupPermission'
           db.create_table('useradmin_grouppermission', (
               ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
@@ -96,12 +63,9 @@ class Migration(DataMigration):
           db.start_transaction()
           db.send_create_signal('useradmin', ['GroupPermission'])
 
-        try:
+        if 'userman_desktoppermission' in connection.introspection.table_names():
           db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
-        except Exception:
-          db.rollback_transaction()  
-          db.start_transaction()
-
+        else:
           # Adding model 'HuePermission'
           db.create_table('useradmin_huepermission', (
               ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
@@ -112,9 +76,9 @@ class Migration(DataMigration):
           db.commit_transaction()
           db.start_transaction()
           db.send_create_signal('useradmin', ['HuePermission'])
-    
+
     def backwards(self, orm):
-        
+
         # Deleting model 'UserProfile'
         db.delete_table('useradmin_userprofile')
 
@@ -123,8 +87,8 @@ class Migration(DataMigration):
 
         # Deleting model 'HuePermission'
         db.delete_table('useradmin_huepermission')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -183,5 +147,5 @@ class Migration(DataMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
-    
+
     complete_apps = ['useradmin']

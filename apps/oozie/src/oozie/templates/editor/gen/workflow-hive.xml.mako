@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -16,12 +17,15 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
             ${ common.prepares(node.get_prepares()) }
+            % if node.job_xml:
+              <job-xml>${ node.job_xml }</job-xml>
+            % endif
             ${ common.configuration(node.get_properties()) }
 
             <script>${ node.script_path }</script>
@@ -32,6 +36,7 @@
 
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
         </hive>
-        <ok to="${ node.get_child('ok') }"/>
-        <error to="${ node.get_child('error') }"/>
+        <ok to="${ node.get_oozie_child('ok') }"/>
+        <error to="${ node.get_oozie_child('error') }"/>
+        ${ common.sla(node) }
     </action>

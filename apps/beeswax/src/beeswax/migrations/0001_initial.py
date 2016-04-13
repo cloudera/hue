@@ -20,6 +20,8 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+LOG = logging.getLogger(__name__)
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -32,7 +34,7 @@ class Migration(SchemaMigration):
             ))
             db.send_create_signal('beeswax', ['MetaInstall'])
         except:
-            logging.warning("Initial db creation being skipped, likely because table already exists.", exc_info=True)
+            LOG.exception("Initial db creation being skipped, likely because table already exists.")
             return
 
         # Adding model 'QueryHistory'

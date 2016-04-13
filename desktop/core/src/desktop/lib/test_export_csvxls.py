@@ -15,61 +15,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pyExcelerator as xl
-import cStringIO
-from desktop.lib.export_csvxls import make_response
-from nose.tools import assert_true, assert_equal, assert_false
+import StringIO
 
-def test_export_csvxls():
-  header = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"] ]
+from nose.tools import assert_equal
+from openpyxl import load_workbook
+
+from desktop.lib.export_csvxls import create_generator, make_response
+
+
+def content_generator(header, data):
+  yield header, data
+
+
+def test_export_csv():
+  headers = ["x", "y"]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
 
   # Check CSV
-  response = make_response(header, data, "csv", "foo")
+  generator = create_generator(content_generator(headers, data), "csv")
+  response = make_response(generator, "csv", "foo")
   assert_equal("application/csv", response["content-type"])
-  assert_equal('"x","y"\r\n"1","2"\r\n"3","4"\r\n', response.content)
+  content = ''.join(response.streaming_content)
+  assert_equal('x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\n', content)
   assert_equal("attachment; filename=foo.csv", response["content-disposition"])
 
+
+def test_export_xls():
+  headers = ["x", "y"]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
+  sheet = [headers] + data
+
   # Check XLS
-  response = make_response(header, data, "xls", "bar")
-  assert_equal("application/xls", response["content-type"])
-  assert_equal("attachment; filename=bar.xls", response["content-disposition"])
-  assert_equal('"x","y"\r\n"1","2"\r\n"3","4"\r\n', xls2csv(response.content))
+  generator = create_generator(content_generator(headers, data), "xls")
+  response = make_response(generator, "xls", "foo")
+  assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
+
+  expected_data = [[cell is not None and cell or "NULL" for cell in row] for row in sheet]
+  sheet_data = _read_xls_sheet_data(response)
+
+  assert_equal(expected_data, sheet_data)
+  assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 
+def _read_xls_sheet_data(response):
+  content = ''.join(response.streaming_content)
 
-def xls2csv(data_str):
-  """
-  Modification of xls2csv.py from pyExcelerator. BSD license.
-  Copyright (C) 2005 Kiseliov Roman
-  """
-  buf_in = cStringIO.StringIO(data_str)
-  buf_out = cStringIO.StringIO()
-  for sheet_name, values in xl.parse_xls(buf_in, 'cp1251'): # parse_xls(arg) -- default encoding
-    matrix = [[]]
-    for row_idx, col_idx in sorted(values.keys()):
-      v = values[(row_idx, col_idx)]
-      if isinstance(v, unicode):
-        v = v.encode('cp866', 'backslashreplace')
-      else:
-        v = `v`
-      v = '"%s"' % v.strip()
-      last_row, last_col = len(matrix), len(matrix[-1])
-      while last_row <= row_idx:
-        matrix.extend([[]])
-        last_row = len(matrix)
+  data = StringIO.StringIO()
+  data.write(content)
 
-      while last_col < col_idx:
-        matrix[-1].extend([''])
-        last_col = len(matrix[-1])
+  wb = load_workbook(filename=data, read_only=True)
+  ws = wb.active
 
-      matrix[-1].extend([v])
-
-    for row in matrix:
-      csv_row = ','.join(row)
-      buf_out.write(csv_row + '\r\n')
-
-  res = buf_out.getvalue()
-  buf_in.close()
-  buf_out.close()
-  return res
+  return [[cell.value if cell else cell for cell in row] for row in ws.rows]

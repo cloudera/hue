@@ -20,7 +20,7 @@ Common utilities for testing Desktop django apps.
 
 import logging
 import re
-import simplejson
+import json
 
 import django.test.client
 from django.contrib.auth.models import User, Group
@@ -33,7 +33,7 @@ class Client(django.test.client.Client):
   """
   def get_json(self, *args, **kwargs):
     response = self.get(*args, **kwargs)
-    return simplejson.JSONDecoder().decode(response.content)
+    return json.JSONDecoder().decode(response.content)
 
 def assert_ok_response(response):
   """
@@ -56,10 +56,14 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
     if recreate:
       user.delete()
       raise User.DoesNotExist
-  except User.DoesNotExist:    
+  except User.DoesNotExist:
     user = User.objects.create_user(username, username + '@localhost', password)
     user.is_superuser = is_superuser
     user.save()
+  else:
+    if user.is_superuser != is_superuser:
+      user.is_superuser = is_superuser
+      user.save()
 
   if groupname is not None:
     group, created = Group.objects.get_or_create(name=groupname)

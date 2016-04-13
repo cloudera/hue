@@ -1,0 +1,292 @@
+<workflow-app name="test-decision" xmlns="uri:oozie:workflow:0.4">
+    <start to="decision-85"/>
+    <decision name="decision-85">
+        <switch>
+            <case to="Sleep-1">
+              ${1 gt 2}
+            </case>
+            <case to="Sleep-5">
+            </case>
+            <default to="end"/>
+        </switch>
+    </decision>
+    <action name="Sleep-1">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.reduce.tasks</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.mapper.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.reducer.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.key.class</name>
+                    <value>org.apache.hadoop.io.IntWritable</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.value.class</name>
+                    <value>org.apache.hadoop.io.NullWritable</value>
+                </property>
+                <property>
+                    <name>mapred.output.format.class</name>
+                    <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.input.format.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.partitioner.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.speculative.execution</name>
+                    <value>false</value>
+                </property>
+                <property>
+                    <name>sleep.job.map.sleep.time</name>
+                    <value>0</value>
+                </property>
+                <property>
+                    <name>sleep.job.reduce.sleep.time</name>
+                    <value>1</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="Sleep-10"/>
+        <error to="kill"/>
+    </action>
+    <action name="Sleep-10">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.reduce.tasks</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.mapper.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.reducer.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.key.class</name>
+                    <value>org.apache.hadoop.io.IntWritable</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.value.class</name>
+                    <value>org.apache.hadoop.io.NullWritable</value>
+                </property>
+                <property>
+                    <name>mapred.output.format.class</name>
+                    <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.input.format.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.partitioner.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.speculative.execution</name>
+                    <value>false</value>
+                </property>
+                <property>
+                    <name>sleep.job.map.sleep.time</name>
+                    <value>0</value>
+                </property>
+                <property>
+                    <name>sleep.job.reduce.sleep.time</name>
+                    <value>10</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <action name="Sleep-5">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.reduce.tasks</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.mapper.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.reducer.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.key.class</name>
+                    <value>org.apache.hadoop.io.IntWritable</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.value.class</name>
+                    <value>org.apache.hadoop.io.NullWritable</value>
+                </property>
+                <property>
+                    <name>mapred.output.format.class</name>
+                    <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.input.format.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.partitioner.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.speculative.execution</name>
+                    <value>false</value>
+                </property>
+                <property>
+                    <name>sleep.job.map.sleep.time</name>
+                    <value>0</value>
+                </property>
+                <property>
+                    <name>sleep.job.reduce.sleep.time</name>
+                    <value>5</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="fork-82"/>
+        <error to="kill"/>
+    </action>
+    <fork name="fork-82">
+        <path start="Sleep-3" />
+        <path start="Sleep-4" />
+    </fork>
+    <action name="Sleep-3">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.reduce.tasks</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.mapper.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.reducer.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.key.class</name>
+                    <value>org.apache.hadoop.io.IntWritable</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.value.class</name>
+                    <value>org.apache.hadoop.io.NullWritable</value>
+                </property>
+                <property>
+                    <name>mapred.output.format.class</name>
+                    <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.input.format.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.partitioner.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.speculative.execution</name>
+                    <value>false</value>
+                </property>
+                <property>
+                    <name>sleep.job.map.sleep.time</name>
+                    <value>0</value>
+                </property>
+                <property>
+                    <name>sleep.job.reduce.sleep.time</name>
+                    <value>3</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="join-83"/>
+        <error to="kill"/>
+    </action>
+    <action name="Sleep-4">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.reduce.tasks</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>mapred.mapper.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.reducer.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.key.class</name>
+                    <value>org.apache.hadoop.io.IntWritable</value>
+                </property>
+                <property>
+                    <name>mapred.mapoutput.value.class</name>
+                    <value>org.apache.hadoop.io.NullWritable</value>
+                </property>
+                <property>
+                    <name>mapred.output.format.class</name>
+                    <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.input.format.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+                </property>
+                <property>
+                    <name>mapred.partitioner.class</name>
+                    <value>org.apache.hadoop.examples.SleepJob</value>
+                </property>
+                <property>
+                    <name>mapred.speculative.execution</name>
+                    <value>false</value>
+                </property>
+                <property>
+                    <name>sleep.job.map.sleep.time</name>
+                    <value>0</value>
+                </property>
+                <property>
+                    <name>sleep.job.reduce.sleep.time</name>
+                    <value>4</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="join-83"/>
+        <error to="kill"/>
+    </action>
+    <join name="join-83" to="end"/>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

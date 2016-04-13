@@ -1,99 +1,148 @@
 ## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.	See the NOTICE file
+## or more contributor license agreements.    See the NOTICE file
 ## distributed with this work for additional information
 ## regarding copyright ownership.  Cloudera, Inc. licenses this file
 ## to you under the Apache License, Version 2.0 (the
 ## "License"); you may not use this file except in compliance
 ## with the License.  You may obtain a copy of the License at
 ##
-##	   http://www.apache.org/licenses/LICENSE-2.0
+##       http://www.apache.org/licenses/LICENSE-2.0
 ##
 ## Unless required by applicable law or agreed to in writing, software
 ## distributed under the License is distributed on an "AS IS" BASIS,
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
-from desktop import conf
-from django.utils.translation import ugettext as _
+  from desktop import conf
+  from django.utils.translation import ugettext as _
+  from desktop.views import commonheader, commonfooter
+  from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>Hue Login</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="">
-	<meta name="author" content="">
 
-	<link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/static/css/hue2.css" rel="stylesheet">
+${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unicode }
 
-	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
+<link rel="stylesheet" href="${ static('desktop/css/login.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<style type="text/css">
+  body {
+    background-color: #EEE;
+    padding-top: 150px;
+  }
+</style>
 
-	<style type="text/css">
-		body {
-			padding-top: 100px;
-		}
-	</style>
-</head>
 
-<body>
-	<div class="navbar navbar-fixed-top">
-		% if conf.CUSTOM.BANNER_TOP_HTML.get():
-		<div id="banner-top" class="banner">
-			${conf.CUSTOM.BANNER_TOP_HTML.get()}
-		</div>
-		% endif
-		<div class="navbar-inner">
-			<div class="container-fluid">
-				<a class="brand" href="#">Hue</a>
-			</div>
-		</div>
-	</div>
+<div class="container">
+  <div class="row">
+    <div class="login-box">
+      <form method="POST" action="${action}">
+      ${ csrf_token(request) | n,unicode }
 
-	<div class="container">
-		<div class="row">
-			<div class="span4 offset4">
-				<form method="POST" action="${action}" class="well">
-					<label>${_('Username')}
-						<input name="username" class="input-large" type="text" maxlength="30">
-					</label>
-					<label>${_('Password')}
-						<input name="password" class="input-large" type="password" maxlength="30">
-					</label>
+      <div class="login-header">
+        <h1>${ _('Welcome to Hue') }</h1>
+        %if first_login_ever:
+          <h2>${_('Create your Hue account')}</h2>
+        %else:
+          <h2>${_('Please sign in to continue')}</h2>
+        %endif
+      </div>
 
-					%if first_login_ever==True:
-						<input type="submit" class="btn primary" value="${_('Sign up')}" />
-					%else:
-						<input type="submit" class="btn primary" value="${_('Sign in')}" />
-					%endif
-					<input type="hidden" name="next" value="${next}" />
+      <div class="logo"><img src="${ static('desktop/art/hue-login-white.png') }" width="50" height="50" /> </div>
 
-					%if login_errors==True:
-						<br/>
-						<br/>
-						<div class="alert alert-error">
-							<p><strong>${_('Error!')}</strong> ${_('Invalid username or password.')}</p>
-						</div>
-					%endif
-				</form>
-			</div>
-		</div>
+      <div class="login-content">
 
-		%if first_login_ever==True:
-		<div class="row">
-			<div class="span6 offset3">
-				<div class="alert alert-block">
-					<p>${_('Since this is your first time logging in, please pick any username and password. Be sure to remember these, as')}
-					 <strong>${_('they will become your superuser credentials for Hue')}</strong>.</p>
-				</div>
-			</div>
-		</div>
-		%endif
-	</div>
-</body>
-</html>
+        %if first_login_ever:
+          <div class="alert alert-block">
+            ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
+            <strong>${_('they will become your Hue superuser credentials.')}</strong>
+            %if is_password_policy_enabled():
+	          <p>${get_password_hint()}</p>
+            %endif
+          </div>
+        %endif
+
+        <div class="
+          %if backend_names == ['OAuthBackend']:
+            hide
+          %endif
+        ">
+          ${ form['username'] | n,unicode }
+        </div>
+
+        ${ form['username'].errors | n,unicode }
+
+        <div class="
+          %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
+            hide
+          %endif
+        ">
+          ${ form['password'] | n,unicode }
+        </div>
+
+        ${ form['password'].errors | n,unicode }
+
+        %if active_directory:
+        <div>
+          ${ form['server'] | n,unicode }
+        </div>
+        %endif
+
+        %if login_errors and not form['username'].errors and not form['password'].errors:
+          <div class="alert alert-error" style="text-align: center">
+            <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
+            %if form.errors:
+              % for error in form.errors:
+               ${ form.errors[error]|unicode,n }
+              % endfor
+            %endif
+          </div>
+        %endif
+
+        %if first_login_ever:
+          <input type="submit" class="btn btn-large btn-primary" value="${_('Create account')}"/>
+        %else:
+          <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
+        %endif
+        <input type="hidden" name="next" value="${next}"/>
+        </div>
+
+      </form>
+
+      %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
+      <div class="alert alert-info" id="login-splash">
+        ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+      </div>
+      %endif
+    </div>
+  </div>
+  <div class="row">
+    <div class="center muted">
+      ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $("form").on("submit", function () {
+      window.setTimeout(function () {
+        $(".logo").find("img").addClass("waiting");
+      }, 1000);
+    });
+
+    %if 'AllowAllBackend' in backend_names:
+      $('#id_password').val('password');
+    %endif
+
+    %if backend_names == ['OAuthBackend']:
+      $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
+      $("input").bind('click', function () {
+        window.location.replace('/login/oauth/');
+        return false;
+      });
+    %endif
+  });
+</script>
+
+${ commonfooter(None, messages) | n,unicode }

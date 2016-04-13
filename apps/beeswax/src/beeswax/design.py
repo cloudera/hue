@@ -19,19 +19,52 @@
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
+import json
 import logging
-import simplejson
+import os
+import re
+import urlparse
 
 import django.http
 from django import forms
+from django.forms import ValidationError
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
+from hadoop.cluster import get_hdfs
 
-import beeswax.forms
 
 LOG = logging.getLogger(__name__)
 
-SERIALIZATION_VERSION = '0.4.0'
+SERIALIZATION_VERSION = '0.4.1'
+
+
+def hql_query(hql, database='default', query_type=None, settings=None, file_resources=None, functions=None):
+  data_dict = HQLdesign.get_default_data_dict()
+
+  if not (isinstance(hql, str) or isinstance(hql, unicode)):
+    raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
+
+  data_dict['query']['query'] = strip_trailing_semicolon(hql)
+  data_dict['query']['database'] = database
+
+  if query_type:
+    data_dict['query']['type'] = query_type
+
+  if settings is not None and HQLdesign.validate_properties('settings', settings, HQLdesign._SETTINGS_ATTRS):
+    data_dict['settings'] = settings
+
+  if file_resources is not None and HQLdesign.validate_properties('file resources', file_resources, HQLdesign._FILE_RES_ATTRS):
+    data_dict['file_resources'] = file_resources
+
+  if functions is not None and HQLdesign.validate_properties('functions', functions, HQLdesign._FUNCTIONS_ATTRS):
+    data_dict['functions'] = functions
+
+  hql_design = HQLdesign()
+  hql_design._data_dict = data_dict
+
+  return hql_design
+
 
 class HQLdesign(object):
   """
@@ -41,31 +74,138 @@ class HQLdesign(object):
   want to use "$" natively, but we leave that as an advanced
   option to turn off.
   """
-  _QUERY_ATTRS = [ 'query', 'type', "is_parameterized", 'email_notify' ]
+  _QUERY_ATTRS = [ 'query', 'type', 'is_parameterized', 'email_notify', 'database' ]
   _SETTINGS_ATTRS = [ 'key', 'value' ]
   _FILE_RES_ATTRS = [ 'type', 'path' ]
   _FUNCTIONS_ATTRS = [ 'name', 'class_name' ]
 
-  def __init__(self, form):
-    """Initialize the design from form data. The form may be invalid."""
-    assert isinstance(form, MultiForm)
-    self._data_dict = dict(
-        query = normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
-        settings = normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
-        file_resources = normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
-        functions = normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS))
+  def __init__(self, form=None, query_type=None):
+    """Initialize the design from a valid form data."""
+    if form is not None:
+      assert isinstance(form, MultiForm)
+      self._data_dict = {
+          'query': normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
+          'settings': normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
+          'file_resources': normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
+          'functions': normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS)
+      }
+      if query_type is not None:
+        self._data_dict['query']['type'] = query_type
+
+  @property
+  def database(self):
+    return self._data_dict['query']['database']
+
+  @property
+  def hql_query(self):
+    return self._data_dict['query']['query']
+
+  @hql_query.setter
+  def hql_query(self, query):
+    self._data_dict['query']['query'] = query
+
+  @property
+  def query(self):
+    return self._data_dict['query'].copy()
+
+  @property
+  def settings(self):
+    return list(self._data_dict.get('settings', []))
+
+  @property
+  def file_resources(self):
+    return list(self._data_dict.get('file_resources', []))
+
+  @property
+  def functions(self):
+    return list(self._data_dict.get('functions', []))
+
+  @property
+  def statement_count(self):
+    return len(self.statements)
+
+  @property
+  def statements(self):
+    hql_query = strip_trailing_semicolon(self.hql_query)
+    return [strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query)]
+
+  @staticmethod
+  def get_default_data_dict():
+    return {
+      'query': {
+        'email_notify': False,
+        'query': None,
+        'type': 0,
+        'is_parameterized': True,
+        'database': 'default'
+      },
+      'functions': [],
+      'VERSION': SERIALIZATION_VERSION,
+      'file_resources': [],
+      'settings': []
+    }
+
+  @staticmethod
+  def loads(data):
+    """Returns an HQLdesign from the serialized form"""
+    dic = json.loads(data)
+    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    if dic['VERSION'] != SERIALIZATION_VERSION:
+      LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
+
+    # Convert to latest version
+    del dic['VERSION']
+    if 'type' not in dic['query'] or dic['query']['type'] is None:
+      dic['query']['type'] = 0
+    if 'database' not in dic['query']:
+      dic['query']['database'] = 'default'
+
+    design = HQLdesign()
+    design._data_dict = dic
+    return design
+
+  @staticmethod
+  def validate_properties(property_type, properties, req_attr_list):
+    """
+    :param property_type: 'Settings', 'File Resources', or 'Functions'
+    :param properties: list of properties as dict
+    :param req_attr_list: list of attributes that are required keys for each dict item
+    """
+    if isinstance(properties, list) and all(isinstance(item, dict) for item in properties):
+      for item in properties:
+        if not all(attr in item for attr in req_attr_list):
+          raise ValidationError(_("Invalid %s, missing required attributes: %s.") % (property_type, ', '.join(req_attr_list)))
+    else:
+      raise ValidationError(_('Invalid settings, expected list of dict items.'))
+    return True
 
   def dumps(self):
     """Returns the serialized form of the design in a string"""
     dic = self._data_dict.copy()
     dic['VERSION'] = SERIALIZATION_VERSION
-    return simplejson.dumps(dic)
+    return json.dumps(dic)
+
+  def get_configuration_statements(self):
+    configuration = []
+
+    for f in self.file_resources:
+      if not urlparse.urlsplit(f['path']).scheme:
+        scheme = get_hdfs().fs_defaultfs
+      else:
+        scheme = ''
+      configuration.append('ADD %(type)s %(scheme)s%(path)s' %
+                           {'type': f['type'].upper(), 'path': f['path'], 'scheme': scheme})
+
+    for f in self.functions:
+      configuration.append("CREATE TEMPORARY FUNCTION %(name)s AS '%(class_name)s'" %
+                           {'name': f['name'], 'class_name': f['class_name']})
+
+    return configuration
 
   def get_query_dict(self):
-    """get_query_dict() -> QueryDict"""
-    # We construct the mform to use its structure and prefix. We don't actually bind
-    # data to the forms.
-    mform = beeswax.forms.query_form()
+    # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
+    from beeswax.forms import QueryForm
+    mform = QueryForm()
     mform.bind()
 
     res = django.http.QueryDict('', mutable=True)
@@ -79,22 +219,85 @@ class HQLdesign(object):
                 self._data_dict['functions'], mform.functions, HQLdesign._FUNCTIONS_ATTRS))
     return res
 
-  @staticmethod
-  def loads(data):
-    """Returns an HQLdesign from the serialized form"""
-    dic = simplejson.loads(data)
-    if dic['VERSION'] != SERIALIZATION_VERSION:
-      LOG.error('Design version mismatch. Found %s; expect %s' %
-                (dic['VERSION'], SERIALIZATION_VERSION))
-      return None
-    del dic['VERSION']
-
-    design = HQLdesign.__new__(HQLdesign)
-    design._data_dict = dic
-    return design
-
   def get_query(self):
     return self._data_dict["query"]
+
+  def get_query_statement(self, n=0):
+    return self.statements[n]
+
+  def __eq__(self, other):
+    return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+
+def split_statements(hql):
+  """
+  Split statements at semicolons ignoring the ones inside quotes and comments.
+  The comment symbols that come inside quotes should be ignored.
+  """
+  statements = []
+  current = ''
+  prev = ''
+  between_quotes = None
+  is_comment = None
+  start_row = 0
+  start_col = 0
+  end_row = 0
+  end_col = len(hql) - 1
+
+  if hql.find(';') in (-1, len(hql) - 1):
+    return [((start_row, start_col), (end_row, end_col), hql)]
+
+  lines = hql.splitlines()
+
+  for row, line in enumerate(lines):
+    end_col = 0
+    end_row = row
+
+    if start_row == row and line.strip() == '':  # ignore leading whitespace rows
+      start_row += 1
+    elif current.strip() == '':  # reset start_row
+      start_row = row
+      start_col = 0
+
+    for col, c in enumerate(line):
+      current += c
+
+      if c in ('"', "'") and prev != '\\' and is_comment is None:
+        if between_quotes == c:
+          between_quotes = None
+        elif between_quotes is None:
+          between_quotes = c
+      elif c == '-' and prev == '-' and between_quotes is None and is_comment is None:
+        is_comment = True
+      elif c == ';':
+        if between_quotes is None and is_comment is None:
+          current = current.strip()
+          # Strip off the trailing semicolon
+          current = current[:-1]
+          if len(current) > 1:
+            statements.append(((start_row, start_col), (row, col + 1), current))
+            start_col = col + 1
+          current = ''
+      # This character holds no significance if it was escaped within a string
+      if prev == '\\' and between_quotes is not None:
+        c = ''
+      prev = c
+      end_col = col
+
+    is_comment = None
+    prev = os.linesep
+
+    if current != '':
+      current += os.linesep
+
+  if current and current != ';':
+    current = current.strip()
+    statements.append(((start_row, start_col), (end_row, end_col), current))
+
+  return statements
 
 def normalize_form_dict(form, attr_list):
   """
@@ -105,7 +308,7 @@ def normalize_form_dict(form, attr_list):
   assert isinstance(form, forms.Form)
   res = { }
   for attr in attr_list:
-    res[attr] = form.data.get(form.add_prefix(attr))
+    res[attr] = form.cleaned_data.get(attr)
   return res
 
 
@@ -128,7 +331,7 @@ def denormalize_form_dict(data_dict, form, attr_list):
   res = django.http.QueryDict('', mutable=True)
   for attr in attr_list:
     try:
-      res[form.add_prefix(attr)] = data_dict[attr]
+      res[str(form.add_prefix(attr))] = data_dict[attr]
     except KeyError:
       pass
   return res
@@ -146,5 +349,19 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
     res.update(denormalize_form_dict(data_dict, form, attr_list))
     res[prefix + '-_exists'] = 'True'
 
-  res[formset.management_form.add_prefix('next_form_id')] = str(len(data_dict_list))
+  res[str(formset.management_form.add_prefix('next_form_id'))] = str(len(data_dict_list))
   return res
+
+  def __str__(self):
+    return '%s: %s' % (self.__class__, self.query)
+
+
+_SEMICOLON_WHITESPACE = re.compile(";\s*$")
+
+def strip_trailing_semicolon(query):
+  """As a convenience, we remove trailing semicolons from queries."""
+  s = _SEMICOLON_WHITESPACE.split(query, 2)
+  if len(s) > 1:
+    assert len(s) == 2
+    assert s[1] == ''
+  return s[0]

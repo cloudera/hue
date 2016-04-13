@@ -43,6 +43,8 @@ class WebHdfsStat(object):
     self.size = file_status['length']
     self.blockSize = file_status['blockSize']
     self.replication = file_status['replication']
+    self.aclBit = file_status.get('aclBit')
+    self.fileId = file_status.get('fileId')
 
     self.mode = int(file_status['permission'], 8)
     if self.isDir:
@@ -82,6 +84,8 @@ class WebHdfsContentSummary(object):
   Content summary info on a directory
   """
   def __init__(self, summary):
+    self.summary = summary
+
     for k, v in summary.iteritems():
       setattr(self, k, v)
 

@@ -1,0 +1,658 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VERSÃO DO PROJECTO\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-05-29 17:10-0700\n"
+"PO-Revision-Date: 2012-07-30 18:47-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8 bits\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/security/forms.py:51 src/security/forms.py:121
+#: src/security/templates/list_users.mako:71
+msgid "Username"
+msgstr "Nome de utilizador"
+
+#: src/security/forms.py:54
+msgid "Required. 30 characters or fewer. No whitespaces or colons."
+msgstr "Obrigatório. 30 caracteres ou menos. Sem espaços em branco ou dois pontos."
+
+#: src/security/forms.py:55 src/security/forms.py:124
+msgid "Whitespaces and ':' not allowed"
+msgstr "Espaços em branco e \":\" não permitidos"
+
+#: src/security/forms.py:56
+msgid "Password"
+msgstr "Palavra-passe"
+
+#: src/security/forms.py:57
+msgid "Password confirmation"
+msgstr "Confirmação de palavra-passe"
+
+#: src/security/forms.py:58 src/security/forms.py:130
+msgid "Create home directory"
+msgstr "Criar directório inicial"
+
+#: src/security/forms.py:59
+msgid "Create home directory if one doesn't already exist."
+msgstr "Criar directório inicial, caso ainda não exista."
+
+#: src/security/forms.py:79
+msgid "Passwords do not match."
+msgstr "As palavras-passe não coincidem."
+
+#: src/security/forms.py:85
+msgid "You must specify a password when creating a new user."
+msgstr "Tem de especificar uma palavra-passe ao criar um novo utilizador."
+
+#: src/security/forms.py:123
+msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
+msgstr "Obrigatório. 30 caracteres ou menos com nome de utilizador. 64 caracteres ou menos com DN. Sem espaços em branco ou dois pontos."
+
+#: src/security/forms.py:125 src/security/forms.py:168
+msgid "Distinguished name"
+msgstr "Nome único"
+
+#: src/security/forms.py:126
+#: src/security/management/commands/import_ldap_group.py:38
+#: src/security/management/commands/import_ldap_user.py:35
+msgid "Whether or not the user should be imported by distinguished name."
+msgstr "Indica se o utilizador deve ou não ser importado por nome distinto."
+
+#: src/security/forms.py:131
+msgid "Create home directory for user if one doesn't already exist."
+msgstr "Criar directório inicial para utilizador, caso ainda não exista."
+
+#: src/security/forms.py:147
+#, python-format
+msgid "Too long: 64 characters or fewer and not %s."
+msgstr "Demasiado longo: 64 caracteres ou menos e não %s."
+
+#: src/security/forms.py:153
+#, python-format
+msgid "Too long: 30 characters or fewer and not %s."
+msgstr "Demasiado longo: 30 caracteres ou menos e não %s."
+
+#: src/security/forms.py:163
+msgid "Name"
+msgstr "Nome"
+
+#: src/security/forms.py:166
+msgid "Required. 80 characters or fewer."
+msgstr "Obrigatório. 80 caracteres ou menos."
+
+#: src/security/forms.py:167
+msgid "80 characters or fewer."
+msgstr "80 caracteres ou menos."
+
+#: src/security/forms.py:169
+msgid "Whether or not the group should be imported by distinguished name."
+msgstr "Indica se o grupo deve ser importado por nome distinto ou não."
+
+#: src/security/forms.py:173
+msgid "Import new members"
+msgstr "Importar novos membros"
+
+#: src/security/forms.py:174
+msgid "Import unimported or new users from the group."
+msgstr "Importar utilizadores não importados ou novos a partir do grupo."
+
+#: src/security/forms.py:177
+msgid "Create home directories"
+msgstr "Criar directórios iniciais"
+
+#: src/security/forms.py:178
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "Criar directórios iniciais para cada membro importado, se estiverem a ser importados membros."
+
+#: src/security/forms.py:181
+msgid "Import new members from all subgroups"
+msgstr "Importar novos membros de todos os subgrupos"
+
+#: src/security/forms.py:182
+msgid "Import unimported or new users from the all subgroups."
+msgstr "Importar utilizadores não importados ou novos de todos os subgrupos."
+
+#: src/security/forms.py:198
+#, python-format
+msgid "Too long: 80 characters or fewer and not %s"
+msgstr "Demasiado longo: 80 caracteres ou menos e não %s"
+
+#: src/security/forms.py:220
+msgid "Group name may only contain letters, numbers, hyphens or underscores."
+msgstr "O nome de grupo pode conter apenas letras, números, hífens ou traços inferiores."
+
+#: src/security/forms.py:235
+msgid "members"
+msgstr "membros"
+
+#: src/security/forms.py:236
+msgid "permissions"
+msgstr "permissões"
+
+#: src/security/forms.py:279
+msgid "groups"
+msgstr "grupos"
+
+#: src/security/forms.py:314
+msgid "Create Home Directories"
+msgstr "Criar directórios iniciais"
+
+#: src/security/forms.py:315
+msgid "Create home directory for every user, if one doesn't already exist."
+msgstr "Criar directório inicial para cada utilizador, caso ainda não exista."
+
+#: src/security/models.py:128
+#, python-format
+msgid "You do not have permissions to %(description)s."
+msgstr "Não tem permissões para %(description)s."
+
+#: src/security/views.py:114
+msgid "You must be a superuser to delete users."
+msgstr "Tem de ser um superutilizador para eliminar utilizadores."
+
+#: src/security/views.py:117
+msgid "A POST request is required."
+msgstr "É necessário um pedido POST."
+
+#: src/security/views.py:124
+msgid "You cannot remove yourself."
+msgstr "Não pode remover-se a si próprio."
+
+#: src/security/views.py:131
+msgid "The users were deleted."
+msgstr "Os utilizadores foram eliminados."
+
+#: src/security/views.py:137
+msgid "You must be a superuser to delete groups."
+msgstr "Tem de ser um superutilizador para eliminar grupos."
+
+#: src/security/views.py:150
+msgid "The default user group may not be deleted."
+msgstr "O grupo de utilizador predefinido não pode ser eliminado."
+
+#: src/security/views.py:155
+msgid "The group was deleted."
+msgstr "O grupo foi eliminado."
+
+#: src/security/views.py:158
+msgid "Group not found."
+msgstr "Grupo não encontrado."
+
+#: src/security/views.py:173
+msgid "You must be a superuser to add or edit another user."
+msgstr "Tem de ser um superutilizador para adicionar ou editar outro utilizador."
+
+#: src/security/views.py:193
+msgid "You cannot change a username."
+msgstr "Não pode alterar um nome de utilizador."
+
+#: src/security/views.py:195
+msgid "You cannot make yourself inactive."
+msgstr "Não pode desactivar-se a si próprio."
+
+#: src/security/views.py:207
+msgid "You cannot make yourself a superuser."
+msgstr "Não pode definir-se a si próprio como superutilizador."
+
+#: src/security/views.py:211
+msgid "User information updated"
+msgstr "Informações do utilizador actualizadas."
+
+#: src/security/views.py:220 src/security/views.py:329
+#, python-format
+msgid "Cannot make home directory for user %s."
+msgstr "Não é possível criar o directório de início para o utilizador %s."
+
+#: src/security/views.py:248
+msgid "You must be a superuser to add or edit a group."
+msgstr "Tem de ser um superutilizador para adicionar ou editar um grupo."
+
+#: src/security/views.py:259
+msgid "Group information updated"
+msgstr "Informações de grupo actualizadas"
+
+#: src/security/views.py:282
+msgid "You must be a superuser to change permissions."
+msgstr "Tem de ser um superutilizador para alterar permissões."
+
+#: src/security/views.py:290
+msgid "Permission information updated"
+msgstr "Informações de permissão actualizadas"
+
+#: src/security/views.py:309
+msgid "You must be a superuser to add another user."
+msgstr "Tem de ser um superutilizador para adicionar outro utilizador."
+
+#: src/security/views.py:322 src/security/views.py:368
+#: src/security/views.py:412
+msgid "There was an error when communicating with LDAP"
+msgstr "Ocorreu um erro ao comunicar com o LDAP"
+
+#: src/security/views.py:333
+#, python-format
+msgid "Could not get LDAP details for users in pattern %s."
+msgstr "Não foi possível obter detalhes de LDAP para utilizadores no padrão %s."
+
+#: src/security/views.py:353
+msgid "You must be a superuser to add another group."
+msgstr "Tem de ser um superutilizador para adicionar outro grupo."
+
+#: src/security/views.py:367
+#, python-format
+msgid "LDAP Exception: %s"
+msgstr "Excepção LDAP: %s"
+
+#: src/security/views.py:374
+#, python-format
+msgid "Could not get LDAP details for groups in pattern %s"
+msgstr "Não foi possível obter detalhes de LDAP para grupos no padrão %s"
+
+#: src/security/views.py:391
+msgid "You must be a superuser to sync the LDAP users/groups."
+msgstr "Tem de ser um superutilizador para sincronizar os utilizadores/grupos de LDAP."
+
+#: src/security/views.py:420
+msgid "The import may not be complete, sync again."
+msgstr "A importação pode não estar completa. Sincronize novamente."
+
+#: src/security/views.py:441
+msgid "No active superuser configured."
+msgstr "Nenhum superutilizador activo configurado."
+
+#: src/security/views.py:443
+msgid "You cannot remove the last active superuser from the configuration."
+msgstr "Não pode remover o último superutilizador activo da configuração."
+
+#: src/security/views.py:501
+#, python-format
+msgid "Synced user %s from Unix"
+msgstr "Utilizador %s sincronizado do Unix"
+
+#: src/security/views.py:530
+#, python-format
+msgid "There was a naming conflict while importing user %(username)s"
+msgstr "Ocorreu um conflito de nomes ao importar o utilizador %(username)s"
+
+#: src/security/views.py:672 src/security/views.py:721
+#, python-format
+msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgstr "Ocorreu um conflito de nomes ao importar o grupo %(groupname)s no padrão %(groupname_pattern)s"
+
+#: src/security/management/commands/import_ldap_group.py:42
+msgid "Import users from the group."
+msgstr "Importar utilizadores do grupo."
+
+#: src/security/management/commands/import_ldap_group.py:45
+msgid "Import users from the group, but also do so recursively."
+msgstr "Importar utilizadores do grupo, mas efectuar também a acção recursivamente"
+
+#: src/security/management/commands/import_ldap_group.py:48
+msgid "Sync users in the group."
+msgstr "Sincronizar utilizadores no grupo."
+
+#: src/security/management/commands/import_ldap_group.py:51
+#: src/security/management/commands/import_ldap_user.py:42
+#: src/security/management/commands/sync_ldap_users_and_groups.py:37
+msgid "Server to connect to."
+msgstr "Servidor ao qual ligar."
+
+#: src/security/management/commands/import_ldap_group.py:60
+msgid "A group name must be provided."
+msgstr "É necessário fornecer um nome de grupo."
+
+#: src/security/management/commands/import_ldap_user.py:39
+msgid "Sync groups of the users."
+msgstr "Sincronizar grupos dos utilizadores"
+
+#: src/security/management/commands/import_ldap_user.py:51
+msgid "A username must be provided."
+msgstr "É necessário fornecer um nome de utilizador."
+
+#: src/security/management/commands/security_sync_with_unix.py:31
+msgid "Minimum UID to import (Inclusive)."
+msgstr "UID mínimo a importar (incluído)."
+
+#: src/security/management/commands/security_sync_with_unix.py:32
+msgid "Maximum UID to import (Exclusive)."
+msgstr "UID máximo a importar (não incluído)."
+
+#: src/security/management/commands/security_sync_with_unix.py:33
+msgid "Minimum GID to import (Inclusive)."
+msgstr "GID mínimo a importar (incluído)."
+
+#: src/security/management/commands/security_sync_with_unix.py:34
+msgid "Maximum GID to import (Exclusive)."
+msgstr "GID máximo a importar (não incluído)."
+
+#: src/security/management/commands/security_sync_with_unix.py:35
+msgid "Whether or not to check that the user's shell is not /bin/false."
+msgstr "Verificar ou não se a shell do utilizador não é /bin/false."
+
+#: src/security/templates/add_ldap_users.mako:25
+#: src/security/templates/edit_user.mako:23
+#: src/security/templates/list_users.mako:25
+#: src/security/templates/list_users.mako:30
+msgid "Hue Users"
+msgstr "Utilizadores da Hue"
+
+#: src/security/templates/add_ldap_users.mako:31
+msgid "Hue Users - Add/Sync LDAP user"
+msgstr "Utilizadores da Hue - Adicionar/sincronizar utilizador de LDAP"
+
+#: src/security/templates/add_ldap_users.mako:47
+#: src/security/templates/edit_user.mako:78
+msgid "Update user"
+msgstr "Actualizar utilizador"
+
+#: src/security/templates/add_ldap_users.mako:49
+msgid "Add/Sync user"
+msgstr "Adicionar/Sincronizar utilizador"
+
+#: src/security/templates/add_ldap_users.mako:51
+#: src/security/templates/edit_group.mako:77
+#: src/security/templates/edit_permissions.mako:57
+#: src/security/templates/sync_ldap_users_groups.mako:51
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/security/templates/add_ldap_users.mako:60
+#: src/security/templates/edit_group.mako:86
+#: src/security/templates/edit_group.mako:93
+#: src/security/templates/edit_permissions.mako:66
+#: src/security/templates/edit_user.mako:93
+msgid "Select all"
+msgstr "Seleccionar tudo"
+
+#: src/security/templates/add_ldap_users.mako:61
+#: src/security/templates/edit_group.mako:87
+#: src/security/templates/edit_group.mako:94
+#: src/security/templates/edit_permissions.mako:67
+#: src/security/templates/edit_user.mako:94
+msgid "Search"
+msgstr "Pesquisar"
+
+#: src/security/templates/add_ldap_users.mako:62
+#: src/security/templates/edit_permissions.mako:68
+#: src/security/templates/edit_user.mako:95
+msgid "No groups found."
+msgstr "Nenhum grupo encontrado."
+
+#: src/security/templates/add_ldap_users.mako:62
+#: src/security/templates/edit_user.mako:95
+msgid "Create a new group now"
+msgstr "Criar um novo grupo agora"
+
+#: src/security/templates/confirm.mako:22
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: src/security/templates/confirm.mako:25
+#: src/security/templates/delete_group.mako:26
+#: src/security/templates/list_users.mako:128
+msgid "Yes"
+msgstr "Sim"
+
+#: src/security/templates/delete_group.mako:22
+msgid "Are you sure you want to delete"
+msgstr "Tem a certeza de que pretende eliminar"
+
+#: src/security/templates/delete_group.mako:22
+msgid "?"
+msgstr "?"
+
+#: src/security/templates/delete_group.mako:25
+#: src/security/templates/list_users.mako:127
+msgid "No"
+msgstr "Não"
+
+#: src/security/templates/edit_group.mako:26
+#: src/security/templates/list_groups.mako:25
+#: src/security/templates/list_groups.mako:30
+msgid "Hue Groups"
+msgstr "Grupos da Hue"
+
+#: src/security/templates/edit_group.mako:48
+#, python-format
+msgid "Hue Groups - Edit group: %(name)s"
+msgstr "Grupos da Hue - Editar grupo: %(name)s"
+
+#: src/security/templates/edit_group.mako:51
+msgid "Hue Groups - Add/Sync LDAP group"
+msgstr "Grupos da Hue - Adicionar/Sincronizar grupo de LDAP"
+
+#: src/security/templates/edit_group.mako:53
+msgid "Hue Groups - Create group"
+msgstr "Grupos da Hue - Criar grupo"
+
+#: src/security/templates/edit_group.mako:69
+msgid "Update group"
+msgstr "Actualizar grupo"
+
+#: src/security/templates/edit_group.mako:72
+msgid "Add/Sync group"
+msgstr "Adicionar/Sincronizar grupo"
+
+#: src/security/templates/edit_group.mako:74
+#: src/security/templates/list_groups.mako:46
+msgid "Add group"
+msgstr "Adicionar grupo"
+
+#: src/security/templates/edit_group.mako:88
+msgid "No users found."
+msgstr "Nenhum utilizador encontrado."
+
+#: src/security/templates/edit_group.mako:88
+msgid "Create a new user now"
+msgstr "Criar um novo utilizador agora"
+
+#: src/security/templates/edit_group.mako:95
+msgid "No permissions found."
+msgstr "Nenhuma permissão encontrada."
+
+#: src/security/templates/edit_permissions.mako:23
+#: src/security/templates/list_permissions.mako:26
+#: src/security/templates/list_permissions.mako:31
+msgid "Hue Permissions"
+msgstr "Permissões da Hue"
+
+#: src/security/templates/edit_permissions.mako:44
+#, python-format
+msgid "Hue Permissions - Edit app: %(app)s"
+msgstr "Permissões da Hue - Editar aplicação: %(app)s"
+
+#: src/security/templates/edit_permissions.mako:56
+msgid "Update permission"
+msgstr "Actualizar permissão"
+
+#: src/security/templates/edit_user.mako:29
+#, python-format
+msgid "Hue Users - Edit user: %(username)s"
+msgstr "Utilizadores da Hue - Editar utilizador: %(username)s"
+
+#: src/security/templates/edit_user.mako:31
+msgid "Hue Users - Create user"
+msgstr "Utilizadores da Hue - Criar utilizador"
+
+#: src/security/templates/edit_user.mako:38
+msgid "Step 1: Credentials (required)"
+msgstr "Passo 1: credenciais (obrigatório)"
+
+#: src/security/templates/edit_user.mako:39
+msgid "Step 2: Names and Groups"
+msgstr "Passo 2: nomes e grupos"
+
+#: src/security/templates/edit_user.mako:39
+msgid "Step 2: Names"
+msgstr "Passo 2: nomes"
+
+#: src/security/templates/edit_user.mako:42
+msgid "Step 3: Advanced"
+msgstr "Passo 3: opções avançadas"
+
+#: src/security/templates/edit_user.mako:74
+msgid "Back"
+msgstr "Voltar"
+
+#: src/security/templates/edit_user.mako:75
+msgid "Next"
+msgstr "Seguinte"
+
+#: src/security/templates/edit_user.mako:80
+#: src/security/templates/list_users.mako:45
+msgid "Add user"
+msgstr "Adicionar utilizador"
+
+#: src/security/templates/edit_user.mako:146
+msgid "This field is required."
+msgstr "Este campo é obrigatório."
+
+#: src/security/templates/layout.mako:59
+msgid "User Admin"
+msgstr "Utilizador admin"
+
+#: src/security/templates/layout.mako:63
+msgid "Users"
+msgstr "Utilizadores"
+
+#: src/security/templates/layout.mako:64
+#: src/security/templates/list_permissions.mako:44
+#: src/security/templates/list_users.mako:75
+msgid "Groups"
+msgstr "Grupos"
+
+#: src/security/templates/layout.mako:65
+#: src/security/templates/list_groups.mako:69
+msgid "Permissions"
+msgstr "Permissões"
+
+#: src/security/templates/list_groups.mako:35
+msgid "Search for name, members, etc..."
+msgstr "Pesquisar por nome, membros, etc..."
+
+#: src/security/templates/list_groups.mako:39
+#: src/security/templates/list_groups.mako:40
+#: src/security/templates/list_users.mako:39
+#: src/security/templates/list_users.mako:40
+msgid "Delete"
+msgstr "Eliminar"
+
+#: src/security/templates/list_groups.mako:49
+msgid "Add/Sync LDAP group"
+msgstr "Adicionar/Sincronizar grupo de LDAP"
+
+#: src/security/templates/list_groups.mako:67
+msgid "Group Name"
+msgstr "Nome de grupo"
+
+#: src/security/templates/list_groups.mako:68
+msgid "Members"
+msgstr "Membros"
+
+#: src/security/templates/list_groups.mako:85
+#, python-format
+msgid "Edit %(groupname)s"
+msgstr "Editar %(groupname)s"
+
+#: src/security/templates/list_groups.mako:101
+msgid "There are no groups matching the search criteria."
+msgstr "Não há grupos correspondentes aos critérios de pesquisa."
+
+#: src/security/templates/list_groups.mako:129
+#: src/security/templates/list_permissions.mako:91
+#: src/security/templates/list_users.mako:167
+msgid "No data available"
+msgstr "Não existem dados disponíveis"
+
+#: src/security/templates/list_groups.mako:130
+#: src/security/templates/list_permissions.mako:92
+#: src/security/templates/list_users.mako:168
+msgid "No matching records"
+msgstr "Não existem registos correspondentes"
+
+#: src/security/templates/list_permissions.mako:35
+msgid "Search for application, group, etc..."
+msgstr "Pesquisar por aplicação, grupo, etc..."
+
+#: src/security/templates/list_permissions.mako:42
+msgid "Application"
+msgstr "Aplicação"
+
+#: src/security/templates/list_permissions.mako:43
+msgid "Permission"
+msgstr "Permissão"
+
+#: src/security/templates/list_permissions.mako:53
+msgid "Edit permission"
+msgstr "Editar permissão"
+
+#: src/security/templates/list_permissions.mako:69
+msgid "There are no permissions matching the search criteria."
+msgstr "Não há permissões correspondentes aos critérios de pesquisa."
+
+#: src/security/templates/list_users.mako:35
+msgid "Search for name, group, etc..."
+msgstr "Pesquisar por nome, grupo, etc..."
+
+#: src/security/templates/list_users.mako:49
+msgid "Add/Sync LDAP user"
+msgstr "Adicionar/Sincronizar utilizador de LDAP"
+
+#: src/security/templates/list_users.mako:52
+msgid "Sync LDAP users/groups"
+msgstr "Sincronizar utilizadores/grupos de LDAP"
+
+#: src/security/templates/list_users.mako:72
+msgid "First Name"
+msgstr "Nome"
+
+#: src/security/templates/list_users.mako:73
+msgid "Last Name"
+msgstr "Apelido"
+
+#: src/security/templates/list_users.mako:74
+msgid "E-mail"
+msgstr "E-mail"
+
+#: src/security/templates/list_users.mako:76
+msgid "Last Login"
+msgstr "Último início de sessão"
+
+#: src/security/templates/list_users.mako:90
+#, python-format
+msgid "Edit %(username)s"
+msgstr "Editar %(username)s"
+
+#: src/security/templates/list_users.mako:109
+msgid "There are no users matching the search criteria."
+msgstr "Não há utilizadores correspondentes aos critérios de pesquisa."
+
+#: src/security/templates/list_users.mako:124
+msgid "Are you sure you want to delete the selected user(s)?"
+msgstr "Tem a certeza de que pretende eliminar o(s) utilizador(es) seleccionado(s)?"
+
+#: src/security/templates/sync_ldap_users_groups.mako:39
+msgid "Sync LDAP users and groups"
+msgstr "Sincronizar utilizadores e grupos de LDAP"
+
+#: src/security/templates/sync_ldap_users_groups.mako:43
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "Não será efectuada a importação de quaisquer utilizadores ou grupos que não existam no Hue. Apenas utilizadores e grupos importados do LDAP podem ser sincronizados."
+
+#: src/security/templates/sync_ldap_users_groups.mako:44
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "Todas as informações de utilizador e associações de grupos serão actualizadas com base no estado actual do servidor LDAP."
+
+#: src/security/templates/sync_ldap_users_groups.mako:52
+msgid "Sync"
+msgstr "Sincronizar"
+

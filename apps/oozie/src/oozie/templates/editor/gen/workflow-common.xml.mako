@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -15,18 +16,31 @@
 ## limitations under the License.
 
 <%!
-import posixpath
+  import posixpath
+  from oozie.utils import smart_path
 %>
 
 
-<%def name="filelink(path)">${ path + '#' + posixpath.basename(path) }</%def>
+<%def name="filelink(path)">${ '#' in path and path or path + '#' + posixpath.basename(path) }</%def>
+
+
+<%def name="credentials(credentials)">\
+<% value = ','.join(cred['name'] for cred in credentials if cred['value']) %>\
+% if value:
+${ ' cred="%s"' % value | n,unicode }\
+% endif
+</%def>
 
 
 <%def name="prepares(prepares)">
         % if prepares:
             <prepare>
                 % for p in prepares:
-                <${ p['type'] } path="${'${'}nameNode}${ p['value'] }"/>
+                  <%
+                    operation = p['type']
+                    path = p['value']
+                  %>
+                  <${ operation } path="${ smart_path(path, mapping) }"/>
                 % endfor
             </prepare>
         % endif
@@ -49,13 +63,26 @@ import posixpath
 
 <%def name="distributed_cache(files, archives)">
     % for f in files:
-        % if len(f) != 0:
-            <file>${ f + '#' + posixpath.basename(f) }</file>
+        % if f:
+            <file>${ filelink(f) }</file>
         % endif
     % endfor
     % for a in archives:
-        % if len(a) != 0:
-            <archive>${ a }</archive>
+        % if a:
+            <archive>${ filelink(a['name']) }</archive>
         % endif
     % endfor
+</%def>
+
+
+<%def name="sla(element)">
+        % if element.sla_enabled:
+          <sla:info>
+          % for sla in element.sla:
+            % if sla['value'] and sla['key'] != 'enabled':
+            <sla:${ sla['key'] }>${ sla['value'] }</sla:${ sla['key'] }>
+            % endif
+          % endfor
+          </sla:info>
+        % endif
 </%def>

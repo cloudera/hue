@@ -15,33 +15,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+
+import inspect
+import json
 import logging
 import os.path
 import re
 import tempfile
+import time
+
 import kerberos
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
+from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
+from django.http import HttpResponseNotAllowed
+from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.http import urlquote
-from django.utils.encoding import iri_to_uri
+from django.utils.translation import ugettext as _
+from django.utils.http import urlquote, is_safe_url
 import django.views.static
-import django.views.generic.simple
 
+import desktop.views
 import desktop.conf
-from desktop.lib import apputil, i18n
-from desktop.lib.django_util import render, render_json, is_jframe_request
-from desktop.lib.exceptions import PopupException, StructuredException
+from desktop.context_processors import get_app_name
+from desktop.lib import apputil, i18n, fsmanager
+from desktop.lib.django_util import render, render_json
+from desktop.lib.exceptions import StructuredException
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
+from desktop import metrics
 from hadoop import cluster
-import simplejson
 
-from django.utils.translation import ugettext as _
+
 
 LOG = logging.getLogger(__name__)
 
@@ -51,8 +64,9 @@ MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 # (see LoginAndPermissionMiddleware)
 DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
-  django.views.generic.simple.redirect_to,
+  desktop.views.is_alive,
 ]
+
 
 class AjaxMiddleware(object):
   """
@@ -63,6 +77,7 @@ class AjaxMiddleware(object):
   def process_request(self, request):
     request.ajax = request.is_ajax() or request.REQUEST.get("format", "") == "json"
     return None
+
 
 class ExceptionMiddleware(object):
   """
@@ -91,28 +106,6 @@ class ExceptionMiddleware(object):
 
     return None
 
-class JFrameMiddleware(object):
-  """
-  Updates JFrame headers to update path and push flash messages into headers.
-  """
-  def process_response(self, request, response):
-    path = request.path
-    if request.GET:
-      get_params = request.GET.copy()
-      if "noCache" in get_params:
-        del get_params["noCache"]
-      query_string = get_params.urlencode()
-      if query_string:
-        path = request.path + "?" + query_string
-    response['X-Hue-JFrame-Path'] = iri_to_uri(path)
-    if response.status_code == 200:
-      if is_jframe_request(request):
-        if hasattr(request, "flash"):
-          flashes = request.flash.get()
-          if flashes:
-            response['X-Hue-Flash-Messages'] = simplejson.dumps(flashes)
-
-    return response
 
 class ClusterMiddleware(object):
   """
@@ -127,16 +120,13 @@ class ClusterMiddleware(object):
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    try:
-      request.fs = cluster.get_hdfs(request.fs_ref)
-    except KeyError:
-      raise KeyError(_('Cannot find HDFS called "%(fs_ref)s"') % {'fs_ref': request.fs_ref})
+    request.fs = fsmanager.get_filesystem(request.fs_ref)
 
     if request.user.is_authenticated():
       if request.fs is not None:
         request.fs.setuser(request.user.username)
 
-      request.jt = cluster.get_default_mrcluster()
+      request.jt = cluster.get_default_mrcluster() # Deprecated, only there for MR1
       if request.jt is not None:
         request.jt.setuser(request.user.username)
     else:
@@ -162,8 +152,12 @@ class NotificationMiddleware(object):
     def error(title, detail=None):
       messages.error(request, message(title, detail))
 
+    def warn(title, detail=None):
+      messages.warning(request, message(title, detail))
+
     request.info = info
     request.error = error
+    request.warn = warn
 
 
 class AppSpecificMiddleware(object):
@@ -171,7 +165,7 @@ class AppSpecificMiddleware(object):
   def augment_request_with_app(cls, request, view_func):
     """ Stuff the app into the request for use in later-stage middleware """
     if not hasattr(request, "_desktop_app"):
-      module = apputil.getmodule_wrapper(view_func)
+      module = inspect.getmodule(view_func)
       request._desktop_app = apputil.get_app_for_module(module)
       if not request._desktop_app and not module.__name__.startswith('django.'):
         logging.debug("no app for view func: %s in %s" % (view_func, module))
@@ -234,16 +228,16 @@ class AppSpecificMiddleware(object):
       try:
           dot = middleware_path.rindex('.')
       except ValueError:
-          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module') % {'module': middleware_path}
+          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module.') % {'module': middleware_path}
       mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
       try:
           mod = __import__(mw_module, {}, {}, [''])
       except ImportError, e:
-          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s"') % {'module': mw_module, 'error': e}
+          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e}
       try:
           mw_class = getattr(mod, mw_classname)
       except AttributeError:
-          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class') % {'module': mw_module, 'class':mw_classname}
+          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname}
 
       try:
         mw_instance = mw_class()
@@ -264,6 +258,7 @@ class AppSpecificMiddleware(object):
       if hasattr(mw_instance, 'process_exception'):
         result['exception'].insert(0, mw_instance.process_exception)
     return result
+
 
 class LoginAndPermissionMiddleware(object):
   """
@@ -293,11 +288,29 @@ class LoginAndPermissionMiddleware(object):
     # app.
     if request.user.is_active and request.user.is_authenticated():
       AppSpecificMiddleware.augment_request_with_app(request, view_func)
-      if request._desktop_app and \
-          request._desktop_app != "desktop" and \
-          not request.user.has_hue_permission(action="access", app=request._desktop_app):
+
+      # Until we get Django 1.3 and resolve returning the URL name, we just do a match of the name of the view
+      try:
+        access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
+      except Exception, e:
+        access_log(request, 'error checking view perm: %s', e, level=access_log_level)
+        access_view =''
+
+      # Accessing an app can access an underlying other app.
+      # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
+      # Here we trust the URL to be the real app we need to check the perms.
+      app_accessed = request._desktop_app
+      ui_app_accessed = get_app_name(request)
+      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
+        app_accessed = ui_app_accessed
+
+      if app_accessed and \
+          app_accessed not in ("desktop", "home", "home2", "about") and \
+          not (request.user.has_hue_permission(action="access", app=app_accessed) or
+               request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
-        return PopupException(_("You do not have permission to access the %(app_name)s application.") % {'app_name': request._desktop_app.capitalize()}).response(request)
+        return PopupException(
+            _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
       else:
         log_page_hit(request, view_func, level=access_log_level)
         return None
@@ -312,59 +325,75 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL,
-        REDIRECT_FIELD_NAME,
-        urlquote(request.get_full_path())))
+      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
 
-class SessionOverPostMiddleware(object):
-  """
-  Django puts session info in cookies, which is reasonable.
-  Unfortunately, the plugin we use for file-uploading
-  doesn't forward the cookies, though it can do so over
-  POST.  So we push the POST data back in.
+class JsonMessage(object):
+  def __init__(self, **kwargs):
+    self.kwargs = kwargs
 
-  This is the issue discussed at
-  http://www.stereoplex.com/two-voices/cookieless-django-sessions-and-authentication-without-cookies
-  and
-  http://digitarald.de/forums/topic.php?id=20
-
-  The author of fancyupload says (http://digitarald.de/project/fancyupload/):
-    Flash-request forgets cookies and session ID
-
-    See option appendCookieData. Flash FileReference is not an intelligent
-    upload class, the request will not have the browser cookies, Flash saves
-    his own cookies. When you have sessions, append them as get-data to the the
-    URL (e.g. "upload.php?SESSID=123456789abcdef"). Of course your session-name
-    can be different.
-
-  and, indeed, folks are whining about it: http://bugs.adobe.com/jira/browse/FP-78
-
-  There seem to be some other solutions:
-  http://robrosenbaum.com/flash/using-flash-upload-with-php-symfony/
-  and it may or may not be browser and plugin-dependent.
-
-  In the meanwhile, this is pretty straight-forward.
-  """
-  def process_request(self, request):
-    cookie_key = settings.SESSION_COOKIE_NAME
-    if cookie_key not in request.COOKIES and cookie_key in request.POST:
-      request.COOKIES[cookie_key] = request.POST[cookie_key]
-      del request.POST[cookie_key]
+  def __str__(self):
+    return json.dumps(self.kwargs)
 
 
-class DatabaseLoggingMiddleware(object):
-  """
-  If configured, logs database queries for every request.
-  """
-  DATABASE_LOG = logging.getLogger("desktop.middleware.DatabaseLoggingMiddleware")
+class AuditLoggingMiddleware(object):
+
+  def __init__(self):
+    from desktop.conf import AUDIT_EVENT_LOG_DIR, SERVER_USER
+
+    self.impersonator = SERVER_USER.get()
+
+    if not AUDIT_EVENT_LOG_DIR.get():
+      LOG.info('Unloading AuditLoggingMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
   def process_response(self, request, response):
-    if desktop.conf.DATABASE_LOGGING.get():
-      if self.DATABASE_LOG.isEnabledFor(logging.INFO):
-          # This only exists if desktop.settings.DEBUG is true, hence the use of getattr
-          for query in getattr(django.db.connection, "queries", []):
-            self.DATABASE_LOG.info("(%s) %s" % (query["time"], query["sql"]))
+    response['audited'] = False
+    try:
+      if hasattr(request, 'audit') and request.audit is not None:
+        self._log_message(request, response)
+        response['audited'] = True
+    except Exception, e:
+      LOG.error('Could not audit the request: %s' % e)
     return response
+
+  def _log_message(self, request, response=None):
+    audit_logger = get_audit_logger()
+
+    audit_logger.debug(JsonMessage(**{
+      'username': self._get_username(request),
+      'impersonator': self.impersonator,
+      'ipAddress': self._get_client_ip(request),
+      'operation': request.audit['operation'],
+      'operationText': request.audit.get('operationText', ''),
+      'eventTime': self._milliseconds_since_epoch(),
+      'allowed': self._get_allowed(request, response),
+      'service': get_app_name(request),
+      'url': request.path
+    }))
+
+  def _get_client_ip(self, request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        x_forwarded_for = x_forwarded_for.split(',')[0]
+    return request.META.get('HTTP_CLIENT_IP') or x_forwarded_for or request.META.get('REMOTE_ADDR')
+
+  def _get_username(self, request):
+    username = 'anonymous'
+    if request.audit.get('username', None):
+      username = request.audit.get('username')
+    elif hasattr(request, 'user') and not request.user.is_anonymous():
+      username = request.user.get_username()
+    return username
+
+  def _milliseconds_since_epoch(self):
+    return int(time.time() * 1000)
+
+  def _get_allowed(self, request, response=None):
+    allowed = response.status_code != 401
+    if 'allowed' in request.audit:
+      return request.audit['allowed']
+    return allowed
 
 
 try:
@@ -437,11 +466,12 @@ class HtmlValidationMiddleware(object):
       fn = urlresolvers.resolve(request.path)[0]
       fn_name = '%s.%s' % (fn.__module__, fn.__name__)
     except:
+      LOG.exception('failed to resolve url')
       fn_name = '<unresolved_url>'
 
     # Write the two versions of html out for offline debugging
     filename = os.path.join(self._outdir, fn_name)
-    
+
     result = "HTML tidy result: %s [%s]:" \
              "\n\t%s" \
              "\nPlease see %s.orig %s.tidy\n-------" % \
@@ -470,6 +500,7 @@ class HtmlValidationMiddleware(object):
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 
+
 class SpnegoMiddleware(object):
   """
   Based on the WSGI SPNEGO middlware class posted here:
@@ -477,7 +508,7 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -573,3 +604,69 @@ class SpnegoMiddleware(object):
     except AttributeError:
       pass
     return username
+
+
+class HueRemoteUserMiddleware(RemoteUserMiddleware):
+  """
+  Middleware to delegate authentication to a proxy server. The proxy server
+  will set an HTTP header (defaults to Remote-User) with the name of the
+  authenticated user. This class extends the RemoteUserMiddleware class
+  built into Django with the ability to configure the HTTP header and to
+  unload the middleware if the RemoteUserDjangoBackend is not currently
+  in use.
+  """
+  def __init__(self):
+    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+      LOG.info('Unloading HueRemoteUserMiddleware')
+      raise exceptions.MiddlewareNotUsed
+    self.header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()
+
+
+class EnsureSafeMethodMiddleware(object):
+  """
+  Middleware to white list configured HTTP request methods.
+  """
+  def process_request(self, request):
+    if request.method not in desktop.conf.HTTP_ALLOWED_METHODS.get():
+      return HttpResponseNotAllowed(desktop.conf.HTTP_ALLOWED_METHODS.get())
+
+
+class EnsureSafeRedirectURLMiddleware(object):
+  """
+  Middleware to white list configured redirect URLs.
+  """
+  def process_response(self, request, response):
+    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location'):
+      redirection_patterns = desktop.conf.REDIRECT_WHITELIST.get()
+      location = response['Location']
+
+      if any(regexp.match(location) for regexp in redirection_patterns):
+        return response
+
+      if is_safe_url(location, request.get_host()):
+        return response
+
+      response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
+      response.status_code = 403
+      return response
+    else:
+      return response
+
+
+class MetricsMiddleware(object):
+  """
+  Middleware to track the number of active requests.
+  """
+
+  def process_request(self, request):
+    self._response_timer = metrics.response_time.time()
+    metrics.active_requests.inc()
+
+  def process_exception(self, request, exception):
+    self._response_timer.stop()
+    metrics.request_exceptions.inc()
+
+  def process_response(self, request, response):
+    self._response_timer.stop()
+    metrics.active_requests.dec()
+    return response

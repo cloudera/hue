@@ -1,0 +1,81 @@
+<div id="shell">
+  <h1 class="card-heading card-heading-blue simple card-marginbottom">{{ title }}</h1>
+  <form class="form-horizontal" id="workflowForm" action="#list-designs" method="POST">
+    <fieldset>
+      {{#name}}
+        {{>name}}
+      {{/name}}
+
+      {{#description}}
+        {{>description}}
+      {{/description}}
+
+      <div class="control-group ">
+        <label class="control-label">
+          <a href="javascript:void(0);" onclick="$('div.advanced').toggle('hide')" class="advanced">
+            <i class="fa fa-share"></i>
+            advanced
+          </a>
+        </label>
+      </div>
+      <div class="advanced hide">
+        {{#is_shared}}
+          {{>is_shared}}
+        {{/is_shared}}
+
+        {{#parameters}}
+          {{>parameters}}
+        {{/parameters}}
+      </div>
+
+      <hr/>
+
+      <div class="control-group">
+        <p class="alert alert-info">{{{ alert }}}</p>
+        <p class="alert alert-info">{{{ paths_alert }}}</p>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ command.name }}" data-content="{{ command.popover }}" data-bind="attr: {'class': ( errors.command().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ command.name }}</label>
+        <div class="controls">
+          <input id="shell-command" type="text" class="pathChooserKo" name="command" data-bind="fileChooser: $data, value: command" />
+          <ul class="help-inline" data-bind="foreach: errors.command()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      {{#prepares}}
+        {{>prepares}}
+      {{/prepares}}
+
+      {{#params}}
+        {{>params}}
+      {{/params}}
+
+      {{#envvars}}
+        {{>envvars}}
+      {{/envvars}}
+
+      {{#job_properties}}
+        {{>job_properties}}
+      {{/job_properties}}
+
+      {{#files}}
+        {{>files}}
+      {{/files}}
+
+      {{#archives}}
+        {{>archives}}
+      {{/archives}}
+
+      {{#capture_output}}
+        {{>capture_output}}
+      {{/capture_output}}
+    </fieldset>
+    <div class="form-actions">
+      <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>
+      <a href="javascript:void(0);" data-bind="click: {{ cancel.func }}" class="btn">{{ cancel.name }}</a>
+    </div>
+  </form>
+</div>

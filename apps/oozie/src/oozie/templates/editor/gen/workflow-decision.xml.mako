@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -21,6 +22,6 @@
               ${ link.comment }
             </case>
         % endfor
-            <default to="${ node.get_child('default') }"/>
+            <default to="${ node.get_oozie_child('default') }"/>
         </switch>
     </decision>

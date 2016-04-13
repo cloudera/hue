@@ -1,0 +1,21 @@
+<workflow-app name="Pig" xmlns="uri:oozie:workflow:0.4">
+    <start to="Pig"/>
+    <action name="Pig">
+        <pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <script>aggregate.pig</script>
+              <param>KEY=VALUE</param>
+              <argument>-param</argument>
+              <argument>INPUT=/user/hue/oozie/workspaces/data</argument>
+              <argument>-param</argument>
+              <argument>OUTPUT=${output}</argument>
+        </pig>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

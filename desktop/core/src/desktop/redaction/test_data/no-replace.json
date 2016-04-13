@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "No more vowels",
+      "search": "[aeiou]"
+    }
+  ]
+}

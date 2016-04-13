@@ -21,7 +21,7 @@
 <%namespace name="utils" file="../../utils.inc.mako" />
 
 
-<%def name="print_key_value(field, element, initial_value)">
+<%def name="print_key_value(field, element)">
   <div class="control-group ko-${element}" rel="popover"
       data-original-title="${ field.label }" data-content="${ field.help_text }">
     <label class="control-label">${ field.label }</label>
@@ -37,7 +37,7 @@
         <tbody data-bind="foreach: ${ element }">
           <tr>
             <td><input type="text" class="required" data-bind="value: name, uniqueName: false" /></td>
-            <td><input type="text" class="required" data-bind="value: value, uniqueName: false" /></td>
+            <td><input type="text" class="required input-xxlarge" data-bind="value: value, uniqueName: false" /></td>
             <td><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
           </tr>
         </tbody>
@@ -54,39 +54,60 @@
     </div>
   </div>
 
-  <style>
+  <style type="text/css">
     .designTable th {
       text-align:left;
     }
   </style>
 
+</%def>
+
+<%def name="init_viewmodel(coordinator)">
   <script type="text/javascript">
     $(document).ready(function(){
-      var ViewModel = function(${ element }) {
+      var ViewModel = function() {
         var self = this;
-        self.${ element } = ko.observableArray(${ element });
+        self.parameters = ko.observableArray(${ coordinator.parameters_escapejs | n });
 
         self.add_parameters = function() {
-          self.${ element }.push({name: "", value: ""});
+          self.parameters.push({name: "", value: ""});
         };
 
         self.remove_parameters = function(val) {
-          self.${ element }.remove(val);
+          self.parameters.remove(val);
+        };
+
+        self.job_properties = ko.observableArray(${ coordinator.job_properties_escapejs | n });
+
+        self.add_job_properties = function() {
+          self.job_properties.push({name: "", value: ""});
+        };
+
+        self.remove_job_properties = function(val) {
+          self.job_properties.remove(val);
         };
 
         self.submit = function(form) {
           var form = $("#jobForm");
 
           $("<input>").attr("type", "hidden")
-              .attr("name", "${ element }")
-              .attr("value", ko.utils.stringifyJson(self.${ element }))
-              .appendTo(form);
+                  .attr("name", "parameters")
+                  .attr("value", ko.utils.stringifyJson(self.parameters))
+                  .appendTo(form);
+          $("<input>").attr("type", "hidden")
+                  .attr("name", "job_properties")
+                  .attr("value", ko.utils.stringifyJson(self.job_properties))
+                  .appendTo(form);
+          $("<input>").attr("type", "hidden")
+                  .attr("name", "sla")
+                  .attr("value", ko.toJSON(window.slaModel.sla))
+                  .appendTo(form);
 
           form.submit();
         };
       };
 
-      window.viewModel = new ViewModel(${ initial_value });
+      window.viewModel = new ViewModel();
     });
   </script>
 </%def>

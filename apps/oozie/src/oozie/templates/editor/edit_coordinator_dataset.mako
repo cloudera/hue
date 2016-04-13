@@ -16,44 +16,50 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from oozie.models import DATASET_FREQUENCY
 %>
 
 
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form class="form-horizontal" id="edit-dataset-form" method="POST" action="${path}">
-  <div class="modal-header">
-    <button class="close" data-dismiss="modal">&times;</button>
-    <h3>${ _('Edit dataset') }</h3>
-  </div>
+<fieldset>
+  ${ utils.render_field(dataset_form['name']) }
+  ${ utils.render_field(dataset_form['description']) }
 
-  <div class="modal-body" id="edit-dataset-body">
-    <fieldset>
-      ${ utils.render_field(dataset_form['name']) }
-      ${ utils.render_field(dataset_form['description']) }
+  <div class="row-fluid">
+    <div class="span6">
       ${ utils.render_field(dataset_form['start']) }
-      <div class="row-fluid">
-        <div class="span6">
-          ${ utils.render_field(dataset_form['frequency_number']) }
-        </div>
-        <div class="span6">
-          ${ utils.render_field(dataset_form['frequency_unit']) }
-        </div>
+    </div>
+    <div class="span6">
+      <div class="alert alert-warning">
+        ${ _('UTC time only.') } ${ _('Recommended to be before the coordinator start date.') }
       </div>
-
-      <div class="alert alert-info">
-        ${ _('You can parameterize the values using') } <code>${"${"}MINUTE}</code>, <code>${"${"}DAY}</code>, <code>${"${"}MONTH}</code> ${ _('and') } <code>${"${"}YEAR}</code>.
-      </div>
-      ${ utils.render_field(dataset_form['uri']) }
-
-      ${ utils.render_field(dataset_form['timezone']) }
-      ${ utils.render_field(dataset_form['done_flag']) }
-    </fieldset>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
+      ${ utils.render_field(dataset_form['frequency_number']) }
+    </div>
+    <div class="span6">
+      ${ utils.render_field(dataset_form['frequency_unit']) }
+    </div>
   </div>
 
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${ _('Close') }</a>
-    <button type="submit" class="btn btn-primary" id="edit-dataset-btn">${ _('Save') }</a>
+  <div class="alert alert-info">
+    ${ _('You can parameterize the values using') }
+    % for frequency in DATASET_FREQUENCY:
+      <code>${"${"}${ frequency }}</code>
+      % if not loop.last:
+        ,
+      % endif
+    % endfor
+    .
   </div>
-</form>
+  ${ utils.render_field(dataset_form['uri']) }
+
+  <%include file="dataset_utils.mako"/>
+
+  ${ utils.render_field(dataset_form['timezone']) }
+  ${ utils.render_field(dataset_form['done_flag']) }
+</fieldset>

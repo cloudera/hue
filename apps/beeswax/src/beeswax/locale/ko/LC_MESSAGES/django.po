@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:35-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,1977 +17,2152 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/beeswax/conf.py:24
-msgid "Host where Beeswax server Thrift daemon is running."
-msgstr "Beeswax 서버 Thrift 데몬이 실행 중인 호스트입니다."
+#: src/beeswax/api.py:117 src/beeswax/api.py:227 src/beeswax/api.py:261
+#: src/beeswax/api.py:327 src/beeswax/api.py:384 src/beeswax/api.py:413
+#: src/beeswax/api.py:462 src/beeswax/api.py:528 src/beeswax/views.py:582
+msgid "A POST request is required."
+msgstr "POST 요청이 필요합니다."
 
-#: src/beeswax/conf.py:30
-msgid "Configure the port the Beeswax Thrift server runs on."
-msgstr "Beeswax Thrift 서버가 실행되는 포트를 구성합니다."
+#: src/beeswax/api.py:204
+#, python-format
+msgid "Bad status for request %s:\n"
+"%s"
+msgstr "잘못된 %s 요청 상태:\n"
+"%s"
 
-#: src/beeswax/conf.py:36
-msgid "Host where Beeswax internal metastore Thrift daemon is running."
-msgstr "Beeswax 내부 Metastore Thrift 데몬이 실행 중인 호스트입니다."
+#: src/beeswax/api.py:309
+msgid "There was an error with your query."
+msgstr "쿼리에 오류가 있습니다."
 
-#: src/beeswax/conf.py:42
-msgid ""
-"Configure the port the internal metastore daemon runs on. Used only if "
-"hive.metastore.local is true."
-msgstr "내부 Metastore 데몬이 실행되는 포트를 구성합니다. hive.metastore.local이 TRUE인 경우에만 사용됩니다."
+#: src/beeswax/api.py:358 src/beeswax/api.py:372
+msgid "A GET request is required."
+msgstr "GET 요청이 필요합니다."
 
-#: src/beeswax/conf.py:49
-msgid "Path to beeswax_server.sh"
-msgstr "beeswax_server.sh 경로"
+#: src/beeswax/api.py:416 src/beeswax/api.py:465 src/beeswax/api.py:531
+#, python-format
+msgid "This query is %(state)s. Results unavailable."
+msgstr "이 쿼리는 %(state)s 상태이므로 결과를 볼 수 없습니다."
 
-#: src/beeswax/conf.py:55
-msgid ""
-"Maximum Java heapsize (in megabytes) used by Beeswax Server.  Note that "
-"the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may "
-"override this setting."
-msgstr ""
-"Beeswax 서버에서 사용하는 최대 Java 힙 크기(단위: 메가바이트)입니다. HADOOP_HEAPSIZE in "
-"$HADOOP_CONF_DIR/hadoop-env.sh가 이 값을 재정의할 수 있음에 유의하십시오."
+#: src/beeswax/api.py:438 src/beeswax/api.py:504 src/beeswax/api.py:560
+#, python-format
+msgid "The result could not be saved: %s."
+msgstr "결과를 저장할 수 없음: %s."
 
-#: src/beeswax/conf.py:63
-msgid ""
-"Path to the root of the Hive installation; defaults to environment "
-"variable when not set."
-msgstr "Hive 설치의 루트 경로입니다. 설정하지 않을 경우 환경 변수가 기본값으로 설정됩니다."
+#: src/beeswax/api.py:483 src/beeswax/api.py:546
+#, python-format
+msgid "Cannot find query handle and state: %s"
+msgstr "쿼리 핸들 및 상태를 찾을 수 없음: %s"
 
-#: src/beeswax/conf.py:68
+#: src/beeswax/api.py:492
+msgid "The target path is a directory"
+msgstr "대상 경로가 디렉토리입니다."
+
+#: src/beeswax/api.py:610
+msgid "Problem accessing table metadata"
+msgstr "테이블 메타데이터를 액세스하는 중 오류 발생"
+
+#: src/beeswax/api.py:620
+msgid "No databases are available. Permissions could be missing."
+msgstr "데이터베이스를 사용할 수 없습니다. 권한이 없습니다."
+
+#: src/beeswax/conf.py:31
+msgid "Host where HiveServer2 server is running. If Kerberos security is enabled, the fully-qualified domain name (FQDN) is required"
+msgstr "HiveServer2 서버가 실행 중인 호스트입니다. Kerberos 보안이 설정된 경우 FQDN(정규화된 도메인 이름)이 필요합니다."
+
+#: src/beeswax/conf.py:37
+msgid "Configure the port the HiveServer2 server runs on."
+msgstr "HiveServer2 서버가 실행되는 포트를 구성합니다."
+
+#: src/beeswax/conf.py:43
 msgid "Hive configuration directory, where hive-site.xml is located."
 msgstr "hive-site.xml이 위치한 Hive 구성 디렉토리입니다."
 
-#: src/beeswax/conf.py:74
-msgid "The local filesystem path containing the Beeswax examples."
-msgstr "Beeswax 예제가 포함된 로컬 파일 시스템 경로입니다."
+#: src/beeswax/conf.py:48
+msgid "Path to HiveServer2 start script"
+msgstr "HiveServer2 시작 스크립트 경로"
 
-#: src/beeswax/conf.py:80
-msgid "Timeout in seconds for Thrift calls to Beeswax service."
-msgstr "Beeswax 서비스에 대한 Thrift 호출의 시간 제한(단위: 초)입니다."
+#: src/beeswax/conf.py:55
+msgid "The local filesystem path containing the Hive examples."
+msgstr "Hive 예제가 포함된 로컬 파일 시스템 경로입니다."
 
-#: src/beeswax/conf.py:86
-msgid ""
-"Timeouts in seconds for Thrift calls to the Hive metastore. This timeout "
-"should take into account that the metastore could talk to an external "
-"database."
-msgstr ""
-"Hive Metastore에 대한 Thrift 호출의 시간 제한(단위: 초)입니다. 이 시간 제한은 Metastore가 외부 "
-"데이터베이스와 통신할 수 있음을 고려해야 합니다."
+#: src/beeswax/conf.py:61
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Thrift 호출의 제한 시간(단위: 초)입니다."
 
-#: src/beeswax/conf.py:92
-msgid "Time in seconds for Beeswax to persist queries in its cache."
-msgstr "Beeswax가 캐시에서 쿼리를 유지하는 시간(단위: 초)입니다."
+#: src/beeswax/conf.py:67
+msgid "Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.If false, Hue will use the FetchResults() thrift call instead."
+msgstr "Hue에서 GetLog() thrift 호출을 사용하여 Hive 로그를 검색할 것인지 선택합니다. False로 설정되면 Hue에서 FetchResults() thrift 호출을 대신 사용합니다."
 
-#: src/beeswax/conf.py:98
-msgid ""
-"Set a LIMIT clause when browsing a partitioned table. A positive value "
-"will be set as the LIMIT. If 0 or negative, do not set any limit."
-msgstr ""
-"분할된 테이블 검색 시의 LIMIT 절을 설정합니다. LIMIT는 양수로 설정되어야 합니다. 0 또는 음수이면 제한이 설정되지 "
-"않습니다."
+#: src/beeswax/conf.py:75
+msgid "Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit."
+msgstr "분할된 테이블 검색 시의 LIMIT 절을 설정합니다. LIMIT는 양수로 설정되어야 합니다. 0 또는 음수이면 제한이 설정되지 않습니다."
+
+#: src/beeswax/conf.py:81
+msgid "A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads."
+msgstr "쿼리에서 다운로드할 수 있는 행 수에 대한 제한입니다. 값이 -1이면 제한이 없음을 의미합니다. 최대값 65,000이 XLS 다운로드에 적용됩니다."
+
+#: src/beeswax/conf.py:85
+msgid "Hue will try to close the Hive query when the user leaves the editor page. This will free all the query resources in HiveServer2, but also make its results inaccessible."
+msgstr "사용자가 편집기 페이지를 나가면 Hue가 Hive 쿼리를 닫습니다. 이렇게 하면 HiveServer2의 모든 쿼리 리소스를 비우지만 해당 결과에 액세스할 수 없게 됩니다."
+
+#: src/beeswax/conf.py:93
+msgid "Thrift version to use when communicating with HiveServer2"
+msgstr "HiveServer2와 통신할 때 사용할 Thrift 버전"
+
+#: src/beeswax/conf.py:100
+msgid "SSL configuration for the server."
+msgstr "서버에 대한 SSL 구성입니다."
 
 #: src/beeswax/conf.py:104
-msgid ""
-"Share saved queries with all users. If set to false, saved queries are "
-"visible only to the owner and administrators."
-msgstr "저장된 쿼리를 모든 사용자와 공유합니다. FALSE로 설정되면 저장된 쿼리가 소유자와 관리자에게만 표시됩니다."
+msgid "SSL communication enabled for this server."
+msgstr "이 서버에 대해 SSL 통신이 설정되었습니다."
 
-#: src/beeswax/create_table.py:87
-#, fuzzy
-msgid "tabs"
-msgstr "테이블"
+#: src/beeswax/conf.py:111
+msgid "Path to Certificate Authority certificates."
+msgstr "인증 기관 인증서에 대한 경로입니다."
 
-#: src/beeswax/create_table.py:88
-msgid "commas"
-msgstr ""
+#: src/beeswax/conf.py:118
+msgid "Path to the private key file."
+msgstr "개인 키 파일에 대한 경로입니다."
 
-#: src/beeswax/create_table.py:89
-msgid "spaces"
-msgstr ""
+#: src/beeswax/conf.py:125
+msgid "Path to the public certificate file."
+msgstr "공용 인증서 파일에 대한 경로입니다."
 
-#: src/beeswax/create_table.py:291
-msgid "Internal error when constructing the delimiter form"
-msgstr "구분 기호 양식을 만드는 중 내부 오류가 발생했습니다."
+#: src/beeswax/conf.py:132
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "서버에서 받은 인증서의 유효성을 Hue에서 검사할 것인지 선택합니다."
 
-#: src/beeswax/create_table.py:318
+#: src/beeswax/conf.py:150
+msgid "The application won't work without a running HiveServer2."
+msgstr "HiveServer2를 실행하지 않으면 애플리케이션이 작동하지 않습니다."
+
+#: src/beeswax/conf.py:158
 #, python-format
-msgid ""
-"Failed to decode file '%(path)s' into printable characters under "
-"%(encoding)s"
+msgid "Failed to access Hive warehouse: %s"
+msgstr "Hive 웨어하우스 액세스 실패: %s"
+
+#: src/beeswax/create_table.py:98
+msgid "ctrl-As"
+msgstr "ctrl-As"
+
+#: src/beeswax/create_table.py:99
+msgid "ctrl-Bs"
+msgstr "ctrl-Bs"
+
+#: src/beeswax/create_table.py:100
+msgid "ctrl-Cs"
+msgstr "ctrl-Cs"
+
+#: src/beeswax/create_table.py:101
+msgid "tabs"
+msgstr "탭"
+
+#: src/beeswax/create_table.py:102
+msgid "commas"
+msgstr "쉼표"
+
+#: src/beeswax/create_table.py:103
+msgid "spaces"
+msgstr "공백"
+
+#: src/beeswax/create_table.py:153
+msgid "Invalid form submission"
+msgstr "올바르지 않은 양식 제출"
+
+#: src/beeswax/create_table.py:223
+msgid "The selected delimiter is creating an un-even number of columns. Please make sure you don't have empty columns."
+msgstr "선택한 구분 기호가 일정하지 않은 열 수를 생성합니다. 빈 열이 없는지 확인하십시오."
+
+#: src/beeswax/create_table.py:314
+#, python-format
+msgid "Internal error when constructing the delimiter form: %(error)s."
+msgstr "구분 기호 양식 생성 중 내부 오류 발생: %(error)s."
+
+#: src/beeswax/create_table.py:341
+#, python-format
+msgid "Failed to decode file '%(path)s' into printable characters under %(encoding)s."
 msgstr "파일 '%(path)s'을(를) %(encoding)s 아래에 인쇄 가능한 문자로 디코딩하지 못했습니다."
 
-#: src/beeswax/create_table.py:380
+#: src/beeswax/create_table.py:364
+msgid "Could not find any columns to import"
+msgstr "가져올 열을 찾을 수 없음"
+
+#: src/beeswax/create_table.py:413
 #, python-format
-msgid "Failed to open file '%(path)s': %(error)s"
-msgstr "파일 '%(path)s'을(를) 열지 못했습니다: %(error)s"
+msgid "Failed to open file '%(path)s': %(error)s."
+msgstr "파일 '%(path)s'을(를) 열지 못함: %(error)s."
 
-#: src/beeswax/create_table.py:431
-msgid "Internal error: Missing needed parameter to load data into table"
-msgstr "내부 오류: 테이블로 데이터를 로드하는 매개변수가 없습니다."
+#: src/beeswax/create_table.py:466
+msgid "Internal error: Missing needed parameter to load data into table."
+msgstr "내부 오류: 테이블로 데이터를 로드하는 필수 매개변수가 없습니다."
 
-#: src/beeswax/data_export.py:88
-msgid ""
-"Error: Potentially incomplete results as an error occurred during data "
-"retrieval."
-msgstr "오류: 데이터를 검색하는 동안 오류가 발생해 결과가 완전하지 않을 수 있습니다."
-
-#: src/beeswax/data_export.py:90
+#: src/beeswax/create_table.py:474
 #, python-format
-msgid ""
-"Detected another client retrieving results for %(server_id)s. Expected "
-"next row to be %(row)s and got %(start_row)s. Aborting"
-msgstr ""
-"%(server_id)s의 결과를 검색하는 다른 클라이언트를 감지했습니다. 필요한 다음 열은 %(row)s(이)며 "
-"%(start_row)s이(가) 반환되었습니다. 중지하는 중"
+msgid "The headers of the file could not be removed."
+msgstr "파일의 헤더를 제거할 수 없습니다."
 
-#: src/beeswax/db_utils.py:69
+#: src/beeswax/data_export.py:56
 #, python-format
-msgid "BeeswaxServer returning invalid handle for query id %(id)d [%(query)s]..."
-msgstr "BeeswaxServer가 쿼리 ID %(id)d [%(query)s]에 대해 잘못된 핸들을 반환하는 중..."
+msgid "%s already exists."
+msgstr "%s이(가) 이미 존재합니다."
 
-#: src/beeswax/forms.py:46
+#: src/beeswax/forms.py:45
 msgid "Change the name to save as a new design."
 msgstr "새 디자인으로 저장할 이름을 변경합니다."
 
-#: src/beeswax/forms.py:47 src/beeswax/forms.py:162 src/beeswax/forms.py:246
-#: src/beeswax/templates/configuration.mako:37
-#: src/beeswax/templates/list_designs.mako:32
+#: src/beeswax/forms.py:46 src/beeswax/forms.py:211 src/beeswax/forms.py:295
+#: src/beeswax/forms.py:385 src/beeswax/templates/configuration.mako:42
+#: src/beeswax/templates/execute.mako:610
+#: src/beeswax/templates/list_designs.mako:84
+#: src/beeswax/templates/list_trashed_designs.mako:68
 msgid "Description"
 msgstr "설명"
 
-#: src/beeswax/forms.py:53 src/beeswax/forms.py:54
-#: src/beeswax/templates/execute.mako:54 src/beeswax/templates/execute.mako:279
-#: src/beeswax/templates/save_results.mako:43
-#: src/beeswax/templates/watch_results.mako:38
-#: src/beeswax/templates/watch_results.mako:156
+#: src/beeswax/forms.py:52 src/beeswax/forms.py:53
+#: src/beeswax/templates/execute.mako:283
+#: src/beeswax/templates/execute.mako:619
+#: src/beeswax/templates/execute.mako:696
+#: src/beeswax/templates/save_results.mako:70
+#: src/beeswax/templates/watch_results.mako:89
+#: src/beeswax/templates/watch_results.mako:334
 msgid "Save"
 msgstr "저장"
 
-#: src/beeswax/forms.py:55 src/beeswax/forms.py:56
+#: src/beeswax/forms.py:54 src/beeswax/forms.py:55
 msgid "Save As"
 msgstr "다른 이름으로 저장"
 
 #: src/beeswax/forms.py:69
-msgid "Please enter a name"
+msgid "Enter a name."
 msgstr "이름을 입력하십시오."
 
 #: src/beeswax/forms.py:83
-msgid "to a new table"
-msgstr "새 테이블로"
+msgid "Directory"
+msgstr "디렉토리"
 
-#: src/beeswax/forms.py:83
-msgid "to HDFS directory"
-msgstr "HDFS 디렉토리로"
+#: src/beeswax/forms.py:85 src/beeswax/templates/execute.mako:681
+msgid "Path to directory"
+msgstr "디렉토리 경로"
 
-#: src/beeswax/forms.py:88 src/beeswax/forms.py:161 src/beeswax/forms.py:245
-#: src/beeswax/templates/show_tables.mako:43
-#: src/beeswax/templates/watch_results.mako:139
+#: src/beeswax/forms.py:93
+msgid "Target directory should begin with a /"
+msgstr "대상 디렉토리는 / 기호로 시작해야 함"
+
+#: src/beeswax/forms.py:95
+msgid "Directory already exists."
+msgstr "디렉토리가 이미 존재합니다."
+
+#: src/beeswax/forms.py:102
+msgid "File path"
+msgstr "파일 경로"
+
+#: src/beeswax/forms.py:104
+msgid "Path to file"
+msgstr "파일 경로"
+
+#: src/beeswax/forms.py:105 src/beeswax/templates/execute.mako:659
+msgid "Overwrite"
+msgstr "덮어쓰기"
+
+#: src/beeswax/forms.py:107
+msgid "Overwrite the selected files"
+msgstr "선택한 파일 덮어쓰기"
+
+#: src/beeswax/forms.py:120 src/beeswax/forms.py:210 src/beeswax/forms.py:294
+#: src/beeswax/templates/watch_results.mako:310
 msgid "Table Name"
 msgstr "테이블 이름"
 
-#: src/beeswax/forms.py:90
+#: src/beeswax/forms.py:122
 msgid "Name of the new table"
 msgstr "새 테이블의 이름"
 
-#: src/beeswax/forms.py:91
-msgid "Results Location"
-msgstr "결과 위치"
+#: src/beeswax/forms.py:142
+msgid "Invalid table prefix name"
+msgstr "올바르지 않은 테이블 접두사 이름"
 
-#: src/beeswax/forms.py:93
-msgid "Empty directory in HDFS to put the results"
-msgstr "결과를 저장할 HDFS의 빈 디렉토리"
-
-#: src/beeswax/forms.py:104
+#: src/beeswax/forms.py:145
 msgid "Table already exists"
 msgstr "테이블이 이미 존재합니다."
 
-#: src/beeswax/forms.py:111 src/beeswax/templates/layout.mako:34
+#: src/beeswax/forms.py:154 src/beeswax/templates/layout.mako:76
 msgid "Query Editor"
 msgstr "쿼리 편집기"
 
-#: src/beeswax/forms.py:128
+#: src/beeswax/forms.py:177 src/beeswax/templates/execute.mako:116
 msgid "jar"
-msgstr ""
+msgstr "jar"
 
-#: src/beeswax/forms.py:129
+#: src/beeswax/forms.py:178 src/beeswax/templates/execute.mako:117
 msgid "archive"
-msgstr ""
+msgstr "아카이브"
 
-#: src/beeswax/forms.py:131
-msgid ""
-"Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' "
-"and 'archive' for files to be copied and made locally available duirng "
-"MAP/TRANSFORM. Paths are on HDFS."
-msgstr ""
-"Hive Job과 함께 업로드할 리소스입니다.  UDF에 'jar'를 사용합니다.  복사할 파일에는 '파일' 및 '아카이브'를 "
-"사용하며 MAP/TRANSFORM 동안 로컬에서 사용 가능하도록 합니다. 경로는 HDFS에 위치합니다."
+#: src/beeswax/forms.py:180
+msgid "Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' and 'archive' for files to be copied and made locally available during MAP/TRANSFORM. Paths are on HDFS."
+msgstr "Hive Job과 함께 업로드할 리소스입니다. UDF에 'jar'를 사용합니다. 파일을 복사하여 MAP/TRANSFORM 동안 로컬에서 사용할 수 있도록 '파일' 및 '아카이브'를 사용합니다. 경로는 HDFS에 있습니다."
 
-#: src/beeswax/forms.py:138
+#: src/beeswax/forms.py:186
 msgid "Path to file on HDFS."
 msgstr "HDFS의 파일에 대한 경로입니다."
 
-#: src/beeswax/forms.py:171
-#, fuzzy
+#: src/beeswax/forms.py:220
 msgid "Field terminator"
-msgstr "여기에 필드 터미네이터를 입력하십시오."
+msgstr "필드 터미네이터"
 
-#: src/beeswax/forms.py:173
-#, fuzzy
+#: src/beeswax/forms.py:222
 msgid "Collection terminator"
-msgstr "여기에 수집 터미네이터를 입력하십시오."
+msgstr "컬렉션 터미네이터"
 
-#: src/beeswax/forms.py:175
-#, fuzzy
+#: src/beeswax/forms.py:224
 msgid "Map key terminator"
-msgstr "여기에 Map 키 터미네이터를 입력하십시오."
+msgstr "Map 키 터미네이터"
 
-#: src/beeswax/forms.py:184
+#: src/beeswax/forms.py:233
 msgid "SerDe Name"
 msgstr "SerDe 이름"
 
-#: src/beeswax/forms.py:187
-msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
+#: src/beeswax/forms.py:236
+msgid "Comma-separated list of key-value pairs. E.g. 'p1=v1, p2=v2'"
 msgstr "쉼표로 구분한 키-값 쌍(예: 'p1=v1, p2=v2') 목록입니다."
 
-#: src/beeswax/forms.py:198
+#: src/beeswax/forms.py:247
 msgid "InputFormat Class"
 msgstr "InputFormat 클래스"
 
-#: src/beeswax/forms.py:199
+#: src/beeswax/forms.py:248
 msgid "OutputFormat Class"
 msgstr "OutputFormat 클래스"
 
-#: src/beeswax/forms.py:208
-#: src/beeswax/templates/create_table_manually.mako:246
-msgid "Use default location"
-msgstr "기본 위치 사용"
+#: src/beeswax/forms.py:256
+msgid "Use default location."
+msgstr "기본 위치를 사용합니다."
 
-#: src/beeswax/forms.py:209
+#: src/beeswax/forms.py:257
 msgid "Path to HDFS directory or file of table data."
 msgstr "테이블 데이터의 HDFS 디렉토리 또는 파일의 경로입니다."
 
-#: src/beeswax/forms.py:231
+#: src/beeswax/forms.py:280
 #, python-format
-msgid "Table \"%(name)s\" already exists"
-msgstr "테이블 \"%(name)s\"이(가) 이미 존재합니다."
+msgid "Table \"%(name)s\" already exists."
+msgstr "\"%(name)s\" 테이블이 이미 존재합니다."
 
-#: src/beeswax/forms.py:238
-msgid "Terminator must be exactly one character."
-msgstr "터미네이터는 정확히 한 자여야 합니다."
+#: src/beeswax/forms.py:287
+msgid "Terminator must not be empty."
+msgstr "터미네이터는 비어 있을 수 없습니다."
 
-#: src/beeswax/forms.py:249
+#: src/beeswax/forms.py:298
 msgid "Input File"
 msgstr "입력 파일"
 
-#: src/beeswax/forms.py:251
+#: src/beeswax/forms.py:300
 msgid "Import data from file"
 msgstr "파일에서 데이터 가져오기"
 
-#: src/beeswax/forms.py:252
+#: src/beeswax/forms.py:301
 msgid "Automatically load this file into the table after creation."
 msgstr "이 파일을 생성한 후 테이블로 자동 로드합니다."
 
-#: src/beeswax/forms.py:260
-#, fuzzy
+#: src/beeswax/forms.py:313
 msgid "Delimiter"
-msgstr "기호로 구분됨"
+msgstr "구분 기호"
 
-#: src/beeswax/forms.py:268
+#: src/beeswax/forms.py:325
+msgid "Delimiter value must be smaller than 65533."
+msgstr "구분 기호 값은 65533보다 작아야 합니다."
+
+#: src/beeswax/forms.py:327
 msgid "Delimiter value is required."
 msgstr "구분 기호 값을 입력해야 합니다."
 
-#: src/beeswax/forms.py:278
-msgid "Delimiter value must be smaller than 256."
-msgstr "구분 기호 값은 256보다 작아야 합니다."
-
-#: src/beeswax/forms.py:281
-msgid "Delimiter must be exactly one character."
-msgstr "구분 기호는 정확히 한 자여야 합니다."
-
-#: src/beeswax/forms.py:305
-#: src/beeswax/templates/create_table_manually.mako:326
+#: src/beeswax/forms.py:352
+#: src/beeswax/templates/create_table_manually.mako:364
 msgid "Column Name"
 msgstr "열 이름"
 
-#: src/beeswax/forms.py:306
-#, fuzzy
+#: src/beeswax/forms.py:353 src/beeswax/templates/define_columns.mako:105
 msgid "Column Type"
 msgstr "열 유형"
 
-#: src/beeswax/forms.py:309
+#: src/beeswax/forms.py:356
 msgid "Array Value Type"
 msgstr "어레이 값 유형"
 
-#: src/beeswax/forms.py:312 src/beeswax/forms.py:315
+#: src/beeswax/forms.py:359 src/beeswax/forms.py:362
 msgid "Specify if column_type is map."
 msgstr "column_type이 Map인지 여부를 지정합니다."
 
-#: src/beeswax/forms.py:317
-msgid "add a column"
+#: src/beeswax/forms.py:364
+#: src/beeswax/templates/create_table_manually.mako:316
+msgid "Add a column"
 msgstr "열 추가"
 
-#: src/beeswax/forms.py:319
-msgid "add a partition"
+#: src/beeswax/forms.py:366
+#: src/beeswax/templates/create_table_manually.mako:332
+msgid "Add a partition"
 msgstr "파티션 추가"
 
-#: src/beeswax/forms.py:324
-msgid "Path"
-msgstr "경로"
-
-#: src/beeswax/forms.py:326
-msgid "Overwrite?"
-msgstr "덮어쓰시겠습니까?"
-
-#: src/beeswax/forms.py:339
+#: src/beeswax/forms.py:372
 #, python-format
-msgid "%(column_name)s (partition key with type %(column_type)s)"
-msgstr "%(column_name)s(유형 %(column_type)s이(가) 포함된 파티션 키)"
+msgid "Database \"%(name)s\" already exists."
+msgstr "\"%(name)s\" 데이터베이스가 이미 존재합니다."
 
-#: src/beeswax/models.py:124
+#: src/beeswax/forms.py:384
+msgid "Database Name"
+msgstr "데이터베이스 이름"
+
+#: src/beeswax/forms.py:388 src/beeswax/templates/create_database.mako:94
+#: src/beeswax/templates/create_table_manually.mako:281
+msgid "Use default location"
+msgstr "기본 위치 사용"
+
+#: src/beeswax/forms.py:389
+msgid "Path to HDFS directory or file of database data."
+msgstr "데이터베이스 데이터의 HDFS 디렉토리 또는 파일의 경로입니다."
+
+#: src/beeswax/models.py:76
+msgid "Host of the query server."
+msgstr "쿼리 서버의 호스트입니다."
+
+#: src/beeswax/models.py:77
+msgid "Port of the query server."
+msgstr "쿼리 서버의 포트입니다."
+
+#: src/beeswax/models.py:78
+msgid "Name of the query server."
+msgstr "쿼리 서버의 이름입니다."
+
+#: src/beeswax/models.py:79
+msgid "Type of the query server."
+msgstr "쿼리 서버의 유형입니다."
+
+#: src/beeswax/models.py:80
+msgid "Type of the query."
+msgstr "쿼리 유형입니다."
+
+#: src/beeswax/models.py:249
 msgid "My saved query"
 msgstr "내 저장된 쿼리"
 
-#: src/beeswax/models.py:125
+#: src/beeswax/models.py:250
 msgid " (new)"
 msgstr " (신규)"
 
-#: src/beeswax/models.py:163
+#: src/beeswax/models.py:264
+msgid "Is trashed"
+msgstr "휴지통으로 이동됨"
+
+#: src/beeswax/models.py:265
+msgid "If this query is trashed."
+msgstr "쿼리가 휴지통으로 이동된 경우."
+
+#: src/beeswax/models.py:323
 #, python-format
-msgid "Cannot retrieve Beeswax design id %(id)s"
-msgstr "Beeswax 디자인 ID %(id)s을(를) 검색할 수 없습니다."
+msgid "Cannot retrieve query id %(id)s."
+msgstr "쿼리 ID %(id)s을(를) 검색할 수 없습니다."
 
-#: src/beeswax/models.py:167
+#: src/beeswax/models.py:327
 #, python-format
-msgid "Design id %(id)s does not belong to user %(user)s"
-msgstr "디자인 ID %(id)s은(는) 사용자 %(user)s에 속하지 않습니다."
+msgid "Query id %(id)s does not belong to user %(user)s."
+msgstr "쿼리 ID %(id)s은(는) 사용자 %(user)s에 속하지 않습니다."
 
-#: src/beeswax/models.py:172
+#: src/beeswax/models.py:332
 #, python-format
-msgid ""
-"Type mismatch for design id %(id)s (owner %(owner)s) - Expected "
-"%(expected_type)s got %(real_type)s"
-msgstr ""
-"디자인 ID %(id)s(소유자 %(owner)s)의 유형이 일치하지 않습니다. %(expected_type)s 대신 "
-"%(real_type)s이(가) 반환되었습니다."
+msgid "Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s, got %(real_type)s."
+msgstr "디자인 ID %(id)s(소유자 %(owner)s)의 유형이 일치하지 않습니다. %(expected_type)s 대신 %(real_type)s이(가) 반환되었습니다."
 
-#: src/beeswax/views.py:69
-#, python-format
-msgid "Design %(id)s does not exist."
-msgstr "디자인 %(id)s이(가) 존재하지 않습니다."
+#: src/beeswax/models.py:394
+msgid "Last used"
+msgstr "최종 사용 날짜"
 
-#: src/beeswax/views.py:75
-#, python-format
-msgid "Cannot access design %(id)s"
-msgstr "디자인 %(id)s에 액세스할 수 없습니다."
+#: src/beeswax/models.py:395
+msgid "Application we communicate with."
+msgstr "통신할 애플리케이션입니다."
 
-#: src/beeswax/views.py:86
-#, python-format
-msgid "QueryHistory %(id)s does not exist."
-msgstr "QueryHistory %(id)s이(가) 존재하지 않습니다."
-
-#: src/beeswax/views.py:92
-#, python-format
-msgid "Cannot access QueryHistory %(id)s"
-msgstr "QueryHistory %(id)s에 액세스할 수 없습니다."
-
-#: src/beeswax/views.py:148
-#, python-format
-msgid "Do you really want to drop the view '%(table)s'?"
-msgstr "뷰 '%(table)s'을(를) 삭제하시겠습니까?"
-
-#: src/beeswax/views.py:150
-#, python-format
-msgid ""
-"This may delete the underlying data as well as the metadata.  Drop table "
-"'%(table)s'?"
-msgstr "이 작업은 기본 데이터와 메타데이터를 모두 삭제합니다. 테이블 '%(table)s'을(를) 삭제하시겠습니까?"
-
-#: src/beeswax/views.py:165
-#, python-format
-msgid "Failed to remove %(table)s.  Error: %(error)s"
-msgstr "%(table)s을(를) 제거하지 못했습니다. 오류: %(error)s"
-
-#: src/beeswax/views.py:166 src/beeswax/views.py:180
-msgid "Beeswax Error"
-msgstr "Beeswax 오류"
-
-#: src/beeswax/views.py:179
-#, python-format
-msgid "Failed to read table. Error: %(error)s"
-msgstr "테이블을 읽지 못했습니다. 오류: %(error)s"
-
-#: src/beeswax/views.py:233
-msgid "Design does not exist"
-msgstr "디자인이 존재하지 않습니다."
-
-#: src/beeswax/views.py:455
-msgid "Query is not parameterizable."
-msgstr "쿼리를 매개변수화할 수 없습니다."
-
-#: src/beeswax/views.py:483
-msgid "Could not retrieve log."
-msgstr "로그를 검색하지 못했습니다."
-
-#: src/beeswax/views.py:485
-msgid "Unknown exception."
-msgstr "알 수 없는 예외입니다."
-
-#: src/beeswax/views.py:518
+#: src/beeswax/views.py:93
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "올바르지 않은 디자인 유형 %(type)s"
 
-#: src/beeswax/views.py:546
-#, python-format
-msgid "Saved design \"%(name)s\""
-msgstr "저장된 디자인 \"%(name)s\""
+#: src/beeswax/views.py:160
+msgid "Delete design(s)?"
+msgstr "디자인을 삭제하시겠습니까?"
 
-#: src/beeswax/views.py:680
+#: src/beeswax/views.py:176
+msgid "Restore design(s)?"
+msgstr "디자인을 복구하시겠습니까?"
+
+#: src/beeswax/views.py:193
 #, python-format
 msgid "Copied design: %(name)s"
 msgstr "복사된 디자인: %(name)s"
 
-#: src/beeswax/views.py:732
-msgid "Beeswax query completed"
-msgstr "Beeswax 쿼리 완료됨"
+#: src/beeswax/views.py:609
+msgid "Beeswax query completed."
+msgstr "Beeswax 쿼리가 완료되었습니다."
 
-#: src/beeswax/views.py:739
-#, fuzzy, python-format
-msgid ""
-"%(subject)s. You may see the results here: %(link)s\n"
+#: src/beeswax/views.py:617
+#, python-format
+msgid "%(subject)s. See the results here: %(link)s\n"
 "\n"
 "Query:\n"
 "%(query)s"
-msgstr ""
-"%(subject)s. 결과는 여기에서 볼 수 있습니다: %(link)s\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"쿼리:\n"
-"\"\n"
-"\"%(query)s"
+msgstr "%(subject)s. 결과 보기: %(link)s\n"
+" \n"
+" 쿼리:\n"
+" %(query)s"
 
-#: src/beeswax/views.py:785
-msgid "The result of this query has expired."
-msgstr "이 쿼리의 결과가 만료되었습니다."
-
-#: src/beeswax/views.py:831
-msgid "Query is still being submitted to the Beeswax Server."
-msgstr "쿼리를 Beeswax 서버로 제출하는 중입니다."
-
-#: src/beeswax/views.py:832
-msgid "Failed to retrieve query state from the Beeswax Server."
-msgstr "Beeswax 서버에서 쿼리 상태를 검색하지 못했습니다."
-
-#: src/beeswax/views.py:836
-msgid "Failed to contact Beeswax Server to check query status."
-msgstr "쿼리 상태를 확인하기 위해 Beeswax 서버에 연결하지 못했습니다."
-
-#: src/beeswax/views.py:902
+#: src/beeswax/views.py:652
 #, python-format
-msgid "Trying to display result that is not yet ready. Query id %(id)s"
-msgstr "아직 준비되지 않은 결과를 표시하려고 합니다. 쿼리 ID %(id)s"
+msgid "Design %(id)s does not exist."
+msgstr "디자인 %(id)s이(가) 존재하지 않습니다."
 
-#: src/beeswax/views.py:959
-msgid "This action is only available to the user who submitted the query."
-msgstr "이 작업은 쿼리를 제출한 사용자만이 수행할 수 있습니다."
-
-#: src/beeswax/views.py:969
+#: src/beeswax/views.py:671
 #, python-format
-msgid "This query has %(state)s. Results unavailable."
-msgstr "이 쿼리는 %(state)s 상태이므로 결과를 볼 수 없습니다."
+msgid "QueryHistory %(id)s does not exist."
+msgstr "QueryHistory %(id)s이(가) 존재하지 않습니다."
 
-#: src/beeswax/views.py:971
-msgid "The result of this query is not available yet."
-msgstr "이 쿼리의 결과는 아직 볼 수 없습니다."
-
-#: src/beeswax/views.py:988
-msgid "Cannot find query."
-msgstr "쿼리를 찾을 수 없습니다."
-
-#: src/beeswax/views.py:994
-msgid ""
-"Saving results from a partitioned table is not supported. You may copy "
-"from the HDFS location manually."
-msgstr "분할된 테이블은 지원되지 않습니다. HDFS 위치로 직접 복사하십시오."
-
-#: src/beeswax/views.py:1001
-msgid ""
-"Saving results from a table to a directory is not supported. You may copy"
-" from the HDFS location manually."
-msgstr "테이블의 결과를 디렉토리로 저장하는 작업은 지원되지 않습니다. HDFS 위치로 직접 복사하십시오."
-
-#: src/beeswax/views.py:1018
-msgid "The table could not be saved."
-msgstr "테이블을 저장할 수 없습니다."
-
-#: src/beeswax/views.py:1026
+#: src/beeswax/views.py:678
 #, python-format
-msgid "Failed to save results from query: %(error)s"
-msgstr "쿼리에서 결과를 저장하지 못했습니다: %(error)s"
+msgid "Permission denied to read QueryHistory %(id)s"
+msgstr "QueryHistory %(id)s을(를) 읽는 데 필요한 권한이 거부됨"
 
-#: src/beeswax/views.py:1083
+#: src/beeswax/views.py:851
+msgid "Failed to retrieve query state from the Query Server."
+msgstr "쿼리 서버에서 쿼리 상태를 검색하지 못했습니다."
+
+#: src/beeswax/views.py:856
+msgid "Failed to contact Server to check query status."
+msgstr "쿼리 상태를 확인하기 위해 서버에 연결하지 못했습니다."
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:76
 #, python-format
-msgid "Saved query results as new table %(table)s"
-msgstr "쿼리를 새 테이블 %(table)s(으)로 저장하지 못했습니다."
+msgid "SQL table examples already installed."
+msgstr "SQL 테이블 예제가 이미 설치되었습니다."
 
-#: src/beeswax/views.py:1135
-msgid "Install sample tables and Beeswax examples?"
-msgstr "샘플 테이블과 Beeswax 예제를 설치하겠습니까?"
+#: src/beeswax/management/commands/beeswax_install_examples.py:78
+msgid "Permission denied. Please check with your system administrator."
+msgstr "권한이 거부되었습니다. 시스템 관리자에게 문의하십시오."
 
-#: src/beeswax/views.py:1154
+#: src/beeswax/management/commands/beeswax_install_examples.py:96
 #, python-format
-msgid "Table '%(table)s' is not partitioned."
-msgstr "테이블 '%(table)s'이(가) 분할되지 않았습니다."
+msgid "Could not install table: %s"
+msgstr "테이블을 설치할 수 없음: %s"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:80
-msgid "Beeswax examples already installed."
-msgstr "Beeswax 예제가 이미 설치되었습니다."
-
-#: src/beeswax/management/commands/beeswax_install_examples.py:172
+#: src/beeswax/management/commands/beeswax_install_examples.py:110
 #, python-format
-msgid "Cannot find table data in \"%(file)s\""
+msgid "Could not install query: %s"
+msgstr "쿼리를 설치할 수 없음: %s"
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:128
+#, python-format
+msgid "Cannot find table data in \"%(file)s\"."
 msgstr "\"%(file)s\"에서 테이블 데이터를 찾을 수 없습니다."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:189
+#: src/beeswax/management/commands/beeswax_install_examples.py:148
 #, python-format
 msgid "Table \"%(table)s\" already exists."
-msgstr "테이블 \"%(table)s\"이(가) 이미 존재합니다."
+msgstr "\"%(table)s\" 테이블이 이미 존재합니다."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:197
+#: src/beeswax/management/commands/beeswax_install_examples.py:156
 #, python-format
 msgid "Error creating table %(table)s: Operation timeout."
 msgstr "테이블 %(table)s 생성 중 오류 발생: 작업이 시간 초과되었습니다."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:201
+#: src/beeswax/management/commands/beeswax_install_examples.py:161
 #, python-format
-msgid "Error creating table %(table)s: %(error)s"
-msgstr "테이블 %(table)s 생성 중 오류 발생: %(error)s"
+msgid "Error creating table %(table)s: %(error)s."
+msgstr "테이블 %(table)s 생성 중 오류 발생: %(error)s."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:221
+#: src/beeswax/management/commands/beeswax_install_examples.py:199
 #, python-format
 msgid "Error loading table %(table)s: Operation timeout."
-msgstr "테이블 %(table)s 로드 중 오류 발생: 작업이 시간 초과되었습니다."
+msgstr "테이블 %(table)s 로드 중 오류 발생: 작업 시간이 초과되었습니다."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:225
+#: src/beeswax/management/commands/beeswax_install_examples.py:203
 #, python-format
-msgid "Error loading table %(table)s: %(error)s"
-msgstr "테이블 %(table)s 로드 중 오류 발생: %(error)s"
+msgid "Error loading table %(table)s: %(error)s."
+msgstr "테이블 %(table)s 로드 중 오류 발생: %(error)s."
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:246
+#: src/beeswax/server/dbms.py:278
 #, python-format
-msgid "Sample design %(name)s already exists."
-msgstr "샘플 디자인 %(name)s이(가) 이미 존재합니다."
+msgid "Only SELECT statements can be saved. Provided query: %(query)s"
+msgstr "SELECT 문만 저장할 수 있습니다. 제공된 쿼리: %(query)s"
 
-#: src/beeswax/report/report_gen.py:98
+#: src/beeswax/server/dbms.py:338
 #, python-format
-msgid "%(aggregation)s is not a valid aggregation"
-msgstr ""
+msgid "Saved query results as new table %(table)s."
+msgstr "쿼리 결과를 새 테이블 %(table)s(으)로 저장했습니다."
 
-#: src/beeswax/report/report_gen.py:191
+#: src/beeswax/server/dbms.py:434
 #, python-format
-msgid "%(relation)s is not a valid operator"
-msgstr ""
+msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
+msgstr "서버가 쿼리 ID %(id)d [%(query)s]에 대해 잘못된 핸들을 반환하는 중..."
 
-#: src/beeswax/report/report_gen_views.py:89
-msgid "Missing ManagementForm for conditions"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:186
-msgid "UnionMultiForm is not valid"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:217
+#: src/beeswax/server/dbms.py:540
 #, python-format
-msgid "%(field)s value not applicable with %(source)s source"
-msgstr ""
+msgid "Could not retrieve logs: %s."
+msgstr "로그를 검색할 수 없음: %s."
 
-#: src/beeswax/report/report_gen_views.py:221
+#: src/beeswax/server/dbms.py:543
+msgid "Unknown exception."
+msgstr "알 수 없는 예외입니다."
+
+#: src/beeswax/server/hive_server2_lib.py:388
 #, python-format
-msgid "%(field)s value missing"
-msgstr ""
+msgid "%s server authentication not supported. Valid are %s."
+msgstr "%s 서버 인증이 지원되지 않습니다. %s이(가) 유효합니다."
 
-#: src/beeswax/report/report_gen_views.py:234
-msgid "Display"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:237
-#: src/beeswax/report/report_gen_views.py:393
-#: src/beeswax/report/report_gen_views.py:400
-#, fuzzy
-msgid "Source"
-msgstr "파일 리소스"
-
-#: src/beeswax/report/report_gen_views.py:240
-msgid "Aggregate"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:243
-msgid "Distinct"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:246
-msgid "Constant value"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:249
-msgid "Table alias"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:251
-#: src/beeswax/report/report_gen_views.py:319
-#, fuzzy
-msgid "From column"
-msgstr "열 추가:"
-
-#: src/beeswax/report/report_gen_views.py:253
-#, fuzzy
-msgid "Column alias"
-msgstr "열"
-
-#: src/beeswax/report/report_gen_views.py:255
-#, fuzzy
-msgid "Sort"
-msgstr "보고서"
-
-#: src/beeswax/report/report_gen_views.py:258
-msgid "Sort order"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:260
-msgid "Group order"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:265
-#: src/beeswax/report/report_gen_views.py:316
-#, fuzzy
-msgid "From table"
-msgstr "테이블 삭제"
-
-#: src/beeswax/report/report_gen_views.py:272
-msgid "Source must be \"table\" when not displaying column"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:275
-msgid "Column alias not applicable when not displaying column"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:278
-msgid "Source value missing"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:313
-#: src/beeswax/report/report_gen_views.py:397
-#: src/beeswax/report/report_gen_views.py:404
-msgid "Constant"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:322
-msgid "Sort order missing"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:329
-msgid "Alias not applicable for selecting \"*\""
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:331
-#, python-format
-msgid "Invalid column name \"%(column)s\""
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:369
-#, python-format
-msgid "Ambiguous table \"%(table)s\" without alias"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:379
-msgid "Not selecting from any table column"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:381
-msgid "Not displaying any selection"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:395
-#: src/beeswax/report/report_gen_views.py:402
-#, fuzzy
-msgid "Table name/alias"
-msgstr "테이블 이름"
-
-#: src/beeswax/report/report_gen_views.py:396
-#: src/beeswax/report/report_gen_views.py:403
-#: src/beeswax/templates/create_table_manually.mako:324
-#: src/beeswax/templates/define_columns.mako:67
-msgid "Column name"
-msgstr "열 이름"
-
-#: src/beeswax/report/report_gen_views.py:398
-#, fuzzy
-msgid "Condition"
-msgstr "조건"
-
-#: src/beeswax/report/report_gen_views.py:416
-#, python-format
-msgid "Operator %(operator)s does not take the right operand"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:420
-#, python-format
-msgid "Operator %(operator)s takes both operands"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:425
-msgid "Constant (Left)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:427
-msgid "Table (Left)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:429
-msgid "Column (Left)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:435
-msgid "Constant (Right)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:437
-msgid "Table (Right)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:439
-msgid "Column (Right)"
-msgstr ""
-
-#: src/beeswax/report/report_gen_views.py:470
-#, fuzzy, python-format
-msgid "Unknown table \"%(table)s\" in condition"
-msgstr "테이블 '%(table)s'이(가) 분할되지 않았습니다."
-
-#: src/beeswax/report/report_gen_views.py:487
-#, fuzzy
-msgid "Remove"
-msgstr "미리 보기"
-
-#: src/beeswax/templates/beeswax_components.mako:198
+#: src/beeswax/templates/beeswax_components.mako:211
 msgid "Beginning of List"
-msgstr "목록 맨 앞"
+msgstr "목록 시작"
 
-#: src/beeswax/templates/beeswax_components.mako:199
+#: src/beeswax/templates/beeswax_components.mako:212
 msgid "Previous Page"
 msgstr "이전 페이지"
 
-#: src/beeswax/templates/beeswax_components.mako:200
-#: src/beeswax/templates/watch_results.mako:109
+#: src/beeswax/templates/beeswax_components.mako:213
 msgid "Next page"
 msgstr "다음 페이지"
 
-#: src/beeswax/templates/beeswax_components.mako:200
+#: src/beeswax/templates/beeswax_components.mako:213
 msgid "Next Page"
 msgstr "다음 페이지"
 
-#: src/beeswax/templates/beeswax_components.mako:201
+#: src/beeswax/templates/beeswax_components.mako:214
 msgid "End of List"
 msgstr "목록 끝"
 
-#: src/beeswax/templates/beeswax_components.mako:203
+#: src/beeswax/templates/beeswax_components.mako:216
 #, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr "%(page)s / %(pages) 페이지, %(count)s 항목 중 %(start)s ~ %(end)s을(를) 표시합니다."
+msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgstr "%(page)s / %(pages)s 페이지, %(count)s 항목 중 %(start)s ~ %(end)s을(를) 표시합니다."
 
-#: src/beeswax/templates/choose_delimiter.mako:23
-#: src/beeswax/templates/choose_file.mako:22
-#: src/beeswax/templates/define_columns.mako:23
-#: src/beeswax/templates/save_results.mako:23
-msgid "Beeswax: Create table from file"
-msgstr "Beeswax: 파일에서 테이블 생성"
+#: src/beeswax/templates/choose_delimiter.mako:25
+#: src/beeswax/templates/choose_file.mako:24
+#: src/beeswax/templates/define_columns.mako:25
+#: src/beeswax/templates/save_results.mako:27
+msgid "Create table from file"
+msgstr "파일에서 테이블 생성"
 
-#: src/beeswax/templates/choose_delimiter.mako:27
-#: src/beeswax/templates/choose_delimiter.mako:33
-#: src/beeswax/templates/choose_file.mako:27
-#: src/beeswax/templates/choose_file.mako:33
-#: src/beeswax/templates/create_table_manually.mako:32
-#: src/beeswax/templates/define_columns.mako:27
-#: src/beeswax/templates/define_columns.mako:33
-#: src/beeswax/templates/show_tables.mako:34
-msgid "Create a new table from a file"
-msgstr "파일에서 새 테이블을 생성합니다."
+#: src/beeswax/templates/choose_delimiter.mako:35
+#: src/beeswax/templates/choose_file.mako:34
+#: src/beeswax/templates/create_table_manually.mako:34
+#: src/beeswax/templates/define_columns.mako:35
+#: src/beeswax/templates/execute.mako:52
+msgid "database"
+msgstr "데이터베이스"
 
-#: src/beeswax/templates/choose_delimiter.mako:32
-#: src/beeswax/templates/choose_file.mako:32
-#: src/beeswax/templates/create_table_manually.mako:31
-#: src/beeswax/templates/define_columns.mako:32
-#: src/beeswax/templates/describe_table.mako:59
-#: src/beeswax/templates/list_history.mako:57
-#: src/beeswax/templates/show_tables.mako:30
+#: src/beeswax/templates/choose_delimiter.mako:47
+#: src/beeswax/templates/choose_file.mako:46
+#: src/beeswax/templates/create_database.mako:32
+#: src/beeswax/templates/create_table_manually.mako:46
+#: src/beeswax/templates/define_columns.mako:47
+#: src/beeswax/templates/list_history.mako:58
 msgid "Actions"
 msgstr "작업"
 
-#: src/beeswax/templates/choose_delimiter.mako:34
-#: src/beeswax/templates/choose_file.mako:34
-#: src/beeswax/templates/create_table_manually.mako:26
-#: src/beeswax/templates/create_table_manually.mako:33
-#: src/beeswax/templates/define_columns.mako:34
-#: src/beeswax/templates/show_tables.mako:35
+#: src/beeswax/templates/choose_delimiter.mako:48
+#: src/beeswax/templates/choose_delimiter.mako:64
+#: src/beeswax/templates/choose_file.mako:47
+#: src/beeswax/templates/choose_file.mako:63
+#: src/beeswax/templates/create_table_manually.mako:47
+#: src/beeswax/templates/define_columns.mako:48
+#: src/beeswax/templates/define_columns.mako:64
+msgid "Create a new table from a file"
+msgstr "파일에서 새 테이블을 생성합니다."
+
+#: src/beeswax/templates/choose_delimiter.mako:49
+#: src/beeswax/templates/choose_file.mako:48
+#: src/beeswax/templates/create_table_manually.mako:48
+#: src/beeswax/templates/create_table_manually.mako:64
+#: src/beeswax/templates/define_columns.mako:49
 msgid "Create a new table manually"
 msgstr "새 테이블을 직접 생성합니다."
 
-#: src/beeswax/templates/choose_delimiter.mako:40
-#: src/beeswax/templates/choose_file.mako:40
-#: src/beeswax/templates/define_columns.mako:40
+#: src/beeswax/templates/choose_delimiter.mako:58
+#: src/beeswax/templates/choose_file.mako:57
+#: src/beeswax/templates/create_table_manually.mako:58
+#: src/beeswax/templates/define_columns.mako:58
+msgid "Databases"
+msgstr "데이터베이스"
+
+#: src/beeswax/templates/choose_delimiter.mako:71
+#: src/beeswax/templates/choose_file.mako:70
+#: src/beeswax/templates/define_columns.mako:71
 msgid "Step 1: Choose File"
 msgstr "1단계: 파일 선택"
 
-#: src/beeswax/templates/choose_delimiter.mako:41
-#: src/beeswax/templates/choose_file.mako:41
-#: src/beeswax/templates/define_columns.mako:41
+#: src/beeswax/templates/choose_delimiter.mako:72
+#: src/beeswax/templates/choose_file.mako:71
+#: src/beeswax/templates/define_columns.mako:72
 msgid "Step 2: Choose Delimiter"
 msgstr "2단계: 구분 기호 선택"
 
-#: src/beeswax/templates/choose_delimiter.mako:42
-#: src/beeswax/templates/choose_file.mako:42
-#: src/beeswax/templates/define_columns.mako:42
+#: src/beeswax/templates/choose_delimiter.mako:73
+#: src/beeswax/templates/choose_file.mako:72
+#: src/beeswax/templates/define_columns.mako:73
 msgid "Step 3: Define Columns"
 msgstr "3단계: 열 정의"
 
-#: src/beeswax/templates/choose_delimiter.mako:50
+#: src/beeswax/templates/choose_delimiter.mako:82
 msgid "Choose a Delimiter"
 msgstr "구분 기호를 선택합니다."
 
-#: src/beeswax/templates/choose_delimiter.mako:52
+#: src/beeswax/templates/choose_delimiter.mako:84
 msgid "Beeswax has determined that this file is delimited by"
 msgstr "Beeswax에서 결정한 이 파일의 구분 기호:"
 
-#: src/beeswax/templates/choose_delimiter.mako:59
+#: src/beeswax/templates/choose_delimiter.mako:91
 msgid "Preview"
 msgstr "미리 보기"
 
-#: src/beeswax/templates/choose_delimiter.mako:61
-#: src/beeswax/templates/create_table_manually.mako:130
-msgid ""
-"Enter the column delimiter.  Must be a single character.  Use syntax like"
-" \"\" or \"\t\" for special characters."
-msgstr "열 구분 기호를 입력합니다.  한 자여야 합니다. 특수 문자의 경우 \"\" 또는 \"\t\" 같은 구문을 사용하십시오."
+#: src/beeswax/templates/choose_delimiter.mako:93
+msgid "Enter the column delimiter which must be a single character. Use syntax like \"\\001\" or \"\t\" for special characters."
+msgstr "한 자여야 하는 열 구분 기호를 입력합니다. 특수 문자의 경우 \"\\001\" 또는 \"\t\"와 같은 구문을 사용하십시오."
 
-#: src/beeswax/templates/choose_delimiter.mako:66
+#: src/beeswax/templates/choose_delimiter.mako:98
 msgid "Table preview"
 msgstr "테이블 미리 보기"
 
-#: src/beeswax/templates/choose_delimiter.mako:93
-#: src/beeswax/templates/define_columns.mako:92
-#: src/beeswax/templates/list_history.mako:171
+#: src/beeswax/templates/choose_delimiter.mako:125
+#: src/beeswax/templates/define_columns.mako:133
+#: src/beeswax/templates/execute.mako:1083
+#: src/beeswax/templates/list_history.mako:187
 msgid "Previous"
 msgstr "이전"
 
-#: src/beeswax/templates/choose_delimiter.mako:94
-#: src/beeswax/templates/choose_file.mako:100
-#: src/beeswax/templates/create_table_manually.mako:303
-#: src/beeswax/templates/list_history.mako:170
+#: src/beeswax/templates/choose_delimiter.mako:126
+#: src/beeswax/templates/choose_file.mako:131
+#: src/beeswax/templates/create_database.mako:122
+#: src/beeswax/templates/create_table_manually.mako:338
+#: src/beeswax/templates/execute.mako:279
+#: src/beeswax/templates/execute.mako:1082
+#: src/beeswax/templates/list_history.mako:186
 msgid "Next"
 msgstr "다음"
 
-#: src/beeswax/templates/choose_delimiter.mako:112
-msgid "Please type your delimiter here"
-msgstr "여기에 구분 기호를 입력하십시오."
+#: src/beeswax/templates/choose_delimiter.mako:151
+#: src/beeswax/templates/choose_file.mako:176
+#: src/beeswax/templates/create_table_manually.mako:481
+#: src/beeswax/templates/define_columns.mako:191
+#: src/beeswax/templates/execute.mako:2676
+msgid "Oops, no database found!"
+msgstr "데이터베이스가 없습니다!"
 
-#: src/beeswax/templates/choose_file.mako:46
+#: src/beeswax/templates/choose_delimiter.mako:162
+msgid "Type your delimiter here"
+msgstr "여기에 구분 기호 입력"
+
+#: src/beeswax/templates/choose_file.mako:77
 msgid "Name Your Table and Choose A File"
 msgstr "테이블 이름 입력 및 파일 선택"
 
-#: src/beeswax/templates/choose_file.mako:50
-#: src/beeswax/templates/create_table_manually.mako:56
-#, fuzzy
+#: src/beeswax/templates/choose_file.mako:81
+#: src/beeswax/templates/create_table_manually.mako:90
 msgid "table_name"
-msgstr "테이블 이름"
+msgstr "table_name"
 
-#: src/beeswax/templates/choose_file.mako:53
-#: src/beeswax/templates/create_table_manually.mako:61
-msgid ""
-"Name of the new table. Table names must be globally unique. Table names "
-"tend to correspond as well to the directory where the data will be "
-"stored."
-msgstr "새 테이블의 이름입니다. 테이블 이름은 전역에서 고유한 값이어야 합니다. 테이블 이름은 데이터가 저장될 디렉토리와 유사합니다."
+#: src/beeswax/templates/choose_file.mako:84
+#: src/beeswax/templates/create_table_manually.mako:95
+msgid "Name of the new table. Table names must be globally unique. Table names tend to correspond to the directory where the data will be stored."
+msgstr "새 테이블의 이름입니다. 테이블 이름은 전역에서 고유해야 합니다. 테이블 이름은 데이터가 저장될 디렉토리와 유사합니다."
 
-#: src/beeswax/templates/choose_file.mako:61
-#: src/beeswax/templates/create_table_manually.mako:69
+#: src/beeswax/templates/choose_file.mako:92
+#: src/beeswax/templates/create_database.mako:72
+#: src/beeswax/templates/create_table_manually.mako:103
 msgid "Optional"
 msgstr "옵션"
 
-#: src/beeswax/templates/choose_file.mako:67
-#: src/beeswax/templates/create_table_manually.mako:73
-msgid ""
-"Use a table comment to describe your table.  For example, you might note "
-"the data's provenance and any caveats users need to know."
-msgstr ""
-"테이블을 설명하는 테이블 설명을 사용합니다. 예를 들어, 데이터의 출처와 사용자가 알아야 할 주의 사항 등을 기록해 두는 것이 "
-"좋습니다."
-
-#: src/beeswax/templates/choose_file.mako:82
-msgid ""
-"The HDFS path to the file that you would like to base this new table "
-"definition on. It can be compressed (gzip) or not."
-msgstr "이 새 테이블 정의를 기반으로 할 파일에 대한 HDFS 경로입니다. 압축(gzip) 여부는 원하는 대로 설정할 수 있습니다."
-
-#: src/beeswax/templates/choose_file.mako:91
-msgid ""
-"Check this box if you want to import the data in this file after creating"
-" the table definition. Leave it unchecked if you want to define an empty "
-"table."
-msgstr ""
-"테이블 정의를 생성한 후 이 파일의 데이터를 가져오려면 이 선택란을 선택합니다. 빈 테이블을 정의하려면 이 선택란을 선택하지 "
-"마십시오."
-
-#: src/beeswax/templates/choose_file.mako:93
-msgid "Warning!"
-msgstr "경고!"
-
-#: src/beeswax/templates/choose_file.mako:93
-msgid "The selected file is going to be moved during the import."
-msgstr "선택한 파일은 가져오는 동안 이동됩니다."
-
-#: src/beeswax/templates/choose_file.mako:111
-#: src/beeswax/templates/create_table_manually.mako:389
-#: src/beeswax/templates/execute.mako:253
-msgid "Choose a file"
-msgstr "파일 선택"
-
-#: src/beeswax/templates/configuration.mako:22
-#: src/beeswax/templates/configuration.mako:25
-msgid "Hive Configuration Variables"
-msgstr "Hive 구성 변수"
-
-#: src/beeswax/templates/configuration.mako:28
-#: src/beeswax/templates/my_queries.mako:41
-msgid "Filter:"
-msgstr "필터:"
-
-#: src/beeswax/templates/configuration.mako:28
-msgid "Search for key, value, etc..."
-msgstr "키, 값 등을 검색"
-
-#: src/beeswax/templates/configuration.mako:29
-msgid "Clear"
-msgstr "지우기"
-
-#: src/beeswax/templates/configuration.mako:35
-msgid "Key"
-msgstr "키"
-
-#: src/beeswax/templates/configuration.mako:36
-msgid "Value"
-msgstr "값"
-
-#: src/beeswax/templates/create_table_index.mako:21
-msgid "Beeswax: Create Table"
-msgstr "Beeswax: 테이블 생성"
-
-#: src/beeswax/templates/create_table_index.mako:28
-msgid "How Do You Want to Create Your Table?"
-msgstr "테이블을 어떻게 생성하시겠습니까?"
-
-#: src/beeswax/templates/create_table_index.mako:30
-msgid "Create From File"
-msgstr "파일에서 생성"
-
-#: src/beeswax/templates/create_table_index.mako:31
-msgid "Create Manually"
-msgstr "직접 생성"
-
-#: src/beeswax/templates/create_table_manually.mako:22
-msgid "Beeswax: Create table manually"
-msgstr "Beeswax: 테이블 직접 생성"
-
-#: src/beeswax/templates/create_table_manually.mako:39
-msgid "Step 1: Name"
-msgstr "1단계: 이름"
-
-#: src/beeswax/templates/create_table_manually.mako:40
-msgid "Step 2: Record Format"
-msgstr "2단계: 레코드 형식"
-
-#: src/beeswax/templates/create_table_manually.mako:41
-msgid "Step 3: Serialization"
-msgstr "3단계: 직렬화"
-
-#: src/beeswax/templates/create_table_manually.mako:42
-msgid "Step 4: File Format"
-msgstr "4단계: 파일 형식"
-
-#: src/beeswax/templates/create_table_manually.mako:43
-msgid "Step 5: Location"
-msgstr "5단계: 위치"
-
-#: src/beeswax/templates/create_table_manually.mako:44
-msgid "Step 6: Columns"
-msgstr "6단계: 열"
-
-#: src/beeswax/templates/create_table_manually.mako:51
-msgid "Create a table"
-msgstr "테이블 생성"
-
-#: src/beeswax/templates/create_table_manually.mako:51
-msgid "Let's start with a name and description for where we'll store your data."
-msgstr "데이터를 저장한 위치에 대한 이름과 설명부터 시작해보겠습니다."
-
-#: src/beeswax/templates/create_table_manually.mako:59
-#: src/beeswax/templates/create_table_manually.mako:128
-#: src/beeswax/templates/create_table_manually.mako:138
-#: src/beeswax/templates/create_table_manually.mako:148
-#: src/beeswax/templates/create_table_manually.mako:212
-#: src/beeswax/templates/create_table_manually.mako:225
-#: src/beeswax/templates/create_table_manually.mako:327
-msgid "This field is required. Spaces are not allowed."
-msgstr ""
-
-#: src/beeswax/templates/create_table_manually.mako:82
-msgid "Choose Your Record Format"
-msgstr "레코드 형식 선택"
-
-#: src/beeswax/templates/create_table_manually.mako:83
-msgid ""
-"Individual records are broken up into columns either with delimiters "
-"(e.g., CSV or TSV) or using a specific serialization / deserialization "
-"(SerDe) implementation. (One common specialized SerDe is for parsing out "
-"columns with a regular expression.)"
-msgstr ""
-"개별 레코드는 구분 기호(예: CSV 또는 TSV) 또는 특정 직렬화/직렬화 해제(SerDe) 구현을 사용하여 열로 "
-"구분됩니다(일반적인 특수 SerDe 중 하나는 정규식을 사용하여 열을 파싱하는 데 사용됨)."
-
-#: src/beeswax/templates/create_table_manually.mako:89
-msgid "Record format"
-msgstr "레코드 형식"
-
-#: src/beeswax/templates/create_table_manually.mako:97
-msgid "Delimited"
-msgstr "기호로 구분됨"
-
-#: src/beeswax/templates/create_table_manually.mako:99
-msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
-msgstr "(데이터 파일은 쉼표(CSV) 또는 탭과 같은 구분 기호를 사용합니다.)"
-
-#: src/beeswax/templates/create_table_manually.mako:108
-msgid "SerDe"
-msgstr "SerDe"
-
-#: src/beeswax/templates/create_table_manually.mako:110
-msgid "(Enter a specialized serialization implementation.)"
-msgstr "(특수 직렬화 구현을 입력하십시오.)"
-
-#: src/beeswax/templates/create_table_manually.mako:121
-#: src/beeswax/templates/create_table_manually.mako:156
-msgid "Configure Record Serialization"
-msgstr "레코드 직렬화 구성"
-
-#: src/beeswax/templates/create_table_manually.mako:122
-msgid "Hive only supports single-character delimiters."
-msgstr "Hive는 한 자의 구분 기호만을 지원합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:140
-msgid "Use for array types."
-msgstr "어레이 유형에 사용합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:150
-msgid "Use for map types."
-msgstr "Map 유형에 사용합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:166
-msgid "Enter the Java Classname of your SerDe."
-msgstr "SerDe의 Java 클래스 이름을 입력합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:166
-#: src/beeswax/templates/create_table_manually.mako:178
-#: src/beeswax/templates/create_table_manually.mako:288
-msgid "e.g."
-msgstr "예:"
-
-#: src/beeswax/templates/create_table_manually.mako:178
-msgid "Properties to pass to the (de)serialization mechanism."
-msgstr "직렬화 (해제) 메커니즘을 전달하는 속성입니다."
-
-#: src/beeswax/templates/create_table_manually.mako:187
-msgid "Choose a File Format"
-msgstr "파일 형식 선택"
-
-#: src/beeswax/templates/create_table_manually.mako:188
-#: src/beeswax/templates/create_table_manually.mako:189
-#: src/beeswax/templates/create_table_manually.mako:190
-msgid "Use"
-msgstr "사용"
-
-#: src/beeswax/templates/create_table_manually.mako:188
-msgid "for newline-delimited text files."
-msgstr "newline-delimited 텍스트 파일에 사용"
-
-#: src/beeswax/templates/create_table_manually.mako:189
-msgid "for Hadoop's binary serialization format."
-msgstr "Hadoop의 바이너리 직렬화 형식에 사용"
-
-#: src/beeswax/templates/create_table_manually.mako:190
-msgid "to choose a custom implementation."
-msgstr "사용자 지정 구현 선택"
-
-#: src/beeswax/templates/create_table_manually.mako:195
-msgid "File format"
-msgstr "파일 형식"
-
-#: src/beeswax/templates/create_table_manually.mako:214
-msgid "Java Class used to read data"
-msgstr "데이터를 읽는 데 사용된 Java 클래스"
-
-#: src/beeswax/templates/create_table_manually.mako:227
-msgid "Java Class used to write data"
-msgstr "데이터를 읽는 데 사용된 Java 클래스"
-
-#: src/beeswax/templates/create_table_manually.mako:236
-msgid "Choose Where Your Table's Data is Stored"
-msgstr "테이블의 데이터가 저장될 위치 선택"
-
-#: src/beeswax/templates/create_table_manually.mako:240
-msgid "Location"
-msgstr "위치"
-
-#: src/beeswax/templates/create_table_manually.mako:249
-msgid ""
-"Store your table in the default location (controlled by Hive, and "
-"typically"
-msgstr "테이블을 기본 위치(보통 Hive가 제어)에 저장합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:263
-msgid "Choose File"
-msgstr "파일 선택"
-
-#: src/beeswax/templates/create_table_manually.mako:265
-msgid "Enter the path (on HDFS) to your table's data location"
-msgstr "테이블의 데이터 위치에 대한 경로(HDFS 상)를 입력합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:273
-msgid "Configure Table Columns"
-msgstr "테이블 열 구성"
-
-#: src/beeswax/templates/create_table_manually.mako:281
-msgid "Add a column"
-msgstr "열 추가"
-
-#: src/beeswax/templates/create_table_manually.mako:285
-msgid "Configure Partitions"
-msgstr "파티션 구성"
-
-#: src/beeswax/templates/create_table_manually.mako:286
-msgid ""
-"If your data is naturally partitioned (by date, for example), partitions "
-"are a way to tell Hive that data for a specific partition value are "
-"stored together."
-msgstr ""
-"데이터가 원래 파티션되어 있을 경우(예: 날짜별), 파티션은 Hive가 특정 파티션 값에 대한 데이터가 함께 저장되어 있는지를 "
-"식별하는 방식이 됩니다."
-
-#: src/beeswax/templates/create_table_manually.mako:287
-msgid "Hive establishes a mapping between directories on disk"
-msgstr "Hive가 디스크의 디렉토리와 해당 일자의 데이터 간"
-
-#: src/beeswax/templates/create_table_manually.mako:289
-msgid ""
-"and the data for that day.  Partitions are virtual columns; they are not "
-"represented in the data itself, but are determined by the data location. "
-"Hive implements query optimizations such that queries that are specific "
-"to a single partition need not read the data in other partitions."
-msgstr ""
-"매핑을 설정합니다. 파티션은 가상의 열입니다. 즉, 데이터 자체에 표시되지는 않으나 데이터 위치에 의해 결정됩니다. Hive는 단일"
-" 파티션에 해당하는 쿼리가 다른 파티션의 데이터를 읽지 않도록 하는 쿼리 최적화를 구현합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:297
-msgid "Add a partition"
-msgstr "파티션 추가"
-
-#: src/beeswax/templates/create_table_manually.mako:302
-msgid "Back"
-msgstr "뒤로"
-
-#: src/beeswax/templates/create_table_manually.mako:304
-msgid "Create table"
-msgstr "테이블 생성"
-
-#: src/beeswax/templates/create_table_manually.mako:319
-msgid "Delete this column"
-msgstr "이 열 삭제"
-
-#: src/beeswax/templates/create_table_manually.mako:329
-msgid "Column name must be single words that start with a letter or a digit."
-msgstr "열 이름은 문자 또는 숫자로 시작하는 한 단어여야 합니다."
-
-#: src/beeswax/templates/create_table_manually.mako:334
-msgid "Column type"
-msgstr "열 유형"
-
-#: src/beeswax/templates/create_table_manually.mako:340
-msgid ""
-"Type for this column. Certain advanced types (namely, structs) are not "
-"exposed in this interface."
-msgstr "이 열의 유형입니다. 특정 고급 유형(structs)은 이 인터페이스에 노출되지 않습니다."
-
-#: src/beeswax/templates/create_table_manually.mako:347
-msgid "Array value type"
-msgstr "어레이 값 유형"
-
-#: src/beeswax/templates/create_table_manually.mako:351
-msgid "Type of the array values."
-msgstr "어레이 값의 유형입니다."
-
-#: src/beeswax/templates/create_table_manually.mako:358
-msgid "Map Key type"
-msgstr "Map 키 유형"
-
-#: src/beeswax/templates/create_table_manually.mako:362
-msgid "Type of the map keys."
-msgstr "Map 키의 유형입니다."
-
-#: src/beeswax/templates/create_table_manually.mako:367
-msgid "Map Value type"
-msgstr "Map 값 유형"
-
-#: src/beeswax/templates/create_table_manually.mako:371
-msgid "Type of the map values."
-msgstr "Map 값의 유형입니다."
-
-#: src/beeswax/templates/create_table_manually.mako:506
-msgid "Type your field terminator here"
-msgstr "여기에 필드 터미네이터를 입력하십시오."
-
-#: src/beeswax/templates/create_table_manually.mako:515
-msgid "Type your collection terminator here"
-msgstr "여기에 수집 터미네이터를 입력하십시오."
-
-#: src/beeswax/templates/create_table_manually.mako:524
-msgid "Type your map key terminator here"
-msgstr "여기에 Map 키 터미네이터를 입력하십시오."
-
-#: src/beeswax/templates/define_columns.mako:55
-msgid "Define your columns"
-msgstr "열 정의"
-
-#: src/beeswax/templates/define_columns.mako:80
-msgid "Row"
-msgstr "행"
-
-#: src/beeswax/templates/define_columns.mako:93
-#: src/beeswax/templates/index.mako:35
-msgid "Create Table"
-msgstr "테이블 생성"
-
-#: src/beeswax/templates/describe_partitions.mako:23
-#, python-format
-msgid "Beeswax Table Partitions: %(tableName)s"
-msgstr "Beeswax 테이블 파티션: %(tableName)s"
-
-#: src/beeswax/templates/describe_partitions.mako:27
-msgid "Partitions"
-msgstr "파티션"
-
-#: src/beeswax/templates/describe_partitions.mako:34
-msgid "Extra column for command links."
-msgstr "명령 링크의 추가 열입니다."
-
-#: src/beeswax/templates/describe_partitions.mako:53
-msgid "Table has no partitions."
-msgstr "테이블에 파티션이 없습니다."
-
-#: src/beeswax/templates/describe_table.mako:24
-#: src/beeswax/templates/my_queries.mako:156
-msgid "View"
-msgstr "보기"
-
-#: src/beeswax/templates/describe_table.mako:26
-msgid "Table"
-msgstr "테이블"
-
-#: src/beeswax/templates/describe_table.mako:28
-#, python-format
-msgid "Beeswax %s Metadata: %s"
-msgstr "Beeswax %s 메타데이터: %s"
-
-#: src/beeswax/templates/describe_table.mako:35
-#: src/beeswax/templates/execute.mako:270
-#: src/beeswax/templates/list_designs.mako:31
-#: src/beeswax/templates/list_history.mako:96
-#: src/beeswax/templates/my_queries.mako:56
-#: src/beeswax/templates/my_queries.mako:121
-msgid "Name"
-msgstr "이름"
-
-#: src/beeswax/templates/describe_table.mako:36
-#: src/beeswax/templates/list_designs.mako:34
-#: src/beeswax/templates/my_queries.mako:58
-msgid "Type"
-msgstr "유형"
-
-#: src/beeswax/templates/describe_table.mako:37
-msgid "Comment"
-msgstr "설명"
-
-#: src/beeswax/templates/describe_table.mako:54
-msgid "Beeswax Table Metadata:"
-msgstr "Beeswax 테이블 메타데이터:"
-
-#: src/beeswax/templates/describe_table.mako:60
-#: src/beeswax/templates/index.mako:49
-msgid "Import Data"
-msgstr "데이터 가져오기"
-
-#: src/beeswax/templates/describe_table.mako:61
-#: src/beeswax/templates/show_tables.mako:53
-msgid "Browse Data"
-msgstr "데이터 찾아보기"
-
-#: src/beeswax/templates/describe_table.mako:62
-msgid "Drop"
-msgstr "삭제"
-
-#: src/beeswax/templates/describe_table.mako:63
-msgid "View File Location"
-msgstr "파일 위치 보기"
-
-#: src/beeswax/templates/describe_table.mako:73
-msgid "Columns"
-msgstr "열"
-
-#: src/beeswax/templates/describe_table.mako:75
-msgid "Partition Columns"
-msgstr "파티션 열"
-
-#: src/beeswax/templates/describe_table.mako:78
-msgid "Sample"
-msgstr "샘플"
-
-#: src/beeswax/templates/describe_table.mako:89
-msgid "Show Partitions"
-msgstr "파티션 표시"
-
-#: src/beeswax/templates/describe_table.mako:126
-msgid "Drop Table"
-msgstr "테이블 삭제"
-
-#: src/beeswax/templates/describe_table.mako:134
-#: src/beeswax/templates/index.mako:64
-#: src/beeswax/templates/list_designs.mako:111
-#: src/beeswax/templates/my_queries.mako:179
-#: src/beeswax/templates/show_tables.mako:76
-msgid "Yes"
-msgstr "예"
-
-#: src/beeswax/templates/describe_table.mako:135
-#: src/beeswax/templates/index.mako:65
-#: src/beeswax/templates/list_designs.mako:112
-#: src/beeswax/templates/my_queries.mako:180
-#: src/beeswax/templates/show_tables.mako:77
-msgid "No"
-msgstr "아니요"
-
-#: src/beeswax/templates/describe_table.mako:146
-msgid "Import data"
-msgstr "데이터 가져오기"
-
-#: src/beeswax/templates/describe_table.mako:150
-#: src/beeswax/templates/load_table.mako:42
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr "데이터를 로드하면 데이터의 원래 위치에서 테이블의 스토리지 위치로 이동됨에 유의하십시오."
-
-#: src/beeswax/templates/describe_table.mako:179
-msgid "Overwrite existing data"
-msgstr "기존 데이터 덮어쓰기"
-
-#: src/beeswax/templates/describe_table.mako:188
-#: src/beeswax/templates/report_gen.mako:106
-msgid "Submit"
-msgstr "제출"
-
-#: src/beeswax/templates/describe_table.mako:189
-#: src/beeswax/templates/parameterization.mako:49
-#: src/beeswax/templates/save_results.mako:44
-#: src/beeswax/templates/watch_results.mako:157
-msgid "Cancel"
-msgstr "취소"
-
-#: src/beeswax/templates/execute.mako:27 src/beeswax/templates/execute.mako:63
-msgid "Hive Query"
-msgstr "Hive 쿼리"
-
-#: src/beeswax/templates/execute.mako:36 src/beeswax/templates/execute.mako:214
-#: src/beeswax/templates/explain.mako:31
-#: src/beeswax/templates/list_designs.mako:69
-#: src/beeswax/templates/list_history.mako:97
-#: src/beeswax/templates/my_queries.mako:85
-#: src/beeswax/templates/my_queries.mako:122
-#: src/beeswax/templates/watch_results.mako:66
-#: src/beeswax/templates/watch_wait.mako:53
-msgid "Query"
-msgstr "쿼리"
-
-#: src/beeswax/templates/execute.mako:41
-msgid "Example: SELECT * FROM tablename"
-msgstr "예: SELECT * FROM tablename"
-
-#: src/beeswax/templates/execute.mako:52
-msgid "Execute"
-msgstr "실행"
-
-#: src/beeswax/templates/execute.mako:56
-msgid "Save as..."
-msgstr "다른 이름으로 저장..."
-
-#: src/beeswax/templates/execute.mako:57
-msgid "Explain"
-msgstr "설명"
-
-#: src/beeswax/templates/execute.mako:58
-msgid "or create a"
-msgstr "또는"
-
-#: src/beeswax/templates/execute.mako:58
-msgid "New query"
-msgstr "새 쿼리 생성"
-
-#: src/beeswax/templates/execute.mako:72
-msgid "Hive settings"
-msgstr "Hive 설정"
-
-#: src/beeswax/templates/execute.mako:79 src/beeswax/templates/execute.mako:114
-#: src/beeswax/templates/execute.mako:149
-msgid "Delete this setting"
-msgstr "이 설정 삭제"
-
-#: src/beeswax/templates/execute.mako:104
-#: src/beeswax/templates/execute.mako:139
-#: src/beeswax/templates/execute.mako:174
-msgid "Add"
-msgstr "추가"
-
-#: src/beeswax/templates/execute.mako:107
-msgid "File Resources"
-msgstr "파일 리소스"
-
-#: src/beeswax/templates/execute.mako:142
-msgid "User-defined Functions"
-msgstr "사용자 지정 함수"
-
-#: src/beeswax/templates/execute.mako:157
-msgid "myFunction"
-msgstr ""
-
-#: src/beeswax/templates/execute.mako:177
-msgid "Parameterization"
-msgstr "매개변수화"
-
-#: src/beeswax/templates/execute.mako:179
-msgid ""
-"If checked (the default), you can include parameters like $parameter_name"
-" in your query, and users will be prompted for a value when the query is "
-"run."
-msgstr ""
-"이 항목이 선택되면(기본 설정) 쿼리에 $parameter_name 같은 매개변수를 포함할 수 있으며 쿼리가 실행 중일 때 "
-"사용자에게 값이 표시됩니다."
-
-#: src/beeswax/templates/execute.mako:181
-msgid "Enable Parameterization"
-msgstr "매개변수화 설정"
-
-#: src/beeswax/templates/execute.mako:184
-msgid "Email Notification"
-msgstr "이메일 알림"
-
-#: src/beeswax/templates/execute.mako:186
-msgid ""
-"If checked, you will receive an email notification when the query "
-"completes."
-msgstr "이 항목이 선택되면 쿼리 완료 시 이메일 알림을 받게 됩니다."
-
-#: src/beeswax/templates/execute.mako:188
-msgid "Email me on completion"
-msgstr "완료 시 이메일 받기"
-
-#: src/beeswax/templates/execute.mako:199
-msgid "Your query has the following error(s):"
-msgstr "쿼리에 다음 오류가 발생했습니다:"
-
-#: src/beeswax/templates/execute.mako:202
-msgid "click the"
-msgstr "자세한 내용은 아래의"
-
-#: src/beeswax/templates/execute.mako:202
-#: src/beeswax/templates/execute.mako:220
-msgid "Error Log"
-msgstr "오류 로그"
-
-#: src/beeswax/templates/execute.mako:202
-msgid "tab below for details"
-msgstr "탭을 클릭하십시오."
-
-#: src/beeswax/templates/execute.mako:266
-msgid "Choose a name"
-msgstr "이름 선택"
-
-#: src/beeswax/templates/explain.mako:23
-msgid "Query Explanation"
-msgstr "쿼리 설명"
-
-#: src/beeswax/templates/explain.mako:27
-msgid "Query Explanation:"
-msgstr "쿼리 설명:"
-
-#: src/beeswax/templates/explain.mako:30
-msgid "Explanation"
-msgstr "설명"
-
-#: src/beeswax/templates/index.mako:22
-msgid "Beeswax"
-msgstr "Beeswax"
-
-#: src/beeswax/templates/index.mako:30
-msgid "Examples"
-msgstr "예제"
-
-#: src/beeswax/templates/index.mako:31 src/beeswax/templates/index.mako:50
-msgid "Install Samples"
-msgstr "샘플 설치"
-
-#: src/beeswax/templates/index.mako:33 src/beeswax/templates/layout.mako:38
-msgid "Tables"
-msgstr "테이블"
-
-#: src/beeswax/templates/index.mako:34
-msgid "Show Tables"
-msgstr "테이블 표시"
-
-#: src/beeswax/templates/index.mako:36
-msgid "Queries"
-msgstr "쿼리"
-
-#: src/beeswax/templates/index.mako:37 src/beeswax/templates/layout.mako:36
-msgid "Saved Queries"
-msgstr "저장된 쿼리"
-
-#: src/beeswax/templates/index.mako:38
-msgid "Execute Query"
-msgstr "쿼리 실행"
-
-#: src/beeswax/templates/index.mako:39
-msgid "Query History"
-msgstr "쿼리 기록"
-
-#: src/beeswax/templates/index.mako:40
-msgid "Configuration"
-msgstr "구성"
-
-#: src/beeswax/templates/index.mako:41
-msgid "Hive Configuration"
-msgstr "Hive 구성"
-
-#: src/beeswax/templates/index.mako:42
-msgid "Extended Configuration"
-msgstr "확장된 구성"
-
-#: src/beeswax/templates/index.mako:47
-msgid "Welcome to Beeswax for Hive"
-msgstr "Hive용 Beeswax에 오신 것을 환영합니다."
-
-#: src/beeswax/templates/index.mako:48
-msgid "To get started with Beeswax you'll first need set up some data:"
-msgstr "Beeswax를 시작하려면 먼저 몇 가지 데이터를 설정해야 합니다."
-
-#: src/beeswax/templates/index.mako:50
-msgid "or"
-msgstr ""
-
-#: src/beeswax/templates/index.mako:58
-#: src/beeswax/templates/show_tables.mako:32
-#: src/beeswax/templates/show_tables.mako:68
-msgid "Install samples"
-msgstr "샘플 설치"
-
-#: src/beeswax/templates/index.mako:85
-#: src/beeswax/templates/show_tables.mako:111
-msgid "There was an error processing your request:"
-msgstr "요청을 처리하는 데 오류가 있었습니다:"
-
-#: src/beeswax/templates/layout.mako:35
-msgid "My Queries"
-msgstr "내 쿼리"
-
-#: src/beeswax/templates/layout.mako:37
-msgid "History"
-msgstr "기록"
-
-#: src/beeswax/templates/layout.mako:39
-msgid "Settings"
-msgstr "설정"
-
-#: src/beeswax/templates/list_designs.mako:24
-#: src/beeswax/templates/list_designs.mako:27
-msgid "Beeswax: Queries"
-msgstr "Beeswax: 쿼리"
-
-#: src/beeswax/templates/list_designs.mako:33
-msgid "Owner"
-msgstr "소유자"
-
-#: src/beeswax/templates/list_designs.mako:35
-#: src/beeswax/templates/my_queries.mako:59
-msgid "Last Modified"
-msgstr "최종 수정 날짜"
-
-#: src/beeswax/templates/list_designs.mako:67
-#: src/beeswax/templates/my_queries.mako:83
-msgid "Report"
-msgstr "보고서"
-
-#: src/beeswax/templates/list_designs.mako:72
-#: src/beeswax/templates/my_queries.mako:88
-msgid "ago"
-msgstr "전"
-
-#: src/beeswax/templates/list_designs.mako:83
-#: src/beeswax/templates/my_queries.mako:97
-msgid "Edit this report."
-msgstr "이 보고서를 편집합니다."
-
-#: src/beeswax/templates/list_designs.mako:83
-#: src/beeswax/templates/list_designs.mako:85
-#: src/beeswax/templates/my_queries.mako:97
-#: src/beeswax/templates/my_queries.mako:99
-msgid "Edit"
-msgstr "편집"
-
-#: src/beeswax/templates/list_designs.mako:85
-#: src/beeswax/templates/my_queries.mako:99
-msgid "Edit this query."
-msgstr "이 쿼리를 편집합니다."
-
-#: src/beeswax/templates/list_designs.mako:87
-#: src/beeswax/templates/my_queries.mako:101
-msgid "Delete this query."
-msgstr "이 쿼리를 삭제합니다."
-
-#: src/beeswax/templates/list_designs.mako:87
-#: src/beeswax/templates/my_queries.mako:101
-msgid "Delete"
-msgstr "삭제"
-
-#: src/beeswax/templates/list_designs.mako:88
-#: src/beeswax/templates/my_queries.mako:102
-msgid "View the usage history of this query."
-msgstr "이 쿼리의 사용량 기록을 봅니다."
-
-#: src/beeswax/templates/list_designs.mako:88
-#: src/beeswax/templates/my_queries.mako:102
-msgid "Usage History"
-msgstr "사용량 기록"
-
-#: src/beeswax/templates/list_designs.mako:91
-#: src/beeswax/templates/list_history.mako:44
-#: src/beeswax/templates/my_queries.mako:103
-msgid "Copy this query."
-msgstr "이 쿼리를 복사합니다."
-
-#: src/beeswax/templates/list_designs.mako:91
-#: src/beeswax/templates/list_history.mako:44
-#: src/beeswax/templates/my_queries.mako:103
-msgid "Clone"
-msgstr "복제"
-
-#: src/beeswax/templates/list_designs.mako:108
-#: src/beeswax/templates/my_queries.mako:176
-msgid "Confirm action"
-msgstr "작업 확인"
-
-#: src/beeswax/templates/list_history.mako:24
-#: src/beeswax/templates/list_history.mako:52
-msgid "Beeswax: Query History"
-msgstr "Beeswax: 쿼리 기록"
-
-#: src/beeswax/templates/list_history.mako:36
-msgid "Unsaved"
-msgstr "미저장"
-
-#: src/beeswax/templates/list_history.mako:47
-msgid "Auto generated action"
-msgstr "자동 생성된 작업"
-
-#: src/beeswax/templates/list_history.mako:64
-msgid "Show my queries"
-msgstr "내 쿼리 표시"
-
-#: src/beeswax/templates/list_history.mako:70
-msgid "Show everyone's queries"
-msgstr "모든 사용자의 쿼리 표시"
-
-#: src/beeswax/templates/list_history.mako:79
-msgid "Show user queries"
-msgstr "사용자 쿼리 표시"
-
-#: src/beeswax/templates/list_history.mako:85
-msgid "Show auto actions"
-msgstr "자동 작업 표시"
-
-#: src/beeswax/templates/list_history.mako:95
-#: src/beeswax/templates/my_queries.mako:120
-msgid "Time"
-msgstr "시간"
-
-#: src/beeswax/templates/list_history.mako:98
-msgid "User"
-msgstr "사용자"
-
-#: src/beeswax/templates/list_history.mako:99
-#: src/beeswax/templates/my_queries.mako:123
-msgid "State"
-msgstr "상태"
-
-#: src/beeswax/templates/list_history.mako:100
-#: src/beeswax/templates/my_queries.mako:124
-msgid "Result"
-msgstr "결과"
-
-#: src/beeswax/templates/list_history.mako:132
-#: src/beeswax/templates/watch_results.mako:63
-msgid "Results"
-msgstr "결과"
-
-#: src/beeswax/templates/list_history.mako:162
-msgid "No data available in table"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:163
-msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:164
-msgid "Showing 0 to 0 of 0 entries"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:165
-msgid "(filtered from _MAX_ total entries)"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:166
-msgid "No matching records found"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:168
-msgid "First"
-msgstr ""
-
-#: src/beeswax/templates/list_history.mako:169
-msgid "Last"
-msgstr ""
-
-#: src/beeswax/templates/load_table.mako:22
-#, python-format
-msgid "Beeswax: Load Data into %(table)s"
-msgstr "Beeswax: %(table)s(으)로 데이터 로드"
-
-#: src/beeswax/templates/load_table.mako:25
-#, python-format
-msgid "Load Data into %(table)s"
-msgstr "%(table)s(으)로 데이터 로드"
-
-#: src/beeswax/templates/load_table.mako:30
-msgid "Open File Chooser"
-msgstr "파일 선택기 열기"
-
-#: src/beeswax/templates/my_queries.mako:25
-#: src/beeswax/templates/my_queries.mako:33
-msgid "Beeswax: My Queries"
-msgstr "Beeswax: 내 쿼리"
-
-#: src/beeswax/templates/my_queries.mako:37
-msgid "Create New Query"
-msgstr "새 쿼리 생성"
-
-#: src/beeswax/templates/my_queries.mako:41
-msgid "Search for name, description, etc..."
-msgstr "이름, 설명 등을 검색"
-
-#: src/beeswax/templates/my_queries.mako:46
-msgid "Recent Saved Queries"
-msgstr "최근 저장된 쿼리"
-
-#: src/beeswax/templates/my_queries.mako:47
-msgid "Recent Run Queries"
-msgstr "최근 실행된 쿼리"
-
-#: src/beeswax/templates/my_queries.mako:57
-msgid "Desc"
-msgstr "설명"
-
-#: src/beeswax/templates/my_queries.mako:92
-msgid "Options"
-msgstr "옵션"
-
-#: src/beeswax/templates/my_queries.mako:112
-msgid "View all my queries"
-msgstr "모든 내 쿼리 보기"
-
-#: src/beeswax/templates/my_queries.mako:166
-msgid "View my entire query history"
-msgstr "내 전체 쿼리 기록 보기"
-
-#: src/beeswax/templates/parameterization.mako:23
-msgid "Parameterize Hive Query"
-msgstr "Hive 쿼리 매개변수화"
-
-#: src/beeswax/templates/parameterization.mako:31
-msgid "Explain query"
-msgstr "쿼리 설명"
-
-#: src/beeswax/templates/parameterization.mako:34
-msgid "Execute query"
-msgstr "쿼리 실행"
-
-#: src/beeswax/templates/parameterization.mako:38
-msgid "Please specify parameters for this query:"
-msgstr "이 쿼리에 대한 매개변수를 지정하십시오:"
-
-#: src/beeswax/templates/report_gen.mako:22
-msgid "Beeswax: Query Constructor"
-msgstr "Beeswax: 쿼리 생성자"
-
-#: src/beeswax/templates/report_gen.mako:25
-msgid "Report Generator"
-msgstr "리포트 생성기"
-
-#: src/beeswax/templates/report_gen.mako:27
-msgid "Working on saved query:"
-msgstr "저장된 쿼리 작업 중:"
-
-#: src/beeswax/templates/report_gen.mako:31
-msgid "Error:"
-msgstr "오류:"
-
-#: src/beeswax/templates/report_gen.mako:35
-msgid "View logs"
-msgstr "로그 보기"
-
-#: src/beeswax/templates/report_gen.mako:41
-msgid "Add column:"
-msgstr "열 추가:"
-
-#: src/beeswax/templates/report_gen.mako:63
-msgid "Conditions"
-msgstr "조건"
-
-#: src/beeswax/templates/report_gen.mako:107
-msgid "Advanced ..."
-msgstr "고급..."
-
-#: src/beeswax/templates/report_gen.mako:116
-msgid "Server Log"
-msgstr "서버 로그"
-
-#: src/beeswax/templates/save_results.mako:29
-#: src/beeswax/templates/watch_results.mako:132
-msgid "Save Query Results"
-msgstr "쿼리 결과 저장"
-
-#: src/beeswax/templates/save_results.mako:33
-#: src/beeswax/templates/watch_results.mako:137
-msgid "In a new table"
-msgstr "새 테이블로"
-
-#: src/beeswax/templates/save_results.mako:39
-#: src/beeswax/templates/watch_results.mako:143
-msgid "In an HDFS directory"
-msgstr "HDFS 디렉토리로"
-
-#: src/beeswax/templates/save_results.mako:41
-#: src/beeswax/templates/watch_results.mako:145
-msgid "Results location"
-msgstr "결과 위치"
-
-#: src/beeswax/templates/show_tables.mako:21
-#: src/beeswax/templates/show_tables.mako:25
-msgid "Beeswax: Table List"
-msgstr "Beeswax: 테이블 목록"
-
-#: src/beeswax/templates/util.mako:66
-msgid "Unsaved Query"
-msgstr "저장 안 된 쿼리"
-
-#: src/beeswax/templates/util.mako:71
-msgid "Query Results"
-msgstr "쿼리 결과"
-
-#: src/beeswax/templates/watch_results.mako:23
-msgid "Beeswax: Query Results"
-msgstr "Beeswax: 쿼리 결과"
-
-#: src/beeswax/templates/watch_results.mako:27
-msgid "Beeswax: Query Results:"
-msgstr "Beeswax: 쿼리 결과:"
-
-#: src/beeswax/templates/watch_results.mako:33
-msgid "Downloads"
-msgstr "다운로드"
-
-#: src/beeswax/templates/watch_results.mako:34
-msgid "Download as CSV"
-msgstr "CSV로 다운로드"
-
-#: src/beeswax/templates/watch_results.mako:35
-msgid "Download as XLS"
-msgstr "XLS로 다운로드"
-
-#: src/beeswax/templates/watch_results.mako:42
-#: src/beeswax/templates/watch_wait.mako:35
-msgid "MR Job"
-msgstr "MR Job"
-
-#: src/beeswax/templates/watch_results.mako:42
-#: src/beeswax/templates/watch_wait.mako:35
-msgid "MR Jobs"
-msgstr "MR Job"
-
-#: src/beeswax/templates/watch_results.mako:52
-#: src/beeswax/templates/watch_wait.mako:45
-msgid "No Hadoop jobs were launched in running this query."
-msgstr "이 쿼리를 실행할 때 실행된 Hadoop Job이 없습니다."
-
-#: src/beeswax/templates/watch_results.mako:61
-msgid "Error"
-msgstr "오류"
-
-#: src/beeswax/templates/watch_results.mako:67
-#: src/beeswax/templates/watch_wait.mako:52
-msgid "Log"
-msgstr "로그"
-
-#: src/beeswax/templates/watch_results.mako:74
-msgid "Error!"
-msgstr "오류!"
-
-#: src/beeswax/templates/watch_results.mako:79
+#: src/beeswax/templates/choose_file.mako:98
+msgid "Use a table comment to describe the table.  For example, note the data's provenance and any caveats users need to know."
+msgstr "테이블을 설명하는 테이블 설명을 사용합니다. 예를 들면, 데이터의 출처와 사용자가 알아야 할 주의 사항 등을 기록해 둡니다."
+
+#: src/beeswax/templates/choose_file.mako:113
+msgid "The HDFS path to the file on which to base this new table definition. It can be compressed (gzip) or not."
+msgstr "이 새 테이블 정의를 기준으로 할 파일에 대한 HDFS 경로입니다. 압축(gzip)하거나 압축하지 않을 수 있습니다."
+
+#: src/beeswax/templates/choose_file.mako:122
+msgid "Check this box to import the data in this file after creating the table definition. Leave it unchecked to define an empty table."
+msgstr "테이블 정의를 생성한 후 이 파일의 데이터를 가져오려면 이 확인란을 선택합니다. 빈 테이블을 정의하려면 이 확인란을 선택하지 마십시오."
+
+#: src/beeswax/templates/choose_file.mako:124
+#: src/beeswax/templates/execute.mako:425
+#: src/beeswax/templates/watch_results.mako:169
 msgid "Warning:"
 msgstr "경고:"
 
-#: src/beeswax/templates/watch_results.mako:79
+#: src/beeswax/templates/choose_file.mako:124
+msgid "The selected file is going to be moved during the import."
+msgstr "선택한 파일은 가져오는 동안 이동됩니다."
+
+#: src/beeswax/templates/choose_file.mako:145
+#: src/beeswax/templates/create_database.mako:137
+#: src/beeswax/templates/create_table_manually.mako:428
+#: src/beeswax/templates/execute.mako:558
+msgid "Choose a file"
+msgstr "파일 선택"
+
+#: src/beeswax/templates/configuration.mako:24
+#: src/beeswax/templates/configuration.mako:29
+#: src/beeswax/templates/execute.mako:39
+msgid "Settings"
+msgstr "설정"
+
+#: src/beeswax/templates/configuration.mako:34
+msgid "Search for key, value, etc."
+msgstr "키, 값 등을 검색합니다."
+
+#: src/beeswax/templates/configuration.mako:35
+msgid "Clear"
+msgstr "지우기"
+
+#: src/beeswax/templates/configuration.mako:40
+#: src/beeswax/templates/execute.mako:81
+msgid "Key"
+msgstr "키"
+
+#: src/beeswax/templates/configuration.mako:41
+#: src/beeswax/templates/execute.mako:86
+msgid "Value"
+msgstr "값"
+
+#: src/beeswax/templates/configuration.mako:66
+#: src/beeswax/templates/execute.mako:1074
+#: src/beeswax/templates/execute.mako:2054
+#: src/beeswax/templates/list_designs.mako:171
+#: src/beeswax/templates/list_history.mako:178
+#: src/beeswax/templates/list_trashed_designs.mako:154
+#: src/beeswax/templates/my_queries.mako:211
+#: src/beeswax/templates/my_queries.mako:233
+#: src/beeswax/templates/watch_results.mako:354
+msgid "No data available"
+msgstr "데이터를 이용할 수 없음"
+
+#: src/beeswax/templates/configuration.mako:67
+#: src/beeswax/templates/execute.mako:1078
+#: src/beeswax/templates/execute.mako:2055
+#: src/beeswax/templates/list_designs.mako:172
+#: src/beeswax/templates/list_history.mako:182
+#: src/beeswax/templates/list_trashed_designs.mako:155
+#: src/beeswax/templates/my_queries.mako:212
+#: src/beeswax/templates/my_queries.mako:234
+#: src/beeswax/templates/watch_results.mako:355
+msgid "No matching records"
+msgstr "일치하는 레코드가 없음"
+
+#: src/beeswax/templates/confirm.mako:25
+#: src/beeswax/templates/list_designs.mako:132
+#: src/beeswax/templates/list_trashed_designs.mako:115
+#: src/beeswax/templates/my_queries.mako:171
+msgid "Confirm action"
+msgstr "작업 확인"
+
+#: src/beeswax/templates/confirm.mako:33
+#: src/beeswax/templates/list_designs.mako:136
+#: src/beeswax/templates/list_trashed_designs.mako:119
+#: src/beeswax/templates/my_queries.mako:175
+msgid "Yes"
+msgstr "예"
+
+#: src/beeswax/templates/confirm.mako:34
+msgid "No"
+msgstr "아니요"
+
+#: src/beeswax/templates/create_database.mako:24
+#: src/beeswax/templates/create_database.mako:123
+msgid "Create database"
+msgstr "데이터베이스 생성"
+
+#: src/beeswax/templates/create_database.mako:33
+#: src/beeswax/templates/create_database.mako:40
+msgid "Create a new database"
+msgstr "새 데이터베이스 생성"
+
+#: src/beeswax/templates/create_database.mako:45
+#: src/beeswax/templates/create_table_manually.mako:71
+msgid "Step 1: Name"
+msgstr "1단계: 이름"
+
+#: src/beeswax/templates/create_database.mako:46
+msgid "Step 2: Location"
+msgstr "2단계: 위치"
+
+#: src/beeswax/templates/create_database.mako:54
+msgid "Create a database"
+msgstr "데이터베이스 생성"
+
+#: src/beeswax/templates/create_database.mako:54
+#: src/beeswax/templates/create_table_manually.mako:85
+msgid "Let's start with a name and description for where we'll store your data."
+msgstr "데이터를 저장한 위치에 대한 이름과 설명부터 시작해보겠습니다."
+
+#: src/beeswax/templates/create_database.mako:59
+msgid "database_name"
+msgstr "database_name"
+
+#: src/beeswax/templates/create_database.mako:62
+#: src/beeswax/templates/create_table_manually.mako:93
+#: src/beeswax/templates/create_table_manually.mako:162
+#: src/beeswax/templates/create_table_manually.mako:172
+#: src/beeswax/templates/create_table_manually.mako:182
+#: src/beeswax/templates/create_table_manually.mako:247
+#: src/beeswax/templates/create_table_manually.mako:260
+#: src/beeswax/templates/create_table_manually.mako:365
+msgid "This field is required. Spaces are not allowed."
+msgstr "이 필드는 필수 항목입니다. 공백은 허용되지 않습니다."
+
+#: src/beeswax/templates/create_database.mako:64
+msgid "Name of the new database. Database names must be globally unique. Database names tend to correspond to the directory where the data will be stored."
+msgstr "새 데이터베이스의 이름입니다. 데이터베이스 이름은 전역에서 고유해야 합니다. 데이터베이스 이름은 데이터가 저장될 디렉토리와 유사합니다."
+
+#: src/beeswax/templates/create_database.mako:76
+msgid "Use a database comment to describe the database. For example, note the data's provenance and any caveats users need to know."
+msgstr "데이터베이스를 설명하는 데이터베이스 설명을 사용합니다. 예를 들면, 데이터의 출처와 사용자가 알아야 할 주의 사항 등을 기록해 둡니다."
+
+#: src/beeswax/templates/create_database.mako:85
+msgid "Choose Where Your Database's Data is Stored"
+msgstr "데이터베이스의 데이터가 저장될 위치 선택"
+
+#: src/beeswax/templates/create_database.mako:88
+#: src/beeswax/templates/create_table_manually.mako:275
+msgid "Location"
+msgstr "위치"
+
+#: src/beeswax/templates/create_database.mako:97
+msgid "Store your database in the default location (controlled by Hive, and typically"
+msgstr "데이터베이스를 기본 위치(보통 Hive가 제어)에 저장"
+
+#: src/beeswax/templates/create_database.mako:111
+#: src/beeswax/templates/execute.mako:1718
+msgid "This field is required."
+msgstr "이 필드는 필수 항목입니다."
+
+#: src/beeswax/templates/create_database.mako:113
+msgid "Enter the path (on HDFS) to your database's data location."
+msgstr "데이터베이스의 데이터 위치에 대한 경로(HDFS 상)를 입력합니다."
+
+#: src/beeswax/templates/create_database.mako:121
+#: src/beeswax/templates/create_table_manually.mako:337
+#: src/beeswax/templates/list_trashed_designs.mako:57
+msgid "Back"
+msgstr "뒤로"
+
+#: src/beeswax/templates/create_table_manually.mako:24
+msgid "Create table manually"
+msgstr "수동으로 테이블 생성"
+
+#: src/beeswax/templates/create_table_manually.mako:72
+msgid "Step 2: Record Format"
+msgstr "2단계: 레코드 형식"
+
+#: src/beeswax/templates/create_table_manually.mako:73
+msgid "Step 3: Serialization"
+msgstr "3단계: 직렬화"
+
+#: src/beeswax/templates/create_table_manually.mako:74
+msgid "Step 4: File Format"
+msgstr "4단계: 파일 형식"
+
+#: src/beeswax/templates/create_table_manually.mako:75
+msgid "Step 5: Location"
+msgstr "5단계: 위치"
+
+#: src/beeswax/templates/create_table_manually.mako:76
+msgid "Step 6: Columns"
+msgstr "6단계: 열"
+
+#: src/beeswax/templates/create_table_manually.mako:85
+msgid "Create a table"
+msgstr "테이블 생성"
+
+#: src/beeswax/templates/create_table_manually.mako:107
+msgid "Use a table comment to describe your table.  For example, note the data's provenance and any caveats users need to know."
+msgstr "테이블을 설명하는 테이블 설명을 사용합니다. 예를 들면, 데이터의 출처와 사용자가 알아야 할 주의 사항 등을 기록해 둡니다."
+
+#: src/beeswax/templates/create_table_manually.mako:116
+msgid "Choose Your Record Format"
+msgstr "레코드 형식 선택"
+
+#: src/beeswax/templates/create_table_manually.mako:117
+msgid "Individual records are broken up into columns either with delimiters (e.g., CSV or TSV) or using a specific serialization/deserialization (SerDe) implementation. (One common specialized SerDe is for parsing out columns with a regular expression.)"
+msgstr "개별 레코드는 구분 기호(예: CSV 또는 TSV) 또는 특정 직렬화/직렬화 해제(SerDe) 구현을 사용하여 열로 구분됩니다(일반적인 특수 SerDe 중 하나는 정규식을 사용하여 열을 구문 분석하는 데 사용됨)."
+
+#: src/beeswax/templates/create_table_manually.mako:123
+msgid "Record format"
+msgstr "레코드 형식"
+
+#: src/beeswax/templates/create_table_manually.mako:131
+msgid "Delimited"
+msgstr "기호로 구분됨"
+
+#: src/beeswax/templates/create_table_manually.mako:133
+msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
+msgstr "(데이터 파일에서 쉼표(CSV) 또는 탭과 같은 구분 기호를 사용합니다.)"
+
+#: src/beeswax/templates/create_table_manually.mako:142
+msgid "SerDe"
+msgstr "SerDe"
+
+#: src/beeswax/templates/create_table_manually.mako:144
+msgid "(Enter a specialized serialization implementation.)"
+msgstr "(특수 직렬화 구현을 입력하십시오.)"
+
+#: src/beeswax/templates/create_table_manually.mako:155
+#: src/beeswax/templates/create_table_manually.mako:190
+msgid "Configure Record Serialization"
+msgstr "레코드 직렬화 구성"
+
+#: src/beeswax/templates/create_table_manually.mako:156
+msgid "Only supports single-character delimiters."
+msgstr "한 자의 구분 기호만을 지원합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:164
+msgid "Enter the column delimiter. Must be a single character. Use syntax like \"\\001\" or \"\t\" for special characters."
+msgstr "열 구분 기호를 입력합니다. 구분 기호는 한 자여야 합니다. 특수 문자의 경우 \"\\001\" 또는 \"\t\"와 같은 구문을 사용하십시오."
+
+#: src/beeswax/templates/create_table_manually.mako:174
+msgid "Use for array types."
+msgstr "어레이 유형에 사용합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:184
+msgid "Use for map types."
+msgstr "Map 유형에 사용합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:200
+msgid "The Java class name of your SerDe."
+msgstr "SerDe의 Java 클래스 이름입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:200
+#: src/beeswax/templates/create_table_manually.mako:212
+#: src/beeswax/templates/create_table_manually.mako:323
+msgid "e.g."
+msgstr "예:"
+
+#: src/beeswax/templates/create_table_manually.mako:212
+msgid "Properties to pass to the (de)serialization mechanism."
+msgstr "직렬화 (해제) 메커니즘을 전달하는 속성입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:222
+msgid "Choose a File Format"
+msgstr "파일 형식 선택"
+
+#: src/beeswax/templates/create_table_manually.mako:223
+#: src/beeswax/templates/create_table_manually.mako:224
+#: src/beeswax/templates/create_table_manually.mako:225
+msgid "Use"
+msgstr "사용"
+
+#: src/beeswax/templates/create_table_manually.mako:223
+msgid "for newline-delimited text files."
+msgstr "줄 바꿈 문자로 구분된 텍스트 파일용입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:224
+msgid "for Hadoop's binary serialization format."
+msgstr "Hadoop의 바이너리 직렬화 형식에 사용"
+
+#: src/beeswax/templates/create_table_manually.mako:225
+msgid "to choose a custom implementation."
+msgstr "사용자 지정 구현 선택"
+
+#: src/beeswax/templates/create_table_manually.mako:230
+msgid "File format"
+msgstr "파일 형식"
+
+#: src/beeswax/templates/create_table_manually.mako:249
+msgid "Java class used to read data."
+msgstr "데이터를 읽는 데 사용된 Java 클래스입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:262
+msgid "Java class used to write data."
+msgstr "데이터를 쓰는 데 사용된 Java 클래스입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:272
+msgid "Choose Where Your Table's Data is Stored"
+msgstr "테이블의 데이터가 저장될 위치 선택"
+
+#: src/beeswax/templates/create_table_manually.mako:284
+msgid "Store your table in the default location (controlled by Hive, and typically"
+msgstr "테이블을 기본 위치(보통 Hive가 제어)에 저장"
+
+#: src/beeswax/templates/create_table_manually.mako:299
+msgid "Enter the path (on HDFS) to your table's data location"
+msgstr "테이블의 데이터 위치에 대한 경로(HDFS에 있는)를 입력합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:308
+msgid "Configure Table Columns"
+msgstr "테이블 열 구성"
+
+#: src/beeswax/templates/create_table_manually.mako:320
+msgid "Configure Partitions"
+msgstr "파티션 구성"
+
+#: src/beeswax/templates/create_table_manually.mako:321
+msgid "If your data is naturally partitioned (by date, for example), partitions are a way to tell the query server that data for a specific partition value are stored together."
+msgstr "데이터가 원래 파티션되어 있을 경우(예: 날짜별), 파티션은 쿼리 서버가 특정 파티션 값에 대한 데이터가 함께 저장되어 있는지를 식별하는 방식이 됩니다."
+
+#: src/beeswax/templates/create_table_manually.mako:322
+msgid "The query server establishes a mapping between directories on disk"
+msgstr "쿼리 서버는 해당 일의 데이터와 디스크의 디렉토리"
+
+#: src/beeswax/templates/create_table_manually.mako:324
+msgid "and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. The query server implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions."
+msgstr "간 매핑을 설정합니다. 파티션은 가상의 열입니다. 즉, 데이터 자체에 표시되지는 않으나 데이터 위치에 의해 결정됩니다. 쿼리 서버는 단일 파티션에 해당하는 쿼리가 다른 파티션의 데이터를 읽지 않도록 하는 쿼리 최적화를 구현합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:339
+msgid "Create table"
+msgstr "테이블 생성"
+
+#: src/beeswax/templates/create_table_manually.mako:357
+msgid "Delete this column"
+msgstr "이 열 삭제"
+
+#: src/beeswax/templates/create_table_manually.mako:362
+#: src/beeswax/templates/define_columns.mako:104
+#: src/beeswax/templates/define_columns.mako:114
+msgid "Column name"
+msgstr "열 이름"
+
+#: src/beeswax/templates/create_table_manually.mako:366
+msgid "There is another field with the same name."
+msgstr "같은 이름의 다른 필드가 있습니다."
+
+#: src/beeswax/templates/create_table_manually.mako:368
+msgid "Column name must be single words that start with a letter or a digit."
+msgstr "열 이름은 문자 또는 숫자로 시작하는 한 단어여야 합니다."
+
+#: src/beeswax/templates/create_table_manually.mako:373
+msgid "Column type"
+msgstr "열 유형"
+
+#: src/beeswax/templates/create_table_manually.mako:379
+msgid "Type for this column. Certain advanced types (namely, structs) are not exposed in this interface."
+msgstr "이 열의 유형입니다. 특정 고급 유형(즉, structs)은 이 인터페이스에 노출되지 않습니다."
+
+#: src/beeswax/templates/create_table_manually.mako:386
+msgid "Array value type"
+msgstr "어레이 값 유형"
+
+#: src/beeswax/templates/create_table_manually.mako:390
+msgid "Type of the array values."
+msgstr "어레이 값의 유형입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:397
+msgid "Map Key type"
+msgstr "Map 키 유형"
+
+#: src/beeswax/templates/create_table_manually.mako:401
+msgid "Type of the map keys."
+msgstr "Map 키의 유형입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:406
+msgid "Map Value type"
+msgstr "Map 값 유형"
+
+#: src/beeswax/templates/create_table_manually.mako:410
+msgid "Type of the map values."
+msgstr "Map 값의 유형입니다."
+
+#: src/beeswax/templates/create_table_manually.mako:551
+msgid "Type your field terminator here"
+msgstr "여기에 필드 터미네이터 입력"
+
+#: src/beeswax/templates/create_table_manually.mako:560
+msgid "Type your collection terminator here"
+msgstr "여기에 수집 터미네이터 입력"
+
+#: src/beeswax/templates/create_table_manually.mako:569
+msgid "Type your map key terminator here"
+msgstr "여기에 Map 키 터미네이터 입력"
+
+#: src/beeswax/templates/define_columns.mako:88
+msgid "Define your columns"
+msgstr "열 정의"
+
+#: src/beeswax/templates/define_columns.mako:93
+msgid "Use first row as column names"
+msgstr "첫째 행을 열 이름으로 사용"
+
+#: src/beeswax/templates/define_columns.mako:96
+msgid "Bulk edit column names"
+msgstr "열 이름 일괄 편집"
+
+#: src/beeswax/templates/define_columns.mako:107
+msgid "Sample Row"
+msgstr "샘플 행"
+
+#: src/beeswax/templates/define_columns.mako:134
+msgid "Create Table"
+msgstr "테이블 생성"
+
+#: src/beeswax/templates/define_columns.mako:147
+msgid "Write or paste comma separated column names"
+msgstr "쉼표로 구분된 이름 쓰기 또는 붙여넣기"
+
+#: src/beeswax/templates/define_columns.mako:155
+msgid "e.g. id, name, salary"
+msgstr "예: id, 이름, 급여"
+
+#: src/beeswax/templates/execute.mako:28 src/beeswax/templates/execute.mako:319
+#: src/beeswax/templates/execute.mako:343
+#: src/beeswax/templates/list_history.mako:119
+#: src/beeswax/templates/my_queries.mako:125
+#: src/beeswax/templates/watch_results.mako:146
+msgid "Query"
+msgstr "쿼리"
+
+#: src/beeswax/templates/execute.mako:38
+msgid "Assist"
+msgstr "지원"
+
+#: src/beeswax/templates/execute.mako:45
+msgid "Double click on a table name or field to insert it in the editor"
+msgstr "테이블 이름 또는 필드를 두 번 클릭하여 편집기에 삽입"
+
+#: src/beeswax/templates/execute.mako:48
+msgid "Manually refresh the table list"
+msgstr "테이블 목록을 수동으로 새로 고침"
+
+#: src/beeswax/templates/execute.mako:54
+msgid "Choose a database..."
+msgstr "데이터베이스 선택..."
+
+#: src/beeswax/templates/execute.mako:55
+msgid "Table name..."
+msgstr "테이블 이름..."
+
+#: src/beeswax/templates/execute.mako:56
+msgid "The selected database has no tables."
+msgstr "선택한 데이터베이스에 테이블이 없습니다"
+
+#: src/beeswax/templates/execute.mako:72
+msgid "settings"
+msgstr "설정"
+
+#: src/beeswax/templates/execute.mako:77 src/beeswax/templates/execute.mako:111
+#: src/beeswax/templates/execute.mako:148
+msgid "Delete this setting"
+msgstr "이 설정 삭제"
+
+#: src/beeswax/templates/execute.mako:93 src/beeswax/templates/execute.mako:130
+#: src/beeswax/templates/execute.mako:163
+msgid "Add"
+msgstr "추가"
+
+#: src/beeswax/templates/execute.mako:101
+msgid "File Resources"
+msgstr "파일 리소스"
+
+#: src/beeswax/templates/execute.mako:114
+msgid "Type"
+msgstr "유형"
+
+#: src/beeswax/templates/execute.mako:118
+msgid "file"
+msgstr "파일"
+
+#: src/beeswax/templates/execute.mako:123
+msgid "Path"
+msgstr "경로"
+
+#: src/beeswax/templates/execute.mako:133
+msgid "User-Defined Functions"
+msgstr "사용자 정의 함수"
+
+#: src/beeswax/templates/execute.mako:138
+msgid "UDFs"
+msgstr "UDF"
+
+#: src/beeswax/templates/execute.mako:151
+#: src/beeswax/templates/execute.mako:603
+#: src/beeswax/templates/list_designs.mako:83
+#: src/beeswax/templates/list_history.mako:118
+#: src/beeswax/templates/list_trashed_designs.mako:67
+#: src/beeswax/templates/my_queries.mako:84
+#: src/beeswax/templates/my_queries.mako:124
+#: src/beeswax/templates/watch_results.mako:220
+msgid "Name"
+msgstr "이름"
+
+#: src/beeswax/templates/execute.mako:156
+msgid "Class name"
+msgstr "클래스 이름"
+
+#: src/beeswax/templates/execute.mako:166
+msgid "Options"
+msgstr "옵션"
+
+#: src/beeswax/templates/execute.mako:168
+msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
+msgstr "이 항목이 선택되면(기본 설정) 쿼리에 $parameter_name 같은 매개변수를 포함할 수 있으며 쿼리가 실행 중일 때 값이 표시됩니다."
+
+#: src/beeswax/templates/execute.mako:170
+msgid "Enable parameterization"
+msgstr "매개변수화 사용"
+
+#: src/beeswax/templates/execute.mako:175
+msgid "Metastore Catalog"
+msgstr "Metastore 카탈로그"
+
+#: src/beeswax/templates/execute.mako:181
+msgid "Sync tables tips"
+msgstr "테이블 팁 동기화"
+
+#: src/beeswax/templates/execute.mako:187
+msgid "invalidates the entire catalog metadata. All table metadata will be reloaded on the next access."
+msgstr "전체 카탈로그 메타데이터를 무효화합니다. 다음에 액세스할 때 모든 테이블 메타데이터가 다시 로드됩니다."
+
+#: src/beeswax/templates/execute.mako:189
+msgid "invalidates the metadata, load on the next access"
+msgstr "메타데이터를 무효화, 다음 액세스에 로드합니다."
+
+#: src/beeswax/templates/execute.mako:191
+msgid "refreshes the metadata immediately. It is a faster, incremental refresh."
+msgstr "메타데이터를 즉시 새로 고칩니다. 훨씬 빠른 증분 새로 고침입니다."
+
+#: src/beeswax/templates/execute.mako:208
+msgid "This query had some sensitive information removed when saved."
+msgstr "이 쿼리에는 저장 시 제거된 민감한 정보가 있습니다."
+
+#: src/beeswax/templates/execute.mako:215
+msgid "Press CTRL + Space to autocomplete"
+msgstr "자동 완성하려면 CTRL + Space 누르기"
+
+#: src/beeswax/templates/execute.mako:216
+msgid "You can execute queries with multiple SQL statements delimited by a semicolon ';'"
+msgstr "세미콜론(;)으로 구분된 여러 SQL 문으로 쿼리를 실행할 수 있음"
+
+#: src/beeswax/templates/execute.mako:217
+msgid "You can highlight and run a fragment of a query"
+msgstr "쿼리 단편을 강조 표시하고 실행할 수 있음"
+
+#: src/beeswax/templates/execute.mako:225
+
+msgid "Share"
+msgstr "공유"
+
+#: src/beeswax/templates/execute.mako:234
+#: src/beeswax/templates/execute.mako:1724
+msgid "Query name"
+msgstr "쿼리 이름"
+
+#: src/beeswax/templates/execute.mako:242
+msgid "Query description"
+msgstr "쿼리 설명"
+
+#: src/beeswax/templates/execute.mako:254
+msgid "Please provide a query"
+msgstr "쿼리를 제공하십시오."
+
+#: src/beeswax/templates/execute.mako:257
+#: src/beeswax/templates/execute.mako:266
+msgid "Your query has the following error(s):"
+msgstr "쿼리에 다음 오류가 있습니다."
+
+#: src/beeswax/templates/execute.mako:276
+msgid "Execute"
+msgstr "실행"
+
+#: src/beeswax/templates/execute.mako:277
+msgid "Canceling..."
+msgstr "취소 중..."
+
+#: src/beeswax/templates/execute.mako:277
+msgid "Cancel the query"
+msgstr "쿼리 취소"
+
+#: src/beeswax/templates/execute.mako:277
+#: src/beeswax/templates/execute.mako:510
+#: src/beeswax/templates/execute.mako:543
+#: src/beeswax/templates/execute.mako:618
+#: src/beeswax/templates/execute.mako:695
+#: src/beeswax/templates/list_designs.mako:135
+#: src/beeswax/templates/list_trashed_designs.mako:118
+#: src/beeswax/templates/my_queries.mako:174
+#: src/beeswax/templates/save_results.mako:71
+#: src/beeswax/templates/watch_results.mako:333
+msgid "Cancel"
+msgstr "취소"
+
+#: src/beeswax/templates/execute.mako:280
+msgid "Restart"
+msgstr "재시작"
+
+#: src/beeswax/templates/execute.mako:285
+msgid "Save as..."
+msgstr "다른 이름으로 저장..."
+
+#: src/beeswax/templates/execute.mako:286
+msgid "Explain"
+msgstr "설명"
+
+#: src/beeswax/templates/execute.mako:287
+msgid "or create a"
+msgstr "또는 생성"
+
+#: src/beeswax/templates/execute.mako:288
+#: src/beeswax/templates/my_queries.mako:68
+msgid "New query"
+msgstr "새 쿼리"
+
+#: src/beeswax/templates/execute.mako:301
+msgid "See results in full screen"
+msgstr "전체 화면으로 결과 보기"
+
+#: src/beeswax/templates/execute.mako:304
+msgid "Save the results to HDFS or a new Hive table"
+msgstr "HDFS 또는 새 Hive 테이블에 결과 저장"
+
+#: src/beeswax/templates/execute.mako:308
+msgid "Download the results in CSV format"
+msgstr "CSV 형식으로 결과 다운로드"
+
+#: src/beeswax/templates/execute.mako:312
+msgid "Download the results in XLS format"
+msgstr "XLS 형식으로 결과 다운로드"
+
+#: src/beeswax/templates/execute.mako:318
+msgid "Recent queries"
+msgstr "최근 쿼리"
+
+#: src/beeswax/templates/execute.mako:321
+#: src/beeswax/templates/watch_results.mako:147
+msgid "Log"
+msgstr "로그"
+
+#: src/beeswax/templates/execute.mako:324
+#: src/beeswax/templates/watch_results.mako:149
+msgid "Columns"
+msgstr "열"
+
+#: src/beeswax/templates/execute.mako:325
+#: src/beeswax/templates/list_history.mako:141
+#: src/beeswax/templates/watch_results.mako:84
+#: src/beeswax/templates/watch_results.mako:143
+msgid "Results"
+msgstr "결과"
+
+#: src/beeswax/templates/execute.mako:326
+#: src/beeswax/templates/watch_results.mako:150
+msgid "Chart"
+msgstr "차트"
+
+#: src/beeswax/templates/execute.mako:329
+msgid "Explanation"
+msgstr "설명"
+
+#: src/beeswax/templates/execute.mako:342
+#: src/beeswax/templates/list_history.mako:117
+#: src/beeswax/templates/my_queries.mako:123
+msgid "Time"
+msgstr "시간"
+
+#: src/beeswax/templates/execute.mako:344
+#: src/beeswax/templates/list_history.mako:122
+msgid "Result"
+msgstr "결과"
+
+#: src/beeswax/templates/execute.mako:353
+msgid "There is currently no query to visualize."
+msgstr "현재 시각화할 쿼리가 없습니다."
+
+#: src/beeswax/templates/execute.mako:369
+msgid "There are currently no logs to visualize."
+msgstr "현재 시각화할 로그가 없습니다."
+
+#: src/beeswax/templates/execute.mako:375
+msgid "There are currently no columns to visualize."
+msgstr "현재 시각화할 열이 없습니다."
+
+#: src/beeswax/templates/execute.mako:377
+msgid "Filter for column name or type..."
+msgstr "열 이름 또는 종류 필터링..."
+
+#: src/beeswax/templates/execute.mako:382
+msgid "Scroll to the column"
+msgstr "열 스크롤"
+
+#: src/beeswax/templates/execute.mako:393
+msgid "Fetching results ran into the following error(s):"
+msgstr "가져오기 결과 다음 오류 발생:"
+
+#: src/beeswax/templates/execute.mako:409
+
+msgid "Show more results..."
+msgstr "추가 결과 보기..."
+
+#: src/beeswax/templates/execute.mako:414
+msgid "The operation has no results."
+msgstr "작업 결과가 없습니다."
+
+#: src/beeswax/templates/execute.mako:418
+msgid "The results have expired, rerun the query if needed."
+msgstr "결과가 만료되었습니다. 필요한 경우 쿼리를 다시 실행하십시오."
+
+#: src/beeswax/templates/execute.mako:423
+msgid "There is currently no data to build a chart on."
+msgstr "현재 차트 생성에 필요한 데이터가 없습니다."
+
+#: src/beeswax/templates/execute.mako:425
+msgid "the results on the chart have been limited to 1000 rows."
+msgstr "차트에 표시되는 결과는 1000개 행으로 제한되었습니다."
+
+#: src/beeswax/templates/execute.mako:430
+#: src/beeswax/templates/watch_results.mako:232
+msgid "Chart type"
+msgstr "차트 종류"
+
+#: src/beeswax/templates/execute.mako:432
+#: src/beeswax/templates/watch_results.mako:234
+msgid "Bars"
+msgstr "막대"
+
+#: src/beeswax/templates/execute.mako:433
+#: src/beeswax/templates/watch_results.mako:235
+msgid "Lines"
+msgstr "줄"
+
+#: src/beeswax/templates/execute.mako:434
+msgid "Pie"
+msgstr "파이"
+
+#: src/beeswax/templates/execute.mako:435
+#: src/beeswax/templates/watch_results.mako:236
+msgid "Map"
+msgstr "Map"
+
+#: src/beeswax/templates/execute.mako:438
+#: src/beeswax/templates/watch_results.mako:239
+msgid "X-Axis"
+msgstr "X축"
+
+#: src/beeswax/templates/execute.mako:441
+#: src/beeswax/templates/watch_results.mako:247
+msgid "Y-Axis"
+msgstr "Y축"
+
+#: src/beeswax/templates/execute.mako:445
+msgid "No sorting"
+msgstr "정렬되지 않음"
+
+#: src/beeswax/templates/execute.mako:446
+msgid "Sort ascending"
+msgstr "오름차순으로 정렬"
+
+#: src/beeswax/templates/execute.mako:447
+msgid "Sort descending"
+msgstr "내림차순으로 정렬"
+
+#: src/beeswax/templates/execute.mako:451
+#: src/beeswax/templates/watch_results.mako:257
+msgid "Latitude"
+msgstr "위도"
+
+#: src/beeswax/templates/execute.mako:454
+#: src/beeswax/templates/watch_results.mako:265
+msgid "Longitude"
+msgstr "경도"
+
+#: src/beeswax/templates/execute.mako:457
+#: src/beeswax/templates/watch_results.mako:273
+msgid "Label"
+msgstr "레이블"
+
+#: src/beeswax/templates/execute.mako:463
+#: src/beeswax/templates/watch_results.mako:284
+msgid "Please select a chart type."
+msgstr "차트 종류를 선택하십시오."
+
+#: src/beeswax/templates/execute.mako:495
+#: src/beeswax/templates/execute.mako:525
+msgid "Please specify parameters for this query"
+msgstr "이 쿼리의 매개변수를 지정하십시오."
+
+#: src/beeswax/templates/execute.mako:511
+msgid "Execute query"
+msgstr "쿼리 실행"
+
+#: src/beeswax/templates/execute.mako:544
+msgid "Explain query"
+msgstr "쿼리 설명"
+
+#: src/beeswax/templates/execute.mako:571
+msgid "Select a directory"
+msgstr "디렉토리 선택"
+
+#: src/beeswax/templates/execute.mako:584
+msgid "Select a file or directory"
+msgstr "파일 또는 디렉토리 선택"
+
+#: src/beeswax/templates/execute.mako:599
+msgid "Choose a name"
+msgstr "이름 선택"
+
+#: src/beeswax/templates/execute.mako:633
+#: src/beeswax/templates/save_results.mako:37
+#: src/beeswax/templates/watch_results.mako:303
+msgid "Save Query Results"
+msgstr "쿼리 결과 저장"
+
+#: src/beeswax/templates/execute.mako:652
+msgid "In an HDFS file"
+msgstr "HDFS 파일에"
+
+#: src/beeswax/templates/execute.mako:655
+msgid "Path to CSV file"
+msgstr "CSV 파일 경로"
+
+#: src/beeswax/templates/execute.mako:667
+#: src/beeswax/templates/save_results.mako:47
+#: src/beeswax/templates/watch_results.mako:308
+msgid "In a new table"
+msgstr "새 테이블에서"
+
+#: src/beeswax/templates/execute.mako:670
+msgid "Table name or <database name>.<table name>"
+msgstr "테이블 이름 또는 <database name>.<table name>"
+
+#: src/beeswax/templates/execute.mako:678
+msgid "Big Query in HDFS"
+msgstr "HDFS 내 대량 쿼리"
+
+#: src/beeswax/templates/execute.mako:689
+msgid "Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory."
+msgstr "대량의 결과를 얻는 경우 이 옵션을 사용하면 전체 쿼리를 다시 실행하여 얻어낸 결과를 선택한 HDFS 디렉토리에 저장합니다."
+
+#: src/beeswax/templates/execute.mako:693
+msgid "Show advanced fields"
+msgstr "고급 필드 표시"
+
+#: src/beeswax/templates/execute.mako:694
+msgid "Hide advanced fields"
+msgstr "고급 필드 숨기기"
+
+#: src/beeswax/templates/execute.mako:705
+#: src/beeswax/templates/execute.mako:1177
+msgid "View in Metastore Browser"
+msgstr "Metastore 브라우저에서 보기"
+
+#: src/beeswax/templates/execute.mako:709
+msgid "Data sample for"
+msgstr "데이터 샘플"
+
+#: src/beeswax/templates/execute.mako:719
+msgid "Ok"
+msgstr "확인"
+
+#: src/beeswax/templates/execute.mako:1075
+#: src/beeswax/templates/list_history.mako:179
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
+
+#: src/beeswax/templates/execute.mako:1076
+#: src/beeswax/templates/list_history.mako:180
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "0~0개(전체 0개 중) 항목 표시"
+
+#: src/beeswax/templates/execute.mako:1077
+#: src/beeswax/templates/list_history.mako:181
+msgid "(filtered from _MAX_ total entries)"
+msgstr "(총 _MAX_ 항목에서 필터링됨)"
+
+#: src/beeswax/templates/execute.mako:1080
+#: src/beeswax/templates/list_history.mako:184
+msgid "First"
+msgstr "처음"
+
+#: src/beeswax/templates/execute.mako:1081
+#: src/beeswax/templates/list_history.mako:185
+msgid "Last"
+msgstr "마지막"
+
+#: src/beeswax/templates/execute.mako:1099
+msgid "See results..."
+msgstr "결과 보기..."
+
+#: src/beeswax/templates/execute.mako:1167
+
+msgid "No databases or tables found."
+msgstr "데이터베이스 또는 테이블을 찾을 수 없습니다."
+
+#: src/beeswax/templates/execute.mako:1179
+msgid "Preview Sample data"
+msgstr "샘플 데이터 미리 보기"
+
+#: src/beeswax/templates/execute.mako:1248
+msgid "There was a problem loading the table preview."
+msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
+
+#: src/beeswax/templates/execute.mako:1428
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
+
+#: src/beeswax/templates/execute.mako:1431
+msgid "Press \"tab\", then \"enter\"."
+msgstr "\"tab\", \"enter\"를 차례로 누르십시오."
+
+#: src/beeswax/templates/execute.mako:1731
+msgid "Empty description"
+msgstr "설명 없음"
+
+#: src/beeswax/templates/execute.mako:1808
+#: src/beeswax/templates/watch_results.mako:586
+msgid "Please select the latitude and longitude columns."
+msgstr "위도와 경로 열을 선택하십시오."
+
+#: src/beeswax/templates/execute.mako:1829
+#: src/beeswax/templates/watch_results.mako:613
+msgid "Please select the columns you would like to see in this chart."
+msgstr "이 차트에 표시할 열을 선택하십시오."
+
+#: src/beeswax/templates/execute.mako:1888
+msgid "MR Job"
+msgstr "MR Job"
+
+#: src/beeswax/templates/execute.mako:1889
+msgid "MR Jobs"
+msgstr "MR Job"
+
+#: src/beeswax/templates/execute.mako:2081
+#: src/beeswax/templates/watch_results.mako:241
+#: src/beeswax/templates/watch_results.mako:249
+#: src/beeswax/templates/watch_results.mako:259
+#: src/beeswax/templates/watch_results.mako:267
+#: src/beeswax/templates/watch_results.mako:275
+msgid "Please select a column"
+msgstr "열을 선택하십시오."
+
+#: src/beeswax/templates/execute.mako:2177
+msgid "No query provided to save."
+msgstr "저장할 쿼리를 제공하지 않았습니다."
+
+#: src/beeswax/templates/execute.mako:2299
+msgid "Server error occurred: "
+msgstr "서버 오류 발생: "
+
+#: src/beeswax/templates/execute.mako:2302
+msgid "Unmanageable server error occurred: "
+msgstr "관리할 수 없는 서버 오류 발생: "
+
+#: src/beeswax/templates/execute.mako:2307
+msgid "Query saved."
+msgstr "쿼리가 저장되었습니다."
+
+#: src/beeswax/templates/execute.mako:2311
+msgid "Could not save design"
+msgstr "디자인을 저장할 수 없음"
+
+#: src/beeswax/templates/execute.mako:2318
+msgid "Could not save results"
+msgstr "결과를 저장할 수 없음"
+
+#: src/beeswax/templates/execute.mako:2325
+msgid "Problem: "
+msgstr "문제: "
+
+#: src/beeswax/templates/execute.mako:2328
+msgid "Query canceled!"
+msgstr "쿼리가 취소되었습니다!"
+
+#: src/beeswax/templates/execute.mako:2360
+#: src/beeswax/templates/execute.mako:2368
+#: src/beeswax/templates/watch_results.mako:125
+msgid "Did you know?"
+msgstr "유용한 정보"
+
+#: src/beeswax/templates/execute.mako:2423
+#: src/beeswax/templates/execute.mako:2430
+msgid "Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:"
+msgstr "일부 테이블이 없습니까? Impala에 표시된 테이블/메타데이터 목록을 업데이트하려면 다음 쿼리 중 하나를 실행하십시오."
+
+#: src/beeswax/templates/layout.mako:41
+msgid "Spark Igniter"
+msgstr "Spark Igniter"
+
+#: src/beeswax/templates/layout.mako:44
+msgid "Editor"
+msgstr "편집기"
+
+#: src/beeswax/templates/layout.mako:46
+msgid "Applications"
+msgstr "애플리케이션"
+
+#: src/beeswax/templates/layout.mako:48
+msgid "Dashboard"
+msgstr "대시보드"
+
+#: src/beeswax/templates/layout.mako:49
+msgid "Contexts"
+msgstr "컨텍스트"
+
+#: src/beeswax/templates/layout.mako:50
+msgid "Uploads"
+msgstr "업로드"
+
+#: src/beeswax/templates/layout.mako:77
+#: src/beeswax/templates/my_queries.mako:29
+#: src/beeswax/templates/my_queries.mako:40
+msgid "My Queries"
+msgstr "내 쿼리"
+
+#: src/beeswax/templates/layout.mako:78
+#: src/beeswax/templates/list_designs.mako:29
+#: src/beeswax/templates/list_designs.mako:38
+#: src/beeswax/templates/list_trashed_designs.mako:27
+msgid "Saved Queries"
+msgstr "저장된 쿼리"
+
+#: src/beeswax/templates/layout.mako:79
+#: src/beeswax/templates/list_history.mako:29
+#: src/beeswax/templates/list_history.mako:101
+msgid "History"
+msgstr "기록"
+
+#: src/beeswax/templates/layout.mako:97
+msgid "Metastore Manager"
+msgstr "Metastore Manager"
+
+#: src/beeswax/templates/list_designs.mako:36
+msgid "App Configurations"
+msgstr "앱 구성"
+
+#: src/beeswax/templates/list_designs.mako:50
+#, python-format
+msgid "Search for %s"
+msgstr "%s 검색"
+
+#: src/beeswax/templates/list_designs.mako:55
+#, python-format
+msgid "Edit the selected %s"
+msgstr "선택한 %s 편집"
+
+#: src/beeswax/templates/list_designs.mako:55
+#: src/beeswax/templates/my_queries.mako:50
+msgid "Edit"
+msgstr "편집"
+
+#: src/beeswax/templates/list_designs.mako:56
+#, python-format
+msgid "Copy the selected %s"
+msgstr "선택한 %s 복사"
+
+#: src/beeswax/templates/list_designs.mako:56
+#: src/beeswax/templates/list_history.mako:46
+#: src/beeswax/templates/my_queries.mako:51
+msgid "Copy"
+msgstr "복사"
+
+#: src/beeswax/templates/list_designs.mako:57
+#, python-format
+msgid "View the usage history of the selected %s"
+msgstr "선택한 %s의 사용량 기록 보기"
+
+#: src/beeswax/templates/list_designs.mako:57
+#: src/beeswax/templates/my_queries.mako:52
+msgid "Usage history"
+msgstr "사용량 기록"
+
+#: src/beeswax/templates/list_designs.mako:60
+#: src/beeswax/templates/my_queries.mako:54
+msgid "Move to trash"
+msgstr "휴지통으로 이동"
+
+#: src/beeswax/templates/list_designs.mako:65
+#: src/beeswax/templates/list_trashed_designs.mako:42
+#: src/beeswax/templates/list_trashed_designs.mako:43
+#: src/beeswax/templates/my_queries.mako:59
+msgid "Delete forever"
+msgstr "영구적으로 삭제"
+
+#: src/beeswax/templates/list_designs.mako:73
+#, python-format
+msgid "Create new %s"
+msgstr "새 %s 생성"
+
+#: src/beeswax/templates/list_designs.mako:73
+#, python-format
+msgid "New %s"
+msgstr "새 %s"
+
+#: src/beeswax/templates/list_designs.mako:74
+#: src/beeswax/templates/my_queries.mako:67
+msgid "Go to the trash"
+msgstr "휴지통으로 이동"
+
+#: src/beeswax/templates/list_designs.mako:74
+#: src/beeswax/templates/my_queries.mako:67
+msgid "View trash"
+msgstr "휴지통 보기"
+
+#: src/beeswax/templates/list_designs.mako:85
+#: src/beeswax/templates/list_trashed_designs.mako:69
+msgid "Owner"
+msgstr "소유자"
+
+#: src/beeswax/templates/list_designs.mako:86
+#: src/beeswax/templates/list_trashed_designs.mako:70
+#: src/beeswax/templates/my_queries.mako:86
+msgid "Last Modified"
+msgstr "최종 수정 날짜"
+
+#: src/beeswax/templates/list_designs.mako:113
+#: src/beeswax/templates/list_trashed_designs.mako:96
+#: src/beeswax/templates/my_queries.mako:108
+msgid "ago"
+msgstr "전"
+
+#: src/beeswax/templates/list_designs.mako:244
+#, python-format
+msgid "Move the selected %s to the trash?"
+msgstr "선택한 %s을(를) 휴지통으로 이동하겠습니까?"
+
+#: src/beeswax/templates/list_designs.mako:250
+#, python-format
+msgid "Delete the selected %s?"
+msgstr "선택한 %s을(를) 삭제하시겠습니까?"
+
+#: src/beeswax/templates/list_history.mako:38
+msgid "Unsaved"
+msgstr "미저장"
+
+#: src/beeswax/templates/list_history.mako:46
+msgid "Copy this query."
+msgstr "이 쿼리를 복사합니다."
+
+#: src/beeswax/templates/list_history.mako:49
+msgid "Auto generated action"
+msgstr "자동 생성된 작업"
+
+#: src/beeswax/templates/list_history.mako:67
+msgid "Show my queries"
+msgstr "내 쿼리 표시"
+
+#: src/beeswax/templates/list_history.mako:75
+msgid "Show everyone's queries"
+msgstr "모든 사용자의 쿼리 표시"
+
+#: src/beeswax/templates/list_history.mako:86
+msgid "Show auto queries"
+msgstr "자동 쿼리 표시"
+
+#: src/beeswax/templates/list_history.mako:94
+msgid "Show only saved queries"
+msgstr "저장된 쿼리만 표시"
+
+#: src/beeswax/templates/list_history.mako:105
+msgid "Search for name, query, etc."
+msgstr "이름, 쿼리 등을 검색합니다."
+
+#: src/beeswax/templates/list_history.mako:120
+msgid "User"
+msgstr "사용자"
+
+#: src/beeswax/templates/list_history.mako:121
+#: src/beeswax/templates/my_queries.mako:126
+msgid "State"
+msgstr "상태"
+
+#: src/beeswax/templates/list_trashed_designs.mako:33
+msgid "Trashed Queries"
+msgstr "휴지통으로 이동된 쿼리"
+
+#: src/beeswax/templates/list_trashed_designs.mako:37
+#: src/beeswax/templates/my_queries.mako:44
+msgid "Search for query"
+msgstr "쿼리 검색"
+
+#: src/beeswax/templates/list_trashed_designs.mako:45
+msgid "Restore from trash"
+msgstr "휴지통 복구"
+
+#: src/beeswax/templates/list_trashed_designs.mako:46
+msgid "Restore"
+msgstr "복구"
+
+#: src/beeswax/templates/list_trashed_designs.mako:53
+#: src/beeswax/templates/list_trashed_designs.mako:54
+msgid "Empty trash"
+msgstr "휴지통 비우기"
+
+#: src/beeswax/templates/list_trashed_designs.mako:56
+msgid "View queries"
+msgstr "쿼리 보기"
+
+#: src/beeswax/templates/list_trashed_designs.mako:208
+msgid "Restore the selected queries?"
+msgstr "선택한 쿼리를 복구하시겠습니까?"
+
+#: src/beeswax/templates/list_trashed_designs.mako:214
+#: src/beeswax/templates/my_queries.mako:337
+msgid "Delete the selected queries?"
+msgstr "선택한 쿼리를 삭제하시겠습니까?"
+
+#: src/beeswax/templates/list_trashed_designs.mako:220
+msgid "Empty the trash?"
+msgstr "휴지통을 비우시겠습니까?"
+
+#: src/beeswax/templates/my_queries.mako:49
+msgid "View the result of the selected"
+msgstr "선택한 항목 결과 보기"
+
+#: src/beeswax/templates/my_queries.mako:49
+msgid "View result"
+msgstr "결과 보기"
+
+#: src/beeswax/templates/my_queries.mako:50
+msgid "Edit the selected query"
+msgstr "선택한 선택한 쿼리 편집"
+
+#: src/beeswax/templates/my_queries.mako:51
+msgid "Copy the selected query"
+msgstr "선택한 쿼리 복사"
+
+#: src/beeswax/templates/my_queries.mako:52
+msgid "View the usage history of the selected query"
+msgstr "선택한 쿼리의 사용량 기록 보기"
+
+#: src/beeswax/templates/my_queries.mako:68
+msgid "Create new query"
+msgstr "새 쿼리 생성"
+
+#: src/beeswax/templates/my_queries.mako:74
+msgid "Recent Saved Queries"
+msgstr "최근 저장된 쿼리"
+
+#: src/beeswax/templates/my_queries.mako:75
+msgid "Recent Run Queries"
+msgstr "최근 실행된 쿼리"
+
+#: src/beeswax/templates/my_queries.mako:85
+msgid "Desc"
+msgstr "설명"
+
+#: src/beeswax/templates/my_queries.mako:114
+msgid "View all my queries"
+msgstr "모든 내 쿼리 보기"
+
+#: src/beeswax/templates/my_queries.mako:158
+msgid "View my entire query history"
+msgstr "내 전체 쿼리 기록 보기"
+
+#: src/beeswax/templates/my_queries.mako:331
+msgid "Move the selected queries to the trash?"
+msgstr "선택한 쿼리를 휴지통으로 이동하시겠습니까?"
+
+#: src/beeswax/templates/save_results.mako:58
+#: src/beeswax/templates/watch_results.mako:315
+msgid "In an HDFS directory"
+msgstr "HDFS 디렉토리에"
+
+#: src/beeswax/templates/save_results.mako:61
+#: src/beeswax/templates/watch_results.mako:318
+msgid "Results location"
+msgstr "결과 위치"
+
+#: src/beeswax/templates/util.mako:66
+msgid "Unsaved Query"
+msgstr "저장되지 않은 쿼리"
+
+#: src/beeswax/templates/util.mako:71
+#: src/beeswax/templates/watch_results.mako:27
+msgid "Query Results"
+msgstr "쿼리 결과"
+
+#: src/beeswax/templates/watch_results.mako:82
+msgid "Collapse this panel"
+msgstr "이 패널 축소"
+
+#: src/beeswax/templates/watch_results.mako:85
+msgid "Download as CSV"
+msgstr "CSV로 다운로드"
+
+#: src/beeswax/templates/watch_results.mako:86
+msgid "Download as XLS"
+msgstr "XLS로 다운로드"
+
+#: src/beeswax/templates/watch_results.mako:94
+msgid "MapReduce Job"
+msgstr "MapReduce Job"
+
+#: src/beeswax/templates/watch_results.mako:94
+msgid "MapReduce Jobs"
+msgstr "MapReduce Job"
+
+#: src/beeswax/templates/watch_results.mako:103
+msgid "No Hadoop jobs were launched in running this query."
+msgstr "이 쿼리를 실행할 때 Hadoop Job이 시작되지 않았습니다."
+
+#: src/beeswax/templates/watch_results.mako:112
+msgid "Multi-statement query"
+msgstr "다중 명령문 쿼리"
+
+#: src/beeswax/templates/watch_results.mako:113
+msgid "Hue stopped as one of your query contains some results."
+msgstr "쿼리 중 하나에 일부 결과가 포함되어 Hue가 중지됩니다."
+
+#: src/beeswax/templates/watch_results.mako:114
+msgid "Click on"
+msgstr "클릭"
+
+#: src/beeswax/templates/watch_results.mako:117
+msgid "next"
+msgstr "다음"
+
+#: src/beeswax/templates/watch_results.mako:119
+msgid "to continue execution of the remaining statements."
+msgstr "나머지 명령문을 계속 실행합니다."
+
+#: src/beeswax/templates/watch_results.mako:127
+msgid "If the result contains a large number of columns, click a row to select a column to jump to"
+msgstr "결과에 많은 열이 포함된 경우 행을 클릭하여 이동할 열을 선택하십시오."
+
+#: src/beeswax/templates/watch_results.mako:128
+msgid "Save huge results on HDFS and download them with FileBrowser"
+msgstr "HDFS에 많은 결과 저장 후 FileBrowser를 사용하여 다운로드"
+
+#: src/beeswax/templates/watch_results.mako:135
+msgid "Query Results:"
+msgstr "쿼리 결과:"
+
+#: src/beeswax/templates/watch_results.mako:141
+#: src/beeswax/templates/watch_results.mako:158
+msgid "Error"
+msgstr "오류"
+
+#: src/beeswax/templates/watch_results.mako:162
+msgid "The query result has expired."
+msgstr "쿼리 결과가 만료되었습니다."
+
+#: src/beeswax/templates/watch_results.mako:163
+msgid "You can rerun it from "
+msgstr "다음에서 다시 실행할 수 있음 "
+
+#: src/beeswax/templates/watch_results.mako:169
 msgid "Page offset may have incremented since last view."
-msgstr "마지막으로 본 이후에 페이지 오프셋이 증가되었을 수 있습니다."
+msgstr "마지막 보기 이후 페이지 오프셋이 증가되었을 수 있습니다."
 
-#: src/beeswax/templates/watch_results.mako:104
-#: src/beeswax/templates/watch_results.mako:106
-msgid "Back to first row"
-msgstr "맨 처음 행으로 돌아가기"
+#: src/beeswax/templates/watch_results.mako:200
+msgid "You have reached the last record for this query."
+msgstr "이 쿼리의 마지막 레코드에 도달했습니다."
 
-#: src/beeswax/templates/watch_results.mako:154
-msgid "Sorry, name is required."
-msgstr "이름을 입력하십시오."
+#: src/beeswax/templates/watch_results.mako:322
+msgid "In text with columns separated by ^A and rows separated by newlines. JSON for non-primitive type columns."
+msgstr "^A로 구분된 열과 줄 바꿈 문자로 구분된 행이 있는 텍스트. 기본 형식이 아닌 열의 JSON."
 
-#: src/beeswax/templates/watch_wait.mako:22
-#: src/beeswax/templates/watch_wait.mako:28
-msgid "Beeswax: Waiting for query..."
-msgstr "Beeswax: 쿼리를 기다리는 중..."
+#: src/beeswax/templates/watch_results.mako:331
+msgid "Name or directory required."
+msgstr "이름 또는 디렉토리를 입력해야 합니다."
 
+#: src/beeswax/templates/watch_results.mako:500
+msgid "Download results from the left."
+msgstr "왼쪽에서 결과를 다운로드합니다."
+
+#~ msgid "%s interface does not support close_operation. %s interface does."
+#~ msgstr "%s 인터페이스가 close_operation을 지원하지 않습니다. %s 인터페이스가 지원합니다."
+#~ msgid ""
+#~ "If checked, you will receive an "
+#~ "email notification when the query "
+#~ "completes."
+#~ msgstr "이 항목이 선택되면 쿼리 완료 시 이메일 알림을 받게 됩니다."
+#~ msgid "Email me on completion"
+#~ msgstr "완료 시 이메일 받기"

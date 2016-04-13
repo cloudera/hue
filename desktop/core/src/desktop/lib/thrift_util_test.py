@@ -22,6 +22,8 @@ import threading
 import time
 import unittest
 
+LOG = logging.getLogger(__name__)
+
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
 if not gen_py_path in sys.path:
   sys.path.insert(1, gen_py_path)
@@ -29,7 +31,7 @@ if not gen_py_path in sys.path:
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from djangothrift_test_gen import TestService
 
-import hadoop
+import python_util
 import thrift_util
 from thrift_util import jsonable2thrift, thrift2json
 
@@ -42,12 +44,15 @@ from nose.tools import assert_equal
 
 
 class SimpleThriftServer(object):
+  socket_family = socket.AF_INET
+
   """A simple thrift server impl"""
   def __init__(self):
-    self.port = hadoop.mini_cluster.find_unused_port()
+    self.port = python_util.find_unused_port()
     self.pid = 0
 
   def ping(self, in_val):
+    logging.info('ping')
     return in_val * 2
 
   def start_server_process(self):
@@ -68,30 +73,33 @@ class SimpleThriftServer(object):
     # Child process runs the thrift server loop
     try:
       processor = TestService.Processor(self)
-      transport = TSocket.TServerSocket(self.port)
+      transport = TSocket.TServerSocket('localhost', self.port, socket_family=self.socket_family)
       server = TServer.TThreadedServer(processor,
                                        transport,
                                        TBufferedTransportFactory(),
                                        TBinaryProtocolFactory())
       server.serve()
     except:
+      LOG.exception('failed to start thrift server')
       sys.exit(1)
 
   def _ensure_online(self):
     """Ensure that the child server is online"""
     deadline = time.time() + 60
+    logging.debug("Socket Info: " + str(socket.getaddrinfo('localhost', self.port, socket.AF_UNSPEC, socket.SOCK_STREAM)))
     while time.time() < deadline:
       logging.info("Waiting for service to come online")
       try:
-        ping_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ping_s = socket.socket(self.socket_family, socket.SOCK_STREAM)
         ping_s.connect(('localhost', self.port))
         ping_s.close()
         return
       except:
+        LOG.exception('failed to connect to child server')
         _, status = os.waitpid(self.pid, os.WNOHANG)
         if status != 0:
           logging.info("SimpleThriftServer child process exited with %s" % (status,))
-        time.sleep(0.1)
+        time.sleep(5)
 
     logging.info("SimpleThriftServer took too long to come online")
     self.stop_server_process()
@@ -116,7 +124,7 @@ class TestWithThriftServer(object):
     cls.server = SimpleThriftServer()
     cls.server.start_server_process()
     cls.client = thrift_util.get_client(TestService.Client,
-                                        '127.0.0.1',
+                                        'localhost',
                                         cls.server.port,
                                         'Hue Unit Test Client',
                                         timeout_seconds=1)

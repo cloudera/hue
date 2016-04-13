@@ -1,0 +1,8 @@
+include     LICENSE ChangeLog TODO MANIFEST.in OpenSSL/RATIONALE *.rst tox.ini memdbg.py runtests.py OpenSSL/test/README
+exclude leakcheck
+recursive-include   doc         *
+recursive-include   examples    *
+recursive-include   rpm         *
+recursive-exclude   leakcheck   *.py *.pem
+global-exclude  *.pyc
+prune               doc/_build

@@ -39,19 +39,13 @@ else
 fi
 
 build_hadoop
-build_mr1
 build_hive
 build_oozie
+build_sqoop
 
 make apps
 
-if python -V 2>&1 | grep -q -v 2.4; then
-  # Install pylint from our archive
-  build/env/bin/easy_install \
-    -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
-    -H archive.cloudera.com pylint
-  build/env/bin/hue runpylint all -- -f parseable > PYLINT.txt
-fi
+build/env/bin/hue runpylint all -- -f parseable > PYLINT.txt
 
 rm -f JAVASCRIPTLINT.txt
 for FILE in $(find . -name *.js);

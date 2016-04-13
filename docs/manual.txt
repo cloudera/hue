@@ -11,15 +11,11 @@ individual users.
 
 This guide describes how to install and configure a Hue tarball. For
 information about installing Hue packages, see
-https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation[Installing Hue].
+http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/CDH5-Installation-Guide/cdh5ig_cdh_hue_configure.html[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
 link:sdk/sdk.html[Hue SDK Documentation]
-
-IMPORTANT: Hue requires the Hadoop contained in
-https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide[Cloudera's
-Distribution including Apache Hadoop (CDH4)]
 
 .Conventions Used in this Guide:
 * Commands that must be run with +root+ permission have a +#+ command prompt.
@@ -30,8 +26,8 @@ Hue Installation Instructions
 -----------------------------
 
 The following instructions describe how to install the Hue tarball on a
-multi-node cluster. You need to also install CDH and update some
-Hadoop configuration files before running Hue.
+multi-node cluster. You need to also install Hadoop and its satellite components
+(Oozie, Hive...) and update some Hadoop configuration files before running Hue.
 
 
 Install Hue
@@ -45,7 +41,7 @@ overly restrictive firewalls. For small clusters of less than 10 nodes,
 you can use your existing master node as the Hue Server.
 
 You can download the Hue tarball here:
-http://github.com/cloudera/hue/downloads/
+gethue.tumblr.com/tagged/release
 
 Hue Dependencies
 ^^^^^^^^^^^^^^^^
@@ -56,27 +52,26 @@ tarball, you must have the following installed:
 
 .Required Dependencies
 [grid="rows"]
-``~
-Redhat,Ubuntu
+```~
+Redhat,Ubuntu 10.04,Ubuntu 12.04/14.04
 ~~~~~~~~~~
-gcc,gcc
-g++,g++
-libxml2-devel,libxml2-dev
-libxslt-devel,libxslt-dev
-cyrus-sasl-devel,libsasl2-dev
-cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
-mysql-devel,libmysqlclient-dev
-python-devel,python-dev
-python-setuptools,python-setuptools
-python-simplejson,python-simplejson
-sqlite-devel,libsqlite3-dev
-ant,ant
-libsasl2-dev,cyrus-sasl-devel
-libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi
-libkrb5-dev,krb5-devel        
-libtidy-0.99-0,libtidy (For unit tests only)
-mvn,mvn (From maven2 package or tarball)
-openldap-dev / libldap2-dev, openldap-devel
+gcc,gcc,gcc
+g++,g++,g++
+libxml2-devel,libxml2-dev,libxml2-dev
+libxslt-devel,libxslt-dev,libxslt-dev
+cyrus-sasl-devel,libsasl2-dev,libsasl2-dev
+cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit,libsasl2-modules-gssapi-mit
+mysql-devel,libmysqlclient-dev,libmysqlclient-dev
+python-devel,python-dev,python-dev
+python-setuptools,python-setuptools,python-setuptools
+sqlite-devel,libsqlite3-dev,libsqlite3-dev
+ant,ant,ant
+libsasl2-dev,cyrus-sasl-devel,libsasl2-dev
+libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
+libkrb5-dev,krb5-devel,libkrb5-dev
+libtidy-0.99-0,libtidy,libtidy-0.99-0 (For unit tests only)
+mvn,mvn (From maven2 package or tarball),mvn (From maven2/maven3 package or tarball)
+openldap-dev / libldap2-dev,openldap-devel,libldap2-dev
 ~~~~~~~~~~
 
 The full list is here: https://github.com/cloudera/hue#development-prerequisites
@@ -88,11 +83,12 @@ Configure `$PREFIX` with the path where you want to install Hue by running:
 
   $ PREFIX=/usr/share make install
   $ cd /usr/share/hue
-  $ sudo chmod 4750 apps/shell/src/shell/build/setuid
 
 You can install Hue anywhere on your system, and run Hue as a non-root user.
 The Shell application needs root privileges to launch various sub-processes as
-the logged in users.
+the logged in users. `$USER` should be the group of the user running Hue (same as
+its username).
+
 It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/share`.
 
@@ -121,27 +117,30 @@ of various Python libraries and you don't have to be concerned about missing
 software components.
 
 
-Install Hadoop from CDH
-~~~~~~~~~~~~~~~~~~~~~~~
+Install Hadoop
+-~~~~~~~~~~~~~
 
-To use Hue, you must install and run Hadoop from CDH4 or later.  If you
-are not running this version of CDH or later, upgrade your cluster before
-proceeding.
+Depending on which apps you need, you need to make sure that some Hadoop services
+are already setup (that way Hue can talk to them).  
 
-.Dependency on CDH Components
+.Dependency
 [grid="rows"]
-`-------------.----------.----------------------------------.------------------------
-  Component   Required   Applications                       Notes
--------------------------------------------------------------------------------------
-  HDFS        Yes        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
-  MR1         No         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
-  Yarn        No         JobDesigner, Beeswax               Transitive dependency via Hive or Oozie
-  Oozie       No         JobDesigner, Oozie                 Oozie access through REST API
-  Hive        No         Beeswax                            Beeswax uses the Hive client libraries
-  Flume       No         Shell                              Optionally provides access to the Flume shell
-  HBase       No         Shell                              Optionally provides access to the HBase shell
-  Pig         No         Shell                              Optionally provides access to the Pig shell
--------------------------------------------------------------------------------------
+`-----------------------------------------------.------------------------
+  Component      Applications                       Notes
+-------------------------------------------------------------------------
+  HDFS        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
+  MR1         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
+  MR2/YARN    JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
+  Oozie       JobDesigner, Oozie                 Oozie access through REST API
+  Hive        Beeswax                            Requires HiveServer2
+  HBase       HBase Browser                      Requires Thrift 1 service
+  Pig         Pig Editor                         Requires Oozie
+  Sqoop2      Sqoop Editor                       Requires Sqoop2 server
+  Search      Search                             Requires Solr server
+  Impala      Impala Editor                      Requires an Impalad
+  ZooKeeper   ZooKeeper Browser                  Requires ZooKeeper server and REST server
+  Spark       Spark Editor                       Requires Spark Jobserver
+--------------------------------------------------------------------------------------
 
 
 Hadoop Configuration
@@ -186,6 +185,12 @@ Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
     </property>
 
 
+Configure MapReduce 0.23+ (MR2)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Hue is using only standard Hadoop APIs.
+
+
 Configure MapReduce 0.20 (MR1)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -193,7 +198,6 @@ Hue communicates with the JobTracker via the Hue plugins, which is a jar
 file that you place in your MapReduce `lib` directory.
 
 If you JobTracker and Hue are located on the same host, copy it over.
-If you are using CDH3, your MapReduce library directory might be in `/usr/lib/hadoop/lib`.
 
     $ cd /usr/share/hue
     $ cp desktop/libs/hadoop/java-lib/hue-plugins-*.jar /usr/lib/hadoop-0.20-mapreduce/lib
@@ -302,7 +306,7 @@ Hive Configuration
 ~~~~~~~~~~~~~~~~~~
 
 Hue's Beeswax application helps you use Hive to query your data.
-It depends on a Hive installation on your system. Please read
+It depends on a Hive Server 2 running in the cluster. Please read
 this section to ensure a proper integration.
 
 Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
@@ -312,33 +316,8 @@ the users whom you expect to be creating tables.  `/tmp` (on the local file
 system) must be world-writable (1777), as Hive makes extensive use of it.
 
 [NOTE]
-If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
-versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
-Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
-Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
-by running the appropriate schema upgrade script located in the
-`apps/beeswax/hive/scripts/metastore/upgrade` directory in the Hue installation.
-Scripts for Derby and MySQL databases are available. If you are using a
-different database for your MetaStore, you will need to provide your own
-upgrade script.
 
-No Existing Hive Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Familiarize yourself with the configuration options in
-`hive-site.xml`. See
-https://ccp.cloudera.com/display/CDH4DOC/Hive+Installation#HiveInstallation-ConfiguringtheHiveMetastore[Hive
-Installation and Configuration].
-Having a `hive-site.xml` is optional but often useful, particularly on setting
-up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
-You may store the `hive-site.xml` in `/etc/hue/conf`, or instruct
-Beeswax to locate it using the `hive_conf_dir` configuration variable.  See
-`/etc/hue/conf/hue.ini`.
-
-Existing Hive Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In `/etc/hue/conf/hue.ini`, modify `hive_conf_dir` to point to the
+In `hue.ini`, modify `hive_conf_dir` to point to the
 directory containing `hive-site.xml`.
 
 
@@ -347,9 +326,9 @@ Configuring Hue
 
 Hue ships with a default configuration that will work for
 pseudo-distributed clusters.  If you are running on a real cluster, you must
-make a few changes to the `/etc/hue/hue.ini` configuration file (or ``pseudo-distributed.ini`
-when in development mode). The following sections describe the key configuration options you must make to
-configure Hue.
+make a few changes to the `hue.ini` configuration file (`/etc/hue/hue.ini` when installed from the
+package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
+The following sections describe the key configuration options you must make to configure Hue.
 
 
 [TIP]
@@ -384,14 +363,14 @@ Web Server Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 These configuration variables are under the `[desktop]` section in
-the `/etc/hue/hue.ini` configuration file.
+the `hue.ini` configuration file.
 
 Specifying the Hue HTTP Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Hue uses a Spawning or a CherryPy web server (configurable).  You can use
-the following options to change the IP address and port that the web server
-listens on. The default setting is port 8888 on all configured IP addresses.
+Hue uses CherryPy web server.  You can use the following options to
+change the IP address and port that the web server listens on.
+The default setting is port 8888 on all configured IP addresses.
 
     # Webserver listens on this address and port
     http_host=0.0.0.0
@@ -435,7 +414,7 @@ do the following steps:
     $ ./build/env/bin/easy_install pyOpenSSL
 
 2. Configure Hue to use your private key by adding the following
-options to the `/etc/hue/hue.ini` configuration file:
+options to the `hue.ini` configuration file:
 
     ssl_certificate=/path/to/certificate
     ssl_private_key=/path/to/key
@@ -462,7 +441,7 @@ Hue Configuration for Hadoop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These configuration variables are under the `[hadoop]` section in
-the `/etc/hue/hue.ini` configuration file.
+the `hue.ini` configuration file.
 
 
 HDFS Cluster
@@ -511,22 +490,6 @@ submit_to::
   If your Oozie is configured with to talk to a 0.20 MapReduce service, then
   set this to `true`. Hue will be submitting jobs to this MapReduce cluster.
 
-hadoop_mapred_home::
-  This is the home of your Hadoop MapReduce installation. It is the
-  root of the Hadoop MR1 untarred directory, or the root of the
-  Hadoop 0.20 untarred directory, or `/usr/lib/hadoop-0.20-mapreduce` for
-  CDH packages. If `submit_to` is true for this cluster, this
-  config value becomes the `$HADOOP_MAPRED_HOME` for
-  BeeswaxServer and child shell processes.
-
-hadoop_bin::
-  Use this as the MR1 Hadoop launcher script, which is usually
-  `/usr/bin/hadoop`.
-
-hadoop_conf_dir::
-  This is the configuration directory of the MR1 service,
-  typically `/etc/hadoop/conf`.
-
 
 Yarn (MR2) Cluster
 ^^^^^^^^^^^^^^^^^^
@@ -545,31 +508,15 @@ submit_to::
   set this to `true`. Hue will be submitting jobs to this Yarn cluster.
   But note that JobBrowser will not be able to show MR2 jobs.
 
-hadoop_mapred_home::
-  This is the home of your Hadoop MapReduce installation. It is the
-  root of the Hadoop 0.23 untarred directory, or
-  `/usr/lib/hadoop-mapreduce` for CDH packages. If `submit_to` is
-  true for this cluster, this config value becomes the
-  `$HADOOP_MAPRED_HOME` for BeeswaxServer and child shell
-  processes.
 
-hadoop_bin::
-  Use this as the Yarn/MR2 Hadoop launcher script, which is usually
-  `/usr/bin/hadoop`.
-
-hadoop_conf_dir::
-  This is the configuration directory of the Yarn/MR2 service,
-  typically `/etc/hadoop/conf`.
-
-
-Beeswax Configuration
-~~~~~~~~~~~~~~~~~~~~~
+Hive Configuration
+~~~~~~~~~~~~~~~~~~
 
 In the `[beeswax]` section of the configuration file, you can
 _optionally_ specify the following:
 
 beeswax_server_host::
-  The hostname or IP that the Beeswax Server should bind to. By
+  The hostname or IP that the Hive Server should bind to. By
   default it binds to `localhost`, and therefore only serves local
   IPC clients.
 
@@ -579,9 +526,6 @@ hive_home_dir::
 hive_conf_dir::
   The directory containing your `hive-site.xml` Hive
   configuration file.
-
-beeswax_server_heapsize::
-  The heap size (-Xmx) of the Beeswax Server.
 
 
 JobDesigner and Oozie Configuration
@@ -654,7 +598,6 @@ A standard Hue installation starts and monitors the following processes:
 
 * `runcpserver` - a web server based on CherryPy that provides the core web
 functionality of Hue
-* `beeswax server` - a daemon that manages concurrent Hive queries
 
 If you have installed other applications into your Hue instance, you may see
 other daemons running under the supervisor as well.
@@ -663,7 +606,6 @@ You can see the supervised processes running in the output of `ps -f -u hue`:
 
   UID        PID  PPID  C STIME TTY          TIME CMD
   hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
-  hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...
 
 Note that the supervisor automatically restarts these processes if they fail for
 any reason. If the processes fail repeatedly within a short time, the supervisor
@@ -776,7 +718,7 @@ To configure Hue to store data in MySQL:
 
   $ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
 
-4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the
+4. Open the `hue.ini` file in a text editor. Directly below the
    `[[database]]` line, add the following options (and modify accordingly for
    your MySQL setup):
 
@@ -811,10 +753,9 @@ The Help application guides users through the various installed applications.
 Supported Browsers
 ~~~~~~~~~~~~~~~~~~
 
-Hue is primarily tested on Firefox, Chrome and Safari on Windows, Mac,
-and Linux.
-
-Most of Hue should work in IE8+ and Opera is not tested.
+* Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
+* Linux : Chrome, Firefox 3.6+
+* Mac: Chrome, Firefox 3.6+, Safari 5+
 
 Feedback
 ~~~~~~~~

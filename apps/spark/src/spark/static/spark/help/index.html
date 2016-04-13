@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Spark</title>
+</head>
+<body id="topic_4"><a name="topic_4"><!-- --></a>
+
+
+
+  <h1 class="title topictitle1">Spark</h1>
+
+<p><span>A </span><a href="http://gethue.com/"><span>Hue</span></a><span> Spark application was recently created. It lets users execute and monitor </span><a href="http://spark.incubator.apache.org/"><span>Spark</span></a><span> jobs directly from their browser and be more productive.</span></p>
+
+<p><span>We previously released the app with an Oozie submission </span><a href="https://dl.dropboxusercontent.com/u/730827/cloudera/spark-app.png"><span>backend</span></a><span> but switched to the Spark Job Server (</span><a href="https://spark-project.atlassian.net/browse/SPARK-818"><span>SPARK-818</span></a><span>) contributed by </span><a href="http://www.ooyala.com/"><span>Ooyala</span></a><span> and </span><a href="https://github.com/velvia"><span>Evan’s</span></a><span> team at the last </span><a href="http://spark-summit.org/talk/chan-the-spark-job-server/"><span>Spark Summit</span></a><span>. This new server will enable a real interactivity with Spark and is closer to the community.<br/><br/></span></p>
+
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/83192197" width="900"></iframe></p>
+<p><a href="http://vimeo.com/83192197"><span> </span></a></p>
+<p>We hope to work with the community and have support for Python, Java, direct script submission without compiling/uploading and other improvements in the future!</p>
+<p><br/><span></span></p>
+<p><span>As usual feel free to comment on the</span><a href="http://groups.google.com/a/cloudera.org/group/hue-user"><span> </span><span>hue-user</span></a><span> list or</span><a href="https://twitter.com/gethue"><span> </span><span>@gethue</span></a><span>! About questions directly related to Job Server, participate on the </span><a href="https://github.com/apache/incubator-spark/pull/222"><span>pull request</span></a><span>, </span><a href="https://spark-project.atlassian.net/browse/SPARK-818"><span>SPARK-818</span></a><span> or the Spark </span><a href="http://spark.incubator.apache.org/mailing-lists.html"><span>user list</span></a><span>!</span></p>
+<p><br/><span></span></p>
+<h2><span>Get Started!</span></h2>
+<p><span>Currently only Scala jobs are supported and programs need to implement this </span><a href="https://github.com/ooyala/incubator-spark/blob/jobserver-preview-2013-12/jobserver/src/main/scala/spark.jobserver/SparkJob.scala#L6"><span>trait</span></a><span> and be packaged into a jar. Here is a </span><a href="https://github.com/ooyala/incubator-spark/blob/jobserver-preview-2013-12/jobserver/src/test/scala/spark.jobserver/WordCountExample.scala#L16"><span>WordCount</span></a><span> example. To learn more about Spark Job Server, check its </span><a href="https://github.com/ooyala/incubator-spark/tree/jobserver-preview-2013-12/jobserver#features"><span>README</span></a><span>.</span></p>
+<p><br/><span></span></p>
+<h2><span>Requirements</span></h2>
+<p><span>We assume you have </span><a href="http://www.scala-lang.org/"><span>Scala</span></a><span> installed on your system. </span></p>
+<p><br/><span></span></p>
+<h2><span>Get Spark Job Server</span></h2>
+<p><span>Currently on github on this </span><a href="https://github.com/ooyala/incubator-spark/commits/jobserver-preview-2013-12"><span>branch</span></a><span>:</span></p>
+<pre class="code">git clone <a href="https://github.com/ooyala/incubator-spark.git">https://github.com/ooyala/incubator-spark.git</a> spark-server
+cd spark-server
+git checkout -b jobserver-preview-2013-12 origin/jobserver-preview-2013-12
+</pre>
+<p><br/><span></span></p>
+<p><span>Then type:</span></p>
+<pre class="code">sbt/sbt
+project jobserver
+re-start
+</pre>
+<p><br/><span></span></p>
+<h2><span>Get Hue</span></h2>
+<p><span>Currently only on github (will be in CDH5b2):</span></p>
+<p><a href="https://github.com/cloudera/hue#getting-started"><span><a href="https://github.com/cloudera/hue#getting-started">https://github.com/cloudera/hue#getting-started</a></span></a><span></span></p>
+<p><br/><span></span></p>
+<p><span>If Hue and Spark Job Server are not on the same machine update the </span><a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini"><span>hue.ini</span></a><span> property in desktop/conf/pseudo-distributed.ini:</span></p>
+
+<pre class="code">[spark]
+  # URL of the Spark Job Server.
+  server_url=http://localhost:8090/
+</pre>
+<h2><span>Get a Spark example to run</span></h2>
+<p><span>Then follow this </span><a href="https://github.com/ooyala/incubator-spark/tree/jobserver-preview-2013-12/jobserver#wordcountexample-walk-through"><span>walk-through</span></a><span> and create the example jar that is used in the video demo.</span></p>
+                </p>
+
+</body>
+</html>

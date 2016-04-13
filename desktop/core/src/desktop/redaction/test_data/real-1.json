@@ -1,0 +1,46 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "Credit Card numbers (with separator)",
+      "search": "\\d{4}.\\d{4}.\\d{4}.\\d{4}",
+      "replace": "XXXX-XXXX-XXXX-XXXX"
+    },
+    {
+      "description": "Credit Card numbers (no separator)",
+      "search": "\\d{16}",
+      "replace": "XXXXXXXXXXXXXXXX"
+    },
+    {
+      "description": "Social Security numbers (with separator)",
+      "search": "\\d{3}.\\d{2}.\\d{4}",
+      "replace": "XXX-XX-XXXX"
+    },
+    {
+      "description": "Social Security numbers (no separator)",
+      "search": "\\d{9}",
+      "replace": "XXXXXXXXX"
+    },
+    {
+      "description": "Password",
+      "trigger": "password",
+      "search": "password=.*",
+      "replace": "password=xxxxx"
+    },
+    {
+      "description": "Hostnames",
+      "search": "\\b(([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])\\.)+([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\b",
+      "replace": "HOSTNAME.REDACTED"
+    },
+    {
+      "description": "IP Addresses",
+      "search": "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}",
+      "replace": "0.0.0.0"
+    },
+    {
+      "description": "Email addresses",
+      "search": "\\b([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-\\._]*[A-Za-z0-9])@(([A-Za-z0-9]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])\\.)+([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\b",
+      "replace": "email@redacted.host"
+    }
+  ]
+}

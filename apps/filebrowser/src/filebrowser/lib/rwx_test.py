@@ -43,5 +43,12 @@ class RwxTest(unittest.TestCase):
       all.add(t)
     self.assertEquals(2*8*8*8, len(all))
 
+  def test_aclbit(self):
+    self.assertEquals('?rw-rw---x', rwx.rwx(0661))
+    self.assertEquals('?rw-rw---x+', rwx.rwx(0661, True))
+
+    self.assertEquals('?-wx-wx-wxt', rwx.rwx(1755))
+    self.assertEquals('?-wx-wx-wxt+', rwx.rwx(1755, True))
+
 if __name__ == "__main__":
   unittest.main()

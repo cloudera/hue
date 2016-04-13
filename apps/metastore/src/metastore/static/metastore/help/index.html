@@ -1,0 +1,248 @@
+<h1><a name="Metastore-IntroducingMetastore"></a>Introducing Hive Metastore Browser</h1>
+
+<p>The Table Browser application enables you to browse tables and partitions of a Hive database. For information about Hive, see <a href="http://archive.cloudera.com/cdh4/cdh/4/hive/">Hive Documentation</a>. You can create Hive tables, view Hive tables, and load data into Hive tables.</p>
+
+  <p>
+                    <p id="docs-internal-guid-69d034aa-9ae7-82e8-1c00-5068cd66771e">Hue makes it easy to create Hive tables.</p>
+<p>With <a href="https://issues.cloudera.org/browse/HUE-1746">HUE-1746</a>, Hue guesses the columns names and types (int, string, float&#8230;) directly by looking at your data. If your data starts with a header, this one will automatically be used and <strong>skipped</strong> while creating the table.</p>
+<p>Quoted CSV fields are also compatible thanks to <a href="https://issues.cloudera.org/browse/HUE-1747">HUE-1747</a>.</p>
+<p><br/><br/></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/80460405" width="900"></iframe></p>
+
+<p>Here is the data file used:</p>
+<p><a href="http://www.fdic.gov/bank/individual/failed/banklist.html"><span><a href="http://www.fdic.gov/bank/individual/failed/banklist.html">http://www.fdic.gov/bank/individual/failed/banklist.html</a></span></a><span></span></p>
+<p><br/><span></span></p>
+<p><span>This is the </span><a href="https://cwiki.apache.org/confluence/display/Hive/SerDe"><span>SerDe</span></a><span> for reading quoted CSV:</span></p>
+<p><a href="https://github.com/ogrodnek/csv-serde"><span><a href="https://github.com/ogrodnek/csv-serde">https://github.com/ogrodnek/csv-serde</a></span></a><span></span></p>
+<p><br/><span></span></p>
+<p><span>And the command to switch the SerDe used by the table:</span></p>
+<pre class="code">ALTER TABLE banks SET SERDE 'com.bizo.hive.serde.csv.CSVSerde'
+</pre>
+<p><br/><span></span><br/><span></span><span>Now go analyze the data with the </span><a href="http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and"><span>Hive</span></a><span>, </span><a href="http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor"><span>Impala</span></a><span> or </span><a href="http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase"><span>Pig</span></a><span> editors!</span></p>
+                </p>
+
+<h2><a name="Metastore-Contents"></a>Contents</h2>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1359395567394 {margin-left: 1.5em;padding: 0;}
+div.rbtoc1359395567394 ul {margin-left: 0;padding-left: 20px;}
+div.rbtoc1359395567394 li {margin-left: 0;padding-left: 0;}
+
+/*]]>*/</style><div class='rbtoc1359395567394'>
+<ul>
+    <li><a href='#Metastore-IntroducingMetastore'>Introducing Table Browser</a></li>
+    <li><a href='#Metastore-MetastoreandHiveInstallationandConfiguration'>Table Browser and Hive Installation and Configuration</a></li>
+    <li><a href='#Metastore-StartingMetastore'>Starting Table Browser</a></li>
+<ul>
+<ul>
+    <li><a href='#Metastore-InstallingtheSampleTables'>Installing the Sample Tables</a></li>
+    <li><a href='#Metastore-ImportingYourOwnData'>Importing Your Own Data</a></li>
+</ul>
+</ul>
+    <li><a href='#Metastore-WorkingwithTables'>Working with Tables</a></li>
+<ul>
+<ul>
+    <li><a href='#Metastore-SelectingtheDatabase'>Selecting the Database</a></li>
+    <li><a href='#Metastore-CreatingTables'>Creating Tables</a></li>
+    <li><a href='#Metastore-BrowsingTables'>Browsing Tables</a></li>
+    <li><a href='#Metastore-ImportingDataintoTables'>Importing Data into Tables</a></li>
+    <li><a href='#Metastore-DroppingTables'>Dropping Tables</a></li>
+    <li><a href='#Metastore-ViewingaTable%27sLocation'>Viewing a Table's Location</a></li>
+</ul>
+</ul>
+</ul></div>
+<p><br class="atl-forced-newline" /></p>
+
+<h1><a name="Metastore-MetastoreandHiveInstallationandConfiguration"></a>Table Browser and Hive Installation and Configuration</h1>
+
+<p>Table Browser is installed and configured as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
+
+<p>Table Browser depends on the Beeswax application being installed and available.</p>
+
+
+<h1><a name="Metastore-StartingMetastore"></a>Starting Table Browser</h1>
+
+<p>To start the Table Browser application, click the <b>Table Browser</b> icon (<span class="image-wrap" style=""><img src="/static/metastore/art/icon_metastore_24.png" width="30" style="border: 0 solid black"/></span>) in the navigation bar at the top of the Hue browser page.</p>
+
+<h3><a name="Metastore-InstallingtheSampleTables"></a>Installing the Sample Tables</h3>
+
+<p>You can install two sample tables to use as examples.</p>
+
+<ol>
+	<li>In the Table Browser window, click <b>Tables</b>.</li>
+	<li>In the ACTIONS pane, click <b>Install samples</b>.</li>
+</ol>
+
+
+<p>Once you have installed the sample data, you will no longer see the <b>Install samples</b> link.</p>
+
+<h3><a name="Metastore-ImportingYourOwnData"></a>Importing Your Own Data</h3>
+
+<p>If you want to import your own data instead of installing the sample tables, following the procedure in <a href="#Metastore-CreatingTables">Creating Tables</a>.</p>
+
+<p><a name="Metastore-CreatingTables"></a></p>
+
+<h3><a name="Metastore-CreatingTables"></a>Creating Tables</h3>
+
+<p>Although you can create tables by executing the appropriate HQL DDL query commands, it is easier to create a table using the Table Browser table creation wizard.</p>
+
+<p>There are two ways to create a table: from a file or manually.</p>
+
+<p>If you create a table from a file, the format of the data in the file will determine some of the properties of the table, such as the record and file formats. The data from the file you specify is imported automatically upon table creation.</p>
+
+<p>When you create a file manually, you specify all the properties of the table, and then execute the resulting query to actually create the table.  You then import data into the table as an additional step.</p>
+
+
+<p><b>To create a table from a file</b>:</p>
+
+<ol>
+	<li>In the Table Browser window, click <b>Tables</b>.</li>
+	<li>In the ACTIONS pane, click <b>Create a new table from a file</b>.<br/>
+The table creation wizard starts.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Follow the instructions in the wizard to create the table. The basic steps are:
+	<ul>
+		<li>Choose your input file.  The input file you specify must exist.<br/>
+Note that you can choose to have Table Browser create the table definition only based on the import file you select, without actually importing data from that file.</li>
+		<li>Specify the column delimiter.</li>
+		<li>Define your columns, providing a name and selecting the type.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	</ul>
+	</li>
+	<li>Click <b>Create Table</b> to create the table.<br/>
+The new table's metadata displays on the right side of the <b>Table Metadata</b> window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+At this point, you can view the metadata or a sample of the data in the table.<br/>
+From the ACTIONS pane you can import new data into the table, browse the table, drop it, or go to the File Browser to see the location of the data.</li>
+</ol>
+
+
+
+<p><b>To create a table manually:</b></p>
+
+<ol>
+	<li>In the Table Browser window, click <b>Tables</b>.</li>
+	<li>In the ACTIONS pane, click <b>Create a new table manually</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The table creation wizard starts.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Follow the instructions in the wizard to create the table. The basic steps are:
+	<ul>
+		<li>Name your table.</li>
+		<li>Choose the record format.</li>
+		<li>Configure record serialization by specifying delimiters for columns, collections, and map keys.</li>
+		<li>Choose the file format.</li>
+		<li>Specify the location for your table's data.</li>
+		<li>Define your columns, providing a name and selecting the type.</li>
+		<li>Add partitions, if appropriate.</li>
+	</ul>
+	</li>
+	<li>Click <b>Create table</b>.<br/>
+The Table Metadata window displays.</li>
+</ol>
+
+
+<p><a name="Metastore-BrowsingTables"></a></p>
+
+<h3><a name="Metastore-BrowsingTables"></a>Browsing Tables</h3>
+
+<p><b>To browse the data in a table:</b></p>
+
+<ol>
+	<li>In the Table List window, click the <b>Browse Data</b> button next to the table you want to browse.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The table's data displays in the Query Results window.</li>
+</ol>
+
+
+<p><b>To browse the metadata in a table:</b></p>
+
+<ol>
+	<li>In the Table List window, click the table name.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The table's metadata displays opened to the <b>Columns</b> tab. You can view the data in the table by selecting the <b>Sample</b> tab.</li>
+</ol>
+
+
+<p><a name="Metastore-ImportingDataintoTables"></a></p>
+
+<h3><a name="Metastore-ImportingDataintoTables"></a>Importing Data into Tables</h3>
+
+<p>When importing data, you can choose to append or overwrite the table's data with data from a file.</p>
+
+<p><b>To import data into a table:</b></p>
+
+<ol>
+	<li>In the Table List window, click the table name.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Table Metadata window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the ACTIONS pane, click <b>Import Data</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>For <b>Path</b>, enter the path to the file that contains the data you want to import.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Check <b>Overwrite existing data</b> to replace the data in the selected table with the imported data.  Leave this unchecked to append to the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Submit</b>.</li>
+</ol>
+
+
+<p><a name="Metastore-DroppingTables"></a></p>
+
+<h3><a name="Metastore-DroppingTables"></a>Dropping Tables</h3>
+
+<p><b>To drop a table:</b></p>
+
+<ol>
+	<li>In the Table List window, click the table name.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Table Metadata window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the ACTIONS pane, click <b>Drop Table</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Yes</b> to confirm the deletion.</li>
+</ol>
+
+
+<p><a name="Metastore-ViewingaTable%27sLocation"></a></p>
+
+<h3><a name="Metastore-ViewingaTable%27sLocation"></a>Viewing a Table's Location</h3>
+
+<p><b>To view a table's location:</b></p>
+
+<ol>
+	<li>In the Table List window, click the table name.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Table Metadata window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>View File Location</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The file location of the selected table displays in its directory in the File Browser window. </li>
+</ol>
+
+
+				    					    <br/>
+                        </td>
+		    </tr>
+	    </table>
+
+    </body>
+</html>

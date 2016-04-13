@@ -23,11 +23,13 @@ PROD_INCLUDES := \
 	desktop \
 	ext/thirdparty \
 	LICENSE.txt \
+	NOTICE.txt \
 	Makefile* \
 	maven \
 	tools/app_reg \
 	tools/virtual-bootstrap \
 	tools/relocatable.sh \
+	tools/load-balancer \
 	VERSION
 
 # Check for things in BDIST_EXCLUDES in various apps
@@ -41,7 +43,6 @@ PROD_EXCLUDES := \
 	desktop/devtools.mk \
 	desktop/libs/hadoop/regenerate-thrift.sh \
 	ext/thirdparty/js/manifest.json \
-	ext/thirdparty/README.md \
         Makefile.tarball
 
 # Macro to remove things we don't want to package
@@ -58,7 +59,7 @@ define remove_devtree_exclusions
 		      -name 'desktop.db' -o \
 		      -name 'app.reg' -o \
 		      -name '*.py[co]' -o \
-		      -name '.*.sw?' \) -prune -exec rm -rf {} \;
+		      -name '.*.sw?' \) -not -path '*/boto/*' -prune -exec rm -rf {} \;
 endef
 
 

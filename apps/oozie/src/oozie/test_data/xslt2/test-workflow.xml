@@ -1,0 +1,36 @@
+<workflow-app name="Sub" xmlns="uri:oozie:workflow:0.5">
+    <start to="fork-68d4"/>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="subworkflow-a13f">
+        <sub-workflow>
+            <app-path>${nameNode}/user/hue/oozie/deployments/_admin_-oozie-50001-1427488969.48</app-path>
+              <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>hue-id-w</name>
+                    <value>50001</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="join-775e"/>
+        <error to="Kill"/>
+    </action>
+    <action name="shell-0f44">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>ls</exec>
+              <capture-output/>
+        </shell>
+        <ok to="join-775e"/>
+        <error to="Kill"/>
+    </action>
+    <fork name="fork-68d4">
+        <path start="subworkflow-a13f" />
+        <path start="shell-0f44" />
+    </fork>
+    <join name="join-775e" to="End"/>
+    <end name="End"/>
+</workflow-app>

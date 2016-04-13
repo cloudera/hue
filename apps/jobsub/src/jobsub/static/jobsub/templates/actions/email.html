@@ -1,0 +1,83 @@
+<div id="java">
+  <h1 class="card-heading card-heading-blue simple card-marginbottom">{{ title }}</h1>
+  <form class="form-horizontal" id="workflowForm" action="#list-designs" method="POST">
+    <fieldset>
+      {{#name}}
+        {{>name}}
+      {{/name}}
+
+      {{#description}}
+        {{>description}}
+      {{/description}}
+
+      <div class="control-group ">
+        <label class="control-label">
+          <a href="javascript:void(0);" onclick="$('div.advanced').toggle('hide')" class="advanced">
+            <i class="fa fa-share"></i>
+            advanced
+          </a>
+        </label>
+      </div>
+      <div class="advanced hide">
+        {{#is_shared}}
+          {{>is_shared}}
+        {{/is_shared}}
+
+        {{#parameters}}
+          {{>parameters}}
+        {{/parameters}}
+      </div>
+
+      <hr/>
+
+      <div class="control-group">
+        <p class="alert alert-info">{{{ alert }}}</p>
+        <p class="alert alert-info">{{{ smtp_alert }}}</p>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ to.name }}" data-content="{{ to.popover }}" data-bind="attr: {'class': ( errors.to().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ to.name }}</label>
+        <div class="controls">
+          <input id="email-to" type="text" name="to" data-bind="value: to" />
+          <ul class="help-inline" data-bind="foreach: errors.to()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ cc.name }}" data-content="{{ cc.popover }}" data-bind="attr: {'class': ( errors.cc().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ cc.name }}</label>
+        <div class="controls">
+          <input id="email-cc" type="text" name="cc" data-bind="value: cc" />
+          <ul class="help-inline" data-bind="foreach: errors.cc()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ subject.name }}" data-content="{{ subject.popover }}" data-bind="attr: {'class': ( errors.subject().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ subject.name }}</label>
+        <div class="controls">
+          <input id="email-subject" type="text" name="subject" data-bind="value: subject" />
+          <ul class="help-inline" data-bind="foreach: errors.subject()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ body.name }}" data-content="{{ body.popover }}" data-bind="attr: {'class': ( errors.body().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ body.name }}</label>
+        <div class="controls">
+          <textarea id="email-body" type="text" name="body" data-bind="value: body"></textarea>
+          <ul class="help-inline" data-bind="foreach: errors.body()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>
+      <a href="javascript:void(0);" data-bind="click: {{ cancel.func }}" class="btn">{{ cancel.name }}</a>
+    </div>
+  </form>
+</div>

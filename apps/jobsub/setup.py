@@ -24,6 +24,6 @@ setup(
       description = "Hadoop Job Submission",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
-      install_requires = ['setuptools', 'desktop'],
+      install_requires = ['setuptools', 'desktop', 'oozie'],
       entry_points = { 'desktop.sdk.application': 'jobsub=jobsub' },
 )

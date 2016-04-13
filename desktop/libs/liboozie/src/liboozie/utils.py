@@ -1,4 +1,19 @@
-# (c) Copyright 2010 Cloudera, Inc. All rights reserved.
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """
 Misc helper functions
@@ -6,7 +21,7 @@ Misc helper functions
 
 try:
   from cStringIO import StringIO
-except:
+except ImportError:
   from StringIO import StringIO
 
 import logging
@@ -29,8 +44,13 @@ def parse_timestamp(timestamp, time_format=None):
   try:
     return time.strptime(timestamp, time_format)
   except ValueError:
-    LOG.error("Failed to convert Oozie timestamp: %s" % (time_format,), exc_info=1)
-    return None
+    try:
+      return time.strptime(re.sub(' \w+$', '', timestamp), time_format.replace(' %Z', ''))
+    except ValueError:
+      LOG.error("Failed to convert Oozie timestamp: %s" % time_format)
+  except Exception:
+    LOG.error("Failed to convert Oozie timestamp: %s" % time_format)
+  return None
 
 
 def config_gen(dic):
@@ -41,7 +61,7 @@ def config_gen(dic):
   print >> sio, '<?xml version="1.0" encoding="UTF-8"?>'
   print >> sio, "<configuration>"
   for k, v in dic.iteritems():
-    print >> sio, "<property>\n  <name>%s</name>\n  <value>%s</value>\n</property>\n" \
+    print >> sio, "<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
         % (k, v)
   print >>sio, "</configuration>"
   sio.flush()

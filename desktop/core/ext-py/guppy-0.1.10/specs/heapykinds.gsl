@@ -1,0 +1,110 @@
+.kind:: EquivalenceRelation
+.kind:: EquivalenceRelationByDictOwner
+.kind:: Helper
+.kind:: IdentitySet
+.kind:: IdentitySetNotEmpty
+.kind:: IdentitySetSingleton
+.kind:: Kind
+.kind:: KindOfClassFamily
+.kind:: KindOfRetClaSetFamily
+.kind:: KindOfSizeFamily
+.kind:: KindOfTypeFamily
+.kind:: KindOfInViaFamily
+.kind:: KindWithAlt
+.kind:: MappingProxy
+.kind:: MorePrinter
+.kind:: Partition
+.kind:: Paths
+.kind:: ReferencePattern
+.kind:: RootStateType
+.kind:: SetOfKind
+.kind:: Stat
+.kind:: UniSet
+.kind:: UniSetAvantGarde
+.kind:: Use
+
+.superkind:: IdentitySet+
+..eg: self.hp.iso(1)
+
+.superkind:: AltOperator+
+..eg: '=='
+
+.superkind:: EquivalenceRelation+
+
+.superkind:: Kind+
+..eg: self.hp.Anything
+
+.superkind:: ClodoKind+
+..eg: self.hp.Clodo(dictof=C)
+...in context:
+class C:
+ pass
+
+
+.superkind:: SetOfKind+
+..eg: self.hp.Size.sokind(24)
+
+.superkind:: SetOfClodoKind+
+..eg: self.hp.Clodo.sokind(int)(dictof=())
+
+.superkind:: UniSet+
+..eg: self.hp.Nothing
+
+.superkind:: loadablefilenamestring+
+..eg: os.path.join(os.path.dirname(__file__),'profileexample.hpy')
+...in context:
+import os
+
+.superkind:: loadableiterableofstrings+
+..eg: open(os.path.join(os.path.dirname(__file__),'profileexample.hpy'))
+...in context:
+import os
+
+
+
+.superkind:: objectaddress+
+..eg: id(None)
+
+.superkind:: profilefilename+
+..eg: os.path.join(os.path.dirname(__file__),'profileexample.hpy')
+...in context:
+import os
+
+.superkind:: relationname+
+..eg: '[0]'
+..eg: '.a'
+
+.superkind:: typeorclass+
+..eg: int
+..eg: C
+...in context:
+class C:
+    pass    
+
+.superkind:: typeorclassexceptdict+
+..eg: int
+..eg: C
+...in context:
+class C:
+    pass    
+
+.superkind:: typeorclassoremptytuple+
+..eg: ()
+..eg: C
+...in context:
+class C:
+    pass    
+
+.superkind:: moduleaddress+
+..eg: id(sys)
+...in context:
+import sys
+
+.superkind:: modulename+
+..eg: 'sys'
+
+.superkind:: writeable_filename_or_file+
+
+.superkind:: writing_mode_string+
+..eg: 'a'
+

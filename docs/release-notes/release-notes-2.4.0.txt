@@ -1,0 +1,370 @@
+Hue v2.4.0, released June 12th, 2013
+====================================
+
+Hue 2.4.0 is compatible with CDH4.3 (Cloudera's Distribution Including Apache Hadoop 4.3).
+
+Website: http://gethue.com
+
+
+Notable Features
+----------------
+
+- Search app: Integrate with Solr, Solr Cloud and Cloudera Search and customize search results and facets
+
+
+Notable Fixes
+-------------
+
+- HUE-1267 [oozie] Import action from josub or a workflow
+- HUE-1304 [oozie] More accurate workflow progress reporting
+- HUE-1303 [metastore] Create a new table wizard uses CTRL+A
+- HUE-1296 [impala] Support parameterized queries
+- HUE-1255 [beeswax] Fix show all the queries history toggling
+- [impala] Update hue.ini to point to HiveServer2 interface
+- [catalog] Rename Table Browser application to Metastore Manager
+
+
+Compatibility
+-------------
+
+Hue 2.4.0 runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 12.10.
+
+Hue 2.4.0 is compatible with CDH4.3. Specifically:
+
+- File Browser depends on Hadoop 0.20 (for WebHDFS/HttpFS).
+- Beeswax is tested against Hive 0.10.0.
+- Job Designer depends on Oozie 3.3, using the Oozie web service API.
+
+
+List of 291 Commits
+-------------------
+
+* d0612ba [search] Update hue.ini
+* c8dcce1 HUE-1313 [core] Unicode error in check_config
+* b596a81 HUE-1174 [impala] config check for Impala
+* c9d6e6b [core] Install all examples button
+* 327f8a9 HUE-1312 [search] Sort dropdown has no impact
+* be580df HUE-1310 [core] External js reference triggering security alerts
+* 96d147b HUE-1250 [oozie] Add a bundle example
+* 522d37a [search] Add initial tests
+* 79e2258 HUE-1173 [beeswax] Config check for Hive
+* b8be825 [metastore] Move navigation bar from beeswax
+* 100843e HUE-1213 [jobsub] Remove old examples
+* 476f2bf HUE-1182 Handle ldapsearch comments appropriately
+* ca2386a HUE-1267 [oozie] Import action from josub or a workflow
+* f5d6aa6 [search] Changed app icon
+* b6e6263 [core] Set version to 2.4
+* fa7db28 HUE-1304 [oozie] More accurate workflow progress reporting
+* c4d3023 HUE-1303 [metastore] Create a new table wizard uses CTRL+A
+* 1422564 [oozie] Fix smoke test
+* 0dcafaa [search] Adding link on home page
+* a1a0431 [search] Fixed strip html functionality in case of no functions
+* 65a5284 [search] Template manager now strips html from inside functions
+* 2a8d808 [search] Indent all lines on source code
+* 75cc0db [search] Add front end dependencies to search app
+* b50c366 [search] Support single core facets and sorting
+* 1cd8949 [search] Fix search collection link from editor
+* f768079 [search] Default template list all the fields
+* 6b504f9 [search] Improve look of Collection properties page
+* 033f27b [search] Edit collection link not pointing to the correct collection
+* edfd4a2 [search] Fixed problem with functions that could have the same name as fields
+* 9cd72d1 [search] Removed autocomplete and prevented django error for search on non-existing collection
+* ea4b104 [search] Make date functions smarter
+* 4309dcd [search] Removed edit link from collection manager page
+* db1dc02 [search] Removed query parameters on collection change
+* 94c4157 [search] Fixed copy bug on public search page
+* 4fa97d3 [search] Fixed plus button on snippet editor
+* 8620f3e [search] Adding fromnow function in editor
+* c25f8db [search] Improved loading UX of collection manager
+* c3c67f3 [search] Collection or Core properties tab are compatible
+* 6698fe6 [search] Deep copy of collection
+* e4e87d0 [search] Removed debug info
+* 970b2b5 [search] Improved labels and schema loading
+* 8497cb0 [search] Search should use collection name and not id
+* 1cbb29e [search] Cookie should save the id and not the name of the last collection
+* 7bf550c [search] Use collection id instead of name
+* 5212bcf [search] Added copy and delete functionalities
+* 12db9f4 [search] Made result page larger
+* da0b3da [search] Empty query matches all the fields
+* 4138fb1 [search] Support Solr server with just simple core
+* 821ff73 [search] Fixed collections filter and changed title layout
+* b668ced [search] Unified import and list collection page
+* 422db36 [search] Added no collections page for normal users
+* 7361ee4 [search] Duplicate jquery.selector.js because of packaging issues
+* b2fb177 [search] Support collections or just core
+* 2789674 [search] Improve admin layout and fix 500 error on properties tab
+* 9a11973 [search] Show collection properties instead of core properties
+* f958bc2 [search] Rename login-spinner URLs to spinner
+* 9bae5fa [search] Fix typo in add a new collection wizard
+* 9c2ea71 [search] Updating default port of Solr
+* 470e328 [search] Code mirror dependency fix
+* bd46843 [search] Fixing collection renaming
+* 1e395fa [search] Support collections part 1
+* d722b97 [search] Preparation for JSON queries
+* b354dfa [search] Several improvements
+* a804769 [search] Remember the previously selected collection
+* d6d1c0c [search] Allow and render fields with dots in their name in the result template
+* 2c79623 [search] Wrong collection name used when searching
+* 551cfe9 [search] Also display default facets
+* 5672a53 [search] Introduced fromnow function in templates
+* 0c6d559 [search] "sort by" dropdown is broken
+* 0523901 [search] Next page button is broken is not collection selected
+* 3d97636 [search] Support facets with spaces
+* 928e7ff [search] sort should not appear in query if empty
+* 8c3e500 [search] Use link icon instead of twitter
+* 55a2db2 [search] Make sort optional
+* 76f9750 [search] restored Twitter images
+* 94999ae [search] Support for labels and ordering of facets on public search UI
+* d99c395 [search] Move from /browse to /select handler
+* 83cb807 [search] Fixed range facet links on search result page
+* 92e1a33 [search] Updated admin template view
+* ebd1ddb [search] Fixed preview bug on Admin that occurred when using the date function
+* b130712 [search] Fixed admin highlighting functionality and improved date facets ordering
+* f4a4b63 [search] Persist facets order
+* 5f00faa [search] Auto enable facets and show or hide save button accordingly
+* 720538a [search] Improve default twitter template
+* bee4b29 [search] Add schema and properties tabs to core configuration
+* b574284 [search] Custom code for the snippets
+* b4935af [search] Fixed facets display
+* a1f0a40 [search] Labels and sortable facets
+* 00e90f1 [search] Added remove icon on search field
+* 142abe4 [search] Converted selects to Chosen on snippet editor
+* 05f6401 [search] Insert layout tool in the snipper editor
+* fc257b6 [search] New Date range facet format
+* f497174 [search] Date range facets support
+* 596df91 [search] Improved snippet editor UX
+* aa544e1 [search] added generic functions to the templates
+* 2345524 [search] Dynamic dropdown elements based on the already selected ones
+* b04b1c7 [search] Add Wizard for facets edition
+* eb188d8 [search] Fixed field add to the template
+* 49a4466 [search] Add file visualization in browser window
+* cc16f98 [search] Disable/enable facets or sorting
+* 197d719 [search] Set range facet as day
+* 29e5087 [search] Customize hightlighting
+* c4343d0 [search] Add sorting customization
+* a8403fe [search] Add enable/disable Facets option
+* fa89204 [search] Small improvements
+* 68eb15c [search] Restyle of highlighting admin section
+* 6eae65a Improve cursor available fields.
+* 880ccee [search] Autocomplete
+* e2814ed Make available fields cursor aware and buttons.
+* 59c7909 [search] Results highlighting
+* 728472e [search] Simplify the UI and first UX
+* d546d63 [search] Added core switch on Admin UI
+* c4960a9 [search] Public Search UI restyle
+* a42e946 [search] Display result template with mustache
+* 93edc4c [search] Save and load sorting properties
+* e34ec0e [search] Support saving and loading of template
+* 470eb32 [search] Build all facets query
+* 139a139 [search] Admin UI
+* 81cd0ac [search] Admin UI
+* 1d2b022 [search] Generic collections and customizable UI skeleton
+* 5d91f99 [search] Rebase on 2.2
+* 8a78603 [search] Fixing Solr url and Python2.4 compatibility
+* a2e2f06 [search] Fixing UTC time and default sort`
+* ad4bbab [search] Multi facet filtering
+* abca687 [search] Polishing Twitter UI
+* fa75e97 [search] Twitter results layout
+* fe22573 [search] Adding some facets
+* 9fe0e2e [search] Adding first version of template
+* bac447f [search] Initial commit
+* aca5696 HUE-1307 [metastore] Browsing partition fails
+* 5a1ce35 HUE-1306 [core] Introspect to skip previous alter field statements
+* ab11f7b Revert "HUE-1064 [core] JT plugin should support hadoop.rpc.protection set to anything other than "authentication""
+* 7af1582 Revert "HUE-1188 [beeswax] Support hadoop.rpc.protection set to anything other than "authentication""
+* 569602e HUE-1296 [impala] Mock Impalad in the test cases
+* 79803ad HUE-1296 [impala] Support parameterized queries
+* f956e85 HUE-1297 [beeswax] Support other databases than default for parameterized queries
+* 74edf8e HUE-1305 [oozie] Support Coordinator throttling option
+* 0ee833f HUE-1301 [jobsub] Create or touch a file in FS action
+* fe1b77f HUE-1300 [oozie] Support LAST_ONLY executuion in coordinators
+* 5b06b1e HUE-1294 [jobsub] 2.x to 2.3 upgrade broken
+* 71403ff HUE-1274 [pig] Correct autocomplete keyword suggestions (uppercase, lowercase, camel-case)
+* 995354c HUE-1276 [metastore] Load data popup button should be disable if no file is selected
+* a9898b4 HUE-1288 [core] Implement proper support for SASL QOP in Hue's Thrift SASL library
+* 55844c1 HUE-1238 [jobsub] Select path
+* 4828558 HUE-1171 [useradmin] Error message when adding an LDAP user is wrong
+* 4b88f37 [help] Update of the internal help
+* 4498724 HUE-1277 [impala] Install queries example fix
+* baf7a8a HUE-1278 [beeswax] HiveServer2 backend should not require a kerberos principal
+* 00a2de3 [beeswax] HS2 principal should come from hive-site.xml
+* cd8064f HUE-1270 [core] Delete file should defaut to trash
+* 0ace6e3 Config align fix
+* 0fcf37a HUE-1133 [pig] Unsaved ribbon
+* 0b9e6e1 [core] Missing sections from hue.ini
+* 9dc0862 [impala] Impala error message refer to below tab instead of above
+* 47cbed9 [shell] Remove default setup of Flume OG
+* 6ccb8f2 [impala] Backward compatibility by using HS2 port if no interface is specified
+* ca13226 Fix test cases for HUE-1268
+* da053b3 HUE-1263 [oozie] Workflow with subworkflow action can't be saved
+* c9d41f0 [oozie] Create hue workspace automatically if does not exist
+* 0f06888 HUE-1263 [oozie] Workflow with subworkflow action can't be saved
+* d661f7b HUE-1264 [pig] Saved pig scripts should prompt for parameters
+* 65a0bdd HUE-1193 [beeswax] Add filter for Saved Queries, History, and Tables
+* cf62f38 HUE-1261 [beeswax] Query explain renders query Execute button useless after a page back
+* 2e0b663 HUE-1262 [help] Subnav menu breaks in two lines on standard resolution screens
+* bf5a90b HUE-1243 [core] Upgrade to Fontawesome 3.1.1
+* b560161 HUE-1259 [oozie] The name of the modification column should be consistent in part of speech and capitalization
+* d40fd69 HUE-1260 [core] The control used to filter lists should have consistent label and info text
+* 820fb0c HUE-1245 [pig] Keyboard shortcut for executing script
+* 2a5788a [beeswax] Make Thrift port easier to pick according to the type of interface used
+* ac2534e HUE-1197 [beeswax] Support explain with hive server 2
+* 12c9541 HUE-1257 [beeswax] Supervisor should not start beeswaxd when using HS2 interface
+* d51b41f HUE-1247 [core] Modal submission with enter key
+* 2fd2ea2 HUE-1252 [core] Correct alignment of toolbar buttons across Hue
+* 91d1276 [core] Trigger HA logic only when more than one MR1 cluster
+* c3ad0e8 HUE-1255 [beeswax] Fix show all the queries history toggling
+* afa9570 [beeswax] CleanableSessionState doesn't have a default constructor
+* 4818137 [impala] Update hue.ini to point to HiveServer2 interface
+* b9bb98d HUE-1251 [pig] Copy feature doesn't list the new copy of the file until page refresh
+* bc9067a HUE-1167 [impala] Query server address depend on the type of the query
+* 2f19ae0 HUE-1249 [core] web page title should include app name
+* 232359e [fb] Add View trash tooltip
+* 54cbd83 [jobbrowser] Fix tracker page with MR1
+* 35af9d3 HUE-1248 [core] Incorrect message in 'About Hue' screen
+* 882e302 [core] Fix symlink in package for hadoop examples
+* 34c06a8 [core] Fix HADOOP_BIN for Hive tests
+* 911b19c [impala] Refresh Thrift service
+* 8e0b9f8 Cleanup Hadoop directory appropriately
+* a664157 [useradmin] Prevent change of username
+* 8544272 Fix smoke tests
+* 1745fd2 Should only try to remove PTH link if it already exists.
+* 88b0eb5 [core] Use MR in hadoop tarball
+* f32f477 [core] relative path for pth symlink.
+* c415033 [core] Round of localization
+* db2e9f2 Make app registry location configurable
+* 663680a HUE-1234 [jobsub] Refresh when creating a new node broken
+* 5efec71 HUE-1237 [jobsub] FS example broken
+* 8a64a06 HUE-1236 [jobsub] Clicking edit and then Home leads to the edit button being unclickable
+* 8fe78f8 HUE-1211 [impala] Cancel a query
+* 20a7933 [pig] Avoid test hanging
+* 8e0aae2 HUE-1229 [oozie] Move file in Fs action is broken in firefox
+* 3a48e4b [beeswax] Fix history page test
+* 58fb7d7 Increase max recursion depth in oozie workflow builder front end
+* 53bd036 [oozie] Skip global configuration in 0.4 workflow definition when importing
+* d47ac9c [pig] Example not showing up
+* cdc13b3 [hadoop] Remove old test jars
+* 5ad920e [impala] Install queries and table samples
+* 788c039 [pig] Show progress of running scripts on dashboards
+* 8827db5 [pig] Show real script name when running from Script List
+* 94fa4cf [pig] Show progress of running scripts on dashboards
+* 5ba7601 HUE-1224 [impala] Autocomplete broken
+* f8c87c3 HUE-1223 [core] Filechooser opens on bad default path
+* 2bec2f6 [core] Lower the configured minimum block size value for the tests
+* 3b1c3ee [beeswax] Support for _HOST in kerberos principal
+* a34b3b2 HUE-1221 [pig] Load back an executed script
+* d8c82ee HUE-1221 [pig] Load back an executed script
+* 3345c80 HUE-1190 [core] Consistent renaming
+* 3adcf7e HUE-1190 [core] Changed trackPageview logic
+* a9a6f78 HUE-1190 [core] Usage statistics
+* 50e7722 HUE-1221 [pig] Load back an executed script
+* 3bd414f HUE-1222 [core] Update favicon to match the new logo
+* 3988246 Fix tests on master
+* 964ee57 HUE-1202 [oozie] Ascii error on oozie coordinator page
+* 26bb197 HUE-1175 [pig] Show parameter popup in case of parameters presence
+* c07bf39 [core] JT plugin HA
+* 89e732a [impala] Progress log support
+* 09a34b9 [metastore] Rename catalog app to metastore app
+* 94bb710 HUE-1206 [beeswax] Table aliasing autocomplete
+* 94e2231 HUE-1218 [pig] Autocomplete aliases
+* b9a41d0 HUE-1212 [fb] Incorrect trash used
+* 1ee35c0 HUE-1218 [pig] Autocomplete aliases
+* 85e5a16 HUE-1220 [core] Case in multi-word field labels and buttons should be consistent
+* 59c5e6c HUE-1217 [jobsub] App breaks on IE8
+* 73a6738 [pig] Avoid 500 error when polling logs for the first time
+* fac5445 [core] Rename oozie share lib for continuous integration
+* 0e40cd8 [catalog] Rename Table Browser application to Metastore Manager
+* 35675e4 HUE-1215 [pig] Log window should occupy all the available space
+* 42cb61f HUE-1216 [jobsub] File dialogs consistency
+* 82489f2 HUE-1198 [core] Change Hue Logo
+* a886f0d HUE-1205 [beeswax] Improve look of "empty" description in Saved query
+* 121070a HUE-1208 [core] Add safety check to ensure the right JDK is being used
+* 1e642ba HUE-1209 [pig] Show execution progress
+* a45961f HUE-1208 [core] Java components should have the option of compiling in JDK1.7
+* 6dbc609 HUE-1155 [catalog] Vertical column layout in create table
+* 577c931 HUE-1161 [oozie] Suspend a job directly from the dashboard lists
+* f286941 HUE-1195 [beeswax] "Go to column" popup prevents ability to select&copy values from results
+* adedc25 HUE-1203 [impala] Autocomplete in Impala Query UI should not offer invalid language elements
+* 71d5d82 HUE-1204 [beeswax] autocomplete delivers obscure error when completing "From"
+* b1ec46b HUE-1207 [fb] Avoid action bar to split buttons in two rows
+* 95d2e01 [beeswax] List of small UI harmonization changes
+* 8fa519b [core] Fix date format of localized files
+* 1189b48 [core] First drop of localization update
+* ec65862 [pig] Adding config check explicting that Oozie is required
+* da58907 [jb] Fix page crash when stdout is empty
+* 5fb5c1f HUE-1200 [core] Use the same labels and icons for Clone/Copy
+* 2f0aa26 HUE-1201 [about] Last step of Quick Start shouldn't depend on how you get there
+* a8ba24f [core] Rename Pig to Pig Editor in admin wizard
+* 6bc225b Fix LDAP test cases
+* c19deab [liboozie] Update config checks
+* fac9e5a HUE-1145 [core] Cleanup icons and images that are not used anymore
+* 4c5d271 HUE-1175 [pig] No submission confirmation popup if parameters list is empty
+* 69dcc5e HUE-1199 [useradmin] Hue LDAP import fails when using non-standard characters
+* 240d4dc HUE-1140 HUE File Browser - UTC Time
+* 8dbc7ba HUE-1139 [pig] Autocomplete HDFS paths
+* c1579d8 [impala] Show impalad server_host in the dump config
+* dffc422 HUE-1189 [beeswax] Lazily build autocomplete tree
+* ba301aa HUE-1185 Fix test cases
+* 3bbb9ec HUE-1185 [jobsub] Trash for designs
+* 1e56aa5 HUE-1183 [useradmin] Hue assumes that the base_dn string is case sensitive.
+* 28f84b5 HUE-1185 [jobsub] Trash for designs
+* fb30185 HUE-1189 [beeswax] Lazily build autocomplete tree
+* 710e8e2 HUE-1189 [beeswax] Lazily build autocomplete tree
+* c3b8d31 HUE-1167 [impala] Decoupled backend interface from Beeswax
+* cfdf020 HUE-1168 [shell] Race condition when merging token files
+* 81c05ca [beeswax] Add autocomplete in query with parameter views
+* 4a613f1 [beeswax] Fix mock db after table autocomplete change
+* 587a7c3 HUE-1187 [beeswax] Trash for queries
+* 0da9f01 HUE-1189 [beeswax] Autocomplete failure should not 500 the page
+* 2ead5f9 HUE-1138 [beeswax] Autocomplete table and fields
+* 3b7f2e5 Fix new test cases for oozie trash functionality
+* d17cb15 HUE-1186 [oozie] Trash for designs
+* 32fc52a [core] Remove Static Group Mapping lib
+* 681e80b [pig] Rename app to Pig Editor
+* f13ef3b HUE-1188 [beeswax] Support hadoop.rpc.protection set to anything other than "authentication"
+* 88d1d2c HUE-75 [beeswax] HS2 support for partitions
+* 156d7a7 HUE-1100 [impala] Add gen-py files
+* 9b765e9 [beeswax] Start over support for Hive Server 2
+* e8928f3 HUE-1184 [oozie] Merge kill nodes into single kill node
+* 3c281a9 Fix tests for pig and beeswax
+* f93f8e7 [beeswax] Use first URI of multiple hive.metastore.uris values
+* 3d02d48 HUE-1132 [pig] Stop button
+
+
+Contributors
+------------
+
+This Hue release is made possible thanks to the contribution from:
+
+- Aaron Newton
+- Aaron T. Myers
+- Abraham Elmahrek
+- Aditya Acharya
+- Alex Newman
+- Andrew Bayer
+- Andrew Yao
+- Ann McCown
+- bc Wong
+- Ben Bishop
+- Bruce Mitchener
+- Bruno Mahé
+- Eli Collins
+- Enrico Berti
+- Eric Wong
+- Harsh J
+- Henry Robinson
+- Jon Natkins
+- Lars Francke
+- Loren Siebert
+- Marcus McLaughlin
+- Mike Cotton
+- Paul Battaglia
+- Philip Zeyliger
+- Romain Rigaux
+- Roman Shaposhnik
+- Shawn Van Ittersum
+- Shrijeet Paliwal
+- Thomas Aylott
+- Todd Lipcon
+- Vinithra Varadharajan
+

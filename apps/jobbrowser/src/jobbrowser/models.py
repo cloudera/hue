@@ -15,27 +15,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.view_util import format_duration_in_millis
-from desktop.lib import i18n
-from hadoop import job_tracker
-from hadoop import confparse
-from urlparse import urlparse, urlunparse
-
 import datetime
 import logging
 import lxml.html
 import re
 import urllib2
 
-from django.utils.translation import ugettext as _
+from urlparse import urlparse, urlunparse
 
-import hadoop.api.jobtracker.ttypes as ttypes
+from django.core.urlresolvers import reverse
+from desktop.lib.view_util import format_duration_in_millis
+from desktop.lib import i18n
+from django.utils.html import escape
+from filebrowser.views import location_to_url
+from hadoop import job_tracker
+from hadoop import confparse
 from hadoop.api.jobtracker.ttypes import JobNotFoundException
 
-from django.utils.translation import ugettext as _
-from desktop.lib.exceptions import PopupException
+import hadoop.api.jobtracker.ttypes as ttypes
+from desktop.lib.exceptions_renderable import PopupException
 
-LOGGER = logging.getLogger(__name__)
+from django.utils.translation import ugettext as _
+from jobbrowser.conf import DISABLE_KILLING_JOBS
+
+LOG = logging.getLogger(__name__)
+
+
+def can_view_job(username, job):
+  acl = get_acls(job).get('mapreduce.job.acl-view-job', '')
+  return acl == '*' or username in acl.split(',')
+
+def can_modify_job(username, job):
+  acl = get_acls(job).get('mapreduce.job.acl-modify-job', '')
+  return acl == '*' or username in acl.split(',')
+
+def get_acls(job):
+  if job.is_mr2:
+    return job.acls
+  else:
+    return job.full_job_conf
+
+def can_kill_job(self, user):
+  if DISABLE_KILLING_JOBS.get():
+    return False
+
+  if self.status.lower() not in ('running', 'pending', 'accepted'):
+    return False
+
+  if user.is_superuser:
+    return True
+
+  if can_modify_job(user.username, self):
+    return True
+
+  return user.username == self.user
 
 class JobLinkage(object):
   """
@@ -52,6 +85,7 @@ class JobLinkage(object):
     self._jobtracker = jobtracker
     self.jobId = jobid
     self.jobId_short = "_".join(jobid.split("_")[-2:])
+    self.is_mr2 = False
 
   def get_task(self, task_id):
     """Retrieve a TaskInProgress from hadoop."""
@@ -59,7 +93,6 @@ class JobLinkage(object):
                     self._jobtracker.thriftjobid_from_string(self.jobId),
                     self._jobtracker.thrifttaskid_from_string(task_id))
     return Task(ttask, self._jobtracker)
-
 
 class Job(JobLinkage):
   """
@@ -73,7 +106,7 @@ class Job(JobLinkage):
     return getattr(self, item)
 
   @staticmethod
-  def from_id(jt, jobid):
+  def from_id(jt, jobid, is_finished=False):
     """
       Returns a Job instance given a job tracker interface and an id. The job tracker interface is typically
       located in request.jt.
@@ -84,7 +117,7 @@ class Job(JobLinkage):
       try:
         thriftjob = jt.get_retired_job(jt.thriftjobid_from_string(jobid))
       except JobNotFoundException, e:
-        raise PopupException(_("Could not find job with id %(jobid)s") % {'jobid': jobid}, detail=e)
+        raise PopupException(_("Could not find job with id %(jobid)s.") % {'jobid': jobid}, detail=e)
 
     return Job(jt, thriftjob)
 
@@ -114,6 +147,8 @@ class Job(JobLinkage):
     self._full_job_conf = None
     self._init_attributes()
     self.is_retired = hasattr(thriftJob, 'is_retired')
+    self.is_mr2 = False
+    self.applicationType = 'MAPREDUCE'
 
   @property
   def counters(self):
@@ -171,14 +206,14 @@ class Job(JobLinkage):
     if self.job.desiredMaps == 0:
       maps_percent_complete = 0
     else:
-      maps_percent_complete = int(round(float(self.job.finishedMaps)/self.job.desiredMaps*100))
+      maps_percent_complete = int(round(float(self.job.finishedMaps) / self.job.desiredMaps * 100))
 
     self.desiredMaps = self.job.desiredMaps
 
     if self.job.desiredReduces == 0:
       reduces_percent_complete = 0
     else:
-      reduces_percent_complete = int(round(float(self.job.finishedReduces)/self.job.desiredReduces*100))
+      reduces_percent_complete = int(round(float(self.job.finishedReduces) / self.job.desiredReduces * 100))
 
     self.desiredReduces = self.job.desiredReduces
     self.maps_percent_complete = maps_percent_complete
@@ -200,10 +235,10 @@ class Job(JobLinkage):
     if finishTime == 0:
       finishTime = datetime.datetime.now()
     else:
-      finishTime = datetime.datetime.fromtimestamp(finishTime/1000)
-    self.duration = finishTime - datetime.datetime.fromtimestamp(self.job.startTime/1000)
+      finishTime = datetime.datetime.fromtimestamp(finishTime / 1000)
+    self.duration = finishTime - datetime.datetime.fromtimestamp(self.job.startTime / 1000)
 
-    diff = int(finishTime.strftime("%s"))*1000 - self.startTimeMs
+    diff = int(finishTime.strftime("%s")) * 1000 - self.startTimeMs
     self.durationFormatted = format_duration_in_millis(diff)
     self.durationInMillis = diff
 
@@ -213,7 +248,7 @@ class Job(JobLinkage):
   def get_task(self, id):
     try:
       return self.task_map[id]
-    except:
+    except KeyError:
       return JobLinkage.get_task(self, id)
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
@@ -364,6 +399,7 @@ class Task(object):
     self.counters = self.task.counters
     self.failed = self.task.failed
     self.complete = self.task.complete
+    self.is_mr2 = False
 
   def get_attempt(self, id):
     """
@@ -406,19 +442,20 @@ class TaskAttempt(object):
     self.mapFinishTimeMs = self.task_attempt.mapFinishTime # DO NOT USE, NOT VALID IN 0.20
     self.mapFinishTimeFormatted = format_unixtime_ms(self.task_attempt.mapFinishTime)
     self.counters = self.task_attempt.counters
+    self.is_mr2 = False
 
   def get_tracker(self):
     try:
       tracker = Tracker.from_name(self.task.jt, self.taskTrackerId)
       return tracker
     except ttypes.TaskTrackerNotFoundException, e:
-      LOGGER.warn("Tracker %s not found: %s" % (self.taskTrackerId, e))
-      if LOGGER.isEnabledFor(logging.DEBUG):
+      LOG.warn("Tracker %s not found: %s" % (self.taskTrackerId, e))
+      if LOG.isEnabledFor(logging.DEBUG):
         all_trackers = self.task.jt.all_task_trackers()
         for t in all_trackers.trackers:
-          LOGGER.debug("Available tracker: %s" % (t.trackerName,))
+          LOG.debug("Available tracker: %s" % (t.trackerName,))
       raise ttypes.TaskTrackerNotFoundException(
-                          _("Cannot lookup TaskTracker %(id)s") % {'id': self.taskTrackerId})
+                          _("Cannot look up TaskTracker %(id)s.") % {'id': self.taskTrackerId})
 
   def get_task_log(self):
     """
@@ -438,20 +475,21 @@ class TaskAttempt(object):
                       None,
                       'attemptid=%s' % (self.attemptId,),
                       None))
-    LOGGER.info('Retrieving %s' % (url,))
+    LOG.info('Retrieving %s' % (url,))
     try:
       data = urllib2.urlopen(url)
     except urllib2.URLError:
-      raise urllib2.URLError(_("Cannot retrieve logs from TaskTracker %(id)s") % {'id': self.taskTrackerId})
+      raise urllib2.URLError(_("Cannot retrieve logs from TaskTracker %(id)s.") % {'id': self.taskTrackerId})
 
     et = lxml.html.parse(data)
     log_sections = et.findall('body/pre')
-    if len(log_sections) != 3:
-      LOGGER.warn('Error parsing task attempt log for %s at "%s". Found %d (not 3) log sections' %
+    logs = [section.text or '' for section in log_sections]
+    if len(logs) < 3:
+      LOG.warn('Error parsing task attempt log for %s at "%s". Found %d (not 3) log sections' %
                   (self.attemptId, url, len(log_sections)))
-      err = _("Hue encountered an error while retrieving logs from '%s'") % (url,)
-      return (err, err, err)
-    return [ section.text for section in log_sections ]
+      err = _("Hue encountered an error while retrieving logs from '%s'.") % (url,)
+      logs += [err] * (3 - len(logs))
+    return logs
 
 
 class Tracker(object):
@@ -485,6 +523,7 @@ class Tracker(object):
     self.maxMapTasks = self.tracker.maxMapTasks
     self.maxReduceTasks = self.tracker.maxReduceTasks
     self.taskReports = self.tracker.taskReports
+    self.is_mr2 = False
 
 
 class Cluster(object):
@@ -518,8 +557,42 @@ class Cluster(object):
     self.blacklistedTrackerNames = self.status.blacklistedTrackerNames
     self.hostname = self.status.hostname
     self.httpPort = self.status.httpPort
-    # self.currentTimeMs = curtime
-    # self.currentTimeFormatted = format_unixtime_ms(curtime)
+
+
+class LinkJobLogs(object):
+
+  @classmethod
+  def _make_hdfs_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+
+  @classmethod
+  def _make_mr_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('(job_[0-9]{12}_[0-9]+)', LinkJobLogs._replace_mr_link, escaped_logs)
+
+  @classmethod
+  def _make_links(cls, log):
+    escaped_logs = escape(log)
+    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+    return re.sub('(job_[0-9]{12}_[0-9]+)', LinkJobLogs._replace_mr_link, hdfs_links)
+
+  @classmethod
+  def _replace_hdfs_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+    except:
+      LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
+      return match.group(0)
+
+  @classmethod
+  def _replace_mr_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+    except:
+      LOG.exception('failed to replace mr links: %s' % (match.groups(),))
+      return match.group(0)
+
 
 def get_jobconf(jt, jobid):
   """

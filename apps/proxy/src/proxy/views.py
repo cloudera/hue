@@ -106,7 +106,7 @@ def proxy(request, host, port, path):
   else:
     resp_text = _rewrite_links(data)
   request.path = _reverse(host, port, path)
-  return HttpResponse(resp_text, mimetype=data.headers.get("content-type"))
+  return HttpResponse(resp_text, content_type=data.headers.get("content-type"))
 
 def _reverse(host, port, path):
   return urlresolvers.reverse("proxy.views.proxy",

@@ -17,51 +17,64 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  import time as py_time
 %>
-
+<%namespace name="actionbar" file="../actionbar.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader( _("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Workflows"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows') }
 
+<style type="text/css">
+  input.search-query {
+    vertical-align: top;
+  }
+</style>
 
 <div class="container-fluid">
-  <h1>${ _('Workflow Editor') }</h1>
+  <div class="card card-small">
+  <h1 class="card-heading simple">${ _('Workflow Manager') }</h1>
 
-  <div class="well hueWell">
-    <div class="btn-group pull-right">
-      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-      % if currentuser.is_superuser:
-        <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
-      % endif
-    </div>
+  <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
+    </%def>
 
-    <div class="row-fluid">
-      <div class="span4">
-        <form>
-          ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
-        </form>
+    <%def name="actions()">
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
+        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="fa fa-calendar"></i> ${ _('Schedule') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="export-btn" disabled="disabled"><i class="fa fa-upload"></i> ${ _('Export') }</button>
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
+          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="span4">
-        <button class="btn action-buttons" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn action-buttons" id="schedule-btn" disabled="disabled"><i class="icon-refresh"></i> ${ _('Schedule') }</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
-        <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
-      </div>
-    </div>
-  </div>
+    </%def>
 
-  <br/>
+    <%def name="creation()">
+      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="fa fa-download"></i> ${ _('Import') }</a>
+      &nbsp;&nbsp;
+      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('Trash') }</a>
+    </%def>
+  </%actionbar:render>
+
 
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="workflowCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
-        <th>${ _('Last Modification') }</th>
+        <th>${ _('Last Modified') }</th>
         <th>${ _('Steps') }</th>
         <th>${ _('Status') }</th>
         <th>${ _('Owner') }</th>
@@ -69,19 +82,20 @@ ${ layout.menubar(section='workflows') }
     </thead>
     <tbody>
       % for workflow in jobs:
-        <tr class="action-row">
-          <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
-            <input type="radio" name="action" data-row-selector-exclude="true"
-              % if workflow.is_accessible(currentuser):
+        <tr>
+          <td data-row-selector-exclude="true">
+             <div class="hueCheckbox workflowCheck fa" data-row-selector-exclude="true"
+              % if workflow.can_read(user):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
                   data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
+                  data-export-url="${ url('oozie:export_workflow', workflow=workflow.id) }"
               % endif
-              % if workflow.is_editable(currentuser):
-                  data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
+              % if workflow.is_editable(user):
+                  data-delete-id="${ workflow.id }"
               % endif
-            />
-            % if workflow.is_accessible(currentuser):
+            ></div>
+            % if workflow.can_read(user):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
           </td>
@@ -90,7 +104,7 @@ ${ layout.menubar(section='workflows') }
           </td>
           <td>${ workflow.description }</td>
 
-          <td nowrap="nowrap">${ utils.format_date(workflow.last_modified) }</td>
+          <td nowrap="nowrap" data-sort-value="${ py_time.mktime(workflow.last_modified.timetuple()) }">${ utils.format_date(workflow.last_modified) }</td>
           <td><span class="badge badge-info">${ workflow.actions.count() }</span></td>
           <td>
             <span class="label label-info">${ workflow.status }</span>
@@ -101,157 +115,212 @@ ${ layout.menubar(section='workflows') }
     </tbody>
   </table>
 
+  </div>
 </div>
 
+<div class="hueOverlay" data-bind="visible: isLoading">
+  <!--[if lte IE 9]>
+    <img src="${ static('desktop/art/spinner-big.gif') }" />
+  <![endif]-->
+  <!--[if !IE]> -->
+    <i class="fa fa-spinner fa-spin"></i>
+  <!-- <![endif]-->
+</div>
 
 <div id="submit-wf-modal" class="modal hide"></div>
 
-<div id="deleteWf" class="modal hide fade">
-  <form id="deleteWfForm" action="" method="POST">
+<div id="trashWf" class="modal hide fade">
+  <form id="trashWfForm" action="${ url('oozie:delete_workflow') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete this workflow?') }</h3>
+      <h3 id="trashWfMessage">${ _('Move the selected workflow(s) to trash?') }</h3>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
     </div>
   </form>
 </div>
 
-<div id="installSamples" class="modal hide fade">
-  <form id="installSamplesForm" action="${url('oozie:setup_app')}" method="POST">
+<div id="destroyWf" class="modal hide fade">
+  <form id="destroyWfForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
+    ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Setup the workspaces and examples?') }</h3>
-    </div>
-    <div class="modal-body">
-      ${ _('Hue is going to re-create the workspaces and re-install the examples...') }
+      <h3 id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
     </div>
   </form>
 </div>
 
-<style>
-  td .btn-large{ cursor: crosshair;  }
 
-  .action-column {
-    cursor: auto;
-  }
-</style>
-
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    $(".action-row").click(function(e){
-      var select_btn = $(this).find('input');
-      select_btn.prop("checked", true);
+  $(document).ready(function () {
+    var viewModel = {
+      availableJobs : ko.observableArray(${ json_jobs | n }),
+      chosenJobs : ko.observableArray([]),
+      isLoading: ko.observable(false)
+    };
 
-      $(".action-row").css("background-color", "");
-      $(this).css("background-color", "#ECF4F8");
+    ko.applyBindings(viewModel);
 
-      $(".action-buttons").attr("disabled", "disabled");
-
-      update_action_buttons_status();
+    $(".selectAll").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
+      }
+      toggleActions();
     });
 
-    function update_action_buttons_status() {
-      var select_btn = $('input[name=action]:checked');
+    $(".workflowCheck").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).addClass("fa-check").attr("checked", "checked");
+      }
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
+      toggleActions();
+    });
 
-      var action_buttons = [
-        ['#submit-btn', 'data-submit-url'],
-        ['#schedule-btn', 'data-schedule-url'],
-        ['#delete-btn', 'data-delete-url'],
-        ['#clone-btn', 'data-clone-url']]
-
-      $.each(action_buttons, function(index) {
-        if (select_btn.attr(this[1])) {
-          $(this[0]).removeAttr('disabled');
-        } else {
-          $(this[0]).attr("disabled", "disabled");
-        }
-      });
+    function toggleActions() {
+      $(".toolbarBtn").attr("disabled", "disabled");
+      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
+      if (selector.length == 1) {
+        var action_buttons = [
+          ['#submit-btn', 'data-submit-url'],
+          ['#schedule-btn', 'data-schedule-url'],
+          ['#clone-btn', 'data-clone-url'],
+          ['#export-btn', 'data-export-url']
+        ];
+        $.each(action_buttons, function (index) {
+          if (selector.attr(this[1])) {
+            $(this[0]).removeAttr("disabled");
+          } else {
+            $(this[0]).attr("disabled", "disabled");
+          }
+        });
+      }
+      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
+      if (can_delete.length > 0 && can_delete.length == selector.length) {
+        $("#trash-btn").removeAttr("disabled");
+        $("#trash-btn-caret").removeAttr("disabled");
+      }
     }
 
-    update_action_buttons_status();
-
-    $("#delete-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
-      var _action = _this.attr("data-delete-url");
-      $("#deleteWfForm").attr("action", _action);
-      $("#deleteWfMessage").text(_this.attr("alt"));
-      $("#deleteWf").modal("show");
+    $("#trash-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("delete-id"));
+      });
+      $("#trashWf").modal("show");
     });
 
-    $('#submit-btn').click(function() {
-      var _this = $('input[name=action]:checked');
-      var _action = _this.attr("data-submit-url");
+    $("#destroy-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("delete-id"));
+      });
+      $("#destroyWf").modal("show");
+    });
 
-      $.get(_action,  function(response) {
-          $('#submit-wf-modal').html(response);
-          $('#submit-wf-modal').modal('show');
+    $("#submit-btn").click(function () {
+      var _this = $(".hueCheckbox[checked='checked']");
+      var _action = _this.attr("data-submit-url");
+      $.get(_action, function (response) {
+          $("#submit-wf-modal").html(response);
+          $("#submit-wf-modal").modal("show");
         }
       );
-     });
+    });
 
-    $("#clone-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
+    $("#clone-btn").click(function (e) {
+      viewModel.isLoading(true);
+      var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-clone-url");
-
-      $.post(_url, function(data) {
+      $.post(_url, function (data) {
         window.location = data.url;
       });
     });
 
-    $("#schedule-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
+    $("#schedule-btn").click(function (e) {
+      viewModel.isLoading(true);
+      var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-schedule-url");
-
       window.location.replace(_url);
     });
 
-    var oTable = $('#workflowTable').dataTable( {
-      "sPaginationType": "bootstrap",
-      'iDisplayLength': 50,
-      "bLengthChange": false,
-      "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-      "aoColumns": [
-        { "bSortable": false },
+    $("#export-btn").click(function (e) {
+      viewModel.isLoading(true);
+      var _this = $(".hueCheckbox[checked='checked']");
+      var _url = _this.attr("data-export-url");
+      window.location.replace(_url);
+      window.setTimeout(function(){
+        viewModel.isLoading(false);
+      }, 500);
+    });
+
+    var oTable = $("#workflowTable").dataTable({
+      "sPaginationType":"bootstrap",
+      'iDisplayLength':50,
+      "bLengthChange":false,
+      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
+      "aoColumns":[
+        { "bSortable":false },
         null,
         null,
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        { "sType": "date" },
         null,
         null
       ],
-      "aaSorting": [[3, 'desc'], [ 1, "asc" ]],
-      "oLanguage": {
-        "sEmptyTable":     "${_('No data available in table')}",
-        "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":    "${_('No matching records found')}",
-        "oPaginate": {
-            "sFirst":    "${_('First')}",
-            "sLast":     "${_('Last')}",
-            "sNext":     "${_('Next')}",
-            "sPrevious": "${_('Previous')}"
-          }
+      "aaSorting":[
+        [3, 'desc'],
+        [ 1, 'asc' ]
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords":"${_('No matching records')}",
+        "oPaginate":{
+          "sFirst":"${_('First')}",
+          "sLast":"${_('Last')}",
+          "sNext":"${_('Next')}",
+          "sPrevious":"${_('Previous')}"
+        }
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
 
-    $('#filterInput').keydown(function(e) {
+    $("#filterInput").keydown(function (e) {
       if (e.which == 13) {
         e.preventDefault();
         return false;
       }
     });
 
-    $("#filterInput").keyup(function() {
+    $("#filterInput").keyup(function () {
       oTable.fnFilter($(this).val());
     });
 
@@ -259,4 +328,4 @@ ${ layout.menubar(section='workflows') }
   });
 </script>
 
-${commonfooter(messages)}
+${commonfooter(request, messages) | n,unicode}

@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -16,25 +17,34 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <java>
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
             ${ common.prepares(node.get_prepares()) }
+            % if node.job_xml:
+              <job-xml>${ node.job_xml }</job-xml>
+            % endif
             ${ common.configuration(node.get_properties()) }
 
             <main-class>${ node.main_class }</main-class>
+
+            % if node.java_opts:
+            <java-opts>${ node.java_opts }</java-opts>
+            % endif
+
             % for arg in node.args.split():
             <arg>${ arg }</arg>
             % endfor
 
-            % if len(node.java_opts):
-            <java-opts>${ node.java_opts }</java-opts>
-            % endif
-
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+
+            % if node.capture_output:
+            <capture-output/>
+            % endif
         </java>
-        <ok to="${ node.get_child('ok') }"/>
-        <error to="${ node.get_child('error') }"/>
+        <ok to="${ node.get_oozie_child('ok') }"/>
+        <error to="${ node.get_oozie_child('error') }"/>
+        ${ common.sla(node) }
     </action>

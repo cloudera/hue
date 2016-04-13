@@ -29,24 +29,30 @@ import errno
 import logging
 import time
 
-from django.core.files.uploadhandler import \
-    FileUploadHandler, StopFutureHandlers, StopUpload
+from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
+from django.utils.translation import ugettext as _
+
 import hadoop.cluster
+
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.fs.exceptions import WebHdfsException
+
+LOG = logging.getLogger(__name__)
+
 
 UPLOAD_SUBDIR = 'hue-uploads'
-LOG = logging.getLogger(__name__)
 
 
 class HDFSerror(Exception):
   pass
+
 
 class HDFStemporaryUploadedFile(object):
   """
   A temporary HDFS file to store upload data.
   This class does not have any file read methods.
   """
-  def __init__(self, request, name):
+  def __init__(self, request, name, destination):
     self.name = name
     self.size = None
     self._do_cleanup = False
@@ -59,19 +65,14 @@ class HDFStemporaryUploadedFile(object):
     if not self._fs:
       raise HDFSerror("No HDFS found")
 
-    # We want to set the user to be the superuser. But any operation
-    # in the fs needs a username, including the retrieval of the superuser.
-    # So we first set it to the DEFAULT_USER to break this chicken-&-egg.
-    self._fs.setuser(self._fs.DEFAULT_USER)
-    self._fs.setuser(self._fs.superuser)
+    # We want to set the user to be the user doing the upload
+    self._fs.setuser(request.user.username)
+    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
 
-    self._path = self._fs.mktemp(
-        subdir='hue-uploads',
-        prefix='tmp.%s' % (request.environ['REMOTE_ADDR'],))
-
-    # Make the tmp dir 0777
-    self._fs.chmod(self._fs.dirname(self._path), 0777)
+    if self._fs.exists(self._path):
+      self._fs._delete(self._path)
     self._file = self._fs.open(self._path, 'w')
+
     self._do_cleanup = True
 
   def __del__(self):
@@ -93,7 +94,7 @@ class HDFStemporaryUploadedFile(object):
 
   def remove(self):
     try:
-      self._fs.remove(self._path)
+      self._fs.remove(self._path, True)
       self._do_cleanup = False
     except IOError, ex:
       if ex.errno != errno.ENOENT:
@@ -116,34 +117,42 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
   This handler is triggered by any upload field whose name starts with
   "HDFS" (case insensitive).
+
+  In practice, the middlewares (which access the request.REQUEST/POST/FILES objects) triggers
+  the upload before reaching the view in case of permissions error. Read about Django
+  uploading documentation.
+
+  This might trigger the upload before executing the hue auth middleware. HDFS destination
+  permissions will be doing the checks.
   """
   def __init__(self, request):
     FileUploadHandler.__init__(self, request)
     self._file = None
     self._starttime = 0
     self._activated = False
+    self._destination = request.GET.get('dest', None) # GET param avoids infinite looping
+    self.request = request
     # Need to directly modify FileUploadHandler.chunk_size
     FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     # Detect "HDFS" in the field name.
-    # NOTE: The user is not authenticated at this point, and it's
-    #       very difficult to do so because we handle upload before
-    #       running the auth middleware.
     if field_name.upper().startswith('HDFS'):
       try:
-        self._file = HDFStemporaryUploadedFile(self.request, file_name)
-      except (HDFSerror, IOError), ex:
+        self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
+        LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
+        self._activated = True
+        self._starttime = time.time()
+      except Exception, ex:
         LOG.error("Not using HDFS upload handler: %s" % (ex,))
-        return
+        self.request.META['upload_failed'] = ex
 
-      LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
-      self._activated = True
-      self._starttime = time.time()
       raise StopFutureHandlers()
 
   def receive_data_chunk(self, raw_data, start):
     if not self._activated:
+      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
+        raise StopUpload()
       return raw_data
 
     try:

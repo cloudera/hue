@@ -1,0 +1,1 @@
+    server node-%(index)s %(address)s cookie cookie-%(index)s check

@@ -82,7 +82,7 @@ class Migration(SchemaMigration):
             ('job_xml', self.gf('django.db.models.fields.CharField')(default='', max_length=512, blank=True)),
             ('jar_path', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('java_opts', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True)),
-            ('args', self.gf('django.db.models.fields.CharField')(max_length=4096, blank=True)),
+            ('args', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('prepares', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),

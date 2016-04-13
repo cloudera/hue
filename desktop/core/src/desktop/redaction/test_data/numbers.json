@@ -1,0 +1,34 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "No numbers 0-5",
+      "search": "[012345]",
+      "replace": "#"
+    },
+    {
+      "description": "No 6's",
+      "trigger": "6",
+      "search": "6",
+      "replace": "#"
+    },
+    {
+      "description": "No 7's",
+      "trigger": "7",
+      "search": "7",
+      "replace": "#"
+    },
+    {
+      "description": "No 8's",
+      "trigger": "8",
+      "search": "8",
+      "replace": "#"
+    },
+    {
+      "description": "No 9's",
+      "trigger": "9",
+      "search": "9",
+      "replace": "#"
+    }
+  ]
+}

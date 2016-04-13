@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -16,7 +17,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <ssh xmlns="uri:oozie:ssh-action:0.1">
             <host>${ node.user }@${ node.host }</host>
             <command>${ node.command }</command>
@@ -29,6 +30,7 @@
               <capture-output/>
             % endif
         </ssh>
-        <ok to="${ node.get_child('ok') }"/>
-        <error to="${ node.get_child('error') }"/>
+        <ok to="${ node.get_oozie_child('ok') }"/>
+        <error to="${ node.get_oozie_child('error') }"/>
+        ${ common.sla(node) }
     </action>

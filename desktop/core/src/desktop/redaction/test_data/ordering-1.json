@@ -1,0 +1,80 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "I am first",
+      "search": "one",
+      "replace": "two"
+    },
+    {
+      "description": "I'm second",
+      "search": "two",
+      "replace": "three"
+    },
+    {
+      "description": "I'm third and last; result is one -> four",
+      "search": "three",
+      "replace": "four"
+    },
+    {
+      "description": "Now triggers are fun...",
+      "trigger": "Please",
+      "search": "ten",
+      "replace": "eleven"
+    },
+    {
+      "description": "Trigger ordering",
+      "trigger": "help",
+      "search": "eleven",
+      "replace": "twelve"
+    },
+    {
+      "description": "Trigger ordering end",
+      "trigger": "me",
+      "search": "twelve",
+      "replace": "thirteen"
+    },
+    {
+      "description": "Malicious interleaving 1",
+      "caseSensitive": "true",
+      "trigger": "",
+      "search": "abc",
+      "replace": "def"
+    },
+    {
+      "description": "Malicious interleaving 2",
+      "caseSensitive": "true",
+      "trigger": "HappY",
+      "search": "def",
+      "replace": "ghi"
+    },
+    {
+      "description": "Malicious interleaving 3",
+      "caseSensitive": "true",
+      "trigger": "",
+      "search": "ghi",
+      "replace": "jkl"
+    },
+    {
+      "description": "Malicious interleaving 4",
+      "caseSensitive": "false",
+      "trigger": "HappY",
+      "search": "JkL",
+      "replace": "mno"
+    },
+    {
+      "description": "Malicious interleaving 5",
+      "caseSensitive": "true",
+      "trigger": "",
+      "search": "mno",
+      "replace": "pqr"
+    },
+    {
+      "description": "Malicious interleaving 6",
+      "caseSensitive": "true",
+      "trigger": "HappY",
+      "search": "pqr",
+      "replace": "stu"
+    }
+  ]
+}

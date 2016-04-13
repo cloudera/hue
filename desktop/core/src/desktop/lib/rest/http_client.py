@@ -14,18 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cookielib
 import logging
 import posixpath
-import types
+import requests
 import urllib
-import urllib2
 
-from urllib2_kerberos import HTTPKerberosAuthHandler
+from django.utils.encoding import iri_to_uri, smart_str
+
+from requests import exceptions
+from requests.auth import HTTPBasicAuth
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 __docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
+
 
 class RestException(Exception):
   """
@@ -40,16 +43,16 @@ class RestException(Exception):
 
     # Get more information if urllib2.HTTPError.
     try:
-      self._code = error.code
-      self._message = error.read()
-      self._headers = error.info()
+      self._code = error.response.status_code
+      self._headers = error.response.headers
+      self._message = self._error.response.text
     except AttributeError:
       pass
 
   def __str__(self):
     res = self._message or ""
     if self._code is not None:
-      res += " (error %s)" % (self._code,)
+      res += " (error %s)" % self._code
     return res
 
   def get_parent_ex(self):
@@ -74,45 +77,20 @@ class HttpClient(object):
     """
     @param base_url: The base url to the API.
     @param exc_class: An exception class to handle non-200 results.
-
-    Creates an HTTP(S) client to connect to the Cloudera Manager API.
     """
     self._base_url = base_url.rstrip('/')
     self._exc_class = exc_class or RestException
     self._logger = logger or LOG
-    self._headers = { }
-
-    # Make a cookie processor
-    cookiejar = cookielib.CookieJar()
-
-    self._opener = urllib2.build_opener(
-        HTTPErrorProcessor(),
-        urllib2.HTTPCookieProcessor(cookiejar))
-
-
-  def set_basic_auth(self, username, password, realm):
-    """
-    Set up basic auth for the client
-    @param username: Login name.
-    @param password: Login password.
-    @param realm: The authentication realm.
-    @return: The current object
-    """
-    # Make a basic auth handler that does nothing. Set credentials later.
-    passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    passmgr.add_password(realm, self._base_url, username, password)
-    authhandler = urllib2.HTTPBasicAuthHandler(passmgr)
-
-    self._opener.add_handler(authhandler)
-    return self
-
+    self._session = requests.Session()
 
   def set_kerberos_auth(self):
     """Set up kerberos auth for the client, based on the current ticket."""
-    authhandler = HTTPKerberosAuthHandler()
-    self._opener.add_handler(authhandler)
+    self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
     return self
 
+  def set_basic_auth(self, username, password):
+    self._session.auth = HTTPBasicAuth(username, password)
+    return self
 
   def set_headers(self, headers):
     """
@@ -120,7 +98,7 @@ class HttpClient(object):
     @param headers: A dictionary with the key value pairs for the headers
     @return: The current object
     """
-    self._headers = headers
+    self._session.headers.update(headers)
     return self
 
 
@@ -132,13 +110,16 @@ class HttpClient(object):
   def logger(self):
     return self._logger
 
+  def set_verify(self, verify=True):
+    self._session.verify = verify
+    return self
+      
   def _get_headers(self, headers):
-    res = self._headers.copy()
     if headers:
-      res.update(headers)
-    return res
+      self._session.headers.update(headers)
+    return self._session.headers.copy()
 
-  def execute(self, http_method, path, params=None, data=None, headers=None):
+  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True, files=None):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -146,32 +127,39 @@ class HttpClient(object):
     @param params: Key-value parameter data.
     @param data: The data to attach to the body of the request.
     @param headers: The headers to set for this request.
+    @param allow_redirects: requests should automatically resolve redirects.
+    @param urlencode: percent encode paths.
+    @param files: for posting Multipart-Encoded files
 
     @return: The result of urllib2.urlopen()
     """
     # Prepare URL and params
-    path = urllib.quote(smart_str(path))
+    if urlencode:
+      path = urllib.quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
-        self.logger.warn(
-            "GET method does not pass any data. Path '%s'" % (path,))
+        self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
         data = None
 
-    # Setup the request
-    request = urllib2.Request(url, data)
-    # Hack/workaround because urllib2 only does GET and POST
-    request.get_method = lambda: http_method
-
-    headers = self._get_headers(headers)
-    for k, v in headers.items():
-      request.add_header(k, v)
-
-    # Call it
-    self.logger.debug("%s %s" % (http_method, url))
+    request_kwargs = {'allow_redirects': allow_redirects}
+    if headers:
+      request_kwargs['headers'] = headers
+    if data:
+      request_kwargs['data'] = data
+    if files:
+      request_kwargs['files'] = files
     try:
-      return self._opener.open(request)
-    except (urllib2.HTTPError, urllib2.URLError), ex:
+      resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
+      if resp.status_code >= 300:
+        resp.raise_for_status()
+        raise exceptions.HTTPError(response=resp)
+      return resp
+    except (exceptions.ConnectionError,
+            exceptions.HTTPError,
+            exceptions.RequestException,
+            exceptions.URLRequired,
+            exceptions.TooManyRedirects), ex:
       raise self._exc_class(ex)
 
   def _make_url(self, path, params):
@@ -182,76 +170,3 @@ class HttpClient(object):
       param_str = urllib.urlencode(params)
       res += '?' + param_str
     return iri_to_uri(res)
-
-
-class HTTPErrorProcessor(urllib2.HTTPErrorProcessor):
-  """
-  Python 2.4 only recognize 200 and 206 as success. It's broken. So we install
-  the following processor to catch the bug.
-  """
-  def http_response(self, request, response):
-    if 200 <= response.code < 300:
-      return response
-    return urllib2.HTTPErrorProcessor.http_response(self, request, response)
-
-  https_response = http_response
-
-#
-# Method copied from Django
-#
-def iri_to_uri(iri):
-    """
-    Convert an Internationalized Resource Identifier (IRI) portion to a URI
-    portion that is suitable for inclusion in a URL.
-
-    This is the algorithm from section 3.1 of RFC 3987.  However, since we are
-    assuming input is either UTF-8 or unicode already, we can simplify things a
-    little from the full method.
-
-    Returns an ASCII string containing the encoded result.
-    """
-    # The list of safe characters here is constructed from the "reserved" and
-    # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
-    #     reserved    = gen-delims / sub-delims
-    #     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-    #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
-    #                   / "*" / "+" / "," / ";" / "="
-    #     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-    # Of the unreserved characters, urllib.quote already considers all but
-    # the ~ safe.
-    # The % character is also added to the list of safe characters here, as the
-    # end of section 3.1 of RFC 3987 specifically mentions that % must not be
-    # converted.
-    if iri is None:
-        return iri
-    return urllib.quote(smart_str(iri), safe="/#%[]=:;$&()+,!?*@'~")
-
-#
-# Method copied from Django
-#
-def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
-    """
-    Returns a bytestring version of 's', encoded as specified in 'encoding'.
-
-    If strings_only is True, don't convert (some) non-string-like objects.
-    """
-    if strings_only and isinstance(s, (types.NoneType, int)):
-        return s
-    elif not isinstance(s, basestring):
-        try:
-            return str(s)
-        except UnicodeEncodeError:
-            if isinstance(s, Exception):
-                # An Exception subclass containing non-ASCII data that doesn't
-                # know how to print itself properly. We shouldn't raise a
-                # further exception.
-                return ' '.join([smart_str(arg, encoding, strings_only,
-                        errors) for arg in s])
-            return unicode(s).encode(encoding, errors)
-    elif isinstance(s, unicode):
-        return s.encode(encoding, errors)
-    elif s and encoding != 'utf-8':
-        return s.decode('utf-8', errors).encode(encoding, errors)
-    else:
-        return s
-

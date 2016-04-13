@@ -1,0 +1,29 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VERSÃO DO PROJECTO\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8 bits\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/libsolr/api.py:200 src/libsolr/api.py:212 src/libsolr/api.py:227
+#: src/libsolr/api.py:247 src/libsolr/api.py:269 src/libsolr/api.py:287
+#: src/libsolr/api.py:305 src/libsolr/api.py:312 src/libsolr/api.py:321
+#: src/libsolr/api.py:331 src/libsolr/api.py:341 src/libsolr/api.py:354
+#: src/libsolr/api.py:364 src/libsolr/api.py:374 src/libsolr/api.py:395
+#: src/libsolr/api.py:411 src/libsolr/api.py:422 src/libsolr/api.py:444
+#: src/libsolr/api.py:467
+msgid "Error while accessing Solr"
+msgstr "Erro ao aceder a Solr"
+

@@ -34,7 +34,7 @@ class TestModel(models.Model):
 
   my_int = models.IntegerField()
   my_str = models.TextField(max_length=100)
-  last_modified = models.DateField(auto_now=True)
+  last_modified = models.DateTimeField(auto_now=True)
 
 class TestDjangoUtil(object):
   def test_update_if_dirty(self):
@@ -162,12 +162,12 @@ def test_reverse_with_get():
   # Basic view
   assert_equal("/", reverse_with_get("desktop.views.index"))
   # Arguments for the view
-  assert_equal("/prefs/foo", reverse_with_get("desktop.views.prefs", kwargs=dict(key="foo")))
+  assert_equal("/desktop/prefs/foo", reverse_with_get("desktop.views.prefs", kwargs=dict(key="foo")))
   # Arguments for the view as well as GET parameters
-  assert_equal("/prefs/foo?a=1&b=2",
+  assert_equal("/desktop/prefs/foo?a=1&b=2",
     reverse_with_get("desktop.views.prefs", kwargs=dict(key="foo"), get=dict(a=1,b=2)))
   # You can use a list of args instead of kwargs, too
-  assert_equal("/prefs/foo?a=1&b=2",
+  assert_equal("/desktop/prefs/foo?a=1&b=2",
     reverse_with_get("desktop.views.prefs", args=["foo"], get=dict(a=1,b=2)))
   # Just GET parameters
   assert_equal("/?a=1", reverse_with_get("desktop.views.index", get=dict(a="1")))

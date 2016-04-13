@@ -55,8 +55,8 @@ public class ThriftPluginServer implements Configurable, Runnable {
   static final int SOCKET_READ_TIMEOUT = 5000; // 5sec
 
   public ThriftPluginServer(InetSocketAddress address,
-                            TProcessorFactory processorFactory)
-    throws TTransportException {
+                            TProcessorFactory processorFactory, Configuration conf)
+    throws TTransportException, IllegalAccessException {
     //options = new TThreadPoolServer.Options();
     port = address.getPort();
     this.address = address;
@@ -71,7 +71,7 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
       this.processorFactory = authBridge.wrapProcessorFactory(
         processorFactory);
-      transportFactory = authBridge.createTransportFactory();
+      transportFactory = authBridge.createTransportFactory(conf);
     } else {
       this.processorFactory = processorFactory;
       transportFactory = new TTransportFactory();
@@ -117,7 +117,10 @@ public class ThriftPluginServer implements Configurable, Runnable {
       server = new SanerThreadPoolServer(
         processorFactory, transport,
         transportFactory, transportFactory,
-        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
+        // 10MB maximum request size
+        new TBinaryProtocol.Factory(true, true, 10*1024*1024),
+        new TBinaryProtocol.Factory(),
+        options);
     }
 
     Thread t = new Thread(this);

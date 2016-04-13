@@ -18,24 +18,26 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  import time as py_time
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("History"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='history') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Submission History') }</h1>
-  <div class="well hueWell">
-    <form class="form-search">
-      ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
-    </form>
-  </div>
+  <div class="card card-small">
+  <h1 class="card-heading simple">${ _('Submission History') }</h1>
+    <div class="card-body">
+      <p>
+        <form class="form-search">
+          <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+        </form>
 
-  <table class="table table-condensed datatables" id="jobTable">
+        <table class="table table-condensed datatables" id="jobTable">
     <thead>
       <tr>
         <th width="10%">${ _('Submission Date') }</th>
@@ -48,7 +50,7 @@ ${ layout.menubar(section='history') }
     <tbody>
     % for record in history:
       <tr>
-        <td>
+        <td data-sort-value="${py_time.mktime(record.submission_date.timetuple())}">
           <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
           ${ utils.format_date(record.submission_date) }
         </td>
@@ -60,10 +62,13 @@ ${ layout.menubar(section='history') }
     % endfor
     </tbody>
   </table>
+      </p>
+    </div>
+</div>
 </div>
 
 
-<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function() {
@@ -72,7 +77,7 @@ ${ layout.menubar(section='history') }
       "sPaginationType": "bootstrap",
       "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
       "aoColumns": [
-        { "sType": "date" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null,
         null,
         null,
@@ -80,26 +85,30 @@ ${ layout.menubar(section='history') }
       ],
       "aaSorting": [[ 0, "desc" ]],
       "oLanguage": {
-            "sEmptyTable":     "${_('No data available in table')}",
+            "sEmptyTable":     "${_('No data available')}",
             "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
             "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
             "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-            "sZeroRecords":    "${_('No matching records found')}",
+            "sZeroRecords":    "${_('No matching records')}",
             "oPaginate": {
                 "sFirst":    "${_('First')}",
                 "sLast":     "${_('Last')}",
                 "sNext":     "${_('Next')}",
                 "sPrevious": "${_('Previous')}"
             }
-         }
-      });
-
-      $("#filterInput").keyup(function() {
-         oTable.fnFilter($(this).val());
-      });
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
+      }
     });
 
-  $("a[data-row-selector='true']").jHueRowSelector();
+    $("#filterInput").keyup(function() {
+       oTable.fnFilter($(this).val());
+    });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
+
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(request, messages) | n,unicode }

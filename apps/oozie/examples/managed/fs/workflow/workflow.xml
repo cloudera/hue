@@ -1,0 +1,20 @@
+
+<workflow-app name="Fs" xmlns="uri:oozie:workflow:0.4">
+    <start to="Fs"/>
+    <action name="Fs">
+        <fs>
+              <delete path='${nameNode}${output}/testfs'/>
+              <mkdir path='${nameNode}${output}/testfs'/>
+              <mkdir path='${nameNode}${output}/testfs/source'/>
+              <move source='${nameNode}${output}/testfs/source' target='${nameNode}${output}/testfs/renamed'/>
+              <chmod path='${nameNode}${output}/testfs/renamed' permissions='700' dir-files='false'/>
+              <touchz path='${nameNode}${output}/testfs/new_file'/>
+        </fs>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

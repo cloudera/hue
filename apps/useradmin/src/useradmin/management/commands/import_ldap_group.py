@@ -16,11 +16,14 @@
 # limitations under the License.
 from optparse import make_option
 
-from useradmin.views import import_ldap_group
-
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from django.utils.translation import ugettext_lazy as _
+from desktop.conf import LDAP
+
+from useradmin import ldap_access
+from useradmin.views import import_ldap_groups
+
 
 class Command(BaseCommand):
   """
@@ -32,13 +35,22 @@ class Command(BaseCommand):
   """
 
   option_list = BaseCommand.option_list + (
-      make_option("--dn", help=_("Whether or not the user should be imported by "
+      make_option("--dn", help=_t("Whether or not the user should be imported by "
                                "distinguished name."),
                           action="store_true",
                           default=False),
-      make_option("--import-members", help=_("Import users from the group."),
+      make_option("--import-members", help=_t("Import users from the group."),
                                       action="store_true",
                                       default=False),
+      make_option("--import-members-recursive", help=_t("Import users from the group, but also do so recursively."),
+                                                action="store_true",
+                                                default=False),
+      make_option("--sync-users", help=_t("Sync users in the group."),
+                                  action="store_true",
+                                  default=False),
+      make_option("--server", help=_t("Server to connect to."),
+                              action="store",
+                              default=None),
    )
 
   args = "group-name"
@@ -49,4 +61,10 @@ class Command(BaseCommand):
 
     import_members = options['import_members']
     import_by_dn = options['dn']
-    import_ldap_group(group, import_members, import_by_dn)
+    import_members_recursive = options['import_members_recursive']
+    sync_users = options['sync_users']
+    server = options['server']
+
+    connection = ldap_access.get_connection_from_server(server)
+
+    import_ldap_groups(connection, group, import_members, import_members_recursive, sync_users, import_by_dn)

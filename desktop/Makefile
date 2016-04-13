@@ -40,8 +40,19 @@ DESKTOP_ROOT := $(realpath .)
 include $(ROOT)/Makefile.vars.priv
 
 APPS := core \
+	libs/aws \
 	libs/hadoop \
-	libs/liboozie
+	libs/indexer \
+	libs/liboauth \
+	libs/liboozie \
+	libs/libopenid \
+	libs/librdbms \
+	libs/libsaml \
+	libs/libsentry \
+	libs/libsolr \
+	libs/libzookeeper \
+	libs/metadata \
+	libs/notebook
 
 .PHONY: default
 default:: hue syncdb
@@ -86,7 +97,7 @@ $(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 	fi
 	@echo "--- Syncing/updating database at $@"
 	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue syncdb --noinput
-	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue migrate
+	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue migrate --merge
 
 # Targets that simply recurse into all of the applications
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
@@ -155,12 +166,7 @@ install: install-source-parts $(INSTALL_BDIST_TARGETS)
 #
 SOURCE_PARTS = \
   $(wildcard *.mk) Makefile \
-  conf \
-  libs/fancyupload \
-  libs/mootools-color \
-  libs/mootools-slick \
-  libs/mootools-touch \
-  libs/protovis
+  conf
 
 .PHONY: install-source-parts
 install-source-parts:

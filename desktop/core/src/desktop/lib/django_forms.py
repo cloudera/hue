@@ -17,18 +17,25 @@
 #
 # Extra form fields and widgets.
 
+import logging
+import json
+import urllib
+
 from django.forms import Widget, Field
 from django import forms
 from django.forms.util import ErrorList, ValidationError, flatatt
 from django.forms.fields import MultiValueField, CharField, ChoiceField, BooleanField
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
+from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils.encoding import StrAndUnicode, force_unicode
 
-import simplejson
-import urllib
-
 import desktop.lib.i18n
+from desktop.lib.i18n import smart_str
+
+
+LOG = logging.getLogger(__name__)
+
 
 class SplitDateTimeWidget(forms.MultiWidget):
   """
@@ -36,8 +43,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
   The date_class and time_class attributes specify class names to be given
   specifically to the corresponding DateInput and TimeInput widgets.
   """
-  date_format = forms.DateInput.format
-  time_format = forms.TimeInput.format
+  date_format = formats.get_format('DATE_INPUT_FORMATS')[0]
+  time_format = formats.get_format('TIME_INPUT_FORMATS')[0]
 
   def __init__(self, attrs=None, date_format=None, time_format=None, date_class='date', time_class='time'):
     date_attrs = dict(attrs)
@@ -304,6 +311,7 @@ class MultiForm(object):
     # to abort early, since we want each form's is_valid to be run.
     for f in self._forms.values():
       if not f.is_valid():
+        LOG.error(smart_str(f.errors))
         r = False
     return r
 
@@ -489,7 +497,7 @@ class DependencyAwareForm(forms.Form):
   Inherit from this class and add
   (condition name, condition value, child name) tuples
   to self.dependencies to describe dependencies between
-  certain form feilds.
+  certain form fields.
 
   The semantic meaning is that the field named "child name"
   is required if and only if the field "condition name"
@@ -502,7 +510,7 @@ class DependencyAwareForm(forms.Form):
     if self.errors:
       return
     for cond, required_value, child in self.dependencies:
-      if self.cleaned_data.get(cond) == required_value:
+      if self.cleaned_data.get(cond, None) == required_value:
         child_val = self.cleaned_data.get(child)
         if child_val in [None, '']:
           self._errors.setdefault(child, []).append("%s is required if %s is %s" % (child, cond, str(required_value)))
@@ -519,4 +527,4 @@ class DependencyAwareForm(forms.Form):
     return [ data(*x) for x in self.dependencies ]
 
   def render_dep_metadata(self):
-    return urllib.quote_plus(simplejson.dumps(self._calculate_data(), separators=(',', ':')))
+    return urllib.quote_plus(json.dumps(self._calculate_data(), separators=(',', ':')))

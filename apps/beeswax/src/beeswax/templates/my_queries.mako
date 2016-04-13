@@ -18,226 +18,332 @@ import time
 from django.template.defaultfilters import timesince
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from beeswax import models
+from beeswax.views import collapse_whitespace
 %>
+
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%!  from beeswax.views import collapse_whitespace %>
-${commonheader(_('My Queries'), "beeswax", user, "100px")}
+
+${ commonheader(_('My Queries'), app_name, user) | n,unicode }
 ${layout.menubar(section='my queries')}
-<style>
+
+<style type="text/css">
     .tab-content {
         overflow:visible!important;
     }
 </style>
+
 <div class="container-fluid">
-    <h1>${_('My Queries')}</h1>
+  <div class="card card-small">
+    <h1 class="card-heading simple">${_('My Queries')}</h1>
 
-    <div class="well hueWell">
-        <div class="btn-group pull-right">
-            <a class="btn" href="/beeswax/">${_('Create New Query')}</a>
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+      </%def>
+
+      <%def name="actions()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <button id="viewBtn" class="btn toolbarBtn" title="${_('View the result of the selected')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View result')}</button>
+          <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="fa fa-edit"></i> ${_('Edit')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+          <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="fa fa-tasks"></i> ${_('Usage history')}</button>
+          <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+            <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
+            <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
+            </ul>
+          </div>
         </div>
+      </%def>
 
-        <form class="form-search">
-            ${_('Filter:')} <input type="text" placeholder="${_('Search for name, description, etc...')}" class="input-xlarge search-query" id="filterInput">
-        </form>
-    </div>
+      <%def name="creation()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="fa fa-trash-o"></i> ${_('View trash')}</a>
+          <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="fa fa-plus-circle"></i> ${_('New query')}</a>
+        </div>
+      </%def>
+    </%actionbar:render>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#recentSavedQueries" data-toggle="tab">${_('Recent Saved Queries')} &nbsp;<span id="recentSavedQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
-        <li><a href="#recentRunQueries" data-toggle="tab">${_('Recent Run Queries')}  &nbsp;<span id="recentRunQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
-    </ul>
+    <li class="active"><a href="#recentSavedQueries" data-toggle="tab">${_('Recent Saved Queries')} &nbsp;<span id="recentSavedQueriesFilterCnt" class="badge badge-info"></span></a></li>
+    <li><a href="#recentRunQueries" data-toggle="tab">${_('Recent Run Queries')}  &nbsp;<span id="recentRunQueriesFilterCnt" class="badge badge-info"></span></a></li>
+  </ul>
 
     <div class="tab-content">
-            <div class="active tab-pane" id="recentSavedQueries">
-
-                 <table id="recentSavedQueriesTable" class="table table-striped table-condensed datatables">
-                      <thead>
-                        <tr>
-                          <th>${_('Name')}</th>
-                          <th>${_('Desc')}</th>
-                          <th>${_('Type')}</th>
-                          <th>${_('Last Modified')}</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                      <%!
-                        from beeswax import models
-                      %>
-                      % for design in q_page.object_list:
-                        <tr>
-                          <td>
-                            <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
-                          </td>
-                          <td>
-                            % if design.desc:
-                             <p>${design.desc}</p>
-                            % endif
-                          </td>
-                          <td>
-                            ${_('Query')}
-                          </td>
-                          <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
-                          <td>
-                            <div class="btn-group">
-                                <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
-                                  ${_('Options')}
-                                  <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                  <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
-                                  <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
-                                  <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
-                                  <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
-                                </ul>
-                            </div>
-                          </td>
-                        </tr>
-                      % endfor
-                      </tbody>
-                    </table>
-                    % if q_page.number != q_page.num_pages():
-                      <a href="${ url('beeswax.views.list_designs') }?user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
-                    % endif
-            </div>
-
-            <div class="tab-pane" id="recentRunQueries">
-                <table id="recentRunQueriesTable" class="table table-striped table-condensed datatables">
-                  <thead>
-                    <tr>
-                      <th>${_('Time')}</th>
-                      <th>${_('Name')}</th>
-                      <th>${_('Query')}</th>
-                      <th>${_('State')}</th>
-                      <th>${_('Result')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  <%!
-                    from beeswax import models, views
-                  %>
-                  % for query in h_page.object_list:
-                    <%
-                    qcontext = ""
-                    try:
-                      design = query.design
-                      qcontext = views.make_query_context('design', design.id)
-                    except:
-                      pass
-                    %>
-                    <tr>
-                      <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-                      <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a></td>
-                      <td>
-                        <p>
-                          % if len(query.query) > 100:
-                            <code>${collapse_whitespace(query.query[:100])}...</code>
-                          % else:
-                            <code>${collapse_whitespace(query.query)}</code>
-                          % endif
-                        </p>
-                      </td>
-                      <td>${models.QueryHistory.STATE[query.last_state]}</td>
-                      <td>
-                        % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-                          <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">${_('View')}</a>
-                        % else:
-                          ~
-                        % endif
-                      </td>
-                    </tr>
-                  % endfor
-                  </tbody>
-                </table>
-                % if h_page.number != h_page.num_pages():
-                  <a href="${ url('beeswax.views.list_query_history') }">${_('View my entire query history')} &raquo;</a>
-                % endif
-            </div>
+    <div class="active tab-pane" id="recentSavedQueries">
+      <table id="recentSavedQueriesTable" class="table table-condensed datatables">
+        <thead>
+          <tr>
+            <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
+            <th>${_('Name')}</th>
+            <th>${_('Desc')}</th>
+            <th>${_('Last Modified')}</th>
+          </tr>
+        </thead>
+        <tbody>
+        % for design in q_page.object_list:
+          <tr>
+            <td data-row-selector-exclude="true">
+              <div class="hueCheckbox savedCheck fa canDelete"
+                   data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
+                   data-delete-name="${ design.id }"
+                   data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
+                   data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }"
+                   data-row-selector-exclude="true"></div>
+            </td>
+            <td>
+              <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${design.name}</a>
+            </td>
+            <td>
+              % if design.desc:
+                ${ design.desc }
+              % endif
+            </td>
+            <td data-sort-value="${time.mktime(design.mtime.timetuple())}"></td>
+          </tr>
+        % endfor
+        </tbody>
+      </table>
+      % if q_page.number != q_page.num_pages():
+        <a href="${ url(app_name + ':list_designs') }?q-user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
+      % endif
     </div>
+
+    <div class="tab-pane" id="recentRunQueries">
+      <table id="recentRunQueriesTable" class="table table-striped table-condensed datatables">
+        <thead>
+          <tr>
+            <th width="1%"><div class="hueCheckbox selectAll" data-selectables="runCheck"></div></th>
+            <th>${_('Time')}</th>
+            <th>${_('Name')}</th>
+            <th>${_('Query')}</th>
+            <th>${_('State')}</th>
+          </tr>
+        </thead>
+        <tbody>
+        % for query in h_page.object_list:
+        <%
+          qcontext = query.design.get_query_context()
+        %>
+          <tr>
+            <td width="1%" data-row-selector-exclude="true">
+              <div class="hueCheckbox runCheck fa"
+                data-edit-url="${ url(app_name + ':execute_design', design_id=query.design.id) }"
+                % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+                  data-view-url="${ url(app_name + ':watch_query_history', query_history_id=query.id) }?context=${qcontext|u}"
+                % endif
+                data-row-selector-exclude="true"></div>
+            </td>
+            <td width="10%" data-sort-value="${time.mktime(query.submission_date.timetuple())}" class="nowrap"></td>
+            <td width="20%"><a href="${ url(app_name + ':execute_design', design_id=query.design.id) }" data-row-selector="true">${ query.design.name }</a></td>
+            <td width="60%">
+              % if len(query.query) > 100:
+              <code>${collapse_whitespace(query.query[:100])}...</code>
+              % else:
+              <code>${ collapse_whitespace(query.query) }</code>
+              % endif
+            </td>
+            <td width="9%">${models.QueryHistory.STATE[query.last_state]}</td>
+          </tr>
+        % endfor
+        </tbody>
+      </table>
+      % if h_page.number != h_page.num_pages():
+        <a href="${ url(app_name + ':list_query_history') }">${_('View my entire query history')} &raquo;</a>
+      % endif
+    </div>
+  </div>
+  </div>
 </div>
 
 <div id="deleteQuery" class="modal hide fade">
-    <form id="deleteQueryForm" action="" method="POST">
+  <form id="deleteQueryForm" action="${ url(app_name + ':delete_design') }" method="POST">
+    ${ csrf_token(request) | n,unicode }
+    <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
     </div>
     <div class="modal-footer">
-        <input type="submit" class="btn primary" value="${_('Yes')}"/>
-        <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}"/>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
-    </form>
+    <div class="hide">
+      <select name="designs_selection" data-bind="options: availableSavedQueries, selectedOptions: chosenSavedQueries" multiple="true"></select>
+    </div>
+  </form>
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        var recentSavedQueries = $("#recentSavedQueriesTable").dataTable({
-            "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "aoColumns": [
-                null,
-                null,
-                null,
-                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
-                { "bSortable": false }
-            ]
-        });
+  $(document).ready(function () {
+    var viewModel = {
+        availableSavedQueries : ko.observableArray(${ designs_json | n }),
+        chosenSavedQueries : ko.observableArray([])
+    };
 
-        var recentRunQueries = $("#recentRunQueriesTable").dataTable({
-            "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "aoColumns": [
-                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
-                null,
-                null,
-                null,
-                { "bSortable": false }
-            ]
-        });
+    ko.applyBindings(viewModel);
 
+    updateQueryCounters();
 
-        $("#filterInput").keyup(function() {
-            recentSavedQueries.fnFilter($(this).val());
-            recentRunQueries.fnFilter($(this).val());
-            if ($.trim($(this).val()) != ""){
-                var recentSavedQueriesCnt = $("#recentSavedQueriesTable tbody tr").length;
-                var isRecentSavedQueriesEmpty = ($("#recentSavedQueries tbody tr td.dataTables_empty").length == 1)
-                if (recentSavedQueriesCnt > 0 && !isRecentSavedQueriesEmpty){
-                    $("#recentSavedQueriesFilterCnt").text(recentSavedQueriesCnt).show();
-                }
-                else {
-                    $("#recentSavedQueriesFilterCnt").hide().text("");
-                }
-
-                var recentRunQueriesCnt = $("#recentRunQueriesTable tbody tr").length;
-                var isRecentRunQueriesEmpty = ($("#recentRunQueriesTable tbody tr td.dataTables_empty").length == 1)
-                if (recentRunQueriesCnt > 0 && !isRecentRunQueriesEmpty){
-                    $("#recentRunQueriesFilterCnt").text(recentRunQueriesCnt).show();
-                }
-                else {
-                    $("#recentRunQueriesFilterCnt").hide().text("");
-                }
-            }
-            else {
-                $("#recentSavedQueriesFilterCnt").hide().text("");
-                $("#recentRunQueriesFilterCnt").hide().text("");
-            }
-        });
-
-        $(".confirmationModal").live("click", function(){
-            $.getJSON($(this).attr("data-confirmation-url"), function(data){
-                $("#deleteQueryForm").attr("action", data.url);
-                $("#deleteQueryMessage").text(data.title);
-            });
-            $("#deleteQuery").modal("show");
-        });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
+    $("[data-sort-value]").each(function(){
+      $(this).text(moment($(this).attr("data-sort-value")*1000).format("L LTS"));
     });
+
+    var recentSavedQueries = $("#recentSavedQueriesTable").dataTable({
+      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+      "bPaginate":false,
+      "bLengthChange":false,
+      "bInfo":false,
+      "aaSorting":[
+        [3, "desc"]
+      ],
+      "aoColumns":[
+        {"bSortable":false, "sWidth":"1%" },
+        {"sWidth":"30%"},
+        {"sWidth":"49%"},
+        { "sSortDataType":"dom-sort-value", "sType":"numeric", "sWidth":"20%" }
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sZeroRecords":"${_('No matching records')}"
+      },
+      "bStateSave": true
+    });
+
+    var recentRunQueries = $("#recentRunQueriesTable").dataTable({
+      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+      "bPaginate":false,
+      "bLengthChange":false,
+      "bInfo":false,
+      "aaSorting":[
+        [1, "desc"]
+      ],
+      "aoColumns":[
+        {"bSortable":false},
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
+        null,
+        null,
+        null
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sZeroRecords":"${_('No matching records')}"
+      },
+      "bStateSave": true
+    });
+
+    $("#filterInput").keyup(function () {
+      recentSavedQueries.fnFilter($(this).val());
+      recentRunQueries.fnFilter($(this).val());
+      updateQueryCounters();
+    });
+
+    $(".selectAll").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
+      }
+      toggleActions();
+    });
+
+    $(".savedCheck").click(function () {
+      $(".runCheck").removeClass("fa-check").removeAttr("checked");
+    });
+
+    $(".runCheck").click(function () {
+      $(".savedCheck").removeClass("fa-check").removeAttr("checked");
+    });
+
+    $(".savedCheck, .runCheck").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).addClass("fa-check").attr("checked", "checked");
+      }
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
+      toggleActions();
+    });
+
+    function toggleActions() {
+      $(".toolbarBtn").attr("disabled", "disabled");
+
+      var selector = $(".hueCheckbox[checked='checked']");
+      if (selector.length == 1) {
+        if (selector.data("view-url")) {
+          $("#viewBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("view-url")
+          });
+        }
+        if (selector.data("edit-url")) {
+          $("#editBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("edit-url");
+          });
+        }
+        if (selector.data("clone-url")) {
+          $("#cloneBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("clone-url")
+          });
+        }
+        if (selector.data("history-url")) {
+          $("#historyBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("history-url")
+          });
+        }
+      }
+
+      if (selector.length >= 1 && $('#recentSavedQueries').hasClass('active')) {
+        $("#trashQueryBtn").removeAttr("disabled");
+        $("#trashQueryCaretBtn").removeAttr("disabled");
+      }
+    }
+
+    function updateQueryCounters() {
+      $("#recentSavedQueriesFilterCnt").text($("#recentSavedQueriesTable tbody tr").length);
+      $("#recentRunQueriesFilterCnt").text($("#recentRunQueriesTable tbody tr").length);
+      if ($("#recentSavedQueries tbody tr td.dataTables_empty").length == 1) {
+        $("#recentSavedQueriesFilterCnt").text("0");
+      }
+      if ($("#recentRunQueries tbody tr td.dataTables_empty").length == 1) {
+        $("#recentRunQueriesFilterCnt").text("0");
+      }
+    }
+
+    function deleteQueries() {
+      viewModel.chosenSavedQueries.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenSavedQueries.push($(this).data("delete-name"));
+      });
+
+      $("#deleteQuery").modal("show");
+    }
+
+    $("#trashQueryBtn").click(function () {
+      $("#skipTrash").val(false);
+      $("#deleteQueryMessage").text("${ _('Move the selected queries to the trash?') }");
+      deleteQueries();
+    });
+
+    $("#deleteQueryBtn").click(function () {
+      $("#skipTrash").val(true);
+      $("#deleteQueryMessage").text("${ _('Delete the selected queries?') }");
+      deleteQueries();
+    });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(request, messages) | n,unicode }

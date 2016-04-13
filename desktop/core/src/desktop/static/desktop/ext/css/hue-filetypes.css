@@ -1,0 +1,48 @@
+@font-face {
+	font-family: 'HueFiletypes';
+	src:url('../fonts/huefiletypes-regular.eot?121z71');
+	src:url('../fonts/huefiletypes-regular.eot?#iefix121z71') format('embedded-opentype'),
+		url('../fonts/huefiletypes-regular.woff?121z71') format('woff'),
+		url('../fonts/huefiletypes-regular.ttf?121z71') format('truetype'),
+		url('../fonts/huefiletypes-regular.svg?121z71#filetypes') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.hfo {
+  display: inline-block;
+  font-family: HueFiletypes;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hfo-file-empty:before {
+  content: "\f016";
+}
+
+.hfo-file-xls:before {
+  content: "\f017";
+}
+
+.hfo-file-csv:before {
+  content: "\f018";
+}
+
+.hfo-file-pdf:before {
+  content: "\f019";
+}
+
+.hfo-file-raw:before {
+  content: "\f01a";
+}
+
+.hfo-file-json:before {
+  content: "\f01b";
+}
+
+.hfo-file-xml:before {
+  content: "\f01c";
+}

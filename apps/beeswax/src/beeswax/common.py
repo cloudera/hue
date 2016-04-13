@@ -20,12 +20,12 @@ Common utils for beeswax.
 """
 
 import re
+import time
 
 from django import forms
-from beeswax import db_utils
 
 
-HIVE_IDENTIFER_REGEX = re.compile("^[a-zA-Z0-9]\w*$")
+HIVE_IDENTIFER_REGEX = re.compile("(^[a-zA-Z0-9]\w*\.)?[a-zA-Z0-9]\w*$")
 
 DL_FORMATS = [ 'csv', 'xls' ]
 
@@ -51,6 +51,15 @@ TERMINATORS = [
   (' ', "Space", 32),
 ]
 
+def timing(fn):
+  def decorator(*args, **kwargs):
+    time1 = time.time()
+    ret = fn(*args, **kwargs)
+    time2 = time.time()
+    print '%s elapsed time: %0.3f ms' % (fn.func_name, (time2-time1)*1000.0)
+    return ret
+  return decorator
+
 
 def to_choices(x):
   """
@@ -60,6 +69,22 @@ def to_choices(x):
   return [ (y, y) for y in x ]
 
 
+def apply_natural_sort(collection, key=None):
+  """
+  Applies a natural sort (http://rosettacode.org/wiki/Natural_sorting) to a list or dictionary
+  Dictionary types require a sort key to be specified
+  Adapted from http://blog.codinghorror.com/sorting-for-humans-natural-sort-order/
+  """
+  convert = lambda text: int(text) if text.isdigit() else text
+
+  def tokenize_and_convert(item, key=None):
+    if key:
+      item = item[key]
+    return [ convert(c) for c in re.split('([0-9]+)', item) ]
+
+  return sorted(collection, key=lambda i: tokenize_and_convert(i, key=key))
+
+
 class HiveIdentifierField(forms.RegexField):
   """
   Corresponds to 'Identifier' in Hive.g (Hive's grammar)
@@ -67,13 +92,3 @@ class HiveIdentifierField(forms.RegexField):
   def __init__(self, *args, **kwargs):
     kwargs['regex'] = HIVE_IDENTIFER_REGEX
     super(HiveIdentifierField, self).__init__(*args, **kwargs)
-
-
-class HiveTableChoiceField(forms.ChoiceField):
-  """To choose from a defined table"""
-  def __init__(self, *args, **kwargs):
-    table_names = db_utils.meta_client().get_tables("default", ".*")
-    kwargs['choices'] = to_choices([''] + table_names)
-    forms.ChoiceField.__init__(self, *args, **kwargs)
-
-

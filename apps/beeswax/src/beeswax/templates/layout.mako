@@ -13,10 +13,7 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-##
-##
-## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
-## multiple spaces and line breaks cause issues
+
 <%!
 from django.utils.translation import ugettext as _
 
@@ -28,17 +25,52 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-<div class="subnav subnav-fixed">
-	<div class="container-fluid">
-		<ul class="nav nav-pills">
-			<li class="${is_selected(section, 'query')}"><a href="/beeswax/execute">${_('Query Editor')}</a></li>
-			<li class="${is_selected(section, 'my queries')}"><a href="/beeswax/my_queries">${_('My Queries')}</a></li>
-			<li class="${is_selected(section, 'saved queries')}"><a href="/beeswax/list_designs">${_('Saved Queries')}</a></li>
-			<li class="${is_selected(section, 'history')}"><a href="/beeswax/query_history">${_('History')}</a></li>
-			<li class="${is_selected(section, 'tables')}"><a href="/beeswax/tables">${_('Tables')}</a></li>
-			<li class="${is_selected(section, 'configuration')}"><a href="/beeswax/configuration">${_('Settings')}</a></li>
-		</ul>
-	</div>
-</div>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                % if app_name == 'impala':
+                  <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                  Impala
+                % elif app_name == 'rdbms':
+                  <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                  DB Query
+                % else:
+                  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                  Hive Editor
+                % endif
+                </a>
+              </li>
+              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
+              <li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
+              <li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
+              <li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
+</%def>
+
+<%def name="metastore_menubar()">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/metastore">
+                  <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
+                  ${ _('Metastore Manager') }
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
 </%def>
 

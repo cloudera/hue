@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html lang=en>
+ <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <title></title></head>
+ <body>
+  <div><a name='docexample.list_of_integers'>
+   <h1>.tgt.docexample.list_of_integers</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>list_of_integers</h2></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ A kind with no formal properties. In this example, I am not
+specifying anything about this kind. It is to be understood from its
+name and context what it means. More specifications can be added later
+as a system description evolves.
+</dd></dl><a name='docexample.example_kind'>
+   <h1>.tgt.docexample.example_kind</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>example_kind</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd><big><a href='#docexample.example_kind.m_noargs'>m_noargs</a></big>()</dd>
+     <dd><big><a href='#docexample.example_kind.m_returns'>m_returns</a></big>() <strong>-></strong> <a href='#docexample.example_kind'>example_kind</a></dd>
+     <dd><big><a href='#docexample.example_kind.m_one'>m_one</a></big>(<var>a</var><code>:</code>&nbsp;<em>int+</em>)</dd>
+     <dd><big><a href='#docexample.example_kind.m_opt'>m_opt</a></big>( [<var>a</var><code>:</code>&nbsp;<em>int+</em>  [<var>b</var><code>:</code>&nbsp;<em>string+</em>]])</dd>
+     <dd><big><a href='#docexample.example_kind.m_alt'>m_alt</a></big>( <sup><strong>alt:</strong></sup>[<var>a</var><code>:</code>&nbsp;<em>int+</em><sup><strong> or </strong></sup><var>a</var><code>:</code>&nbsp;<em>string+</em><sup><strong> or </strong></sup><var>a</var><code>:</code>&nbsp;<em>list+</em>])</dd>
+     <dd><big><a href='#docexample.example_kind.m_repeat'>m_repeat</a></big>( <sup><strong>0..*:</strong></sup><var>a</var><code>:</code>&nbsp;<em>int+</em> <sup><strong>2..4:</strong></sup><var>b</var><code>:</code>&nbsp;<em>string+</em>)</dd>
+     <dd><big><a href='#docexample.example_kind.m_draw_keywords'>m_draw_keywords</a></big>( <sup><strong>draw:</strong></sup>[<code>a</code><strong>&nbsp;=&nbsp;</strong><em>int+</em> , <code>b</code><strong>&nbsp;=&nbsp;</strong><em>int+</em> , <code>c</code><strong>&nbsp;=&nbsp;</strong><em>string+</em>])</dd>
+     <dd><big><a href='#docexample.example_kind.range'>range</a></big>( <sup><strong>alt:</strong></sup>[<var>stop</var><code>:</code>&nbsp;<em>int+</em><sup><strong> or </strong></sup> <sup><strong>seq:</strong></sup>[<var>start</var><code>:</code>&nbsp;<em>int+</em> , <var>stop</var><code>:</code>&nbsp;<em>int+</em> ,  [<var>step</var><code>:</code>&nbsp;<em>int+</em>]]]) <strong>-></strong> <a href='#docexample.list_of_integers'>list_of_integers</a></dd>
+     <dt><strong><big>Attribute</big></strong></dt>
+     <dd><big><a href='#docexample.example_kind.a_nokind'>a_nokind</a></big><code>:</code>&nbsp;<strong> anything</strong></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ A kind specifying some example attributes and methods.
+</dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='docexample.example_kind.m_noargs'><strong><big>m_noargs</big></strong></a>()
+    <dl>
+     <dd>
+ A method that takes no arguments, and returns an unspecified kind.
+</dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_returns'><strong><big>m_returns</big></strong></a>() <strong>-></strong> <a href='#docexample.example_kind'>example_kind</a>
+    <dl>
+     <dd> A method which returns objects of kind <em>example_kind</em> again.</dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_one'><strong><big>m_one</big></strong></a>(<var>a</var><code>:</code>&nbsp;<em>int+</em>)
+    <dl>
+     <dd> A method with one argument.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>a</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd> A positional argument of kind <em>int+</em>. The <em>int+</em> kind is a so called<em> superkind</em>
+  because an API with this specification,
+is expected to accept values according to the specification of
+ <em>int+</em>, but it is allowed to accept other kinds of arguments as well. A<em>
+ compatible
+</em>
+ new specification could add these alternative kinds of
+arguments as allowed arguments, but it would still have to accept the
+ <em>int+</em> kind of argument.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>The + in the int+ name is a convention to indicate that it is a<em> superkind</em>.</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>The name of the argument, a, does<em>
+ not
+</em>
+ mean that it can be specified as a keyword argument with that
+name.  It is only when keyword arguments are specifically specified
+that they are actually keyword arguments.
+</dd></dl></dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_opt'><strong><big>m_opt</big></strong></a>( [<var>a</var><code>:</code>&nbsp;<em>int+</em>  [<var>b</var><code>:</code>&nbsp;<em>string+</em>]])
+    <dl>
+     <dd>
+ A method with optional arguments.  Square brackets without a
+preceding modifier means that the contents is optional.  So in this
+case, either no argument must be given, or if one argument is given it
+is a, or if two arguments are given, it is a and b in that order.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_alt'><strong><big>m_alt</big></strong></a>( <sup><strong>alt:</strong></sup>[<var>a</var><code>:</code>&nbsp;<em>int+</em><sup><strong> or </strong></sup><var>a</var><code>:</code>&nbsp;<em>string+</em><sup><strong> or </strong></sup><var>a</var><code>:</code>&nbsp;<em>list+</em>])
+    <dl>
+     <dd>
+ A method with alternative arguments.
+An<sup><strong>
+ alt:
+</strong></sup>
+ before the bracket is a modifier that means that there is a
+choice of alternatives. The argument is required and should be either
+an int+, string+ or list+.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>a</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd> Description for an int argument.</dd>
+         <dt><var>a</var><code>:</code>&nbsp;<em>string+</em></dt>
+         <dd> Description for a string argument.</dd>
+         <dt><var>a</var><code>:</code>&nbsp;<em>list+</em></dt>
+         <dd>
+ Description for a list argument.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_repeat'><strong><big>m_repeat</big></strong></a>( <sup><strong>0..*:</strong></sup><var>a</var><code>:</code>&nbsp;<em>int+</em> <sup><strong>2..4:</strong></sup><var>b</var><code>:</code>&nbsp;<em>string+</em>)
+    <dl>
+     <dd>
+ A method with repeated arguments.
+A modifier<sup><strong>
+ m..n:
+</strong></sup>
+ before the argument, where m and n are integers, means an
+argument that may be repeated at least m times and at most n
+times. Instead of n, * may be specified and means any number of times.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>a</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd>
+ This argument may be repeated any number of times as long as
+it is of of kind int+.
+</dd>
+         <dt><var>b</var><code>:</code>&nbsp;<em>string+</em></dt>
+         <dd>
+ The final arguments must be of kind string+ and be repeated 2,
+3 or 4 times.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='docexample.example_kind.m_draw_keywords'><strong><big>m_draw_keywords</big></strong></a>( <sup><strong>draw:</strong></sup>[<code>a</code><strong>&nbsp;=&nbsp;</strong><em>int+</em> , <code>b</code><strong>&nbsp;=&nbsp;</strong><em>int+</em> , <code>c</code><strong>&nbsp;=&nbsp;</strong><em>string+</em>])
+    <dl>
+     <dd> A method with optional keyword arguments.</dd>
+     <dd> The modifier<sup><strong>
+ draw:
+</strong></sup>
+ means to 'draw' any combination of arguments from within the
+brackets.  Keyword arguments by them self would not be optional, but
+would be mandatory, in the current specification system.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='docexample.example_kind.range'><strong><big>range</big></strong></a>( <sup><strong>alt:</strong></sup>[<var>stop</var><code>:</code>&nbsp;<em>int+</em><sup><strong> or </strong></sup> <sup><strong>seq:</strong></sup>[<var>start</var><code>:</code>&nbsp;<em>int+</em> , <var>stop</var><code>:</code>&nbsp;<em>int+</em> ,  [<var>step</var><code>:</code>&nbsp;<em>int+</em>]]]) <strong>-></strong> <a href='#docexample.list_of_integers'>list_of_integers</a>
+    <dl>
+     <dd>
+ A method combining different argument specifications.
+</dd>
+     <dd> The modifier<sup><strong>
+ seq
+</strong></sup> means arguments that are specified by the<em> sequence</em>
+ of arguments within the following brackets.
+
+      <p> Create a range of numbers.</p></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>start</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd> The first value of the range.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>0</dt>
+           <dd>Starts with first value.</dd></dl></dd>
+         <dt><var>stop</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd> The value just beyond the last value of the range.</dd>
+         <dt><var>step</var><code>:</code>&nbsp;<em>int+</em></dt>
+         <dd> Positive or negative, steps values up or down.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>1</dt>
+           <dd></dd></dl></dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a list containing an arithmetic progression of integers.
+</dt></dl></dd></dl></dd>
+   <dt>
+    <h2>Attribute</h2></dt>
+   <dd><a name='docexample.example_kind.a_nokind'><strong><big>a_nokind</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd>
+ An attribute named a_nokind, with unspecified kind.
+</dd></dl></dd></dl>
+  <hr>Generated by <a href="http://guppy-pe.sourceforge.net/gsl.html">GSL-HTML 0.1.5</a> on Sat Jul  4 13:25:11 2009</div></body></html>

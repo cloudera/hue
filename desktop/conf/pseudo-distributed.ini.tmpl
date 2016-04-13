@@ -6,12 +6,12 @@
 # ===================================
 #
 # For complete documentation about the contents of this file, run
-#       $ <hue_root>/build/env/bin/hue config_help
+#   $ <hue_root>/build/env/bin/hue config_help
 #
 # All .ini files under the current directory are treated equally.  Their
 # contents are merged to form the Hue configuration, which can
 # can be viewed on the Hue at
-#       http://<hue_host>:<port>/dump_config
+#   http://<hue_host>:<port>/dump_config
 
 
 ###########################################################################
@@ -20,14 +20,13 @@
 
 [desktop]
 
-  send_dbug_messages=1
-
-  # To show database transactions, set database_logging to 1
-  database_logging=0
-
   # Set this to a random string, the longer the better.
   # This is used for secure hashing in the session store.
   secret_key=
+
+  # Execute this script to produce the Django secret key. This will be used when
+  # `secret_key` is not set.
+  ## secret_key_script=
 
   # Webserver listens on this address and port
   http_host=0.0.0.0
@@ -36,11 +35,20 @@
   # Time zone name
   time_zone=America/Los_Angeles
 
-  # Turn off debug
-  django_debug_mode=1
+  # Enable or disable Django debug mode.
+  ## django_debug_mode=true
 
-  # Turn off backtrace for server error
-  http_500_debug_mode=1
+  # Enable or disable database debug mode.
+  ## database_logging=false
+
+  # Whether to send debug messages from JavaScript to the server logs.
+  send_dbug_messages=true
+
+  # Enable or disable backtrace for server error
+  ## http_500_debug_mode=true
+
+  # Enable or disable memory profiling.
+  ## memory_profiler=false
 
   # Server email for internal error messages
   ## django_server_email='hue@localhost.localdomain'
@@ -48,21 +56,22 @@
   # Email backend
   ## django_email_backend=django.core.mail.backends.smtp.EmailBackend
 
-  # Set to true to use CherryPy as the webserver, set to false
-  # to use Spawning as the webserver. Defaults to Spawning if
-  # key is not specified.
-  ## use_cherrypy_server = false
-
   # Webserver runs as this user
   ## server_user=hue
   ## server_group=hue
+
+  # This should be the Hue admin and proxy user
+  ## default_user=hue
+
+  # This should be the hadoop cluster admin
+  ## default_hdfs_superuser=hdfs
 
   # If set to false, runcpserver will not actually start the web server.
   # Used if Apache is being used as a WSGI container.
   ## enable_server=yes
 
   # Number of threads used by the CherryPy web server
-  ## cherrypy_server_threads=10
+  ## cherrypy_server_threads=40
 
   # Filename of SSL Certificate
   ## ssl_certificate=
@@ -70,8 +79,132 @@
   # Filename of SSL RSA Private Key
   ## ssl_private_key=
 
+  # Filename of SSL Certificate Chain
+  ## ssl_certificate_chain=
+
+  # SSL certificate password
+  ## ssl_password=
+
+  # Execute this script to produce the SSL password. This will be used when `ssl_password` is not set.
+  ## ssl_password_script=
+
+  # List of allowed and disallowed ciphers in cipher list format.
+  # See http://www.openssl.org/docs/apps/ciphers.html for more information on
+  # cipher list format. This list is from
+  # https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 intermediate
+  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
+  # Opera 5 and Safari 1.
+  ## ssl_cipher_list=ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
+
+  # Path to default Certificate Authority certificates.
+  ## ssl_cacerts=/etc/hue/cacerts.pem
+
+  # Choose whether Hue should validate certificates received from the server.
+  ## validate=true
+
+  # Default LDAP/PAM/.. username and password of the hue user used for authentications with other services.
+  # Inactive if password is empty.
+  # e.g. LDAP pass-through authentication for HiveServer2 or Impala. Apps can override them individually.
+  ## auth_username=hue
+  ## auth_password=
+
   # Default encoding for site data
   ## default_site_encoding=utf-8
+
+  # Help improve Hue with anonymous usage analytics.
+  # Use Google Analytics to see how many times an application or specific section of an application is used, nothing more.
+  ## collect_usage=true
+
+  # Tile layer server URL for the Leaflet map charts
+  # Read more on http://leafletjs.com/reference.html#tilelayer
+  ## leaflet_tile_layer=http://{s}.tile.osm.org/{z}/{x}/{y}.png
+
+  # The copyright message for the specified Leaflet maps Tile Layer
+  ## leaflet_tile_layer_attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+
+  # X-Frame-Options HTTP header value. Use 'DENY' to deny framing completely                   
+  ## http_x_frame_options=SAMEORIGIN
+
+  # Enable X-Forwarded-Host header if the load balancer requires it.
+  ## use_x_forwarded_host=false
+
+  # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
+  ## secure_proxy_ssl_header=false
+
+  # Comma-separated list of Django middleware classes to use.
+  # See https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on middlewares in Django.
+  ## middleware=desktop.auth.backend.LdapSynchronizationBackend
+
+  # Comma-separated list of regular expressions, which match the redirect URL.
+  # For example, to restrict to your local domain and FQDN, the following value can be used:
+  # ^\/.*$,^http:\/\/www.mydomain.com\/.*$
+  ## redirect_whitelist=^\/.*$
+
+  # Comma separated list of apps to not load at server startup.
+  # e.g.: pig,zookeeper
+  ## app_blacklist=
+
+  # Choose whether to show the new SQL editor.
+  ## use_new_editor=true
+
+  # The directory where to store the auditing logs. Auditing is disable if the value is empty.
+  # e.g. /var/log/hue/audit.log
+  ## audit_event_log_dir=
+
+  # Size in KB/MB/GB for audit log to rollover.
+  ## audit_log_max_file_size=100MB
+
+  # A json file containing a list of log redaction rules for cleaning sensitive data
+  # from log files. It is defined as:
+  #
+  # {
+  #   "version": 1,
+  #   "rules": [
+  #     {
+  #       "description": "This is the first rule",
+  #       "trigger": "triggerstring 1",
+  #       "search": "regex 1",
+  #       "replace": "replace 1"
+  #     },
+  #     {
+  #       "description": "This is the second rule",
+  #       "trigger": "triggerstring 2",
+  #       "search": "regex 2",
+  #       "replace": "replace 2"
+  #     }
+  #   ]
+  # }
+  #
+  # Redaction works by searching a string for the [TRIGGER] string. If found,
+  # the [REGEX] is used to replace sensitive information with the
+  # [REDACTION_MASK].  If specified with `log_redaction_string`, the
+  # `log_redaction_string` rules will be executed after the
+  # `log_redaction_file` rules.
+  #
+  # For example, here is a file that would redact passwords and social security numbers:
+
+  # {
+  #   "version": 1,
+  #   "rules": [
+  #     {
+  #       "description": "Redact passwords",
+  #       "trigger": "password",
+  #       "search": "password=\".*\"",
+  #       "replace": "password=\"???\""
+  #     },
+  #     {
+  #       "description": "Redact social security numbers",
+  #       "trigger": "",
+  #       "search": "\d{3}-\d{2}-\d{4}",
+  #       "replace": "XXX-XX-XXXX"
+  #     }
+  #   ]
+  # }
+  ## log_redaction_file=
+
+  # Comma separated list of strings representing the host/domain names that the Hue server can serve.
+  # e.g.: localhost,domain1,*
+  ## allowed_hosts=*
 
   # Administrators
   # ----------------
@@ -84,8 +217,17 @@
   # -------------------
   [[custom]]
 
-  # Top banner HTML code
-  ## banner_top_html=
+    # Top banner HTML code
+    # e.g. <H4>Test Lab A2 Hue Services</H4>
+    ## banner_top_html=
+
+    # Login splash HTML code
+    # e.g. WARNING: You are required to have authorization before you proceed
+    ## login_splash_html=
+
+    # Cache timeout in milliseconds for the assist, autocomplete, etc.
+    # defaults to 86400000 (1 day), set to 0 to disable caching
+    ## cacheable_ttl=86400000
 
   # Configuration options for user authentication into the web application
   # ------------------------------------------------------------------------
@@ -98,39 +240,149 @@
     #     (Default. Relies on Django and user manager, after the first login)
     # - desktop.auth.backend.LdapBackend
     # - desktop.auth.backend.PamBackend
+    # - desktop.auth.backend.SpnegoDjangoBackend
+    # - desktop.auth.backend.RemoteUserDjangoBackend
+    # - libsaml.backend.SAML2Backend
+    # - libopenid.backend.OpenIDBackend
+    # - liboauth.backend.OAuthBackend
+    #     (New oauth, support Twitter, Facebook, Google+ and Linkedin
+    # Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.
+    # However, in order to enable OAuthBackend, it must be the ONLY backend configured.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
+    # Class which defines extra accessor methods for User objects.
+    ## user_aug=desktop.auth.backend.DefaultUserAugmentor
+
+    # The service to use when querying PAM.
     ## pam_service=login
+
+    # When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets
+    # the normalized name of the header that contains the remote user.
+    # The HTTP header in the request is converted to a key by converting
+    # all characters to uppercase, replacing any hyphens with underscores
+    # and adding an HTTP_ prefix to the name. So, for example, if the header
+    # is called Remote-User that would be configured as HTTP_REMOTE_USER
+    #
+    # Defaults to HTTP_REMOTE_USER
+    ## remote_user_header=HTTP_REMOTE_USER
+
+    # Ignore the case of usernames when searching for existing users.
+    # Supported in remoteUserDjangoBackend and SpnegoDjangoBackend
+    ## ignore_username_case=true
+
+    # Forcibly cast usernames to lowercase, takes precedence over force_username_uppercase
+    # Supported in remoteUserDjangoBackend and SpnegoDjangoBackend
+    ## force_username_lowercase=true
+
+    # Forcibly cast usernames to uppercase, cannot be combined with force_username_lowercase
+    ## force_username_uppercase=false
+
+    # Users will expire after they have not logged in for 'n' amount of seconds.
+    # A negative number means that users will never expire.
+    ## expires_after=-1
+
+    # Apply 'expires_after' to superusers.
+    ## expire_superusers=true
+
+    # Users will automatically be logged out after 'n' seconds of inactivity.
+    # A negative number means that idle sessions will not be timed out.
+    idle_session_timeout=-1
+
+    # Force users to change password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend
+    ## change_default_password=false
+
+    # Number of login attempts allowed before a record is created for failed logins
+    ## login_failure_limit=3
+
+    # After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?
+    ## login_lock_out_at_failure=false
+
+    # If set, defines period of inactivity in seconds after which failed logins will be forgotten
+    ## login_cooloff_time=60
+
+    # If True, lock out based on IP and browser user agent
+    ## login_lock_out_by_combination_browser_user_agent_and_ip=false
+
+    # If True, lock out based on IP and user
+    ## login_lock_out_by_combination_user_and_ip=false
 
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
   [[ldap]]
 
-  # The search base for finding users and groups
-  ## base_dn="DC=mycompany,DC=com"
+    # The search base for finding users and groups
+    ## base_dn="DC=mycompany,DC=com"
 
-  # The NT domain to connect to (only for use with Active Directory)
-  ## nt_domain=mycompany.com
+    # URL of the LDAP server
+    ## ldap_url=ldap://auth.mycompany.com
 
-  # URL of the LDAP server
-  ## ldap_url=ldap://auth.mycompany.com
+    # The NT domain used for LDAP authentication
+    ## nt_domain=mycompany.com
 
-  # Path to certificate for authentication over TLS
-  ## ldap_cert=
+    # A PEM-format file containing certificates for the CA's that
+    # Hue will trust for authentication over TLS.
+    # The certificate for the CA that signed the
+    # LDAP server certificate must be included among these certificates.
+    # See more here http://www.openldap.org/doc/admin24/tls.html.
+    ## ldap_cert=
+    ## use_start_tls=true
 
-  # Distinguished name of the user to bind as -- not necessary if the LDAP server
-  # supports anonymous searches
-  ## bind_dn="CN=ServiceAccount,DC=mycompany,DC=com"
+    # Distinguished name of the user to bind as -- not necessary if the LDAP server
+    # supports anonymous searches
+    ## bind_dn="CN=ServiceAccount,DC=mycompany,DC=com"
 
-  # Password of the bind user -- not necessary if the LDAP server supports
-  # anonymous searches
-  ## bind_password=
+    # Password of the bind user -- not necessary if the LDAP server supports
+    # anonymous searches
+    ## bind_password=
 
-  # Pattern for searching for usernames -- Use <username> for the parameter
-  # For use when using LdapBackend for Hue authentication
-  ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
+    # Execute this script to produce the bind user password. This will be used
+    # when `bind_password` is not set.
+    ## bind_password_script=
 
-      [[[users]]]
+    # Pattern for searching for usernames -- Use <username> for the parameter
+    # For use when using LdapBackend for Hue authentication
+    ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
+
+    # Create users in Hue when they try to login with their LDAP credentials
+    # For use when using LdapBackend for Hue authentication
+    ## create_users_on_login = true
+
+    # Synchronize a users groups when they login
+    ## sync_groups_on_login=false
+
+    # Ignore the case of usernames when searching for existing users in Hue.
+    ## ignore_username_case=true
+
+    # Force usernames to lowercase when creating new users from LDAP.
+    # Takes precedence over force_username_uppercase
+    ## force_username_lowercase=true
+
+    # Force usernames to uppercase, cannot be combined with force_username_lowercase
+    ## force_username_uppercase=false
+
+    # Use search bind authentication.
+    ## search_bind_authentication=true
+
+    # Choose which kind of subgrouping to use: nested or suboordinate (deprecated).
+    ## subgroups=suboordinate
+
+    # Define the number of levels to search for nested members.
+    ## nested_members_search_depth=10
+
+    # Whether or not to follow referrals
+    ## follow_referrals=false
+
+    # Enable python-ldap debugging.
+    ## debug=false
+
+    # Sets the debug level within the underlying LDAP C lib.
+    ## debug_level=255
+
+    # Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,
+    # 2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.
+    ## trace_level=0
+
+    [[[users]]]
 
       # Base filter for searching for users
       ## user_filter="objectclass=*"
@@ -138,29 +390,122 @@
       # The username attribute in the LDAP schema
       ## user_name_attr=sAMAccountName
 
-      [[[groups]]]
+    [[[groups]]]
 
       # Base filter for searching for groups
       ## group_filter="objectclass=*"
 
-      # The username attribute in the LDAP schema
+      # The group name attribute in the LDAP schema
       ## group_name_attr=cn
 
-  # Configuration options for specifying the Desktop Database.  For more info,
-  # see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine
+      # The attribute of the group object which identifies the members of the group
+      ## group_member_attr=members
+
+    [[[ldap_servers]]]
+
+      ## [[[[mycompany]]]]
+
+        # The search base for finding users and groups
+        ## base_dn="DC=mycompany,DC=com"
+
+        # URL of the LDAP server
+        ## ldap_url=ldap://auth.mycompany.com
+
+        # The NT domain used for LDAP authentication
+        ## nt_domain=mycompany.com
+
+        # A PEM-format file containing certificates for the CA's that
+        # Hue will trust for authentication over TLS.
+        # The certificate for the CA that signed the
+        # LDAP server certificate must be included among these certificates.
+        # See more here http://www.openldap.org/doc/admin24/tls.html.
+        ## ldap_cert=
+        ## use_start_tls=true
+
+        # Distinguished name of the user to bind as -- not necessary if the LDAP server
+        # supports anonymous searches
+        ## bind_dn="CN=ServiceAccount,DC=mycompany,DC=com"
+
+        # Password of the bind user -- not necessary if the LDAP server supports
+        # anonymous searches
+        ## bind_password=
+
+        # Execute this script to produce the bind user password. This will be used
+        # when `bind_password` is not set.
+        ## bind_password_script=
+
+        # Pattern for searching for usernames -- Use <username> for the parameter
+        # For use when using LdapBackend for Hue authentication
+        ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
+
+        ## Use search bind authentication.
+        ## search_bind_authentication=true
+
+        # Whether or not to follow referrals
+        ## follow_referrals=false
+
+        # Enable python-ldap debugging.
+        ## debug=false
+
+        # Sets the debug level within the underlying LDAP C lib.
+        ## debug_level=255
+
+        # Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,
+        # 2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.
+        ## trace_level=0
+
+        ## [[[[[users]]]]]
+
+          # Base filter for searching for users
+          ## user_filter="objectclass=Person"
+
+          # The username attribute in the LDAP schema
+          ## user_name_attr=sAMAccountName
+
+        ## [[[[[groups]]]]]
+
+          # Base filter for searching for groups
+          ## group_filter="objectclass=groupOfNames"
+
+          # The username attribute in the LDAP schema
+          ## group_name_attr=cn
+
+  # Configuration options for specifying the Desktop Database. For more info,
+  # see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine
   # ------------------------------------------------------------------------
   [[database]]
     # Database engine is typically one of:
-    # postgresql, mysql, sqlite3, or oracle
+    # postgresql_psycopg2, mysql, sqlite3 or oracle.
     #
-    # Note that for sqlite3, 'name', below is a filename;
-    # for other backends, it is the database name.
+    # Note that for sqlite3, 'name', below is a path to the filename. For other backends, it is the database name.
+    # Note for Oracle, options={"threaded":true} must be set in order to avoid crashes.
+    # Note for Oracle, you can use the Oracle Service Name by setting "port=0" and then "name=<host>:<port>/<service_name>".
+    # Note for MariaDB use the 'mysql' engine.
     ## engine=sqlite3
     ## host=
     ## port=
     ## user=
     ## password=
-    ## name=
+    ## name=desktop/desktop.db
+    ## options={}
+
+  # Configuration options for specifying the Desktop session.
+  # For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/
+  # ------------------------------------------------------------------------
+  [[session]]
+    # The cookie containing the users' session ID will expire after this amount of time in seconds.
+    # Default is 2 weeks.
+    ## ttl=1209600
+
+    # The cookie containing the users' session ID will be secure.
+    # Should only be enabled with HTTPS.
+    ## secure=false
+
+    # The cookie containing the users' session ID will use the HTTP only flag.
+    ## http_only=true
+
+    # Use session-length cookies. Logs out the user when she closes the browser window.
+    ## expire_at_browser_close=false
 
 
   # Configuration options for connecting to an external SMTP server
@@ -192,6 +537,142 @@
     ## kinit_path=/path/to/kinit
 
 
+  # Configuration options for using OAuthBackend (Core) login
+  # ------------------------------------------------------------------------
+  [[oauth]]
+    # The Consumer key of the application
+    ## consumer_key=XXXXXXXXXXXXXXXXXXXXX
+
+    # The Consumer secret of the application
+    ## consumer_secret=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    # The Request token URL
+    ## request_token_url=https://api.twitter.com/oauth/request_token
+
+    # The Access token URL
+    ## access_token_url=https://api.twitter.com/oauth/access_token
+
+    # The Authorize URL
+    ## authenticate_url=https://api.twitter.com/oauth/authorize
+
+  # Configuration options for Metrics
+  # ------------------------------------------------------------------------
+  [[metrics]]
+
+   # Enable the metrics URL "/desktop/metrics"
+   ## enable_web_metrics=True
+
+   # If specified, Hue will write metrics to this file.
+   ## location=/var/log/hue/metrics.json
+
+   # Time in milliseconds on how frequently to collect metrics
+   ## collection_interval=30000
+
+
+###########################################################################
+# Settings to configure the snippets available in the Notebook
+###########################################################################
+
+[notebook]
+
+  ## Show the notebook menu or not
+  # show_notebooks=true
+
+  ## Base URL to Remote GitHub Server
+  # github_remote_url=https://github.com
+
+  ## Base URL to GitHub API
+  # github_api_url=https://api.github.com
+
+  ## Client ID for Authorized GitHub Application
+  # github_client_id=
+
+  ## Client Secret for Authorized GitHub Application
+  # github_client_secret=
+
+  # One entry for each type of snippet. The first 5 will appear in the wheel.
+  [[interpreters]]
+    # Define the name and how to connect and execute the language.
+
+    [[[hive]]]
+      # The name of the snippet.
+      name=Hive
+      # The backend connection to use to communicate with the server.
+      interface=hiveserver2
+
+    [[[impala]]]
+      name=Impala
+      interface=hiveserver2
+
+    # [[[sparksql]]]
+    #   name=SparkSql
+    #   interface=hiveserver2
+
+    [[[spark]]]
+      name=Scala
+      interface=livy
+
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
+
+    [[[r]]]
+      name=R
+      interface=livy
+
+    [[[jar]]]
+      name=Spark Submit Jar
+      interface=livy-batch
+
+    [[[py]]]
+      name=Spark Submit Python
+      interface=livy-batch
+
+    [[[pig]]]
+      name=Pig
+      interface=pig
+
+    [[[text]]]
+      name=Text
+      interface=text
+
+    [[[markdown]]]
+      name=Markdown
+      interface=text
+
+    [[[mysql]]]
+      name = MySQL
+      interface=rdbms
+
+    [[[sqlite]]]
+      name = SQLite
+      interface=rdbms
+
+    [[[postgresql]]]
+      name = PostgreSQL
+      interface=rdbms
+
+    [[[oracle]]]
+      name = Oracle
+      interface=rdbms
+
+    [[[solr]]]
+      name = Solr SQL
+      interface=solr
+      ## Name of the collection handler
+      # options='{"collection": "default"}'
+
+    # [[[mysql]]]
+    #   name=MySql JDBC
+    #   interface=jdbc
+    #   ## Specific options for connecting to the server.
+    #   ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    #   options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
+
+  ## Main flag to override the automatic starting of the DBProxy server.
+  # enable_dbproxy_server=true
+
 ###########################################################################
 # Settings to configure your Hadoop cluster.
 ###########################################################################
@@ -201,98 +682,246 @@
   # Configuration for HDFS NameNode
   # ------------------------------------------------------------------------
   [[hdfs_clusters]]
+    # HA support by using HttpFs
 
     [[[default]]]
       # Enter the filesystem uri
       fs_defaultfs=hdfs://localhost:8020
 
-      # Use WebHdfs/HttpFs as the communication mechanism. To fallback to
-      # using the Thrift plugin (used in Hue 1.x), this must be uncommented
-      # and explicitly set to the empty value.
-      ## webhdfs_url=
+      # NameNode logical name.
+      ## logical_name=
 
+      # Use WebHdfs/HttpFs as the communication mechanism.
+      # Domain should be the NameNode or HttpFs host.
+      # Default port is 14000 for HttpFs.
+      ## webhdfs_url=http://localhost:50070/webhdfs/v1
+
+      # Change this if your HDFS cluster is Kerberos-secured
       ## security_enabled=false
 
-      # Settings about this HDFS cluster. If you install HDFS in a
-      # different location, you need to set the following.
+      # In secure mode (HTTPS), if SSL certificates from YARN Rest APIs
+      # have to be verified against certificate authority
+      ## ssl_cert_ca_verify=True
 
-      # Defaults to $HADOOP_HDFS_HOME or /usr/lib/hadoop-hdfs
-      ## hadoop_hdfs_home=/usr/lib/hadoop-hdfs
+      # Directory of the Hadoop configuration
+      ## hadoop_conf_dir=$HADOOP_CONF_DIR when set or '/etc/hadoop/conf'
 
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
-
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
-
-  # Configuration for MapReduce JobTracker
-  # ------------------------------------------------------------------------
-  [[mapred_clusters]]
-
-    [[[default]]]
-      # Enter the host on which you are running the Hadoop JobTracker
-      jobtracker_host=localhost
-      # The port where the JobTracker IPC listens on
-      jobtracker_port=8021
-      # Thrift plug-in port for the JobTracker
-      ## thrift_port=9290
-      # Whether to submit jobs to this cluster
-      ## submit_to=False
-
-      ## security_enabled=false
-
-      # Settings about this MR1 cluster. If you install MR1 in a
-      # different location, you need to set the following.
-
-      # Defaults to $HADOOP_MR1_HOME or /usr/lib/hadoop-0.20-mapreduce
-      ## hadoop_mapred_home=/usr/lib/hadoop-0.20-mapreduce
-
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
-
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
-
-  # Configuration for Yarn
+  # Configuration for YARN (MR2)
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
 
     [[[default]]]
       # Enter the host on which you are running the ResourceManager
-      resourcemanager_host=localhost
-      # The port where the ResourceManager IPC listens on
-      resourcemanager_port=8032
-      # Whether to submit jobs to this cluster
-      ## submit_to=False
+      ## resourcemanager_host=localhost
 
+      # The port where the ResourceManager IPC listens on
+      ## resourcemanager_port=8032
+
+      # Whether to submit jobs to this cluster
+      submit_to=True
+
+      # Resource Manager logical name (required for HA)
+      ## logical_name=
+
+      # Change this if your YARN cluster is Kerberos-secured
       ## security_enabled=false
 
-      # Settings about this MR2 cluster. If you install MR2 in a
-      # different location, you need to set the following.
+      # URL of the ResourceManager API
+      ## resourcemanager_api_url=http://localhost:8088
 
-      # Defaults to $HADOOP_MR2_HOME or /usr/lib/hadoop-mapreduce
-      ## hadoop_mapred_home=/usr/lib/hadoop-mapreduce
+      # URL of the ProxyServer API
+      ## proxy_api_url=http://localhost:8088
 
-      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
-      ## hadoop_bin=/usr/bin/hadoop
+      # URL of the HistoryServer API
+      ## history_server_api_url=http://localhost:19888
 
-      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
-      ## hadoop_conf_dir=/etc/hadoop/conf
+      # URL of the Spark History Server
+      ## spark_history_server_url=http://localhost:18088
+
+      # In secure mode (HTTPS), if SSL certificates from YARN Rest APIs
+      # have to be verified against certificate authority
+      ## ssl_cert_ca_verify=True
+
+    # HA support by specifying multiple clusters.
+    # Redefine different properties there.
+    # e.g.
+
+    # [[[ha]]]
+      # Resource Manager logical name (required for HA)
+      ## logical_name=my-rm-name
+
+      # Un-comment to enable
+      ## submit_to=True
+
+      # URL of the ResourceManager API
+      ## resourcemanager_api_url=http://localhost:8088
+
+      # ...
+
+  # Configuration for MapReduce (MR1)
+  # ------------------------------------------------------------------------
+  [[mapred_clusters]]
+
+    [[[default]]]
+      # Enter the host on which you are running the Hadoop JobTracker
+      ## jobtracker_host=localhost
+
+      # The port where the JobTracker IPC listens on
+      ## jobtracker_port=8021
+
+      # JobTracker logical name for HA
+      ## logical_name=
+
+      # Thrift plug-in port for the JobTracker
+      ## thrift_port=9290
+
+      # Whether to submit jobs to this cluster
+      submit_to=False
+
+      # Change this if your MapReduce cluster is Kerberos-secured
+      ## security_enabled=false
+
+    # HA support by specifying multiple clusters
+    # e.g.
+
+    # [[[ha]]]
+      # Enter the logical name of the JobTrackers
+      ## logical_name=my-jt-name
 
 
 ###########################################################################
-# Settings to configure liboozie
+# Settings to configure Beeswax with Hive
 ###########################################################################
 
-[liboozie]
-  # The URL where the Oozie service runs on. This is required in order for
-  # users to submit jobs.
-  ## oozie_url=http://localhost:11000/oozie
+[beeswax]
 
-  ## security_enabled=false
+  # Host where HiveServer2 is running.
+  # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
+  ## hive_server_host=localhost
 
-  # Location on HDFS where the workflows/coordinator are deployed when submitted.
-  ## remote_deployement_dir=/user/hue/oozie/deployments
+  # Port where HiveServer2 Thrift server runs on.
+  ## hive_server_port=10000
+
+  # Hive configuration directory, where hive-site.xml is located
+  ## hive_conf_dir=/etc/hive/conf
+
+  # Timeout in seconds for thrift calls to Hive service
+  ## server_conn_timeout=120
+
+  # Choose whether to use the old GetLog() thrift call from before Hive 0.14 to retrieve the logs.
+  # If false, use the FetchResults() thrift call from Hive 1.0 or more instead.
+  ## use_get_log_api=false
+
+  # Limit the number of partitions that can be listed.
+  ## list_partitions_limit=10000
+
+  # The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.
+  ## query_partitions_limit=10
+
+  # A limit to the number of cells (rows * columns) that can be downloaded from a query
+  # (e.g. - 10K rows * 1K columns = 10M cells.)
+  # A value of -1 means there will be no limit.
+  ## download_cell_limit=10000000
+
+  # Hue will try to close the Hive query when the user leaves the editor page.
+  # This will free all the query resources in HiveServer2, but also make its results inaccessible.
+  ## close_queries=false
+
+  # Thrift version to use when communicating with HiveServer2.
+  # New column format is from version 7.
+  ## thrift_version=7
+
+  # A comma-separated list of white-listed Hive configuration properties that users are authorized to set.
+  # config_whitelist=hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename
+
+  # Override the default desktop username and password of the hue user used for authentications with other services.
+  # e.g. Used for LDAP/PAM pass-through authentication.
+  ## auth_username=hue
+  ## auth_password=
+
+  [[ssl]]
+    # Path to Certificate Authority certificates.
+    ## cacerts=/etc/hue/cacerts.pem
+
+    # Choose whether Hue should validate certificates received from the server.
+    ## validate=true
+
+
+###########################################################################
+# Settings to configure Impala
+###########################################################################
+
+[impala]
+  # Host of the Impala Server (one of the Impalad)
+  ## server_host=localhost
+
+  # Port of the Impala Server
+  ## server_port=21050
+
+  # Kerberos principal
+  ## impala_principal=impala/hostname.foo.com
+
+  # Turn on/off impersonation mechanism when talking to Impala
+  ## impersonation_enabled=False
+
+  # Number of initial rows of a result set to ask Impala to cache in order
+  # to support re-fetching them for downloading them.
+  # Set to 0 for disabling the option and backward compatibility.
+  ## querycache_rows=50000
+
+  # Timeout in seconds for thrift calls
+  ## server_conn_timeout=120
+
+  # Hue will try to close the Impala query when the user leaves the editor page.
+  # This will free all the query resources in Impala, but also make its results inaccessible.
+  ## close_queries=true
+
+  # If > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work
+  # (compute or send back results) for that query within QUERY_TIMEOUT_S seconds.
+  ## query_timeout_s=600
+
+  # If > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work
+  # (compute or send back results) for that session within QUERY_TIMEOUT_S seconds (default 12hours).
+  ## session_timeout_s=43200
+
+  # Override the desktop default username and password of the hue user used for authentications with other services.
+  # e.g. Used for LDAP/PAM pass-through authentication.
+  ## auth_username=hue
+  ## auth_password=
+
+  [[ssl]]
+    # SSL communication enabled for this server.
+    ## enabled=false
+
+    # Path to Certificate Authority certificates.
+    ## cacerts=/etc/hue/cacerts.pem
+
+    # Choose whether Hue should validate certificates received from the server.
+    ## validate=true
+
+
+###########################################################################
+# Settings to configure the Spark application.
+###########################################################################
+
+[spark]
+  # Host address of the Livy Server.
+  ## livy_server_host=localhost
+
+  # Port of the Livy Server.
+  ## livy_server_port=8998
+
+  # Configure livy to start in local 'process' mode, or 'yarn' workers.
+  ## livy_server_session_kind=process
+
+  # If livy should use proxy users when submitting a job.
+  ## livy_impersonation_enabled=true
+
+  # Host of the Sql Server
+  ## sql_server_host=localhost
+
+  # Port of the Sql Server
+  ## sql_server_port=10000
 
 
 ###########################################################################
@@ -309,78 +938,135 @@
   # Location on HDFS where the oozie examples and workflows are stored.
   ## remote_data_dir=/user/hue/oozie/workspaces
 
-  # Share workflows and coordinators information with all users. If set to false,
-  # they will be visible only to the owner and administrators.
-  ## share_jobs=True
-
   # Maximum of Oozie workflows or coodinators to retrieve in one API call.
-  ## oozie_jobs_count=100
+  ## oozie_jobs_count=50
+
+  # Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.
+  ## enable_cron_scheduling=true
 
 
 ###########################################################################
-# Settings to configure Beeswax
+# Settings to configure the Filebrowser app
 ###########################################################################
 
-[beeswax]
+[filebrowser]
+  # Location on local filesystem where the uploaded archives are temporary stored.
+  ## archive_upload_tempdir=/tmp
 
-  # Deprecated! Will be removed in Hue 3
-  # Multiple sections are now available in query_servers
-  # Host where Beeswax internal metastore Thrift daemon is running
-  ## beeswax_meta_server_host=localhost
+  # Show Download Button for HDFS file browser.
+  ## show_download_button=false
 
-  # Deprecated! Will be removed in Hue 3
-  # Multiple sections are now available in query_servers  
-  # Configure the port the internal metastore daemon runs on. Used only if
-  # hive.metastore.local is true. 
-  ## beeswax_meta_server_port=8003
+  # Show Upload Button for HDFS file browser.
+  ## show_upload_button=false
 
-  # Host where Beeswax internal metastore Thrift daemon is running
-  ## beeswax_meta_server_host=localhost
-  
-  # Configure the port the internal metastore daemon runs on. Used only if
-  # hive.metastore.local is true. 
-  ## beeswax_meta_server_port=8003
 
-  # Hive home directory
-  ## hive_home_dir=/usr/lib/hive
+###########################################################################
+# Settings to configure Pig
+###########################################################################
 
-  # Hive configuration directory, where hive-site.xml is located
-  ## hive_conf_dir=/etc/hive/conf
+[pig]
+  # Location of piggybank.jar on local filesystem.
+  ## local_sample_dir=/usr/share/hue/apps/pig/examples
 
-  # Timeout in seconds for thrift calls to beeswax service
-  ## beeswax_server_conn_timeout=120
+  # Location piggybank.jar will be copied to in HDFS.
+  ## remote_data_dir=/user/hue/pig/examples
 
-  # Timeout in seconds for thrift calls to the hive metastore
-  ## metastore_conn_timeout=10
 
-  # Maximum Java heapsize (in megabytes) used by Beeswax Server.
-  # Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh
-  # may override this setting.
-  ## beeswax_server_heapsize=1000
+###########################################################################
+# Settings to configure Sqoop2
+###########################################################################
 
-  # Share saved queries with all users. If set to false, saved queries are
-  # visible only to the owner and administrators.
-  ## share_saved_queries=true
+[sqoop]
+  # For autocompletion, fill out the librdbms section.
 
- # One entry for each Query Server that can execute some SQL queries.
- # This must be in the bottom of the [beewax] section.
- [[query_servers]]
+  # Sqoop server URL
+  ## server_url=http://localhost:12000/sqoop
 
-   [[[default]]]
-   # Host where the Query Server Thrift daemon is running
-   ## server_host=localhost
-   # Configure the port the Query Server Thrift server 
-   ## server_port=8002
-   # If DDL queries are supported (e.g. DROP can be sent directly to this server)
-   ## support_ddl=True
+  # Path to configuration directory
+  ## sqoop_conf_dir=/etc/sqoop2/conf
+
+
+###########################################################################
+# Settings to configure Proxy
+###########################################################################
+
+[proxy]
+  # Comma-separated list of regular expressions,
+  # which match 'host:port' of requested proxy target.
+  ## whitelist=(localhost|127\.0\.0\.1):(50030|50070|50060|50075)
+
+  # Comma-separated list of regular expressions,
+  # which match any prefix of 'host:port/path' of requested proxy target.
+  # This does not support matching GET parameters.
+  ## blacklist=
+
+
+###########################################################################
+# Settings to configure HBase Browser
+###########################################################################
+
+[hbase]
+  # Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.
+  # Use full hostname with security.
+  # If using Kerberos we assume GSSAPI SASL, not PLAIN.
+  ## hbase_clusters=(Cluster|localhost:9090)
+
+  # HBase configuration directory, where hbase-site.xml is located.
+  ## hbase_conf_dir=/etc/hbase/conf
+
+  # Hard limit of rows or columns per row fetched before truncating.
+  ## truncate_limit = 500
+
+  # 'buffered' is the default of the HBase Thrift Server and supports security.
+  # 'framed' can be used to chunk up responses,
+  # which is useful when used in conjunction with the nonblocking server in Thrift.
+  ## thrift_transport=buffered
+
+
+###########################################################################
+# Settings to configure Solr Search
+###########################################################################
+
+[search]
+
+  # URL of the Solr Server
+  ## solr_url=http://localhost:8983/solr/
+
+  # Requires FQDN in solr_url if enabled
+  ## security_enabled=false
+
+  ## Query sent when no term is entered
+  ## empty_query=*:*
+
+  # Use latest Solr 5.2+ features.
+  ## latest=false
+
+
+###########################################################################
+# Settings to configure Solr API lib
+###########################################################################
+
+[libsolr]
+
+  # Choose whether Hue should validate certificates received from the server.
+  ## ssl_cert_ca_verify=true
+
+
+###########################################################################
+# Settings to configure Solr Indexer
+###########################################################################
+
+[indexer]
+
+  # Location of the solrctl binary.
+  ## solrctl_path=/usr/bin/solrctl
+
 
 ###########################################################################
 # Settings to configure Job Designer
 ###########################################################################
 
 [jobsub]
-  # Location on HDFS where the jobsub examples and templates are stored.
-  ## remote_data_dir=/user/hue/jobsub
 
   # Location on local FS where examples and template are stored.
   ## local_data_dir=..../data
@@ -390,7 +1076,7 @@
 
 
 ###########################################################################
-# Settings to configure Job Browser
+# Settings to configure Job Browser.
 ###########################################################################
 
 [jobbrowser]
@@ -398,69 +1084,44 @@
   # submitted jobs are visible only to the owner and administrators.
   ## share_jobs=true
 
+  # Whether to disalbe the job kill button for all users in the jobbrowser
+  ## disable_killing_jobs=false
+
 
 ###########################################################################
-# Settings to configure the Shell application
+# Settings to configure Sentry / Security App.
 ###########################################################################
 
-[shell]
-  # The shell_buffer_amount specifies the number of bytes of output per shell
-  # that the Shell app will keep in memory. If not specified, it defaults to
-  # 524288 (512 MiB).
-  ## shell_buffer_amount=100
+[security]
 
-  # If you run Hue against a Hadoop cluster with Kerberos security enabled, the
-  # Shell app needs to acquire delegation tokens for the subprocesses to work
-  # correctly. These delegation tokens are stored as temporary files in some
-  # directory. You can configure this directory here. If not specified, it
-  # defaults to /tmp/hue_delegation_tokens.
-  ## shell_delegation_token_dir=/tmp/hue_delegation_tokens
+  # Use Sentry API V1 for Hive.
+  ## hive_v1=true
 
-  [[ shelltypes ]]
+  # Use Sentry API V2 for Hive.
+  ## hive_v2=false
 
-    # Define and configure a new shell type "flume"
-    # ------------------------------------------------------------------------
-    [[[ flume ]]]
-      nice_name = "Flume Shell"
-      command = "/usr/bin/flume shell"
-      help = "The command-line Flume client interface."
+  # Use Sentry API V2 for Solr.
+  ## solr_v2=false
 
-      [[[[ environment ]]]]
-        # You can specify environment variables for the Flume shell
-        # in this section.
 
-    # Define and configure a new shell type "pig"
-    # ------------------------------------------------------------------------
-    [[[ pig ]]]
-      nice_name = "Pig Shell (Grunt)"
-      command = "/usr/bin/pig -l /dev/null"
-      help = "The command-line interpreter for Pig"
+###########################################################################
+# Settings to configure the Zookeeper application.
+###########################################################################
 
-      [[[[ environment ]]]]
-        # You can specify environment variables for the Pig shell
-        # in this section. Note that JAVA_HOME must be configured
-        # for the Pig shell to run.
+[zookeeper]
 
-        [[[[[ JAVA_HOME ]]]]]
-          value = "/usr/lib/jvm/java-6-sun"
+  [[clusters]]
 
-    # Define and configure a new shell type "hbase"
-    # ------------------------------------------------------------------------
-    [[[ hbase ]]]
-      nice_name = "HBase Shell"
-      command = "/usr/bin/hbase shell"
-      help = "The command-line HBase client interface."
+    [[[default]]]
+      # Zookeeper ensemble. Comma separated list of Host/Port.
+      # e.g. localhost:2181,localhost:2182,localhost:2183
+      ## host_ports=localhost:2181
 
-      [[[[ environment ]]]]
-        # You can configure environment variables for the HBase shell
-        # in this section.
+      # The URL of the REST contrib service (required for znode browsing).
+      ## rest_url=http://localhost:9998
 
-    # Define and configure a new shell type "bash" for testing only
-    # ------------------------------------------------------------------------
-    [[[ bash ]]]
-      nice_name = "Bash (Test only!!!)"
-      command = "/bin/bash"
-      help = "A shell that does not depend on Hadoop components"
+      # Name of Kerberos principal when using security.
+      ## principal_name=zookeeper
 
 
 ###########################################################################
@@ -468,5 +1129,318 @@
 ###########################################################################
 
 [useradmin]
+  # Default home directory permissions
+  ## home_dir_permissions=0755
+
   # The name of the default user group that users will be a member of
   ## default_user_group=default
+
+  [[password_policy]]
+    # Set password policy to all users. The default policy requires password to be at least 8 characters long,
+    # and contain both uppercase and lowercase letters, numbers, and special characters.
+
+    ## is_enabled=false
+    ## pwd_regex="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"
+    ## pwd_hint="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
+    ## pwd_error_message="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
+
+
+###########################################################################
+# Settings to configure liboozie
+###########################################################################
+
+[liboozie]
+  # The URL where the Oozie service runs on. This is required in order for
+  # users to submit jobs. Empty value disables the config check.
+  ## oozie_url=http://localhost:11000/oozie
+
+  # Requires FQDN in oozie_url if enabled
+  ## security_enabled=false
+
+  # Location on HDFS where the workflows/coordinator are deployed when submitted.
+  ## remote_deployement_dir=/user/hue/oozie/deployments
+
+
+###########################################################################
+# Settings for the AWS lib
+###########################################################################
+
+[aws]
+  [[aws_accounts]]
+    # Default AWS account
+    [[[default]]]
+      # AWS credentials
+      ## access_key_id=
+      ## secret_access_key=
+
+      # Allow to use either environment variables or
+      # EC2 InstanceProfile to retrieve AWS credentials.
+      ## allow_environment_credentials=yes
+
+      # AWS region to use
+      ## region=us-east-1
+
+
+###########################################################################
+# Settings for the Sentry lib
+###########################################################################
+
+[libsentry]
+  # Hostname or IP of server.
+  ## hostname=localhost
+
+  # Port the sentry service is running on.
+  ## port=8038
+
+  # Sentry configuration directory, where sentry-site.xml is located.
+  ## sentry_conf_dir=/etc/sentry/conf
+
+
+###########################################################################
+# Settings to configure the ZooKeeper Lib
+###########################################################################
+
+[libzookeeper]
+  # ZooKeeper ensemble. Comma separated list of Host/Port.
+  # e.g. localhost:2181,localhost:2182,localhost:2183
+  ## ensemble=localhost:2181
+
+  # Name of Kerberos principal when using security.
+  ## principal_name=zookeeper
+
+
+###########################################################################
+# Settings for the RDBMS application
+###########################################################################
+
+[librdbms]
+  # The RDBMS app can have any number of databases configured in the databases
+  # section. A database is known by its section name
+  # (IE sqlite, mysql, psql, and oracle in the list below).
+
+  [[databases]]
+    # sqlite configuration.
+    ## [[[sqlite]]]
+      # Name to show in the UI.
+      ## nice_name=SQLite
+
+      # For SQLite, name defines the path to the database.
+      ## name=/tmp/sqlite.db
+
+      # Database backend to use.
+      ## engine=sqlite
+
+      # Database options to send to the server when connecting.
+      # https://docs.djangoproject.com/en/1.4/ref/databases/
+      ## options={}
+
+    # mysql, oracle, or postgresql configuration.
+    ## [[[mysql]]]
+      # Name to show in the UI.
+      ## nice_name="My SQL DB"
+
+      # For MySQL and PostgreSQL, name is the name of the database.
+      # For Oracle, Name is instance of the Oracle server. For express edition
+      # this is 'xe' by default.
+      ## name=mysqldb
+
+      # Database backend to use. This can be:
+      # 1. mysql
+      # 2. postgresql
+      # 3. oracle
+      ## engine=mysql
+
+      # IP or hostname of the database to connect to.
+      ## host=localhost
+
+      # Port the database server is listening to. Defaults are:
+      # 1. MySQL: 3306
+      # 2. PostgreSQL: 5432
+      # 3. Oracle Express Edition: 1521
+      ## port=3306
+
+      # Username to authenticate with when connecting to the database.
+      ## user=example
+
+      # Password matching the username to authenticate with when
+      # connecting to the database.
+      ## password=example
+
+      # Database options to send to the server when connecting.
+      # https://docs.djangoproject.com/en/1.4/ref/databases/
+      ## options={}
+
+
+###########################################################################
+# Settings to configure SAML
+###########################################################################
+
+[libsaml]
+  # Xmlsec1 binary path. This program should be executable by the user running Hue.
+  ## xmlsec_binary=/usr/local/bin/xmlsec1
+
+  # Entity ID for Hue acting as service provider.
+  # Can also accept a pattern where '<base_url>' will be replaced with server URL base.
+  ## entity_id="<base_url>/saml2/metadata/"
+
+  # Create users from SSO on login.
+  ## create_users_on_login=true
+
+  # Required attributes to ask for from IdP.
+  # This requires a comma separated list.
+  ## required_attributes=uid
+
+  # Optional attributes to ask for from IdP.
+  # This requires a comma separated list.
+  ## optional_attributes=
+
+  # IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates.
+  ## metadata_file=
+
+  # Private key to encrypt metadata with.
+  ## key_file=
+
+  # Signed certificate to send along with encrypted metadata.
+  ## cert_file=
+
+  # Path to a file containing the password private key.
+  ## key_file_password=/path/key
+
+  # Execute this script to produce the private key password. This will be used when `key_file_password` is not set.
+  ## key_file_password_script=/path/pwd.sh
+
+  # A mapping from attributes in the response from the IdP to django user attributes.
+  ## user_attribute_mapping={'uid': ('username', )}
+
+  # Have Hue initiated authn requests be signed and provide a certificate.
+  ## authn_requests_signed=false
+
+  # Have Hue initiated logout requests be signed and provide a certificate.
+  ## logout_requests_signed=false
+
+  # Username can be sourced from 'attributes' or 'nameid'.
+  ## username_source=attributes
+
+  # Performs the logout or not.
+  ## logout_enabled=true
+
+
+###########################################################################
+# Settings to configure OpenID
+###########################################################################
+
+[libopenid]
+  # (Required) OpenId SSO endpoint url.
+  ## server_endpoint_url=https://www.google.com/accounts/o8/id
+
+  # OpenId 1.1 identity url prefix to be used instead of SSO endpoint url
+  # This is only supported if you are using an OpenId 1.1 endpoint
+  ## identity_url_prefix=https://app.onelogin.com/openid/your_company.com/
+
+  # Create users from OPENID on login.
+  ## create_users_on_login=true
+
+  # Use email for username
+  ## use_email_for_username=true
+
+
+###########################################################################
+# Settings to configure OAuth
+###########################################################################
+
+[liboauth]
+  # NOTE:
+  # To work, each of the active (i.e. uncommented) service must have
+  # applications created on the social network.
+  # Then the "consumer key" and "consumer secret" must be provided here.
+  #
+  # The addresses where to do so are:
+  # Twitter:  https://dev.twitter.com/apps
+  # Google+ : https://cloud.google.com/
+  # Facebook: https://developers.facebook.com/apps
+  # Linkedin: https://www.linkedin.com/secure/developer
+  #
+  # Additionnaly, the following must be set in the application settings:
+  # Twitter:  Callback URL (aka Redirect URL) must be set to http://YOUR_HUE_IP_OR_DOMAIN_NAME/oauth/social_login/oauth_authenticated
+  # Google+ : CONSENT SCREEN must have email address
+  # Facebook: Sandbox Mode must be DISABLED
+  # Linkedin: "In OAuth User Agreement", r_emailaddress is REQUIRED
+
+  # The Consumer key of the application
+  ## consumer_key_twitter=
+  ## consumer_key_google=
+  ## consumer_key_facebook=
+  ## consumer_key_linkedin=
+
+  # The Consumer secret of the application
+  ## consumer_secret_twitter=
+  ## consumer_secret_google=
+  ## consumer_secret_facebook=
+  ## consumer_secret_linkedin=
+
+  # The Request token URL
+  ## request_token_url_twitter=https://api.twitter.com/oauth/request_token
+  ## request_token_url_google=https://accounts.google.com/o/oauth2/auth
+  ## request_token_url_linkedin=https://www.linkedin.com/uas/oauth2/authorization
+  ## request_token_url_facebook=https://graph.facebook.com/oauth/authorize
+
+  # The Access token URL
+  ## access_token_url_twitter=https://api.twitter.com/oauth/access_token
+  ## access_token_url_google=https://accounts.google.com/o/oauth2/token
+  ## access_token_url_facebook=https://graph.facebook.com/oauth/access_token
+  ## access_token_url_linkedin=https://api.linkedin.com/uas/oauth2/accessToken
+
+  # The Authenticate URL
+  ## authenticate_url_twitter=https://api.twitter.com/oauth/authorize
+  ## authenticate_url_google=https://www.googleapis.com/oauth2/v1/userinfo?access_token=
+  ## authenticate_url_facebook=https://graph.facebook.com/me?access_token=
+  ## authenticate_url_linkedin=https://api.linkedin.com/v1/people/~:(email-address)?format=json&oauth2_access_token=
+
+  # Username Map. Json Hash format.
+  # Replaces username parts in order to simplify usernames obtained
+  # Example: {"@sub1.domain.com":"_S1", "@sub2.domain.com":"_S2"}
+  # converts 'email@sub1.domain.com' to 'email_S1'
+  ## username_map={}
+
+  # Whitelisted domains (only applies to Google OAuth). CSV format.
+  ## whitelisted_domains_google=
+
+
+###########################################################################
+# Settings to configure Metadata
+###########################################################################
+
+[metadata]
+  # For metadata tagging and enhancement features
+
+  [[optimizer]]
+    # For SQL query and table analysis
+    # Base URL to Optimizer API.
+    ## api_url=https://alpha.optimizer.cloudera.com
+    # The name of the product or group which will have API access to the emails associated with it.
+    ## product_name=hue
+    # A secret passphrase associated with the productName
+    ## product_secret=hue
+    # Execute this script to produce the product secret. This will be used when `product_secret` is not set.
+    ## product_secret_script=
+
+    # The email of the Optimizer account you want to associate with the Product.
+    ## email=hue@gethue.com
+    # The password associated with the Optimizer account you to associate with the Product.
+    ## email_password=hue
+    # Execute this script to produce the email password. This will be used when `email_password` is not set.
+    ## password_script=
+
+    # In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority.
+    ## ssl_cert_ca_verify=True
+
+  [[navigator]]
+    # For tagging tables, files and getting lineage of data.
+    # Navigator API URL with version (without version suffix)
+    ## api_url=http://localhost:7187/api
+
+    # Navigator API HTTP authentication username and password
+    # Override the desktop default username and password of the hue user used for authentications with other services.
+    # e.g. Used for LDAP/PAM pass-through authentication.
+    ## auth_username=hue
+    ## auth_password=

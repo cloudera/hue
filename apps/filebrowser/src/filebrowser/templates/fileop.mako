@@ -23,13 +23,14 @@ from django.utils.translation import ugettext as _
 
 
 
-${commonheader(_('File Operation'), 'filebrowser', user)}
+${ commonheader(_('File Operation'), 'filebrowser', user) | n,unicode }
 
 ## Not sure if enctype breaks anything if used for things other than file upload.
 
 <div class="container-fluid">
 <div class="well">
 <form action="" method="POST" enctype="multipart/form-data" class="form-stacked">
+${ csrf_token(request) | n,unicode }
 <h1>${form.op}</h1>
 % if isinstance(form, forms.Form):
 	${form.as_p()|n}
@@ -40,10 +41,10 @@ ${commonheader(_('File Operation'), 'filebrowser', user)}
 	${form.management_form}
 % endif
 <div>
-<input type="submit" value="${('Submit')}" class="btn primary" />
+<input type="submit" value="${('Submit')}" class="btn btn-primary" />
 <a href="${urlencode(next)}" class="btn">${('Cancel')}</a>
 </div>
 </form>
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(request, messages) | n,unicode }

@@ -1,0 +1,12 @@
+.*html
+.*txt
+PKG-INFO
+.*po
+.*pot
+.*jar
+.*cfg
+.*json
+.*csv
+.*/gen-py/.*
+.*xslt
+.*xml

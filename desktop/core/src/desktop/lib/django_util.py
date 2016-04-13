@@ -19,24 +19,29 @@
 
 import logging
 import re
-import simplejson
+import json
 import socket
 import datetime
 
-from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import ungettext, ugettext
-from django.core import urlresolvers, serializers
 from django.conf import settings
-from django.utils.http import urlencode # this version is unicode-friendly
+from django.core import urlresolvers, serializers
+from django.core.context_processors import csrf
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.http import QueryDict, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as django_render_to_response
-from django.template.loader import render_to_string as django_render_to_string
 from django.template import RequestContext
-from django.db import models
+from django.template.loader import render_to_string as django_render_to_string
+from django.utils.http import urlencode # this version is unicode-friendly
+from django.utils.translation import ungettext, ugettext
+from django.utils.tzinfo import LocalTimezone
 
-from desktop.lib import django_mako
 import desktop.conf
 import desktop.lib.thrift_util
+from desktop.lib import django_mako
+from desktop.lib.json_utils import JSONEncoderForHTML
+
+LOG = logging.getLogger(__name__)
 
 # Values for template_lib parameter
 DJANGO = 'django'
@@ -44,9 +49,14 @@ MAKO = 'mako'
 
 # This is what Debian allows. See chkname.c in shadow.
 USERNAME_RE_RULE = "[^-:\s][^:\s]*"
-GROUPNAME_RE_RULE = "[\w-]+"
+GROUPNAME_RE_RULE = ".{,80}"
 
-class Encoder(simplejson.JSONEncoder):
+
+# For backward compatibility for upgrades to Hue 2.2
+class PopupException: pass
+
+
+class Encoder(json.JSONEncoder):
   """
   Automatically encodes JSON for Django models and
   Thrift objects, as well as objects that have
@@ -63,7 +73,7 @@ class Encoder(simplejson.JSONEncoder):
       assert len(x) == 1
       return x[0]
 
-    return simplejson.JSONEncoder.default(self, o)
+    return json.JSONEncoder.default(self, o)
 
 def get_username_re_rule():
   return USERNAME_RE_RULE
@@ -129,10 +139,10 @@ def _get_template_lib(template, kwargs):
   return template_lib
 
 
-def _render_to_response(template, *args, **kwargs):
+def _render_to_response(template, request, *args, **kwargs):
   template_lib = _get_template_lib(template, kwargs)
-
   if template_lib == DJANGO:
+    kwargs.update(csrf(request))
     return django_render_to_response(template, *args, **kwargs)
   elif template_lib == MAKO:
     return django_mako.render_to_response(template, *args, **kwargs)
@@ -188,7 +198,7 @@ def is_jframe_request(request):
   return request.META.get('HTTP_X_HUE_JFRAME') or \
       request.GET.get("format") == "embed"
 
-def render(template, request, data, json=None, template_lib=None, force_template=False, **kwargs):
+def render(template, request, data, json=None, template_lib=None, force_template=False, status=200, **kwargs):
   """
   Render() is the main shortcut/workhorse for rendering view responses.
   It takes a template (either ".mako" or ".html", or influenced by
@@ -205,13 +215,15 @@ def render(template, request, data, json=None, template_lib=None, force_template
   is_ajax = getattr(request, "ajax", False)
   if not force_template and not is_jframe_request(request) and (is_ajax or template is None):
     if json is not None:
-      return render_json(json, request.GET.get("callback"))
+      return render_json(json, request.GET.get("callback"), status=status)
     else:
-      return render_json(data, request.GET.get("callback"))
+      return render_json(data, request.GET.get("callback"), status=status)
   else:
     return _render_to_response(template,
-                               RequestContext(request=request, dict=data),
+                               request,
+                               RequestContext(request=request, dict_=data),
                                template_lib=template_lib,
+                               status=status,
                                **kwargs)
 
 
@@ -252,14 +264,23 @@ def encode_json(data, indent=None):
   Typically this is used from render_json, but it's the natural
   endpoint to test the Encoder logic, so it's separated out.
   """
-  return simplejson.dumps(data, indent=indent, cls=Encoder)
+  return json.dumps(data, indent=indent, cls=Encoder)
+
+def encode_json_for_js(data, indent=None):
+  """
+  Converts data into a JSON string.
+
+  Typically this is used from render_json, but it's the natural
+  endpoint to test the Encoder logic, so it's separated out.
+  """
+  return json.dumps(data, indent=indent, cls=JSONEncoderForHTML)
 
 VALID_JSON_IDENTIFIER = re.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$")
 
 class IllegalJsonpCallbackNameException(Exception):
   pass
 
-def render_json(data, jsonp_callback=None):
+def render_json(data, jsonp_callback=None, js_safe=False, status=200):
   """
   Renders data as json.  If jsonp is specified, wraps
   the result in a function.
@@ -268,12 +289,15 @@ def render_json(data, jsonp_callback=None):
     indent = 2
   else:
     indent = 0
-  json = encode_json(data, indent)
+  if js_safe:
+    json = encode_json_for_js(data, indent)
+  else:
+    json = encode_json(data, indent)
   if jsonp_callback is not None:
     if not VALID_JSON_IDENTIFIER.match(jsonp_callback):
       raise IllegalJsonpCallbackNameException("Invalid jsonp callback name: %s" % jsonp_callback)
     json = "%s(%s);" % (jsonp_callback, json)
-  return HttpResponse(json, mimetype='text/javascript')
+  return HttpResponse(json, content_type='text/javascript', status=status)
 
 def update_if_dirty(model_instance, **kwargs):
   """
@@ -305,6 +329,7 @@ def get_app_nice_name(app_name):
   try:
     return desktop.appmanager.get_desktop_module(app_name).settings.NICE_NAME
   except:
+    LOG.exception('failed to get nice name for app %s' % app_name)
     return app_name
 
 class TruncatingModel(models.Model):
@@ -424,3 +449,26 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
       else:
         s += ugettext('%(separator)s %(number)d %(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
   return s
+
+
+# Backported from Django 1.7
+class JsonResponse(HttpResponse):
+    """
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before EcmaScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be an json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    """
+
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, indent=None, **kwargs):
+        if safe and not isinstance(data, dict):
+            raise TypeError('In order to allow non-dict objects to be '
+                'serialized set the safe parameter to False')
+        kwargs.setdefault('content_type', 'application/json')
+        data = json.dumps(data, cls=encoder, indent=indent)
+        super(JsonResponse, self).__init__(content=data, **kwargs)

@@ -1,0 +1,1 @@
+  server %(address)s max_fails=3

@@ -32,17 +32,14 @@ PTH_FILE = 'hue.pth'
 def _get_pth_filename():
   """
   _get_pth_filename -> Path to the .pth file.
+  Location can be defined via HUE_PTH_DIR environment variable.
   May raise SystemError if the virtual env is absent.
   """
-  glob_path = os.path.join(common.VIRTUAL_ENV, 'lib', 'python*', 'site-packages')
-  res = glob.glob(glob_path)
-  if len(res) == 0:
-    raise SystemError("Cannot find a Python installation in %s. "
-                      "Did you do `make hue'?" % (glob_path,))
-  elif len(res) > 1:
-    raise SystemError("Found multiple Python installations in %s. "
-                      "Please `make clean' first." % (glob_path,))
-  return os.path.join(res[0], PTH_FILE)
+  pth_dir = common.HUE_PTH_DIR
+  if pth_dir:
+    return os.path.join(pth_dir, PTH_FILE)
+  else:
+    return os.path.join(common._get_python_site_packages_dir(), PTH_FILE)
 
 
 class PthFile(object):
@@ -52,6 +49,9 @@ class PthFile(object):
     self._entries = [ ]
     self._read()
 
+  def _relpath(self, path):
+    return os.path.relpath(path, os.path.dirname(self._path))
+
   def _read(self):
     if os.path.exists(self._path):
       self._entries = set(file(self._path).read().split('\n'))
@@ -59,37 +59,69 @@ class PthFile(object):
   def add(self, app):
     """
     Add the app and its ext eggs into the pth file
+
+    PTH files need paths relative to the pth file, not APPS_ROOT
     """
-    module_path = os.path.join(app.path, 'src')
-    LOG.debug('Add to %s: %s' % (self._path, module_path))
-    self._entries.add(module_path)
+    if os.path.isabs(app.path):
+      # Absolute path
+      module_path = os.path.join(app.abs_path, 'src')
+      self._entries.add(module_path)
+      LOG.debug('Add to %s: %s' % (self._path, module_path))
 
-    # Eggs could be in ext-py/<pkg>/dist/*.egg
-    ext_pys = app.find_ext_pys()
-    for py in ext_pys:
-      ext_egg = glob.glob(os.path.join(py, 'dist', '*.egg'))
-      LOG.debug('Add to %s: %s' % (self._path, ext_egg))
-      self._entries.update(ext_egg)
+      # Eggs could be in ext-py/<pkg>/dist/*.egg
+      for py in app.find_ext_pys():
+        ext_eggs = glob.glob(os.path.join(py, 'dist', '*.egg'))
+        self._entries.update(ext_eggs)
+        LOG.debug('Add to %s: %s' % (self._path, ext_eggs))
 
-    # And eggs could also be in ext-eggs/*.egg
-    for egg_file in glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg')):
-      LOG.debug('Add to %s: %s' % (self._path, egg_file))
-      self._entries.add(egg_file)
+      # And eggs could also be in ext-eggs/*.egg
+      egg_files = glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg'))
+      self._entries.update(egg_files)
+      LOG.debug('Add to %s: %s' % (self._path, egg_files))
+
+    else:
+      # Relative paths require some transformation.
+      # Paths are relative to directory of pth file
+      module_path = self._relpath(os.path.join(app.abs_path, 'src'))
+      self._entries.add(module_path)
+      LOG.debug('Add to %s: %s' % (self._path, module_path))
+
+      # Eggs could be in ext-py/<pkg>/dist/*.egg
+      for py in app.find_ext_pys():
+        ext_eggs = [self._relpath(egg) for egg in glob.glob(os.path.join(py, 'dist', '*.egg'))]
+        self._entries.update(ext_eggs)
+        LOG.debug('Add to %s: %s' % (self._path, ext_eggs))
+
+      # And eggs could also be in ext-eggs/*.egg
+      egg_files = [self._relpath(egg_file) for egg_file in glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg'))]
+      self._entries.update(egg_files)
+      LOG.debug('Add to %s: %s' % (self._path, egg_files))
 
   def remove(self, app):
     """
     Remove the app and its ext eggs from the pth file
     """
     for path in self._entries.copy():
-      if path.startswith(app.path):
-        self._entries.remove(path)
+      module_path = os.path.join(app.abs_path, 'src')
+      if path.startswith(module_path):
+        self._entries.remove(module_path)
+
+      rel_module_path = self._relpath(module_path)
+      if path.startswith(rel_module_path):
+        self._entries.remove(rel_module_path)
 
   def save(self):
-    """Save the pth file"""
-    tmp_path = self._path + '.new'
-    file(tmp_path, 'w').write('\n'.join(sorted(self._entries)))
-    os.rename(tmp_path, self._path)
-    LOG.info('=== Saved %s' % (self._path,))
+    """
+    Save the pth file
+    Create a symlink to the path if it does not already exist.
+    """
+    with open(self._path, 'w') as _file:
+      # We want the Hue libraries to come before system libraries in
+      # case there is a name collision.
+      _file.write("import sys; sys.__plen = len(sys.path)\n")
+      _file.write('\n'.join(sorted(self._entries)))
+      _file.write("\nimport sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; sys.path[0:0]=new\n")
+    LOG.info('=== Saved %s' % self._path)
 
   def sync(self, apps):
     """Sync the .pth file with the installed apps"""

@@ -1,0 +1,44 @@
+snippet tbl
+	create table ${1:table_name} (
+		${2:columns}
+	);
+snippet s*
+	select * from ${1:table_name}
+snippet showcolumns
+	SHOW COLUMNS (FROM|IN) table_name [(FROM|IN) db_name];
+snippet showcompactions
+	SHOW COMPACTIONS;
+snippet showconf
+	SHOW CONF <configuration_name>;
+snippet showcreate
+	SHOW CREATE TABLE ([db_name.]table_name|view_name);
+snippet showcurrentroles
+	SHOW CURRENT ROLES;
+snippet showdatabases
+	SHOW (DATABASES|SCHEMAS) [LIKE 'identifier_with_wildcards'];
+snippet showdblocks
+	SHOW LOCKS (DATABASE|SCHEMA) database_name;
+snippet showfunctions
+	SHOW FUNCTIONS "a.*";
+snippet showgrant
+	SHOW GRANT;
+snippet showindex
+	SHOW [FORMATTED] (INDEX|INDEXES) ON ${1:table_with_index} [(FROM|IN) ${2:db_name}];
+snippet showlocks
+	SHOW LOCKS ${1:table_name} PARTITION (${2:partition_spec}) EXTENDED;
+snippet showpartitions
+	SHOW PARTITIONS ${1:table_name} PARTITION(ds='2010-03-03', hr='12');
+snippet showprincipals
+	SHOW PRINCIPALS;
+snippet showrolegrant
+	SHOW ROLE GRANT;
+snippet showroles
+	SHOW ROLES;
+snippet showtableextended
+	SHOW TABLE EXTENDED [IN|FROM ${1:database_name}] LIKE 'identifier_with_wildcards' [PARTITION(${2:partition_spec})];
+snippet showtables
+	SHOW TABLES [IN ${1:database_name}] ['identifier_with_wildcards'];
+snippet showtblproperties
+	SHOW TBLPROPERTIES ${1:table_name};
+snippet showtransactions
+	SHOW TRANSACTIONS;

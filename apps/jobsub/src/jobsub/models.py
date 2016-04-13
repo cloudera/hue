@@ -16,17 +16,14 @@
 # limitations under the License.
 
 import logging
-try:
-  import json
-except ImportError:
-  import simplejson
 
 from django.db import models
 from django.core import urlresolvers
 from django.contrib.auth.models import User
-from jobsub.parameterization import find_parameters, bind_parameters
+from desktop.lib.parameterization import find_parameters, bind_parameters
 
 from django.utils.translation import ugettext_lazy as _
+
 
 LOG = logging.getLogger(__name__)
 
@@ -46,7 +43,7 @@ class JobDesign(models.Model):
   # Type corresponds to a JobSubForm that gets registered in jobsub.forms.interface.registry
   type = models.CharField(max_length=128)
   # Data is serialized via JobSubFormInterface.serialize_[to|from]_string
-  data = models.CharField(max_length=4096)
+  data = models.TextField()
 
   def edit_url(self):
     return urlresolvers.reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
@@ -91,6 +88,10 @@ PATH_MAX = 512
 
 class OozieAction(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   The OozieAction model is an abstract base class. All concrete actions
   derive from it. And it provides something for the OozieDesign to
   reference. See
@@ -119,6 +120,10 @@ class OozieAction(models.Model):
 
 class OozieDesign(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Contains information about all (Oozie) designs. Specific action info are
   stored in the Oozie*Action models.
   """
@@ -174,6 +179,10 @@ class OozieDesign(models.Model):
 
 class OozieMapreduceAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Stores MR actions
   """
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path')
@@ -193,6 +202,10 @@ class OozieMapreduceAction(OozieAction):
 
 class OozieStreamingAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   This is still an MR action from Oozie's perspective. But the data modeling is
   slightly different.
 
@@ -214,6 +227,10 @@ class OozieStreamingAction(OozieAction):
 
 class OozieJavaAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Definition of Java actions
   """
   PARAM_FIELDS = ('files', 'archives', 'jar_path', 'main_class', 'args',
@@ -228,7 +245,7 @@ class OozieJavaAction(OozieAction):
   # Location of the jar in hdfs
   jar_path = models.CharField(max_length=PATH_MAX, blank=False)
   main_class = models.CharField(max_length=256, blank=False)
-  args = models.CharField(max_length=4096, blank=True)
+  args = models.TextField(blank=True)
   java_opts = models.CharField(max_length=256, blank=True)
   # For the job configuration. JSON dict.
   job_properties = models.TextField(default="[]")
@@ -236,6 +253,10 @@ class OozieJavaAction(OozieAction):
 
 class JobHistory(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Contains informatin on submitted jobs/workflows.
   """
   owner = models.ForeignKey(User)

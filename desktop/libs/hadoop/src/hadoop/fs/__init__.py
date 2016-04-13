@@ -42,14 +42,7 @@ import shutil
 import stat
 import sys
 
-# SEEK_SET and family is found in posixfile or os, depending on the python version
-if sys.version_info[:2] < (2, 5):
-  import posixfile
-  _tmp_mod = posixfile
-else:
-  _tmp_mod = os
-SEEK_SET, SEEK_CUR, SEEK_END = _tmp_mod.SEEK_SET, _tmp_mod.SEEK_CUR, _tmp_mod.SEEK_END
-del _tmp_mod
+SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
 
 # The web (and POSIX) always uses forward slash as a separator

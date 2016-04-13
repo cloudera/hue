@@ -1,0 +1,121 @@
+
+/*
+ * This file is part of the Arnapou jqCron package.
+ *
+ * (c) Arnaud Buathier <arnaud@arnapou.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+ 
+.jqCron-selector {
+	position: relative;
+}
+.jqCron-cross,
+.jqCron-selector-title {
+	cursor: pointer;
+	border-radius: 2px;
+	border: 1px solid #ddd;
+	margin: 0 0.2em;
+	padding: 0.2em 0.5em;
+}
+.jqCron-container.disable .jqCron-cross:hover,
+.jqCron-container.disable .jqCron-selector-title:hover,
+.jqCron-cross,
+.jqCron-selector-title {
+	background: #fff;
+	border-color: #ddd;
+}
+.jqCron-cross:hover,
+.jqCron-selector-title:hover {
+	background-color: #f3f3f3;
+	border-color: #aaa;
+}
+
+.jqCron-container.readonly .jqCron-cross,
+.jqCron-container.readonly .jqCron-cross:hover,
+.jqCron-container.readonly .jqCron-selector-title,
+.jqCron-container.readonly .jqCron-selector-title:hover {
+  border: none;
+  font-weight: bold;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.jqCron-cross {
+	border-radius: 1em;
+	font-size: 80%;
+	padding: 0 0.3em;
+}
+.jqCron-selector-list {
+	background: #fff;
+	border: 1px solid #aaa;
+	-webkit-box-shadow: 2px 2px 3px #ccc;
+	box-shadow: 2px 2px 3px #ccc;
+	left: 0.2em;
+	list-style: none;
+	margin: 0;
+	padding: 4px;
+	position: absolute;
+	top: 1.5em;
+	z-index: 1;
+}
+.jqCron-selector-list li {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	cursor: default;
+	display: inline-block;
+	margin: 0;
+	padding: 0.1em 0.4em;
+	width: 100%;
+  text-align: center;
+}
+.jqCron-selector-list li.selected {
+	background: #0088cc;
+	color: white;
+}
+.jqCron-selector-list li:hover {
+	background: #5fb9e7;
+	color: white;
+}
+.jqCron-selector-list.cols2 {
+	width: 4em;
+}
+.jqCron-selector-list.cols2 li {
+	width: 50%;
+}
+.jqCron-selector-list.cols3 {
+	width: 6em;
+}
+.jqCron-selector-list.cols3 li {
+	width: 33%;
+}
+.jqCron-selector-list.cols4 {
+	width: 8em;
+}
+.jqCron-selector-list.cols4 li {
+	width: 25%;
+}
+.jqCron-selector-list.cols5 {
+	width: 10em;
+}
+.jqCron-selector-list.cols5 li {
+	width: 20%;
+}
+.jqCron-error .jqCron-selector-title {
+	background: #fee;
+	border: 1px solid #fdd;
+	color: red;
+}
+.jqCron-container.disable * {
+	color: #888;
+}
+.jqCron-container.disable .jqCron-selector-title {
+	background: #eee !important;
+}
+
+
+

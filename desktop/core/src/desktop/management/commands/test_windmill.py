@@ -21,7 +21,6 @@ after appropriate setup.
 import sys
 import time
 from optparse import make_option
-from hadoop import mini_cluster
 
 from django.core.management.base import BaseCommand
 from windmill.authoring import djangotest
@@ -59,8 +58,8 @@ class Command(BaseCommand):
     We have to adapt a bit for South as well.
     """
     # South:
-    import south.management.commands.syncdb
-    south.management.commands.syncdb.patch_for_test_db_setup()
+    import south.management.commands
+    south.management.commands.patch_for_test_db_setup()
 
     # Create the test database
     from django.db import connection
@@ -73,7 +72,7 @@ class Command(BaseCommand):
     This currently doesn't start app-specific
     other servers.
     """
-    self.cluster = mini_cluster.shared_cluster(conf=True)
+    pass
 
   def stop_helper_servers(self):
     self.cluster.shutdown()

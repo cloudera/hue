@@ -18,6 +18,14 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%def name="getEllipsifiedCell(val, placement='bottom', klass='')">
+  % if len(val) > 25:
+    <td class="${ klass }" rel="tooltip" title="${ val[:300] }" data-placement="${ placement }" >${ (val[:25]) }&hellip;</td>
+  % else:
+    <td class="${ klass }">${ val }</td>
+  % endif
+</%def>
+
 <%def name="fieldName(field)">
 </%def>
 
@@ -149,7 +157,7 @@ ${field.label_tag() | n}
             ${unicode(field) | n}
         % else:
             % if tag == 'textarea':
-                <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>
+                <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} class="${cls}" />${extract_field_data(field) or ''}</textarea>
             % elif tag == 'button':
                 <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
             % elif tag == 'checkbox':
@@ -160,9 +168,9 @@ ${field.label_tag() | n}
                 % endif
             % else:
                 %if file_chooser:
-                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc | n,unicode} /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
                 %else:
-                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc | n,unicode} />
                 %endif
             % endif
         % endif
@@ -175,23 +183,28 @@ ${field.label_tag() | n}
 
 <%def name="pageref(num)">
   % if hasattr(filter_params, "urlencode"):
-    href="?page=${num}&${filter_params.urlencode()}"
+    href="?q-page=${num}&${filter_params.urlencode()}"
   % else:
-    href="?page=${num}&${filter_params}"
+    href="?q-page=${num}&${filter_params}"
   % endif
 </%def>
+
 <%def name="prevpage(page)">
   ${pageref(page.previous_page_number())}
 </%def>
+
 <%def name="nextpage(page)">
   ${pageref(page.next_page_number())}
 </%def>
+
 <%def name="toppage(page)">
   ${pageref(1)}
 </%def>
+
 <%def name="bottompage(page)">
   ${pageref(page.num_pages())}
 </%def>
+
 <%def name="pagination(page)">
     <div class="pagination">
         <ul class="pull-right">

@@ -17,52 +17,73 @@
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${commonheader(_('Task Trackers - Job Browser'), "jobbrowser", user)}
+${ commonheader(_('Task Trackers'), "jobbrowser", user) | n,unicode }
+${ comps.menubar()}
 <div class="container-fluid">
-<table class="datatables">
-	<thead>
-		<tr>
-			<th>${_('Name')}</th>
-			<th>${_('Host')}</th>
-			<th>${_('Port')}</th>
-			<th>${_('Last Seen')}</th>
-			<th>${_('Available Space')}</th>
-			<th>${_('Failure Count')}</th>
-			<th>${_('Map Count')}</th>
-			<th>${_('Reduce Count')}</th>
-			<th>${_('Max Map Tasks')}</th>
-			<th>${_('Max Reduce Tasks')}</th>
-		</tr>
-	</thead>
-	<tbody>
-		% for t in trackers:
-		<tr>
-			<td><a href="/jobbrowser/trackers/${t.trackerId}">${t.trackerId}</a></td>
-			<td>${t.host}</td>
-			<td>${t.httpPort}</td>
-			<td>${t.lastSeenFormatted}</td>
-			<td>${t.availableSpace}</td>
-			<td>${t.failureCount}</td>
-			<td>${t.mapCount}</td>
-			<td>${t.reduceCount}</td>
-			<td>${t.maxMapTasks}</td>
-			<td>${t.maxReduceTasks}</td>
-		</tr>
-		% endfor
-	</tbody>
+<div class="row-fluid">
+  <div class="span12">
+    <div class="card card-small">
+      <h2 class="card-heading simple">${_('Task Trackers')}</h2>
+      <div class="card-body">
+        <p>
+
+<table class="datatables" style="width: 100%">
+    <thead>
+        <tr>
+            <th>${_('Name')}</th>
+            <th>${_('Host')}</th>
+            <th>${_('Port')}</th>
+            <th>${_('Last Seen')}</th>
+            <th>${_('Available Space')}</th>
+            <th>${_('Failure Count')}</th>
+            <th>${_('Map Count')}</th>
+            <th>${_('Reduce Count')}</th>
+            <th>${_('Max Map Tasks')}</th>
+            <th>${_('Max Reduce Tasks')}</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for t in trackers:
+        <tr>
+            <td><a href="/jobbrowser/trackers/${t.trackerId}">${t.trackerId}</a></td>
+            <td>${t.host}</td>
+            <td>${t.httpPort}</td>
+            <td>${t.lastSeenFormatted}</td>
+            <td>${t.availableSpace}</td>
+            <td>${t.failureCount}</td>
+            <td>${t.mapCount}</td>
+            <td>${t.reduceCount}</td>
+            <td>${t.maxMapTasks}</td>
+            <td>${t.maxReduceTasks}</td>
+        </tr>
+        % endfor
+    </tbody>
 </table>
+
 <div id="trackerDialog"></div>
+
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
+</div>
+
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function(){
-	$(".datatables").dataTable({
-		"bPaginate": false,
-		"bLengthChange": false,
-		"bFilter": false,
-		"bInfo": false				
-	});
+    $(".datatables").dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bInfo": false,
+        "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}",
+        }
+    });
 });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(request, messages) | n,unicode }

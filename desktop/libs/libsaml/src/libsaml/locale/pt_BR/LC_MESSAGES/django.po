@@ -1,0 +1,87 @@
+# Portuguese (Brazil) translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/libsaml/conf.py:58
+msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgstr "Caminho binário Xmlsec1. Este programa deve ser executável pelo usuário que está executando Hue."
+
+#: src/libsaml/conf.py:64
+msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
+msgstr "ID da entidade para Hue agindo como provedor de serviços. Também pode aceitar o padrão onde '<base_url>' será substituído pela base da URL do servidor."
+
+#: src/libsaml/conf.py:70
+msgid "Create users from IdP on login."
+msgstr "Crie usuários de IdP ao fazer login."
+
+#: src/libsaml/conf.py:77
+msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgstr "O diretório do mapa de atributos contém arquivos que mapeiam atributos SAML para atributos pysaml2."
+
+#: src/libsaml/conf.py:84
+msgid "Allow responses that are initiated by the IdP."
+msgstr "Permitir respostas que sejam iniciadas pelo IdP."
+
+#: src/libsaml/conf.py:90
+msgid "Required attributes to ask for from IdP."
+msgstr "Atributos obrigatórios a serem solicitados do IdP."
+
+#: src/libsaml/conf.py:96
+msgid "Optional attributes to ask for from IdP."
+msgstr "Atributo opcionais a serem solicitados do IdP."
+
+#: src/libsaml/conf.py:102
+msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgstr "Metadados de IdP no formato de um arquivo. Geralmente é um arquivo XML contendo metadados que o Provedor de identidades gera."
+
+#: src/libsaml/conf.py:108
+msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
+msgstr "key_file é o nome de um arquivo com formato PEM que contém a chave principal do serviço Hue. Isso é usado imediatamente para criptografar/assinar declarações e como chave cliente em uma sessão HTTPS."
+
+#: src/libsaml/conf.py:114
+msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgstr "Esta é a parte pública do par de chave privada/pública do serviço. cert_file deve ser um arquivo da cadeia de certificados com formato PEM."
+
+#: src/libsaml/conf.py:120
+msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgstr "Um mapeamento dos atributos na resposta dos atributos de usuário IdP para django."
+
+#: src/libsaml/conf.py:126
+msgid "Have Hue initiated authn requests be signed and provide a certificate."
+msgstr "Deixe que as solicitações de autenticação iniciadas pelo Hue sejam assinadas e forneça um certificado."
+
+#: src/libsaml/conf.py:132
+msgid "Have Hue initiated logout requests be signed and provide a certificate."
+msgstr "Deixe que as solicitações de logout iniciadas pelo Hue sejam assinadas e forneça um certificado."
+
+#: src/libsaml/conf.py:138
+msgid "Username can be sourced from 'attributes' or 'nameid'"
+msgstr "O nome do usuário pode ser originado de 'attributes' ou'nameid'"
+
+#: src/libsaml/conf.py:144
+msgid "Performs the logout or not."
+msgstr "Executa o logout ou não."
+
+#: src/libsaml/conf.py:150
+msgid "Request this NameID format from the server"
+msgstr "Solicitar este formato NameID do servidor"
+
+#: src/libsaml/conf.py:156
+msgid "username_source not configured properly. SAML integration may not work."
+msgstr "username_source não configurado corretamente. Talvez a integração SAML não funcione."
+

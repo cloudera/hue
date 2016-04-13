@@ -34,8 +34,10 @@ def runcmd(cmdv, additional_env=None):
   env = os.environ.copy()
   if additional_env is not None:
     env.update(additional_env)
-  LOG.debug("Running '%s' with %r" % (' '.join(cmdv), additional_env))
-  popen = subprocess.Popen(cmdv, env=env)
+  env['PATH'] = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin') + os.path.pathsep + env['PATH']
+  shell_command = ' '.join(cmdv)
+  LOG.info("Running '%s' with %r" % (shell_command, additional_env))
+  popen = subprocess.Popen(shell_command, env=env, shell=True)
   return popen.wait()
 
 
@@ -45,7 +47,7 @@ def make_app(app):
 
   Call `make egg-info ext-eggs' on the app.
   """
-  cmdv = [ 'make', '-C', app.path, 'egg-info', 'ext-eggs' ]
+  cmdv = [ 'make', '-C', app.abs_path, 'egg-info', 'ext-eggs' ]
   return runcmd(cmdv, dict(ROOT=common.INSTALL_ROOT)) == 0
 
 
@@ -53,5 +55,19 @@ def make_syncdb():
   """
   make_syncdb() -> True/False
   """
-  cmdv = [ 'make', '-C', os.path.join(common.INSTALL_ROOT, 'desktop'), '-B', 'syncdb' ]
-  return runcmd(cmdv) == 0
+  statuses = []
+  hue_exec = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
+  if os.path.exists(hue_exec):
+    statuses.append( runcmd([ hue_exec, 'syncdb', '--noinput' ]) )
+    statuses.append( runcmd([ hue_exec, 'migrate', '--merge' ]) )
+  return not any(statuses)
+
+def make_collectstatic():
+  """
+  make_collectstatic() -> True/False
+  """
+  statuses = []
+  hue_exec = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
+  if os.path.exists(hue_exec):
+    statuses.append( runcmd([ hue_exec, 'collectstatic', '--noinput' ]) )
+  return not any(statuses)

@@ -14,123 +14,222 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import logging
 import os.path
+import sys
+import beeswax.hive_site
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
+  AUTH_USERNAME as DEFAULT_AUTH_USERNAME
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
+from desktop.lib.exceptions import StructuredThriftTransportException
+
+from beeswax.settings import NICE_NAME
+
+LOG = logging.getLogger(__name__)
 
 
-QUERY_SERVERS = UnspecifiedConfigSection(
-  "query_servers",
-  help=_("One entry for each Query Server that can execute some queries."),
-  each=ConfigSection(
-    help=_("Information about a single Query Server"),
-    members=dict(
-      SERVER_HOST = Config(
-        key="server_host",
-        help=_("Host where the Query Server Thrift daemon is running."),
-        private=True,
-        default="localhost"),
-      SERVER_PORT = Config(
-        key="server_port",
-        help=_("Configure the port the Query Server Thrift server."),
-        default=8002,
-        type=int),
-      SUPPORT_DDL = Config(
-        key='support_ddl',
-        default=True,
-        type=coerce_bool,
-        help=_('If DDL queries are supported (e.g. DROP can be sent directly to this server).'))
-    )
-  )
-)
-
-# Deprecated! To remove in Hue 3
-# Multiple sections are now available in QUERY_SERVERS
-BEESWAX_SERVER_HOST = Config(
-  key="beeswax_server_host",
-  help=_("Host where Beeswax server Thrift daemon is running."),
-  private=True,
+HIVE_SERVER_HOST = Config(
+  key="hive_server_host",
+  help=_t("Host where HiveServer2 server is running. If Kerberos security is enabled, "
+         "the fully-qualified domain name (FQDN) is required"),
   default="localhost")
 
-# Deprecated! To remove in Hue 3
-# Multiple sections are now available in QUERY_SERVERS
-BEESWAX_SERVER_PORT = Config(
-  key="beeswax_server_port",
-  help=_("Configure the port the Beeswax Thrift server runs on."),
-  default=8002,
+HIVE_SERVER_PORT = Config(
+  key="hive_server_port",
+  help=_t("Configure the port the HiveServer2 server runs on."),
+  default=10000,
   type=int)
 
-
-BEESWAX_META_SERVER_HOST = Config(
-  key="beeswax_meta_server_host",
-  help=_("Host where Beeswax internal metastore Thrift daemon is running."),
-  private=True,
-  default="localhost")
-
-BEESWAX_META_SERVER_PORT = Config(
-  key="beeswax_meta_server_port",
-  help=_("Configure the port the internal metastore daemon runs on. Used only if "
-       "hive.metastore.local is true."),
-  default=8003,
-  type=int)
-
-BEESWAX_SERVER_BIN = Config(
-  key="beeswax_server_bin",
-  help=_("Path to beeswax_server.sh"),
-  private=True,
-  default=os.path.join(os.path.dirname(__file__), "..", "..", "beeswax_server.sh"))
-
-BEESWAX_SERVER_HEAPSIZE = Config(
-  key="beeswax_server_heapsize",
-  help=_("Maximum Java heapsize (in megabytes) used by Beeswax Server.  " + \
-    "Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh " + \
-    "may override this setting."),
-  default="1000")
-
-BEESWAX_HIVE_HOME_DIR = Config(
-  key="hive_home_dir",
-  default=os.environ.get("HIVE_HOME", "/usr/lib/hive"),
-  help=_("Path to the root of the Hive installation; " +
-        "defaults to environment variable when not set."))
-
-BEESWAX_HIVE_CONF_DIR = Config(
+HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
-  help=_('Hive configuration directory, where hive-site.xml is located.'),
+  help=_t('Hive configuration directory, where hive-site.xml is located.'),
   default=os.environ.get("HIVE_CONF_DIR", '/etc/hive/conf'))
+
+HIVE_SERVER_BIN = Config(
+  key="hive_server_bin",
+  help=_t("Path to HiveServer2 start script"),
+  default='/usr/lib/hive/bin/hiveserver2',
+  private=True)
 
 LOCAL_EXAMPLES_DATA_DIR = Config(
   key='local_examples_data_dir',
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
-  help=_('The local filesystem path containing the Beeswax examples.'))
+  help=_t('The local filesystem path containing the Hive examples.'))
 
-BEESWAX_SERVER_CONN_TIMEOUT = Config(
-  key='beeswax_server_conn_timeout',
+SERVER_CONN_TIMEOUT = Config(
+  key='server_conn_timeout',
   default=120,
   type=int,
-  help=_('Timeout in seconds for Thrift calls to Beeswax service.'))
+  help=_t('Timeout in seconds for Thrift calls.'))
 
-METASTORE_CONN_TIMEOUT= Config(
-  key='metastore_conn_timeout',
+USE_GET_LOG_API = Config( # To remove in Hue 4
+  key='use_get_log_api',
+  default=False,
+  type=coerce_bool,
+  help=_t('Choose whether to use the old GetLog() thrift call from before Hive 0.14 to retrieve the logs.'
+          'If false, use the FetchResults() thrift call from Hive 1.0 or more instead.')
+)
+
+BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
+  key='browse_partitioned_table_limit',
+  default=1000,
+  type=int,
+  help=_t('Limit the number of partitions to list on the partitions page. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+
+QUERY_PARTITIONS_LIMIT = Config(
+  key='query_partitions_limit',
   default=10,
   type=int,
-  help=_('Timeouts in seconds for Thrift calls to the Hive metastore. This timeout should take into account that the metastore could talk to an external database.'))
+  help=_t('The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.'))
 
-BEESWAX_RUNNING_QUERY_LIFETIME = Config(
-  key='beeswax_running_query_lifetime',
-  default=604800000L, # 7*24*60*60*1000 (1 week)
-  type=long,
-  help=_('Time in seconds for Beeswax to persist queries in its cache.'))
+def get_browse_partitioned_table_limit():
+  """Get the old default"""
+  return BROWSE_PARTITIONED_TABLE_LIMIT.get()
 
-BROWSE_PARTITIONED_TABLE_LIMIT = Config(
-  key='browse_partitioned_table_limit',
-  default=250,
+LIST_PARTITIONS_LIMIT = Config(
+  key='list_partitions_limit',
+  dynamic_default=get_browse_partitioned_table_limit,
   type=int,
-  help=_('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+  help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
-SHARE_SAVED_QUERIES = Config(
-  key='share_saved_queries',
-  default=True,
+DOWNLOAD_CELL_LIMIT = Config(
+  key='download_cell_limit',
+  default=10000000,
+  type=int,
+  help=_t('A limit to the number of cells (rows * columns) that can be downloaded from a query '
+          '(e.g. - 10K rows * 1K columns = 10M cells.) '
+          'A value of -1 means there will be no limit.'))
+
+APPLY_NATURAL_SORT_MAX = Config(
+  key="apply_natural_sort_max",
+  help=_t("The max number of records in the result set permitted to apply a natural sort to the database or tables list."),
+  type=int,
+  default=2000
+)
+
+CLOSE_QUERIES = Config(
+  key="close_queries",
+  help=_t("Hue will try to close the Hive query when the user leaves the editor page. "
+          "This will free all the query resources in HiveServer2, but also make its results inaccessible."),
   type=coerce_bool,
-  help=_('Share saved queries with all users. If set to false, saved queries are visible only to the owner and administrators.'))
+  default=False
+)
+
+THRIFT_VERSION = Config(
+  key="thrift_version",
+  help=_t("Thrift version to use when communicating with HiveServer2."),
+  type=int,
+  default=7
+)
+
+CONFIG_WHITELIST = Config(
+  key='config_whitelist',
+  default='hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename',
+  type=coerce_csv,
+  help=_t('A comma-separated list of white-listed Hive configuration properties that users are authorized to set.')
+)
+
+SSL = ConfigSection(
+  key='ssl',
+  help=_t('SSL configuration for the server.'),
+  members=dict(
+    CACERTS = Config(
+      key="cacerts",
+      help=_t("Path to Certificate Authority certificates."),
+      type=str,
+      dynamic_default=default_ssl_cacerts,
+    ),
+
+    KEY = Config(
+      key="key",
+      help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
+      type=str,
+      default=None
+    ),
+
+    CERT = Config(
+      key="cert",
+      help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
+      type=str,
+      default=None
+    ),
+
+    VALIDATE = Config(
+      key="validate",
+      help=_t("Choose whether Hue should validate certificates received from the server."),
+      type=coerce_bool,
+      dynamic_default=default_ssl_validate,
+    )
+  )
+)
+
+def get_auth_username():
+  """Get from top level default from desktop"""
+  return DEFAULT_AUTH_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_t("Auth username of the hue user used for authentications."),
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  """Get from script or backward compatibility"""
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if password:
+    return password
+
+  return DEFAULT_AUTH_PASSWORD.get()
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
+
+
+def config_validator(user):
+  # dbms is dependent on beeswax.conf (this file)
+  # import in method to avoid circular dependency
+  from beeswax.server import dbms
+
+  res = []
+  try:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        server = dbms.get(user)
+        server.get_databases()
+    except StructuredThriftTransportException, e:
+      if 'Error validating the login' in str(e):
+        msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+        raise e
+  except Exception, e:
+    msg = "The application won't work without a running HiveServer2."
+    LOG.exception(msg)
+    res.append((NICE_NAME, _(msg)))
+
+  try:
+    from desktop.lib.fsmanager import get_filesystem
+    warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
+    fs = get_filesystem()
+    fs.stats(warehouse)
+  except Exception:
+    msg = 'Failed to access Hive warehouse: %s'
+    LOG.exception(msg % warehouse)
+
+    return [(NICE_NAME, _(msg) % warehouse)]
+
+  return res

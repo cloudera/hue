@@ -19,15 +19,10 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.cloudera</groupId>
-    <artifactId>parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
 
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>2.1.0-SNAPSHOT</version>
+  <version>3.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
@@ -42,10 +37,16 @@
   </licenses>
 
   <properties>
-    <hadoop.version>2.0.0-mr1-cdh4.0.0-SNAPSHOT</hadoop.version>
-    <hive.version>0.8.1-cdh4.0.0-SNAPSHOT</hive.version>
+    <hadoop-mr1.version>2.6.0-mr1-cdh5.5.0-SNAPSHOT</hadoop-mr1.version>
+    <hadoop.version>2.6.0-cdh5.5.0-SNAPSHOT</hadoop.version>
+    <spark.version>1.5.0-cdh5.5.0-SNAPSHOT</spark.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
+    <thrift.version>0.9.0</thrift.version>
+    <minJavaVersion>1.7</minJavaVersion>
+    <maxJavaVersion>1.8</maxJavaVersion>
+    <sourceJavaVersion>1.7</sourceJavaVersion>
+    <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
 
   <organization>
@@ -60,6 +61,15 @@
   </scm>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -69,6 +79,44 @@
           <tagBase>https://svn.apache.org/repos/asf/maven/components/releases</tagBase>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>[2.0.0,)</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>[${minJavaVersion}.0,${maxJavaVersion}.1000]</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+              <id>clean</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>pre-clean</phase>
+          </execution>
+          <execution>
+              <id>default</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>validate</phase>
+          </execution>
+          <execution>
+              <id>site</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>pre-site</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -77,27 +125,12 @@
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-core</artifactId>
-        <version>${hadoop.version}</version>
+        <version>${hadoop-mr1.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-client</artifactId>
-        <version>${hadoop.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-metastore</artifactId>
-        <version>${hive.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-exec</artifactId>
-        <version>${hive.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-common</artifactId>
-        <version>${hive.version}</version>
+        <version>${hadoop-mr1.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -117,7 +150,7 @@
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-test</artifactId>
-        <version>${hadoop.version}</version>
+        <version>${hadoop-mr1.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
@@ -146,21 +179,20 @@
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libthrift</artifactId>
-        <version>0.7.0</version>
+        <version>${thrift.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libfb303</artifactId>
-        <version>0.7.0</version>
+        <version>${thrift.version}</version>
       </dependency>
-
 
     </dependencies>
   </dependencyManagement>
 
   <repositories>
     <repository>
-      <id>cloudera.repos</id>
+      <id>cdh.releases.repo</id>
       <url>https://repository.cloudera.com/content/groups/cdh-releases-rcs</url>
       <name>Cloudera Public Repositories</name>
       <snapshots>
@@ -168,7 +200,7 @@
       </snapshots>
     </repository>
     <repository>
-      <id>cloudera.snapshots.repo</id>
+      <id>cdh.snapshots.repo</id>
       <url>https://repository.cloudera.com/content/repositories/snapshots</url>
       <name>Cloudera Snapshots Repository</name>
       <snapshots>

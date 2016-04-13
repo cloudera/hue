@@ -14,28 +14,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Handling of data export
 
 import logging
 import time
 
-from django.http import HttpResponse
-
-from beeswax import common
-from beeswax import db_utils
-from beeswaxd.ttypes import QueryHandle
-
-from desktop.lib.export_csvxls import CSVformatter, XLSformatter, TooBigToDownloadException
-
 from django.utils.translation import ugettext as _
+
+from desktop.lib import export_csvxls
+
+from beeswax import common, conf
+
 
 LOG = logging.getLogger(__name__)
 
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
+FETCH_SIZE = 1000
 
 
-def download(query_model, format):
+def download(handle, format, db):
   """
   download(query_model, format) -> HttpResponse
 
@@ -45,73 +41,68 @@ def download(query_model, format):
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  if format == 'csv':
-    formatter = CSVformatter()
-    mimetype = 'application/csv'
-  elif format == 'xls':
-    formatter = XLSformatter()
-    mimetype = 'application/xls'
+  max_cells = conf.DOWNLOAD_CELL_LIMIT.get()
 
-  gen = data_generator(query_model, formatter)
-  resp = HttpResponse(gen, mimetype=mimetype)
-  resp['Content-Disposition'] = 'attachment; filename=query_result.%s' % (format,)
-  return resp
+  content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
+  generator = export_csvxls.create_generator(content_generator, format)
+  return export_csvxls.make_response(generator, format, 'query_result')
 
 
-def data_generator(query_model, formatter):
+def upload(path, handle, user, db, fs):
   """
-  data_generator(query_model, formatter) -> generator object
+  upload(query_model, path, user, db, fs) -> None
 
-  Return a generator object for a csv. The first line is the column names.
-
-  This is similar to export_csvxls.generator, but has
-  one or two extra complexities.
+  Retrieve the query result in the format specified and upload to hdfs.
   """
-  global _DATA_WAIT_SLEEP
-  is_first_row = True
-  next_row = 0
-  results = None
-  handle = QueryHandle(query_model.server_id, query_model.log_context)
+  if fs.do_as_user(user.username, fs.exists, path):
+    raise Exception(_("%s already exists.") % path)
+  else:
+    fs.do_as_user(user.username, fs.create, path)
 
-  yield formatter.init_doc()
+  content_generator = HS2DataAdapter(handle, db, max_cells=-1, start_over=True)
+  for header, data in content_generator:
+    dataset = export_csvxls.dataset(None, data)
+    fs.do_as_user(user.username, fs.append, path, dataset.csv)
 
-  while True:
-    # Make sure that we have the next batch of ready results
-    while results is None or not results.ready:
-      results = db_utils.db_client(query_model.get_query_server()).fetch(handle, start_over=is_first_row, fetch_size=-1)
-      if not results.ready:
-        time.sleep(_DATA_WAIT_SLEEP)
 
-    # Someone is reading the results concurrently. Abort.
-    # But unfortunately, this current generator will produce incomplete data.
-    if next_row != results.start_row:
-      msg = _('Error: Potentially incomplete results as an error occurred during data retrieval.')
-      yield formatter.format_row([msg])
-      err = (_('Detected another client retrieving results for %(server_id)s. '
-             'Expected next row to be %(row)s and got %(start_row)s. Aborting') %
-             {'server_id': query_model.server_id, 'row': next_row, 'start_row': results.start_row})
-      LOG.error(err)
-      raise RuntimeError(err)
+def HS2DataAdapter(handle, db, max_cells=-1, start_over=True):
+  """
+  HS2DataAdapter(query_model, db) -> headers, 2D array of data.
+  """
+  results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
-    if is_first_row:
-      is_first_row = False
-      yield formatter.format_header(results.columns)
-    else:
-      for i, row in enumerate(results.data):
-        # TODO(bc): Hive seems to always return tab delimited row data.
-        # What if a cell has a tab?
-        row = row.split('\t')
-        try:
-          yield formatter.format_row(row)
-        except TooBigToDownloadException, ex:
-          LOG.error(ex)
-          # Exceeded limit. Stop.
-          results.has_more = False
-          break
+  while not results.ready:
+    time.sleep(_DATA_WAIT_SLEEP)
+    results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
-      if results.has_more:
-        next_row += len(results.data)
-        results = None
-      else:
-        yield formatter.fini_doc()
+  headers = results.cols()
+  num_cols = len(headers)
+
+  # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
+  if num_cols > 100:
+    LOG.warn('The query results contain %d columns and may take an extremely long time to download, will reduce fetch size to 100.' % num_cols)
+    fetch_size = 100
+  else:
+    fetch_size = FETCH_SIZE
+
+  row_ctr = 1
+  limit_cells = max_cells > -1
+
+  while results is not None:
+    data = []
+    for row in results.rows():
+      row_ctr += 1
+      if limit_cells and (row_ctr * num_cols) > max_cells:
+        LOG.warn('The query results exceeded the maximum cell limit of %d. Data has been truncated to first %d rows.' % (max_cells, row_ctr))
         break
+      data.append(row)
+
+    yield headers, data
+
+    if limit_cells and (row_ctr * num_cols) > max_cells:
+      break
+
+    if results.has_more:
+      results = db.fetch(handle, start_over=False, rows=fetch_size)
+    else:
+      results = None

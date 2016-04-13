@@ -48,9 +48,12 @@ import shutil
 import socket
 import time
 import tempfile
-import simplejson
+import json
 import lxml.etree
 import urllib2
+
+from desktop.lib import python_util
+from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
 from hadoop.fs.hadoopfs import HadoopFileSystem
 from hadoop.job_tracker import LiveJobTracker
@@ -82,18 +85,6 @@ TEST_USER_GROUP_MAPPING = {
 
 LOGGER=logging.getLogger(__name__)
 
-def find_unused_port():
-  """
-  Finds a port that's available.
-  Unfortunately, this port may not be available by the time
-  the subprocess uses it, but this generally works.
-  """
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
-  sock.bind(('127.0.0.1', 0))
-  sock.listen(socket.SOMAXCONN)
-  _, port = sock.getsockname()
-  sock.close()
-  return port
 
 class MiniHadoopCluster(object):
   """
@@ -165,7 +156,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "jar",
         hadoop.conf.HADOOP_TEST_JAR.get(),
         "minicluster",
-        "-writeConfig", tmppath("config.xml"), 
+        "-writeConfig", tmppath("config.xml"),
         "-writeDetails", tmppath("details.json"),
         "-datanodes", str(self.num_datanodes),
         "-tasktrackers", str(self.num_tasktrackers),
@@ -178,13 +169,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "jobclient.progress.monitor.poll.interval=100",
         "-D", "fs.checkpoint.period=1",
         # For a reason I don't fully understand, this must be 0.0.0.0 and not 'localhost'
-        "-D", "dfs.secondary.http.address=0.0.0.0:%d" % find_unused_port(),
+        "-D", "dfs.secondary.http.address=0.0.0.0:%d" % python_util.find_unused_port(),
         # We bind the NN's thrift interface to a port we find here.
         # This is suboptimal, since there's a race.  Alas, if we don't
         # do this here, the datanodes fail to discover the namenode's thrift
         # address, and there's a race there
-        "-D", "dfs.thrift.address=localhost:%d" % find_unused_port(),
-        "-D", "jobtracker.thrift.address=localhost:%d" % find_unused_port(),
+        "-D", "dfs.thrift.address=localhost:%d" % python_util.find_unused_port(),
+        "-D", "jobtracker.thrift.address=localhost:%d" % python_util.find_unused_port(),
         # Jobs realize they have finished faster with this timeout.
         "-D", "jobclient.completion.poll.interval=50",
         "-D", "hadoop.security.authorization=true",
@@ -245,7 +236,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       while not details:
         try:
           details_file.seek(0)
-          details = simplejson.load(details_file)
+          details = json.load(details_file)
         except ValueError:
           pass
         if self.clusterproc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
@@ -265,7 +256,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     # Parse the configuration using XPath and place into self.config.
     config = lxml.etree.parse(tmppath("config.xml"))
-    self.config = dict( (property.find("./name").text, property.find("./value").text) 
+    self.config = dict( (property.find("./name").text, property.find("./value").text)
       for property in config.xpath("/configuration/property"))
 
     # Write out Hadoop-style configuration directory, 
@@ -275,7 +266,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     hadoop.conf.HADOOP_CONF_DIR.set_for_testing(self.config_dir)
 
-    write_config(self.config, tmppath("conf/core-site.xml"), 
+    write_config(self.config, tmppath("conf/core-site.xml"),
       ["fs.defaultFS", "jobclient.completion.poll.interval",
        "dfs.namenode.checkpoint.period", "dfs.namenode.checkpoint.dir",
        'hadoop.proxyuser.'+self.superuser+'.groups', 'hadoop.proxyuser.'+self.superuser+'.hosts'])
@@ -429,11 +420,11 @@ def shared_cluster(conf=False):
     # This is djanky (that's django for "janky").
     # Caches are tricky w.r.t. to to testing;
     # perhaps there are better patterns?
-    old = hadoop.cluster.clear_caches()
+    old_caches = clear_sys_caches()
 
   def finish():
     if conf:
-      hadoop.cluster.restore_caches(old)
+      restore_sys_caches(old_caches)
     for x in closers:
       x()
 

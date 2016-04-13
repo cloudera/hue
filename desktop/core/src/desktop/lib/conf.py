@@ -65,23 +65,37 @@ variables.
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 pytype = type
 
+from django.utils.encoding import smart_str
+
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
 import configobj
+import json
 import logging
 import os
 import textwrap
+import re
+import subprocess
 import sys
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
+
+# Supported thrift transports
+SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
 
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool"]
+__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv", "coerce_json_dict"]
 
 class BoundConfig(object):
   def __init__(self, config, bind_to, grab_key=_ANONYMOUS, prefix=''):
@@ -239,12 +253,12 @@ class Config(object):
     @throws ValueError if it does not validate correctly.
     """
     if self.required and not present:
-      raise KeyError("Configuration key %s not in configuration!"
-                     % self.key)
+      raise KeyError("Configuration key %s not in configuration!" % self.key)
     if present:
       raw_val = val
     else:
       raw_val = self.default
+
     if coerce_type:
       return self._coerce_type(raw_val, prefix)
     else:
@@ -428,8 +442,7 @@ class ConfigSection(Config):
 
     # We sort the configuration for canonicalization.
     for programmer_key, config in sorted(self.members.iteritems(), key=lambda x: x[1].key):
-      config.print_help(out=out,
-                        indent=new_indent)
+      config.print_help(out=out, indent=new_indent)
 
 class UnspecifiedConfigSection(Config):
   """
@@ -460,7 +473,7 @@ class UnspecifiedConfigSection(Config):
 
     The keys are the keys specified by the user in the config file.
     """
-    return dict([(key, self.get_member(raw, key, prefix))
+    return OrderedDict([(key, self.get_member(raw, key, prefix))
                  for key in raw.iterkeys()])
 
   def get_member(self, data, attr, prefix=''):
@@ -476,8 +489,7 @@ class UnspecifiedConfigSection(Config):
     print >>out, self.get_presentable_help_text(indent=indent)
     print >>out
     print >>out, indent_str + "  Consists of some number of sections like:"
-    self.each.print_help(out=out,
-                         indent=indent+2)
+    self.each.print_help(out=out, indent=indent+2)
 
 def _configs_from_dir(conf_dir):
   """
@@ -491,8 +503,7 @@ def _configs_from_dir(conf_dir):
     try:
       conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
     except configobj.ConfigObjError, ex:
-      LOG.error("Error in configuration file '%s': %s" %
-                    (os.path.join(conf_dir, filename), ex))
+      LOG.error("Error in configuration file '%s': %s" % (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
     yield conf
@@ -566,9 +577,7 @@ def bind_module_config(mod, conf_data, config_key):
     bind_data = conf_data.get(config_key, {})
 
   members = _bind_module_members(mod, bind_data, section)
-  return ConfigSection(section,
-                       members=members,
-                       help=mod.__doc__)
+  return ConfigSection(section, members=members, help=mod.__doc__)
 
 def initialize(modules, config_dir):
   """
@@ -598,20 +607,53 @@ def initialize(modules, config_dir):
 def is_anonymous(key):
   return key == _ANONYMOUS
 
+
+def coerce_str_lowercase(value):
+  return smart_str(value).lower()
+
+
 def coerce_bool(value):
   if isinstance(value, bool):
     return value
 
-  try:
+  if isinstance(value, basestring):
     upper = value.upper()
-  except:
+  else:
     upper = value
+
   if upper in ("FALSE", "0", "NO", "OFF", "NAY", "", None):
     return False
   if upper in ("TRUE", "1", "YES", "ON", "YEA"):
     return True
   raise Exception("Could not coerce %r to boolean value" % (value,))
 
+def coerce_string(value):
+  if type(value) == list:
+    return ','.join(value)
+  else:
+    return value
+
+def coerce_csv(value):
+  if isinstance(value, str):
+    return value.split(',')
+  elif isinstance(value, list):
+    return value
+  raise Exception("Could not coerce %r to csv array." % value)
+
+def coerce_json_dict(value):
+  if isinstance(value, basestring):
+    return json.loads(value)
+  elif isinstance(value, dict):
+    return value
+  raise Exception("Could not coerce %r to json dictionary." % value)
+
+def list_of_compiled_res(skip_empty=False):
+  def fn(list_of_strings):
+    if isinstance(list_of_strings, basestring):
+      list_of_strings = list_of_strings.split(',')
+    list_of_strings = filter(lambda string: string if skip_empty else True, list_of_strings)
+    return list(re.compile(x) for x in list_of_strings)
+  return fn
 
 def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
   """
@@ -647,3 +689,30 @@ def validate_port(confvar):
   except ValueError:
     return error_res
   return [ ]
+
+def validate_thrift_transport(confvar):
+  """
+  Validate that the provided thrift transport is supported.
+  Returns [(confvar, error_msg)] or []
+  """
+  transport = confvar.get()
+  error_res = [(confvar, 'Thrift transport %s not supported. Please choose a supported transport: %s' % (transport, ', '.join(SUPPORTED_THRIFT_TRANSPORTS)))]
+
+  if transport not in SUPPORTED_THRIFT_TRANSPORTS:
+    return error_res
+
+  return []
+
+def coerce_password_from_script(script):
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
+  stdout, stderr = p.communicate()
+
+  if p.returncode != 0:
+    if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
+      raise subprocess.CalledProcessError(p.returncode, script)
+    else:
+      return None
+
+  # whitespace may be significant in the password, but most files have a
+  # trailing newline.
+  return stdout.strip('\n')

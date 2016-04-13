@@ -16,71 +16,74 @@
 # limitations under the License.
 # Common functions for hudson build scripts
 
+if [ ! -e $HOME/.hue_cache ]; then
+  mkdir -p $HOME/.hue_cache
+fi;
+
+check_mtime() {
+  MTIME_FILE=${1}
+  MTIME=$( curl -Is ${2} | awk 'BEGIN {FS=":"} { if ($1 == "Last-Modified") { print substr($2,2) } }' )
+
+  if echo "${MTIME}" | diff ${MTIME_FILE} - > /dev/null; then
+    return 0
+  else
+    echo ${MTIME} > ${MTIME_FILE}
+    return 1
+  fi;
+}
+
+##########
 #
 # Use $CDH_URL to control where to download Hadoop.
 # If not specified, it uses the $CDH variable to select an archive location.
 #
 
-CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.2.0-SNAPSHOT.tar.gz}
+CDH_URL=${CDH_URL:-http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.5.0-cdh5.2.0.tar.gz}
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
+CDH_SHORT_VERSION=${CDH_VERSION/hadoop-/}
 CDH_CACHE="$HOME/.hue_cache/${CDH_TGZ}"
+CDH_MTIME_FILE="$HOME/.hue_cache/.cdh_mtime"
 
 build_hadoop() {
-  if [ ! -f $CDH_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${CDH_MTIME_FILE} ${CDH_URL} || [ ! -f $CDH_CACHE ]; then
     echo "Downloading $CDH_URL..."
     wget $CDH_URL -O $CDH_CACHE
   fi
 
   HADOOP_DIR=$HUE_ROOT/ext/hadoop
-  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}"
-  export HADOOP_BIN=$HADOOP_HDFS_HOME/bin/hadoop
+  export YARN_HOME="$HADOOP_DIR/${CDH_VERSION}"
+  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/hdfs"
+  export HADOOP_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/hadoop"
+  export HADOOP_MAPRED_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2"
+  export HADOOP_MAPRED_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/mapred"
 
   mkdir -p $HADOOP_DIR
-  rm -rf $HADOOP_HDFS_HOME
+  rm -rf "$HADOOP_DIR/${CDH_VERSION}"
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
+  ln -sf $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
+  # For Hive
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*.jar $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs-${CDH_SHORT_VERSION}.jar  $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs.jar
+  # For MR2
+  ln -sf "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
 }
 
 ##########
 
-MR1_URL=${MR1_URL:-http://nightly.cloudera.com/cdh4/cdh/4/mr1-2.0.0-mr1-cdh4.2.0-SNAPSHOT.tar.gz}
-
-MR1_TGZ=$(basename $MR1_URL)
-MR1_VERSION=${MR1_TGZ/.tar.gz/}
-MR1_VERSION=${MR1_VERSION/mr1/hadoop}
-MR1_CACHE="$HOME/.hue_cache/${MR1_TGZ}"
-
-build_mr1() {
-  if [ ! -f $MR1_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
-    echo "Downloading $MR1_URL..."
-    wget $MR1_URL -O $MR1_CACHE
-  fi
-
-  MR1_DIR=$HUE_ROOT/ext/mr1
-  export HADOOP_MR1_HOME="$MR1_DIR/${MR1_VERSION}"
-  export HADOOP_MR1_BIN="$HADOOP_MR1_HOME/bin/hadoop"
-
-  mkdir -p $MR1_DIR
-  rm -rf $HADOOP_MR1_HOME
-  echo "Unpacking $MR1_CACHE to $MR1_DIR"
-  tar -C $MR1_DIR -xzf $MR1_CACHE
-}
-
-##########
-
-HIVE_URL=${HIVE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hive-0.9.0-cdh4.2.0-SNAPSHOT.tar.gz}
+HIVE_URL=${HIVE_URL:-http://archive.cloudera.com/cdh5/cdh/5/hive-0.13.1-cdh5.2.0.tar.gz}
 
 HIVE_TGZ=$(basename $HIVE_URL)
 HIVE_VERSION=${HIVE_TGZ/.tar.gz/}
 HIVE_CACHE="$HOME/.hue_cache/${HIVE_TGZ}"
+HIVE_MTIME_FILE="$HOME/.hue_cache/.hive_mtime"
 
 build_hive() {
-  if [ ! -f $HIVE_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${HIVE_MTIME_FILE} ${HIVE_URL} || [ ! -f $HIVE_CACHE ]; then
     echo "Downloading $HIVE_URL..."
     wget $HIVE_URL -O $HIVE_CACHE
   fi
@@ -92,19 +95,23 @@ build_hive() {
   rm -rf $HIVE_HOME
   echo "Unpacking $HIVE_CACHE to $HIVE_DIR"
   tar -C $HIVE_DIR -xzf $HIVE_CACHE
+  ln -sf $HIVE_DIR/${HIVE_VERSION} $HIVE_DIR/hive
   export HIVE_CONF_DIR=$HIVE_HOME/conf
+
+  # Weird HADOOP_HOME, creating a HADOOP_HIVE_HOME
+  #sed -i'.bk' "s|HADOOP=\$HADOOP_HOME/bin/hadoop|HADOOP=\$HADOOP_HIVE_HOME/bin/hadoop|g" $HIVE_HOME/bin/hive
 }
 
 ##########
-OOZIE_URL=${OOZIE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/oozie-3.2.0-cdh4.2.0-SNAPSHOT.tar.gz}
+OOZIE_URL=${OOZIE_URL:-http://archive.cloudera.com/cdh5/cdh/5/oozie-4.0.0-cdh5.2.0.tar.gz}
 
 OOZIE_TGZ=$(basename $OOZIE_URL)
 OOZIE_VERSION=${OOZIE_TGZ/.tar.gz/}
 OOZIE_CACHE="$HOME/.hue_cache/${OOZIE_TGZ}"
+OOZIE_MTIME_FILE="$HOME/.hue_cache/.oozie_mtime"
 
 build_oozie() {
-  if [ ! -f $OOZIE_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${OOZIE_MTIME_FILE} ${OOZIE_URL} || [ ! -f $OOZIE_CACHE ]; then
     echo "Downloading $OOZIE_URL..."
     wget $OOZIE_URL -O $OOZIE_CACHE
   fi
@@ -119,14 +126,53 @@ build_oozie() {
   export OOZIE_CONF_DIR=$OOZIE_HOME/conf
 
   rm -rf $OOZIE_DIR/oozie
-  ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie # easier to reference later
+  ln -sf $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie
 
   mkdir -p $OOZIE_HOME/libext
-  tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*-cdh*-SNAPSHOT.tar.gz
-  cp $OOZIE_HOME/libext/oozie-*-SNAPSHOT/hadooplibs/hadooplib-*-mr1-cdh*-SNAPSHOT/*jar $OOZIE_HOME/libext/
+  tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*.tar.gz
+  HADOOP_LIB=`echo "${CDH_VERSION}" | sed 's/hadoop/hadooplib/g'`
+  cp $OOZIE_HOME/libext/oozie-*/hadooplibs/${HADOOP_LIB}*/*jar $OOZIE_HOME/libext/
   tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
-  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-sharelib-*-SNAPSHOT-sharelib.tar.gz
+  cp  $OOZIE_HOME/oozie-sharelib-*-yarn.tar.gz $OOZIE_HOME/oozie-sharelib.tar.gz
 
-  $OOZIE_HOME/bin/oozie-setup.sh
+  $OOZIE_HOME/bin/oozie-setup.sh prepare-war
   $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
+}
+
+
+##########
+SQOOP_URL=${SQOOP_URL:-http://archive.cloudera.com/cdh5/cdh/5/sqoop2-1.99.3-cdh5.2.0.tar.gz}
+
+SQOOP_TGZ=$(basename $SQOOP_URL)
+SQOOP_VERSION=${SQOOP_TGZ/.tar.gz/}
+SQOOP_CACHE="$HOME/.hue_cache/${SQOOP_TGZ}"
+SQOOP_MTIME_FILE="$HOME/.hue_cache/.sqoop_mtime"
+
+build_sqoop() {
+  if ! check_mtime ${SQOOP_MTIME_FILE} ${SQOOP_URL} || [ ! -f $SQOOP_CACHE ]; then
+    echo "Downloading $SQOOP_URL..."
+    wget $SQOOP_URL -O $SQOOP_CACHE
+  fi
+
+  SQOOP_DIR=$HUE_ROOT/ext/sqoop
+  export SQOOP_HOME="$SQOOP_DIR/${SQOOP_VERSION}"
+
+  mkdir -p $SQOOP_DIR
+  rm -rf $SQOOP_HOME
+  echo "Unpacking $SQOOP_CACHE to $SQOOP_DIR"
+  tar -C $SQOOP_DIR -xzf $SQOOP_CACHE
+  export SQOOP_CONF_DIR=$SQOOP_HOME/server/conf
+
+  rm -rf $SQOOP_DIR/sqoop
+  ln -sf $SQOOP_DIR/${SQOOP_VERSION} $SQOOP_DIR/sqoop
+
+  # Change ports and hostnames to be configurable or replaceable
+  sed -i'.bk' 's/12000/${test.port.http}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' 's/12001/${test.port.shutdown}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' 's/localhost/${test.host.local}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' "s|\(common.loader.*$\)|\1,$HADOOP_DIR/hadoop/share/hadoop/common/lib/*.jar,$HADOOP_DIR/hadoop/share/hadoop/mapreduce1/*.jar,$HADOOP_DIR/hadoop/share/hadoop/mapreduce1/lib/*.jar|g" $SQOOP_CONF_DIR/catalina.properties
+  sed -i'.bk' "s|\${catalina\.base}/logs|\${test.log.dir}|g" $SQOOP_CONF_DIR/logging.properties
+  sed -i'.bk' "s|\@LOGDIR\@|\${test.log.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
+  sed -i'.bk' "s|\@BASEDIR\@|\${test.base.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
+  sed -i'.bk' "s|/etc/hadoop/conf|\${test.hadoop.conf.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
 }

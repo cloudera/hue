@@ -1,0 +1,151 @@
+# French translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
+#: src/liboauth/backend.py:158 src/liboauth/backend.py:171
+#: src/liboauth/backend.py:180 src/liboauth/backend.py:254
+#, python-format
+msgid "Invalid response from OAuth provider: %s"
+msgstr "Réponse non valide du fournisseur OAuth : %s"
+
+#: src/liboauth/conf.py:27
+msgid "The Consumer key of the twitter application."
+msgstr "Clé Consommateur de l'application Twitter."
+
+#: src/liboauth/conf.py:33
+msgid "The Consumer key of the google application."
+msgstr "Clé Consommateur de l'application Google."
+
+#: src/liboauth/conf.py:39
+msgid "The Consumer key of the facebook application."
+msgstr "Clé Consommateur de l'application Facebook."
+
+#: src/liboauth/conf.py:45
+msgid "The Consumer key of the linkedin application."
+msgstr "Clé Consommateur de l'application LinkedIn."
+
+#: src/liboauth/conf.py:52
+msgid "The Consumer secret of the twitter application."
+msgstr "Secret Consommateur de l'application Twitter."
+
+#: src/liboauth/conf.py:58
+msgid "The Consumer secret of the google application."
+msgstr "Secret Consommateur de l'application Google."
+
+#: src/liboauth/conf.py:64
+msgid "The Consumer secret of the facebook application."
+msgstr "Secret Consommateur de l'application Facebook."
+
+#: src/liboauth/conf.py:70
+msgid "The Consumer secret of the linkedin application."
+msgstr "Secret Consommateur de l'application LinkedIn."
+
+#: src/liboauth/conf.py:78
+msgid "The Twitter Request token URL."
+msgstr "URL du jeton de la requête Twitter."
+
+#: src/liboauth/conf.py:84
+msgid "The Google Request token URL."
+msgstr "URL du jeton de la requête Google."
+
+#: src/liboauth/conf.py:90
+msgid "The Facebook Request token URL."
+msgstr "URL du jeton de la requête Facebook."
+
+#: src/liboauth/conf.py:96
+msgid "The Linkedin Request token URL."
+msgstr "URL du jeton de la requête LinkedIn."
+
+#: src/liboauth/conf.py:103
+msgid "The Twitter Access token URL."
+msgstr "URL du jeton d'accès Twitter."
+
+#: src/liboauth/conf.py:109
+msgid "The Google Access token URL."
+msgstr "URL du jeton d'accès Google."
+
+#: src/liboauth/conf.py:115
+msgid "The Facebook Access token URL."
+msgstr "URL du jeton d'accès Facebook."
+
+#: src/liboauth/conf.py:121
+msgid "The Linkedin Access token URL."
+msgstr "URL du jeton d'accès LinkedIn."
+
+#: src/liboauth/conf.py:129
+msgid "The Twitter Authorize URL."
+msgstr "URL d'autorisation Twitter."
+
+#: src/liboauth/conf.py:135
+msgid "The Google Authorize URL."
+msgstr "URL d'autorisation Google."
+
+#: src/liboauth/conf.py:141
+msgid "The Facebook Authorize URL."
+msgstr "URL d'autorisation Facebook."
+
+#: src/liboauth/conf.py:147
+msgid "The Linkedin Authorize URL."
+msgstr "URL d'autorisation LinkedIn."
+
+#: src/liboauth/conf.py:154
+msgid "Comma-separated list of whitelisted domains."
+msgstr "Liste des domaines acceptés, séparés par des virgules."
+
+#: src/liboauth/conf.py:161
+msgid "JSON formatted hash of username simplifications. Example: {\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} converts \"email@sub1.domain.com\" to \"email_S1\""
+msgstr "Hachage au format JSON des simplifications de noms d'utilisateur. Exemple : {\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} convertit \"email@sub1.domain.com\" en \"email_S1\""
+
+#: src/liboauth/views.py:72
+#, python-format
+msgid "Invalid request: %s"
+msgstr "Requête non valide : %s"
+
+#: src/liboauth/templates/oauth-login.mako:25
+msgid "Hue - Sign up"
+msgstr "Hue - Inscription"
+
+#: src/liboauth/templates/oauth-login.mako:27
+msgid "Hue - Sign in"
+msgstr "Hue - Connexion"
+
+#: src/liboauth/templates/oauth-login.mako:155
+msgid "Visit gethue.com"
+msgstr "Visitez le site gethue.com"
+
+#: src/liboauth/templates/oauth-login.mako:155
+msgid "Fell asleep? Visit us on gethue.com instead!"
+msgstr "Envie d'une petite sieste ? Visitez plutôt notre site à l'adresse gethue.com."
+
+#: src/liboauth/templates/oauth-login.mako:170
+msgid "Error!"
+msgstr "Erreur !"
+
+#: src/liboauth/templates/oauth-login.mako:170
+msgid "Invalid username or password."
+msgstr "Nom d'utilisateur ou mot de passe non valide."
+
+#: src/liboauth/templates/oauth-login.mako:177
+msgid "This is your first time logging in."
+msgstr "Il s'agit de votre première connexion."
+
+#: src/liboauth/templates/oauth-login.mako:178
+msgid "You will become Hue superuser."
+msgstr "Vous deviendrez un superutilisateur Hue."
+

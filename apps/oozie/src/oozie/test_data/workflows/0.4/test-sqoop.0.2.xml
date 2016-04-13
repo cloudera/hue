@@ -1,0 +1,23 @@
+<workflow-app name="Sqoop" xmlns="uri:oozie:workflow:0.4">
+    <start to="Sqoop"/>
+    <action name="Sqoop">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                  <delete path="${nameNode}${output}"/>
+            </prepare>
+            <command>import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1</command>
+            <arg>My invalid arg</arg>
+            <arg>My invalid arg 2</arg>
+            <file>db.hsqldb.properties#db.hsqldb.properties</file>
+            <file>db.hsqldb.script#db.hsqldb.script</file>
+        </sqoop>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

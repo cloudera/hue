@@ -1,0 +1,25 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "Credit Card numbers - redact all but last 4",
+      "search": "\\d{4}.\\d{4}.\\d{4}.(\\d{4})",
+      "replace": "XXXX-XXXX-XXXX-$1"
+    },
+    {
+      "description": "Hostnames, leaving TLD",
+      "search": "\\b(([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])\\.)+([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\b",
+      "replace": "HOSTNAME.REDACTED.$3"
+    },
+    {
+      "description": "IP Addresses - reordered",
+      "search": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})",
+      "replace": "$3.$1.$4.$2"
+    },
+    {
+      "description": "Magic double double",
+      "search": "Magic ([a-z]+)",
+      "replace": "$1: Magic $1, $1"
+    }
+  ]
+}

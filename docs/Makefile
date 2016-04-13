@@ -28,11 +28,11 @@ docs: $(BLD_DIR_DOC)
 NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 
 #
-# Being lazy/loose with the prerequsite. Include all files except sdk and
+# Being lazy/loose with the prerequisite. Include all files except sdk and
 # release notes, which are handled separately below.
 #
-DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -o -print)
-$(BLD_DIR_DOC): sdk release-notes $(DOC_FILES)
+DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -o -print)
+$(BLD_DIR_DOC): sdk release-notes user-guide $(DOC_FILES)
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
 
@@ -51,8 +51,28 @@ release-notes: $(BLD_DIR_DOC)/release-notes
 $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	@echo '--- Generating release notes at $@'
 	@mkdir -p $@
-	@for i in $? ; do asciidoc $$i ; done
+	@cp docbook.css $@
+	@cp docbook.css release-notes/
+	@for i in $? ; do \
+	  a2x --format=xhtml --stylesheet=docbook.css $$i ; \
+	  rm -f $$i.xml ; \
+	done;
+	@rm release-notes/docbook.css
 	@mv release-notes/*.html $@/
+	@echo "--- Generated $@"
+
+
+.PHONY: user-guide
+user-guide: $(BLD_DIR_DOC)/user-guide
+$(BLD_DIR_DOC)/user-guide: $(wildcard user-guide/*.md)
+	@echo '--- Generating user-guide doc at $@'
+	@mkdir -p $@
+	@cp -r user-guide/images $@
+	@cp docbook.css $@
+	@for x in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
+	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
+	  $$x > $(BLD_DIR_DOC)/$$x ; done
+	@(cd $@; for file in *.md; do mv $${file} $${file/\.md/.html}; done)
 	@echo "--- Generated $@"
 
 

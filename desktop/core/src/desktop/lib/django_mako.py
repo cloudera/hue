@@ -17,18 +17,28 @@
 #
 # Adapted from http://code.google.com/p/django-mako/source/browse/trunk/djangomako/shortcuts.py
 
-from django.http import HttpResponse
-from desktop.lib import apputil, i18n
 import os
 import tempfile
-from mako.lookup import TemplateLookup, TemplateCollection
+
 import django.template
+from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.http import HttpResponse
+
+from mako.lookup import TemplateLookup, TemplateCollection
+
+from desktop.lib import apputil, i18n
+
+register = django.template.Library()
 
 ENCODING_ERRORS = 'replace'
 
 # Things to automatically import into all template namespaces
 IMPORTS=[
-  "from desktop.lib.django_mako import url"
+  "from django.utils.html import escape",
+  "from desktop.lib.django_mako import url",
+  "from desktop.lib.django_mako import csrf_token",
+  "from desktop.lib.django_mako import static",
 ]
 
 class DesktopLookup(TemplateCollection):
@@ -63,7 +73,7 @@ class DesktopLookup(TemplateCollection):
                             output_encoding=i18n.get_site_encoding(),
                             input_encoding=i18n.get_site_encoding(),
                             encoding_errors=ENCODING_ERRORS,
-                            default_filters=['unicode'], 
+                            default_filters=['unicode', 'escape'],
                             imports=IMPORTS)
     # TODO(philip): Make a django_aware default filter, that understands
     # django safe strings.  See http://www.makotemplates.org/docs/filtering.html.
@@ -79,7 +89,6 @@ class DesktopLookup(TemplateCollection):
     return real_loader.get_template(uri)
 
 lookup = DesktopLookup()
-
 
 def render_to_string_test(template_name, django_context):
   """
@@ -101,6 +110,7 @@ def render_to_string_normal(template_name, django_context):
     data_dict = django_context
 
   template = lookup.get_template(template_name)
+  data_dict = dict(map(lambda k: (str(k), data_dict.get(k)), data_dict.keys()))
   result = template.render(**data_dict)
   return i18n.smart_unicode(result)
 
@@ -119,3 +129,27 @@ def url(view_name, *args, **view_args):
   """URL tag for use in templates - like {% url ... %} in django"""
   from django.core.urlresolvers import reverse
   return reverse(view_name, args=args, kwargs=view_args)
+
+
+from django.core.context_processors import csrf
+
+def csrf_token(request):
+  """
+  Returns the rendered common footer
+  """
+  csrf_token = unicode(csrf(request)["csrf_token"])
+  return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+
+def static(path):
+  """
+  Returns the URL to a file using the staticfiles's storage engine
+  """
+  try:
+    return staticfiles_storage.url(path)
+  except ValueError:
+    # django.contrib.staticfiles raises a ValueError if the file we are looking
+    # for is not in the staticfiles directory. This will result in a 500 error
+    # in a mako script, which is a little unfriendly. Instead we'll return a
+    # path to a non-existing file so the template renders and we can see the
+    # missing file in the logs.
+    return settings.STATIC_URL + path

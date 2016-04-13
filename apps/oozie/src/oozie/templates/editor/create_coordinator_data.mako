@@ -54,11 +54,11 @@ from django.utils.safestring import mark_safe
 
   <button type="button" class="btn" data-bind="click: add_${ element }">${ _('Add') }</button>
 
-  ${ formset.management_form }
+  ${ formset.management_form | n,unicode }
 
   </div>
 
-  <style>
+  <style type="text/css">
     .dataTable th {
       text-align:left;
     }
@@ -66,9 +66,9 @@ from django.utils.safestring import mark_safe
 
   <script type="text/javascript">
     $(document).ready(function(){
-      var initial = ${ [{'name': str(form['name']), 'dataset': str(form['dataset']), 'error_message': str(form.errors) } for form in formset.forms] };
-      var nameHTML = '${ str(formset.empty_form["name"]).replace("\r", "").replace("\n", "").replace("\s", "") }';
-      var datasetHTML = '${ str(formset.empty_form["dataset"]).replace("\r", "").replace("\n", "").replace("\s", "") }';
+      var initial = ${ [{'name': str(form['name']), 'dataset': str(form['dataset']), 'error_message': str(form.errors) } for form in formset.forms]  | n,unicode };
+      var nameHTML = '${ str(formset.empty_form["name"]).replace("\r", "").replace("\n", "").replace("\s", "") | n,unicode }';
+      var datasetHTML = '${ str(formset.empty_form["dataset"]).replace("\r", "").replace("\n", "").replace("\s", "") | n,unicode }';
       var count = initial.length;
       var root = $('#${element}');
       var table = root.find('table');

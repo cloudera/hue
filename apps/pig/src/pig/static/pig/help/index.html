@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Pig Editor</title>
+</head>
+<body id="xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9c"><a name="xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9c"><!-- --></a>
+
+
+  <h1 class="title topictitle1">Pig Editor</h1>
+
+
+  <div class="body conbody">
+    <p class="p">The Pig Editor application allows you to define Pig scripts, run scripts,
+      and view the status of jobs. For information about Pig, see <a class="xref" href="http://archive.cloudera.com/cdh5/cdh/5/pig/" target="_blank">Pig Documentation</a>. </p>
+
+  </div>
+
+<p id="docs-internal-guid-0ab02ef5-c3a4-c1fe-509c-31f69bf4beb7"><span>In Hue 3.5, a new assistant was added to the </span><a href="http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3"><span>Pig Editor</span></a><span>: Navigator.</span></p>
+<p><br/><span></span></p>
+<p><span>Similarly to the </span><a href="http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and"><span>Hive</span></a><span> and </span><a href="http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor"><span>Impala</span></a><span> Editors, functions and Pig statements are made directly available from within the editor:</span></p>
+<p><br/><span></span></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/81111082" width="900"></iframe></p>
+<p><br/><span></span></p>
+<p><span>Navigator is:</span></p>
+<ul><li>
+<p><span>Sorted by category</span></p>
+</li>
+<li>
+<p><span>Searchable</span></p>
+</li>
+<li>
+<p><span>Auto-completable (as well as HDFS paths and Metastore tables)</span></p>
+</li>
+</ul><p><br/><span></span><span>So now, get started with </span><a href="http://pig.apache.org/"><span>Apache Pig</span></a><span>!</span></p>
+                </p>
+                
+
+  <div class="topic concept nested1" id="concept_u25_g2v_yj"><a name="concept_u25_g2v_yj"><!-- --></a>
+    <h2 class="title topictitle2">Pig Editor Installation and Configuration </h2>
+
+    <div class="body conbody">
+      <p class="p">Pig Editor is one of the applications installed as part of Hue.
+
+    </div>
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_e2q_xn5_wj"><a name="concept_e2q_xn5_wj"><!-- --></a>
+    <h2 class="title topictitle2">Starting Pig Editor</h2>
+
+    <div class="body conbody">
+      <div class="p">Click the <strong class="ph b">Pig Editor</strong> icon (<a name="concept_e2q_xn5_wj__image_fgk_4n5_wj"><!-- --></a><img class="image" id="concept_e2q_xn5_wj__image_fgk_4n5_wj" src="/static/pig/art/icon_pig_24.png"/>) in the navigation bar at the top of the Hue
+        browser page. The Pig Editor opens with three tabs:<a name="concept_e2q_xn5_wj__ul_itr_clx_2k"><!-- --></a><ul class="ul" id="concept_e2q_xn5_wj__ul_itr_clx_2k">
+          <li class="li">Editor - editor where you can create, edit, run, save, copy, and
+            delete scripts and edit script properties.</li>
+
+          <li class="li">Scripts - script manager where you can create, open, run, copy,
+            and delete scripts. </li>
+
+          <li class="li">Dashboard - dashboard where you can view running and completed
+            scripts and view the log of a job. </li>
+
+        </ul>
+</div>
+
+    </div>
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_lng_kjt_yj"><a name="concept_lng_kjt_yj"><!-- --></a>
+    <h2 class="title topictitle2">Installing the Sample Pig Scripts </h2>
+
+    <div class="body conbody">
+      <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> You must be a superuser to perform this task.</div>
+
+      <a name="concept_lng_kjt_yj__ol_zys_pjt_yj"><!-- --></a><ol class="ol" id="concept_lng_kjt_yj__ol_zys_pjt_yj">
+        <li class="li">Click <a name="concept_lng_kjt_yj__d45e102"><!-- --></a><img class="image" id="concept_lng_kjt_yj__d45e102" src="/static/desktop/art/hue-logo-mini.png"/>. The Quick Start Wizard opens.</li>
+<li class="li">Click <strong class="ph b">Step 2:
+            Examples</strong>.</li>
+
+        <li class="li">Click <strong class="ph b">Pig Editor</strong>.</li>
+
+      </ol>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_b5z_23x_2k"><a name="concept_b5z_23x_2k"><!-- --></a>
+      <h3 class="title topictitle3">Scripts</h3>
+
+      <div class="body conbody">
+        <div class="section" id="concept_b5z_23x_2k__section_s35_5lx_2k"><a name="concept_b5z_23x_2k__section_s35_5lx_2k"><!-- --></a><h4 class="title sectiontitle">Creating a Script</h4>
+          
+          <a name="concept_b5z_23x_2k__ol_mwq_z2y_2k"><!-- --></a><ol class="ol" id="concept_b5z_23x_2k__ol_mwq_z2y_2k">
+            <li class="li">In either the Editor or Scripts screen, click <span class="ph uicontrol">New
+                script</span>. Edit the script as desired.</li>
+
+            <li class="li">Click <span class="ph uicontrol">Edit
+              Properties</span>. In the Script name field, type a name for the script.</li>
+
+            <li class="li">Click <span class="ph uicontrol">Save</span>.</li>
+
+          </ol>
+
+        </div>
+
+        <div class="section" id="concept_b5z_23x_2k__section_tvv_5lx_2k"><a name="concept_b5z_23x_2k__section_tvv_5lx_2k"><!-- --></a><h4 class="title sectiontitle">Opening a Script</h4>
+          
+          <a name="concept_b5z_23x_2k__ol_nvn_2fy_2k"><!-- --></a><ol class="ol" id="concept_b5z_23x_2k__ol_nvn_2fy_2k">
+            <li class="li">Click the <span class="ph uicontrol">Scripts</span> tab.</li>
+
+            <li class="li">In the list of scripts, click a script.</li>
+
+          </ol>
+
+        </div>
+
+        <div class="section" id="concept_b5z_23x_2k__section_gjr_rfy_2k"><a name="concept_b5z_23x_2k__section_gjr_rfy_2k"><!-- --></a><h4 class="title sectiontitle">Running a Script</h4>
+          
+          <a name="concept_b5z_23x_2k__ol_r2q_sfy_2k"><!-- --></a><ol class="ol" id="concept_b5z_23x_2k__ol_r2q_sfy_2k">
+            <li class="li">Do one of the following:<a name="concept_b5z_23x_2k__ul_gj2_5fy_2k"><!-- --></a><ul class="ul" id="concept_b5z_23x_2k__ul_gj2_5fy_2k">
+                <li class="li">In the Editor screen, click the <span class="ph uicontrol">Run</span> button.</li>
+
+                <li class="li">In the Scripts screen,  check the checkbox next to a script and click the
+                    <span class="ph uicontrol">Run</span> button.</li>
+
+              </ul>
+</li>
+
+          </ol>
+
+        </div>
+
+        <div class="section" id="concept_b5z_23x_2k__section_kf2_zfy_2k"><a name="concept_b5z_23x_2k__section_kf2_zfy_2k"><!-- --></a><h4 class="title sectiontitle">Viewing the Result of Running a Script</h4>
+          
+          <a name="concept_b5z_23x_2k__ol_jvm_2gy_2k"><!-- --></a><ol class="ol" id="concept_b5z_23x_2k__ol_jvm_2gy_2k">
+            <li class="li">Click the <span class="ph uicontrol">Dashboard</span> tab.</li>
+
+            <li class="li">Click a job.</li>
+
+          </ol>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+</body>
+</html>

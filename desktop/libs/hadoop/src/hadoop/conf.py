@@ -14,13 +14,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Settings to configure your Hadoop cluster."""
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
+
 import fnmatch
 import logging
 import os
 
+from django.utils.translation import ugettext_lazy as _t
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.conf import default_ssl_validate
+
+LOG = logging.getLogger(__name__)
 DEFAULT_NN_HTTP_PORT = 50070
+
 
 def find_file_recursive(desired_glob, root):
   def f():
@@ -38,26 +43,6 @@ def find_file_recursive(desired_glob, root):
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
   return f
 
-HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
-  help="[Used only in testing code.] Path to the Hadoop plugin jar.",
-  type=str,
-  dynamic_default=find_file_recursive("hue-plugins-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'java-lib')),
-  private=True)
-
-SUDO_SHELL_JAR = Config("hadoop_sudo_shell_jar",
-  help="Tool that allows a proxy user UGI to be used to upload files.",
-  type=str,
-  dynamic_default=find_file_recursive("sudo-shell-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'sudo-shell', 'java-lib')),
-  private=True)
-
-CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
-  help="Tool that is capable of merging multiple files containing delegation tokens into one.",
-  type=str,
-  dynamic_default=find_file_recursive("credentials-merger-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'credentials-merger', 'java-lib')),
-  private=True)
 
 UPLOAD_CHUNK_SIZE = Config(
   key="upload_chunk_size",
@@ -72,53 +57,32 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
-      # Deprecated
-      NN_HOST=Config("namenode_host", help="Host/IP for name node"),
-
-      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
-                            type=int),
-      NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int),
-      # End deprecation
       FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
                           default="hdfs://localhost:8020"),
+      LOGICAL_NAME = Config("logical_name", default="",
+                            type=str, help=_t('NameNode logical name.')),
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFS service. Defaults to " +
                          "the WebHDFS URL on the NameNode.",
-                         type=str, default=None),
-      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
+                         type=str, default="http://localhost:50070/webhdfs/v1"),
+      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode", # Unused
                                    default="hdfs", type=str),
-      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
+      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode", # Unused
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
+      SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
+                  help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
+                  dynamic_default=default_ssl_validate,
+                  type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
-
-      HADOOP_HDFS_HOME = Config(
-        key="hadoop_hdfs_home",
-        default=os.environ.get("HADOOP_HDFS_HOME", "/usr/lib/hadoop-hdfs"),
-        help=("Path to Hadoop HDFS home - HADOOP_HOME or HADOOP_HDFS_HOME in " +
-              "hadoop parlance. For tarball installations, it is the root of " +
-              "the untarred directory. For packages, " +
-              "it is /usr/lib/hadoop-hdfs." +
-              "Defaults to the environment varible HADOOP_BIN when set, " +
-              "or '/usr/bin/hadoop'."),
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
       HADOOP_CONF_DIR = Config(
         key="hadoop_conf_dir",
         default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
+        help=("Directory of the Hadoop configuration) Defaults to the environment variable " +
               "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
+      )
     )
   )
 )
@@ -134,6 +98,10 @@ MR_CLUSTERS = UnspecifiedConfigSection(
                   default=8021,
                   help="Service port for the JobTracker",
                   type=int),
+      LOGICAL_NAME=Config('logical_name',
+                          default="",
+                          type=str,
+                          help=_t('JobTracker logical name.')),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int),
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
@@ -141,37 +109,14 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=True, type=coerce_bool),
-
-      HADOOP_MAPRED_HOME = Config(
-        key="hadoop_mapred_home",
-        default=os.environ.get("HADOOP_MR1_HOME", "/usr/lib/hadoop-0.20-mapreduce"),
-        help=("Path to directory holding Hadoop MR1 libs. " +
-              "E.g. /usr/lib/hadoop. Defaults to the environment variable " +
-              "HADOOP_MR1_HOME when set, or '/usr/lib/hadoop'.")
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_MR1_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_MR1_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
-              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
+                       default=True, type=coerce_bool), # True here for backward compatibility
     )
   )
 )
 
 YARN_CLUSTERS = UnspecifiedConfigSection(
   "yarn_clusters",
-  help="One entry for each Yarn cluster. Currently only one cluster "
-       "(called 'default') is supported.",
+  help="One entry for each Yarn cluster",
   each=ConfigSection(
     help="Information about a single Yarn cluster",
     members=dict(
@@ -182,87 +127,99 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   default=8032,
                   type=int,
                   help="Service port for the ResourceManager"),
+      LOGICAL_NAME=Config('logical_name',
+                          default="",
+                          type=str,
+                          help=_t('Resource Manager logical name.')),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=False, type=coerce_bool),
-
-      HADOOP_MAPRED_HOME = Config(
-        key="hadoop_mapred_home",
-        default=os.environ.get("HADOOP_MR2_HOME", "/usr/lib/hadoop-mapreduce"),
-        help=("Path to directory holding Hadoop MR2 libs. " +
-              "E.g. /usr/lib/hadoop. Defaults to the environment " +
-              "variable HADOOP_MR2_HOME when set, or '/usr/lib/hadoop'.")
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_MR2_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_MR2_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
-              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
+                       default=False, type=coerce_bool), # False here for backward compatibility
+      IS_YARN=Config("is_yarn", help="Attribute set only on YARN clusters and not MR1 ones.",
+                     default=True, type=coerce_bool),
+      RESOURCE_MANAGER_API_URL=Config("resourcemanager_api_url",
+                  default='http://localhost:8088',
+                  help="URL of the ResourceManager API"),
+      PROXY_API_URL=Config("proxy_api_url",
+                  default='http://localhost:8088',
+                  help="URL of the ProxyServer API"),
+      HISTORY_SERVER_API_URL=Config("history_server_api_url",
+                  default='http://localhost:19888',
+                  help="URL of the HistoryServer API"),
+      SPARK_HISTORY_SERVER_URL=Config("spark_history_server_url",
+                  default='http://localhost:18088',
+                  help="URL of the Spark History Server"),
+      SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
+                  help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
+                  dynamic_default=default_ssl_validate,
+                  type=coerce_bool)
     )
   )
 )
 
 
-def config_validator():
+def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
 
   Called by core check_config() view.
   """
-  from hadoop.fs import webhdfs
   from hadoop import job_tracker
-  res = [ ]
-  submit_to = [ ]
+  from hadoop.fs import webhdfs
+
+  res = []
+  submit_to = []
 
   # HDFS_CLUSTERS
   has_default = False
   for name in HDFS_CLUSTERS.keys():
     cluster = HDFS_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_HDFS_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
     res.extend(webhdfs.test_fs_configuration(cluster))
     if name == 'default':
       has_default = True
   if not has_default:
-    res.append("hadoop.hdfs_clusters", "You should have an HDFS called 'default'.")
+    res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # MR_CLUSTERS
+  mr_down = []
   for name in MR_CLUSTERS.keys():
     cluster = MR_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
-    res.extend(job_tracker.test_jt_configuration(cluster))
     if cluster.SUBMIT_TO.get():
+      mr_down.extend(job_tracker.test_jt_configuration(cluster))
       submit_to.append('mapred_clusters.' + name)
+  # If HA still failing
+  if mr_down and len(mr_down) == len(MR_CLUSTERS.keys()):
+    res.extend(mr_down)
 
   # YARN_CLUSTERS
+  if YARN_CLUSTERS.keys():
+    res.extend(test_yarn_configurations(user))
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
     if cluster.SUBMIT_TO.get():
       submit_to.append('yarn_clusters.' + name)
 
-  # Only one cluster should have submit_to
-  if len(submit_to) > 1:
-    res.append(("hadoop", "Only one cluster may enable 'submit_to'. "
-                "But it is enabled in the following clusters: " + 
-                ', '.join(submit_to)))
-  elif len(submit_to) == 0:
+  if not submit_to:
     res.append(("hadoop", "Please designate one of the MapReduce or "
                 "Yarn clusters with `submit_to=true' in order to run jobs."))
 
   return res
+
+
+def test_yarn_configurations(user):
+  result = []
+
+  try:
+    from jobbrowser.api import get_api # Required for cluster HA testing
+  except Exception, e:
+    LOG.warn('Jobbrowser is disabled, skipping test_yarn_configurations')
+    return result
+
+  try:
+    get_api(user, None).get_jobs(user, username=user.username, state='all', text='')
+  except Exception, e:
+    msg = 'Failed to contact an active Resource Manager: %s' % e
+    LOG.exception(msg)
+    result.append(('Resource Manager', msg))
+
+  return result

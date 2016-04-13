@@ -1,0 +1,67 @@
+<workflow-app name="test-workflow" xmlns="uri:oozie:workflow:0.4">
+  <global>
+    <job-tracker>${job-tracker}</job-tracker>
+    <name-node>${namd-node}</name-node>
+    <job-xml>job1.xml</job-xml>
+    <configuration>
+      <property>
+        <name>mapred.job.queue.name</name>
+        <value>${queueName}</value>
+      </property>
+    </configuration>
+  </global>
+  <start to="Sleep-1"/>
+  <action name="Sleep-1">
+    <map-reduce>
+      <configuration>
+        <property>
+          <name>mapred.reduce.tasks</name>
+          <value>1</value>
+        </property>
+        <property>
+          <name>mapred.mapper.class</name>
+          <value>org.apache.hadoop.examples.SleepJob</value>
+        </property>
+        <property>
+          <name>mapred.reducer.class</name>
+          <value>org.apache.hadoop.examples.SleepJob</value>
+        </property>
+        <property>
+          <name>mapred.mapoutput.key.class</name>
+          <value>org.apache.hadoop.io.IntWritable</value>
+        </property>
+        <property>
+          <name>mapred.mapoutput.value.class</name>
+          <value>org.apache.hadoop.io.NullWritable</value>
+        </property>
+        <property>
+          <name>mapred.output.format.class</name>
+          <value>org.apache.hadoop.mapred.lib.NullOutputFormat</value>
+        </property>
+        <property>
+          <name>mapred.input.format.class</name>
+          <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+        </property>
+        <property>
+          <name>mapred.partitioner.class</name>
+          <value>org.apache.hadoop.examples.SleepJob</value>
+        </property>
+        <property>
+          <name>mapred.speculative.execution</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>sleep.job.map.sleep.time</name>
+          <value>0</value>
+        </property>
+        <property>
+          <name>sleep.job.reduce.sleep.time</name>
+          <value>1</value>
+        </property>
+      </configuration>
+    </map-reduce>
+    <ok to="done"/>
+    <error to="kill"/>
+  </action>
+  <end name="done"/>
+</workflow-app>

@@ -1,0 +1,128 @@
+# English translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/about/views.py:61
+msgid "POST request required."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:21
+#: src/about/templates/admin_wizard.mako:28
+msgid "Quick Start"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:29
+msgid "Configuration"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:30
+msgid "Server Logs"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:42
+msgid "Quick Start Wizard"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:54
+msgid "Step 1:"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:54
+msgid "Check Configuration"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:55
+msgid "Step 2:"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:55
+msgid "Examples"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:56
+msgid "Step 3:"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:56
+msgid "Users"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:57
+msgid "Step 4:"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:57
+msgid "Go !"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:67
+msgid "Check your current configuration"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:81
+msgid "Install or re-install the application examples"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:87
+#: src/about/templates/admin_wizard.mako:94
+#: src/about/templates/admin_wizard.mako:101
+#: src/about/templates/admin_wizard.mako:108
+#: src/about/templates/admin_wizard.mako:115
+msgid "Installing..."
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:131
+msgid "Go create or import users"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:134
+msgid "User Admin"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:145
+msgid "Anonymous usage analytics"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:152
+msgid "How does it work?"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:167
+msgid "Go use the apps"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:170
+msgid "Hue Home"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:177
+msgid "Back"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:178
+msgid "Next"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:208
+msgid "Examples refreshed"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:275
+msgid "Configuration updated"
+msgstr ""
+

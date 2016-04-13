@@ -1,0 +1,35 @@
+<table class="table table-striped table-condensed datatables">
+  <thead>
+    <tr>
+      <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
+      <th>{{ name }}</th>
+      <th>{{ description }}</th>
+      <th>{{ owner }}</th>
+      <th>{{ type }}</th>
+      <th>{{ status }}</th>
+      <th>{{ last_modified }}</th>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: designs">
+    <tr data-bind="with: design">
+      <td data-row-selector-exclude="true">
+        <div class="hueCheckbox savedCheck" data-row-selector-exclude="true"></div>
+      </td>
+      <td><a href="javascript:void(0);" data-row-selector="true" data-bind="text: name, click: function(data, event) {$root.selectByIndex.call($root, $index()); $root.showDesign.call($root, data, event);}"></a></td>
+      <td data-bind="text: description"></td>
+      <td data-bind="text: owner"></td>
+      <td data-bind="text: type"></td>
+      <td data-bind="text: is_shared"></td>
+      <td data-sort-value="${time.mktime(design.mtime.timetuple())}" data-bind="text: last_modified"></td>
+    </tr>
+  </tbody>
+</table>
+<div class="pagination">
+    <ul class="pull-right">
+        <li class="prev"><a title="{{ first }}" ${toppage(page)}>&larr; {{ first }}</a></li>
+        <li><a title="{{ previous }}" ${prevpage(page)}>{{ previous }}</a></li>
+        <li><a title="{{ next }}" ${nextpage(page)}>{{ next }}</a></li>
+        <li class="next"><a title="{{ last }}" ${bottompage(page)}>{{ last }} &rarr;</a></li>
+    </ul>
+    <!-- <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p> -->
+</div>

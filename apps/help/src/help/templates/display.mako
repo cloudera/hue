@@ -15,18 +15,65 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+
+def is_selected(section, matcher):
+  if section == matcher:
+    return "active"
+  else:
+    return ""
 %>
-${commonheader("Hue Help", "help", user, "100px")}
-	<div class="subnav subnav-fixed">
-		<div class="container-fluid">
-		<ul class="nav nav-pills">
-			% for app in apps:
-				<li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-			% endfor
-		</ul>
-		</div>
-	</div>
-	<div class="container-fluid">
-		${content|n}
-	</div>
-${commonfooter(messages)}
+${ commonheader("Hue Help", "help", user, "40px") | n,unicode }
+
+<style type="text/css">
+  .card h1, .card h2, .card h3, .card h4 {
+    color: #777777;
+  }
+
+  .card h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  .card h2 {
+    border-bottom: 1px solid #E5E5E5;
+    font-size: 24px;
+    font-weight: 300;
+    margin-top: 30px;
+  }
+
+  .card h3 {
+    font-size: 20px;
+    font-weight: 300;
+    margin-top: 20px;
+  }
+
+</style>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+            % for app in apps:
+              <li class="${is_selected(app.name, current)}"><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+            % endfor
+        </ul>
+      </div>
+    </div>
+    <div class="span10 card card-small">
+      <div class="card-body">
+        <p>
+          ${content|n}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $.jHueScrollUp();
+  });
+</script>
+
+${ commonfooter(request, messages) | n,unicode }

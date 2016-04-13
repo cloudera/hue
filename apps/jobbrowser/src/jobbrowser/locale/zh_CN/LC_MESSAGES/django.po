@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:36-0700\n"
+"POT-Creation-Date: 2015-02-04 18:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,648 +18,862 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid ""
-"Share submitted jobs information with all users. If set to false, "
-"submitted jobs are visible only to the owner and administrators."
+msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "与所有用户共享提交的作业信息。如果设置为 false，提交的作业仅对所有者和管理员可见。"
 
-#: src/jobbrowser/models.py:87
+#: src/jobbrowser/models.py:103
 #, python-format
-msgid "Could not find job with id %(jobid)s"
-msgstr "找不到 ID 为 %(jobid)s 的作业"
+msgid "Could not find job with id %(jobid)s."
+msgstr "找不到 ID 为 %(jobid)s 的作业。"
 
-#: src/jobbrowser/models.py:421
+#: src/jobbrowser/models.py:441
 #, python-format
-msgid "Cannot lookup TaskTracker %(id)s"
-msgstr "无法查找任务跟踪器 %(id)s"
+msgid "Cannot look up TaskTracker %(id)s."
+msgstr "无法查找 TaskTracker %(id)s。"
 
-#: src/jobbrowser/models.py:445
+#: src/jobbrowser/models.py:465
 #, python-format
-msgid "Cannot retrieve logs from TaskTracker %(id)s"
-msgstr "无法从任务跟踪器 %(id)s 检索日志"
+msgid "Cannot retrieve logs from TaskTracker %(id)s."
+msgstr "无法从 TaskTracker %(id)s 检索日志。"
 
-#: src/jobbrowser/models.py:452
+#: src/jobbrowser/models.py:473
 #, python-format
-msgid "Hue encountered an error while retrieving logs from '%s'"
-msgstr "Hue 在从 '%s' 检索日志期间遇到错误"
+msgid "Hue encountered an error while retrieving logs from '%s'."
+msgstr "Hue 在从 '%s' 检索日志期间遇到错误。"
 
-#: src/jobbrowser/views.py:61
+#: src/jobbrowser/views.py:63
 #, python-format
-msgid "You don't have the permissions to access job %(id)s"
-msgstr "您没有访问作业 %(id)s 的权限"
+msgid "Job %s has expired."
+msgstr "作业 %s 已到期。"
 
-#: src/jobbrowser/views.py:134
+#: src/jobbrowser/views.py:63
+msgid "Cannot be found on the History Server."
+msgstr "无法在 History Server 上找到。"
+
+#: src/jobbrowser/views.py:65
 #, python-format
-msgid "kill_job may only be invoked with a POST (got a %(method)s)"
-msgstr "只能使用 POST（得到一个 %(method)s）调用 kill_job"
+msgid "Could not find job %s."
+msgstr "找不到作业 %s。"
 
-#: src/jobbrowser/views.py:137
+#: src/jobbrowser/views.py:69
+#, python-format
+msgid "You don't have permission to access job %(id)s."
+msgstr "您没有访问作业 %(id)s 的权限。"
+
+#: src/jobbrowser/views.py:85
+#, python-format
+msgid "Error polling job %s: %s"
+msgstr "轮询作业 %s 时出错：%s"
+
+#: src/jobbrowser/views.py:104
+msgid "Resource Manager cannot be contacted or might be down."
+msgstr "无法联系 Resource Manager，Resource Manager 可能已停止。"
+
+#: src/jobbrowser/views.py:106
+
+msgid "Job Tracker cannot be contacted or might be down."
+msgstr "无法联系 Job Tracker，Job Tracker 可能已停止。"
+
+#: src/jobbrowser/views.py:130 src/jobbrowser/views.py:131
+#: src/jobbrowser/templates/job.mako:531 src/jobbrowser/templates/job.mako:535
+#: src/jobbrowser/templates/job.mako:538 src/jobbrowser/templates/job.mako:542
+#: src/jobbrowser/templates/job.mako:547 src/jobbrowser/templates/jobs.mako:239
+#: src/jobbrowser/templates/jobs.mako:240
+#: src/jobbrowser/templates/jobs.mako:243
+msgid "N/A"
+msgstr "无"
+
+#: src/jobbrowser/views.py:224
+#, python-format
+msgid "kill_job may only be invoked with a POST (got a %(method)s)."
+msgstr "只能使用 POST（得到一个 %(method)s）调用 kill_job。"
+
+#: src/jobbrowser/views.py:227
 msgid "Insufficient permission"
 msgstr "无足够权限"
 
-#: src/jobbrowser/views.py:138
+#: src/jobbrowser/views.py:228
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
 msgstr "权限被拒绝。用户 %(username)s 无法删除用户 %(user)s 的作业。"
 
-#: src/jobbrowser/views.py:154
-msgid "Job did not appear as killed within 15 seconds"
-msgstr "作业未出现，因为将在 15 秒内被停止"
+#: src/jobbrowser/views.py:247
+msgid "Job did not appear as killed within 15 seconds."
+msgstr "作业未出现，因为已在 15 秒内被停止。"
 
-#: src/jobbrowser/views.py:232
+#: src/jobbrowser/views.py:266
+#, python-format
+msgid "Cannot find job attempt '%(id)s'."
+msgstr "无法找到作业尝试“%(id)s”。"
+
+#: src/jobbrowser/views.py:279 src/jobbrowser/yarn_models.py:342
+#, python-format
+msgid "Failed to retrieve log: %s"
+msgstr "无法检索日志：%s"
+
+#: src/jobbrowser/views.py:311
+#, python-format
+msgid "No tasks found for job %(id)s."
+msgstr "未找到作业 %(id)s 的任务。"
+
+#: src/jobbrowser/views.py:379 src/jobbrowser/views.py:398
 #, python-format
 msgid "Cannot find attempt '%(id)s' in task"
-msgstr "在任务中找不到尝试 '%(id)s'"
+msgstr "无法在任务中找到尝试“%(id)s”"
 
-#: src/jobbrowser/views.py:243
+#: src/jobbrowser/views.py:417
 msgid "Failed to retrieve log. TaskTracker not found."
-msgstr "无法检索日志。未找到任务跟踪器。"
+msgstr "无法检索日志。未找到 TaskTracker。"
+
+#: src/jobbrowser/views.py:419
+msgid "Failed to retrieve log. TaskTracker not ready."
+msgstr "无法检索日志。TaskTracker 未就绪。"
+
+#: src/jobbrowser/views.py:478
+msgid "The tracker could not be contacted."
+msgstr "无法联系到跟踪器。"
+
+#: src/jobbrowser/views.py:488
+msgid "The container disappears as soon as the job finishes."
+msgstr "一旦完成作业，容器便会消失。"
 
 #: src/jobbrowser/templates/attempt.mako:22
-#: src/jobbrowser/templates/attempt.mako:24
+#: src/jobbrowser/templates/attempt.mako:60
+#: src/jobbrowser/templates/attempt_logs.mako:22
+#: src/jobbrowser/templates/attempt_logs.mako:56
 #, python-format
-msgid "Task Attempt: %(attemptId)s - Job Browser"
-msgstr "任务尝试：%(attemptId)s - 作业浏览器"
+msgid "Task Attempt: %(attemptId)s"
+msgstr "任务尝试：%(attemptId)s"
 
-#: src/jobbrowser/templates/attempt.mako:29
-#: src/jobbrowser/templates/attempt.mako:71
-#: src/jobbrowser/templates/task.mako:59
+#: src/jobbrowser/templates/attempt.mako:32
+#: src/jobbrowser/templates/attempt.mako:83
+#: src/jobbrowser/templates/attempt_logs.mako:30
+#: src/jobbrowser/templates/job_attempt_logs.mako:31
+#: src/jobbrowser/templates/task.mako:66
 msgid "Attempt ID"
 msgstr "尝试 ID"
 
-#: src/jobbrowser/templates/attempt.mako:31
+#: src/jobbrowser/templates/attempt.mako:34
+#: src/jobbrowser/templates/attempt_logs.mako:32
 msgid "Task"
 msgstr "任务"
 
-#: src/jobbrowser/templates/attempt.mako:32
-#: src/jobbrowser/templates/attempt.mako:76
-#: src/jobbrowser/templates/job.mako:40
-msgid "View this task"
-msgstr "查看此任务"
-
-#: src/jobbrowser/templates/attempt.mako:34
-#: src/jobbrowser/templates/task.mako:32
+#: src/jobbrowser/templates/attempt.mako:38
+#: src/jobbrowser/templates/attempt_logs.mako:35
+#: src/jobbrowser/templates/job_attempt_logs.mako:40
+#: src/jobbrowser/templates/job_not_assigned.mako:26
+#: src/jobbrowser/templates/task.mako:34
 msgid "Job"
 msgstr "作业"
 
-#: src/jobbrowser/templates/attempt.mako:35
-#: src/jobbrowser/templates/attempt.mako:84
-#: src/jobbrowser/templates/jobs.mako:98 src/jobbrowser/templates/task.mako:33
-#: src/jobbrowser/templates/task.mako:109
-msgid "View this job"
-msgstr "查看此作业"
-
-#: src/jobbrowser/templates/attempt.mako:36
-#: src/jobbrowser/templates/job.mako:92 src/jobbrowser/templates/job.mako:218
-#: src/jobbrowser/templates/jobs.mako:83 src/jobbrowser/templates/task.mako:34
-#: src/jobbrowser/templates/task.mako:116
-#: src/jobbrowser/templates/tasks.mako:74
+#: src/jobbrowser/templates/attempt.mako:41
+#: src/jobbrowser/templates/attempt_logs.mako:37
+#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:215
+#: src/jobbrowser/templates/job.mako:361 src/jobbrowser/templates/jobs.mako:68
+#: src/jobbrowser/templates/task.mako:36 src/jobbrowser/templates/task.mako:131
+#: src/jobbrowser/templates/tasks.mako:76
 msgid "Status"
 msgstr "状态"
 
-#: src/jobbrowser/templates/attempt.mako:55
-#: src/jobbrowser/templates/job.mako:138 src/jobbrowser/templates/task.mako:50
+#: src/jobbrowser/templates/attempt.mako:65
+#: src/jobbrowser/templates/attempt_logs.mako:60
+#: src/jobbrowser/templates/job.mako:131 src/jobbrowser/templates/job.mako:263
+#: src/jobbrowser/templates/task.mako:56
 msgid "Metadata"
 msgstr "元数据"
 
-#: src/jobbrowser/templates/attempt.mako:56
-#: src/jobbrowser/templates/job.mako:140 src/jobbrowser/templates/task.mako:51
+#: src/jobbrowser/templates/attempt.mako:66
+#: src/jobbrowser/templates/attempt_logs.mako:61
+#: src/jobbrowser/templates/job.mako:265 src/jobbrowser/templates/task.mako:57
 msgid "Counters"
 msgstr "计数器"
 
-#: src/jobbrowser/templates/attempt.mako:57
+#: src/jobbrowser/templates/attempt.mako:68
+#: src/jobbrowser/templates/attempt_logs.mako:62
+#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:115
+#: src/jobbrowser/templates/job.mako:116 src/jobbrowser/templates/job.mako:217
+#: src/jobbrowser/templates/job.mako:218 src/jobbrowser/templates/job.mako:274
+#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
+#: src/jobbrowser/templates/tasks.mako:72
 msgid "Logs"
 msgstr "日志"
 
-#: src/jobbrowser/templates/attempt.mako:65
-#: src/jobbrowser/templates/job.mako:181 src/jobbrowser/templates/job.mako:228
-#: src/jobbrowser/templates/jobbrowser_components.mako:54
-#: src/jobbrowser/templates/jobs.mako:82 src/jobbrowser/templates/task.mako:95
-#: src/jobbrowser/templates/tasktrackers.mako:26
+#: src/jobbrowser/templates/attempt.mako:77
+#: src/jobbrowser/templates/job.mako:140 src/jobbrowser/templates/job.mako:324
+#: src/jobbrowser/templates/job.mako:370
+#: src/jobbrowser/templates/jobbrowser_components.mako:81
+#: src/jobbrowser/templates/jobbrowser_components.mako:122
+#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:109
+#: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Name"
 msgstr "名称"
 
-#: src/jobbrowser/templates/attempt.mako:66
-#: src/jobbrowser/templates/job.mako:182 src/jobbrowser/templates/job.mako:229
+#: src/jobbrowser/templates/attempt.mako:78
+#: src/jobbrowser/templates/job.mako:141 src/jobbrowser/templates/job.mako:187
+#: src/jobbrowser/templates/job.mako:325 src/jobbrowser/templates/job.mako:371
 #: src/jobbrowser/templates/jobbrowser_components.mako:30
-#: src/jobbrowser/templates/task.mako:96
+#: src/jobbrowser/templates/jobbrowser_components.mako:56
+#: src/jobbrowser/templates/task.mako:110
 msgid "Value"
 msgstr "值"
 
-#: src/jobbrowser/templates/attempt.mako:75
-#: src/jobbrowser/templates/task.mako:30 src/jobbrowser/templates/tasks.mako:71
+#: src/jobbrowser/templates/attempt.mako:87
+#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:73
 msgid "Task ID"
 msgstr "任务 ID"
 
-#: src/jobbrowser/templates/attempt.mako:79
+#: src/jobbrowser/templates/attempt.mako:89
+#: src/jobbrowser/templates/attempt_logs.mako:33
+#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:606
+msgid "View this task"
+msgstr "查看此任务"
+
+#: src/jobbrowser/templates/attempt.mako:92
 msgid "Task Type"
 msgstr "任务类型"
 
-#: src/jobbrowser/templates/attempt.mako:83
-#: src/jobbrowser/templates/task.mako:108
+#: src/jobbrowser/templates/attempt.mako:96
+#: src/jobbrowser/templates/task.mako:123
 msgid "JobId"
 msgstr "作业 ID"
 
-#: src/jobbrowser/templates/attempt.mako:87
-#: src/jobbrowser/templates/task.mako:61 src/jobbrowser/templates/task.mako:112
-#: src/jobbrowser/templates/tasks.mako:75
+#: src/jobbrowser/templates/attempt.mako:98
+#: src/jobbrowser/templates/attempt_logs.mako:36
+#: src/jobbrowser/templates/job_attempt_logs.mako:40
+#: src/jobbrowser/templates/jobs.mako:235
+#: src/jobbrowser/templates/task.mako:124
+msgid "View this job"
+msgstr "查看此作业"
+
+#: src/jobbrowser/templates/attempt.mako:101
+#: src/jobbrowser/templates/container.mako:46
+#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:127
+#: src/jobbrowser/templates/tasks.mako:77
 msgid "State"
 msgstr "状态"
 
-#: src/jobbrowser/templates/attempt.mako:91
-#: src/jobbrowser/templates/task.mako:63 src/jobbrowser/templates/task.mako:120
-#: src/jobbrowser/templates/tasks.mako:76
+#: src/jobbrowser/templates/attempt.mako:105
+#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:135
+#: src/jobbrowser/templates/tasks.mako:78
 msgid "Start Time"
 msgstr "开始时间"
 
-#: src/jobbrowser/templates/attempt.mako:95
+#: src/jobbrowser/templates/attempt.mako:109
 msgid "Finish Time"
 msgstr "完成时间"
 
-#: src/jobbrowser/templates/attempt.mako:99
-#: src/jobbrowser/templates/task.mako:60 src/jobbrowser/templates/task.mako:132
-#: src/jobbrowser/templates/tasks.mako:73
+#: src/jobbrowser/templates/attempt.mako:113
+#: src/jobbrowser/templates/job.mako:117 src/jobbrowser/templates/task.mako:67
+#: src/jobbrowser/templates/task.mako:147
+#: src/jobbrowser/templates/tasks.mako:75
 msgid "Progress"
 msgstr "进度"
 
-#: src/jobbrowser/templates/attempt.mako:103
-#: src/jobbrowser/templates/task.mako:62
+#: src/jobbrowser/templates/attempt.mako:117
+#: src/jobbrowser/templates/task.mako:69
 msgid "Task Tracker"
-msgstr "任务跟踪器"
+msgstr "Task Tracker"
 
-#: src/jobbrowser/templates/attempt.mako:107
-#: src/jobbrowser/templates/task.mako:66
+#: src/jobbrowser/templates/attempt.mako:128
+#: src/jobbrowser/templates/task.mako:73
 msgid "Phase"
 msgstr "阶段"
 
-#: src/jobbrowser/templates/attempt.mako:111
-#: src/jobbrowser/templates/task.mako:65
+#: src/jobbrowser/templates/attempt.mako:132
+#: src/jobbrowser/templates/task.mako:72
 msgid "Output Size"
 msgstr "输出大小"
 
-#: src/jobbrowser/templates/attempt.mako:135
+#: src/jobbrowser/templates/attempt.mako:169
+#: src/jobbrowser/templates/attempt.mako:185
+#: src/jobbrowser/templates/attempt_logs.mako:142
+#: src/jobbrowser/templates/attempt_logs.mako:158
+#: src/jobbrowser/templates/job.mako:449 src/jobbrowser/templates/job.mako:481
+#: src/jobbrowser/templates/jobs.mako:132
+#: src/jobbrowser/templates/task.mako:181
+#: src/jobbrowser/templates/task.mako:197
+#: src/jobbrowser/templates/task.mako:213
+#: src/jobbrowser/templates/tasks.mako:123
+#: src/jobbrowser/templates/tasktrackers.mako:82
+msgid "No data available"
+msgstr "没有可用数据"
+
+#: src/jobbrowser/templates/attempt.mako:170
+#: src/jobbrowser/templates/attempt.mako:186
+#: src/jobbrowser/templates/attempt_logs.mako:143
+#: src/jobbrowser/templates/attempt_logs.mako:159
+#: src/jobbrowser/templates/job.mako:450 src/jobbrowser/templates/job.mako:482
+#: src/jobbrowser/templates/jobs.mako:133
+#: src/jobbrowser/templates/task.mako:182
+#: src/jobbrowser/templates/task.mako:198
+#: src/jobbrowser/templates/task.mako:214
+#: src/jobbrowser/templates/tasks.mako:124
+#: src/jobbrowser/templates/tasktrackers.mako:83
+msgid "No matching records"
+msgstr "没有匹配记录"
+
+#: src/jobbrowser/templates/attempt_logs.mako:80
 msgid "task diagnostic log"
 msgstr "任务诊断日志"
 
-#: src/jobbrowser/templates/attempt.mako:141
+#: src/jobbrowser/templates/attempt_logs.mako:81
+#: src/jobbrowser/templates/job_attempt_logs.mako:46
 msgid "stdout"
 msgstr "stdout"
 
-#: src/jobbrowser/templates/attempt.mako:147
+#: src/jobbrowser/templates/attempt_logs.mako:82
+#: src/jobbrowser/templates/job_attempt_logs.mako:47
 msgid "stderr"
 msgstr "stderr"
 
-#: src/jobbrowser/templates/attempt.mako:153
+#: src/jobbrowser/templates/attempt_logs.mako:83
+#: src/jobbrowser/templates/job_attempt_logs.mako:48
 msgid "syslog"
 msgstr "syslog"
 
-#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:137
-msgid "Tasks"
-msgstr "任务"
-
-#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/task.mako:104
-#: src/jobbrowser/templates/tasks.mako:72
-msgid "Type"
-msgstr "类型"
-
-#: src/jobbrowser/templates/job.mako:80 src/jobbrowser/templates/job.mako:83
+#: src/jobbrowser/templates/container.mako:23
 #, python-format
-msgid "Job: %(jobId)s - Job Browser"
-msgstr "作业：%(jobId)s - 作业浏览器"
+msgid "Container: %(trackerId)s"
+msgstr "容器：%(trackerId)s"
 
-#: src/jobbrowser/templates/job.mako:88
-msgid "Job ID"
-msgstr "作业 ID"
+#: src/jobbrowser/templates/container.mako:33
+#, python-format
+msgid "Container at %(trackerHost)s on port %(trackerPort)s"
+msgstr "%(trackerHost)s 上位于端口 %(trackerPort)s 上的容器"
 
-#: src/jobbrowser/templates/job.mako:90 src/jobbrowser/templates/job.mako:190
-#: src/jobbrowser/templates/jobs.mako:84
-msgid "User"
-msgstr "用户"
-
-#: src/jobbrowser/templates/job.mako:97
-msgid "Kill Job"
-msgstr "停止作业"
-
-#: src/jobbrowser/templates/job.mako:99 src/jobbrowser/templates/jobs.mako:138
-msgid "Kill this job"
-msgstr "停止此作业"
-
-#: src/jobbrowser/templates/job.mako:104
-msgid "Maps:"
-msgstr "映射："
-
-#: src/jobbrowser/templates/job.mako:106
-msgid "Reduces:"
-msgstr "减少："
-
-#: src/jobbrowser/templates/job.mako:117
-msgid "Output"
-msgstr "输出"
-
-#: src/jobbrowser/templates/job.mako:147
-msgid "This jobs is "
-msgstr "此作业是 "
-
-#: src/jobbrowser/templates/job.mako:147
-msgid "retired"
-msgstr "已退出"
-
-#: src/jobbrowser/templates/job.mako:147
-msgid " and so has little information available."
-msgstr " ，因此可用信息较少。"
-
-#: src/jobbrowser/templates/job.mako:154
-msgid "View Failed Tasks"
-msgstr "查看失败的任务"
-
-#: src/jobbrowser/templates/job.mako:155
-msgid "Failed Tasks"
-msgstr "失败的任务"
-
-#: src/jobbrowser/templates/job.mako:163
-msgid "View All Tasks"
-msgstr "查看所有任务"
-
-#: src/jobbrowser/templates/job.mako:165
-msgid "Recent Tasks"
-msgstr "近期任务"
-
-#: src/jobbrowser/templates/job.mako:176
-msgid "Filter: "
-msgstr "过滤器： "
-
-#: src/jobbrowser/templates/job.mako:176 src/jobbrowser/templates/jobs.mako:59
-#: src/jobbrowser/templates/tasks.mako:56
-msgid "Text Filter"
-msgstr "文本过滤器"
-
-#: src/jobbrowser/templates/job.mako:186 src/jobbrowser/templates/jobs.mako:81
-#: src/jobbrowser/templates/tasktracker.mako:27
+#: src/jobbrowser/templates/container.mako:36
+#: src/jobbrowser/templates/job.mako:329 src/jobbrowser/templates/jobs.mako:66
+#: src/jobbrowser/templates/tasktracker.mako:36
 msgid "ID"
 msgstr "ID"
 
-#: src/jobbrowser/templates/job.mako:195 src/jobbrowser/templates/jobs.mako:85
-msgid "Maps"
-msgstr "映射"
+#: src/jobbrowser/templates/container.mako:41
+#: src/jobbrowser/templates/tasktracker.mako:43
+msgid "Memory Metrics"
+msgstr "内存指标"
 
-#: src/jobbrowser/templates/job.mako:199 src/jobbrowser/templates/jobs.mako:86
-msgid "Reduces"
-msgstr "减少"
+#: src/jobbrowser/templates/container.mako:44
+msgid "Node Id"
+msgstr "节点 ID"
 
-#: src/jobbrowser/templates/job.mako:204
-msgid "Started"
-msgstr "开始"
+#: src/jobbrowser/templates/container.mako:48
+#: src/jobbrowser/templates/job.mako:111 src/jobbrowser/templates/job.mako:213
+#: src/jobbrowser/templates/job.mako:333 src/jobbrowser/templates/jobs.mako:69
+msgid "User"
+msgstr "用户"
 
-#: src/jobbrowser/templates/job.mako:209
-msgid "Ended"
-msgstr "结束"
+#: src/jobbrowser/templates/container.mako:50
+#: src/jobbrowser/templates/job.mako:177
+msgid "Diagnostics"
+msgstr "诊断"
 
-#: src/jobbrowser/templates/job.mako:213 src/jobbrowser/templates/jobs.mako:89
+#: src/jobbrowser/templates/container.mako:52
+msgid "Total Memory Needed in MB"
+msgstr "MB 中所需的总内存"
+
+#: src/jobbrowser/templates/container.mako:54
+msgid "Exit Code"
+msgstr "退出代码"
+
+#: src/jobbrowser/templates/container.mako:59
+#: src/jobbrowser/templates/tasktracker.mako:69
+msgid "Back"
+msgstr "返回"
+
+#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:259
+#: src/jobbrowser/templates/job.mako:261
+msgid "Tasks"
+msgstr "任务"
+
+#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/task.mako:119
+#: src/jobbrowser/templates/tasks.mako:74
+msgid "Type"
+msgstr "类型"
+
+#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:252
+#, python-format
+msgid "Job: %(jobId)s"
+msgstr "作业：%(jobId)s"
+
+#: src/jobbrowser/templates/job.mako:109
+
+msgid "App ID"
+msgstr "应用程序 ID"
+
+#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:225
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:74
 msgid "Duration"
 msgstr "持续时间"
 
-#: src/jobbrowser/templates/job.mako:225
-msgid "Raw configuration:"
-msgstr "原始配置："
+#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:245
+msgid "Actions"
+msgstr "操作"
 
-#: src/jobbrowser/templates/jobbrowser_components.mako:29
-msgid "Counter Name"
-msgstr "计数器名称"
+#: src/jobbrowser/templates/job.mako:133
 
-#: src/jobbrowser/templates/jobbrowser_components.mako:55
-msgid "Maps Total"
-msgstr "映射总计"
+msgid "Metrics"
+msgstr "指标"
 
-#: src/jobbrowser/templates/jobbrowser_components.mako:56
-msgid "Reduces Total"
-msgstr "减少总计"
+#: src/jobbrowser/templates/job.mako:145
+msgid "Jobs"
+msgstr "作业"
 
-#: src/jobbrowser/templates/jobbrowser_components.mako:57
-msgid "Total"
-msgstr "总计"
+#: src/jobbrowser/templates/job.mako:149
+#: src/jobbrowser/templates/tasktrackers.mako:36
+msgid "Host"
+msgstr "主机"
 
-#: src/jobbrowser/templates/jobbrowser_components.mako:112
-#, fuzzy
-msgid "Retired"
-msgstr "已退出"
+#: src/jobbrowser/templates/job.mako:153
+msgid "Queue Name"
+msgstr "队列名称"
 
-#: src/jobbrowser/templates/jobs.mako:32 src/jobbrowser/templates/jobs.mako:34
-#: src/jobbrowser/templates/jobs.mako:151
-msgid "Job Browser"
-msgstr "作业浏览器"
+#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:347
+msgid "Started"
+msgstr "开始"
 
-#: src/jobbrowser/templates/jobs.mako:37
-msgid "Job status:"
-msgstr ""
+#: src/jobbrowser/templates/job.mako:161
 
-#: src/jobbrowser/templates/jobs.mako:39
-msgid "All States"
-msgstr "所有状态"
+msgid "Finished"
+msgstr "完成"
 
-#: src/jobbrowser/templates/jobs.mako:40
-msgid "Running"
-msgstr "正在运行"
+#: src/jobbrowser/templates/job.mako:165
+msgid "Pre-empted Resource VCores"
+msgstr "先占资源 VCores"
 
-#: src/jobbrowser/templates/jobs.mako:41
-msgid "Completed"
-msgstr "已完成"
+#: src/jobbrowser/templates/job.mako:169
+msgid "VCore seconds"
+msgstr "VCore 秒数"
 
-#: src/jobbrowser/templates/jobs.mako:42
-msgid "Failed"
-msgstr "失败"
+#: src/jobbrowser/templates/job.mako:173
 
-#: src/jobbrowser/templates/jobs.mako:43
-msgid "Killed"
-msgstr "已停止"
+msgid "Memory seconds"
+msgstr "内存秒数"
 
-#: src/jobbrowser/templates/jobs.mako:53
-msgid "Show retired jobs"
-msgstr ""
+#: src/jobbrowser/templates/job.mako:186
 
-#: src/jobbrowser/templates/jobs.mako:58
-msgid "Text:"
-msgstr ""
+msgid "Metric"
+msgstr "指标"
 
-#: src/jobbrowser/templates/jobs.mako:62
-#, fuzzy
-msgid "Username:"
-msgstr "计数器名称"
+#: src/jobbrowser/templates/job.mako:192
+msgid "header"
+msgstr "标题"
 
-#: src/jobbrowser/templates/jobs.mako:63
-msgid "User Name Filter"
-msgstr "用户名过滤器"
+#: src/jobbrowser/templates/job.mako:211
+#: src/jobbrowser/templates/job_not_assigned.mako:36
+msgid "Job ID"
+msgstr "作业 ID"
 
+#: src/jobbrowser/templates/job.mako:220 src/jobbrowser/templates/job.mako:338
+#: src/jobbrowser/templates/jobs.mako:70
+msgid "Maps"
+msgstr "Maps"
+
+#: src/jobbrowser/templates/job.mako:222 src/jobbrowser/templates/job.mako:342
 #: src/jobbrowser/templates/jobs.mako:71
-msgid "There were no jobs that match your search criteria."
-msgstr "没有与您的搜索条件匹配的作业。"
+msgid "Reduces"
+msgstr "Reduces"
 
-#: src/jobbrowser/templates/jobs.mako:87
-msgid "Queue"
-msgstr "队列"
+#: src/jobbrowser/templates/job.mako:234
+msgid "Output"
+msgstr "输出"
 
-#: src/jobbrowser/templates/jobs.mako:88
-msgid "Priority"
-msgstr "优先级"
-
-#: src/jobbrowser/templates/jobs.mako:90
-msgid "Date"
-msgstr "日期"
-
-#: src/jobbrowser/templates/jobs.mako:104
-#: src/jobbrowser/templates/jobs.mako:109
-#, python-format
-msgid "Show only %(status)s jobs"
-msgstr "仅显示 %(status)s 作业"
-
-#: src/jobbrowser/templates/jobs.mako:113
-#: src/jobbrowser/templates/jobs.mako:120
-#: src/jobbrowser/templates/jobs.mako:129
-msgid "N/A"
-msgstr "不适用"
-
-#: src/jobbrowser/templates/jobs.mako:139
-msgid "Kill"
-msgstr "停止"
-
-#: src/jobbrowser/templates/jobs.mako:153
-msgid "Welcome to the Job Browser"
-msgstr "欢迎使用作业浏览器"
-
-#: src/jobbrowser/templates/jobs.mako:155
-msgid "There aren't any jobs running. Let's fix that."
-msgstr "没有任何作业在运行。让我们来解决此问题。"
-
-#: src/jobbrowser/templates/jobs.mako:157
-msgid "Launch the Job Designer"
-msgstr "启动作业设计器"
-
-#: src/jobbrowser/templates/jobs.mako:160
-msgid "Launch Beeswax"
-msgstr "启动 Beeswax"
-
-#: src/jobbrowser/templates/jobs.mako:169
-msgid "Please Confirm"
-msgstr ""
-
-#: src/jobbrowser/templates/jobs.mako:172
-msgid "Are you sure you want to kill this job?"
-msgstr ""
-
-#: src/jobbrowser/templates/jobs.mako:176
-msgid "Yes"
-msgstr ""
-
-#: src/jobbrowser/templates/jobs.mako:177
-msgid "No"
-msgstr ""
-
-#: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:25
-#, python-format
-msgid "Job Task: %(taskId)s - Job Browser"
-msgstr "作业任务：%(taskId)s - 作业浏览器"
-
-#: src/jobbrowser/templates/task.mako:49 src/jobbrowser/templates/tasks.mako:98
+#: src/jobbrowser/templates/job.mako:258 src/jobbrowser/templates/task.mako:55
+#: src/jobbrowser/templates/tasks.mako:105
 msgid "Attempts"
 msgstr "尝试"
 
-#: src/jobbrowser/templates/task.mako:64 src/jobbrowser/templates/tasks.mako:77
+#: src/jobbrowser/templates/job.mako:275
+msgid "Id"
+msgstr "Id"
+
+#: src/jobbrowser/templates/job.mako:276
+msgid "Container"
+msgstr "容器"
+
+#: src/jobbrowser/templates/job.mako:298
+msgid "This jobs is "
+msgstr "作业为 "
+
+#: src/jobbrowser/templates/job.mako:298
+msgid "retired"
+msgstr "已退出"
+
+#: src/jobbrowser/templates/job.mako:298
+msgid " and so has little information available."
+msgstr " ，因此可用信息较少。"
+
+#: src/jobbrowser/templates/job.mako:303
+msgid "View All Failed Tasks"
+msgstr "查看所有失败的任务"
+
+#: src/jobbrowser/templates/job.mako:304
+msgid "Failed Tasks"
+msgstr "失败的任务"
+
+#: src/jobbrowser/templates/job.mako:310
+msgid "View All Tasks"
+msgstr "查看所有任务"
+
+#: src/jobbrowser/templates/job.mako:311
+msgid "Recent Tasks"
+msgstr "近期任务"
+
+#: src/jobbrowser/templates/job.mako:320 src/jobbrowser/templates/tasks.mako:57
+msgid "Text Filter"
+msgstr "文本筛选器"
+
+#: src/jobbrowser/templates/job.mako:352
+msgid "Ended"
+msgstr "结束"
+
+#: src/jobbrowser/templates/job.mako:367
+msgid "Raw configuration:"
+msgstr "原始配置："
+
+#: src/jobbrowser/templates/job.mako:420 src/jobbrowser/templates/jobs.mako:88
+msgid "Confirm Kill"
+msgstr "确认停止"
+
+#: src/jobbrowser/templates/job.mako:423 src/jobbrowser/templates/jobs.mako:91
+msgid "Are you sure you want to kill this job?"
+msgstr "是否确定要停止此作业？"
+
+#: src/jobbrowser/templates/job.mako:426 src/jobbrowser/templates/jobs.mako:94
+msgid "No"
+msgstr "否"
+
+#: src/jobbrowser/templates/job.mako:427 src/jobbrowser/templates/jobs.mako:95
+msgid "Yes"
+msgstr "是"
+
+#: src/jobbrowser/templates/job.mako:492
+msgid "There was a problem communicating with the server. Refresh the page."
+msgstr "与服务器通信时出现问题。请刷新页面。"
+
+#: src/jobbrowser/templates/job.mako:520 src/jobbrowser/templates/job.mako:521
+#: src/jobbrowser/templates/jobs.mako:230
+#: src/jobbrowser/templates/jobs.mako:263
+msgid "Kill this job"
+msgstr "停止此作业"
+
+#: src/jobbrowser/templates/job.mako:528
+#: src/jobbrowser/templates/jobbrowser_components.mako:188
+#: src/jobbrowser/templates/jobs.mako:237
+msgid "Retired"
+msgstr "已退出"
+
+#: src/jobbrowser/templates/job.mako:632 src/jobbrowser/templates/jobs.mako:359
+msgid "There was a problem killing this job."
+msgstr "停止此作业时出现问题。"
+
+#: src/jobbrowser/templates/job_attempt_logs.mako:23
+#, python-format
+msgid "Job Attempt: %(attempt_index)s"
+msgstr "作业尝试：%(attempt_index)s"
+
+#: src/jobbrowser/templates/job_attempt_logs.mako:41
+#, python-format
+msgid "Attempt: %(attempt_index)s"
+msgstr "尝试：%(attempt_index)s"
+
+#: src/jobbrowser/templates/job_not_assigned.mako:43
+msgid "Loading..."
+msgstr "正在加载..."
+
+#: src/jobbrowser/templates/job_not_assigned.mako:47
+msgid "The application might not be running yet or there is no Node Manager or Container available."
+msgstr "应用程序可能尚未运行或没有可用的 Node Manager 或容器。"
+
+#: src/jobbrowser/templates/job_not_assigned.mako:48
+msgid "This page will be automatically refreshed."
+msgstr "此页面将自动刷新。"
+
+#: src/jobbrowser/templates/jobbrowser_components.mako:29
+#: src/jobbrowser/templates/jobbrowser_components.mako:55
+msgid "Counter Name"
+msgstr "计数器名称"
+
+#: src/jobbrowser/templates/jobbrowser_components.mako:82
+#: src/jobbrowser/templates/jobbrowser_components.mako:123
+msgid "Maps Total"
+msgstr "Maps 总计"
+
+#: src/jobbrowser/templates/jobbrowser_components.mako:83
+#: src/jobbrowser/templates/jobbrowser_components.mako:124
+msgid "Reduces Total"
+msgstr "Reduces 总计"
+
+#: src/jobbrowser/templates/jobbrowser_components.mako:84
+#: src/jobbrowser/templates/jobbrowser_components.mako:125
+msgid "Total"
+msgstr "总计"
+
+#: src/jobbrowser/templates/jobbrowser_components.mako:241
+msgid "Job Browser"
+msgstr "Job Browser"
+
+#: src/jobbrowser/templates/jobs.mako:35
+msgid "Username"
+msgstr "用户名"
+
+#: src/jobbrowser/templates/jobs.mako:35
+msgid "Search for username"
+msgstr "搜索用户名"
+
+#: src/jobbrowser/templates/jobs.mako:36
+msgid "Text"
+msgstr "文本"
+
+#: src/jobbrowser/templates/jobs.mako:36
+msgid "Search for text"
+msgstr "搜索文本"
+
+#: src/jobbrowser/templates/jobs.mako:48
+msgid "Show retired jobs"
+msgstr "显示已注销的作业"
+
+#: src/jobbrowser/templates/jobs.mako:52
+msgid "Succeeded"
+msgstr "成功"
+
+#: src/jobbrowser/templates/jobs.mako:53
+msgid "Running"
+msgstr "正在运行"
+
+#: src/jobbrowser/templates/jobs.mako:54
+msgid "Failed"
+msgstr "失败"
+
+#: src/jobbrowser/templates/jobs.mako:55
+msgid "Killed"
+msgstr "已停止"
+
+#: src/jobbrowser/templates/jobs.mako:60
+msgid "There are no jobs that match your search criteria."
+msgstr "没有与您的搜索条件匹配的作业。"
+
+#: src/jobbrowser/templates/jobs.mako:72
+msgid "Queue"
+msgstr "队列"
+
+#: src/jobbrowser/templates/jobs.mako:73
+msgid "Priority"
+msgstr "优先级"
+
+#: src/jobbrowser/templates/jobs.mako:75
+msgid "Submitted"
+msgstr "已提交"
+
+#: src/jobbrowser/templates/jobs.mako:140
+
+msgid "There was a problem communicating with the server: "
+msgstr "与服务器通信时出现问题： "
+
+#: src/jobbrowser/templates/jobs.mako:231
+#: src/jobbrowser/templates/jobs.mako:264
+msgid "Kill"
+msgstr "停止"
+
+#: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:51
+#, python-format
+msgid "Job Task: %(taskId)s"
+msgstr "作业任务：%(taskId)s"
+
+#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:79
 msgid "End Time"
 msgstr "结束时间"
 
-#: src/jobbrowser/templates/task.mako:67
+#: src/jobbrowser/templates/task.mako:74
 msgid "Shuffle Finish"
 msgstr "打乱完成"
 
-#: src/jobbrowser/templates/task.mako:68
+#: src/jobbrowser/templates/task.mako:75
 msgid "Sort Finish"
 msgstr "排序完成"
 
-#: src/jobbrowser/templates/task.mako:69
+#: src/jobbrowser/templates/task.mako:76
 msgid "Map Finish"
-msgstr "映射完成"
+msgstr "Map 完成"
 
-#: src/jobbrowser/templates/task.mako:75
+#: src/jobbrowser/templates/task.mako:83
 msgid "View this attempt"
 msgstr "查看此尝试"
 
-#: src/jobbrowser/templates/task.mako:100
+#: src/jobbrowser/templates/task.mako:115
 msgid "Task id"
 msgstr "任务 ID"
 
-#: src/jobbrowser/templates/task.mako:124
+#: src/jobbrowser/templates/task.mako:139
 msgid "Execution Start Time"
 msgstr "执行开始时间"
 
-#: src/jobbrowser/templates/task.mako:128
+#: src/jobbrowser/templates/task.mako:143
 msgid "Execution Finish Time"
 msgstr "执行完成时间"
 
 #: src/jobbrowser/templates/tasks.mako:24
-#, python-format
-msgid "Task View: Job: %(jobId)s - Job Browser"
-msgstr "任务视图：作业：%(jobId)s - 作业浏览器"
-
-#: src/jobbrowser/templates/tasks.mako:32
+#: src/jobbrowser/templates/tasks.mako:35
 #, python-format
 msgid "Task View: Job: %(jobId)s"
 msgstr "任务视图：作业：%(jobId)s"
 
-#: src/jobbrowser/templates/tasks.mako:35
+#: src/jobbrowser/templates/tasks.mako:39
 msgid "Filter tasks:"
 msgstr "过滤任务："
 
-#: src/jobbrowser/templates/tasks.mako:38
+#: src/jobbrowser/templates/tasks.mako:41
 msgid "All states"
 msgstr "所有状态"
 
-#: src/jobbrowser/templates/tasks.mako:39
+#: src/jobbrowser/templates/tasks.mako:42
 msgid "succeeded"
 msgstr "成功"
 
-#: src/jobbrowser/templates/tasks.mako:40
+#: src/jobbrowser/templates/tasks.mako:43
 msgid "running"
 msgstr "正在运行"
 
-#: src/jobbrowser/templates/tasks.mako:41
+#: src/jobbrowser/templates/tasks.mako:44
 msgid "failed"
 msgstr "失败"
 
-#: src/jobbrowser/templates/tasks.mako:42
+#: src/jobbrowser/templates/tasks.mako:45
 msgid "killed"
 msgstr "已停止"
 
-#: src/jobbrowser/templates/tasks.mako:43
+#: src/jobbrowser/templates/tasks.mako:46
 msgid "pending"
 msgstr "待定"
 
-#: src/jobbrowser/templates/tasks.mako:48
+#: src/jobbrowser/templates/tasks.mako:50
 msgid "All types"
 msgstr "所有类型"
 
-#: src/jobbrowser/templates/tasks.mako:49
-msgid "maps"
-msgstr "映射"
-
-#: src/jobbrowser/templates/tasks.mako:50
-msgid "reduces"
-msgstr "减少"
-
 #: src/jobbrowser/templates/tasks.mako:51
+msgid "maps"
+msgstr "maps"
+
+#: src/jobbrowser/templates/tasks.mako:52
+msgid "reduces"
+msgstr "reduces"
+
+#: src/jobbrowser/templates/tasks.mako:53
 msgid "cleanups"
 msgstr "清理"
 
-#: src/jobbrowser/templates/tasks.mako:52
+#: src/jobbrowser/templates/tasks.mako:54
 msgid "setups"
 msgstr "设置"
 
-#: src/jobbrowser/templates/tasks.mako:56
+#: src/jobbrowser/templates/tasks.mako:57
 msgid "Text filter"
-msgstr "文本过滤器"
+msgstr "文本筛选器"
 
-#: src/jobbrowser/templates/tasks.mako:66
+#: src/jobbrowser/templates/tasks.mako:67
 msgid "There were no tasks that match your search criteria."
 msgstr "没有与您的搜索条件匹配的任务。"
 
-#: src/jobbrowser/templates/tasks.mako:78
+#: src/jobbrowser/templates/tasks.mako:80
 msgid "View Attempts"
 msgstr "查看尝试"
 
-#: src/jobbrowser/templates/tasks.mako:91
+#: src/jobbrowser/templates/tasks.mako:98
 #, python-format
 msgid "Show only %(state)s tasks"
 msgstr "仅显示 %(state)s 任务"
 
-#: src/jobbrowser/templates/tasktracker.mako:22
+#: src/jobbrowser/templates/tasktracker.mako:23
 #, python-format
-msgid "Tracker: %(trackerId)s - Job Browser"
-msgstr "跟踪器：%(trackerId)s - 作业浏览器"
+msgid "Tracker: %(trackerId)s"
+msgstr "跟踪器：%(trackerId)s"
 
-#: src/jobbrowser/templates/tasktracker.mako:24
+#: src/jobbrowser/templates/tasktracker.mako:33
 #, python-format
 msgid "Tracker at %(trackerHost)s on port %(trackerPort)s"
 msgstr "%(trackerHost)s 上位于端口 %(trackerPort)s 的跟踪器"
 
-#: src/jobbrowser/templates/tasktracker.mako:29
+#: src/jobbrowser/templates/tasktracker.mako:38
 msgid "Last heard from at"
 msgstr "上次收到信号的位置"
 
-#: src/jobbrowser/templates/tasktracker.mako:34
-msgid "Memory Metrics"
-msgstr "内存指标"
-
-#: src/jobbrowser/templates/tasktracker.mako:37
+#: src/jobbrowser/templates/tasktracker.mako:46
 msgid "Total virtual memory:"
 msgstr "总虚拟内存："
 
-#: src/jobbrowser/templates/tasktracker.mako:39
+#: src/jobbrowser/templates/tasktracker.mako:48
 msgid "Total physical memory:"
 msgstr "总物理内存："
 
-#: src/jobbrowser/templates/tasktracker.mako:41
+#: src/jobbrowser/templates/tasktracker.mako:50
 msgid "Available space:"
 msgstr "可用空间："
 
-#: src/jobbrowser/templates/tasktracker.mako:46
-msgid "Map and Reduce"
-msgstr "映射和减少"
-
-#: src/jobbrowser/templates/tasktracker.mako:49
-msgid "Map count:"
-msgstr "映射计数："
-
-#: src/jobbrowser/templates/tasktracker.mako:51
-msgid "Reduce count:"
-msgstr "减少计数："
-
-#: src/jobbrowser/templates/tasktracker.mako:53
-msgid "Max map tasks:"
-msgstr "最大映射任务："
-
 #: src/jobbrowser/templates/tasktracker.mako:55
+msgid "Map and Reduce"
+msgstr "Map 和 Reduce"
+
+#: src/jobbrowser/templates/tasktracker.mako:58
+msgid "Map count:"
+msgstr "Map 计数："
+
+#: src/jobbrowser/templates/tasktracker.mako:60
+msgid "Reduce count:"
+msgstr "Reduce 计数："
+
+#: src/jobbrowser/templates/tasktracker.mako:62
+msgid "Max map tasks:"
+msgstr "最大 map 任务："
+
+#: src/jobbrowser/templates/tasktracker.mako:64
 msgid "Max reduce tasks:"
-msgstr "最大減少任务："
+msgstr "最大 reduce 任务："
 
-#: src/jobbrowser/templates/tasktrackers.mako:21
-msgid "Task Trackers - Job Browser"
-msgstr "任务追踪器 - 作业浏览器"
-
-#: src/jobbrowser/templates/tasktrackers.mako:27
-msgid "Host"
-msgstr "主机"
-
+#: src/jobbrowser/templates/tasktrackers.mako:22
 #: src/jobbrowser/templates/tasktrackers.mako:28
+msgid "Task Trackers"
+msgstr "Task Tracker"
+
+#: src/jobbrowser/templates/tasktrackers.mako:37
 msgid "Port"
 msgstr "端口"
 
-#: src/jobbrowser/templates/tasktrackers.mako:29
+#: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Last Seen"
 msgstr "上次看到"
 
-#: src/jobbrowser/templates/tasktrackers.mako:30
+#: src/jobbrowser/templates/tasktrackers.mako:39
 msgid "Available Space"
 msgstr "可用空间"
 
-#: src/jobbrowser/templates/tasktrackers.mako:31
+#: src/jobbrowser/templates/tasktrackers.mako:40
 msgid "Failure Count"
 msgstr "失败计数"
 
-#: src/jobbrowser/templates/tasktrackers.mako:32
+#: src/jobbrowser/templates/tasktrackers.mako:41
 msgid "Map Count"
-msgstr "映射计数"
+msgstr "Map 计数"
 
-#: src/jobbrowser/templates/tasktrackers.mako:33
+#: src/jobbrowser/templates/tasktrackers.mako:42
 msgid "Reduce Count"
-msgstr "减少计数"
+msgstr "Reduce 计数"
 
-#: src/jobbrowser/templates/tasktrackers.mako:34
+#: src/jobbrowser/templates/tasktrackers.mako:43
 msgid "Max Map Tasks"
-msgstr "最大映射任务"
+msgstr "最大 Map 任务数"
 
-#: src/jobbrowser/templates/tasktrackers.mako:35
+#: src/jobbrowser/templates/tasktrackers.mako:44
 msgid "Max Reduce Tasks"
-msgstr "最大減少任务"
+msgstr "最大 Reduce 任务数"
 
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
 msgstr "没有时间"
 
+#~ msgid "Maps:"
+#~ msgstr "Maps:"
+#~ msgid "Reduces:"
+#~ msgstr "Reduces:"
+#~ msgid "Duration:"
+#~ msgstr "持续时间："
+#~ msgid "Date"
+#~ msgstr "日期"

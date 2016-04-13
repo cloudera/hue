@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8. Changelog &mdash; Py4J</title>
+    <link rel="stylesheet" href="_static/py4jdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  'true'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Py4J" href="index.html" />
+    <link rel="prev" title="7. Contributing to Py4J" href="contributing.html" />
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18626179-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script> 
+  </head>
+  <body>
+  	<div class="page">
+<div class="banner">Py4J - A Bridge between Python and Java</div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="7. Contributing to Py4J"
+             accesskey="P">previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">On This Page</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">8. Changelog</a><ul>
+<li><a class="reference internal" href="#py4j-0-9">8.1. Py4J 0.9</a></li>
+<li><a class="reference internal" href="#py4j-0-8-2-1">8.2. Py4J 0.8.2.1</a></li>
+<li><a class="reference internal" href="#py4j-0-8-2">8.3. Py4J 0.8.2</a></li>
+<li><a class="reference internal" href="#py4j-0-8-1">8.4. Py4J 0.8.1</a></li>
+<li><a class="reference internal" href="#py4j-0-8">8.5. Py4J 0.8</a></li>
+<li><a class="reference internal" href="#py4j-0-7">8.6. Py4J 0.7</a></li>
+<li><a class="reference internal" href="#py4j-0-6">8.7. Py4J 0.6</a></li>
+<li><a class="reference internal" href="#py4j-0-5">8.8. Py4J 0.5</a></li>
+<li><a class="reference internal" href="#py4j-0-4">8.9. Py4J 0.4</a></li>
+<li><a class="reference internal" href="#py4j-0-3">8.10. Py4J 0.3</a></li>
+<li><a class="reference internal" href="#py4j-0-2">8.11. Py4J 0.2</a></li>
+<li><a class="reference internal" href="#py4j-0-1">8.12. Py4J 0.1</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="contributing.html"
+                                  title="previous chapter">7. Contributing to Py4J</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/changelog.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="changelog">
+<h1>8. Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<p>The changelog describes in plain English the changes that occurred between Py4J
+releases.</p>
+<div class="section" id="py4j-0-9">
+<h2>8.1. Py4J 0.9<a class="headerlink" href="#py4j-0-9" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python side: constructor parameters have been deprecated in favor of
+GatewayParameters and CallbackServerParameters. This was necessary because
+the number of configuration options is growing fast. Old parameters will be
+supported until Py4J 1.0 (at least two more minor versions).</li>
+<li>Python side: IDEs and interactive interpreters such as IPython can now get
+help text/autocompletion for Java classes, objects, and members. This makes
+Py4J an ideal tool to explore complex Java APIs (e.g., the Eclipse API).
+Thanks to &#64;jonahkichwacoders</li>
+<li>Python side: the callback gateway server (necessary for Java to call back
+Python functions) can be daemonized and can be started after the main
+JavaGateway is started.</li>
+<li>Python side: py4j.java_gateway.launch_gateway has now a cleaner
+implementation that discards stdout and stderr output by default. It is also
+possible to redirect the output from these channels to separate files,
+deques, or queues. Thanks to &#64;davidcsterratt for finding the root cause and
+work on the fix.</li>
+<li>It is now possible to install Py4J from git with pip: pip install
+git+https://github.com/bartdag/py4j.git</li>
+<li>The Eclipse components of Py4J have been moved to another repository. Existing
+forks and pull requests can still use the &#64;before-eclipse-split branch until
+Py4J reaches 1.0. Fixes won&#8217;t be backported to this branch, but pull requests
+will be merged by the main maintainer to &#64;master if requested.</li>
+<li>Major cleanup of Python source code to make it fully flake8 (pep8 + pyflakes)
+compliant. This should be easier to contribute now.</li>
+<li>Major test cleanup effort to make Python tests more reliable. Testing Py4J is
+difficult because there are many versions of Python and Java to test and
+Python 2.6 lacks many interesting test features. Effort to make tests even
+more robust will continue in the next milestone.</li>
+<li>We introduced a <a class="reference internal" href="contributing.html"><em>contributing guide and an implicit contributor license
+agreement</em></a> that indicates that anyone contributing to Py4J
+keeps the copyright of the contribution but gives a non-revokable right to
+license the code using Py4J&#8217;s license (3-clause BSD). The copyright statement
+has been changed to &#8220;Copyright (c) 2009-2015, Barthelemy Dagenais and
+individual contributors.  All rights reserved.&#8221; to make it clear that
+individual contributors retain copyrights of their contributions. An
+AUTHORS.txt file has been added to the repository to keep track of
+contributors: if your name is not in the file and you have contributed to
+Py4J, do not hesitate to write on the mailing list or open a pull request.</li>
+<li>Cleaned up the doc that was referring to broken links or refactored classes.
+Long-time users may want to review the <a class="reference internal" href="advanced_topics.html"><em>advanced topics</em></a> page.</li>
+<li>Added support for <a class="reference external" href="https://pypi.python.org/pypi/wheel">Python Wheels</a>.</li>
+<li>We have a new website: <a class="reference external" href="https://www.py4j.org">https://www.py4j.org</a></li>
+<li>We have a new blog: <a class="reference external" href="https://blog.py4j.org">https://blog.py4j.org</a></li>
+<li>Eclipse features have moved to: <a class="reference external" href="http://eclipse.py4j.org">http://eclipse.py4j.org</a></li>
+<li>We have a <a class="reference external" href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">new mailing list</a>.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues?q=is%3Aissue+milestone%3A0.9+is%3Aclosed">github 0.9 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-8-2-1">
+<h2>8.2. Py4J 0.8.2.1<a class="headerlink" href="#py4j-0-8-2-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fixed a test that used an assert method that does not exist in Python 2.6</li>
+</ul>
+</div>
+<div class="section" id="py4j-0-8-2">
+<h2>8.3. Py4J 0.8.2<a class="headerlink" href="#py4j-0-8-2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fixed constructors not being able to pass proxy (python classes implementing
+Java interfaces)</li>
+<li>Java 6 compatibility was restored in compiled jar file.</li>
+<li>Fixed unit tests for JDK 8</li>
+<li>Added a few extra paths to find_jar_path</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues?milestone=11&amp;state=closed">github 0.8.2 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-8-1">
+<h2>8.4. Py4J 0.8.1<a class="headerlink" href="#py4j-0-8-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fixed a bug in type inference when interface hierarchy is deeper than
+abstract class hierarchy.</li>
+<li>Added a utility method <code class="docutils literal"><span class="pre">is_instance_of</span></code> in py4j.java_gateway to determine
+if a JavaObject is an instance of a class.</li>
+<li>Released Py4J in central Maven repository.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues?milestone=8&amp;page=1&amp;state=closed">github 0.8.1 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-8">
+<h2>8.5. Py4J 0.8<a class="headerlink" href="#py4j-0-8" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Major fix to the Java byte[] support. Thanks to &#64;agronholm for spotting
+this subtle but major issue and thanks to &#64;fdinto from The Atlantic for
+providing a patch!</li>
+<li>Ability to fail early if the py4j.java_gateway.JavaGateway cannot connect to
+the JVM.</li>
+<li>Added support for long primitives, BigDecimal, enum types, and inner classes
+on the Java side.</li>
+<li>Set saner log levels</li>
+<li>Many small bug fixes and API enhancements (backward compatible).</li>
+<li>Wrote a section in the FAQ about security concerns and precautions with Py4J.</li>
+<li>Added support of <a class="reference external" href="https://travis-ci.org/bartdag/py4j">Travis-CI</a> and
+cleaned up the test suite to remove hardcoded paths.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues?milestone=7&amp;page=1&amp;state=closed">github 0.8 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-7">
+<h2>8.6. Py4J 0.7<a class="headerlink" href="#py4j-0-7" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Major refactoring to support Python 3. Thanks to Alex Grönholm for his
+patch.</li>
+<li>The build and setup files have been totally changed. Py4J no longer requires
+Paver to build and everything is done through ant. The setup.py file only
+uses distutils.</li>
+<li>Added support for Java byte[]: byte array are passed by value and converted
+to bytearray or bytes.</li>
+<li>Py4J package name changed from Py4J to py4j.</li>
+<li>Bug fixes in the Python callback server and unicode support.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.7">github 0.7 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-6">
+<h2>8.7. Py4J 0.6<a class="headerlink" href="#py4j-0-6" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added new exception <code class="docutils literal"><span class="pre">Py4JJavaError</span></code> that enables Python client programs to access
+instance of Java exception thrown in the Java client code.</li>
+<li>Improved Py4J setup: no more warnings displayed when installing Py4J.</li>
+<li>Bug fixes and API additions.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.6">github 0.6 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-5">
+<h2>8.8. Py4J 0.5<a class="headerlink" href="#py4j-0-5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added the ability to import packages (e.g., <code class="docutils literal"><span class="pre">java_import(gateway.jvm,</span> <span class="pre">'java.io.*')</span></code>)</li>
+<li>Added support for pattern filtering in <code class="docutils literal"><span class="pre">JavaGateway.help()</span></code> (e.g., <code class="docutils literal"><span class="pre">gateway.help(obj,'get*Foo*Bar')</span></code>)</li>
+<li>Added support for automatic conversion of Python collections (list, set,
+dictionary) to Java collections. User <code class="docutils literal"><span class="pre">JavaGateway(auto_convert=True)</span></code> or
+an explicit convertor.</li>
+<li>Created two Eclipse features: one embeds the Py4J
+Java library. The other
+provides a default GatewayServer that is started when Eclipse starts. Both
+features are available on the new Py4J Eclipse update site:
+<code class="docutils literal"><span class="pre">http://www.py4j.org/py4j_eclipse</span></code></li>
+<li>Redesigned the module decomposition of Py4J: there are no more mandatory circular dependencies among modules.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.5">github 0.5 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-4">
+<h2>8.9. Py4J 0.4<a class="headerlink" href="#py4j-0-4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Polishing of existing features: fields can be set (not just read), None is accepted as a method parameter, methods are sorted alhabetically in gateway.help(), etc.</li>
+<li>Java Exception Stack Trace are now propagated to Python side.</li>
+<li>Changed <strong>interfaces</strong> member in Callback classes to <strong>implements</strong>.</li>
+<li>Internal refactoring to adopt clearer terminology and make Py4J protocol extensible.</li>
+<li>Many bug fixes: most are related to the callback feature.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.4">github 0.4 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-3">
+<h2>8.10. Py4J 0.3<a class="headerlink" href="#py4j-0-3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added support for Java arrays and set.</li>
+<li>Added support for callbacks: Java objects can now call back Python objects.</li>
+<li>Completely redesigned threading and connection model of Py4J to allow multiple threads and callbacks on both side.</li>
+<li>Refactored the memory management to ensure best effort garbage collection.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.3">github 0.3 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-2">
+<h2>8.11. Py4J 0.2<a class="headerlink" href="#py4j-0-2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>It is now possible to call constructors and reference static members: use the <cite>jvm</cite> member of a <cite>JavaGateway</cite> object.</li>
+<li>Java Map is converted to a Python Dictionary.</li>
+<li>Field access is supported through the <code class="docutils literal"><span class="pre">get_field</span></code> function or the <code class="docutils literal"><span class="pre">auto_field=True</span></code> member of <cite>JavaGateway</cite>.</li>
+<li>Obtain an interactive help page with <code class="docutils literal"><span class="pre">JavaGateway.help(object)</span></code>.</li>
+<li>Set is only accessible through the Java Set interface for now.</li>
+<li>Arrays can be referenced, but individual items can only be accessed with this workaround: <code class="docutils literal"><span class="pre">gateway.jvm.java.lang.reflect.Array.get(object,index)</span></code>.</li>
+<li>Complete rewrite of the reflection engine on the Java side for more flexibility.</li>
+<li>Improved memory model: no more memory leak caused by Py4J.</li>
+<li>New concurrency model: Py4J is now thread-safe.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.2">github 0.2 milestone</a></li>
+</ul>
+</div>
+<div class="section" id="py4j-0-1">
+<h2>8.12. Py4J 0.1<a class="headerlink" href="#py4j-0-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This is the first release.</li>
+<li>Basic features like connecting to a JVM and calling methods are implemented.</li>
+<li>Java List is converted to a Python List.</li>
+<li>Field access, constructors, and static classes are <strong>NOT</strong> accessible yet.</li>
+<li>Dictionary and Set are only accessible through the Java Map and Set interface for now.</li>
+<li>Arrays can be referenced, but individual items cannot be accessed yet.</li>
+<li><a class="reference external" href="https://github.com/bartdag/py4j/issues/labels/v0.1">github 0.1 milestone</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+		  		
+				<div class="helpbar">
+					<h3>Questions/Feedback?</h3>
+					<ul>
+						<li>Try the <a href="faq.html">FAQ</a> -- It answers many questions.</li>
+						<li>Search for information in the <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j">archives of the py4j-users mailing list</a>, or <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">post a question</a>.</li>
+						<li>If you notice errors with this documentation, <a href="https://github.com/bartdag/py4j/issues">open a ticket</a> and let us know. Please, only open a ticket for feedback or improvements on the docs. To get help, use the links above!</li>
+					</ul>
+				</div>
+				
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="7. Contributing to Py4J"
+             >previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2013, Barthélémy Dagenais.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.
+    </div>
+  </div>
+  </body>
+
+
+</html>

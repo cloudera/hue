@@ -1,0 +1,14 @@
+<div class="control-group" data-bind="attr: {'class': {{ ko.error_class }} }">
+	<label class="control-label">{{ title }}</label>
+	<div class="controls">
+	  <table class="table-condensed designTable" data-bind="visible: {{ ko.condition }}">
+	    <tbody data-bind="foreach: {{ ko.items }}">
+	      <tr>
+	        <td><input type="text" class="input span5 required pathFolderChooserKo" data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
+	        <td><a class="btn" href="javascript:void(0);" data-bind="click: {{ delete.func }}">{{ delete.name }}</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <button class="btn" data-bind="click: {{ add.func }}">{{ add.name }}</button>
+	</div>
+</div>

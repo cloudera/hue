@@ -1,0 +1,6 @@
+{
+  "attributes": {
+    "description": "Example of Fs action",
+    "deployment_dir": "/user/hue/oozie/workspaces/managed/fs"
+  }
+}

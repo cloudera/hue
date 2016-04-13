@@ -1,0 +1,3 @@
+[eventlistener:monitor-hue-lb]
+command=%(here)s/../bin/monitor-hue-lb --nginx nginx --haproxy haproxy
+events=TICK_60

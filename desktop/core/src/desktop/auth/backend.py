@@ -26,23 +26,31 @@ In addition, the User classes they return must support:
  - has_hue_permission(action, app) -> boolean
 Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
-
-In Desktop, only one authentication backend may be specified.
 """
-from django.contrib.auth.models import User
-import django.contrib.auth.backends
-import logging
-import desktop.conf
-from django.utils.importlib import import_module
-from django.core.exceptions import ImproperlyConfigured
-from useradmin.models import get_profile, get_default_user_group, UserProfile
 
-import pam
-from django_auth_ldap.backend import LDAPBackend, ldap_settings
 import ldap
+import logging
+import pam
+
+import django.contrib.auth.backends
+from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
+
+from django_auth_ldap.backend import LDAPBackend
+from django_auth_ldap.config import LDAPSearch
+
+import desktop.conf
+from desktop import metrics
+from liboauth.metrics import oauth_authentication_time
+
+from useradmin import ldap_access
+from useradmin.models import get_profile, get_default_user_group, UserProfile
+from useradmin.views import import_ldap_users
 
 
 LOG = logging.getLogger(__name__)
+
 
 def load_augmentation_class():
   """
@@ -58,6 +66,7 @@ def load_augmentation_class():
     LOG.info("Augmenting users with class: %s" % (klass,))
     return klass
   except:
+    LOG.exception('failed to augment class')
     raise ImproperlyConfigured("Could not find user_augmentation_class: %s" % (class_name,))
 
 _user_augmentation_class = None
@@ -74,9 +83,12 @@ def rewrite_user(user):
   We currently only re-write specific attributes,
   though this could be generalized.
   """
-  augment = get_user_augmentation_class()(user)
-  for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
-    setattr(user, attr, getattr(augment, attr))
+  if user is None:
+    LOG.warn('Failed to rewrite user, user is None.')
+  else:
+    augment = get_user_augmentation_class()(user)
+    for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
+      setattr(user, attr, getattr(augment, attr))
   return user
 
 class DefaultUserAugmentor(object):
@@ -95,20 +107,44 @@ class DefaultUserAugmentor(object):
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
 
-def find_or_create_user(username, password=None):
+def find_user(username):
   try:
     user = User.objects.get(username=username)
     LOG.debug("Found user %s in the db" % username)
   except User.DoesNotExist:
-    LOG.info("Materializing user %s in the database" % username)
-    user = User(username=username)
-    if password is None:
-      user.set_unusable_password()
-    else:
-      user.set_password(password)
-    user.is_superuser = True
-    user.save()
+    user = None
   return user
+
+def create_user(username, password):
+  LOG.info("Materializing user %s in the database" % username)
+  user = User(username=username)
+  if password is None:
+    user.set_unusable_password()
+  else:
+    user.set_password(password)
+  user.is_superuser = True
+  user.save()
+  return user
+
+def find_or_create_user(username, password=None):
+  user = find_user(username)
+  if user is None:
+    user = create_user(username, password)
+  return user
+
+def ensure_has_a_group(user):
+  default_group = get_default_user_group()
+
+  if not user.groups.exists() and default_group is not None:
+    user.groups.add(default_group)
+    user.save()
+
+def force_username_case(username):
+  if desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get():
+    username = username.lower()
+  elif desktop.conf.AUTH.FORCE_USERNAME_UPPERCASE.get():
+    username = username.upper()
+  return username
 
 class DesktopBackendBase(object):
   """
@@ -137,8 +173,7 @@ class DesktopBackendBase(object):
     Implementors should return a boolean value which determines
     whether the given username and password pair is valid.
     """
-    raise Exception("Abstract class - must implement check_auth")
-
+    raise NotImplemented("Abstract class - must implement check_auth")
 
 
 class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
@@ -152,16 +187,16 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       if user.is_active:
         user = rewrite_user(user)
         return user
-      return None
+      return user
 
     if self.is_first_login_ever():
       user = find_or_create_user(username, password)
       user = rewrite_user(user)
+      userprofile = get_profile(user)
+      userprofile.first_login = False
+      userprofile.save()
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
       return user
 
@@ -177,19 +212,93 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     return User.objects.count() == 0
 
 
+class OAuthBackend(DesktopBackendBase):
+  """
+  Deprecated, use liboauth.backend.OAuthBackend instead
 
-class AllowAllBackend(DesktopBackendBase):
+  Heavily based on Twitter Oauth: https://github.com/simplegeo/python-oauth2#logging-into-django-w-twitter
+  Requires: python-oauth2 and httplib2
+
+  build/env/bin/python setup.py install https://github.com/simplegeo/python-oauth2
+  build/env/bin/pip install httplib2
   """
-  Authentication backend that allows any user to login as long
-  as they have a username and password of any kind.
-  """
-  def check_auth(self, username, password):
-    return True
+
+  @oauth_authentication_time
+  def authenticate(self, access_token):
+    username = access_token['screen_name']
+    password = access_token['oauth_token_secret']
+
+    # Could save oauth_token detail in the user profile here
+
+    user = find_or_create_user(username, password)
+    user.is_superuser = False
+    user.save()
+
+    ensure_has_a_group(user)
+
+    return user
 
   @classmethod
   def manages_passwords_externally(cls):
     return True
 
+
+class AllowAllBackend(DesktopBackendBase):
+  """
+  Authentication backend that allows any user to login as long
+  as they have a username. The users will be added to the 'default_user_group'.
+
+  We want to ensure that already created users (e.g., from other backends)
+  retain their superuser status, and any new users are not super users by default.
+  """
+  def check_auth(self, username, password):
+    user = find_user(username)
+    if user is None:
+      user = create_user(username, password)
+      user.is_superuser = False
+      user.save()
+
+    ensure_has_a_group(user)
+
+    return user
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+
+
+class DemoBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  Log automatically users without a session with a new user account.
+  """
+  def authenticate(self, username, password):
+    user = super(DemoBackend, self).authenticate(username, password)
+
+    if not user:
+      username = self._random_name()
+
+      user = find_or_create_user(username, None)
+
+      user.is_superuser = False
+      user.save()
+
+      ensure_has_a_group(user)
+
+    user = rewrite_user(user)
+
+    return user
+
+  def get_user(self, user_id):
+    user = super(DemoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+
+  def _random_name(self):
+    import string
+    import random
+
+    N = 7
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(N))
 
 
 class PamBackend(DesktopBackendBase):
@@ -197,14 +306,21 @@ class PamBackend(DesktopBackendBase):
   Authentication backend that uses PAM to authenticate logins. The first user to
   login will become the superuser.
   """
-  def check_auth(self, username, password):
+
+  @metrics.pam_authentication_time
+  def authenticate(self, username, password):
+    username = force_username_case(username)
+
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.count() == 0:
         is_super = True
 
       try:
-        user = User.objects.get(username=username)
+        if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+          user = User.objects.get(username__iexact=username)
+        else:
+          user = User.objects.get(username=username)
       except User.DoesNotExist:
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
@@ -213,9 +329,7 @@ class PamBackend(DesktopBackendBase):
           profile.save()
           user.is_superuser = is_super
 
-          default_group = get_default_user_group()
-          if default_group is not None:
-            user.groups.add(default_group)
+          ensure_has_a_group(user)
 
           user.save()
 
@@ -229,7 +343,6 @@ class PamBackend(DesktopBackendBase):
     return True
 
 
-
 class LdapBackend(object):
   """
   Authentication backend that uses LDAP to authenticate logins.
@@ -237,45 +350,107 @@ class LdapBackend(object):
   """
   def __init__(self):
     # Delegate to django_auth_ldap.LDAPBackend
-    self._backend = LDAPBackend()
+    class _LDAPBackend(LDAPBackend):
+      def get_or_create_user(self, username, ldap_user):
+        username = force_username_case(username)
 
-    ldap_settings.AUTH_LDAP_SERVER_URI = desktop.conf.LDAP.LDAP_URL.get()
-    if ldap_settings.AUTH_LDAP_SERVER_URI is None:
+        if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
+          try:
+            return User.objects.get(username__iexact=username), False
+          except User.DoesNotExist:
+            return User.objects.get_or_create(username=username)
+        else:
+          return User.objects.get_or_create(username=username)
+
+    self._backend = _LDAPBackend()
+
+  def add_ldap_config(self, ldap_config):
+    if ldap_config.LDAP_URL.get() is None:
       LOG.warn("Could not find LDAP URL required for authentication.")
       return None
-
-    nt_domain = desktop.conf.LDAP.NT_DOMAIN.get()
-    if nt_domain is None:
-      pattern = desktop.conf.LDAP.LDAP_USERNAME_PATTERN.get()
-      pattern = pattern.replace('<username>', '%(user)s')
-      ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = pattern
     else:
-      # %(user)s is a special string that will get replaced during the authentication process
-      ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = "%(user)s@" + nt_domain
+      setattr(self._backend.settings, 'SERVER_URI', ldap_config.LDAP_URL.get())
+
+    if ldap_config.SEARCH_BIND_AUTHENTICATION.get():
+      # New Search/Bind Auth
+      base_dn = ldap_config.BASE_DN.get()
+      user_name_attr = ldap_config.USERS.USER_NAME_ATTR.get()
+      user_filter = ldap_config.USERS.USER_FILTER.get()
+      if not user_filter.startswith('('):
+        user_filter = '(' + user_filter + ')'
+
+      if ldap_config.BIND_DN.get():
+        bind_dn = ldap_config.BIND_DN.get()
+        setattr(self._backend.settings, 'BIND_DN', bind_dn)
+
+        bind_password = ldap_config.BIND_PASSWORD.get()
+        if not bind_password:
+          bind_password = ldap_config.BIND_PASSWORD_SCRIPT.get()
+        setattr(self._backend.settings, 'BIND_PASSWORD', bind_password)
+
+      if user_filter is None:
+        search_bind_results = LDAPSearch(base_dn,
+            ldap.SCOPE_SUBTREE, "(" + user_name_attr + "=%(user)s)")
+
+      else:
+        search_bind_results = LDAPSearch(base_dn,
+            ldap.SCOPE_SUBTREE, "(&(" + user_name_attr + "=%(user)s)" + user_filter + ")")
+
+      setattr(self._backend.settings, 'USER_SEARCH', search_bind_results)
+    else:
+      nt_domain = ldap_config.NT_DOMAIN.get()
+      if nt_domain is None:
+        pattern = ldap_config.LDAP_USERNAME_PATTERN.get()
+        pattern = pattern.replace('<username>', '%(user)s')
+        setattr(self._backend.settings, 'USER_DN_TEMPLATE', pattern)
+      else:
+        # %(user)s is a special string that will get replaced during the authentication process
+        setattr(self._backend.settings, 'USER_DN_TEMPLATE', "%(user)s@" + nt_domain)
 
     # Certificate-related config settings
-    if desktop.conf.LDAP.LDAP_CERT.get():
-      ldap_settings.AUTH_LDAP_START_TLS = True
-      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_CACERTFILE] = desktop.conf.LDAP.LDAP_CERT.get()
+    if ldap_config.LDAP_CERT.get():
+      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
     else:
-      ldap_settings.AUTH_LDAP_START_TLS = False
-      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_REQUIRE_CERT] = ldap.OPT_X_TLS_NEVER
+      setattr(self._backend.settings, 'START_TLS', False)
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
-  def authenticate(self, username=None, password=None):
+    if ldap_config.FOLLOW_REFERRALS.get():
+      ldap.set_option(ldap.OPT_REFERRALS, 1)
+    else:
+      ldap.set_option(ldap.OPT_REFERRALS, 0)
+
+  def add_ldap_config_for_server(self, server):
+    if desktop.conf.LDAP.LDAP_SERVERS.get():
+      # Choose from multiple server configs
+      if server in desktop.conf.LDAP.LDAP_SERVERS.get():
+        self.add_ldap_config(desktop.conf.LDAP.LDAP_SERVERS.get()[server])
+    else:
+      self.add_ldap_config(desktop.conf.LDAP)
+
+  @metrics.ldap_authentication_time
+  def authenticate(self, username=None, password=None, server=None):
+    self.add_ldap_config_for_server(server)
+
+    username_filter_kwargs = ldap_access.get_ldap_user_kwargs(username)
+
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
     if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
       # If there are no LDAP users already in the system, the first one will
       # become a superuser
       is_super = True
-    elif User.objects.filter(username=username).exists():
+    elif User.objects.filter(**username_filter_kwargs).exists():
       # If the user already exists, we shouldn't change its superuser
       # privileges. However, if there's a naming conflict with a non-external
       # user, we should do the safe thing and turn off superuser privs.
-      existing_user = User.objects.get(username=username)
+      existing_user = User.objects.get(**username_filter_kwargs)
       existing_profile = get_profile(existing_user)
       if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
-        is_super = User.objects.get(username=username).is_superuser
+        is_super = User.objects.get(**username_filter_kwargs).is_superuser
+    elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
+      return None
 
     try:
       user = self._backend.authenticate(username, password)
@@ -290,23 +465,26 @@ class LdapBackend(object):
       user.is_superuser = is_super
       user = rewrite_user(user)
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
-      return user
+      if desktop.conf.LDAP.SYNC_GROUPS_ON_LOGIN.get():
+        self.import_groups(server, user)
 
-    return None
+    return user
 
   def get_user(self, user_id):
     user = self._backend.get_user(user_id)
     user = rewrite_user(user)
     return user
 
+  def import_groups(self, server, user):
+    connection = ldap_access.get_connection_from_server(server)
+    import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
+
   @classmethod
   def manages_passwords_externally(cls):
     return True
+
 
 class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
@@ -318,14 +496,20 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   the KRB5_KTNAME environment variable to point to another location
   (e.g. /etc/hue/hue.keytab).
   """
+
+  @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
+    username = force_username_case(username)
     is_super = False
     if User.objects.count() == 0:
       is_super = True
 
     try:
-      user = User.objects.get(username=username)
+      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
+        user = User.objects.get(username=username)
     except User.DoesNotExist:
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
@@ -334,13 +518,13 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
         profile.save()
         user.is_superuser = is_super
 
-        default_group = get_default_user_group()
-        if default_group is not None:
-          user.groups.add(default_group)
+        ensure_has_a_group(user)
 
         user.save()
 
-    user = rewrite_user(user)
+    if user is not None:
+      user = rewrite_user(user)
+
     return user
 
   def clean_username(self, username):
@@ -352,3 +536,42 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     user = super(SpnegoDjangoBackend, self).get_user(user_id)
     user = rewrite_user(user)
     return user
+
+
+
+class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
+  """
+  Delegates to Django's RemoteUserBackend and requires HueRemoteUserMiddleware
+  """
+  def authenticate(self, remote_user=None):
+    username = self.clean_username(remote_user)
+    username = force_username_case(username)
+    is_super = False
+    if User.objects.count() == 0:
+      is_super = True
+
+    try:
+      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      user = find_or_create_user(username, None)
+      if user is not None and user.is_active:
+        profile = get_profile(user)
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.save()
+        user.is_superuser = is_super
+
+        ensure_has_a_group(user)
+
+        user.save()
+
+    user = rewrite_user(user)
+    return user
+
+  def get_user(self, user_id):
+    user = super(RemoteUserDjangoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+

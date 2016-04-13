@@ -1,0 +1,51 @@
+<coordinator-app name="DailyAnalytics"
+  frequency="${coord:days(1)}"
+  start="2013-06-03T00:00Z" end="2013-06-05T00:00Z" timezone="America/Los_Angeles"
+  xmlns="uri:oozie:coordinator:0.2">
+  <datasets>
+    <dataset name="daily_shakespeare" frequency="${coord:days(1)}"
+             initial-instance="2012-05-31T00:00Z" timezone="America/Los_Angeles">
+      <uri-template>${nameNode}/user/hue/oozie/workspaces/data/${YEAR}${MONTH}${DAY}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+    <dataset name="daily_aggregated_shakespeare" frequency="${coord:days(1)}"
+             initial-instance="2012-05-31T00:00Z" timezone="America/Los_Angeles">
+      <uri-template>${nameNode}/tmp/test-coord-${coord:user()}/${YEAR}${MONTH}${DAY}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+  </datasets>
+  <input-events>
+    <data-in name="input" dataset="daily_shakespeare">
+    <start-instance>
+        ${coord:current(-1)}
+    </start-instance>
+    <end-instance>
+        ${coord:current(0)}
+    </end-instance>
+    </data-in>
+  </input-events>
+  <output-events>
+    <data-out name="output" dataset="daily_aggregated_shakespeare">
+    <instance>${coord:current(0)}</instance>
+    </data-out>
+  </output-events>
+  <action>
+    <workflow>
+      <app-path>${wf_application_path}</app-path>
+      <configuration>
+          <property>
+            <name>input</name>
+            <value>${coord:dataIn('input')}</value>
+          </property>
+        <property>
+          <name>output</name>
+          <value>${coord:dataOut('output')}</value>
+        </property>
+        <property>
+          <name>oozie.use.system.libpath</name>
+          <value>true</value>
+        </property>
+      </configuration>
+   </workflow>
+  </action>
+</coordinator-app>

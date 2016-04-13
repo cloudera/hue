@@ -18,13 +18,11 @@
 
 import datetime
 import logging
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import connection
 from django.db import models
 
 from desktop.lib.django_db_util import remove_content_type
@@ -33,20 +31,20 @@ from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, Oozi
 LOG = logging.getLogger(__name__)
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
         """
         Added custom transaction processing for transactional DBMS.
         If a DDL operation fails, the entire transaction fails and all future commands are ignored.
         """
-        
+
         # Adding model 'OozieStreamingAction'
         db.create_table('jobsub_ooziestreamingaction', (
             ('oozieaction_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['jobsub.OozieAction'], unique=True, primary_key=True)),
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('mapper', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('reducer', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
         ))
         db.send_create_signal('jobsub', ['OozieStreamingAction'])
@@ -85,7 +83,7 @@ class Migration(SchemaMigration):
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('jar_path', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
         ))
         db.send_create_signal('jobsub', ['OozieMapreduceAction'])
 
@@ -95,8 +93,8 @@ class Migration(SchemaMigration):
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('jar_path', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('java_opts', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True)),
-            ('args', self.gf('django.db.models.fields.CharField')(max_length=4096, blank=True)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('args', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('main_class', self.gf('django.db.models.fields.CharField')(max_length=256)),
         ))
@@ -104,33 +102,29 @@ class Migration(SchemaMigration):
 
         # Adding field 'CheckForSetup.setup_level'
         db.add_column('jobsub_checkforsetup', 'setup_level', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-    
+
         # The next sequence may fail... so they should have their own transactions.
         db.commit_transaction()
 
         # Delete legacy tables. Note that this only applies to Hue 1.x installations
-        db.start_transaction()
-        try:
+        
+        if 'jobsub_submission' in connection.introspection.table_names():
+            db.start_transaction()
             db.delete_table('jobsub_submission')
             remove_content_type('jobsub', 'submission')
             db.commit_transaction()
-        except Exception, ex:
-            db.rollback_transaction()
 
-        db.start_transaction()
-        try:
+        if 'jobsub_serversubmissionstate' in connection.introspection.table_names():
+            db.start_transaction()
             db.delete_table('jobsub_serversubmissionstate')
             remove_content_type('jobsub', 'serversubmissionstate')
             db.commit_transaction()
-        except Exception, ex:
-            db.rollback_transaction()
 
+        # South commits transaction at end of forward migration.
         db.start_transaction()
-        hue1_to_hue2_data_migration()
-
 
     def backwards(self, orm):
-        
+
         # Deleting model 'OozieStreamingAction'
         db.delete_table('jobsub_ooziestreamingaction')
 
@@ -151,8 +145,8 @@ class Migration(SchemaMigration):
 
         # Deleting field 'CheckForSetup.setup_level'
         db.delete_column('jobsub_checkforsetup', 'setup_level')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -257,88 +251,6 @@ class Migration(SchemaMigration):
             'root_action': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['jobsub.OozieAction']"})
         }
     }
-    
+
     complete_apps = ['jobsub']
-
-
-#
-# Data migration helper
-#
-
-def hue1_to_hue2_data_migration():
-  """
-  Data migration from the JobDesign table to the new Oozie-based models.
-
-  The migration could be incomplete:
-  - Jar types, for which the main class wasn't specified.
-
-  We add an `(incomplete)' marker to the design name to alert the user.
-  """
-  jd_list = JobDesign.objects.all()
-
-  for jd in jd_list:
-    if jd.type == 'jar':
-      job_design_migration_for_jar(jd)
-    elif jd.type == 'streaming':
-      job_design_migration_for_streaming(jd)
-    else:
-      LOG.warn("Unknown JobDesign type '%s' in the old table. Row id: %s" %
-               (jd.type, jd.id))
-
-
-def job_design_migration_for_jar(jd):
-  """Migrate one jar type design"""
-  data = json.loads(jd.data)
-  action = OozieJavaAction(action_type=OozieJavaAction.ACTION_TYPE,
-                           jar_path=data['jarfile'],
-                           main_class="please.specify.in.the.job.design",
-                           args=data['arguments'])
-  action.save()
-
-  design = OozieDesign(owner=jd.owner,
-                       name=jd.name + ' (incomplete)',
-                       description=jd.description,
-                       root_action=action)
-  design.save()
-
-
-def job_design_migration_for_streaming(jd):
-  """Migrate one streaming type design"""
-  data = json.loads(jd.data)
-
-  files = json.dumps(data['cache_files'])
-  archives = json.dumps(data['cache_archives'])
-  properties = data['hadoop_properties']
-
-  def add_property(key, value):
-    if value:
-      properties[key] = value
-
-  add_property('mapred.input.dir', ','.join(data['input']))
-  add_property('mapred.output.dir', data['output'])
-  add_property('mapred.combiner.class', data['combiner_class'])
-  add_property('mapred.mapper.class', data['mapper_class'])
-  add_property('mapred.reducer.class', data['reducer_class'])
-  add_property('mapred.partitioner.class', data['partitioner_class'])
-  add_property('mapred.input.format.class', data['inputformat_class'])
-  add_property('mapred.output.format.class', data['outputformat_class'])
-  add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
-
-  property_list = [ ]
-  for k, v in properties.iteritems():
-    property_list.append(dict(name=k, value=v))
-
-  action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
-                                mapper=data['mapper_cmd'],
-                                reducer=data['reducer_cmd'],
-                                files=files,
-                                archives=archives,
-                                job_properties=json.dumps(property_list))
-  action.save()
-
-  design = OozieDesign(owner=jd.owner,
-                       name=jd.name,
-                       description=jd.description,
-                       root_action=action)
-  design.save()
 

@@ -1,0 +1,94 @@
+<div id="java">
+  <h1 class="card-heading card-heading-blue simple card-marginbottom">{{ title }}</h1>
+  <form class="form-horizontal" id="workflowForm" action="#list-designs" method="POST">
+    <fieldset>
+      {{#name}}
+        {{>name}}
+      {{/name}}
+
+      {{#description}}
+        {{>description}}
+      {{/description}}
+
+      <div class="control-group ">
+        <label class="control-label">
+          <a href="javascript:void(0);" onclick="$('div.advanced').toggle('hide')" class="advanced">
+            <i class="fa fa-share"></i>
+            advanced
+          </a>
+        </label>
+      </div>
+      <div class="advanced hide">
+        {{#is_shared}}
+          {{>is_shared}}
+        {{/is_shared}}
+
+        {{#parameters}}
+          {{>parameters}}
+        {{/parameters}}
+      </div>
+
+      <hr/>
+
+      <div class="control-group">
+        <p class="alert alert-info">{{{ alert }}}</p>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ jar_path.name }}" data-content="{{ jar_path.popover }}" data-bind="attr: {'class': ( errors.jar_path().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ jar_path.name }}</label>
+        <div class="controls">
+          <input id="java-jar-path" type="text" name="jar-path" data-bind="value: jar_path" />
+          <ul class="help-inline" data-bind="foreach: errors.jar_path()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="Main class" data-bind="attr: {'class': ( errors.main_class().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">Main class</label>
+        <div class="controls">
+          <input id="java-main-class" type="text" name="main-class" maxlength="256" data-bind="value: main_class" />
+          <ul class="help-inline" data-bind="foreach: errors.main_class()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="Args" data-bind="attr: {'class': ( errors.args().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">Args</label>
+        <div class="controls">
+          <input id="java-args" type="text" name="args" maxlength="4096" data-bind="value: args" />
+          <ul class="help-inline" data-bind="foreach: errors.args()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="Java opts" data-bind="attr: {'class': ( errors.java_opts().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">Java opts</label>
+        <div class="controls">
+          <input id="java-java-opts" type="text" name="java-opts" maxlength="256" data-bind="value: java_opts" />
+          <ul class="help-inline" data-bind="foreach: errors.java_opts()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      {{#job_properties}}
+        {{>job_properties}}
+      {{/job_properties}}
+
+      {{#files}}
+        {{>files}}
+      {{/files}}
+
+      {{#archives}}
+        {{>archives}}
+      {{/archives}}
+    </fieldset>
+    <div class="form-actions">
+      <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>
+      <a href="javascript:void(0);" data-bind="click: {{ cancel.func }}" class="btn">{{ cancel.name }}</a>
+    </div>
+  </form>
+</div>

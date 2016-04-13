@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -22,112 +23,208 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
-${ layout.menubar(section='running') }
+${ commonheader(_("Workflow Action"), "oozie", user) | n,unicode }
+${ layout.menubar(section='workflows', dashboard=True) }
 
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='workflows') }
+  <div class="card card-small">
+  <div class="card-body">
+  <p>
+ <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list" style="border:none">
+          <li class="nav-header">${ _('Workflow') }</li>
+          <li>
+            <a title="${ _('Edit workflow') }" href="${ workflow.get_absolute_url() }">${ workflow.appName }</a>
+          </li>
 
-  <h1>
-    ${ _('Workflow') } <a href="${ url('oozie:list_oozie_workflow', job_id=workflow.id) }">${ workflow.appName }</a> :
-    ${ _('Action') } ${ action.name }
-  </h1>
+          <li class="nav-header">${ _('Name') }</li>
+          <li class="white">${ action.name }</li>
 
-  <table class="table table-condensed datatables" id="jobTable">
-    <thead>
-      <tr>
-        <th>${ _('Property') }</th>
-        <th>${ _('Value') }</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>${ _('Name') }</td>
-        <td>${ action.name }</td>
-      </tr>
-      <tr>
-        <td>${ _('Type') }</td>
-        <td>${ action.type }</td>
-      </tr>
-      <tr>
-        <td>${ _('Status') }</td>
-        <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
-      </tr>
-      <tr>
-        <td>${ _('Configuration') }</td>
-        <td>${ utils.display_conf(action.conf_dict) }</td>
-      </tr>
-      % if action.errorCode:
-        <tr>
-          <td>${ _('Error Code') }</td>
-          <td>${ action.errorCode }</td>
-        </tr>
-      % endif
-      % if action.errorMessage:
-        <tr>
-          <td>${ _('Error Message') }</td>
-          <td>${ action.errorMessage }</td>
-        </tr>
-      % endif
-    </tbody>
-  </table>
-
-  <h2>${ _('Details') }</h2>
-
-  <table class="table table-condensed datatables" id="jobTable">
-    <thead>
-      <tr>
-        <th>${ _('Property') }</th>
-        <th>${ _('Value') }</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>${ _('External Id') }</td>
-        <td>
-          % if action.externalId:
-            <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ action.externalId }</a>
+          <li class="nav-header">${ _('External Id') }</li>
+          % if action.get_external_id_url():
+            <li><a href="${ action.get_external_id_url() }">${ action.externalId }</a></li>
+          % else:
+            <li>${ action.externalId } </li>
           % endif
-        </td>
-      </tr>
-      <tr>
-        <td>${ _('External Status') }</td>
-        <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
-      </tr>
-      <tr>
-        <td>${ _('Data') }</td>
-        <td>${ action.data }</td>
-      </tr>
-      <tr>
-        <td>${ _('Start time') }</td>
-        <td>${ utils.format_time(action.startTime) }</td>
-      </tr>
-      <tr>
-        <td>${ _('End time') }</td>
-        <td>${ utils.format_time(action.endTime) }</td>
-      </tr>
-      <tr>
-        <td>${ _('Id') }</td>
-        <td>${ action.id }</td>
-      </tr>
-      <tr>
-        <td>${ _('Retries') }</td>
-        <td>${ action.retries }</td>
-      </tr>
-      <tr>
-        <td>${ _('TrackerUri') }</td>
-        <td>${ action.trackerUri }</td>
-      </tr>
-      <tr>
-        <td>${ _('Transition') }</td>
-        <td>${ action.transition }</td>
-      </tr>
-    </tbody>
-  </table>
+          %  if action.get_absolute_log_url():
+            <li class="nav-header">${ _('Logs') }</li>
+            <li>
+              <a href="${ action.get_absolute_log_url() }" title="${ _('View the logs') }" rel="tooltip"><i class="fa fa-tasks"></i></a>
+            </li>
+          % endif
 
-  <br/>
-  <a class="btn" onclick="history.back()">${ _('Back') }</a>
+          <li class="nav-header">${ _('Type') }</li>
+          <li class="white">${ action.type }</li>
+
+          <li class="nav-header">${ _('Status') }</li>
+          <li class="white" id="status"><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="span10">
+       <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
+        % if oozie_bundle:
+          ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
+        % endif
+        % if oozie_coordinator:
+          ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
+        % endif
+        % if oozie_parent and (oozie_coordinator is None or oozie_parent.id != oozie_coordinator.id):
+          ${ _('Parent') } <a href="${ oozie_parent.get_absolute_url() }">${ oozie_parent.appName }</a> :
+        % endif
+        ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
+        ${ _('Action') } ${ action.name }
+      </h1>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
+        <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+        <li><a href="#child-jobs" data-toggle="tab">${ _('Child Jobs') }</a></li>
+      </ul>
+
+      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
+
+        <div class="tab-pane active" id="details">
+          <table class="table table-condensed datatables" id="jobTable">
+            <thead>
+              <tr>
+                <th>${ _('Property') }</th>
+                <th>${ _('Value') }</th>
+              </tr>
+            </thead>
+            <tbody>
+              % if 'sub-workflow' == action.type and action.get_external_id_url():
+                <tr>
+                  <td>${ _('Workflow') }</td>
+                  <td><a href="${ action.get_external_id_url() }">${ action.externalId }</a></td>
+                </tr>
+              % endif
+              % if action.externalStatus:
+              <tr>
+                <td>${ _('External Status') }</td>
+                <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
+              </tr>
+              % endif
+              % if action.data:
+              <tr>
+                <td>${ _('Data') }</td>
+                <td>${ action.data }</td>
+              </tr>
+              % endif
+              <tr>
+                <td>${ _('Start time') }</td>
+                <td>${ utils.format_time(action.startTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('End time') }</td>
+                <td>${ utils.format_time(action.endTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('Id') }</td>
+                <td>${ action.id }</td>
+              </tr>
+              % if action.errorCode:
+                <tr>
+                  <td>${ _('Error Code') }</td>
+                  <td>${ action.errorCode }</td>
+                </tr>
+              % endif
+              % if action.errorMessage:
+                <tr>
+                  <td>${ _('Error Message') }</td>
+                  <td>${ action.errorMessage }</td>
+                </tr>
+              % endif
+              % if action.trackerUri:
+              <tr>
+                <td>${ _('TrackerURI') }</td>
+                <td>${ action.trackerUri }</td>
+              </tr>
+              % endif
+              % if action.transition:
+              <tr>
+                <td>${ _('Transition') }</td>
+                <td>${ action.transition }</td>
+              </tr>
+              %endif
+            </tbody>
+          </table>
+        </div>
+
+        <div id="configuration" class="tab-pane" style="min-height:400px">
+          <textarea id="configurationEditor">${ action.conf }</textarea>
+        </div>
+
+        <div id="child-jobs" class="tab-pane">
+          % if not action.externalChildIDs:
+            ${ _('No child jobs') }
+          % else:
+          <table class="table table-condensed datatables" id="jobTable">
+            <thead>
+              <tr>
+                <th>${ _('Logs') }</th>
+                <th>${ _('Ids') }</th>
+              </tr>
+            </thead>
+            <tbody>
+            % for child_id in action.externalChildIDs.split(','):
+              <tr>
+                <td>
+                  <a href="${ url('jobbrowser.views.job_single_logs', job=child_id) }" title="${ _('View the logs') }" rel="tooltip">
+                    <i class="fa fa-tasks"></i>
+                  </a>
+                </td>
+                <td>
+                  <a href="${ url('jobbrowser.views.single_job', job=child_id) }">
+                    ${ "_".join(child_id.split("_")[-2:]) }
+                  </a>
+                </td>
+              </tr>
+            % endfor
+              </tbody>
+            </table>
+          % endif
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px">
+        <a class="btn" onclick="history.back()">${ _('Back') }</a>
+      </div>
+    </div>
+  </div>
+</p>
+    </div>
+    </div>
 </div>
 
-${commonfooter(messages)}
+
+<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    var definitionEditor = $("#configurationEditor")[0];
+
+    var codeMirror = CodeMirror(function (elt) {
+      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+    }, {
+      value:definitionEditor.value,
+      readOnly:true,
+      lineNumbers:true
+    });
+
+    // force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#configuration") {
+        codeMirror.refresh();
+      }
+    });
+  });
+</script>
+
+${ commonfooter(request, messages) | n,unicode }

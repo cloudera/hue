@@ -1,0 +1,34 @@
+<workflow-app name="Sequential Java" xmlns="uri:oozie:workflow:0.4">
+    <start to="TeraGenWorkflow"/>
+    <action name="TeraGenWorkflow">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>org.apache.hadoop.examples.terasort.TeraGen</main-class>
+            <arg>${records}</arg>
+            <arg>${output_dir}/teragen</arg>
+            <capture-output/>
+        </java>
+        <ok to="TeraSort"/>
+        <error to="kill1"/>
+    </action>
+    <action name="TeraSort">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>org.apache.hadoop.examples.terasort.TeraSort</main-class>
+            <arg>-Dmapred.reduce.tasks=${terasort_reducers}</arg>
+            <arg>${output_dir}/teragen</arg>
+            <arg>${output_dir}/terasort</arg>
+        </java>
+        <ok to="end"/>
+        <error to="kill2"/>
+    </action>
+    <kill name="kill1">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <kill name="kill2">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

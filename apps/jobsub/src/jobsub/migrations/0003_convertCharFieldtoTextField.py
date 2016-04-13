@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'OozieStreamingAction.job_properties'
         db.alter_column('jobsub_ooziestreamingaction', 'job_properties', self.gf('django.db.models.fields.TextField')())
 
@@ -16,10 +16,10 @@ class Migration(SchemaMigration):
 
         # Changing field 'OozieJavaAction.job_properties'
         db.alter_column('jobsub_ooziejavaaction', 'job_properties', self.gf('django.db.models.fields.TextField')())
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'OozieStreamingAction.job_properties'
         db.alter_column('jobsub_ooziestreamingaction', 'job_properties', self.gf('django.db.models.fields.CharField')(max_length=32768))
 
@@ -28,8 +28,8 @@ class Migration(SchemaMigration):
 
         # Changing field 'OozieJavaAction.job_properties'
         db.alter_column('jobsub_ooziejavaaction', 'job_properties', self.gf('django.db.models.fields.CharField')(max_length=32768))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -134,5 +134,5 @@ class Migration(SchemaMigration):
             'reducer': ('django.db.models.fields.CharField', [], {'max_length': '512'})
         }
     }
-    
+
     complete_apps = ['jobsub']

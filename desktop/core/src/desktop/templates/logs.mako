@@ -20,16 +20,23 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 import re
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader(_('About'), "about", user, "100px")}
+
+${ commonheader(_('Server Logs'), "about", user) | n,unicode }
 ${layout.menubar(section='log_view')}
 
-<style>
+<style type="text/css">
   pre {
     margin: 0;
     padding: 2px;
     border: 0;
+    white-space: pre-wrap;
+  }
+
+  pre.nowrap {
+    white-space: nowrap;
   }
 
   pre.highlighted {
@@ -38,6 +45,7 @@ ${layout.menubar(section='log_view')}
 
   #logs {
     overflow: auto;
+    background-color: #F5F5F5;
   }
 
   #logs pre:first-child {
@@ -54,25 +62,25 @@ ${layout.menubar(section='log_view')}
 </style>
 
 <div class="container-fluid">
-  <h1>${_('Log entries (most recent first)')}</h1>
+  <div class="card card-small">
+    <%actionbar:render>
+      <%def name="search()">
+        <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
+      </%def>
+      <%def name="creation()">
+        <label class="checkbox" style="display: inline-block; margin-right: 10px"><input id="wrapLogs" type="checkbox" checked="checked">${_('Wrap logs')}</label>
+        <a href="/desktop/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+      </%def>
+    </%actionbar:render>
 
-  <%actionbar:render>
-    <%def name="search()">
-        <input type="text" class="input-xxlarge search-query" placeholder="${_('Search...')}" value="${query}">
-    </%def>
-    <%def name="creation()">
-        <span class="btn-group">
-          <a href="/download_logs" class="btn"><i class="icon-download-alt"></i> ${_('Download entire log as zip')}</a>
-        </span>
-    </%def>
-  </%actionbar:render>
+    <% log.reverse() %>
 
-  <% log.reverse() %>
+    <div id="logs">
+        % for l in log:
+          <pre>${smart_unicode(l, errors='ignore')}</pre>
+        % endfor
+    </div>
 
-  <div id="logs">
-      % for l in log:
-        <pre>${smart_unicode(l, errors='ignore') | h}</pre>
-      % endfor
   </div>
 
 </div>
@@ -90,13 +98,9 @@ ${layout.menubar(section='log_view')}
       }, 200);
     });
 
-    var filterTimeout = -1;
-    $(".search-query").keyup(function () {
-      window.clearTimeout(filterTimeout);
-      filterTimeout = window.setTimeout(function () {
-        filterLogs($(".search-query").val());
-      }, 500);
-    });
+    $(".search-query").jHueDelayedInput(function(){
+      filterLogs($(".search-query").val());
+    }, 500);
 
     if ("${query}" != "") {
       filterLogs("${query}");
@@ -112,7 +116,7 @@ ${layout.menubar(section='log_view')}
         heightAfter += $(this).outerHeight(true);
       });
       if (_el.height() > ($(window).height() - _el.offset().top - heightAfter)) {
-        _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter);
+        _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter - 30);
       }
     }
 
@@ -138,7 +142,16 @@ ${layout.menubar(section='log_view')}
         $("#logs").scrollTop(0);
       }
     }
+
+    $("#wrapLogs").on("change", function(){
+      if ($(this).is(":checked")){
+        $("pre").removeClass("nowrap");
+      }
+      else {
+        $("pre").addClass("nowrap");
+      }
+    });
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(request, messages) | n,unicode }

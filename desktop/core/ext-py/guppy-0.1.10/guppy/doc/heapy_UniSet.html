@@ -1,0 +1,1484 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html lang=en>
+ <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <title></title></head>
+ <body>
+  <div><a name='heapykinds.UniSet'>
+   <h1>.tgt.heapykinds.UniSet</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>UniSet</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.UniSet'>UniSet</a>:</h3></dt>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.disjoint'>disjoint</a></big>(<var>y</var><code>:</code>&nbsp;<em>UniSet+</em>) <strong>-></strong> <em>boolean</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.get_ckc'>get_ckc</a></big>()</dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.get_render'>get_render</a></big>() <strong>-></strong> <em>callable</em></dd>
+     <dt><strong><big>Operators</big></strong></dt>
+     <dd><a href='#heapy_UniSet.UniSet.fop:bool'><big><strong>bool</strong></big></a>(x) <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.fop:str'><big><strong>str</strong></big></a>(x) <strong>-></strong> <em>string</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.fop:repr'><big><strong>repr</strong></big></a>(x) <strong>-></strong> <em>string</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.fop:-126-'><big><strong>~</strong></big></a>(x) <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-38-'># </a>x <big><strong>&amp;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-124-'># </a>x <big><strong>|</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-94-'># </a>x <big><strong>^</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:--'># </a>x <big><strong>-</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a></dd>
+     <dd><a href='#heapy_UniSet.UniSet.rop:in'># </a><var>y</var><code>:</code>&nbsp;<em>Any+</em><big> <strong>in</strong> </big>x <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-61--61-'># </a>x <big><strong>==</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-33--61-'># </a>x <big><strong>!=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-60--61-'># </a>x <big><strong>&lt;=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-60-'># </a>x <big><strong>&lt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-62--61-'># </a>x <big><strong>&gt;=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_UniSet.UniSet.op:-62-'># </a>x <big><strong>&gt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.biper'>biper</a></big><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.brief'>brief</a></big><code>:</code>&nbsp;<em>string</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.UniSet.dictof'>dictof</a></big><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></dd></dl></dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='heapykinds.UniSet.disjoint'>x<code>.</code><strong><big>disjoint</big></strong></a>(<var>y</var><code>:</code>&nbsp;<em>UniSet+</em>) <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ True if x and y are disjoint sets, False otherwise. This
+is equivalent to calculating
+        <p> not (x &amp; y)</p>
+        <p>
+ but may be implemented more efficiently in some cases.
+
+</p></dt></dl></dd></dl></dd>
+   <dd><a name='heapykinds.UniSet.get_ckc'>x<code>.</code><strong><big>get_ckc</big></strong></a>()
+    <dl>
+     <dd>
+ Get low-level classification information, where available.
+Returns a tuple (classifier, kind, comparator).
+</dd></dl></dd>
+   <dd><a name='heapykinds.UniSet.get_render'>x<code>.</code><strong><big>get_render</big></strong></a>() <strong>-></strong> <em>callable</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a function that may be used to render the representation
+of the elements of self.
+</dt></dl></dd>
+     <dd>
+ This is mainly intended for internal representation support.
+The function returned depends on the kind of elements x contains. The
+rendering function is choosen so that it will be appropriate, and can
+be used safely, for all objects of that kind.  For the most general
+kind of objects, the rendering function will only return an address
+representation. For more specialized kinds, the function may provide
+more information, and can be equivalent to the builtin repr() when the
+kind is narrow enough that it would work for all elements of that kind
+without exception.
+
+</dd></dl></dd>
+   <dt>
+    <h2>Operators</h2></dt>
+   <dd><a name='heapy_UniSet.UniSet.fop:bool'><big><strong>bool</strong></big></a>(x) <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ True if self contains some element, False otherwise.
+</dt></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.fop:str'><big><strong>str</strong></big></a>(x) <strong>-></strong> <em>string</em>
+    <dl>
+     <dd>
+ Convert the set to a printable string.
+The string is usually the same as the .brief
+attribute, but a major exception is the IdentitySet class.</dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.fop:repr'><big><strong>repr</strong></big></a>(x) <strong>-></strong> <em>string</em>
+    <dl>
+     <dd>
+ Convert the set to a printable string.
+This may be a more formal representation than str().</dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.fop:-126-'><big><strong>~</strong></big></a>(x) <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a>
+    <dl>
+     <dd>
+ Complement: the set of objects that are not in x.
+</dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-38-'></a>x <big><strong>&amp;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a>
+    <dl>
+     <dd>
+
+Intersection: the set of objects that are in both x and y.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-124-'></a>x <big><strong>|</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a>
+    <dl>
+     <dd>
+
+Union: the set of objects that are in either x or y.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-94-'></a>x <big><strong>^</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a>
+    <dl>
+     <dd>
+
+Symmetric set difference: the set of objects that are in exactly one of x and y.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:--'></a>x <big><strong>-</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <a href='#heapykinds.UniSet'>UniSet</a>
+    <dl>
+     <dd>
+
+Set difference: the set of objects that are in x but not in y.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.rop:in'></a><var>y</var><code>:</code>&nbsp;<em>Any+</em><big> <strong>in</strong> </big>x <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Inclusion test. True if y is a member of x, False otherwise.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-61--61-'></a>x <big><strong>==</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Equal:
+    x and y contain the same elements.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-33--61-'></a>x <big><strong>!=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Not equal:
+             x and y do not contain the same elements.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-60--61-'></a>x <big><strong>&lt;=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Subset, non-strict:
+             all elements in x are also in y.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-60-'></a>x <big><strong>&lt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Subset, strict:
+             all elements in x are also in y,
+             and y contains some element not in x.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-62--61-'></a>x <big><strong>&gt;=</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Superset, non-strict:
+             all elements in y are also in x.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.UniSet.op:-62-'></a>x <big><strong>&gt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>UniSet+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Superset, strict:
+             all elements in y are also in x,
+             and x contains some element not in y.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='heapykinds.UniSet.biper'>x<code>.</code><strong><big>biper</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ A bipartitioning equivalence relation based on x.
+This may be used to partition or classify sets into two equivalence
+classes:
+      <dl>
+       <dt> x.biper(0) == x</dt>
+       <dd> The set of elements that are in x.</dd>
+       <dt> x.biper(1) == ~x</dt>
+       <dd> The set of elements that are not in x.</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.UniSet.brief'>x<code>.</code><strong><big>brief</big></strong></a><code>:</code>&nbsp;<em>string</em></dd>
+   <dd>
+    <dl>
+     <dd>
+A string representation of self, which is brief relative to the
+representation returned by str() and repr(). (In many cases it is
+the same - both are then brief - but for IdentitySet objects the
+brief representation is typically much shorter than the non-brief one.)
+</dd></dl></dd>
+   <dd><a name='heapykinds.UniSet.dictof'>x<code>.</code><strong><big>dictof</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ If x represents a kind of objects with a builtin __dict__ attribute,
+x.dictof is the kind representing the set of all those dict objects.
+In effect, x.dictof maps lambda e:getattr(e, '__dict__') for
+all objects e in x. But it is symbolically evaluated to generate a new
+symbolic set (a Kind).</dd></dl></dd></dl><a name='heapykinds.Kind'>
+   <h1>.tgt.heapykinds.Kind</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>Kind</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.Kind.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ These are symbolic sets that contain no actual countable elements
+but only has a mechanism to determine if elements are contained in
+them or not. When combined with other symbolic sets via set operations
+(intersection, union etc) the result may be a new symbolic set or an <em>IdentitySet</em>
+ depending on the sets and operations involved. For
+example, when intersected with IdentitySet, a new IdentitySet will be
+returned that contains only those element from the IdentitySet that
+were actually in the symbolic set.
+
+</dd>
+   <dt>
+    <h2><a name='heapy_UniSet.Kind.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></h2></dt></dl><a name='heapykinds.KindWithAlt'>
+   <h1>.tgt.heapykinds.KindWithAlt</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindWithAlt</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindWithAlt.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.Kind'>Kind</a></big></strong></dt>
+     <dt><strong><big>Method</big></strong></dt>
+     <dd><big><a href='#heapykinds.KindWithAlt.alt'>alt</a></big>(<var>operator</var><code>:</code>&nbsp;<em>AltOperator+</em>) <strong>-></strong> <a href='#heapykinds.Kind'>Kind</a></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ These are symbolic sets (subkind of Kind) that have an alt
+method.  The alt method works differently for different families of
+Kinds, but rather than specifying these separately, I have put the
+common part of the specification here for brevity.
+</dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindWithAlt.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.Kind'>Kind</a></h2></dt>
+   <dt>
+    <h2>Method</h2></dt>
+   <dd><a name='heapykinds.KindWithAlt.alt'><strong><big>alt</big></strong></a>(<var>operator</var><code>:</code>&nbsp;<em>AltOperator+</em>) <strong>-></strong> <a href='#heapykinds.Kind'>Kind</a>
+    <dl>
+     <dd>
+Make a new kind that is modified according to an operator.  If
+the operator is '==', the method is a no-op and just returns the
+original kind. If it is '!=', it returns the complement of the
+original kind, so it is a synonym for ~x. Otherwise the operator may
+be one of &lt;, &lt;=, &gt;=, and &gt;. The actual modification depends on the
+family of the original kind. See the particular kind family.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd></dl><a name='heapykinds.KindOfTypeFamily'>
+   <h1>.tgt.heapykinds.KindOfTypeFamily</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindOfTypeFamily</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindOfTypeFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ A kind of this family includes all objects of one particular 'type',
+where the type is, in user terms, what is returned by the type() builtin
+and is implemented as the value of the ob_type field in C.
+</dd>
+   <dd>
+ The kind returned by the alt method depends on its operator argument
+in the following way.
+    <table>
+     <tr>
+      <th> Operator</th>
+      <th> Returned kind in terms of original type</th></tr>
+     <tr>
+      <td> &lt;</td>
+      <td> strict subtype</td></tr>
+     <tr>
+      <td> &lt;=</td>
+      <td> subtype</td></tr>
+     <tr>
+      <td> &gt;=</td>
+      <td> supertype</td></tr>
+     <tr>
+      <td> &gt;</td>
+      <td>
+ strict supertype
+</td></tr></table></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindOfTypeFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></h2></dt></dl><a name='heapykinds.KindOfClassFamily'>
+   <h1>.tgt.heapykinds.KindOfClassFamily</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindOfClassFamily</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindOfClassFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ A kind of this family includes all objects of one particular 'class',
+where the class is the value of the builtin __class__ attribute.  This
+is equal to type() unless the object is of an 'old-fashioned' class;
+then type() is &lt;type 'instance'&gt;.
+</dd>
+   <dd>
+ The kind returned by the alt method depends on its operator argument
+in the following way.
+    <table>
+     <tr>
+      <th> Operator</th>
+      <th> Returned kind in terms of original class</th></tr>
+     <tr>
+      <td> &lt;</td>
+      <td> strict subclass</td></tr>
+     <tr>
+      <td> &lt;=</td>
+      <td> subclass</td></tr>
+     <tr>
+      <td> &gt;=</td>
+      <td> superclass</td></tr>
+     <tr>
+      <td> &gt;</td>
+      <td>
+ strict superclass
+</td></tr></table></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindOfClassFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></h2></dt></dl><a name='heapykinds.KindOfSizeFamily'>
+   <h1>.tgt.heapykinds.KindOfSizeFamily</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindOfSizeFamily</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindOfSizeFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ The kind returned by the alt method depends on its operator argument
+in the following way.
+    <table>
+     <tr>
+      <th> Operator</th>
+      <th> Returned kind in terms of original</th></tr>
+     <tr>
+      <td> &lt;</td>
+      <td> size &lt; original</td></tr>
+     <tr>
+      <td> &lt;=</td>
+      <td> size &lt;= original</td></tr>
+     <tr>
+      <td> &gt;=</td>
+      <td> size &gt;= original</td></tr>
+     <tr>
+      <td> &gt;</td>
+      <td>
+ size &gt; original
+</td></tr></table></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindOfSizeFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></h2></dt></dl><a name='heapykinds.KindOfRetClaSetFamily'>
+   <h1>.tgt.heapykinds.KindOfRetClaSetFamily</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindOfRetClaSetFamily</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindOfRetClaSetFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ The kind returned by the alt method depends on its operator argument
+in the following way.
+    <table>
+     <tr>
+      <th> Operator</th>
+      <th> Returned kind in terms of original</th></tr>
+     <tr>
+      <td> &lt;</td>
+      <td> referred by less than the original set of kinds</td></tr>
+     <tr>
+      <td> &lt;=</td>
+      <td> referred by at most the original set of kinds</td></tr>
+     <tr>
+      <td> &gt;=</td>
+      <td> referred by at least the original set of kinds</td></tr>
+     <tr>
+      <td> &gt;</td>
+      <td>
+ referred by more than the original set of kinds
+</td></tr></table></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindOfRetClaSetFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></h2></dt></dl><a name='heapykinds.KindOfInViaFamily'>
+   <h1>.tgt.heapykinds.KindOfInViaFamily</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>KindOfInViaFamily</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.KindOfInViaFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></big></strong></dt></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ The kind returned by the alt method depends on its operator argument
+in the following way.
+    <table>
+     <tr>
+      <th> Operator</th>
+      <th> Returned kind in terms of original</th></tr>
+     <tr>
+      <td> &lt;</td>
+      <td> referred via less than the original set of relations</td></tr>
+     <tr>
+      <td> &lt;=</td>
+      <td> referred via at most the original set of relations</td></tr>
+     <tr>
+      <td> &gt;=</td>
+      <td> referred via at least the original set of relations</td></tr>
+     <tr>
+      <td> &gt;</td>
+      <td>
+ referred via more than the original set of relations
+
+</td></tr></table></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.KindOfInViaFamily.-60-0-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.KindWithAlt'>KindWithAlt</a></h2></dt></dl><a name='heapykinds.IdentitySet'>
+   <h1>.tgt.heapykinds.IdentitySet</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>IdentitySet</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.IdentitySet.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></big></strong></dt>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.IdentitySet'>IdentitySet</a>:</h3></dt>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.by'>by</a></big>(<var>er</var><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a>) <strong>-></strong> <a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.diff'>diff</a></big>(<var>y</var><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a>) <strong>-></strong> <em>Stat</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.dump'>dump</a></big>(<var>fn</var><code>:</code>&nbsp;<em>writeable_filename_or_file+</em>  [<code>mode</code><strong>&nbsp;=&nbsp;</strong><em>writing_mode_string+</em>])</dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.get_rp'>get_rp</a></big>( <sup><strong>draw:</strong></sup>[<code>depth</code><strong>&nbsp;=&nbsp;</strong><em>positive+</em> , <code>er</code><strong>&nbsp;=&nbsp;</strong><em>EquivalenceRelation+</em> , <code>imdom</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em> , <code>bf</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em> , <code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>stopkind</code><strong>&nbsp;=&nbsp;</strong><em>UniSet+</em> , <code>nocyc</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em>]) <strong>-></strong> <em>ReferencePattern</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.get_shpaths'>get_shpaths</a></big>( <sup><strong>draw:</strong></sup>[<code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>avoid_nodes</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>avoid_edges</code><strong>&nbsp;=&nbsp;</strong><em>NodeGraph+</em>]) <strong>-></strong> <em>Paths</em></dd>
+     <dt><strong><big>Operators</big></strong></dt>
+     <dd><a href='#heapy_UniSet.IdentitySet.fop:hash'><big><strong>hash</strong></big></a>(x) <strong>-></strong> <em>int</em></dd>
+     <dd><a href='#heapy_UniSet.IdentitySet.fop:len'><big><strong>len</strong></big></a>(x) <strong>-></strong> <em>notnegative</em></dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byclass'>byclass</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byclodo'>byclodo</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byid'>byid</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.bymodule'>bymodule</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byrcs'>byrcs</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.bysize'>bysize</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.bytype'>bytype</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byunity'>byunity</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.byvia'>byvia</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.count'>count</a></big><code>:</code>&nbsp;<em>notnegative</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.dominos'>dominos</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.domisize'>domisize</a></big><code>:</code>&nbsp;<em>notnegative</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.er'>er</a></big><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.imdom'>imdom</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.indisize'>indisize</a></big><code>:</code>&nbsp;<em>notnegative</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.kind'>kind</a></big><code>:</code>&nbsp;<a href='#heapykinds.Kind'>Kind</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.maprox'>maprox</a></big><code>:</code>&nbsp;<em>MappingProxy</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.more'>more</a></big><code>:</code>&nbsp;<em>MorePrinter</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.nodes'>nodes</a></big><code>:</code>&nbsp;<em>ImmNodeSet</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.owners'>owners</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.partition'>partition</a></big><code>:</code>&nbsp;<em>Partition</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.parts'>parts</a></big><code>:</code>&nbsp;<em>iterable</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.pathsin'>pathsin</a></big><code>:</code>&nbsp;<em>Paths</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.pathsout'>pathsout</a></big><code>:</code>&nbsp;<em>Paths</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.referents'>referents</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.referrers'>referrers</a></big><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.rp'>rp</a></big><code>:</code>&nbsp;<em>ReferencePattern</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.shpaths'>shpaths</a></big><code>:</code>&nbsp;<em>Paths</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.size'>size</a></big><code>:</code>&nbsp;<em>notnegative</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.sp'>sp</a></big><code>:</code>&nbsp;<em>Paths</em></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySet.stat'>stat</a></big><code>:</code>&nbsp;<em>Stat</em></dd></dl></dd>
+   <dt>
+    <h2><a name='heapy_UniSet.IdentitySet.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></h2></dt>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='heapykinds.IdentitySet.by'>x<code>.</code><strong><big>by</big></strong></a>(<var>er</var><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a>) <strong>-></strong> <a href='#heapykinds.IdentitySet'>IdentitySet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a copy of x, but using a different equivalence relation for
+partitioning. That is, the <a href='#heapykinds.IdentitySet.er'>er</a> attribute of the copy will be set to the er argument.</dt></dl></dd>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.partition'>partition</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.diff'>x<code>.</code><strong><big>diff</big></strong></a>(<var>y</var><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a>) <strong>-></strong> <em>Stat</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a statistics object that is the difference of the statistics
+of x and y, i.e. it is a shorthand for &quot;<code> x.stat - y.by(x.er).stat</code>&quot;.</dt></dl></dd>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.stat'>stat</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.dump'>x<code>.</code><strong><big>dump</big></strong></a>(<var>fn</var><code>:</code>&nbsp;<em>writeable_filename_or_file+</em>  [<code>mode</code><strong>&nbsp;=&nbsp;</strong><em>writing_mode_string+</em>])
+    <dl>
+     <dd> Dump statistical data to a file.</dd>
+     <dd> A shorthand for x.stat.dump.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>fn</var><code>:</code>&nbsp;<em>writeable_filename_or_file+</em></dt>
+         <dd> A file name or open file to dump to.</dd>
+         <dt><code>mode</code><strong>&nbsp;=&nbsp;</strong><em>writing_mode_string+</em></dt>
+         <dd> The mode to open the file with, if not already open.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>'a'</dt>
+           <dd> Per default, the file is opened in append mode.</dd></dl></dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.stat'>stat</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.get_rp'>x<code>.</code><strong><big>get_rp</big></strong></a>( <sup><strong>draw:</strong></sup>[<code>depth</code><strong>&nbsp;=&nbsp;</strong><em>positive+</em> , <code>er</code><strong>&nbsp;=&nbsp;</strong><em>EquivalenceRelation+</em> , <code>imdom</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em> , <code>bf</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em> , <code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>stopkind</code><strong>&nbsp;=&nbsp;</strong><em>UniSet+</em> , <code>nocyc</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em>]) <strong>-></strong> <em>ReferencePattern</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ An object containing the pattern of references to the objects
+in x, including references to those referrers in turn. It has a string
+representation in the form of a tree of a certain maximum depth, with
+cycle patterns marked.
+</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><code>depth</code><strong>&nbsp;=&nbsp;</strong><em>positive+</em></dt>
+         <dd>	The depth to which the pattern will be generated.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>The depth attribute of the RefPat module glue.</dt>
+           <dd></dd></dl></dd>
+         <dt><code>er</code><strong>&nbsp;=&nbsp;</strong><em>EquivalenceRelation+</em></dt>
+         <dd> The equivalence relation to partition the referrers.</dd>
+         <dd> The default is to use the <em>Use.Clodo</em>
+ equivalence relation
+</dd>
+         <dt><code>imdom</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em></dt>
+         <dd>
+	If true, the immediate dominators will be used instead
+	of the referrers. This will take longer time to calculate,
+	but may be useful to reduce the complexity of the reference
+	pattern.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>False</dt>
+           <dd></dd></dl></dd>
+         <dt><code>bf</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em></dt>
+         <dd>
+	If true, the pattern will be printed in breadth-first
+	order instead of depth-first. (Experimental.)</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>False</dt>
+           <dd></dd></dl></dd>
+         <dt><code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em></dt>
+         <dd>	An alternative reference source.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>The default heapy root.</dt>
+           <dd></dd></dl></dd>
+         <dt><code>stopkind</code><strong>&nbsp;=&nbsp;</strong><em>UniSet+</em></dt>
+         <dd> The referrers of objects of kind stopkind will not be followed.</dd>
+         <dd>
+ The default is a kind representing a union of all modules, classes, types
+and their dicts; and also all code and frame objects. Actually, it is
+made by code like this:
+          <pre>
+stopkind = (
+	    hp.Type.Module |
+	    hp.Type.Class |
+	    hp.Type.Type |
+	    hp.Type.Module.dictof |
+	    hp.Type.Class.dictof |
+	    hp.Type.Type.dictof |
+	    hp.Type.Code |
+	    hp.Type.Frame
+	    )</pre></dd>
+         <dt><code>nocyc</code><strong>&nbsp;=&nbsp;</strong><em>boolean+</em></dt>
+         <dd> When True, certain cycles will not be followed.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>False</dt>
+           <dd></dd></dl></dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.rp'>rp</a>, <a href='#heapykinds.IdentitySet.shpaths'>shpaths</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.get_shpaths'>x<code>.</code><strong><big>get_shpaths</big></strong></a>( <sup><strong>draw:</strong></sup>[<code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>avoid_nodes</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em> , <code>avoid_edges</code><strong>&nbsp;=&nbsp;</strong><em>NodeGraph+</em>]) <strong>-></strong> <em>Paths</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> an object containing the shortest paths to objects in x.</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><code>src</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em></dt>
+         <dd> An alternative source set of objects.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>The default heapy root.</dt>
+           <dd></dd></dl></dd>
+         <dt><code>avoid_nodes</code><strong>&nbsp;=&nbsp;</strong><em>IdentitySet+</em></dt>
+         <dd> Nodes to avoid</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>No nodes are avoided, except those that</dt>
+           <dd>must be avoided to hide the data in the heapy system itself.</dd></dl></dd>
+         <dt><code>avoid_edges</code><strong>&nbsp;=&nbsp;</strong><em>NodeGraph+</em></dt>
+         <dd> Edges to avoid                  </dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>No edges are avoided.</dt>
+           <dd></dd></dl></dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.shpaths'>shpaths</a></dd></dl></dd></dl></dd>
+   <dt>
+    <h2>Operators</h2></dt>
+   <dd><a name='heapy_UniSet.IdentitySet.fop:hash'><big><strong>hash</strong></big></a>(x) <strong>-></strong> <em>int</em>
+    <dl>
+     <dd> Hashing</dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a hash value based on the addresses of the elements.
+</dt></dl></dd></dl></dd>
+   <dd><a name='heapy_UniSet.IdentitySet.fop:len'><big><strong>len</strong></big></a>(x) <strong>-></strong> <em>notnegative</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the number of different sets in the partitioning of x, as determined
+by its equivalence relation ( <a href='#heapykinds.IdentitySet.er'>er</a>
+) attribute.
+</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.partition'>partition</a></dd></dl></dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='heapykinds.IdentitySet.byclass'>x<code>.</code><strong><big>byclass</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Class</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.byclodo'>x<code>.</code><strong><big>byclodo</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Clodo</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.byid'>x<code>.</code><strong><big>byid</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Id</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.bymodule'>x<code>.</code><strong><big>bymodule</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Module</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.byrcs'>x<code>.</code><strong><big>byrcs</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Rcs</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.bysize'>x<code>.</code><strong><big>bysize</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Size</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.bytype'>x<code>.</code><strong><big>bytype</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Type</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.byunity'>x<code>.</code><strong><big>byunity</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Unity</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.byvia'>x<code>.</code><strong><big>byvia</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd> A copy of x, but with <em>Use.Via</em>
+ as the equivalence relation.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.count'>x<code>.</code><strong><big>count</big></strong></a><code>:</code>&nbsp;<em>notnegative</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The number of individual objects in x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.dominos'>x<code>.</code><strong><big>dominos</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The set 'dominated' by the set of objects in x. This is the
+objects that will become deallocated, directly or indirectly, when the
+objects in x are deallocated.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.domisize'>domisize</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.domisize'>x<code>.</code><strong><big>domisize</big></strong></a><code>:</code>&nbsp;<em>notnegative</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The dominated size of the set x. The dominated size of x
+is the total size of memory that will become deallocated, directly or
+indirectly, when the objects in x are deallocated.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.dominos'>dominos</a>, <a href='#heapykinds.IdentitySet.size'>size</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.er'>x<code>.</code><strong><big>er</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The Equivalence Relation of x, used for partitioning
+when representing / printing this set.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.imdom'>x<code>.</code><strong><big>imdom</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The immediate dominators of x. The immediate dominators is a
+subset of the referrers. It includes only those referrers that are
+reachable directly, avoiding any other referrer.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.indisize'>x<code>.</code><strong><big>indisize</big></strong></a><code>:</code>&nbsp;<em>notnegative</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The total 'individual' size of the set of objects.  The
+individual size of an object is the size of memory that is allocated
+directly in the object, not including any externally visible
+subobjects.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Synonym</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.size'>size</a></dd></dl></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.domisize'>domisize</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.kind'>x<code>.</code><strong><big>kind</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.Kind'>Kind</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The kind of objects in x. It is the union of the element-wise
+classifications as determined by the equivalence relation of x, <a href='#heapykinds.IdentitySet.er'>er</a>
+.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.maprox'>x<code>.</code><strong><big>maprox</big></strong></a><code>:</code>&nbsp;<em>MappingProxy</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An object that can be used to map operations to the objects in
+x, forming a new set of the result. This works as follows:
+
+      <ul>
+       <li>
+  Getting an attribute of the MappingProxy object will get the attribute from
+  each of the objects in the set and form a set of the results. If there
+  was an exception when getting some attribute, it will be ignored.</li>
+       <li>
+  Indexing the MappingProxy object will index into each of the objects in the
+  set and return a set of the results. Exceptions will be ignored.</li></ul></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Example</big></strong></dt>
+       <dd>
+        <pre>
+&gt;&gt;&gt; hp.iso({'a':'b'}, {'a':1}).maprox['a'].byid
+Set of 2 &lt;mixed&gt; objects. Total size = 40 bytes.
+ Index     Size   %   Cumulative  %   Brief
+     0       28  70.0        28  70.0 str: 'b'
+     1       12  30.0        40 100.0 int: 1
+&gt;&gt;&gt; </pre></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.more'>x<code>.</code><strong><big>more</big></strong></a><code>:</code>&nbsp;<em>MorePrinter</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An object that can be used to show more lines of the string
+representation of x. The object returned, a MorePrinter instance,
+has a string representation that continues after the end of
+the representation of x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.nodes'>x<code>.</code><strong><big>nodes</big></strong></a><code>:</code>&nbsp;<em>ImmNodeSet</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The actual objects contained in x. These are called nodes
+because they are treated with equality based on address, and not on
+the generalized equality that is used by ordinary builtin sets or
+dicts.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.owners'>x<code>.</code><strong><big>owners</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The set of objects that 'own'  objects in x. The owner
+is defined for an object of type dict, as the object (if any) that
+refers to the object via its special __dict__ attribute.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.partition'>x<code>.</code><strong><big>partition</big></strong></a><code>:</code>&nbsp;<em>Partition</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ A partition of the set of objects in x. The set is partitioned
+into subsets by equal kind, as given by an equivalence relation.
+Unless otherwise specified, the equivalence relation used is
+'byclodo', which means it classifies 'by type or class or dict
+owner'. Different equivalence relations can be specified by using
+'by_...' attributes of any IdentitySet object.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.er'>er</a>, <a href='#heapykinds.IdentitySet.by'>by</a>, <a href='#heapykinds.IdentitySet.parts'>parts</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.parts'>x<code>.</code><strong><big>parts</big></strong></a><code>:</code>&nbsp;<em>iterable</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An iterable object, that can be used to iterate over the 'parts'
+of x, i.e. the subsets in the partitioning of x. The iteration order
+is determined by the sorting order of the partition. The partition is
+normally sorted with the subsets that have the larger total object
+size first, so the first element of x.parts will then be the subset in
+the partition of x that uses the most memory.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.partition'>partition</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.pathsin'>x<code>.</code><strong><big>pathsin</big></strong></a><code>:</code>&nbsp;<em>Paths</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The paths from the direct referrers of the objects in x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.pathsout'>x<code>.</code><strong><big>pathsout</big></strong></a><code>:</code>&nbsp;<em>Paths</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The paths to the referents of the objects in x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.referents'>x<code>.</code><strong><big>referents</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The set of objects that are directly referred to by
+any of the objects in x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.referrers'>x<code>.</code><strong><big>referrers</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ The set of objects that directly refer to
+any of the objects in x.
+</dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.rp'>x<code>.</code><strong><big>rp</big></strong></a><code>:</code>&nbsp;<em>ReferencePattern</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The current pattern of references to the objects in x.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.get_rp'>get_rp</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.shpaths'>x<code>.</code><strong><big>shpaths</big></strong></a><code>:</code>&nbsp;<em>Paths</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An object containing the shortest paths to objects in x.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Synonym</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.sp'>sp</a></dd></dl></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.get_shpaths'>get_shpaths</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.size'>x<code>.</code><strong><big>size</big></strong></a><code>:</code>&nbsp;<em>notnegative</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The total 'individual' size of the set of objects.  The
+individual size of an object is the size of memory that is allocated
+directly in the object, not including any externally visible
+subobjects.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Synonym</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.indisize'>indisize</a></dd></dl></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.domisize'>domisize</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.sp'>x<code>.</code><strong><big>sp</big></strong></a><code>:</code>&nbsp;<em>Paths</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An object containing the shortest paths to objects in x.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Synonym</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.shpaths'>shpaths</a></dd></dl></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <a href='#heapykinds.IdentitySet.get_shpaths'>get_shpaths</a></dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.IdentitySet.stat'>x<code>.</code><strong><big>stat</big></strong></a><code>:</code>&nbsp;<em>Stat</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ An object summarizing the statistics of the partitioning of x.
+This is useful when only the statistics is required, not the
+objects themselves. The statistics can be dumped to a file,
+unlike the set of objects itself.
+</dd></dl></dd></dl><a name='heapykinds.IdentitySetNotEmpty'>
+   <h1>.tgt.heapykinds.IdentitySetNotEmpty</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>IdentitySetNotEmpty</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.IdentitySetNotEmpty.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></big></strong></dt>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.IdentitySetNotEmpty'>IdentitySetNotEmpty</a>:</h3></dt>
+     <dt><strong><big>Operator</big></strong></dt>
+     <dd><a href='#heapy_UniSet.IdentitySetNotEmpty.-60-3-62-'># </a>x[<var>index</var><code>:</code>&nbsp;<em>int+</em>] <strong>-></strong> <a href='#heapykinds.IdentitySetNotEmpty'>IdentitySetNotEmpty</a></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ Sets that contain at least one object.
+</dd>
+   <dt>
+    <h2><a name='heapy_UniSet.IdentitySetNotEmpty.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySet'>IdentitySet</a></h2></dt>
+   <dt>
+    <h2>Operator</h2></dt>
+   <dt><a name='heapy_UniSet.IdentitySetNotEmpty.-60-3-62-'></a>x[<var>index</var><code>:</code>&nbsp;<em>int+</em>] <strong>-></strong> <a href='#heapykinds.IdentitySetNotEmpty'>IdentitySetNotEmpty</a></dt>
+   <dd>
+    <dl></dl></dd>
+   <dd> Indexing.</dd>
+   <dd>
+    <dl>
+     <dt><strong>Returns </strong> the subset in the partition of x at index.</dt></dl></dd>
+   <dd>
+ The partition is
+normally sorted with the subsets that have the larger total object
+size first, so for example<code> x[0]</code>
+ will be the subset in the partition of x that uses the most memory.
+</dd>
+   <dd>
+    <dl>
+     <dt><strong><big>See also</big></strong></dt>
+     <dd> <em>partition</em>, <em>parts</em></dd></dl></dd></dl><a name='heapykinds.IdentitySetSingleton'>
+   <h1>.tgt.heapykinds.IdentitySetSingleton</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>IdentitySetSingleton</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_UniSet.IdentitySetSingleton.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySetNotEmpty'>IdentitySetNotEmpty</a></big></strong></dt>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.IdentitySetSingleton'>IdentitySetSingleton</a>:</h3></dt>
+     <dt><strong><big>Attribute</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.IdentitySetSingleton.theone'>theone</a></big><code>:</code>&nbsp;<em>Any</em></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd> Sets that contain exactly one object.</dd>
+   <dt>
+    <h2><a name='heapy_UniSet.IdentitySetSingleton.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.IdentitySetNotEmpty'>IdentitySetNotEmpty</a></h2></dt>
+   <dt>
+    <h2>Attribute</h2></dt>
+   <dd><a name='heapykinds.IdentitySetSingleton.theone'>x<code>.</code><strong><big>theone</big></strong></a><code>:</code>&nbsp;<em>Any</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ The actual object that the set contains.
+</dd></dl></dd></dl><a name='heapykinds.EquivalenceRelation'>
+   <h1>.tgt.heapykinds.EquivalenceRelation</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>EquivalenceRelation</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_ER.EquivalenceRelation.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></big></strong></dt>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a>:</h3></dt>
+     <dt><strong><big>Method</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.EquivalenceRelation.sokind'>sokind</a></big>() <strong>-></strong> <em>SetOfKind</em></dd>
+     <dt><strong><big>Operators</big></strong></dt>
+     <dd><a href='#heapy_ER.EquivalenceRelation.rop:in'># </a><var>y</var><code>:</code>&nbsp;<em>UniSet+</em><big> <strong>in</strong> </big>x <strong>-></strong> <em>boolean</em></dd>
+     <dd><a href='#heapy_ER.EquivalenceRelation.op:-38-'># </a>x <big><strong>&amp;</strong></big> <var>y</var><code>:</code>&nbsp;<em>EquivalenceRelation+</em> <strong>-></strong> <a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+     <dd><a href='#heapy_ER.EquivalenceRelation.op:-60-'># </a>x <big><strong>&lt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>EquivalenceRelation+</em> <strong>-></strong> <em>boolean</em></dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd>x<big><code>.</code><a href='#heapykinds.EquivalenceRelation.dictof'>dictof</a></big><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelationByDictOwner'>EquivalenceRelationByDictOwner</a></dd>
+     <dd>x<big><code>.</code><a href='#heapykinds.EquivalenceRelation.refdby'>refdby</a></big><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd></dl></dd>
+   <dt>
+    <h2><a name='heapy_ER.EquivalenceRelation.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.UniSet'>UniSet</a></h2></dt>
+   <dd>
+ The operations of UniSet are supported by EquivalenceRelation as well,
+but some have a redefined behaviour which are described here.
+</dd>
+   <dt>
+    <h2>Method</h2></dt>
+   <dd><a name='heapykinds.EquivalenceRelation.sokind'>x<code>.</code><strong><big>sokind</big></strong></a>() <strong>-></strong> <em>SetOfKind</em>
+    <dl>
+     <dd>
+ Create a set of kinds; a set of equivalence classes of x. The
+arguments are the same as when calling x itself.  One call to x.sokind
+returns a set of one equivalence class.  This set is again callable,
+with the same kind of arguments. Each call will return a new set with
+one new equivalence class added to the previous set.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ an object that may be used to get at the corresponding referred-by
+equivalence class via its .refdby attribute. 
+</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Example</strong></dt>
+       <dd>Show the objects in the heap that are referred from only the dict of __main__.
+        <pre>
+&gt;&gt;&gt; from guppy import hpy; hp=hpy()
+&gt;&gt;&gt; hp.heap() &amp; hp.Module.dictof.sokind(hp.Module('__main__')).refdby
+Partition of a set of 1 object. Total size = 32 bytes.
+ Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+     0      1 100       32 100        32 100 str
+&gt;&gt;&gt; </pre></dd></dl></dd></dl></dd>
+   <dt>
+    <h2>Operators</h2></dt>
+   <dd><a name='heapy_ER.EquivalenceRelation.rop:in'></a><var>y</var><code>:</code>&nbsp;<em>UniSet+</em><big> <strong>in</strong> </big>x <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Inclusion test. True if y is a member of x, False otherwise.
+
+      <p>
+ The members of an equivalence relation in this implementation
+are defined to be the subsets of its equivalence classes. The
+inclusion test can be used to see if all elements of a set classify
+equal according to the classifier of an equivalence relation.
+</p></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Example</big></strong></dt>
+       <dd>
+        <pre>
+&gt;&gt;&gt; from guppy import hpy; hp=hpy()
+&gt;&gt;&gt; hp.iso([],[]) in hp.Size # Equal sizes
+True
+&gt;&gt;&gt; hp.iso([],range(100)) in hp.Size # Different sizes
+False
+&gt;&gt;&gt; hp.iso([],range(100)) in hp.Type # Equal types
+True
+&gt;&gt;&gt; hp.iso([],xrange(100)) in hp.Type # Different types
+False
+&gt;&gt;&gt; 
+&gt;&gt;&gt; hp.Size(56) in hp.Size # An equivalence class of hp.Size
+True
+&gt;&gt;&gt; hp.Type.Int in hp.Size # Not an equivalence class of hp.Size
+False</pre></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Note</big></strong></dt>
+       <dd><small>
+ Mathematically equivalence relations are often modelled as
+set of pairs of equal elements, I considered to mimic this in the
+implementation of the inclusion test but found some problems and I
+think another model is more useful here.</small></dd></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_ER.EquivalenceRelation.op:-38-'></a>x <big><strong>&amp;</strong></big> <var>y</var><code>:</code>&nbsp;<em>EquivalenceRelation+</em> <strong>-></strong> <a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a>
+    <dl>
+     <dd>
+
+Intersection: the set of objects that are in both x and y.
+</dd>
+     <dd>
+ When y is an equivalence relation, the result will be one of
+the arguments if that one was mathematically a subset of the other, or
+otherwise, which is the normally usable case, it will be a new
+equivalence relation that is a symbolic intersection of the two
+arguments.  This can be used to partition a set based on a combination
+of classification criteria.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Example</big></strong></dt>
+       <dd>
+        <pre>
+
+&gt;&gt;&gt; from guppy import hpy; hp=hpy()
+&gt;&gt;&gt; hp.iso(1, 10, [], [2], [3,4]).by(hp.Type &amp; hp.Size)
+Partition of a set of 5 objects. Total size = 172 bytes.
+ Index  Count   %     Size   % Cumulative  % Type &amp; Individual Size
+     0      2  40      120  70       120  70 list &amp; 60
+     1      1  20       28  16       148  86 list &amp; 28
+     2      2  40       24  14       172 100 int &amp; 12
+&gt;&gt;&gt; </pre></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Note</big></strong></dt>
+       <dd>
+When y is not an equivalence relation, the result will be a
+symbolic intersected UniSet, that is it can not be used for
+partitioning but may still be used for inclusion tests.</dd></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapy_ER.EquivalenceRelation.op:-60-'></a>x <big><strong>&lt;</strong></big> <var>y</var><code>:</code>&nbsp;<em>EquivalenceRelation+</em> <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+
+Subset, also called subrelation, strict:
+             all elements in x are also in y,
+             and x and y are not equal.
+
+      <p>
+ An EquivalenceRelation can only be a subrelation of another
+EquivalenceRelation. This is an explicitly defined relationship among
+the equivalence relations. In most cases the equivalence relations are
+disjoint, i.e. none is a subrelation of the other.  But it is useful
+to know which ones are actually subrelations.  The following table
+shows for each pair of predefined relations, whether the one at the
+top of the column is a strict subrelation of the one at the end of the
+row.  ( I have included Size &amp; Type as an example of an intersected
+equivalence relation. )
+</p>
+      <table>
+       <tr>
+        <th> Class</th>
+        <th> Clodo</th>
+        <th> Id</th>
+        <th> Module</th>
+        <th> Rcs</th>
+        <th> Size</th>
+        <th> Type</th>
+        <th> Unity</th>
+        <th> Size&amp;Type</th></tr>
+       <tr>
+        <td>  </td>
+        <td> &lt;</td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <th> Class</th></tr>
+       <tr>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td> &lt;</td>
+        <th> Size</th></tr>
+       <tr>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td>  </td>
+        <td> &lt;</td>
+        <th> Type</th></tr>
+       <tr>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td> &lt;</td>
+        <td>  </td>
+        <td> &lt;</td>
+        <th>
+ Unity
+</th></tr></table><small> Generated by printrel.py at Nov 21 2005.</small></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Example</big></strong></dt>
+       <dd>
+ Class is a subrelation of Type, since all objects with the same
+class also have the same type. On the other hand, Type is not a
+subrelation of Class, since objects with the same type (InstanceType)
+may be of different class.
+
+        <pre>
+
+&gt;&gt;&gt; hp.Class &lt; hp.Type
+True
+&gt;&gt;&gt; hp.Type &lt; hp.Class
+False
+&gt;&gt;&gt; </pre></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Note</big></strong></dt>
+       <dd> The other relational operators are derived from this one.</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong><big>Note</big></strong></dt>
+       <dd><small>
+ 
+Id is currently not defined to be a subrelation
+of anything else except Unity, due to some subtle considerations.
+
+</small></dd></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='heapykinds.EquivalenceRelation.dictof'>x<code>.</code><strong><big>dictof</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelationByDictOwner'>EquivalenceRelationByDictOwner</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ This attribute, when accessed, will contain a derived
+equivalence relation. This equivalence relation classifies objects
+either as not being a dict, or as being a dict owned by a particular
+kind. The owner, if any, is classified by x.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>Example</big></strong></dt>
+       <dd>
+        <pre>
+
+&gt;&gt;&gt; from guppy import hpy; hp=hpy()
+&gt;&gt;&gt; h=hp.heap()&amp;dict
+&gt;&gt;&gt; h.by(hp.Size.dictof)
+Partition of a set of 1512 objects. Total size = 715008 bytes.
+ Index  Count   %     Size   % Cumulative  % Dict of Individual Size
+     0    140   9   225056  31    225056  31 dict of        24
+     1    336  22   172800  24    397856  56 dict of        44
+     2    582  38   152112  21    549968  77 dict (no owner)
+     3    347  23    92120  13    642088  90 dict of        32</pre>
+ This shows that there are 140 dicts that are owned by
+some objects of size 24, 336 dicts that are owned by some objects
+of size 44, 582 dicts without owner and so on.
+</dd></dl></dd></dl></dd>
+   <dd><a name='heapykinds.EquivalenceRelation.refdby'>x<code>.</code><strong><big>refdby</big></strong></a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></dd>
+   <dd>
+    <dl>
+     <dd>
+ This attribute, when accessed, creates a derived
+equivalence relation. It will classify objects according to
+the set of their referrer classification. The referrers
+are classified by x.
+      <p> The <em>Use.Rcs</em>
+ equivalence relation is a special case of this
+construction, where the underlying equivalence relation is <em>Use.Clodo.</em>
+:
+
+       <pre>
+
+&gt;&gt;&gt; hp.Clodo.refdby == hp.Rcs
+True</pre></p></dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong><big>See also</big></strong></dt>
+       <dd> <em>Use.Rcs</em></dd></dl></dd></dl></dd></dl><a name='heapykinds.EquivalenceRelationByDictOwner'>
+   <h1>.tgt.heapykinds.EquivalenceRelationByDictOwner</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>EquivalenceRelationByDictOwner</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big><a href='#heapy_ER.EquivalenceRelationByDictOwner.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></big></strong></dt>
+     <dt>
+      <h3>For any object <var>x</var> of kind <a href='#heapykinds.EquivalenceRelationByDictOwner'>EquivalenceRelationByDictOwner</a>:</h3></dt>
+     <dt><strong><big>Mapping</big></strong></dt>
+     <dd><a href='#heapy_ER.EquivalenceRelationByDictOwner.-60-3-62-'><strong>callable</strong></a><code>:</code>&nbsp;x( <sup><strong>alt:</strong></sup>[<var>k</var><code>:</code>&nbsp;<em>None+</em><sup><strong> or </strong></sup><var>k</var><code>:</code>&nbsp;<em>Kind+</em>]) <strong>-></strong> <a href='#heapykinds.Kind'>Kind</a></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+ This equivalence relation classifies objects either as not being
+a dict, or as being a dict owned by a particular kind of objects. The
+owner, if any, is classified by the equivalence relation used to
+create<strong> x</strong>, usually via <em>EquivalenceRelation.dictof</em>
+.
+</dd>
+   <dt>
+    <h2><a name='heapy_ER.EquivalenceRelationByDictOwner.-60-1-62-'>Subkind of</a><code>:</code>&nbsp;<a href='#heapykinds.EquivalenceRelation'>EquivalenceRelation</a></h2></dt>
+   <dt>
+    <h2>Mapping</h2></dt><a name='heapy_ER.EquivalenceRelationByDictOwner.-60-3-62-'><strong>callable</strong></a><code>:</code>&nbsp;x( <sup><strong>alt:</strong></sup>[<var>k</var><code>:</code>&nbsp;<em>None+</em><sup><strong> or </strong></sup><var>k</var><code>:</code>&nbsp;<em>Kind+</em>]) <strong>-></strong> <a href='#heapykinds.Kind'>Kind</a>
+   <dl>
+    <dd>
+ Calling this equivalence relation creates a Kind object
+representing an equivalence class. The argument specifies if the kind
+should be about dicts at all, and in that case, the kind of dict
+owner.
+</dd>
+    <dd>
+     <dl>
+      <dt><strong><big>Argument</big></strong></dt>
+      <dd>
+       <dl>
+        <dt><var>k</var><code>:</code>&nbsp;<em>None+</em></dt>
+        <dd>
+ With a None argument, the returned equivalence class will
+be &quot;all objects except dicts&quot;, i.e.<code> ~hp.Type.Dict</code>.</dd>
+        <dt><var>k</var><code>:</code>&nbsp;<em>Kind+</em></dt>
+        <dd>
+ If not None, the argument must be a Kind object.
+The returned kind will be the kind representing dicts that are owned
+by objects of the kind specified in arg. If the argument is <em>Use.Nothing</em> , the returned kind represents dicts with no owner.</dd></dl></dd></dl></dd>
+    <dd>
+     <dl>
+      <dt><strong>Returns </strong>
+ an equivalence class.
+</dt></dl></dd>
+    <dd>
+     <dl>
+      <dt><strong><big>Note</big></strong></dt>
+      <dd><small>
+ To make the argument an equivalence class of x, the
+argument must be an equivalence class of the equivalence relation
+associated with the owner classification of x, though this is not
+currently checked.
+
+</small></dd></dl></dd></dl></dl>
+  <hr>Generated by <a href="http://guppy-pe.sourceforge.net/gsl.html">GSL-HTML 0.1.5</a> on Sat Jul  4 13:25:11 2009</div></body></html>

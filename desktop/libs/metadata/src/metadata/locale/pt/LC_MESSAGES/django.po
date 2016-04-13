@@ -1,0 +1,329 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VERSÃO DO PROJECTO\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: NOME COMPLETO <EMAIL@ADDRESS>\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+
+#~ msgid "Notebook saved !"
+#~ msgstr "Ficheiro de projecto guardado!"
+
+#~ msgid "Notebook closed !"
+#~ msgstr "Ficheiro de projecto fechado!"
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "URL do servidor de trabalho Spark."
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "Lista de tipos de fragmentos disponíveis."
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "A aplicação não funciona sem um servidor Job em execução"
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "Exemplo: 1 + 1 ou prima CTRL + espaço"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr "Exemplo: SELECT * FROM nome de tabela, ou prima CTRL + espaço"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>Isto é um fragmento de texto</h2>Escreva o seu texto aqui"
+
+#~ msgid "Query"
+#~ msgstr "Consultar"
+
+#~ msgid "Execute all snippets"
+#~ msgstr "Executar todos os fragmentos"
+
+#~ msgid "Clear all results"
+#~ msgstr "Eliminar todos os resultados"
+
+#~ msgid "Edit"
+#~ msgstr "Editar"
+
+#~ msgid "Save"
+#~ msgstr "Guardar"
+
+#~ msgid "Saving..."
+#~ msgstr "A guardar..."
+
+#~ msgid "Brand New"
+#~ msgstr "Completamente novo"
+
+#~ msgid "Notebooks"
+#~ msgstr "Ficheiros de projecto"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "Adicionar um novo ficheiro de projecto"
+
+#~ msgid "Toggle Assist"
+#~ msgstr "Activar/desactivar assistente"
+
+#~ msgid "Data sample for"
+#~ msgstr "Amostra de dados para"
+
+#~ msgid "Ok"
+#~ msgstr "Ok"
+
+#~ msgid "Manually refresh the table list"
+#~ msgstr "Actualizar manualmente a lista da tabela"
+
+#~ msgid "database"
+#~ msgstr "base de dados"
+
+#~ msgid "Choose a database..."
+#~ msgstr "Seleccione uma base de dados..."
+
+#~ msgid "Table name..."
+#~ msgstr "Nome da tabela..."
+
+#~ msgid "The selected database has no tables."
+#~ msgstr "A base de dados seleccionada não tem tabelas."
+
+#~ msgid "The database list cannot be loaded."
+#~ msgstr "A lista da base de dados não pode ser carregada."
+
+#~ msgid "Add a snippet to start your new notebook"
+#~ msgstr ""
+#~ "Adicione um fragmento para começar a "
+#~ "utilizar o seu novo ficheiro de "
+#~ "projecto"
+
+#~ msgid "Add a new snippet"
+#~ msgstr "Adicionar um novo fragmento"
+
+#~ msgid "Text"
+#~ msgstr "Texto"
+
+#~ msgid "Creating session"
+#~ msgstr "A criar sessão"
+
+#~ msgid "CTRL + ENTER"
+#~ msgstr "CTRL + ENTER"
+
+#~ msgid "Cancel"
+#~ msgstr "Cancelar"
+
+#~ msgid "Grid"
+#~ msgstr "Grelha"
+
+#~ msgid "Bars"
+#~ msgstr "Barras"
+
+#~ msgid "Lines"
+#~ msgstr "Linhas"
+
+#~ msgid "Pie"
+#~ msgstr "Circular"
+
+#~ msgid "Scatter"
+#~ msgstr "Dispersão"
+
+#~ msgid "Marker Map"
+#~ msgstr "Marker Map"
+
+#~ msgid "Gradient Map"
+#~ msgstr "Gradient Map"
+
+#~ msgid "Show Logs"
+#~ msgstr "Mostrar registos"
+
+#~ msgid "Download first rows as CSV"
+#~ msgstr "Transferir filas iniciais como CSV"
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr "Transferir filas iniciais como XLS"
+
+#~ msgid "Excel"
+#~ msgstr "Excel"
+
+#~ msgid "Loading..."
+#~ msgstr "A carregar..."
+
+#~ msgid "Success."
+#~ msgstr "Sucesso."
+
+#~ msgid "Success but empty results."
+#~ msgstr "Operação realizada com sucesso mas sem resultados."
+
+#~ msgid "Hide columns"
+#~ msgstr "Ocultar colunas"
+
+#~ msgid "columns"
+#~ msgstr "colunas"
+
+#~ msgid "Show columns"
+#~ msgstr "Mostrar colunas"
+
+#~ msgid "Hide"
+#~ msgstr "Ocultar"
+
+#~ msgid "Hide settings"
+#~ msgstr "Ocultar definições"
+
+#~ msgid "x-axis"
+#~ msgstr "eixo X"
+
+#~ msgid "region"
+#~ msgstr "região"
+
+#~ msgid "latitude"
+#~ msgstr "latitude"
+
+#~ msgid "legend"
+#~ msgstr "legenda"
+
+#~ msgid "Choose a column..."
+#~ msgstr "Seleccione uma coluna..."
+
+#~ msgid "y-axis"
+#~ msgstr "eixo Y"
+
+#~ msgid "value"
+#~ msgstr "valor"
+
+#~ msgid "longitude"
+#~ msgstr "longitude"
+
+#~ msgid "label"
+#~ msgstr "etiqueta"
+
+#~ msgid "scatter group"
+#~ msgstr "grupo de dispersão"
+
+#~ msgid "scatter size"
+#~ msgstr "tamanho da dispersão"
+
+#~ msgid "sorting"
+#~ msgstr "a classificar"
+
+#~ msgid "No sorting"
+#~ msgstr "Sem classificação"
+
+#~ msgid "Sort ascending"
+#~ msgstr "Classificação ascendente"
+
+#~ msgid "Sort descending"
+#~ msgstr "Classificação descendente"
+
+#~ msgid "Show settings"
+#~ msgstr "Mostrar definições"
+
+#~ msgid "Paste or type a link"
+#~ msgstr "Colar ou escrever uma hiperligação"
+
+#~ msgid "Open in new window"
+#~ msgstr "Abrir numa nova janela"
+
+#~ msgid "No data available"
+#~ msgstr "Não existem dados disponíveis"
+
+#~ msgid "No matching records"
+#~ msgstr "Não existem registos correspondentes"
+
+#~ msgid "Distribution"
+#~ msgstr "Distribuição"
+
+#~ msgid "There was a problem loading the table preview."
+#~ msgstr "Ocorreu um problema ao carregar a pré-visualização da tabela."
+
+#~ msgid "Spark Editor"
+#~ msgstr "Editor Spark"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr "Pesquisar por nome, descrição, etc..."
+
+#~ msgid "Submit"
+#~ msgstr "Enviar"
+
+#~ msgid "Share"
+#~ msgstr "Partilhar"
+
+#~ msgid "Copy"
+#~ msgstr "Copiar"
+
+#~ msgid "Delete"
+#~ msgstr "Eliminar"
+
+#~ msgid "Create"
+#~ msgstr "Criar"
+
+#~ msgid "Name"
+#~ msgstr "Nome"
+
+#~ msgid "Description"
+#~ msgstr "Descrição"
+
+#~ msgid "Owner"
+#~ msgstr "Proprietário"
+
+#~ msgid "Last Modified"
+#~ msgstr "Última modificação"
+
+#~ msgid "Delete the selected notebook(s)?"
+#~ msgstr "Eliminar o(s) ficheiro(s) de projecto seleccionado(s)?"
+
+#~ msgid "No"
+#~ msgstr "Não"
+
+#~ msgid "Yes"
+#~ msgstr "Sim"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "A mostrar _START_ a _END_ de _TOTAL_ entradas"
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr "A mostrar 0 a 0 de 0 entradas"
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr "(filtradas de um total de _MAX_ entradas)"
+
+#~ msgid "First"
+#~ msgstr "Primeiro"
+
+#~ msgid "Last"
+#~ msgstr "Último"
+
+#~ msgid "Next"
+#~ msgstr "Seguinte"
+
+#~ msgid "Previous"
+#~ msgstr "Anterior"
+

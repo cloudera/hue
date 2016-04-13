@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from desktop.lib.django_util import render
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop import appmanager
 from hadoop.fs import LocalSubFileSystem
 
@@ -79,7 +79,8 @@ def view(request, app, path):
   data = {
     'content': content,
     'apps': sorted([ x for x in appmanager.DESKTOP_MODULES if x.help_dir ],
-      key = lambda x: x.nice_name.lower()),
-    'title': appmanager.get_desktop_module(app).nice_name
+      key = lambda app: app.menu_index),
+    'title': appmanager.get_desktop_module(app).nice_name,
+    'current': app
   }
   return render("display.mako", request, data)

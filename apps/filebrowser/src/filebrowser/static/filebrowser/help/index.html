@@ -1,0 +1,798 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>File Browser</title>
+</head>
+<body id="topic_6"><a name="topic_6"><!-- --></a>
+
+
+
+  <h1 class="title topictitle1">File Browser </h1>
+
+
+  <div class="body conbody">
+
+    <p class="p">
+      The File Browser application lets you browse and manipulate files and directories in the Hadoop Distributed File
+      System (HDFS) while using Hue. With File Browser, you can:
+    </p>
+
+<p>
+                    <p>Managing and viewing data in <a href="http://hadoop.apache.org/docs/r1.0.4/hdfs_user_guide.html">HDFS</a> is an important part of Big Data analytics. <a href="http://cloudera.github.com/hue">Hue</a>, the open source web-based interface that makes <a href="http://hadoop.apache.org/">Apache Hadoop</a> easier to use, helps you do that through a GUI in your browser —  instead of logging into a Hadoop gateway host with a terminal program and using the command line.</p>
+<p>The first episode in a new series of Hue demos, the video below demonstrates how to get up and running quickly with HDFS file operations via Hue’s File Browser application.</p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/63343487" width="900"></iframe></p>
+<h3>Other Features</h3>
+<p>In addition to the above scenario, File Browser lets you perform more advanced file operations:</p>
+<ul><li>Download</li>
+<li>Rename</li>
+<li>Move</li>
+<li>Copy</li>
+<li>Recursive change of permissions</li>
+<li>Recursive change of ownership</li>
+<li>Sort by attributes (e.g. name, size, date…)</li>
+<li>View content of zip/gz text</li>
+<li>View content of huge files</li>
+<li>Drag &amp; drop files to upload</li>
+</ul>
+<h3>What’s Next?</h3>
+<p>Thanks to File Browser, file operations in HDFS are only a few clicks away. Hue’s other apps leverage the File Browser as well and offer direct links to the outputs of your MapReduce jobs, Hive queries, or Pig scripts so that you can share or take a glance/visualize in no time.</p>
+<p>Thank you for watching, and stay tuned for upcoming episodes! Feel free to ask questions in comments or via the <a href="https://groups.google.com/a/cloudera.org/forum/?fromgroups#%21forum/hue-user">Hue group</a>.</p>
+                </p>
+
+    <ul class="ul">
+
+      <li class="li">Create files and directories, upload and download files, upload zip archives, and
+				rename, move, and delete files and directories. You can also change a file's or
+				directory's owner, group, and permissions. See <a class="xref" href="#topic_6_3">Working with
+					Files and Directories</a>.</li>
+
+
+      <li class="li">Search for files, directories, owners, and groups. See <a class="xref" href="#topic_6_4">Searching for Files and Directories</a>.</li>
+
+
+      <li class="li">View and edit files as text or binary. See <a class="xref" href="#topic_6_5">Viewing and Editing Files</a>.</li>
+
+
+    </ul>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_6_1"><a name="topic_6_1"><!-- --></a>
+
+    <h2 class="title topictitle2">File Browser Installation and Configuration
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p"> File Browser is one of the applications installed as part of Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span>
+      </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_6_2"><a name="topic_6_2"><!-- --></a>
+
+    <h2 class="title topictitle2">Starting File Browser
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">File Browser</strong> icon (<i class="fa fa-file"></i>) in the navigation bar at the top of the Hue browser page. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_6_3"><a name="topic_6_3"><!-- --></a>
+
+    <h2 class="title topictitle2">Files and Directories </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">You can use File Browser to view the input and output files of your
+        MapReduce jobs. Typically, you can save your output files in <samp class="ph codeph">/</samp><samp class="ph codeph">tmp</samp> or in your home directory if your system administrator set one up for you.
+        You must have the proper permissions to manipulate other user's files. </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_1"><a name="topic_6_3_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating Directories
+      </h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the File Browser window, select <strong class="ph b">New &gt; Directory</strong>.</li>
+
+
+          <li class="li">In the <strong class="ph b">Create Directory</strong> dialog box, enter a directory name and then
+						click <strong class="ph b">Submit</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_2"><a name="topic_6_3_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Changing Directories
+      </h3>
+
+
+      <div class="body conbody">
+
+        <ul class="ul">
+
+          <li class="li">Click the directory name or parent directory dots in the <strong class="ph b">File Browser</strong>
+						window.</li>
+
+
+          <li class="li">Click the <img class="image" src="/static/desktop/art/help/edit.png"/> icon, type a directory name, and press <strong class="ph b">Enter</strong>.</li>
+
+
+        </ul>
+
+
+        <p class="p">
+          To change to your home directory, click <strong class="ph b">Home</strong> in the path field at the top of the <strong class="ph b">File Browser</strong>
+          window.
+        </p>
+
+
+        <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> 
+          <p class="p">
+            The <strong class="ph b">Home</strong> button is disabled if you do not have a home directory. Ask a Hue administrator to create a
+            home directory for you.
+          </p>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_3"><a name="topic_6_3_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating Files
+      </h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the File Browser window, select <strong class="ph b">New &gt; File</strong>.</li>
+
+
+          <li class="li">In the <strong class="ph b">Create File</strong> dialog box, enter a file name and then click
+							<strong class="ph b">Submit</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_4"><a name="topic_6_3_4"><!-- --></a>
+
+      <h3 class="title topictitle3">Uploading Files
+      </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">
+          You can upload text and binary files to the HDFS.
+        </p>
+
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">File Browser</strong> window, browse to the directory where you want to
+						upload the file.</li>
+
+
+          <li class="li">Select <strong class="ph b">Upload &gt; Files</strong>.</li>
+
+
+          <li class="li">In the box that opens, click <strong class="ph b">Upload a File</strong> to browse to and select
+						the file(s) you want to upload, and then click <strong class="ph b">Open</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_gft_ln5_yj"><a name="concept_gft_ln5_yj"><!-- --></a>
+      <h3 class="title topictitle3">Copying a File</h3>
+
+      <div class="body conbody">
+        <a name="concept_gft_ln5_yj__ol_ifz_pn5_yj"><!-- --></a><ol class="ol" id="concept_gft_ln5_yj__ol_ifz_pn5_yj">
+          <li class="li">In the <strong class="ph b">File Browser</strong> window,
+            check the checkbox next to the file you want to copy.</li>
+
+          <li class="li">Click the <a name="concept_gft_ln5_yj__image_nz4_tn5_yj"><!-- --></a><img class="image" id="concept_gft_ln5_yj__image_nz4_tn5_yj" src="/static/desktop/art/help/copy.png"/> Copy button.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_5"><a name="topic_6_3_5"><!-- --></a>
+
+      <h3 class="title topictitle3">Downloading Files
+      </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">
+          You can download text and binary files to the HDFS.
+        </p>
+
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">File Browser</strong> window, check the checkbox next to the file you
+						want to download.</li>
+
+
+          <li class="li">Click the <strong class="ph b">Download</strong> button.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_6"><a name="topic_6_3_6"><!-- --></a>
+
+      <h3 class="title topictitle3">Uploading Zip Archives
+      </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p"> You can upload zip archives to the HDFS. The archive is uploaded and
+          extracted to a directory named <var class="keyword varname">archivename</var>. </p>
+
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">File Browser</strong> window, browse to the directory where you want to
+						upload the archive.</li>
+
+
+          <li class="li">Select <strong class="ph b">Upload &gt; Zip file</strong>.</li>
+
+
+          <li class="li">In the box that opens, click <strong class="ph b">Upload a zip file</strong> to browse to and
+						select the archive you want to upload, and then click <strong class="ph b">Open</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_ejf_h3r_2k"><a name="concept_ejf_h3r_2k"><!-- --></a>
+      <h3 class="title topictitle3">Trash Folder</h3>
+
+      <div class="body conbody">
+        <p class="p">File Browser supports the HDFS trash folder (<span class="ph filepath"><var class="keyword varname">home
+              directory</var>/.Trash</span>) to contain files and directories before they
+          are permanently deleted. Files in the folder have the full path of the deleted files (in
+          order to be able to restore them if needed) and checkpoints. The length of time a file or
+          directory stays in the trash depends on HDFS properties. For information on how to
+          configure the HDFS trash folder, see Enabling Trash. in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</p>
+
+        
+<div class="tablenoborder"><a name="concept_ejf_h3r_2k__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_ejf_h3r_2k__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d8839e346">Action</th>
+
+                <th class="entry" valign="top" width="75%" id="d8839e349">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e346 ">
+                  <p class="p">
+                    <strong class="ph b">Open</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e349 ">
+                  <div class="p">
+                    <a name="concept_ejf_h3r_2k__ol_idh_ypg_dk"><!-- --></a><ol class="ol" id="concept_ejf_h3r_2k__ol_idh_ypg_dk">
+                      <li class="li">In the <strong class="ph b">File Browser</strong> window, click <a name="concept_ejf_h3r_2k__image_wxl_l3r_2k"><!-- --></a><img class="image" id="concept_ejf_h3r_2k__image_wxl_l3r_2k" src="/static/desktop/art/help/fbtrash.png"/>.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e346 ">
+                  <p class="p">
+                    <strong class="ph b">Move Files and Directories To</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e349 ">
+                  <div class="p">
+                    <a name="concept_ejf_h3r_2k__ol_k2l_43r_2k"><!-- --></a><ol class="ol" id="concept_ejf_h3r_2k__ol_k2l_43r_2k">
+                      <li class="li">In the <strong class="ph b">File Browser</strong> window, check the
+                        checkbox next to one or more files and directories.</li>
+
+                      <li class="li">Select <span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Move to trash</span></span></li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e346 ">
+                  <p class="p">
+                    <strong class="ph b">Empty</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e349 ">
+                  <a name="concept_ejf_h3r_2k__ol_fgd_s3r_2k"><!-- --></a><ol class="ol" id="concept_ejf_h3r_2k__ol_fgd_s3r_2k">
+                    <li class="li">In the <strong class="ph b">File Browser</strong> window, click <a name="concept_ejf_h3r_2k__image_lgd_s3r_2k"><!-- --></a><img class="image" id="concept_ejf_h3r_2k__image_lgd_s3r_2k" src="/static/desktop/art/help/fbtrash.png"/>.</li>
+
+                    <li class="li">Click <span class="ph uicontrol">Empty</span>.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+      </div>
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_7"><a name="topic_6_3_7"><!-- --></a>
+
+      <h3 class="title topictitle3">Renaming, Moving, Deleting, and
+        Restoring Files and Directories </h3>
+
+
+      <div class="body conbody">
+        
+<div class="tablenoborder"><a name="topic_6_3_7__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_6_3_7__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d8839e479">Action</th>
+
+                <th class="entry" valign="top" width="75%" id="d8839e482">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e479 ">
+                  <p class="p"><strong class="ph b">Rename</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e482 ">
+                  <a name="topic_6_3_7__ol_jy2_1pg_dk"><!-- --></a><ol class="ol" id="topic_6_3_7__ol_jy2_1pg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, check the checkbox next to the file or directory you want to
+                      rename.</li>
+
+                    <li class="li">Click the <strong class="ph b">Rename</strong>
+                      button.</li>
+
+                    <li class="li">Enter the new name and then click <strong class="ph b">Submit</strong>.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e479 ">
+                  <p class="p"><strong class="ph b">Move</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e482 ">
+                  <a name="topic_6_3_7__ol_iqj_1pg_dk"><!-- --></a><ol class="ol" id="topic_6_3_7__ol_iqj_1pg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, check the checkbox next to the file or directory you want to
+                      move.</li>
+
+                    <li class="li">Click the <strong class="ph b">Move</strong>
+                      button.</li>
+
+                    <li class="li">In the <strong class="ph b">Move</strong> dialog
+                      box, browse to or type the new directory, and then click <strong class="ph b">Submit</strong>.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e479 ">
+                  <p class="p"><strong class="ph b">Delete</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e482 ">
+                  <a name="topic_6_3_7__ol_w3q_1pg_dk"><!-- --></a><ol class="ol" id="topic_6_3_7__ol_w3q_1pg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, check the checkbox next to the file or directory you want to delete.
+                      If you select a directory, all of the files and subdirectories contained
+                      within that directory are also deleted.</li>
+
+                    <li class="li">Choose one of the following:<ul class="ul">
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Move to trash</span></span></li>
+
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Delete forever</span></span></li>
+
+            </ul>
+</li>
+
+                    <li class="li">Click <strong class="ph b">Yes</strong> to confirm.
+                      When you move a file to trash it is stored in the .Trash folder in your home
+                      directory. </li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e479 ">
+                  <p class="p"><strong class="ph b">Restore</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e482 ">
+                  <a name="topic_6_3_7__ol_rtc_yhr_2k"><!-- --></a><ol class="ol" id="topic_6_3_7__ol_rtc_yhr_2k">
+                    <li class="li">In the <strong class="ph b">File Browser</strong> window, open the
+                      .Trash folder.</li>
+
+                    <li class="li">Navigate to the folder containing the file you want to restore.</li>
+
+                    <li class="li">Check the checkbox next to the file.</li>
+
+                    <li class="li">Click <strong class="ph b">Restore</strong>.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_6_3_8"><a name="topic_6_3_8"><!-- --></a>
+
+      <h3 class="title topictitle3">Changing a File's or Directory's Owner, Group, or Permissions
+      </h3>
+
+
+      <div class="body conbody">
+
+        <div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> 
+          <p class="p">
+            Only the Hadoop superuser can change a file's or directory's owner, group, or permissions. The user who
+            starts Hadoop is the Hadoop superuser. The Hadoop superuser account is not necessarily the same as a Hue
+            superuser account. If you create a Hue user (in User Admin) with the same user name and password as the
+            Hadoop superuser, then that Hue user can change a file's or directory's owner, group, or permissions.
+          </p>
+
+        </div>
+
+        
+<div class="tablenoborder"><a name="topic_6_3_8__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_6_3_8__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d8839e682">Change</th>
+
+                <th class="entry" valign="top" width="75%" id="d8839e685">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e682 ">
+                  <p class="p"><strong class="ph b">Owner or Group</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e685 ">
+                  <a name="topic_6_3_8__ol_u2r_cpg_dk"><!-- --></a><ol class="ol" id="topic_6_3_8__ol_u2r_cpg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, check the checkbox next to the select the file or directory whose
+                      owner or group you want to change.</li>
+
+                    <li class="li">Choose <strong class="ph b">Change
+                        Owner/Group</strong> from the Options menu.</li>
+
+                    <li class="li">In the <strong class="ph b">Change
+                        Owner/Group</strong> dialog box: <a name="topic_6_3_8__ul_y4f_4nt_4j"><!-- --></a><ul class="ul" id="topic_6_3_8__ul_y4f_4nt_4j">
+                        <li class="li">Choose the new user from the <strong class="ph b">User</strong> drop-down menu.</li>
+
+                        <li class="li">Choose the new group from the <strong class="ph b">Group</strong> drop-down menu.</li>
+
+                        <li class="li">Check the <strong class="ph b">Recursive</strong> checkbox to propagate the change.</li>
+
+                      </ul>
+</li>
+
+                    <li class="li">Click <strong class="ph b">Submit</strong> to make
+                      the changes.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e682 ">
+                  <p class="p"><strong class="ph b">Permissions</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e685 ">
+                  <a name="topic_6_3_8__ol_tbz_cpg_dk"><!-- --></a><ol class="ol" id="topic_6_3_8__ol_tbz_cpg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, check the checkbox next to the file or directory whose permissions you
+                      want to change.</li>
+
+                    <li class="li">Click the <strong class="ph b">Change
+                        Permissions</strong> button.</li>
+
+                    <li class="li">In the <strong class="ph b">Change
+                        Permissions</strong> dialog box, select the permissions you want to assign and
+                      then click <strong class="ph b">Submit</strong>.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_6_4"><a name="topic_6_4"><!-- --></a>
+
+    <h2 class="title topictitle2">Searching for Files and Directories
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p"> To search for files or directories by name using the query search box,
+        enter the name of the file or directory in the query search box. File Browser lists the
+        files or directories matching the search criteria. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_6_5"><a name="topic_6_5"><!-- --></a>
+
+    <h2 class="title topictitle2">Viewing and Editing Files
+    </h2>
+
+
+    <div class="body conbody">
+
+      <div class="p"> You can view and edit files as text or binary. 
+<div class="tablenoborder"><a name="topic_6_5__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_6_5__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d8839e831">Action</th>
+
+                <th class="entry" valign="top" width="75%" id="d8839e834">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e831 ">
+                  <p class="p"><strong class="ph b">View</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e834 ">
+                  <a name="topic_6_5__ol_rvk_jpg_dk"><!-- --></a><ol class="ol" id="topic_6_5__ol_rvk_jpg_dk">
+                    <li class="li">In the <strong class="ph b">File Browser</strong>
+                      window, click the file you want to view. File Browser displays the first 4,096
+                      bytes of the file in the <strong class="ph b">File Viewer</strong> window.
+                        <a name="topic_6_5__ul_fp5_4nt_4j"><!-- --></a><ul class="ul" id="topic_6_5__ul_fp5_4nt_4j">
+                        <li class="li">If the file is larger than 4,096 bytes, use the
+                          Block navigation buttons (First Block, Previous Block, Next Block, Last
+                          Block) to scroll through the file block by block. The <strong class="ph b">Viewing Bytes</strong> fields show the range of
+                          bytes you are currently viewing.</li>
+
+                        <li class="li">To switch the view from text to binary, click <strong class="ph b">View as Binary</strong> to view a hex dump.</li>
+
+                        <li class="li">To switch the view from binary to text, click <strong class="ph b">View as Text</strong>.</li>
+
+                      </ul>
+</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e831 ">
+                  <p class="p"><strong class="ph b">Edit</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e834 ">
+                  <a name="topic_6_5__ol_vzs_jpg_dk"><!-- --></a><ol class="ol" id="topic_6_5__ol_vzs_jpg_dk">
+                    <li class="li">If you are viewing a text file, click <strong class="ph b">Edit File</strong>. File Browser displays the contents
+                      of the file in the <strong class="ph b">File Editor</strong> window.</li>
+
+                    <li class="li">Edit the file and then click <strong class="ph b">Save</strong> or <strong class="ph b">Save
+                        As</strong> to save the file.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d8839e831 ">
+                  <p class="p"><strong class="ph b">View Location in HDFS</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d8839e834 ">Click <strong class="ph b">View File
+                    Location</strong>. File Browser displays the file's location in the <strong class="ph b">File Browser</strong> window.</td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+</div>
+
+
+    </div>
+
+
+  </div>
+
+
+
+</body>
+</html>

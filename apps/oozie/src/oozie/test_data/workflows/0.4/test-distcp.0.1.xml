@@ -1,0 +1,20 @@
+<workflow-app name="DistCp" xmlns="uri:oozie:workflow:0.4">
+    <start to="DistCp"/>
+    <action name="DistCp">
+        <distcp xmlns="uri:oozie:distcp-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <arg>-overwrite</arg>
+              <arg>-m</arg>
+              <arg>${MAP_NUMBER}</arg>
+              <arg>/user/hue/oozie/workspaces/data</arg>
+              <arg>${OUTPUT}</arg>
+        </distcp>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

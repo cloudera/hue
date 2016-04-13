@@ -682,7 +682,7 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         try {
           InetSocketAddress address = NetUtils.createSocketAddr(
             conf.get(THRIFT_ADDRESS_PROPERTY, DEFAULT_THRIFT_ADDRESS));
-          this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory());
+          this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory(), conf);
           thriftServer.setConf(conf);
           thriftServer.start();
           // The port may have been 0, so we update it.
@@ -1093,7 +1093,18 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             try {
               jcs = assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Counters>() {
                 public Counters run() throws java.io.IOException {
-                    return jobTracker.getJobCounters(JTThriftUtils.fromThrift(jobID));
+                    JobInProgress job = jobTracker.getJob(JTThriftUtils.fromThrift(jobID));
+                    if (job != null) {
+                        if (jobTracker.areACLsEnabled()) {
+                            UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
+                            // check the job-access
+                            jobTracker.getACLsManager().checkAccess(job, ugi,
+                                    Operation.VIEW_JOB_COUNTERS);
+                        }
+                        return job.inited() ? job.getCounters() : new Counters();
+                    } else {
+                        return jobTracker.getJobCounters(JTThriftUtils.fromThrift(jobID));
+                    }
                 }
               });
             } catch (IOException e) {

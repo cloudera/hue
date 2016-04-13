@@ -36,8 +36,8 @@ def test_require_login():
   # AllowAllBackend should let us in.
   c.login(username="test", password="test")
   # And now we shouldn't need to be redirected.
-  response = c.get('/')
-  assert_equal(200, response.status_code, "Expected ok status.")
+  response = c.get('/', follow=True)
+  assert_equal(200, response.status_code)
 
 
 def test_ajax_require_login():

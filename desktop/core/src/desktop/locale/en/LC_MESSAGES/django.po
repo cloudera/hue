@@ -1,0 +1,884 @@
+# English translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-05-10 11:58-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/desktop/appmanager.py:228
+msgid "load_apps has already been called."
+msgstr ""
+
+#: src/desktop/conf.py:32
+msgid ""
+"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
+"as the webserver."
+msgstr ""
+
+#: src/desktop/conf.py:38
+msgid "HTTP host to bind to."
+msgstr ""
+
+#: src/desktop/conf.py:43
+msgid "HTTP port to bind to."
+msgstr ""
+
+#: src/desktop/conf.py:48
+msgid "Filename of SSL Certificate"
+msgstr ""
+
+#: src/desktop/conf.py:52
+msgid "Filename of SSL RSA Private Key"
+msgstr ""
+
+#: src/desktop/conf.py:56
+msgid ""
+"If set to false, runcpserver will not actually start the web server.  "
+"Used if Apache is being used as a WSGI container."
+msgstr ""
+
+#: src/desktop/conf.py:61
+msgid "Number of threads used by the CherryPy web server."
+msgstr ""
+
+#: src/desktop/conf.py:66
+msgid "Used in hashing algorithms for sessions."
+msgstr ""
+
+#: src/desktop/conf.py:71
+msgid "Number of user access to remember per view per user."
+msgstr ""
+
+#: src/desktop/conf.py:96
+msgid "Configuration options for connecting to an external SMTP server."
+msgstr ""
+
+#: src/desktop/conf.py:100
+msgid "The SMTP server for email notification delivery."
+msgstr ""
+
+#: src/desktop/conf.py:107
+msgid "The SMTP server port."
+msgstr ""
+
+#: src/desktop/conf.py:114
+msgid "The username for the SMTP host."
+msgstr ""
+
+#: src/desktop/conf.py:121
+msgid "The password for the SMTP user."
+msgstr ""
+
+#: src/desktop/conf.py:128
+msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
+msgstr ""
+
+#: src/desktop/conf.py:135
+msgid "Default email address to use for various automated notifications from Hue."
+msgstr ""
+
+#: src/desktop/conf.py:144
+msgid ""
+"Configuration options for specifying the Desktop Database.\n"
+"          For more info, see "
+"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr ""
+
+#: src/desktop/conf.py:149
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgstr ""
+
+#: src/desktop/conf.py:155
+msgid "Database name, or path to DB if using sqlite3."
+msgstr ""
+
+#: src/desktop/conf.py:161
+msgid "Database username."
+msgstr ""
+
+#: src/desktop/conf.py:167
+msgid "Database password."
+msgstr ""
+
+#: src/desktop/conf.py:173
+msgid "Database host."
+msgstr ""
+
+#: src/desktop/conf.py:179
+msgid "Database port."
+msgstr ""
+
+#: src/desktop/conf.py:188
+msgid ""
+"Configuration options for specifying Hue's Kerberos integration for\n"
+"          secured Hadoop clusters."
+msgstr ""
+
+#: src/desktop/conf.py:193
+msgid "Path to a Kerberos keytab file containing Hue's service credentials."
+msgstr ""
+
+#: src/desktop/conf.py:198
+msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
+msgstr ""
+
+#: src/desktop/conf.py:203
+msgid "Frequency in seconds with which Hue will renew its keytab."
+msgstr ""
+
+#: src/desktop/conf.py:208
+msgid "Path to keep Kerberos credentials cached."
+msgstr ""
+
+#: src/desktop/conf.py:215
+msgid "Path to Kerberos 'kinit' command."
+msgstr ""
+
+#: src/desktop/conf.py:225
+msgid "Time zone name."
+msgstr ""
+
+#: src/desktop/conf.py:232
+msgid "Default system-wide unicode encoding."
+msgstr ""
+
+#: src/desktop/conf.py:239
+msgid "Username to run servers as."
+msgstr ""
+
+#: src/desktop/conf.py:244
+msgid "Group to run servers as."
+msgstr ""
+
+#: src/desktop/conf.py:251
+msgid "Customizations to the UI."
+msgstr ""
+
+#: src/desktop/conf.py:255
+msgid ""
+"Top banner HTML code. This code will be placed in the navigation bar so "
+"that it will reside at the top of the page in a fixed position. One "
+"common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr ""
+
+#: src/desktop/conf.py:262
+msgid "Configuration options for user authentication into the web application."
+msgstr ""
+
+#: src/desktop/conf.py:266
+msgid ""
+"Authentication backend.  Common settings are "
+"django.contrib.auth.backends.ModelBackend (fully Django backend), "
+"desktop.auth.backend.AllowAllBackend (allows everyone), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
+"user manager, after the first login). "
+msgstr ""
+
+#: src/desktop/conf.py:272
+msgid "Class which defines extra accessor methods for User objects."
+msgstr ""
+
+#: src/desktop/conf.py:275
+msgid ""
+"The service to use when querying PAM. The service usually corresponds to "
+"a single filename in /etc/pam.d"
+msgstr ""
+
+#: src/desktop/conf.py:279
+msgid ""
+"When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
+"the normalized name of the header that contains the remote user. The HTTP"
+" header in the request is converted to a key by converting all characters"
+" to uppercase, replacing any hyphens with underscores and adding an HTTP_"
+" prefix to the name. So, for example, if the header is called Remote-User"
+" that would be configured as HTTP_REMOTE_USER"
+msgstr ""
+
+#: src/desktop/conf.py:289
+msgid "Configuration options for LDAP connectivity."
+msgstr ""
+
+#: src/desktop/conf.py:293
+msgid "The base LDAP distinguished name to use for LDAP search."
+msgstr ""
+
+#: src/desktop/conf.py:296
+msgid "The NT domain used for LDAP authentication."
+msgstr ""
+
+#: src/desktop/conf.py:299
+msgid "The LDAP URL to connect to."
+msgstr ""
+
+#: src/desktop/conf.py:303
+msgid "Use StartTLS when communicating with LDAP server."
+msgstr ""
+
+#: src/desktop/conf.py:306
+msgid ""
+"A PEM-format file containing certificates for the CA's that Hue will "
+"trust for authentication over TLS. The certificate for the CA that signed"
+" the LDAP server certificate must be included among these certificates. "
+"See more here http://www.openldap.org/doc/admin24/tls.html."
+msgstr ""
+
+#: src/desktop/conf.py:309
+msgid "A pattern to use for constructing LDAP usernames."
+msgstr ""
+
+#: src/desktop/conf.py:312
+msgid "The distinguished name to bind as, when importing from LDAP."
+msgstr ""
+
+#: src/desktop/conf.py:315
+msgid "The password for the bind user."
+msgstr ""
+
+#: src/desktop/conf.py:317
+msgid "Create users when they login with their LDAP credentials."
+msgstr ""
+
+#: src/desktop/conf.py:323
+msgid "Configuration for LDAP user schema and search."
+msgstr ""
+
+#: src/desktop/conf.py:327
+msgid "A base filter for use when searching for users."
+msgstr ""
+
+#: src/desktop/conf.py:330
+msgid ""
+"The username attribute in the LDAP schema. Typically, this is "
+"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgstr ""
+
+#: src/desktop/conf.py:338
+msgid "Configuration for LDAP group schema and search."
+msgstr ""
+
+#: src/desktop/conf.py:342
+msgid "A base filter for use when searching for groups."
+msgstr ""
+
+#: src/desktop/conf.py:345
+msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
+msgstr ""
+
+#: src/desktop/conf.py:349
+msgid "The LDAP attribute which specifies the members of a group."
+msgstr ""
+
+#: src/desktop/conf.py:358
+msgid "Configuration options for Oauth 1.0 authentication"
+msgstr ""
+
+#: src/desktop/conf.py:362
+msgid "The Consumer key of the application."
+msgstr ""
+
+#: src/desktop/conf.py:369
+msgid "The Consumer secret of the application."
+msgstr ""
+
+#: src/desktop/conf.py:376
+msgid "The Request token URL."
+msgstr ""
+
+#: src/desktop/conf.py:383
+msgid "The Access token URL."
+msgstr ""
+
+#: src/desktop/conf.py:390
+msgid "The Authorize URL."
+msgstr ""
+
+#: src/desktop/conf.py:400
+msgid "Paths on the local file system that users should be able to browse."
+msgstr ""
+
+#: src/desktop/conf.py:405
+msgid "The path on the local filesystem."
+msgstr ""
+
+#: src/desktop/conf.py:413
+msgid "Link for 'feedback' tab."
+msgstr ""
+
+#: src/desktop/conf.py:420
+msgid "Whether to send debug messages from JavaScript to the server logs."
+msgstr ""
+
+#: src/desktop/conf.py:427
+msgid "If true, log all database requests."
+msgstr ""
+
+#: src/desktop/conf.py:433
+msgid "Administrators that should receive error emails."
+msgstr ""
+
+#: src/desktop/conf.py:438
+msgid "The full name of the admin."
+msgstr ""
+
+#: src/desktop/conf.py:441
+msgid "The email address of the admin."
+msgstr ""
+
+#: src/desktop/conf.py:445
+msgid "Enable or disable Django debug mode."
+msgstr ""
+
+#: src/desktop/conf.py:452
+msgid ""
+"Enable or disable debugging information in the 500 internal server error "
+"response. Note that the debugging information may contain sensitive data."
+" If django_debug_mode is True, this is automatically enabled."
+msgstr ""
+
+#: src/desktop/conf.py:461
+msgid "Email address that internal error messages should send as."
+msgstr ""
+
+#: src/desktop/conf.py:467
+msgid "The email backend to use."
+msgstr ""
+
+#: src/desktop/conf.py:483
+msgid "Secret key should be configured as a random string."
+msgstr ""
+
+#: src/desktop/conf.py:489
+msgid "SSL private key file should be set to enable HTTPS."
+msgstr ""
+
+#: src/desktop/conf.py:495
+msgid "Encoding not supported."
+msgstr ""
+
+#: src/desktop/conf.py:504
+#, python-format
+msgid "Keytab should have 0600 permissions (has %o)."
+msgstr ""
+
+#: src/desktop/conf.py:514
+msgid "LDAP is only partially configured. An LDAP URL must be provided."
+msgstr ""
+
+#: src/desktop/conf.py:520
+msgid ""
+"LDAP is only partially configured. An NT Domain or username search "
+"pattern must be provided."
+msgstr ""
+
+#: src/desktop/conf.py:526
+msgid ""
+"The LDAP username pattern should contain the special<username> "
+"replacement string for authentication."
+msgstr ""
+
+#: src/desktop/decorators.py:40
+#, python-format
+msgid "Permission denied (%(action)s/%(app)s)."
+msgstr ""
+
+#: src/desktop/middleware.py:136
+#, python-format
+msgid "Cannot find HDFS called \"%(fs_ref)s\"."
+msgstr ""
+
+#: src/desktop/middleware.py:240
+#, python-format
+msgid "%(module)s isn't a middleware module."
+msgstr ""
+
+#: src/desktop/middleware.py:245
+#, python-format
+msgid "Error importing middleware %(module)s: \"%(error)s\"."
+msgstr ""
+
+#: src/desktop/middleware.py:249
+#, python-format
+msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
+msgstr ""
+
+#: src/desktop/middleware.py:261
+#, python-format
+msgid ""
+"AppSpecificMiddleware module \"%(module)s\" has a process_request "
+"function which is impossible."
+msgstr ""
+
+#: src/desktop/middleware.py:312
+#, python-format
+msgid "You do not have permission to access the %(app_name)s application."
+msgstr ""
+
+#: src/desktop/views.py:63 src/desktop/views.py:78 src/desktop/views.py:188
+#: src/desktop/views.py:215 src/desktop/views.py:370
+msgid "You must be a superuser."
+msgstr ""
+
+#: src/desktop/views.py:70
+msgid "No logs found!"
+msgstr ""
+
+#: src/desktop/views.py:111
+msgid "No logs found."
+msgstr ""
+
+#: src/desktop/auth/forms.py:28 src/desktop/templates/login.mako:119
+msgid "Username"
+msgstr ""
+
+#: src/desktop/auth/forms.py:29 src/desktop/auth/forms.py:38
+#: src/desktop/templates/login.mako:127
+msgid "Password"
+msgstr ""
+
+#: src/desktop/auth/views.py:111 src/desktop/auth/views.py:112
+msgid "Could not create home directory."
+msgstr ""
+
+#: src/desktop/auth/views.py:166 src/desktop/auth/views.py:183
+#, python-format
+msgid "Invalid response from OAuth provider: %s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:397
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:398
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:399
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:400
+msgid "day"
+msgid_plural "days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:401
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:402
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:403
+msgid "second"
+msgid_plural "seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:424
+msgid "s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:426
+msgid "seconds"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:432
+#, python-format
+msgid "%(number)d%(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:434
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:441
+#, python-format
+msgid "%(separator)s %(number)d%(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:443
+#, python-format
+msgid "%(separator)s %(number)d %(type)s"
+msgstr ""
+
+#: src/desktop/lib/security_util.py:33
+#, python-format
+msgid "Can't replace %s pattern since host is null."
+msgstr ""
+
+#: src/desktop/management/commands/config_dump.py:39
+msgid "Dumping configuration..."
+msgstr ""
+
+#: src/desktop/management/commands/config_dump.py:60
+#: src/desktop/management/commands/config_dump.py:70
+#: src/desktop/templates/dump_config.mako:133
+#: src/desktop/templates/dump_config.mako:145
+msgid "No help available."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:38
+msgid "Upgrades the Hue configuration with a mapping file."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:41
+msgid "Location of the mapping file."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:49
+#, python-format
+msgid "--%(param)s is required."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:60
+#, python-format
+msgid "Invalid mapping %(mapping)s in %(file)s."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:31
+msgid "Creates a Hue application directory structure."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:33
+msgid "application name"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:37
+msgid "Expected arguments: app_name [app_dir]"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:45
+#, python-format
+msgid "App template dir missing: %(template)s."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:49
+#, python-format
+msgid "The template path, %(path)r, does not exist."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:52
+#, python-format
+msgid ""
+"%(name)r is not a valid application name. Use only numbers, letters and "
+"underscores."
+msgstr ""
+
+#: src/desktop/management/commands/create_test_fs.py:31
+#, python-format
+msgid "Created fs in: %(dir)s"
+msgstr ""
+
+#: src/desktop/management/commands/runcherrypyserver.py:47
+msgid "CherryPy Server for Desktop."
+msgstr ""
+
+#: src/desktop/management/commands/runcherrypyserver.py:108
+#, python-format
+msgid "starting server with options %(options)s"
+msgstr ""
+
+#: src/desktop/management/commands/runcpserver.py:34
+msgid "Web server for Hue."
+msgstr ""
+
+#: src/desktop/management/commands/runpylint.py:28
+msgid ""
+"\n"
+"  Runs pylint on desktop and app code.\n"
+"\n"
+"  With no arguments, or with \"all\", this will run pylint on all\n"
+"  installed apps.  Otherwise, specify modules to run, as well\n"
+"  as other parameters to pylint.  Note that you'll want to preface the "
+"section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them "
+"along.\n"
+"\n"
+"  Examples:\n"
+"    python core/manage.py runpylint all -- -f parseable\n"
+"    python core/manage.py runpylint filebrowser\n"
+"    python core/manage.py runpylint\n"
+"  "
+msgstr ""
+
+#: src/desktop/management/commands/runpylint.py:61
+#, python-format
+msgid "Cannot find pylint at '%(path)s'. Please install pylint first."
+msgstr ""
+
+#: src/desktop/management/commands/runspawningserver.py:70
+msgid "Spawning Server for Hue."
+msgstr ""
+
+#: src/desktop/templates/404.mako:20
+msgid "Not Found"
+msgstr ""
+
+#: src/desktop/templates/404.mako:23
+msgid "Page not found"
+msgstr ""
+
+#: src/desktop/templates/404.mako:24
+msgid "We're sorry, but the requested page could not be found:"
+msgstr ""
+
+#: src/desktop/templates/500.mako:21 src/desktop/templates/error.mako:22
+msgid "Error"
+msgstr ""
+
+#: src/desktop/templates/500.mako:24
+msgid "Server Error (500)"
+msgstr ""
+
+#: src/desktop/templates/500.mako:25
+msgid ""
+"Sorry, there's been an error. An email was sent to your administrators. "
+"Thank you for your patience."
+msgstr ""
+
+#: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:37
+msgid "More Info"
+msgstr ""
+
+#: src/desktop/templates/500.mako:30 src/desktop/templates/500.mako:54
+#: src/desktop/templates/popup_error.mako:39
+#: src/desktop/templates/popup_error.mako:63
+msgid "View Logs"
+msgstr ""
+
+#: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:46
+msgid "File Name"
+msgstr ""
+
+#: src/desktop/templates/500.mako:38 src/desktop/templates/popup_error.mako:47
+msgid "Line Number"
+msgstr ""
+
+#: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:48
+msgid "Function Name"
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:34
+msgid "Quick start"
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:35
+#: src/desktop/templates/dump_config.mako:26
+msgid "Configuration"
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:36
+#: src/desktop/templates/logs.mako:27
+msgid "Server Logs"
+msgstr ""
+
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
+msgid "Search..."
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:22
+#: src/desktop/templates/dump_config.mako:48
+msgid "Configuration files located in"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:25
+msgid "Potential misconfiguration detected. Fix and restart Hue."
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:42
+msgid "Current value:"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:50
+msgid "All OK. Configuration check passed."
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:66
+#: src/desktop/templates/error.mako:34
+msgid "Back"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:67
+msgid "Select this folder"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:68
+msgid "Create folder"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:69
+msgid "Folder name"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:70
+msgid "Cancel"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:71
+msgid "The file has not been found"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:72
+msgid "Upload a file"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:73
+msgid "Failed"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:80
+msgid "Go to column:"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:81
+msgid "column name..."
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:139
+msgid "About Hue"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:146
+msgid "Profile"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:148
+msgid "Sign Out"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:155
+#: src/desktop/templates/home.mako:21
+msgid "Home"
+msgstr ""
+
+#: src/desktop/templates/config_alert_dock.mako:20
+msgid "Misconfiguration detected"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:56
+msgid "Installed Applications"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:72
+msgid "Configuration Sections and Variables"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:146
+msgid "Default:"
+msgstr ""
+
+#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:134
+msgid "Error!"
+msgstr ""
+
+#: src/desktop/templates/home.mako:35
+msgid "Welcome Home."
+msgstr ""
+
+#: src/desktop/templates/home.mako:40
+msgid "Hue is a Web UI for Apache Hadoop. Please select an application below."
+msgstr ""
+
+#: src/desktop/templates/home.mako:53
+msgid "Query"
+msgstr ""
+
+#: src/desktop/templates/home.mako:60
+msgid "Shell"
+msgstr ""
+
+#: src/desktop/templates/home.mako:72
+msgid "Hadoop"
+msgstr ""
+
+#: src/desktop/templates/home.mako:76
+msgid "Files"
+msgstr ""
+
+#: src/desktop/templates/home.mako:77
+msgid "Jobs"
+msgstr ""
+
+#: src/desktop/templates/home.mako:78
+msgid "Tables"
+msgstr ""
+
+#: src/desktop/templates/home.mako:79
+msgid "Designs"
+msgstr ""
+
+#: src/desktop/templates/home.mako:91
+msgid "Workflow"
+msgstr ""
+
+#: src/desktop/templates/home.mako:95
+msgid "Dashboard"
+msgstr ""
+
+#: src/desktop/templates/home.mako:96
+msgid "Editor"
+msgstr ""
+
+#: src/desktop/templates/login.mako:25
+msgid "Hue - Sign up"
+msgstr ""
+
+#: src/desktop/templates/login.mako:27
+msgid "Hue - Sign in"
+msgstr ""
+
+#: src/desktop/templates/login.mako:134
+msgid "Invalid username or password."
+msgstr ""
+
+#: src/desktop/templates/login.mako:141
+msgid ""
+"Since this is your first time logging in, pick any username and password."
+" Be sure to remember these, as"
+msgstr ""
+
+#: src/desktop/templates/login.mako:142
+msgid "they will become your Hue superuser credentials."
+msgstr ""
+
+#: src/desktop/templates/login.mako:145
+msgid "Sign up"
+msgstr ""
+
+#: src/desktop/templates/login.mako:148
+msgid "Sign in"
+msgstr ""
+
+#: src/desktop/templates/logs.mako:65
+msgid "Download entire log as zip"
+msgstr ""
+
+#: src/desktop/templates/popup_error.mako:70
+msgid "Go back"
+msgstr ""
+

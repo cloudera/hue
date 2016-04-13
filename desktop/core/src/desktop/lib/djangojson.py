@@ -18,7 +18,7 @@
 from django.forms import util
 from django.forms import fields
 from django import forms
-import simplejson
+import json
 
 class JsonFormField(fields.CharField):
   """
@@ -41,7 +41,7 @@ class JsonFormField(fields.CharField):
   def clean(self, value):
     value = super(JsonFormField, self).clean(value)
     try:
-      simplejson.loads(value)
+      json.loads(value)
     except ValueError, e:
       raise util.ValidationError(e)
     return value

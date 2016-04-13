@@ -32,14 +32,23 @@ default: env-install
 
 APPS := about \
   beeswax \
+  metastore \
   filebrowser \
   help \
   jobbrowser \
   jobsub \
   oozie \
   proxy \
-  shell \
-  useradmin
+  useradmin \
+  impala \
+  pig \
+  search \
+  hbase \
+  sqoop \
+  zookeeper \
+  rdbms \
+  spark \
+  security
 
 ################################################
 # Install all applications into the Desktop environment
@@ -50,7 +59,7 @@ EGG_INFO_TARGETS := $(APPS:%=.recursive-egg-info/%)
 
 .PHONY: env-install
 env-install: $(EGG_INFO_TARGETS)
-	$(APP_REG) --install $(APPS)
+	$(APP_REG) --install $(APPS) --relative-paths
 
 
 ################################################
@@ -102,12 +111,20 @@ ext-clean: $(EXT_CLEAN_TARGETS)
 ################################################
 I18N_APPS := about \
   beeswax \
+  metastore \
   filebrowser \
   jobbrowser \
   jobsub \
-  shell \
   useradmin \
-  oozie
+  oozie \
+  impala \
+  pig \
+  search \
+  hbase \
+  sqoop \
+  zookeeper \
+  rdbms \
+  spark
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)

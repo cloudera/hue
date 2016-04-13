@@ -1,0 +1,25 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "description": "Testing case insensitivity...",
+      "caseSensitive": "false",
+      "search": "aAa",
+      "replace": "bbb"
+    },
+    {
+      "description": "Testing case insensitivity with trigger...",
+      "caseSensitive": "false",
+      "trigger": "cCc",
+      "search": "dDd",
+      "replace": "eEe"
+    },
+    {
+      "description": "Case Sensitive.",
+      "caseSensitive": "true",
+      "trigger": "fFf",
+      "search": "gGg",
+      "replace": "hHh"
+    }
+  ]
+}

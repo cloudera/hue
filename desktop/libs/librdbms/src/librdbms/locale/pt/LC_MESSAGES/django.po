@@ -1,0 +1,89 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/librdbms/conf.py:26
+msgid "RDBMS server configurations."
+msgstr "Configurações do servidor RDBMS."
+
+#: src/librdbms/conf.py:28
+msgid "RDBMS server configuration."
+msgstr "Configuração do servidor RDBMS."
+
+#: src/librdbms/conf.py:32
+msgid "Nice name of server."
+msgstr "Nome do servidor."
+
+#: src/librdbms/conf.py:38
+msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgstr "Nome de base de dados ou caminho para o ficheiro de base de dados. Se fornecido, então a escolha de outras bases de dados não será permitida."
+
+#: src/librdbms/conf.py:44
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgstr "Motor de base de dados, como postgresql_psycopg2, mysql ou sqlite3."
+
+#: src/librdbms/conf.py:50
+msgid "Database username."
+msgstr "Nome de utilizador da base de dados."
+
+#: src/librdbms/conf.py:56
+msgid "Database password."
+msgstr "Palavra-passe da base de dados."
+
+#: src/librdbms/conf.py:62
+msgid "Database host."
+msgstr "Anfitrião da base de dados."
+
+#: src/librdbms/conf.py:68
+msgid "Database port."
+msgstr "Porta da base de dados."
+
+#: src/librdbms/conf.py:74
+msgid "Database options to send to the server when connecting."
+msgstr "Opções da base de dados a enviar para o servidor ao ligar."
+
+#: src/librdbms/conf.py:90
+msgid "Database name should not be empty for the SQLite backend."
+msgstr "O nome da base de dados não deve estar vazio para o back-end de SQLite."
+
+#: src/librdbms/conf.py:92
+msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgstr "O nome de base de dados não deve estar vazio para o back-end de Oracle. Deve ser o SID da sua base de dados."
+
+#: src/librdbms/conf.py:94
+msgid "Database name should not be empty for the PostgreSQL backend."
+msgstr "O nome de base de dados não deve estar vazio para o back-end do PostgreSQL."
+
+#: src/librdbms/design.py:110
+msgid "No server!"
+msgstr "Sem servidor!"
+
+#: src/librdbms/design.py:112
+msgid "No database!"
+msgstr "Sem base de dados!"
+
+#: src/librdbms/server/mysql_lib.py:80
+#, python-format
+msgid "Database '%s' is not allowed. Please use database '%s'."
+msgstr "A base de dados \"%s\" não é permitida. Utilize a base de dados \"%s\"."
+
+#: src/librdbms/server/mysql_lib.py:107
+#, python-format
+msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
+msgstr "Não é possível localizar a base de dados %s. Tem a certeza de que a sua configuração está correcta?"
+

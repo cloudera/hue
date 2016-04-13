@@ -1,0 +1,27 @@
+/*
+	${app_name} styles
+	important: these should be namespaced
+	example:
+		let's say you are creating an app called "calculator"; you should prefix all your styles with your application's name like so
+
+		.calculator img {
+			border: 1px solid #000;
+		}
+		.calculator p {
+			margin: 10px 0;
+		}
+		etc...
+
+	other notes:
+	* don't use ids - there may be more than one of your apps open; use classes!
+	* the toolbar element is absolutely positioned and 100% wide (and therefor 0px high);
+	  any elements inside it should also be absolutely positioned
+*/
+
+.${app_name} img.${app_name}_icon {
+	width: 55px;
+	height: 55px;
+	position: absolute;
+	top: 27px;
+	left: 3px;
+}

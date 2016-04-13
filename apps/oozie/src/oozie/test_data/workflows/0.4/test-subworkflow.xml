@@ -1,0 +1,21 @@
+<workflow-app name="Subworkflow" xmlns="uri:oozie:workflow:0.4">
+    <start to="Subworkflow"/>
+    <action name="Subworkflow">
+        <sub-workflow>
+            <app-path>/user/hue/oozie/workspaces/managed/sleep</app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>test</name>
+                    <value>test</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

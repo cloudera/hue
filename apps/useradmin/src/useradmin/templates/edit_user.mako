@@ -15,96 +15,189 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
-from desktop.lib.django_util import extract_field_data
-import urllib
 from django.utils.translation import ugettext as _
+from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
+
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Hue Users'), "useradmin", user, "100px")}
-${layout.menubar(section='users', _=_)}
-
-<%def name="render_field(field)">
-  %if not field.is_hidden:
-    <% group_class = len(field.errors) and "error" or "" %>
-    <div class="control-group ${group_class}">
-      <label class="control-label" for="id_${field.html_name}">${_(field.label)}</label>
-      <div class="controls">
-		${unicode(field) | n}
-        % if len(field.errors):
-          <span class="help-inline">${unicode(field.errors) | n}</span>
-        % endif
-      </div>
-    </div>
-  %endif
-</%def>
+${ commonheader(_('Hue Users'), "useradmin", user) | n,unicode }
+${ layout.menubar(section='users') }
 
 <div class="container-fluid">
-	% if username:
-		<h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
-	% else:
-		% if ldap:
-			<h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
-		% else:
-			<h1>${_('Hue Users - Create user')}</h1>
-		% endif
-	% endif
+  <div class="card card-small">
+    % if username:
+      <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
+    % else:
+      <h1 class="card-heading simple">${_('Hue Users - Create user')}</h1>
+    % endif
 
     <br/>
+    <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
+    ${ csrf_token(request) | n,unicode }
+    <div id="properties" class="section">
+      <ul class="nav nav-tabs" style="margin-bottom: 0">
+        <li class="active">
+          <a href="#step1" class="step">${ _('Step 1: Credentials') }
+          % if not username:
+            ${ _('(required)') }
+          % endif
+          </a>
+        </li>
+        <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
+        </li>
+        % if user.is_superuser:
+            <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
+        % endif
+      </ul>
 
-	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
-		<fieldset>
-			% for field in form:
-                %if field.name == "username" and "password1" in form.fields:
-                    ${render_field(form["username"])}
-                    <div class="row">
-                        <div class="span5">
-                        ${render_field(form["password1"])}
-                        </div>
-                        <div class="span4">
-                        ${render_field(form["password2"])}
-                        </div>
-                    </div>
-                %elif field.name == "first_name":
-                    <div class="row">
-                        <div class="span5">
-                        ${render_field(form["first_name"])}
-                        </div>
-                        <div class="span4">
-                        ${render_field(form["last_name"])}
-                        </div>
-                    </div>
-                %elif field.name == "last_name" or field.name == "password1" or field.name == "password2":
-                    ## skip rendering
-                %else:
-				    ${render_field(field)}
-                %endif
-			% endfor
-		</fieldset>
-		<br/>
-		<div class="form-actions">
-			% if username:
-				<input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-			% else:
-				% if ldap:
-					<input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
-				% else:
-					<input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
-				% endif
-			% endif
-			<a href="/useradmin/users" class="btn">${_('Cancel')}</a>
-		</div>
-	</form>
+    <div class="steps">
+      <div id="step1" class="stepDetails">
+        ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
+        % if "password1" in form.fields:
+          % if username and "password_old" in form.fields:
+            ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % endif
+          ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % if is_password_policy_enabled():
+            <div class="password_rule" style="margin-left:180px; width:500px;">
+              <p>${get_password_hint()}</p>
+            </div>
+          % endif
+          ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
+        % endif
+        ${layout.render_field(form["ensure_home_directory"])}
+        </div>
+        <div id="step2" class="stepDetails hide">
+        % if "first_name" in form.fields:
+                  ${layout.render_field(form["first_name"])}
+                  ${layout.render_field(form["last_name"])}
+                % endif
+
+                ${layout.render_field(form["email"])}
+
+                %if request.user.username == username:
+                  ${layout.render_field(form["language"])}
+                % endif
+
+                % if user.is_superuser:
+                  ${layout.render_field(form["groups"])}
+                % endif
+        </div>
+      % if user.is_superuser:
+        <div id="step3" class="stepDetails hide">
+        ${layout.render_field(form["is_active"])}
+                ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
+        </div>
+      % endif
+      </div>
+      <div class="form-actions">
+        <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+
+      % if username:
+        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+      % else:
+        <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
+      % endif
+      </div>
+    </form>
+  </div>
 </div>
+
+<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#id_groups").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
-            width:618,
-            height:240
-        });
-	});
+
+$(document).ready(function(){
+  $("#id_groups").jHueSelector({
+    selectAllLabel: "${_('Select all')}",
+    searchPlaceholder: "${_('Search')}",
+    noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+    width:618,
+    height:240
+  });
+
+ var currentStep = "step1";
+
+ routie({
+    "step1":function () {
+      showStep("step1");
+    },
+    "step2":function () {
+      if (validateStep("step1")) {
+        showStep("step2");
+      }
+    },
+    "step3":function () {
+      if (validateStep("step1") && validateStep("step2")) {
+        showStep("step3");
+      }
+    }
+  });
+
+  function showStep(step) {
+    currentStep = step;
+    if (step != "step1") {
+      $("#backBtn").removeClass("disabled");
+    } else {
+      $("#backBtn").addClass("disabled");
+    }
+
+    if (step != $(".stepDetails:last").attr("id")) {
+      $("#nextBtn").removeClass("disabled");
+    } else {
+      $("#nextBtn").addClass("disabled");
+    }
+
+    $("a.step").parent().removeClass("active");
+    $("a.step[href=#" + step + "]").parent().addClass("active");
+    $(".stepDetails").hide();
+    $("#" + step).show();
+  }
+
+  function validateStep(step) {
+    var proceed = true;
+    $("#" + step).find("[validate=true]").each(function () {
+      if ($(this).val().trim() == "") {
+        proceed = false;
+        routie(step);
+        $(this).parents(".control-group").addClass("error");
+        $(this).parent().find(".help-inline").remove();
+        $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
+      }
+    });
+    return proceed;
+  }
+
+  $("#backBtn").click(function () {
+    var nextStep = (currentStep.substr(4) * 1 - 1);
+    if (nextStep >= 1) {
+      routie("step" + nextStep);
+    }
+  });
+
+  $("#nextBtn").click(function () {
+    var nextStep = (currentStep.substr(4) * 1 + 1);
+    if (nextStep <= $(".step").length) {
+      routie("step" + nextStep);
+    }
+  });
+
+  $("[validate=true]").change(function () {
+    $(this).parents(".control-group").removeClass("error");
+    $(this).parent().find(".help-inline").remove();
+  });
+
+  $("#editForm").on("submit", function(){
+    if (validateStep("step1") && validateStep("step2")) {
+      return true;
+    }
+    return false;
+  })
+});
 </script>
-${commonfooter(messages)}
+
+${layout.commons()}
+
+${ commonfooter(None, messages) | n,unicode }

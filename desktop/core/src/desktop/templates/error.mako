@@ -17,19 +17,36 @@
 from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop import conf
 %>
-${commonheader(_('Error'), "", user)}
+
+${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
 
   <div class="container-fluid">
-    <h1>${_('Error!')}</h1>
-    <pre>${smart_unicode(error) | h }</pre>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="card card-small">
+          <h1 class="card-heading simple">${ _('Error!') }</h1>
+          <div class="card-body">
+            <p>
+              <pre>${ smart_unicode(error) }</pre>
 
-    %if traceback:
-      <textarea style="width: 100%;" rows=80 readonly="readonly">
-      ${smart_unicode(traceback) | h}
-      </textarea>
-    %endif
+              %if traceback and user.is_superuser:
+                <textarea style="width: 100%;" rows=80 readonly="readonly">
+                ${ smart_unicode(traceback) }
+                </textarea>
+              %endif
+
+              <a class="btn" onclick="history.back()">${ _('Back') }</a>
+
+              %if conf.REDIRECT_WHITELIST.get():
+                <a class="btn btn-primary" href="/">${ _('Home') }</a>
+              % endif
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-${commonfooter(messages)}
-
+${ commonfooter(request, messages) | n,unicode }

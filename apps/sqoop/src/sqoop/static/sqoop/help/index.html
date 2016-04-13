@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Pig Editor</title>
+</head>
+<body id="xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9c"><a name="xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9c"><!-- --></a>
+
+
+<h1>Sqoop UI</h1>
+<p>The Sqoop UI enables transferring data between structured and unstructured data sources. Examples of structured data source are the relational databases such as the MySQL and Postgres, and unstructured, semi-structured data sources include Hbase, HDFS, Cassandra. The UI lives uses Apache Sqoop to do this.
+See the <a href="http://sqoop.apache.org/docs/1.99.4/index.html">Sqoop Documentation</a> for more details on Sqoop.</p>
+
+<p>
+<p>Hue, the <a href="http://gethue.com">open source Big Data UI</a>, has an application that enables transferring data between data sources such as relational databases and <a href="http://hadoop.apache.org/">Hadoop</a>. This new application is driven by <a href="http://sqoop.apache.org/">Sqoop 2</a> and has several user experience improvements to boot.</p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/76063637" width="900"></iframe></p>
+<p>Sqoop is a batch data migration tool for transferring data between traditional databases and Hadoop. The first version of Sqoop is a heavy client that drives and oversees data transfer via MapReduce.</p>
+ <p>In Sqoop 2, the majority of the work was moved to a server that a thin client communicates with. Also, any client can communicate with the Sqoop 2 server over its <a href="http://sqoop.apache.org/docs/1.99.4/RESTAPI.html">JSON-REST API</a>
+ Sqoop 2 was chosen instead of its predecessors because of its client-server design.</p>
+
+<h3>Environment</h3>
+<ul><li>
+<p>CDH 4.4 or <span>Hue 3.0.0</span></p>
+</li>
+<li>
+<p>MySQL 5.1</p>
+</li>
+</ul>
+<h2>Importing FROM MySQL TO HDFS</h2>
+<p>The following is the canonical FROM job example sourced from <a href="http://sqoop.apache.org/docs/1.99.4/Sqoop5MinutesDemo.html"><a href="http://sqoop.apache.org/docs/1.99.4/Sqoop5MinutesDemo.html">Sqoop5MinutesDemo.html</a></a>.</p>
+<p>In Hue, this can be done in 3 easy steps:</p>
+<p>If the new job button is not appearing, Sqoop2 is probably not starting. Make sure the MySql or other DB connectors are in the /usr/lib/sqoop/lib directory of Sqoop2. Make sure you have these properties in the Sqoop2 Server configuration:</p>
+<pre class="code">org.apache.sqoop.repository.schema.immutable=false
+org.apache.sqoop.connector.autoupgrade=true
+org.apache.sqoop.driver.autoupgrade=true 
+</pre>
+
+<h3>1. Create Links for the From and To</h3>
+<p>In the Sqoop app, the data source link manager is available from the “New Job” wizard. To get to the new job wizard, click on “New Job”. There may be a list of links available if a few have been created before. For the purposes of this demo, we’ll go through the process of creating a new link. Click “Add a new link” and fill in the blanks with the data below.
+ Then click save to return to the “New Job” wizard!</p>
+<p>Add a link for the FROM data source such as the MySQL </p>
+
+<div>
+<pre class="code">Link Config Input                     Value
+
+Name                                  mysql-link-demo
+
+JDBC Driver Class                     com.mysql.jdbc.Driver
+
+JDBC Connection String                jdbc:mysql://hue-demo/demo
+
+Username                              demo
+
+Password                              demo
+</pre>
+</div>
+<p>Add a link for the TO data source such as the HDFS </p>
+<div>
+<pre class="code">Link Config Input                     Value
+
+Name                                  hdfs-link-demo 
+
+HDFS URI                              hdfs://hue-demo:8020/demo
+
+</pre>
+</div>
+<h3>2. Create a Job</h3>
+<p>After creating the FROM and TO links, follow the wizard and fill in the blanks with the information below. We can use the two links created above to associate the From and To for the job.
+
+</p>
+
+<p>Job configuration for the FROM data source</p>
+
+<div>
+<pre class="code">From Job Config Input                                 Value
+
+Schema name(Optional)
+
+Table name                                             test
+
+Table SQL statement:(Optional)
+
+Table column names:(Optional)
+
+Partition column name:(Optional)                        id
+
+Null value allowed for the partition column:(Optional)
+
+Boundary query:(Optional)
+
+</pre>
+</div>
+
+<p>Job configuration for the TO data source</p>
+
+<div>
+<pre class="code">To Job Config Input                           Value
+
+Output format                                 TEXT_FILE
+
+Compression format(Optional)
+
+Output directory                              /tmp/mysql-import-job-demo
+</pre>
+</div>
+
+
+<p>Job configuration for the Job Execution Drivere</p>
+
+<div>
+<pre class="code">DriverConfig Input                     Value
+
+Extractors(Optional)                     2
+
+Loaders(Optional)                        2
+
+</pre>
+</div>
+
+<h3>3. Save and Submit the Job</h3>
+<p>At the end of the Job wizard, click “Save and Run”! The job should automagically start after that and the job dashboard will be displayed. As the job is running, a progress bar below the job listing will be dynamically updated. Links to the HDFS output via the File Browser and Map Reduce logs via Job Browser will be available on the left hand side of the job edit page.</p>
+<h1>Sum Up</h1>
+<p>The new Sqoop application enables batch data migration from a more traditional databases to Hadoop and vice versa through Hue. Using Hue, a user can move data between storage systems in a distributed fashion with the click of a button.</p>
+
+<p>I’d like to send out a big thank you to the Sqoop community for the new client-server design!</p>
+
+<p>Both projects are undergoing heavy development and are welcoming external contributions! Have any suggestions? Feel free to tell us what you think through <a href="http://groups.google.com/a/cloudera.org/group/hue-user">hue-user</a> or <a href="https://twitter.com/gethue">@gethue</a>​!</p>
+                </p>
+
+<h2>Installation and Configuration</h2>
+<p>The Sqoop UI is one of the applications installed as part of
+Hue. For information about installing and configuring Hue, see the Hue Installation
+manual.</p>
+<h2>Starting</h2>
+<p>Click the <strong>Sqoop</strong> icon
+(<img alt="image" src="/static/sqoop/art/icon_sqoop_24.png" />) in the navigation bar at the top of
+the Hue browser page.</p>
+<h2>Sqoop Jobs</h2>
+<p>Sqoop UI is oriented around jobs in Apache Sqoop.</p>
+<h3>Creating a New Job</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>In the Name field, enter a name.</li>
+<li>Choose the FROM and TO.
+   The corresponding job  configuration inputs will change depending on FROM or TO chosen.</li>
+<li>Select a link for the FROM or TO data source, or create one if it does not exist.</li>
+<li>Fill in the rest of the fields for the job.
+   For FROM, the "Schema/Table name" and "Input directory" are necessary at a minimum for MySQL and HDFS data sources respectively</li>
+   For MySQL "TO" data source, the "Schema/Table name" is necessary and for HDFS TO data source, the Output directory" are necessary at a minimum.
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3>Editing a Job</h3>
+<ol>
+<li>In the list of jobs, click on the name of the job.</li>
+<li>Edit the desired configuration fields in the job.</li>
+</ol>
+<h3>Copying a Job</h3>
+<ol>
+<li>In the list of jobs, click on the name of the job.</li>
+<li>On the left hand side of the job editor, there should be a panel containing actions.
+   Click <strong>Copy</strong>.</li>
+</ol>
+<h3>Removing a Job</h3>
+<ol>
+<li>In the list of jobs, click on the name of the job.</li>
+<li>On the left hand side of the job editor, there should be a panel containing actions.
+   Click <strong>Delete</strong>.</li>
+</ol>
+<h3>Running a Job</h3>
+<p>There's a status on each of the items in the job list indicating
+the last time a job was ran. The progress of the job should dynamically
+update. There's a progress bar at the bottom of each item on the job list
+as well.</p>
+<ol>
+<li>In the list of jobs, click on the name of the job.</li>
+<li>On the left hand side of the job editor, there should be a panel containing actions.
+   Click <strong>Run</strong>.</li>
+</ol>
+<h3>Creating a New Link</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the link field, click the hyperlink titled <strong>Add a new link</strong>.</li>
+<li>Fill in the displayed fields.</li>
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3>Editing a Link</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the link field, select the link by name that should be edited.</li>
+<li>Click <strong>Edit</strong>.</li>
+<li>Edit the any of the fields.</li>
+<li>Click <strong>save</strong> to finish.</li>
+</ol>
+<h3>Removing a Link</h3>
+<ol>
+<li>Click the <strong>New job</strong> button at the top right.</li>
+<li>At the link field, select the link by name that should be deleted.</li>
+<li>Click <strong>Delete</strong>.</li>
+</ol>
+<p>NOTE: If this does not work, it's like because a job is using that link.
+      Make sure not jobs are using the link that will be deleted.</p>
+<h3>Filtering Sqoop Jobs</h3>
+<p>The text field in the top, left corner of the Sqoop Jobs page enables fast filtering
+of sqoop jobs by name.</p>  
+
+
+</body>
+</html>

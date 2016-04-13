@@ -1,0 +1,832 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+   "http://www.w3.org/TR/REC-html40/strict.dtd">
+
+<html lang=en>
+ <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <title></title></head>
+ <body>
+  <div><a name='heapyc.module-32-heapyc'>
+   <h1>.tgt.heapyc.module heapyc</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>module heapyc</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd><big><a href='#heapyc.module-32-heapyc.HeapView'>HeapView</a></big>(<var>root</var><code>:</code>&nbsp;<em>Any+</em>, <var>heapdefs</var><code>:</code>&nbsp;<em>HeapDefs+</em>) <strong>-></strong> <a href='#kindnames.HeapView'>HeapView</a></dd>
+     <dd><big><a href='#heapyc.module-32-heapyc.interpreter'>interpreter</a></big>(<var>command</var><code>:</code>&nbsp;<em>command+</em>  [<var>locals</var><code>:</code>&nbsp;<em>dict+</em>]) <strong>-></strong> <em>thread_id</em></dd>
+     <dd><big><a href='#heapyc.module-32-heapyc.NodeGraph'>NodeGraph</a></big>( [<var>edges</var><code>:</code>&nbsp;<em>iterable+</em>  [<var>is_mapping</var><code>:</code>&nbsp;<em>boolean+</em>]]) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dd>
+     <dd><big><a href='#heapyc.module-32-heapyc.set_async_exc'>set_async_exc</a></big>(<var>thread_id</var><code>:</code>&nbsp;<em>thread_id+</em>, <var>exception</var><code>:</code>&nbsp;<em>Exception+</em>)</dd>
+     <dd><big><a href='#heapyc.module-32-heapyc.xmemstats'>xmemstats</a></big>()</dd>
+     <dt><strong><big>Attribute</big></strong></dt>
+     <dd><big><a href='#heapyc.module-32-heapyc.RootState'>RootState</a></big><code>:</code>&nbsp;<strong> anything</strong></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd> The heapyc module.</dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='heapyc.module-32-heapyc.HeapView'><strong><big>HeapView</big></strong></a>(<var>root</var><code>:</code>&nbsp;<em>Any+</em>, <var>heapdefs</var><code>:</code>&nbsp;<em>HeapDefs+</em>) <strong>-></strong> <a href='#kindnames.HeapView'>HeapView</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a new HeapView object.</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>root</var><code>:</code>&nbsp;<em>Any+</em></dt>
+         <dd> The initial value of the root member.</dd>
+         <dt><var>heapdefs</var><code>:</code>&nbsp;<em>HeapDefs+</em></dt>
+         <dd>
+ Definitions of specially treated extension types.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='heapyc.module-32-heapyc.interpreter'><strong><big>interpreter</big></strong></a>(<var>command</var><code>:</code>&nbsp;<em>command+</em>  [<var>locals</var><code>:</code>&nbsp;<em>dict+</em>]) <strong>-></strong> <em>thread_id</em>
+    <dl>
+     <dd> Create a new interpreter structure with a new thread.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>command</var><code>:</code>&nbsp;<em>command+</em></dt>
+         <dd> A command that will be exec'd in the new environment.</dd>
+         <dt><var>locals</var><code>:</code>&nbsp;<em>dict+</em></dt>
+         <dd> Local variables passed to the command when exec'd.</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> the thread identity number.</dt></dl></dd>
+     <dd>
+The new interpreter and thread is started in a new environment.  This
+environment consists of a new '__main__' module, with the optional
+locals dict as local variables.</dd>
+     <dd>
+The site-specific initializations are not automatically made. To do
+that, 'import site' could be used as the first statement in the
+command string.</dd>
+     <dd>
+The interpreter() function will return after the new thread structure
+has been created. The command will execute sooner or later.  The
+thread will terminate, and the interpreter structure be deallocated,
+when the command has been executed, and dependent threads have
+terminated.
+</dd></dl></dd>
+   <dd><a name='heapyc.module-32-heapyc.NodeGraph'><strong><big>NodeGraph</big></strong></a>( [<var>edges</var><code>:</code>&nbsp;<em>iterable+</em>  [<var>is_mapping</var><code>:</code>&nbsp;<em>boolean+</em>]]) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a>
+    <dl>
+     <dd> Construct a new NodeGraph object.</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>edges</var><code>:</code>&nbsp;<em>iterable+</em></dt>
+         <dd>
+ The edges that will be used to
+         initialize the new nodegraph. It should yield a
+         sequence of pairs being edges of the form (source, target).</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>()</dt>
+           <dd></dd></dl></dd>
+         <dt><var>is_mapping</var><code>:</code>&nbsp;<em>boolean+</em></dt>
+         <dd>
+ If True, will cause the nodegraph
+         to be treated like a 'mapping'. It will then, for the
+         purpose of indexing, be expected to contain a single
+         target for each source node.</dd>
+         <dd>
+          <dl>
+           <dt><strong>Default: </strong>False</dt>
+           <dd></dd></dl></dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='heapyc.module-32-heapyc.set_async_exc'><strong><big>set_async_exc</big></strong></a>(<var>thread_id</var><code>:</code>&nbsp;<em>thread_id+</em>, <var>exception</var><code>:</code>&nbsp;<em>Exception+</em>)
+    <dl>
+     <dd> Set an exception to be raised asynchronously in a thread.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='heapyc.module-32-heapyc.xmemstats'><strong><big>xmemstats</big></strong></a>()
+    <dl>
+     <dd> Print system-dependent memory statistics.</dd>
+     <dd>
+ What is printed depends on the system configuration.
+</dd></dl></dd>
+   <dt>
+    <h2>Attribute</h2></dt>
+   <dd><a name='heapyc.module-32-heapyc.RootState'><strong><big>RootState</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd>
+ The single instance of RootStateType.
+</dd></dl></dd></dl><a name='kindnames.HeapView'>
+   <h1>.tgt.kindnames.HeapView</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>HeapView</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><big><strong>Constructor</strong></big></dt>
+     <dd>
+      <dl>
+       <dt><a href='#heapyc.module-32-heapyc'>module heapyc</a><big><code>.</code><a href='#heapyc.module-32-heapyc.HeapView'>HeapView</a></big>(<var>root</var><code>:</code>&nbsp;<em>Any+</em>, <var>heapdefs</var><code>:</code>&nbsp;<em>HeapDefs+</em>) <strong>-></strong> <a href='#kindnames.HeapView'>HeapView</a></dt></dl></dd>
+     <dt>
+      <h3>For any object <var>HV</var> of kind <a href='#kindnames.HeapView'>HeapView</a>:</h3></dt>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_class'>cli_class</a></big>() <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_clodo'>cli_clodo</a></big>(<var>owners</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_indisize'>cli_indisize</a></big>(<var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_none'>cli_none</a></big>() <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_rcs'>cli_rcs</a></big>(<var>referrers</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>classifier</var><code>:</code>&nbsp;<em>ObjectClassifier+</em>, <var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.cli_type'>cli_type</a></big>() <strong>-></strong> <em>ObjectClassifier</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.heap'>heap</a></big>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.indisize_sum'>indisize_sum</a></big>(<var>S</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <em>int</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.numedges'>numedges</a></big>(<var>src</var><code>:</code>&nbsp;<em>Any+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <em>int</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.reachable'>reachable</a></big>(<var>X</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.reachable_x'>reachable_x</a></big>(<var>X</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.register__hiding_tag__type'>register__hiding_tag__type</a></big>(<em>type_with_hiding_tag+</em>)</dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.register_hidden_exact_type'>register_hidden_exact_type</a></big>(<em>type+</em>)</dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.relate'>relate</a></big>(<var>src</var><code>:</code>&nbsp;<em>Any+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <em>RelationStructure</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.relimg'>relimg</a></big>(<var>S</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.shpathstep'>shpathstep</a></big>(<var>G</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>U</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>S</var><code>:</code>&nbsp;<em>NodeSet+</em>  [<var>AvoidEdges</var><code>:</code>&nbsp;<em>NodeGraph+</em>  [<var>find_one</var><code>:</code>&nbsp;<em>boolean+</em>]]) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.update_dictowners'>update_dictowners</a></big>(<var>owners</var><code>:</code>&nbsp;<em>NodeGraph+</em>)</dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.update_referrers'>update_referrers</a></big>(<var>X</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>)</dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.update_referrers_completely'>update_referrers_completely</a></big>(<var>X</var><code>:</code>&nbsp;<em>NodeGraph+</em>)</dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView._hiding_tag_'>_hiding_tag_</a></big><code>:</code>&nbsp;<strong> anything</strong></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.delete_extra_type'>delete_extra_type</a></big><code>:</code>&nbsp;<strong> anything</strong></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.is_hiding_calling_interpreter'>is_hiding_calling_interpreter</a></big><code>:</code>&nbsp;<em>boolean</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.is_using_traversing_owner_update'>is_using_traversing_owner_update</a></big><code>:</code>&nbsp;<em>boolean</em></dd>
+     <dd>HV<big><code>.</code><a href='#kindnames.HeapView.limitframe'>limitframe</a></big><code>:</code>&nbsp; (
+      <dl>
+       <dd><strong><sup> either:</sup></strong>[<em>None</em><strong><sup> or </sup></strong><em>frame</em>]</dd>
+       <dd> )</dd></dl></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+    <p>
+A HeapView object provides methods to get memory related information
+about the system heap and about individual objects. 
+</p>
+    <p>
+It implements much of the low-level functionality for the Heapy
+system. It is intended to provide what can not be done at all or would
+be much slower if programmed directly in Python. It is not intended to
+be used directly by a user, but to be wrapped in higher level objects.
+</p>
+    <p>
+Some terms that are referred to in the method descriptions:
+</p><a name='kindnames.HeapView.label:Visible-32-objects'></a>
+    <h3> Visible objects.</h3>
+    <p>
+The HeapView object attempts to restrict its view of the heap to only
+the 'visible objects'. This is to make it possible to analyse the heap
+via a Python library that inevitably itself is continually allocating
+and deallocating objects. These should be hidden from the heap view
+presented. This is primarily done via a special tag attribute, see <a href='#kindnames.HeapView._hiding_tag_'>_hiding_tag_</a> and <a href='#kindnames.HeapView.register__hiding_tag__type'>register__hiding_tag__type</a>
+. Frames can be hidden
+with another mechanism, see <a href='#kindnames.HeapView.limitframe'>limitframe</a>. For hiding all objects of a special type, <a href='#kindnames.HeapView.register_hidden_exact_type'>register_hidden_exact_type</a>
+ may be used. It is also
+possible to use a separate interpreter and hide its root objects, see <a href='#kindnames.HeapView.is_hiding_calling_interpreter'>is_hiding_calling_interpreter</a>
+.
+</p>
+    <h3> Classifiers.</h3>
+The methods named cli_* are factory methods that create objects of
+type ObjectClassifier. The principal difference between classifiers is
+how a single object is classified. The single-object classification
+function is available in classifier objects; it is the classify
+method. There are also methods that operate on collections of objects,
+namely partition and select. These eliminate the per-object
+Python-level function call overhead that would occur if the classify
+method were to be called from Python for each object in a collection.
+See also the ObjectClassifier type.
+<a name='kindnames.HeapView.label:Individual-32-size'></a>
+    <h3> Individual size.</h3>
+    <p>
+The individual size of an object is its individually allocated memory size. 
+</p>
+    <p>
+It includes:
+</p>
+    <ul>
+     <li> The basic object size, as can be found out in a standard way.</li>
+     <li> The extra memory for variable size objects.</li>
+     <li> For GC collected objects, the size of the GC information.</li>
+     <li> An alignment to the next highest multiple of a pointer size.</li>
+     <li> The size of any other memory allocated that belongs to the object.</li></ul>
+    <p>
+
+Some types of objects have extra memory allocated that can not be
+accounted for in the standard way. This memory should nevertheless be
+included in the individual size. To determine the size of these
+objects, special functions are needed. These are defined for standard
+builtin types, such as lists and dicts. Other types should be defined
+via the heapdefs argument to the HeapView constructor.
+</p>
+    <p> The individual size does not include:</p>
+    <ul>
+     <li> Subobjects that are accounted for separately.</li>
+     <li>
+ Overhead for the memory allocation system. This varies depending
+  on the kind of memory allocator, the requested size, etc.
+</li></ul></dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='kindnames.HeapView.cli_class'>HV<code>.</code><strong><big>cli_class</big></strong></a>() <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier that classifies by &quot;class&quot;.</dt>
+       <dd>
+
+If an object is of instance type, its classification will be its
+class, as given in its C-level member 'in_class', otherwise it will
+be its type, as given in 'ob_type'.</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Note</strong></dt>
+       <dd>
+This is like classifying by the Python-level '__class__' attribute
+in newer versions of Python, except that even though the '__class__'
+attribute may be redefined via the class definition, the classification
+as made by cli_class isn't affected.</dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.cli_clodo'>HV<code>.</code><strong><big>cli_clodo</big></strong></a>(<var>owners</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier, that classifies by &quot;Class Or Dict Owner&quot;.</dt>
+       <dd>
+The classification of an object is its class (as by cli_class),
+unless the object is a dict object that is 'owned' by some owner.
+If the object is such an owned dict, the classification will be a
+1-tuple containing the class (as by cli_class) of its owner.
+</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>owners</var><code>:</code>&nbsp;<em>NodeGraph+</em></dt>
+         <dd>
+
+Used to map each dict object to its owner, or to None if it has no
+owner. The graph will be automatically updated, from heap information
+defined by HV, whenever an attempt is made to classify a dict that
+maps to nothing.</dd>
+         <dt><var>memo</var><code>:</code>&nbsp;<em>dict+</em></dt>
+         <dd>
+ Used to memoize the 1-tuples  generated when classifying owned dicts.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.cli_indisize'>HV<code>.</code><strong><big>cli_indisize</big></strong></a>(<var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier that classifies by &quot;individual size&quot;.</dt>
+       <dd>
+ The classification of each object is an int, containing the
+object's individual memory size.</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Argument</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>memo</var><code>:</code>&nbsp;<em>dict+</em></dt>
+         <dd>
+ Used to memoize the classification objects.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.cli_none'>HV<code>.</code><strong><big>cli_none</big></strong></a>() <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier that classifies all objects the same.</dt>
+       <dd>
+ The classification of each object is None.
+</dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.cli_rcs'>HV<code>.</code><strong><big>cli_rcs</big></strong></a>(<var>referrers</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>classifier</var><code>:</code>&nbsp;<em>ObjectClassifier+</em>, <var>memo</var><code>:</code>&nbsp;<em>dict+</em>) <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier that classifies by Referrer Classification Set.</dt>
+       <dd>
+ The classification of an object is the classifications of its
+referrers, collected in an immutable NodeSet object. 
+</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>referrers</var><code>:</code>&nbsp;<em>NodeGraph+</em></dt>
+         <dd> Used to map each object to its referrers.</dd>
+         <dt><var>classifier</var><code>:</code>&nbsp;<em>ObjectClassifier+</em></dt>
+         <dd> Used to classify each referrer.</dd>
+         <dt><var>memo</var><code>:</code>&nbsp;<em>dict+</em></dt>
+         <dd>
+ Used to memoize the classification sets.
+</dd></dl></dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.cli_type'>HV<code>.</code><strong><big>cli_type</big></strong></a>() <strong>-></strong> <em>ObjectClassifier</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a classifier that classifies by type.</dt>
+       <dd>
+
+The classification of each object is the type, as given by its
+C-level member 'ob_type'. (This is the same as the type returned
+by the Python-level builtin 'type'.)
+</dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.heap'>HV<code>.</code><strong><big>heap</big></strong></a>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a set containing all 'visible objects' in the heap view
+defined by HV.</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <em>
+ Visible objects
+</em></dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.indisize_sum'>HV<code>.</code><strong><big>indisize_sum</big></strong></a>(<var>S</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <em>int</em>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> the sum of the 'individual size' of the objects in S.</dt></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd> <em>
+ Individual size
+</em></dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.numedges'>HV<code>.</code><strong><big>numedges</big></strong></a>(<var>src</var><code>:</code>&nbsp;<em>Any+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <em>int</em>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the number of edges from src to tgt.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.reachable'>HV<code>.</code><strong><big>reachable</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the set of objects reached via a path in the visible heap as
+defined by HV, from some object in X, avoiding any object in Y.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.reachable_x'>HV<code>.</code><strong><big>reachable_x</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the set of objects reached via a path in the visible heap as
+defined by HV, from some object in X, avoiding any object in Y except
+at the end of the path.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.register__hiding_tag__type'>HV<code>.</code><strong><big>register__hiding_tag__type</big></strong></a>(<em>type_with_hiding_tag+</em>)
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+
+Register a type of objects that may be hidden from the heap view
+defined by HV. The type must have a slot named _hiding_tag_. An object
+that is an instance of the type, or of a subtype, is hidden when its
+_hiding_tag_ is HV._hiding_tag_.
+</dd></dl></dd>
+   <dd><a name='kindnames.HeapView.register_hidden_exact_type'>HV<code>.</code><strong><big>register_hidden_exact_type</big></strong></a>(<em>type+</em>)
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+
+Register a type of objects that should be hidden from the heap view
+defined by HV. Objects of the exact type registered -- not including
+subtypes -- will be hidden.
+</dd></dl></dd>
+   <dd><a name='kindnames.HeapView.relate'>HV<code>.</code><strong><big>relate</big></strong></a>(<var>src</var><code>:</code>&nbsp;<em>Any+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>) <strong>-></strong> <em>RelationStructure</em>
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a description of the relation between src and tgt.</dt>
+       <dd> This is used for descriptions of edges in paths.</dd>
+       <dd>
+ [The result is in a special format that I choose to not define here
+since it is for special low-level use and subject to change.]
+</dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.relimg'>HV<code>.</code><strong><big>relimg</big></strong></a>(<var>S</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> the 'relational image of HV wrt S'.</dt>
+       <dd>
+ That is, the set of nodes
+that are directly referred to from the nodes in S via the visible heap
+reachability relation as defined by HV.</dd></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.shpathstep'>HV<code>.</code><strong><big>shpathstep</big></strong></a>(<var>G</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>U</var><code>:</code>&nbsp;<em>NodeSet+</em>, <var>S</var><code>:</code>&nbsp;<em>NodeSet+</em>  [<var>AvoidEdges</var><code>:</code>&nbsp;<em>NodeGraph+</em>  [<var>find_one</var><code>:</code>&nbsp;<em>boolean+</em>]]) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+ This method implements one step of a shortest path algorithm.
+</dd>
+     <dd>
+      <dl>
+       <dt><strong>Arguments</strong></dt>
+       <dd>
+        <dl>
+         <dt><var>G</var><code>:</code>&nbsp;<em>NodeGraph+</em></dt>
+         <dd>
+         Updated by the method, with the edges from nodes in the
+                source set to the new nodes visited.
+</dd>
+         <dt><var>U</var><code>:</code>&nbsp;<em>NodeSet+</em></dt>
+         <dd>
+ The source set for this step.
+</dd>
+         <dt><var>S</var><code>:</code>&nbsp;<em>NodeSet+</em></dt>
+         <dd>
+ The set of already visited nodes.
+</dd>
+         <dt><var>AvoidEdges</var><code>:</code>&nbsp;<em>NodeGraph+</em></dt>
+         <dd>
+ Edges to avoid.
+</dd>
+         <dt><var>find_one</var><code>:</code>&nbsp;<em>boolean+</em></dt>
+         <dd>
+ If True, at most one edge will be found from each node
+         in the source set. Normally, all edges will be found.
+</dd></dl></dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> the new nodes visited.</dt>
+       <dd>
+ This may be used for the U argument the next time the method is called.
+</dd></dl></dd>
+     <dd>
+      <dl>
+       <dt><strong>See also</strong></dt>
+       <dd>
+ shpgraph_algorithm in Path.py.
+</dd></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.update_dictowners'>HV<code>.</code><strong><big>update_dictowners</big></strong></a>(<var>owners</var><code>:</code>&nbsp;<em>NodeGraph+</em>)
+    <dl>
+     <dd> Update owners with ownership edges.</dd>
+     <dd>
+ The dict owners graph will be updated with an edge from each dict
+object in the heap, to either its owner or to None.
+</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.update_referrers'>HV<code>.</code><strong><big>update_referrers</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>NodeGraph+</em>, <var>Y</var><code>:</code>&nbsp;<em>NodeSet+</em>)
+    <dl>
+     <dd> Update referrer graph X for Y.</dd>
+     <dd>
+ The visible heap defined by HV will be traversed from the root of HV
+so that the edges of every path from the root to nodes in Y will be
+represented, inverted, in X.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.update_referrers_completely'>HV<code>.</code><strong><big>update_referrers_completely</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>NodeGraph+</em>)
+    <dl>
+     <dd>
+      <dl></dl></dd>
+     <dd> Update referrer graph X 'completely'.</dd>
+     <dd>
+ [Experimental algorithm that updates X with the referrers to all
+objects in the heap (of visible nodes as defined in HV). It is not
+normally used.]
+</dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='kindnames.HeapView._hiding_tag_'>HV<code>.</code><strong><big>_hiding_tag_</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd>
+ The hiding tag defining what objects are hidden from the view defined
+by HV. Objects that contain a _hiding_tag_ object which is identical
+to HV._hiding_tag_, will be hidden from view, in the following cases:
+      <ul>
+       <li> The object is of a type that has been registered for hiding via <a href='#kindnames.HeapView.register__hiding_tag__type'>register__hiding_tag__type</a>, or is of a subtype of such a type.</li>
+       <li>
+ The object is of instance type. Such an object will be checked
+  for a _hiding_tag_ item in its __dict__.
+</li></ul></dd></dl></dd>
+   <dd><a name='kindnames.HeapView.delete_extra_type'>HV<code>.</code><strong><big>delete_extra_type</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd>
+ For Internal Use
+</dd></dl></dd>
+   <dd><a name='kindnames.HeapView.is_hiding_calling_interpreter'>HV<code>.</code><strong><big>is_hiding_calling_interpreter</big></strong></a><code>:</code>&nbsp;<em>boolean</em></dd>
+   <dd>
+    <dl>
+     <dd>
+
+If True, the data of the interpreter using the HV will be hidden from
+the heap view as seen from RootState.</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+This is used when multiple Python interpreters are used. One
+interpreter will be monitoring the operation of the other
+interpreter(s). It would set is_hiding_calling_interpreter to True in
+the HV it is using. Its own data will then be hidden from view, making
+memory leak detection more practical.
+</dd></dl></dd>
+   <dd><a name='kindnames.HeapView.is_using_traversing_owner_update'>HV<code>.</code><strong><big>is_using_traversing_owner_update</big></strong></a><code>:</code>&nbsp;<em>boolean</em></dd>
+   <dd>
+    <dl>
+     <dd>
+
+True if update_dictowners is using a recursive traversal algorithm to
+find the dicts in the heap. When False, the normal case, it will use the
+dicts found in the gc collection structure, by gc.get_objects(). This was
+found to be much faster in usual cases, but the old version is available
+by setting this flag. -- It may be removed in a later release!
+
+</dd></dl></dd>
+   <dd><a name='kindnames.HeapView.limitframe'>HV<code>.</code><strong><big>limitframe</big></strong></a><code>:</code>&nbsp; (
+    <dl>
+     <dd><strong><sup> either:</sup></strong>[<em>None</em><strong><sup> or </sup></strong><em>frame</em>]</dd>
+     <dd> )</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd> The traversal limiting frame.</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+ If limitframe is set to a frame object, the frames that are more
+recently entered than limitframe will be hidden when traversing the
+heap from the root RootState. It will start traversing from limitframe
+rather than from the most recent frame as it would otherwise do.
+</dd></dl></dd></dl><a name='kindnames.NodeGraph'>
+   <h1>.tgt.kindnames.NodeGraph</h1></a>
+  <dl>
+   <dt>
+    <h2>Name</h2></dt>
+   <dd>
+    <h2>NodeGraph</h2></dd>
+   <dt>
+    <h2>Synopsis</h2></dt>
+   <dd>
+    <dl>
+     <dt><big><strong>Constructor</strong></big></dt>
+     <dd>
+      <dl>
+       <dt><a href='#heapyc.module-32-heapyc'>module heapyc</a><big><code>.</code><a href='#heapyc.module-32-heapyc.NodeGraph'>NodeGraph</a></big>( [<var>edges</var><code>:</code>&nbsp;<em>iterable+</em>  [<var>is_mapping</var><code>:</code>&nbsp;<em>boolean+</em>]]) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dt></dl></dd>
+     <dt>
+      <h3>For any object <var>NG</var> of kind <a href='#kindnames.NodeGraph'>NodeGraph</a>:</h3></dt>
+     <dt><strong><big>Methods</big></strong></dt>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.add_edge'>add_edge</a></big>(<var>source</var><code>:</code>&nbsp;<em>Any+</em>, <var>target</var><code>:</code>&nbsp;<em>Any+</em>)</dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.add_edges_n1'>add_edges_n1</a></big>(<var>srcs</var><code>:</code>&nbsp;<em>iterable+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>)</dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.as_flat_list'>as_flat_list</a></big>() <strong>-></strong> <em>list</em></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.clear'>clear</a></big>()</dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.copy'>copy</a></big>() <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.domain_covers'>domain_covers</a></big>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <em>boolean</em></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.domain_restricted'>domain_restricted</a></big>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.get_domain'>get_domain</a></big>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.get_range'>get_range</a></big>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.invert'>invert</a></big>()</dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.inverted'>inverted</a></big>() <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.relimg'>relimg</a></big>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.update'>update</a></big>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>)</dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.updated'>updated</a></big>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a></dd>
+     <dt><strong><big>Operators</big></strong></dt>
+     <dd><a href='#heapyc.NodeGraph.fop:len'><big><strong>len</strong></big></a>(NG) <strong>-></strong> <em>int</em></dd>
+     <dd><a href='#heapyc.NodeGraph.-60-7-62-'># </a>NG[<var>source</var><code>:</code>&nbsp;<em>Any+</em>] <strong>-></strong> <em>Any</em></dd>
+     <dd><a href='#heapyc.NodeGraph.-60-8-62-'># </a>NG[<var>source</var><code>:</code>&nbsp;<em>Any+</em>]<strong><big> = </big></strong><var>target_spec</var><code>:</code>&nbsp;<em>TargetSpec+</em></dd>
+     <dd><a href='#heapyc.NodeGraph.fop:iter'><big><strong>iter</strong></big></a>(NG) <strong>-></strong> <em>iterator</em></dd>
+     <dt><strong><big>Attributes</big></strong></dt>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph._hiding_tag_'>_hiding_tag_</a></big><code>:</code>&nbsp;<strong> anything</strong></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.is_mapping'>is_mapping</a></big><code>:</code>&nbsp;<em>boolean</em></dd>
+     <dd>NG<big><code>.</code><a href='#kindnames.NodeGraph.is_sorted'>is_sorted</a></big><code>:</code>&nbsp;<em>boolean</em></dd></dl></dd>
+   <dt>
+    <h2>Description</h2></dt>
+   <dd>
+A NodeGraph object contains pairs of nodes (edges) and can be indexed
+on the first node of such a pair (the source of an edge) to find all
+second nodes of such pairs (the targets of those edges).
+    <p>
+NodeGraph objects are used internally in the Heapy system, for example
+to record dict ownership and shortest-path graphs.</p>
+    <p>
+They may be used generally for mapping and dict-like purposes, but
+differ from dicts in the following:</p>
+    <ul>
+     <li>
+ The mapping is based on object identity - no equality or hashing is
+  assumed, so any object can be used as a key. Only the address is used.
+  To distinguish this usage from that of ordinary dicts and sets, such
+  objects are called 'nodes'.</li>
+     <li> There may be any number of targets associated with each source.</li>
+     <li>
+ Performance characteristics differ from dicts, in somewhat subtle ways.
+</li></ul></dd>
+   <dt>
+    <h2>Methods</h2></dt>
+   <dd><a name='kindnames.NodeGraph.add_edge'>NG<code>.</code><strong><big>add_edge</big></strong></a>(<var>source</var><code>:</code>&nbsp;<em>Any+</em>, <var>target</var><code>:</code>&nbsp;<em>Any+</em>)
+    <dl>
+     <dd> Add to NG, an edge from source to target.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.add_edges_n1'>NG<code>.</code><strong><big>add_edges_n1</big></strong></a>(<var>srcs</var><code>:</code>&nbsp;<em>iterable+</em>, <var>tgt</var><code>:</code>&nbsp;<em>Any+</em>)
+    <dl>
+     <dd> Add to NG, for each src in srcs, an edge from src to tgt.</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.as_flat_list'>NG<code>.</code><strong><big>as_flat_list</big></strong></a>() <strong>-></strong> <em>list</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the edges of NG in the form [src0, tgt0, src1, tgt1 ...].
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.clear'>NG<code>.</code><strong><big>clear</big></strong></a>()
+    <dl>
+     <dd>
+ Remove all items from NG.
+</dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.copy'>NG<code>.</code><strong><big>copy</big></strong></a>() <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a copy of NG.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.domain_covers'>NG<code>.</code><strong><big>domain_covers</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <em>boolean</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> True if each node in X is the source of some edge in NG, False otherwise.</dt></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.domain_restricted'>NG<code>.</code><strong><big>domain_restricted</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> a new NodeGraph, containing those edges in NG that have the source in X.</dt></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.get_domain'>NG<code>.</code><strong><big>get_domain</big></strong></a>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the set of nodes that are the source of some edge in NG.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.get_range'>NG<code>.</code><strong><big>get_range</big></strong></a>() <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the set of nodes that are the target of some edge in NG.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.invert'>NG<code>.</code><strong><big>invert</big></strong></a>()
+    <dl>
+     <dd>
+ Invert the edges of NG.
+</dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.inverted'>NG<code>.</code><strong><big>inverted</big></strong></a>() <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a copy of NG with the edges inverted.
+</dt></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.relimg'>NG<code>.</code><strong><big>relimg</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='sets.html#kindnames.NodeSet'>NodeSet</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong> the relational image of NG wrt X.</dt>
+       <dd>
+ That is, the set of nodes that are the target of some edge that have
+       its source in X.</dd></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.update'>NG<code>.</code><strong><big>update</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>)
+    <dl>
+     <dd>
+ Update NG with the edges from X,
+specified as pairs of the form (source, target).</dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.updated'>NG<code>.</code><strong><big>updated</big></strong></a>(<var>X</var><code>:</code>&nbsp;<em>iterable+</em>) <strong>-></strong> <a href='#kindnames.NodeGraph'>NodeGraph</a>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ a copy of NG updated with the edges from X,
+specified as pairs of the form (source, target).</dt></dl></dd>
+     <dd>
+      <dl></dl></dd></dl></dd>
+   <dt>
+    <h2>Operators</h2></dt>
+   <dd><a name='heapyc.NodeGraph.fop:len'><big><strong>len</strong></big></a>(NG) <strong>-></strong> <em>int</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ the number of edges in NG.
+</dt></dl></dd></dl></dd>
+   <dt><a name='heapyc.NodeGraph.-60-7-62-'></a>NG[<var>source</var><code>:</code>&nbsp;<em>Any+</em>] <strong>-></strong> <em>Any</em></dt>
+   <dd>
+    <dl>
+     <dt><strong>Returns </strong>
+ the target(s) of all edges with a particular source. The value
+depends on if NG was initialized to be a 'mapping' or not:
+      <dl>
+       <dt> NG.is_mapping == False</dt>
+       <dd>
+ Return a tuple of all targets of edges from the source.
+          The tuple will be empty if there are no such edges.</dd>
+       <dt> NG.is_mapping == True</dt>
+       <dd>
+ Return the target of the edge from the source.
+          If there is no such edge, KeyError will be raised.
+          If there is more than one edge, ValueError will be raised.</dd></dl></dt></dl></dd>
+   <dd>
+    <dl></dl></dd>
+   <dt><a name='heapyc.NodeGraph.-60-8-62-'></a>NG[<var>source</var><code>:</code>&nbsp;<em>Any+</em>]<strong><big> = </big></strong><var>target_spec</var><code>:</code>&nbsp;<em>TargetSpec+</em></dt>
+   <dd>
+ Assign new target(s) to the edge(s) from a given source. How the
+targets are specified, depends on whether NG is a 'mapping' or not:
+    <dl>
+     <dt> NG.is_mapping == False</dt>
+     <dd>
+ The target_spec argument is a tuple of targets.
+    There must already be the same number of edges in NG from the given
+    source as the number of objects in target_spec.</dd>
+     <dt> NG.is_mapping == True</dt>
+     <dd>
+ The target_spec argument is the target itself.
+    There must already be exactly one edge in NG from the given source.</dd></dl></dd>
+   <dd>
+
+If there were not already the same number of edges as the targets specified,
+ValueError will be raised. The reason for the restriction is to make sure
+assignment will be efficient when interleaved with indexing.</dd>
+   <dd>
+    <dl>
+     <dt><strong><big>See also</big></strong></dt>
+     <dd> <a href='#kindnames.NodeGraph.add_edge'>add_edge</a>, <a href='#kindnames.NodeGraph.add_edges_n1'>add_edges_n1</a></dd></dl></dd>
+   <dd>
+    <dl></dl></dd>
+   <dd><a name='heapyc.NodeGraph.fop:iter'><big><strong>iter</strong></big></a>(NG) <strong>-></strong> <em>iterator</em>
+    <dl>
+     <dd>
+      <dl>
+       <dt><strong>Returns </strong>
+ an iterator yielding a pair (source, target) for each edge in NG.
+</dt></dl></dd></dl></dd>
+   <dt>
+    <h2>Attributes</h2></dt>
+   <dd><a name='kindnames.NodeGraph._hiding_tag_'>NG<code>.</code><strong><big>_hiding_tag_</big></strong></a><code>:</code>&nbsp;<strong> anything</strong></dd>
+   <dd>
+    <dl>
+     <dd> The hiding tag: if it is the the same object as <em>HeapView._hiding_tag_</em>
+ of a HeapView object, the nodegraph will be hidden from the corresponding heap view .
+</dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.is_mapping'>NG<code>.</code><strong><big>is_mapping</big></strong></a><code>:</code>&nbsp;<em>boolean</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ Read only. True if NG is a 'mapping'. Then, only one edge is
+allowed for each source; indexing returns the actual target object
+instead of a tuple of targets.
+</dd></dl></dd>
+   <dd><a name='kindnames.NodeGraph.is_sorted'>NG<code>.</code><strong><big>is_sorted</big></strong></a><code>:</code>&nbsp;<em>boolean</em></dd>
+   <dd>
+    <dl>
+     <dd>
+ Read only. True if NG is sorted.
+</dd></dl></dd>
+   <dd>
+    <dl>
+     <dd>
+ It will become unsorted after any update. It will need to be
+sorted to make it possible to find edges (implementation uses binary
+search). Any indexing operation will automatically sort it if it was
+not already sorted.  The flag is currently used from Python to see if
+the nodegraph has been used at least once after update, so that it
+will not be cleared too early.
+</dd></dl></dd></dl>
+  <hr>Generated by <a href="http://guppy-pe.sourceforge.net/gsl.html">GSL-HTML 0.1.5</a> on Sat Jul  4 13:25:10 2009</div></body></html>

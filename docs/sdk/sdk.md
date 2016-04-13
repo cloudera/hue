@@ -1,31 +1,6 @@
 
 <link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
-<style>
-.note {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em
-}
-pre {
-  font-size: 10px;
-  font-family: monico, courier;
-  overflow: auto;
-  padding: 8px;
-}
-img {
-  border: 1px solid #999;
-  margin: 10px;
-}
-h6 {
-  color:#148BCF;
-  font-family:'lucida grande',helvetica,verdana,sans-serif;
-  font-weight:bold;
-  font-size: 12px;
-  font-style:italic;
-}
-</style>
-
 Hue SDK Documentation
 =====================
 
@@ -51,8 +26,6 @@ By building on top of Hue SDK, you get, out of the box:
 This document will orient you with the general structure of Hue
 and will walk you through adding a new application using the SDK.
 
-NOTE: Hue began its life as "Cloudera Desktop," so you may find
-references to "Desktop" in a few places.
 
 From 30,000 feet
 ----------------
@@ -77,13 +50,13 @@ for their "models".  (For example, the JobDesigner application stores
 job designs in the database.)
 
 In addition to the web server, some Hue applications run
-daemon processes "on the side".  For example, Beeswax runs a daemon
-("beeswax_server") that keeps track of query states.  Running
+daemon processes "on the side".  For example, Spark runs a daemon
+("livy_server") that keeps track of the Spark shells of the user. Running
 a separate process for applications is the preferred
 way to manage long-running tasks that you may wish
 to co-exist with web page rendering.  The web "views"
 typically communicate with these side daemons
-by using Thrift (e.g., for Beeswax query execution) or by exchanging state
+by using Thrift (e.g., for Hive query execution) or by exchanging state
 through the database.
 
 Interacting with Hadoop
@@ -138,9 +111,9 @@ Software
 --------
 
 Developing for the Hue SDK has similar requirements to running
-Hue itself.  We require python (2.4 to 2.7), Django (1.2 included
-with our distribution), Hadoop (Cloudera's Distribution including Apache Hadoop,
-at least version 4), Java (Sun Java 1.6), and Firefox (at least 3.0).
+Hue itself.  We require python (2.6 to 2.7), Django (1.4 included
+with our distribution), Hadoop (Apache Hadoop 1.2+), Java (Sun Java 1.7),
+and Browser (latest Chrome, Firefox or IE9+).
 
 Recommended Reading / Important Technologies
 --------------------------------------------
@@ -166,25 +139,18 @@ Download, Unpack, Build Distro
 The Hue SDK is available from [Github](http://github.com/cloudera/hue). Releases
 can be found on the [download page](https://github.com/cloudera/hue/downloads).
 Releases are missing a few dependencies that could not be included because of
-licencing issues (e.g. the werkzeug module). So if you prefer to have an
-environment ready from scratch, it is preferable to checkout a particular
-release tag instead.
+licencing issues. So if you prefer to have an environment ready from scratch,
+it is preferable to checkout a particular release tag instead.
 
     $ cd hue
     ## Build
     $ make apps
     ## Run
-    $ build/env/bin/hue runserver_plus
-    $ build/env/bin/hue beeswax_server
+    $ build/env/bin/hue runserver
     ## Alternative run
     $ build/env/bin/hue supervisor
     ## Visit http://localhost:8000/ with your web browser.
 
-<div class="note">
-  Why <code>runserver_plus</code>?   <code>runserver_plus</code>
-  enables the <a href="http://werkzeug.pocoo.org/">Werkzeug</a> debugger,
-  which is very handy.
-</div>
 
 Run "create_desktop_app" to Set up a New Source Tree
 --------------------------------------------
@@ -202,10 +168,18 @@ Run "create_desktop_app" to Set up a New Source Tree
     calculator/src/calculator/templates/shared_components.mako
 
     # Static resources
-    calculator/src/calculator/static/art/calculator.png # logo
-    calculator/src/calculator/static/css/calculator.css
-    calculator/src/calculator/static/js/calculator.js
+    calculator/src/static/calculator/art/calculator.png # logo
+    calculator/src/static/calculator/css/calculator.css
+    calculator/src/static/calculator/js/calculator.js
 
+To download an app or browse dditional plugin apps available in the Hue app store:
+    ## Visit http://gethue.com/app-store/
+
+<div class="note">
+  Some apps are blacklisted on certain versions of CDH (such as the 'Spark' app) due to
+  certain incompatibilities, which prevent them loading from in Hue.
+  Check the hue.ini 'app_blacklist' parameter for details.
+</div>
 
 Install SDK Application
 -----------------------
@@ -219,13 +193,11 @@ the applications that are installed. Note that in the following example, the val
 "--install" option is the path to the root directory of the application you want to install. In this
 example, it is a relative path to "/Users/philip/src/hue/calculator".
 
-        $ ./build/env/bin/python tools/app_reg/app_reg.py --install calculator
+        $ ./build/env/bin/python tools/app_reg/app_reg.py --install calculator --relative-paths
         === Installing app at calculator
         Updating registry with calculator (version 0.1)
         --- Making egg-info for calculator
 
-        $ ./build/env/bin/python tools/app_reg/app_reg.py --list 2>&1 | grep calculator
-        calculator           0.1     /Users/philip/src/hue/calculator
 
 <div class="note">
   If you'd like to customize the build process, you can modify (or even complete
@@ -250,7 +222,7 @@ Congrats, you've added a new app!
 You can now browse the new application.
 
     # If you haven't killed the old process, do so now.
-    $ build/env/bin/hue runserver_plus
+    $ build/env/bin/hue runserver
 
 And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
 You should see the app (with a boring "SDK" icon) in the dock, and clicking it
@@ -270,7 +242,7 @@ to include a simple form:
     <%!from desktop.views import commonheader, commonfooter %>
     <%namespace name="shared" file="shared_components.mako" />
 
-    ${commonheader("Calculator", "calculator", "100px")}
+    ${commonheader("Calculator", "calculator", user, "100px") | n,unicode}
 
     ## Main body
 
@@ -279,6 +251,7 @@ to include a simple form:
       <span>${a} ${op} ${b} = ${result}</span>
       % endif
       <form action=${url("calculator.views.index")} method=POST>
+        ${ csrf_token(request) | n,unicode }
         <input name="a">
         <input type="radio" name="op" value="add">+</input>
         <input type="radio" name="op" value="subtract">-</input>
@@ -288,7 +261,7 @@ to include a simple form:
         <input type="submit" value="Calculate">
       </form>
     </div>
-    ${commonfooter(messages)}
+    ${commonfooter(messages) | n,unicode}
 
 The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
 which is flexible and powerful.  If you use the "`.html`" extension, Hue
@@ -327,22 +300,14 @@ should see something like:
 
 <img src="calculator_working.png">
 
-Debugging Django
-----------------
 
-<img src="calculator_error.png">
+Integrate external Web applications in any language
+===================================================
+Use the [create_proxy_app command](http://gethue.tumblr.com/post/66367939672/integrate-external-web-applications-in-any-language)
 
-If you enter a number only in the first text box and hit "Calculate", you'll
-hit an error. If you're using `runserver_plus`, you'll get a handy debugging
-page. You can click on any stack frame to get a debugging console:
-
-<img src="calculator_werkzeug.png">
-
-Great! Now that we've added a single application, we're going to
-delve further into the back-end.
 
 A Look at Three Existing Apps
-===========================
+=============================
 
 ![Arch](arch_examples.png)
 
@@ -509,9 +474,9 @@ the admin. To take advantage of this feature, create a `config_validator`
 function in your `conf.py`:
 
 <pre>
-  def config_validator():
+  def config_validator(user):
     """
-    config_validator() -> [(config_variable, error_msg)] or None
+    config_validator(user) -> [(config_variable, error_msg)] or None
     Called by core check_config() view.
     """
     res = [ ]
@@ -564,11 +529,8 @@ The next time Hue restarts, your `my_daemon` will start automatically.
 If your daemon program dies (exits with a non-zero exit code), Hue will
 restart it.
 
-"Under the covers:" Threading.  Hue, by default, runs a Spawning web server. It
-can also be configured to run under a CherryPy WSGI server.
-This server is multi-threaded, so you can use python
-threading support (such as it is).  The "runserver_plus" version
-is single-threaded.  If Hue is configured (and it may be, in the future)
+"Under the covers:" Threading.  Hue, by default, runs CherryPy web server.
+If Hue is configured (and it may be, in the future)
 to use mod_wsgi under Apache httpd, then there would be multiple python
 processes serving the backend.  This means that your Django application
 code should avoid depending on shared process state.  Instead, place
@@ -648,7 +610,7 @@ Hue works in any WSGI-compliant container web server.
 The current recommended deployment server is the built-in CherryPy server.
 The CherryPy server, which is multi-threaded, is invoked by `runcpserver`
 and is configured to start when Hue's `supervisor` script is used.
-Meanwhile, `runserver` and `runserver_plus` start a single-threaded
+Meanwhile, `runserver` start a single-threaded
 testing server.
 
 Because multiple threads may be accessing your views
@@ -702,6 +664,51 @@ Then you can use this decorator on your view functions to enforce permission:
     @desktop.decorators.hue_permission_required("delete", "my_app_name")
     def delete_financial_report(request):
       ...
+
+Using and Installing Thrift
+---------------------------
+Right now, we check in the generated thrift code.
+To generate the code, you'll need the thrift binary version 0.9.0.
+Please download from http://thrift.apache.org/.
+
+The modules using ``Thrift`` have some helper scripts like ``regenerate_thrift.sh``
+for regenerating the code from the interfaces.
+
+Profiling Hue Apps
+------------------
+Hue has a profiling system built in, which can be used to analyze server-side
+performance of applications.  To enable profiling::
+
+    $ build/env/bin/hue runprofileserver
+
+Then, access the page that you want to profile.  This will create files like
+/tmp/useradmin.users.000072ms.2011-02-21T13:03:39.745851.prof.  The format for
+the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.
+
+Hue uses the hotshot profiling library for instrumentation.  The documentation
+for this library is located at: http://docs.python.org/library/hotshot.html.
+
+You can use kcachegrind to view the profiled data graphically::
+
+    $ hotshot2calltree /tmp/xyz.prof > /tmp/xyz.trace
+    $ kcachegrind /tmp/xyz.trace
+
+More generally, you can programmatically inspect a trace::
+
+    #!/usr/bin/python
+    import hotshot.stats
+    import sys
+
+    stats = hotshot.stats.load(sys.argv[1])
+    stats.sort_stats('cumulative', 'calls')
+    stats.print_stats(100)
+
+This script takes in a .prof file, and orders function calls by the cumulative
+time spent in that function, followed by the number of times the function was
+called, and then prints out the top 100 time-wasters.  For information on the
+other stats available, take a look at this website:
+http://docs.python.org/library/profile.html#pstats.Stats
+
 
 <!--
 ## Django Models
@@ -764,7 +771,7 @@ Icons
 -----
 
 You should create an icon for your application that is a transparent png sized
-55px by 55px. Your `settings.py` file should point to your icon via the `ICON`
+24px by 24px. Your `settings.py` file should point to your icon via the `ICON`
 variable. The `create_desktop_app` command creates a default icon for you.
 
 <div class="note">
@@ -772,43 +779,37 @@ variable. The `create_desktop_app` command creates a default icon for you.
   in the navigation bar.
 </div>
 
-Hue includes a selection of around 1,500 small 16px by 16px icons that can be
-useful when making links that perform actions. These are open source icons that
-you can use in your own applications as you like. You can find these in
-*desktop/core/static/art/icons/* and *desktop/core/static/art/led-icons/* and
-you can style your elements to use them like this (in your css file):
+Hue ships with Twitter Bootstrap and Font Awesome 3 (http://fortawesome.github.io/Font-Awesome/)
+so you have plenty of scalable icons to choose from. You can style your elements to use them
+like this (in your mako template):
 
-    /* show an add icon next to the text of the link: */
-    .calculator a.add {
-      background: url(/static/art/icons/add.png) no-repeat 1px 0px;
-      display: block;
-      height: 18px;
-      padding-left: 22px;
-    }
-    /* or hide the link text and show only the icon: */
-    .calculator a.add {
-      background: url(/static/art/icons/add.png) no-repeat 1px 0px;
-      display: block;
-      height: 16px;
-      width: 16px
-      text-indent: -200px; /* this pushes the text out of view, leaving only the icon */
-      overflow: hidden;
-    }
+    <!-- show a trash icon in a link -->
+    <a href="#something"><i class="icon-trash"></i> Trash</a>
+
+Static files
+------------
+
+For better performances, Hue uses the Django staticfiles app. If in production mode, if you edit
+some static files, you would need to run this command or `make apps`. No actions are needed in
+development mode.
+<pre>
+./build/env/bin/hue collectstatic
+</pre>
 
 Adding Interactive Elements to Your UI
 --------------------------------------
 
 Hue by default loads these JavaScript components:
 
-* jQuery 1.8.1
-* jQuery.dataTables 1.8.2
-* Bootstrap 2.1.1
+* jQuery
+* jQuery.dataTables
+* Bootstrap
 
 These are used by some Hue applications, but not loaded by default:
 
-* Knockout 2.1.0 (`desktop/core/static/ext/js/knockout-2.1.0.js`)
+* Knockout js (`desktop/core/static/ext/js/knockout-min.js`)
 * DataTables pagination using the Bootstrap style (`desktop/core/static/ext/js/datatables-paging-0.1.js`)
-* jQuery UI autocomplete 1.8.18 (`desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js`)
+* jQuery UI (`desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js`)
 
 These standard components have their own online documentation, which we will
 not repeat here. They let you write interactive behaviors with little or no
@@ -873,27 +874,42 @@ call.
 <!-- ## Lost: Keyboard shortcuts -->
 
 
+Internationalization
+====================
+How to update all the messages and compile them::
+
+    $ make locales
+
+How to update and compile the messages of one app::
+
+    $ cd apps/beeswax
+    $ make compile-locale
+
+How to create a new locale for an app::
+
+    $ cd $APP_ROOT/src/$APP_NAME/locale
+    $ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
+
+
 Debugging Tips and Tricks
 =========================
 
 * Set `DESKTOP_DEBUG=1` as an environment variable if you want logs to go to stderr
   as well as to the respective log files.
-* Use runserver_plus.  If you want to set a CLI breakpoint, just insert
+* Use runserver.  If you want to set a CLI breakpoint, just insert
   `__import__("ipdb").set_trace()`
-  into your code.  If you want to inspect variables, you can simply insert
-  `raise None`, and visit the URL of the view you're interested in, activating
-  the Werkzeug debugger.
+  into your code.
 * Django tends to restart its server whenever it notices a file changes.  For
   certain things (like configuration changes), this is not sufficient.  Restart
   the server whole-heartedly.
 * If you find yourself writing a lot of JavaScript, you'll want to disable the
   JavaScript caching that the server does. At startup Hue reads all your
   dependencies and JS files into memory to make things faster. You can disable
-  this by executing the runserver_plus command with an environment variable
+  this by executing the runserver command with an environment variable
   set. Hue will be a little slower, but your JS will always represent what's on
   the disk. Here's what that looks like:
 
-    `$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver_plus`
+    `$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver`
 
 * We highly recommend developing with the [Firebug](http://getfirebug.com)
   debugging plugin for Firefox. With it enabled, you can use a utility called
@@ -908,8 +924,6 @@ Debugging Tips and Tricks
   re-enabled which makes element inspection a little easier in Firebug.
 
 <!--
-
-## runserver_plus
 
 ## testing with windmill
 

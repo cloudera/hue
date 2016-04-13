@@ -15,31 +15,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
+import json
 import logging
 import os
+import re
 import sys
 import tempfile
 import time
 import traceback
 import zipfile
 
+from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
+from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods
 import django.views.debug
 
-from desktop.lib import django_mako
-from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
-from desktop.lib.paths import get_desktop_root
-from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences
-from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
 
-from django.utils.translation import ugettext as _
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
+from desktop.conf import USE_NEW_EDITOR
+from desktop.converters import DocumentConverter
+from desktop.lib import django_mako
+from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
+from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
+from desktop.lib.i18n import smart_str
+from desktop.lib.paths import get_desktop_root
+from desktop.lib.thread_util import dump_traceback
+from desktop.log.access import access_log_level, access_warn
+from desktop.models import UserPreferences, Settings
+from desktop import appmanager
+
 
 LOG = logging.getLogger(__name__)
+
+
+@require_http_methods(['HEAD'])
+def is_alive(request):
+  return HttpResponse('')
+
+
+def home(request):
+  docs = _get_docs(request.user)
+
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('home.mako', request, {
+    'apps': apps,
+    'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
+    'json_tags': json.dumps(massaged_tags_for_json(docs, request.user)),
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
+
+def home2(request):
+  try:
+    converter = DocumentConverter(request.user)
+    converter.convert()
+  except Exception, e:
+    LOG.warning("Failed to convert and import documents: %s" % e)
+
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('home2.mako', request, {
+    'apps': apps,
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
 
 @access_log_level(logging.WARN)
 def log_view(request):
@@ -48,18 +96,24 @@ def log_view(request):
   If it is attached to the root logger, this view will display that history,
   otherwise it will report that it can't be found.
   """
+  if not request.user.is_superuser:
+    return HttpResponse(_("You must be a superuser."))
+
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
       return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", "")))
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")]))
+  return render('logs.mako', request, dict(log=[_("No logs found!")], query=''))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
   """
   Zip up the log buffer and then return as a file attachment.
   """
+  if not request.user.is_superuser:
+    return HttpResponse(_("You must be a superuser."))
+
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
@@ -70,7 +124,7 @@ def download_log_view(request):
         tmp = tempfile.NamedTemporaryFile()
         log_tmp = tempfile.NamedTemporaryFile("w+t")
         for l in h.buf:
-          log_tmp.write(l + '\n')
+          log_tmp.write(smart_str(l, errors='replace') + '\n')
         # This is not just for show - w/out flush, we often get truncated logs
         log_tmp.flush()
         t = time.time()
@@ -83,15 +137,15 @@ def download_log_view(request):
         # if we don't seek to start of file, no bytes will be written
         tmp.seek(0)
         wrapper = FileWrapper(tmp)
-        response = HttpResponse(wrapper,content_type="application/zip")
+        response = HttpResponse(wrapper, content_type="application/zip")
         response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
         response['Content-Length'] = length
         return response
       except Exception, e:
-        logging.exception("Couldn't construct zip file to write logs to!")
+        LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
-  return render_to_response("logs.mako", dict(log=[_("No logs found!")]))
+  return render_to_response("logs.mako", dict(log=[_("No logs found.")]))
 
 
 @access_log_level(logging.DEBUG)
@@ -128,14 +182,14 @@ def bootstrap(request):
   """Concatenates bootstrap.js files from all installed Hue apps."""
 
   # Has some None's for apps that don't have bootsraps.
-  all_bootstraps = [ (app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name) ]
+  all_bootstraps = [(app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name)]
 
   # Iterator over the streams.
-  concatenated = [ "\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None ]
+  concatenated = ["\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None]
 
   # HttpResponse can take an iteratable as the first argument, which
   # is what happens here.
-  return HttpResponse(concatenated, mimetype='text/javascript')
+  return HttpResponse(concatenated, content_type='text/javascript')
 
 
 _status_bar_views = []
@@ -165,7 +219,7 @@ def status_bar(request):
 def dump_config(request):
   # Note that this requires login (as do most apps).
   show_private = False
-  conf_dir = os.path.realpath(get_desktop_root('conf'))
+  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
@@ -173,19 +227,15 @@ def dump_config(request):
   if request.GET.get("private"):
     show_private = True
 
+  apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.name)
+  apps_names = [app.name for app in apps]
+  top_level = sorted(GLOBAL_CONFIG.get().values(), key=lambda obj: apps_names.index(obj.config.key))
+
   return render("dump_config.mako", request, dict(
     show_private=show_private,
-    top_level=desktop.lib.conf.GLOBAL_CONFIG,
+    top_level=top_level,
     conf_dir=conf_dir,
-    apps=appmanager.DESKTOP_MODULES))
-
-if sys.version_info[0:2] <= (2,4):
-  def _threads():
-    import threadframe
-    return threadframe.dict().iteritems()
-else:
-  def _threads():
-    return sys._current_frames().iteritems()
+    apps=apps))
 
 @access_log_level(logging.WARN)
 def threads(request):
@@ -193,35 +243,102 @@ def threads(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
-  out = []
-  for thread_id, stack in _threads():
-    out.append("Thread id: %s" % thread_id)
-    for filename, lineno, name, line in traceback.extract_stack(stack):
-      out.append("  %-20s %s(%d)" % (name, filename, lineno))
-      out.append("    %-80s" % (line))
-    out.append("")
-  return HttpResponse("\n".join(out), content_type="text/plain")
+  out = StringIO.StringIO()
+  dump_traceback(file=out)
+
+  return HttpResponse(out.getvalue(), content_type="text/plain")
+
+@access_log_level(logging.WARN)
+def memory(request):
+  """Dumps out server threads.  Useful for debugging."""
+  if not request.user.is_superuser:
+    return HttpResponse(_("You must be a superuser."))
+
+  if not hasattr(settings, 'MEMORY_PROFILER'):
+    return HttpResponse(_("You must enable the memory profiler via the memory_profiler config in the hue.ini."))
+
+  # type, from, to, index
+  command_order = {
+    'type': 0,
+    'from': 1,
+    'to': 2,
+    'index': 3
+  }
+  default_command = [None, None, None, None]
+  commands = []
+
+  for item in request.GET:
+    res = re.match(r'(?P<command>\w+)\.(?P<count>\d+)', item)
+    if res:
+      d = res.groupdict()
+      count = int(d['count'])
+      command = str(d['command'])
+      while len(commands) <= count:
+        commands.append(default_command[:])
+      commands[count][command_order.get(command)] = request.GET.get(item)
+
+  heap = settings.MEMORY_PROFILER.heap()
+  for command in commands:
+    if command[0] is not None:
+      heap = getattr(heap, command[0])
+    if command[1] is not None and command[2] is not None:
+      heap = heap[int(command[1]):int(command[2])]
+    if command[3] is not None:
+      heap = heap[int(command[3])]
+  return HttpResponse(str(heap), content_type="text/plain")
 
 def jasmine(request):
   return render('jasmine.mako', request, None)
 
 @login_notrequired
+def unsupported(request):
+  return render('unsupported.mako', request, None)
+
 def index(request):
-  return render("index.mako", request, dict(
-    feedback_url=desktop.conf.FEEDBACK_URL.get(),
-    send_dbug_messages=desktop.conf.SEND_DBUG_MESSAGES.get()
-  ))
+  if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
+    return redirect(reverse('about:index'))
+  else:
+    if USE_NEW_EDITOR.get():
+      return home2(request)
+    else:
+      return home(request)
+
+def csrf_failure(request, reason=None):
+  """Registered handler for CSRF."""
+  access_warn(request, reason)
+  return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
+
+def serve_403_error(request, *args, **kwargs):
+  """Registered handler for 403. We just return a simple error"""
+  access_warn(request, "403 access forbidden")
+  return render("403.mako", request, dict(uri=request.build_absolute_uri()), status=403)
 
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")
-  return render("404.mako", request, dict(uri=request.build_absolute_uri()))
+  return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
-  if desktop.conf.HTTP_500_DEBUG_MODE.get():
-    return django.views.debug.technical_500_response(request, *sys.exc_info())
-  return render("500.mako", request, {'traceback': traceback.extract_tb(sys.exc_info()[2])})
+  try:
+    exc_info = sys.exc_info()
+    if exc_info:
+      if desktop.conf.HTTP_500_DEBUG_MODE.get() and exc_info[0] and exc_info[1]:
+        # If (None, None, None), default server error describing why this failed.
+        return django.views.debug.technical_500_response(request, *exc_info)
+      else:
+        # Could have an empty traceback
+        return render("500.mako", request, {'traceback': traceback.extract_tb(exc_info[2])})
+    else:
+      # exc_info could be empty
+      return render("500.mako", request, {})
+  finally:
+    # Fallback to default 500 response if ours fails
+    # Will end up here:
+    #   - Middleware or authentication backends problems
+    #   - Certain missing imports
+    #   - Packaging and install issues
+    pass
 
 _LOG_LEVELS = {
   "critical": logging.CRITICAL,
@@ -255,38 +372,78 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def who_am_i(request):
-  """
-  Returns username and FS username, and optionally sleeps.
-  """
-  try:
-    sleep = float(request.REQUEST.get("sleep") or 0.0)
-  except ValueError:
-    sleep = 0.0
-  time.sleep(sleep)
-  return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")
-
-def commonheader(title, section, user, padding="60px"):
+def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_idle_timeout=False):
   """
   Returns the rendered common header
   """
-  apps_list = sorted(appmanager.get_apps(user), key=lambda app: app.menu_index)
+  current_app = None
+  other_apps = []
+  if user.is_authenticated():
+    apps = appmanager.get_apps(user)
+    apps_list = appmanager.get_apps_dict(user)
+    for app in apps:
+      if app.display_name not in [
+          'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
+          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
+        other_apps.append(app)
+      if section == app.display_name:
+        current_app = app
+  else:
+    apps_list = []
 
-  return django_mako.render_to_string("common_header.mako", dict(
-    apps=apps_list,
-    title=title,
-    section=section,
-    padding=padding,
-    user=user
-  ))
+  return django_mako.render_to_string("common_header.mako", {
+    'current_app': current_app,
+    'apps': apps_list,
+    'other_apps': other_apps,
+    'title': title,
+    'section': section,
+    'padding': padding,
+    'user': user,
+    'skip_topbar': skip_topbar,
+    'skip_idle_timeout': skip_idle_timeout,
+    'leaflet': {
+      'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
+    },
+    'is_demo': desktop.conf.DEMO_ENABLED.get(),
+    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
+  })
 
-def commonfooter(messages=None):
+def commonshare():
+  return django_mako.render_to_string("common_share.mako", {})
+
+def commonshare2():
+  return django_mako.render_to_string("common_share2.mako", {})
+
+def commonimportexport(request):
+  return django_mako.render_to_string("common_import_export.mako", {'request': request})
+
+def login_modal(request):
+  return desktop.auth.views.dt_login(request, True)
+
+def is_idle(request):
+  return HttpResponse("no!")
+
+def commonfooter(request, messages=None):
   """
   Returns the rendered common footer
   """
   if messages is None:
     messages = {}
-  return render_to_string("common_footer.html", {'messages': messages})
+
+  hue_settings = Settings.get_settings()
+
+  return django_mako.render_to_string("common_footer.mako", {
+    'request': request,
+    'messages': messages,
+    'version': settings.HUE_DESKTOP_VERSION,
+    'collect_usage': collect_usage(),
+    'tours_and_tutorials': hue_settings.tours_and_tutorials
+  })
+
+
+def collect_usage():
+  return desktop.conf.COLLECT_USAGE.get() and Settings.get_settings().collect_usage
 
 
 # If the app's conf.py has a config_validator() method, call it.
@@ -301,7 +458,7 @@ CONFIG_VALIDATOR = 'config_validator'
 #
 _CONFIG_ERROR_LIST = None
 
-def _get_config_errors(cache=True):
+def _get_config_errors(request, cache=True):
   """Returns a list of (confvar, err_msg) tuples."""
   global _CONFIG_ERROR_LIST
 
@@ -320,7 +477,16 @@ def _get_config_errors(cache=True):
         continue
 
       try:
-        error_list.extend(validator())
+        for confvar, error in validator(request.user):
+          error = {
+            'name': confvar if isinstance(confvar, str) else confvar.get_fully_qualifying_key(),
+            'message': error,
+          }
+
+          if isinstance(confvar, BoundConfig):
+            error['value'] = confvar.get()
+
+          error_list.append(error)
       except Exception, ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
     _CONFIG_ERROR_LIST = error_list
@@ -331,17 +497,24 @@ def check_config(request):
   """Check config and view for the list of errors"""
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
-  conf_dir = os.path.realpath(get_desktop_root('conf'))
-  return render('check_config.mako', request, dict(
-                    error_list=_get_config_errors(cache=False),
-                    conf_dir=conf_dir))
+
+  context = {
+    'conf_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
+    'error_list': _get_config_errors(request, cache=False),
+  }
+
+  if request.GET.get('format') == 'json':
+    return JsonResponse(context)
+  else:
+    return render('check_config.mako', request, context, force_template=True)
+
 
 def check_config_ajax(request):
   """Alert administrators about configuration problems."""
   if not request.user.is_superuser:
     return HttpResponse('')
 
-  error_list = _get_config_errors()
+  error_list = _get_config_errors(request)
   if not error_list:
     # Return an empty response, rather than using the mako template, for performance.
     return HttpResponse('')
@@ -350,4 +523,11 @@ def check_config_ajax(request):
                 dict(error_list=error_list),
                 force_template=True)
 
-register_status_bar_view(check_config_ajax)
+# This is a global non-view for inline KO i18n
+def _ko(str=""):
+  return _(str).replace("'", "\\'")
+
+# This global Mako filtering option, use it with ${ yourvalue | n,antixss }
+def antixss(value):
+  xss_regex = re.compile(r'<[^>]+>')
+  return xss_regex.sub('', value)

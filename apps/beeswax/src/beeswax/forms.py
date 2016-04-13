@@ -17,45 +17,34 @@
 
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
-import hive_metastore
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.forms import NumberInput
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
-from beeswax import db_utils, common, conf, models
 from filebrowser.forms import PathField
 
+from beeswax import common
+from beeswax.models import SavedQuery
 
-def query_form():
-  """Generates a multi form object for queries."""
-  return MultiForm(
+
+class QueryForm(MultiForm):
+  def __init__(self):
+    super(QueryForm, self).__init__(
       query=HQLForm,
       settings=SettingFormSet,
       file_resources=FileResourceFormSet,
       functions=FunctionFormSet,
-      saveform=SaveForm,
-      query_servers=QueryServerForm)
-
-
-class QueryServerForm(forms.Form):
-  server = forms.CharField(max_length=128, help_text=_t('Host:port of the query server.'))
-
-  def __init__(self, *args, **kwargs):
-    super(QueryServerForm, self).__init__(*args, **kwargs)
-
-    if conf.QUERY_SERVERS:
-      servers = ((server, server) for server in conf.QUERY_SERVERS.keys())
-    else:
-      servers = (('default', 'default'),)
-    self.fields['server'].widget = forms.Select(choices=servers)
+      saveform=SaveForm
+    )
 
 
 class SaveForm(forms.Form):
   """Used for saving query design."""
   name = forms.CharField(required=False,
-                        max_length=64,
-                        initial=models.SavedQuery.DEFAULT_NEW_DESIGN_NAME,
-                        help_text=_t('Change the name to save as a new design.'))
+                         max_length=64,
+                         initial=SavedQuery.DEFAULT_NEW_DESIGN_NAME,
+                         help_text=_t('Change the name to save as a new design.'))
   desc = forms.CharField(required=False, max_length=1024, label=_t("Description"))
   save = forms.BooleanField(widget=SubmitButton, required=False)
   saveas = forms.BooleanField(widget=SubmitButton, required=False)
@@ -68,18 +57,19 @@ class SaveForm(forms.Form):
     self.fields['saveas'].widget.label = _('Save As')
 
   def clean_name(self):
-    name = self.cleaned_data.get('name', '').strip()
-    return name
+    return self.cleaned_data.get('name', '').strip()
 
   def clean(self):
+    cleaned_data = super(SaveForm, self).clean()
+
     if self.errors:
       return
-    save = self.cleaned_data.get('save')
-    name = self.cleaned_data.get('name')
-    if save and len(name) == 0:
+    save = cleaned_data.get('save')
+    name = cleaned_data.get('name')
+    if save and not name:
       # Bother with name iff we're saving
-      raise forms.ValidationError(_('Please enter a name'))
-    return self.cleaned_data
+      raise forms.ValidationError(_('Enter a name.'))
+    return cleaned_data
 
   def set_data(self, name, desc=''):
     """Set the name and desc programmatically"""
@@ -89,42 +79,99 @@ class SaveForm(forms.Form):
     self.data = data2
 
 
-class SaveResultsForm(DependencyAwareForm):
-  """Used for saving the query result data"""
+class SaveResultsDirectoryForm(forms.Form):
+  """Used for saving the query result data to hdfs directory"""
 
-  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = (_('to a new table'), _('to HDFS directory'))
-  save_target = forms.ChoiceField(required=True,
-                                  choices=common.to_choices(SAVE_TYPES),
-                                  widget=forms.RadioSelect)
+  target_dir = forms.CharField(label=_t("Directory"),
+                               required=True,
+                               help_text=_t("Path to directory"))
+
+  def __init__(self, *args, **kwargs):
+    self.fs = kwargs.pop('fs', None)
+    super(SaveResultsDirectoryForm, self).__init__(*args, **kwargs)
+
+  def clean_target_dir(self):
+    if not self.cleaned_data['target_dir'].startswith('/'):
+      raise forms.ValidationError(_("Target directory should begin with a /"))
+    elif self.fs.exists(self.cleaned_data['target_dir']):
+      raise forms.ValidationError(_('Directory already exists.'))
+    return self.cleaned_data['target_dir']
+
+
+class SaveResultsFileForm(forms.Form):
+  """Used for saving the query result data to hdfs file"""
+
+  target_file = forms.CharField(label=_t("File path"),
+                                required=True,
+                                help_text=_t("Path to file"))
+  overwrite = forms.BooleanField(label=_t('Overwrite'),
+                                 required=False,
+                                 help_text=_t("Overwrite the selected files"))
+
+  def clean_target_file(self):
+    if not self.cleaned_data['target_file'].startswith('/'):
+      raise forms.ValidationError("Target file should begin with a /")
+
+    return self.cleaned_data['target_file']
+
+
+class SaveResultsTableForm(forms.Form):
+  """Used for saving the query result data to hive table"""
+
   target_table = common.HiveIdentifierField(
                                   label=_t("Table Name"),
-                                  required=False,
-                                  help_text=_t("Name of the new table"))
-  target_dir = PathField(label=_t("Results Location"),
-                        required=False,
-                        help_text=_t("Empty directory in HDFS to put the results"))
-  dependencies = [
-    ('save_target', SAVE_TYPE_TBL, 'target_table'),
-    ('save_target', SAVE_TYPE_DIR, 'target_dir'),
-  ]
+                                  required=True,
+                                  help_text=_t("Name of the new table")) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
 
-  def clean_target_table(self):
-    tbl = self.cleaned_data.get('target_table')
-    if tbl:
-      try:
-        db_utils.meta_client().get_table("default", tbl)
-        raise forms.ValidationError(_('Table already exists'))
-      except hive_metastore.ttypes.NoSuchObjectException:
-        pass
-    return tbl
+  def __init__(self, *args, **kwargs):
+    self.db = kwargs.pop('db', None)
+    self.target_database = kwargs.pop('database', 'default')
+    super(SaveResultsTableForm, self).__init__(*args, **kwargs)
+
+  def clean(self):
+    cleaned_data = super(SaveResultsTableForm, self).clean()
+    target_table = cleaned_data.get('target_table')
+
+    if not target_table:
+      raise forms.ValidationError(_("Table name is required."))
+    else:
+      if self.db is None:
+        raise forms.ValidationError(_("Cannot validate form, db object is required."))
+      else:
+        # Table field may be set to <database>.<table> so we need to parse it before validation
+        name_parts = target_table.split(".")
+        if len(name_parts) == 1:
+          pass
+        elif len(name_parts) == 2:   # Update table name without the DB prefix
+          self.target_database, target_table = name_parts
+        else:
+          raise forms.ValidationError(_("Invalid table prefix name."))
+
+        # Check if table already exists
+        table = None
+        try:
+          table = self.db.get_table(self.target_database, target_table)
+        except Exception:
+          cleaned_data['target_table'] = target_table
+
+        if table is not None:
+          raise forms.ValidationError(_("Table %s.%s already exists") % (self.target_database, target_table))
+
+    return cleaned_data
 
 
 class HQLForm(forms.Form):
   query = forms.CharField(label=_t("Query Editor"),
                           required=True,
-                          widget=forms.Textarea(attrs={'class':'beeswax_query'}))
+                          widget=forms.Textarea(attrs={'class': 'beeswax_query'}))
   is_parameterized = forms.BooleanField(required=False, initial=True)
   email_notify = forms.BooleanField(required=False, initial=False)
+  type = forms.IntegerField(required=False, initial=0)
+  database = forms.ChoiceField(required=False,
+                           label='',
+                           choices=(('default', 'default'),),
+                           initial=0,
+                           widget=forms.widgets.Select(attrs={'class': 'input-medium'}))
 
 
 class FunctionForm(forms.Form):
@@ -142,12 +189,12 @@ class FileResourceForm(forms.Form):
       ("FILE", ("file")),
     ], help_text=_t("Resources to upload with your Hive job." +
        "  Use 'jar' for UDFs.  Use 'file' and 'archive' for "
-       "files to be copied and made locally available duirng MAP/TRANSFORM. " +
+       "files to be copied and made locally available during MAP/TRANSFORM. " +
        "Paths are on HDFS.")
   )
-  # TODO(philip): Could upload files here, too.  Or merely link
-  # to upload utility?
+
   path = forms.CharField(required=True, help_text=_t("Path to file on HDFS."))
+
 
 FileResourceFormSet = simple_formset_factory(FileResourceForm)
 
@@ -196,7 +243,7 @@ class CreateTableForm(DependencyAwareForm):
   serde_name = forms.CharField(required=False, label=_t("SerDe Name"))
   serde_properties = forms.CharField(
                         required=False,
-                        help_text=_t("Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"))
+                        help_text=_t("Comma-separated list of key-value pairs. E.g. 'p1=v1, p2=v2'"))
 
   dependencies += [
     ("row_format", "SerDe", "serde_name"),
@@ -216,8 +263,7 @@ class CreateTableForm(DependencyAwareForm):
   ]
 
   # External?
-  use_default_location = forms.BooleanField(required=False, initial=True,
-    label=_t("Use default location"))
+  use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location."))
   external_location = forms.CharField(required=False, help_text=_t("Path to HDFS directory or file of table data."))
 
   dependencies += [
@@ -234,20 +280,21 @@ class CreateTableForm(DependencyAwareForm):
     return _clean_terminator(self.cleaned_data.get('map_key_terminator'))
 
   def clean_name(self):
-    return _clean_tablename(self.cleaned_data['name'])
+    return _clean_tablename(self.db, self.cleaned_data['name'], self.database)
 
 
-def _clean_tablename(name):
+def _clean_tablename(db, name, database='default'):
   try:
-    db_utils.meta_client().get_table("default", name)
-    raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
-  except hive_metastore.ttypes.NoSuchObjectException:
+    table = db.get_table(database, name)
+    if table.name:
+      raise forms.ValidationError(_('Table "%(name)s" already exists.') % {'name': name})
+  except Exception:
     return name
 
 
 def _clean_terminator(val):
-  if val is not None and len(val.decode('string_escape')) != 1:
-      raise forms.ValidationError(_('Terminator must be exactly one character.'))
+  if val is not None and val == '':
+    raise forms.ValidationError(_('Terminator must not be empty.'))
   return val
 
 
@@ -263,8 +310,12 @@ class CreateByImportFileForm(forms.Form):
                           label=_t("Import data from file"),
                           help_text=_t("Automatically load this file into the table after creation."))
 
+  def __init__(self, *args, **kwargs):
+    self.db = kwargs.pop('db', None)
+    super(CreateByImportFileForm, self).__init__(*args, **kwargs)
+
   def clean_name(self):
-    return _clean_tablename(self.cleaned_data['name'])
+    return _clean_tablename(self.db, self.cleaned_data['name'])
 
 
 class CreateByImportDelimForm(forms.Form):
@@ -276,34 +327,42 @@ class CreateByImportDelimForm(forms.Form):
   def clean(self):
     # ChoiceOrOtherField doesn't work with required=True
     delimiter = self.cleaned_data.get('delimiter')
+    if delimiter.isdigit():
+      try:
+        unichr(int(delimiter))
+        return int(delimiter)
+      except ValueError:
+        raise forms.ValidationError(_('Delimiter value must be smaller than 65533.'))
     if not delimiter:
       raise forms.ValidationError(_('Delimiter value is required.'))
     _clean_terminator(delimiter)
     return self.cleaned_data
 
-  def old(self):
-    if delimiter.isdigit():
-      try:
-        chr(int(delimiter))
-        return int(delimiter)
-      except ValueError:
-        raise forms.ValidationError(_('Delimiter value must be smaller than 256.'))
-    val = delimiter.decode('string_escape')
-    if len(val) != 1:
-      raise forms.ValidationError(_('Delimiter must be exactly one character.'))
-    return ord(val)
-
 
 # Note, struct is not currently supported.  (Because it's recursive, for example.)
 HIVE_TYPES = \
     ( "string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "array", "map",)
+      "float", "double", "array", "map", "timestamp", "date",
+      "char", "varchar")
 HIVE_PRIMITIVE_TYPES = \
-    ("string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double")
+    ("string", "tinyint", "smallint", "int", "bigint", "boolean",
+      "float", "double", "timestamp", "date", "char", "varchar")
 
 class PartitionTypeForm(forms.Form):
+  dependencies = [
+    ("column_type", "char", "char_length"),
+    ("column_type", "varchar", "varchar_length")
+  ]
   column_name = common.HiveIdentifierField(required=True)
   column_type = forms.ChoiceField(required=True, choices=common.to_choices(HIVE_PRIMITIVE_TYPES))
+  char_length = forms.IntegerField(required=False, initial=1,
+                                   widget=NumberInput(attrs={'min': 1, 'max': 255}),
+                                   validators=[MinValueValidator(1), MaxValueValidator(255)],
+                                   help_text=_t("Specify if column_type is char"))
+  varchar_length = forms.IntegerField(required=False, initial=1,
+                                      widget=NumberInput(attrs={'min': 1, 'max': 65355}),
+                                      validators=[MinValueValidator(1), MaxValueValidator(65355)],
+                                      help_text=_t("Specify if column_is varchar"))
 
 class ColumnTypeForm(DependencyAwareForm):
   """
@@ -313,6 +372,8 @@ class ColumnTypeForm(DependencyAwareForm):
     ("column_type", "array", "array_type"),
     ("column_type", "map", "map_key_type"),
     ("column_type", "map", "map_value_type"),
+    ("column_type", "char", "char_length"),
+    ("column_type", "varchar", "varchar_length")
   ]
   column_name = common.HiveIdentifierField(label=_t('Column Name'), required=True)
   column_type = forms.ChoiceField(label=_t('Column Type'), required=True,
@@ -325,29 +386,46 @@ class ColumnTypeForm(DependencyAwareForm):
   map_value_type = forms.ChoiceField(required=False,
                                      choices=common.to_choices(HIVE_PRIMITIVE_TYPES),
                                      help_text=_t("Specify if column_type is map."))
+  char_length = forms.IntegerField(required=False, initial=1,
+                                   widget=NumberInput(attrs={'min': 1, 'max': 255}),
+                                   validators=[MinValueValidator(1), MaxValueValidator(255)],
+                                   help_text=_t("Specify if column_type is char"))
+  varchar_length = forms.IntegerField(required=False, initial=1,
+                                      widget=NumberInput(attrs={'min': 1, 'max': 65355}),
+                                      validators=[MinValueValidator(1), MaxValueValidator(65355)],
+                                      help_text=_t("Specify if column_is varchar"))
 
-ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("add a column"))
+
+ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("Add a column"))
 # Default to no partitions
-PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("add a partition"))
+PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("Add a partition"))
 
 
-class LoadDataForm(forms.Form):
-  """Form used for loading data into an existing table."""
-  path = PathField(label=_t("Path"))
-  overwrite = forms.BooleanField(required=False, initial=False,
-    label=_t("Overwrite?"))
+def _clean_databasename(name):
+  try:
+    if name in db.get_databases(): # Will always fail
+      raise forms.ValidationError(_('Database "%(name)s" already exists.') % {'name': name})
+  except Exception:
+    return name
 
-  def __init__(self, table_obj, *args, **kwargs):
-    """
-    @param table_obj is a hive_metastore.thrift Table object,
-    used to add fields corresopnding to partition keys.
-    """
-    super(LoadDataForm, self).__init__(*args, **kwargs)
-    self.partition_columns = dict()
-    for i, column in enumerate(table_obj.partitionKeys):
-      # We give these numeric names because column names
-      # may be unpleasantly arbitrary.
-      name = "partition_%d" % i
-      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})
-      self.fields[name] = char_field
-      self.partition_columns[name] = column.name
+
+class CreateDatabaseForm(DependencyAwareForm):
+  """
+  Form used in the create database page
+  """
+  dependencies = []
+
+  # Basic Data
+  name = common.HiveIdentifierField(label=_t("Database Name"), required=True)
+  comment = forms.CharField(label=_t("Description"), required=False)
+
+  # External if not true
+  use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location"))
+  external_location = forms.CharField(required=False, help_text=_t("Path to HDFS directory or file of database data."))
+
+  dependencies += [
+    ("use_default_location", False, "external_location")
+  ]
+
+  def clean_name(self):
+    return _clean_databasename(self.cleaned_data['name'])

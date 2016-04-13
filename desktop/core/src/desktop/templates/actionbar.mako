@@ -18,13 +18,13 @@
 %>
 
 <%def name="render()">
-    <div class="well" style="padding-top: 10px; padding-bottom: 0">
-        <div class="pull-right" style="margin:0">
+    <div class="actionbar-main" style="padding: 10px;">
+        <div class="pull-right actionbar-creation">
             %if hasattr(caller, "creation"):
                 ${caller.creation()}
             %endif
         </div>
-        <p>
+        <div class="actionbar-actions">
             %if hasattr(caller, "search"):
                 ${caller.search()}
             %else:
@@ -34,6 +34,6 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 ${caller.actions()}
             %endif
-        </p>
+        </div>
     </div>
 </%def>

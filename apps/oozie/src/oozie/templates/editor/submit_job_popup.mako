@@ -22,6 +22,7 @@
 
 
 <form action="${ action }" method="POST">
+  ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3>${ _('Submit this job?') }</h3>
@@ -30,14 +31,18 @@
     <fieldset>
       <div id="param-container">
 
-       ${ params_form.management_form }
+       ${ params_form.management_form | n,unicode }
 
        % for form in params_form.forms:
           % for hidden in form.hidden_fields():
-            ${ hidden }
+            ${ hidden | n,unicode }
           % endfor
           <div class="fieldWrapper">
-            <div class="row-fluid">
+            <div class="row-fluid
+              % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+                hide
+              % endif
+              ">
               <div class="span6">
                 ${ form['name'].form.initial.get('name') }
               </div>
@@ -49,9 +54,15 @@
          % endfor
       </div>
     </fieldset>
+
+    % if show_dryrun:
+      <label class="checkbox" style="display: inline-block; margin-top: 5px">
+        <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job?') }
+      </label>
+    % endif
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn secondary" data-dismiss="modal">${ _('Cancel') }</a>
-    <input id="submit-btn" type="submit" class="btn primary" value="${ _('Submit') }"/>
+    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <input id="submit-btn" type="submit" class="btn btn-primary" value="${ _('Submit') }"/>
   </div>
 </form>

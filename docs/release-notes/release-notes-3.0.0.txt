@@ -1,0 +1,356 @@
+Hue v3.0.0, released Friday 20th, September 2013
+================================================
+
+Hue, http://gethue.com, is an open source UI for Hadoop and its satellite projects.
+
+It makes the whole platform (e.g. HDFS, MapReduce, Hive,  Oozie, Pig, Impala, Solr, Sqoop,
+ZooKeeper...) easy to use and accessible from your browser (e.g. upload files to HDFS, send Hive queries from a Web editor,
+build workflows with Drag & Drop... all within a single app).
+
+
+Notable Features
+----------------
+
+- Sqoop
+  With the Sqoop 2 application data from databases can be easily exported or imported into HDFS in a scalable way. The Job Wizard hides the
+  complexity of creating Sqoop jobs and the dashboard offers a live progress and log access.
+
+- Zookeeper
+  Navigate and browse the Znode hierarchy and content of a Zookeeper cluster. Znodes can be added, deleted and edited.
+  Multi-clusters are supported and their various statistics are available.
+
+- Shell app is removed and replaced by Pig Editor, HBase Browser and the Sqoop apps.
+
+- Python 2.6 is required.
+
+- Beeswax daemon is replaced by HiveServer2.
+
+
+Notable Fixes
+-------------
+
+- HUE-897 [core] Redesign of the overall layout
+- HUE-1521 [core] Improve JT HA
+- HUE-1493 [beeswax] Replace Beeswaxd by HiveServer2
+- HUE-1474 [core] upgrade django from 1.2 to 1.4
+- HUE-1506 [search] Impersonation support
+- HUE-1475 [core] Switch back from spawning server
+
+Compatibility
+-------------
+
+Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL), and Ubuntu 10.04 to 12.10.
+CentOS 5 requires EPEL python package.
+
+Tested with CDH5beta1. Specifically:
+
+- Hadoop 0.20 / 2.2.0
+- Hive 0.11.0
+- Oozie 4.0
+- HBase 0.94
+- Pig 0.12
+- Impala 1.0 / 1.1
+- Solr 4.0
+- Sqoop2 1.99.3 
+
+Supported Browsers:
+
+* Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
+* Linux : Chrome, Firefox 3.6+
+* Mac: Chrome, Firefox 3.6+, Safari 5+
+
+
+Runs with Python 2.6+
+
+
+List of 245 Commits
+-------------------
+
+* 2bdf150 [core] Add some tours
+* 9b50092 [core] jHueTour should support external links too
+* b51826e HUE-1577 [search] Remove null bytes in Solr response
+* 799d197 HUE-1417 [oozie] Check for valid action name
+* 6439222 HUE-1573 [beeswax] Save query button fails
+* 5273649 HUE-1561 [beeswax] HiveServer2 0.11 async query support
+* 943c6ef HUE-1575 [beeswax] expand_exception attribute 'message' fix
+* 6a1d529 Preparing for Hadoop 2.1.0
+* d0426f5 [beeswax] Make sure IE doesn't cache ajax requests
+* 84e7dd2 [pig] Report error when submittion fails
+* d60b3e4 HUE-1541 [core] SAML logout
+* 0d343b1 HUE-1554 [core] Polishing glitches from new design
+* 7493d17 HUE-1567 [search] Add support for a default sort order
+* 653aac3 [core] Make minicluster temp. dir readable
+* b2825a4 [sqoop] Fix tests
+* ba25522 HUE-1559 [core] app registry should truncate and overwrite
+* 1501975 [useradmin] Fix ensure home directory name conflict
+* d6b3d47 HUE-1553 [sqoop2] tests
+* ab37b4b [hbase] Regen thrift command update
+* fc8edaa [core] Add video functionalities to jHueTour
+* fc7b44d HUE-1553 [sqoop2] tests
+* 92cc4a9 HUE-1549 [oozie] Date widget does not persist manually entered date
+* 5cd0d81 [useradmin] Fix sync_ldap_users_and_groups command
+* 5bba2e2 HUE-1529 [core] cookies should be secure
+* b49532b HUE-1538 [core] Change jHueNotify to event based
+* 6255e27 [desktop] Fix test by using a non deprecated view
+* a5694b6 HUE-1546 [oozie] Support same coordinators into a bundle
+* 60b54d1 HUE-1547 [core] SAML bugs
+* 4ed5122 HUE-1528 [core] expose way to change session timeout
+* e6fab10 [beeswax] remove SUPERVISOR_SPEC
+* 709ab08 HUE-1367 [core] Dump config can be slow
+* 464eb31 HUE-1545 [core] Improve SAML configuration parameters
+* 91fae47 Complete search doc. Add search doc to index. Fix broken links in converted docs. New and updated graphics.
+* 82820ca HUE-1543 [core] Consolidate Filechooser plugin
+* 879766c HUE-1537 [core] serve_404_error does not use 404 status code
+* 2e924d4 [sqoop2] Documentation
+* e47a0e2 [oozie] Adding missing migration
+* 3d3ef2c [docs] Improved styles
+* 1657671 HUE-1351 [search] Introduce default result templates
+* 2ff2067 [doc] Add HBase documentation
+* 9a77557 [search] Default template should display all the fields
+* 5acec75 HUE-1524 [core] LDAP warning even if not used
+* 4fed792 HUE-1536 [core] check_config should not show a warning in case of valid JT failover
+* c418e35 Fix builds
+* f3bdad5 HUE-917 [core] Support SAML based authentication
+* a091b41 HUE-1534 [zookeeper] host_ports conf parsing breaking
+* 238d0a2 [jobsub] Remove deprecated oozielib config
+* 155025a [core] see sqlite3 as an acceptable shortname for django.db.backends.sqlite3
+* 76abc78 [core] Fix test runner return code
+* 18ce78f [sqoop2] Update client to sync with sqoop 1.99.3
+* 03b66cf HUE-1531 [jobbrowser] Avoid 500 when trying to open a log that doesn't exist yet
+* c48454d HUE-1521 [core] Improve JT HA
+* 571f90a [core] Upgrade jenkins to 4.5.0 Hadoop snapshots
+* e0cf015 [zookeeper] Avoid 500 when no configured cluster
+* 52d14b7 HUE-1391 [jobbrowser] last line repeated when executing oozie workflow
+* 6449b8c HUE-1530 [oozie] Improve re-run dialogs
+* 0301b9e [impala] Fix test checking for impersonation
+* 3e0d488 [core] Listing new Zookeeper App
+* e390919 [zookeeper] Allow multi custers
+* abb4efd [zookeeper] Plug in 18n
+* 2598154 [zookeeper] Ported app to Hue3 style
+* 23eff10 [zookeeper] Porting to current master
+* 4237673 [zookeeper] Initial commit
+* 96ec70e HUE-1526 [search] Solve licensing issues of color picker component
+* 09e5e4b [oozie] Fix management form tampering in a test
+* 351ec02 HUE-1525 [hbase] Query is cleared upon new submission of one
+* 311e51a HUE-1239 [core] PooledClient should use poll
+* ea7d2d7 HUE-1517 [hbase] Edit Modals are a bit thin
+* 012a8d9 HUE-1518 [hbase] Some Final Bugfixes & Polish
+* d123e0f HUE-1515 [hbase] Search Navbar no longer stickies in tableview
+* 347d01e HUE-1484 [hbase] Grid layout option
+* 4bf6431 HUE-1487 [hbase] Add column for should support binary
+* bfd5176 HUE-1511 [pig] Editor interprets slash in literal constant as a path
+* 515115a HUE-897 Small fixes on Beeswax and Metastore
+* 8bbf825 HUE-1506 [search] Impersonation support
+* d9ce59f HUE-1505 [impala] Impersonation support
+* 6582441 [metastore] Do not check for valid number of columns
+* 62116e0 HUE-1499 [hbase] Extraneous GA logs
+* a0e28ec HUE-897 Initial port of HBase to Hue 3
+* b0b25c0 HUE-1486 [hbase] Bulk upload support
+* ac7dd85 HUE-1513 [hbase] Various bugs and improvements
+* d3dcd3b HUE-897 Ported Beeswax app to Hue 3
+* 73fbe8d HUE-897 Ported Sqoop2 app to Hue 3
+* 5750f1b HUE-1509 [core] Truncate hue.pth instead of overwrite
+* 3df4c7c HUE-897 Oozie ported to Hue 3
+* 8e709b4 HUE-897 Better titles for Search admin in Hue 3
+* 7e14448 HUE-1490 [hbase] Display and edit binary avro
+* edc2115 HUE-1507 [hbase] Selecting Filter without hilighted linker replaces previous filter
+* 0c06825 HUE-1510 [core] Remove symlink from pth manager
+* 50772d1 HUE-1473 [hbase] Cell History does a put
+* 50b65c2 HUE-1498 [hbase] On page load family-less routed column queries not working properly
+* f715faa [core] Localization pass number two for 2.5
+* 9029c2c [search] Add date type in the date and range facets
+* 7b3c3d9 [hbase] Remove unused models
+* 22f65fb HUE-1309 [core] ldap attributes are case sensitive
+* 778992e HUE-897 Ported Job Browser to Hue 3
+* 028e94c HUE-897 Ported Metastore Manager to Hue 3
+* 3035167 HUE-897 Changed primary button color, login logo and error page
+* 7c6fc8b HUE-897 Better Hive icon
+* deb6a34 HUE-1502 [core] database short names in config
+* e68c45c HUE-897 Ported Search to Hue 3
+* f3db1e1 [metastore] Avoid 500 on table page when missing a serde
+* 1d34cee HUE-897 [core] Redesign of the overall layout
+* b2be145 HUE-897 [core] Redesign of the overall layout
+* 46c4936 HUE-897 [core] Redesign of the overall layout
+* abbadc7 [core] Ported utils and admin wizard to Hue 3
+* 29074f7 HUE-1500 [core] upgrade virtual env to 1.10.1
+* 42eeb32 HUE-1483 [hbase] Better cell editor
+* 9e85837 HUE-1491 [hbase] Column Prefix Filter only works for number prefixes
+* 464c0f7 HUE-1480 [hbase] Make column family optional in searchbar
+* 285d7da HUE-1371 [core] Encoding error on download logs
+* 480d66a HUE-1479 [hbase] Column range scan in search bar
+* 43ec833 HUE-1337 [impala] Cleanup some old Beeswax classes
+* e711562 Revert "Revert "HUE-1337 [impala] ResetCatalog() is deprecated in 1.1""
+* 362597e [core] Added files to .gitignore (cherry picked from commit 7c22bcbb92ba4822644a99141234c38d826b8640)
+* 05a12ba [filebrowser] Ported to Hue 3
+* 4f7214a [useradmin] Ported UI to Hue3 (cherry picked from commit f987fa97012a6c90d72a8f57669c3bdde019bc2f)
+* bb4cd04 [core] Added new style, ported icons to monochromatic, converted help app (cherry picked from commit bfb85d1cf7338ac134d44fda9ea047a4cf05a1c8)
+* 8860075 [core] Moved JS files out of Source/jhue folder (cherry picked from commit b48b283de8ad8bb5f7ac36e7b7b7842a9bf87eb2)
+* aed634d [core] Moved JS files out of Source/jhue folder (cherry picked from commit 64a24ab03b04c2f2acac01f92f3350ee3e49b67d)
+* 30b4b73 [sqoop] Correct from and to labels for export or import jobs
+* b99c811 [sqoop2] Fix databind errors when saving and running first job and connection
+* 73eb89b HUE-1495 [beeswax] Use operation handle for async queries
+* 393edec HUE-1460 [beeswax] Support non acii char in the editor
+* 231c8d3 [core] Remove some Java dependencies
+* f3104d3 [core] More obvious debugging settings
+* 7e55817 HUE-1496 [sqoop2] Spinner showing when can't connect
+* 3467bcb HUE-1475 [core] Switch back from spawning server
+* 7383d32 HUE-1493 [beeswax] Replace Beeswaxd by HiveServer2
+* 8791f0d HUE-1489 [core] Upgrade django nose
+* 49788fd HUE-1478 [hbase] Simplify main layout
+* cde7ccb HUE-1481 [hbase] Improve autocomplete
+* d6ec5aa HUE-1492 [hbase] Create new table popup is not hidden on creation
+* d817bdc HUE-1488 [oozie] Coordinator should reuse workflow properties
+* 146516d [sdk] Couple fixes to the desktop app template
+* 3cc5304 HUE-1474 [core] upgrade django from 1.2 to 1.4
+* 3413f59 HUE-1463 [metastore] Do not assume default database when creating a table
+* e9b0536 [core] Setting version to 3.0.0
+* 60dc395 [search] Add missing import
+* 9a3a90d [search] Fix i18n extraction
+* 29393e0 [search] Security support
+* fbaa152 HUE-1477 [hbase] Autocomplete hints for column prefix & scan
+* 463603a HUE-1425 [hbase] Number row key breaks the parser
+* 797ea35 HUE-1470 [hbase] Autocomplete should be selectable by keys
+* 91ed126 HUE-1471 [hbase] i18n on all js strings
+* 895f30d HUE-1432 [hbase] Move lazy-loading to backend
+* 0048739 HUE-1453 [beeswax] hive server 2 principal hostname replacement incorrect
+* b518b4f HUE-1439 [hbase] Column range help in search bar
+* bd73e46 HUE-1443 [hbase] Upload data to a cell
+* 688ac7f HUE-1467 [sqoop2] Fix spinner in IE9
+* 26bd4dd HUE-1468 [sqoop2] Fix ajax caching problems in IE9
+* 18c437a HUE-1436 [hbase] Autocomplete rows
+* cb3de6a HUE-1381 [sqoop2] support for mapped type
+* be864cf HUE-1440 [hbase] Escape search terms
+* c8bc814 HUE-1466 [core] "Next" button (step4) in Quick Start Wizard doesn't work
+* c36036e HUE-1444 [hbase] CSS issues in ie9
+* bee9929 HUE-1430 [hbase] Disable and drop options
+* a561f69 HUE-1413 [hbase] Cell History Display in Modal
+* a74da34 HUE-1414 [hbase] Searchbar Filter Autocomplete
+* 4e9529a HUE-1465 [sqoop2] Visual feedback on save and save and run buttons
+* 640c6c1 HUE-1407 [sqoop2] When validating show the step where the error occurs
+* 6871658 HUE-1464 [hbase] hyphens not supported in cluster name
+* 868ae3d HUE-1445 [hbase] Column Filters are Persistent & throws NoSuchColumnFamily error on nav
+* 1a198df HUE-1458 [hbase] Lose query from search bar
+* 0a8cd62 [core] LDAP backend should use search/bind semantics
+* dd5e519 HUE-1429 [useradmin] LdapSync of groups in AD with more than 30 chars in the group name fails
+* 4bc57eb HUE-1454 [sqoop2] Validate path when editing
+* e671f33 [hbase] Fix create table additional families placeholders
+* a888d6d HUE-1459 [hbase] New table and row modals are not reset
+* c016260 HUE-1441 [hbase] Sort is broken
+* f5ced10 [core] Do not mask exceptions for non logged in users
+* 494418b [oozie] Kill email action is not saved
+* 8b1c257 HUE-1451 [sqoop2] Improve UX
+* 7b206d6 HUE-1419 [pig] Show error line
+* 137ad36 [beeswax] Bug when using Hue + Kerberos + Hive metastore server on a different host
+* c65963d [useradmin] LdapSync of groups in AD with members who's DN's are like "CN=Last1\, First,CN=Users,DC=Test,DC=Com fail.
+* f1f31ee [hbase] Correct naming in create table modal
+* d9f72b0 [sqoop] Various UX improvements for export job
+* 074f336 HUE-994 [impala] Close queries
+* 8f52347 HUE-1412 [core] Add splash screen to Follow me tour plugin
+* 1d30419 HUE-1447 [hbase] New Row Broken
+* b85424a [oozie] Refactor editor menu
+* bc36d4d HUE-1393 [hbase] Routing to tableview does not clear query
+* fc50df5 [desktop] Bacht of translations for 2.5
+* 76dd7f8 [metastore] Rename readonly permissions
+* b73d015 [oozie] Hue test TestEditorWithOozie.test_import_workflow is failing
+* 3feeaed HUE-1423 [hbase] Various Searchbar Improvements
+* fd25c61 HUE-1435 [hbase] Searchbar & tableview cleanup
+* 9ade5ab HUE-1431 [hbase] Truncate the columns in the backend
+* 18804c7 HUE-1434 [hbase] Buggy Searchbar
+* 25a91c3 HUE-1400 [hbase] Abe Review
+* a3f23b9 HUE-1408 [sqoop2] Ask confirmation when deleting
+* 5d50863 HUE-1427 [sqoop2] Search for job type
+* 36add80 HUE-1426 [sqoop2] fix status observable
+* 1cc738c HUE-1421 [sqoop2] Save and run with new job
+* fffd5a4 HUE-1402 [sqoop] Error when clicking too soon on a job on the dashboard
+* 190758c HUE-1422 [sqoop2] double submission progress
+* c311f4f [core] Converting to mako python variables
+* ba43e62 [fb] Display full HDFS exception message instead of None
+* 58993a9 HUE-1409 [pig] Autocomplete table names
+* d354864 HUE-1405 [sqoop2] Improve job title on the job list
+* b149add HUE-1406 [sqoop2] Create import/export buttons instead of dropdown
+* 575ef16 HUE-1420 [core] Migrate common_footer from html to mako
+* 3ef7183 HUE-1420 [core] Migrate common_footer from html to mako
+* 487a3df [oozie] Add informative message about "to" field in kill node editor
+* b838e73 HUE-1415 [hbase] Better UX for table management
+* 78c3609 [pig] Fix log scrolling when re-submitting a script
+* 9ffef6a [search] Escape facets in pagination buttons
+* e59de3d [oozie] Allow kill actions to pass through an email action
+* c73dca8 HUE-1403 [hbase] Searchbar Column Prefix & FilterString Support
+* f063460 [beeswax] Do not 500 when clicking on query not in HS2 history
+* c994659 [core] Various UX improvements
+* 3e5b99d HUE-1411 [pig] Autocomplete doesn't work on the recent Firefox versions
+* df0ae48 HUE-1404 [jb] Finished jobs are not updated in live
+* 5d30681 [desktop] Move data collection to ini
+* 80e5835 HUE-1380 [sqoop2] support for boolean type
+* 2b8f938 HUE-1401 [hbase] Show 500 Error Upon Down Cluster
+* 740b3cd [oozie] Error link to start node disallowed
+* 8fab928 HUE-1395 [sqoop] Improve UI
+* 91c9d24 [desktop] More consistent 500 page
+* ca33a61 [beeswax] HiveServer2 impersonation property was renamed
+* 4820ab3 HUE-1330 [oozie] Make kill action target configurable
+* df14937 HUE-1399 [hbase] GA tracking not proper URL
+* a462d34 HUE-1392 [hbase] Searchbar Rewrite
+* ad1cd53 HUE-1397 [hbase] Avoid filter well to split to a new line
+* 1a355b5 HUE-1394 [pig] The stop button doesn't show up in certain cases
+* 0ee74d6 [core] Check for file named hue.pth.lnk before creating it
+* 8bfc052 HUE-1385 [sqoop2] Save and run at the end of the job edit wizard
+* 23eda7b HUE-1390 [sqoop2] output directory available in filebrowser
+* 1c28513 HUE-1396 [pig] Wrong links on the log panel
+* b350068 [beeswax] HiveServer2 changed metadata API to be consistent
+* 29bd135 [beeswax] HiveServer2 impersonation support
+* 1717d87 HUE-1378 [sqoop2] move "name" to first page in wizard
+* d15d1be [jb] Cleanup tests to be less flaky
+* c517088 HUE-1330 [oozie] Make kill action target configurable
+* f21df02 HUE-1362 [metastore] Readonly mode permissions
+* 9cb5240 [desktop] Update home with HBase and Sqoop
+* 13cd820 [core] Add missing licences
+* b625deb HUE-1387 [core] Follow me tour plugin
+* e246fb5 [core] programatic syncdb should be executed in shell
+* 582a8d3 [core] Fix symlinks in pth manager and check for hue binary before sync'ing
+* b7824d9 [core] Fix English mistakes
+* d06f8a0 [beeswax] Make create table test more robust
+* 3f366a1 [core] Fix 500 handler
+* e07a192 [doc] Adding 2.5 release notes
+* f813a7a HUE-1386 [search] Searching with non-English queries is unavailable
+* 5884c3d HUE-1387 [core] Follow me tour plugin
+* 8362606 HUE-1214 [sqoop] Sqoop App
+
+
+Contributors
+------------
+
+This Hue release is made possible thanks to the contribution from:
+
+- Aaron Newton
+- Aaron T. Myers
+- Abraham Elmahrek
+- Aditya Acharya
+- Alex Newman
+- Andrew Bayer
+- Andrew Yao
+- Ann McCown
+- bc Wong
+- Ben Bishop
+- Bruce Mitchener
+- Bruno Mahé
+- Eli Collins
+- Enrico Berti
+- Eric Wong
+- Harsh J
+- Henry Robinson
+- Jon Natkins
+- Kevin Wang
+- Lars Francke
+- Loren Siebert
+- Marcus McLaughlin
+- Mike Cotton
+- Paul Battaglia
+- Philip Zeyliger
+- Romain Rigaux
+- Roman Shaposhnik
+- Shawn Van Ittersum
+- Shrijeet Paliwal
+- Thomas Aylott
+- Todd Lipcon
+- Vinithra Varadharajan
+

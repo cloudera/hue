@@ -15,85 +15,73 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from desktop.lib.django_util import extract_field_data
+
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Create table from file'), "beeswax", user, "100px")}
-${layout.menubar(section='history')}
+
+${ commonheader(_('Create table from file'), app_name, user) | n,unicode }
+${layout.menubar(section='query')}
+
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <div class="container-fluid">
 % if error_msg:
-<h4>${error_msg}</h4>
+  <h4>${error_msg}</h4>
 % endif
-<h1>${_('Save Query Results')}</h1>
-<form id="saveForm" action="${action}" method="POST" class="form form-inline">
-	<label class="radio">
-		<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-		&nbsp;${_('In a new table')}
-	</label>
-	${comps.field(form['target_table'], notitle=True, placeholder="Table Name")}
-	<br/>
-	<label class="radio">
-		<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-		&nbsp;${_('In an HDFS directory')}
-	</label>
-	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
-  <br/>
-  <br/>
-  <div id="fileChooserModal" class="smallModal well hide">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
+  <div class="card card-small">
+    <h1 class="card-heading simple">${_('Save Query Results')}</h1>
+    <div class="card-body">
+      <p>
+        <form id="saveForm" action="${action}" method="POST" class="form form-inline">
+          ${ csrf_token(request) | n,unicode }
+          <fieldset>
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input id="id_save_target_0" type="radio" name="save_target" value="${ form.SAVE_TYPE_TBL }" data-bind="checked: toWhere"/>
+                  &nbsp;${ _('In a new table') }
+                </label>
+                <span data-bind="visible: toWhere() == 'to a new table'">
+                  ${ comps.field(form['target_table'], notitle=True, placeholder='Table Name') }
+                </span>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input id="id_save_target_1" type="radio" name="save_target" value="${ form.SAVE_TYPE_DIR }" data-bind="checked: toWhere">
+                  &nbsp;${ _('In an HDFS directory') }
+                </label>
+                <span data-bind="visible: toWhere() == 'to HDFS directory'">
+                  ${ comps.field(form['target_dir'], notitle=True, placeholder=_('Results location'), klass='pathChooser') }
+                </span>
+              </div>
+            </div>
+            <div id="fileChooserModal" class="smallModal well hide">
+              <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+          </fieldset>
+          <div class="form-actions" style="padding-left:10px">
+            <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
+            <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
+          </div>
+        </form>
+      </p>
+    </div>
   </div>
-  <br/><br/>
-  <input type="submit" name="save" value="${_('Save')}" class="btn primary"/>
-  <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
-</form>
 </div>
-
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    $("input[name='save_target']").change(function () {
-      $("#fieldRequired").addClass("hide");
-      $("input[name='target_dir']").removeClass("fieldError");
-      $("input[name='target_table']").removeClass("fieldError");
-      if ($(this).val().indexOf("HDFS") > -1) {
-        $("input[name='target_table']").addClass("hide");
-        $("input[name='target_dir']").removeClass("hide");
-        $(".fileChooserBtn").removeClass("hide");
-      }
-      else {
-        $("input[name='target_table']").removeClass("hide");
-        $("input[name='target_dir']").addClass("hide");
-        $(".fileChooserBtn").addClass("hide");
-      }
-    });
-
-    $("#saveForm").submit(function (e) {
-      if ($(e.originalEvent.explicitOriginalTarget).attr("name") == "cancel") {
-        return true;
-      }
-      if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
-        if ($.trim($("input[name='target_dir']").val()) == "") {
-          $("#fieldRequired").removeClass("hide");
-          $("input[name='target_dir']").addClass("fieldError");
-          return false;
-        }
-      }
-      else {
-        if ($.trim($("input[name='target_table']").val()) == "") {
-          $("#fieldRequired").removeClass("hide");
-          $("input[name='target_table']").addClass("fieldError");
-          return false;
-        }
-      }
-      return true;
-    });
-
     $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
 
     function getFileBrowseButton(inputElement) {
-      return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
+      return $("<a>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
         e.preventDefault();
         $("#fileChooserModal").jHueFileChooser({
           onFolderChange:function (filePath) {
@@ -109,8 +97,17 @@ ${layout.menubar(section='history')}
           initialPath:$.trim(inputElement.val())
         });
         $("#fileChooserModal").slideDown();
+        $("input[name='target_dir']").parents(".control-group").removeClass("error");
+        $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").removeClass("btn-danger");
       });
     }
+
+    var viewModel = {
+      toWhere: ko.observable("${ extract_field_data(form['save_target']) }")
+    };
+
+    ko.applyBindings(viewModel);
   });
 </script>
-${commonfooter(messages)}
+
+${ commonfooter(request, messages) | n,unicode }

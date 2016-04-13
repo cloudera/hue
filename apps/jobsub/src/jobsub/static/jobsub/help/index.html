@@ -1,0 +1,1171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Job Designer</title>
+</head>
+<body id="topic_8"><a name="topic_8"><!-- --></a>
+
+
+
+	<h1 class="title topictitle1">Job Designer </h1>
+
+
+	<div class="body conbody">
+
+		<p class="p">The Job Designer application enables you to create and submit jobs to the
+			Hadoop cluster. You can include variables with your jobs to enable you and other users
+			to enter values for the variables when they run your job. The Job Designer supports the
+			actions supported by <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/oozie/" target="_blank">Oozie</a>: <a class="xref" href="../../../../content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/index.html" target="_blank">MapReduce</a>, Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, and
+			Email. </p>
+
+
+	</div>
+
+
+	<div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_8_1"><a name="topic_8_1"><!-- --></a>
+
+		<h2 class="title topictitle2">Job Designer Installation and Configuration </h2>
+
+
+		<div class="body conbody">
+
+			<p class="p">Job Designer is one of the applications installed as part of Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span></p>
+
+			<p class="p">In order to run DistCp, Streaming, Pig, Sqoop, and Hive
+      jobs, Oozie must be configured to use the Oozie ShareLib. See Oozie Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>. </p>
+
+
+		</div>
+
+
+	</div>
+
+
+	<div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_8_2"><a name="topic_8_2"><!-- --></a>
+
+		<h2 class="title topictitle2">Starting Job Designer </h2>
+
+
+		<div class="body conbody">
+
+			<p class="p">Click the <strong class="ph b">Job Designer</strong> icon (<img class="image" src="/static/jobsub/art/icon_jobsub_24.png"/>) in the navigation bar at the top of the Hue web page.
+				The <strong class="ph b">Job Designs</strong> page opens in the browser. </p>
+
+
+		</div>
+
+
+	</div>
+
+
+	<div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_8_3"><a name="topic_8_3"><!-- --></a>
+
+		<h2 class="title topictitle2">Installing the Example Job Designs </h2>
+
+
+		<div class="body conbody">
+			<div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> You must be a superuser to perform this task.</div>
+
+			<a name="topic_8_3__ol_ebx_xng_dk"><!-- --></a><ol class="ol" id="topic_8_3__ol_ebx_xng_dk">
+				<li class="li">Click <a name="topic_8_3__d104e102"><!-- --></a><img class="image" id="topic_8_3__d104e102" src="/static/desktop/art/hue-logo-mini.png"/>. The Quick Start Wizard opens.</li>
+<li class="li">Click <strong class="ph b">Step 2:
+            Examples</strong>.</li>
+
+				<li class="li">Click <strong class="ph b">Job Designer</strong>.</li>
+
+			</ol>
+
+
+		</div>
+
+
+	</div>
+
+
+	<div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_8_4"><a name="topic_8_4"><!-- --></a>
+
+		<h2 class="title topictitle2">Job Designs </h2>
+
+
+		<div class="body conbody">
+
+			<p class="p">A job design specifies several meta-level properties of a job, including
+				the job design name, description, the executable scripts or classes, and any
+				parameters for those scripts or classes. </p>
+
+
+		</div>
+
+
+		<div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_8_4_1"><a name="topic_8_4_1"><!-- --></a>
+
+			<h3 class="title topictitle3">Filtering Job Designs </h3>
+
+
+			<div class="body conbody">
+
+				<p class="p">You can filter the job designs that appear in the list by owner, name, type, and
+					description.  </p>
+
+
+				<p class="p">
+					<strong class="ph b">To filter the Job Designs list:</strong>
+				</p>
+
+
+				<ol class="ol">
+
+					<li class="li">In the <strong class="ph b">Job Designs</strong> window, click <strong class="ph b">Designs</strong>.</li>
+
+
+					<li class="li" id="topic_8_4_1__li_81"><a name="topic_8_4_1__li_81"><!-- --></a>Enter text in the Filter text box at the top of the <strong class="ph b">Job
+							Designs</strong> window. When you type in the Filter field, the designs are
+						dynamically filtered to display only those rows containing text that matches
+						the specified substring.</li>
+
+
+				</ol>
+
+
+			</div>
+
+
+		</div>
+
+		<div class="topic concept nested2" id="concept_jkv_qf3_zj"><a name="concept_jkv_qf3_zj"><!-- --></a>
+			<h3 class="title topictitle3">Creating a Job Design</h3>
+
+			<div class="body conbody">
+				<a name="concept_jkv_qf3_zj__ol_xmj_5f3_zj"><!-- --></a><ol class="ol" id="concept_jkv_qf3_zj__ol_xmj_5f3_zj">
+					<li class="li">In the <strong class="ph b">Job Designs</strong>
+						window, click <span class="ph menucascade"><span class="ph uicontrol">New Action</span> &gt; <span class="ph uicontrol"><var class="keyword varname">Action</var></span></span>, where <var class="keyword varname">Action</var> is MapReduce, Streaming,
+						Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, or Email.</li>
+
+					<li class="li">In the <strong class="ph b">Job Design
+								(<var class="keyword varname">Action</var> type)</strong> window, specify the common and
+						job type specific information.  </li>
+
+					<li class="li">Click <strong class="ph b">Save</strong> to save the
+						job settings.</li>
+
+				</ol>
+
+			</div>
+
+		</div>
+
+		<div class="topic concept nested2" id="concept_rfg_wfr_2k"><a name="concept_rfg_wfr_2k"><!-- --></a>
+			<h3 class="title topictitle3">Deleting and Restoring Job Designs</h3>
+
+			<div class="body conbody">
+				<p class="p">You can move job designs to the trash and later restore or permanently delete
+					them.</p>
+
+				<div class="section" id="concept_rfg_wfr_2k__section_xny_zfr_2k"><a name="concept_rfg_wfr_2k__section_xny_zfr_2k"><!-- --></a><h4 class="title sectiontitle">Deleting Job Designs</h4>
+					
+					<a name="concept_rfg_wfr_2k__ol_rk2_fgr_2k"><!-- --></a><ol class="ol" id="concept_rfg_wfr_2k__ol_rk2_fgr_2k">
+						<li class="li">In a Manager screen, check the checkbox next to one or more job
+							designs.</li>
+
+						<li class="li">Choose one of the following:<ul class="ul">
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Move to trash</span></span></li>
+
+              <li class="li"><span class="ph menucascade"><span class="ph uicontrol">Delete</span> &gt; <span class="ph uicontrol">Delete forever</span></span></li>
+
+            </ul>
+</li>
+
+					</ol>
+
+				</div>
+
+				<div class="section" id="concept_rfg_wfr_2k__section_i5h_1gr_2k"><a name="concept_rfg_wfr_2k__section_i5h_1gr_2k"><!-- --></a><h4 class="title sectiontitle">Restoring Job Designs</h4>
+					
+					<a name="concept_rfg_wfr_2k__ol_rrt_kgr_2k"><!-- --></a><ol class="ol" id="concept_rfg_wfr_2k__ol_rrt_kgr_2k">
+						<li class="li">In a Manager screen, click <a name="concept_rfg_wfr_2k__d238e349"><!-- --></a><img class="image" id="concept_rfg_wfr_2k__d238e349" src="/static/desktop/art/help/trash.png"/>
+            <strong class="ph b">Trash</strong>.</li>
+
+						<li class="li">Check the checkbox next to one or more job designs.</li>
+
+						<li class="li">Click <span class="ph uicontrol">Restore</span>.</li>
+
+					</ol>
+
+				</div>
+
+			</div>
+
+		</div>
+
+		<div class="topic concept nested2" id="concept_gt5_bh3_zj"><a name="concept_gt5_bh3_zj"><!-- --></a>
+			<h3 class="title topictitle3">Job Design Settings</h3>
+
+			<div class="body conbody">
+				<div class="section" id="concept_gt5_bh3_zj__section_zt2_w33_zj"><a name="concept_gt5_bh3_zj__section_zt2_w33_zj"><!-- --></a><h4 class="title sectiontitle">Job Design Common
+						Settings </h4>
+					
+					<p class="p">Most job design types support all the settings listed in the following
+						table.  For job type specific settings, see: <a class="xref" href="#concept_gt5_bh3_zj__section_lvq_ch3_zj">MapReduce</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_zrd_gh3_zj">Streaming</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_abl_hh3_zj">Java</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_tvm_3h3_zj">Pig</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_lxq_3h3_zj">Hive</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_xb5_3h3_zj">Sqoop</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_xvw_3h3_zj">Shell</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_tnz_3h3_zj">Ssh</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_qsc_jh3_zj">DistCp</a>, <a class="xref" href="#concept_gt5_bh3_zj__section_hx4_lh3_zj">Fs</a>, and <a class="xref" href="#concept_gt5_bh3_zj__section_qjt_lh3_zj">Email</a>. </p>
+
+					<p class="p">All job design settings except Name and Description
+						support the use of variables of the form <samp class="ph codeph">$</samp><var class="keyword varname">variable_name</var>. When you run the job, a
+						dialog box will appear to enable you to specify the values of the variables. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_skf_x33_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_skf_x33_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Name</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">Identifies the job and its collection
+											of properties and parameters. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Description</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">A description of the job. The
+											description is displayed in the dialog box that appears
+											if you specify variables for the job. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Advanced</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<a name="concept_gt5_bh3_zj__ul_pyd_nf3_zj"><!-- --></a><ul class="ul" id="concept_gt5_bh3_zj__ul_pyd_nf3_zj">
+											<li class="li"><strong class="ph b">Is shared</strong> -
+												Indicate whether to share the action with all
+												users.</li>
+
+											<li class="li"><strong class="ph b">Oozie parameters</strong> - </li>
+
+										</ul>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Prepare</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">Specifies paths to create or delete before starting the
+										workflow job. </td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Params</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">Parameters to pass to a script or command.  The parameters
+										are expressed using the  <a class="xref" href="http://jcp.org/aboutJava/communityprocess/final/jsr152/" target="_blank">JSP
+											2.0 Specification (JSP.2.3) Expression Language</a>,
+										allowing variables, functions, and complex expressions as
+										parameters. </td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Job Properties</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">Job properties. To set a property
+											value, click <strong class="ph b">Add
+												Property</strong>.   </p>
+
+										<a name="concept_gt5_bh3_zj__ul_jlf_x33_zj"><!-- --></a><ul class="ul" id="concept_gt5_bh3_zj__ul_jlf_x33_zj">
+											<li class="li"><strong class="ph b">Property name -</strong> a configuration
+												property name. This field provides autocompletion,
+												so you can type the first few characters of a
+												property name and then select the one you want from
+												the drop-down list. </li>
+
+											<li class="li"><strong class="ph b">Value -</strong> the property value.</li>
+
+										</ul>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Files</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">Files to pass to the job. Equivalent
+											to the Hadoop <samp class="ph codeph">-files</samp> option.  </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p">
+											<strong class="ph b">Archives</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">Archives to pass to the job.
+											Equivalent to the Hadoop <samp class="ph codeph">-archives</samp>
+											option. </p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_lvq_ch3_zj"><a name="concept_gt5_bh3_zj__section_lvq_ch3_zj"><!-- --></a><h4 class="title sectiontitle">MapReduce Job Design </h4>
+					
+					<div class="p">A MapReduce job design consists of MapReduce functions
+						written in Java. You can create a MapReduce job design from existing mapper
+						and reducer classes without having to write a main Java class. You must
+						specify the mapper and reducer classes as well as other MapReduce properties
+						in the Job Properties setting. 
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_zcz_5g3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_zcz_5g3_zj" class="table" frame="hsides" border="1" rules="all">
+								
+								
+								<tbody class="tbody">
+									<tr class="row">
+										<td class="entry" valign="top" width="25%">
+											<p class="p"><strong class="ph b">Jar
+												path</strong>
+											</p>
+
+										</td>
+
+										<td class="entry" valign="top" width="75%">
+											<p class="p">The fully-qualified path to a JAR
+												file containing the classes that implement the
+												Mapper and Reducer functions. </p>
+
+										</td>
+
+									</tr>
+
+								</tbody>
+
+							</table>
+</div>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_zrd_gh3_zj"><a name="concept_gt5_bh3_zj__section_zrd_gh3_zj"><!-- --></a><h4 class="title sectiontitle">Streaming Job Design </h4>
+					
+					<p class="p">Hadoop streaming jobs enable you to create MapReduce
+						functions in any non-Java language that reads standard Unix input and writes
+						standard Unix output. For more information about Hadoop streaming jobs, see
+							<a class="xref" href="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/streaming.html" target="_blank">Hadoop Streaming</a>. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_jnj_vg3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_jnj_vg3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Mapper</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The path to the mapper script or
+											class. If the mapper file is not on the machines on the
+											cluster, use the <strong class="ph b">Files</strong>
+											option to pass it as a part of job submission.
+											Equivalent to the Hadoop <samp class="ph codeph">-mapper</samp>
+											option. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Reducer</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The path to the reducer script or
+											class. If the reducer file is not on the machines on the
+											cluster, use the <strong class="ph b">Files</strong>
+											option to pass it as a part of job submission.
+											Equivalent to the Hadoop <samp class="ph codeph">-reducer</samp>
+											option. </p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_abl_hh3_zj"><a name="concept_gt5_bh3_zj__section_abl_hh3_zj"><!-- --></a><h4 class="title sectiontitle">Java Job Design </h4>
+					
+					<p class="p">A Java job design consists of a main class written in
+						Java. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_odm_wg3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_odm_wg3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Jar
+												path</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The fully-qualified path to a JAR
+											file containing the main class. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Main
+												class</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The main class to invoke the program.
+										</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Args</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The arguments to pass to the main
+											class. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="25%">
+										<p class="p"><strong class="ph b">Java
+												opts</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="75%">
+										<p class="p">The options to pass to the JVM. </p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_tvm_3h3_zj"><a name="concept_gt5_bh3_zj__section_tvm_3h3_zj"><!-- --></a><h4 class="title sectiontitle">Pig Job Design</h4>
+					
+					<p class="p">A Pig job design consists of a Pig script. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_tck_4h3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_tck_4h3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Script
+												name</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">Script name or path to the Pig script.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_lxq_3h3_zj"><a name="concept_gt5_bh3_zj__section_lxq_3h3_zj"><!-- --></a><h4 class="title sectiontitle">Hive Job Design </h4>
+					
+					<p class="p">A Hive job design consists of a Hive script. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_mzv_ph3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_mzv_ph3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Script
+												name</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">Script name or path to the Hive script. </p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_xb5_3h3_zj"><a name="concept_gt5_bh3_zj__section_xb5_3h3_zj"><!-- --></a><h4 class="title sectiontitle">Sqoop Job Design </h4>
+					
+					<p class="p">A Sqoop job design consists of a Sqoop command. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_enb_qh3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_enb_qh3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Command</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The Sqoop command.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_xvw_3h3_zj"><a name="concept_gt5_bh3_zj__section_xvw_3h3_zj"><!-- --></a><h4 class="title sectiontitle">Shell Job Design </h4>
+					
+					<p class="p">A Shell job design consists of a shell command. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_mn2_qh3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_mn2_qh3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Command</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The shell command.</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Capture
+												output</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">Indicate whether to capture the output
+											of the command.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_tnz_3h3_zj"><a name="concept_gt5_bh3_zj__section_tnz_3h3_zj"><!-- --></a><h4 class="title sectiontitle">Ssh Job Design </h4>
+					
+					<p class="p">A Ssh job design consists of an ssh command. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_ysk_qh3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_ysk_qh3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">User</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The name of the user to run the command as. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Host</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The name of the host to run the command on.</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Command</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The ssh command.</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Capture
+												output</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">Indicate whether to capture the output of the command.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_qsc_jh3_zj"><a name="concept_gt5_bh3_zj__section_qsc_jh3_zj"><!-- --></a><h4 class="title sectiontitle">DistCp Job Design </h4>
+					
+					<p class="p">A DistCp job design consists of a . </p>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_hx4_lh3_zj"><a name="concept_gt5_bh3_zj__section_hx4_lh3_zj"><!-- --></a><h4 class="title sectiontitle">Fs Job Design</h4>
+					
+					<p class="p">A Fs job design consists of a command that operates on HDFS. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_szs_qh3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_szs_qh3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="33.33333333333333%">
+										<p class="p"><strong class="ph b">Delete
+												path</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="66.66666666666666%">
+										<p class="p">The path to delete.  If it is a directory, it deletes recursively
+											all its content and then deletes the directory.  </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="33.33333333333333%">
+										<p class="p"><strong class="ph b">Create
+												directory</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="66.66666666666666%">
+										<p class="p">The path of a directory to create. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="33.33333333333333%">
+										<p class="p"><strong class="ph b">Move
+												file</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="66.66666666666666%">
+										<p class="p">The source and destination paths to the file to be moved.</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="33.33333333333333%">
+										<p class="p"><strong class="ph b">Change
+												permissions</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="66.66666666666666%">
+										<p class="p">The path whose permissions are to be changed, the permissions, and
+											an indicator of whether to change permission
+											recursively.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+				<div class="section" id="concept_gt5_bh3_zj__section_qjt_lh3_zj"><a name="concept_gt5_bh3_zj__section_qjt_lh3_zj"><!-- --></a><h4 class="title sectiontitle">Email Job Design </h4>
+					
+					<p class="p">A Email job design consists of an email message. </p>
+
+					
+<div class="tablenoborder"><a name="concept_gt5_bh3_zj__table_yyw_qh3_zj"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="concept_gt5_bh3_zj__table_yyw_qh3_zj" class="table" frame="hsides" border="1" rules="all">
+							
+							
+							<tbody class="tbody">
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">To
+												addresses</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The recipient of the email message.
+										</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">CC addresses (optional)</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The cc recipients of the email
+											message. </p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Subject</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The subject of the email message.</p>
+
+									</td>
+
+								</tr>
+
+								<tr class="row">
+									<td class="entry" valign="top" width="50%">
+										<p class="p"><strong class="ph b">Body</strong>
+										</p>
+
+									</td>
+
+									<td class="entry" valign="top" width="50%">
+										<p class="p">The body of the email message.</p>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_8_4_6"><a name="topic_8_4_6"><!-- --></a>
+
+			<h3 class="title topictitle3">Submitting a Job Design </h3>
+
+
+			<div class="body conbody">
+				<div class="note note"><span class="notetitle"><img src="/static/desktop/art/help/note.jpg"/> 
+      <b>Note</b>:</span> 
+					<p class="p">A job's input files must be uploaded to the cluster before you can submit the
+						job.</p>
+
+				</div>
+
+
+				<p class="p">
+					<strong class="ph b">To submit a job design:</strong>
+				</p>
+
+
+				<ol class="ol">
+
+					<li class="li">In the <strong class="ph b">Job Designs</strong> window, click <strong class="ph b">Designs</strong> in the upper left
+						corner. Your jobs and other users' jobs are displayed in the <strong class="ph b">Job
+							Designs</strong> window.</li>
+
+
+					<li class="li">Check the checkbox next to the job you want to submit.</li>
+
+
+					<li class="li">Click the <strong class="ph b">Submit</strong> button. <a name="topic_8_4_6__ol_apj_lnt_4j"><!-- --></a><ol class="ol" type="a" id="topic_8_4_6__ol_apj_lnt_4j"> <li class="li">If the job
+								contains variables, enter the information requested in the dialog
+								box that appears. For example, the sample grep MapReduce design
+								displays a dialog where you specify the output directory.</li>
+
+								<li class="li">Click <strong class="ph b">Submit</strong> to submit the job.</li>
+ </ol>
+
+					</li>
+
+
+				</ol>
+
+
+				<p class="p" id="topic_8_4_6__p_87"><a name="topic_8_4_6__p_87"><!-- --></a> After the job is complete, the Job Designer displays the results of
+					the job. For information about displaying job results, see <a class="xref" href="#topic_8_5">Displaying the Results of Submitting a
+						Job</a>. </p>
+
+
+			</div>
+
+
+		</div>
+
+
+		<div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_8_4_7"><a name="topic_8_4_7"><!-- --></a>
+
+			<h3 class="title topictitle3">Copying, Editing, and Deleting a Job Design </h3>
+
+
+			<div class="body conbody">
+
+				<p class="p">If you want to edit and use a job but you don't own it, you can make a copy of
+					it and then edit and use the copied job. </p>
+
+				
+<div class="tablenoborder"><a name="topic_8_4_7__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_8_4_7__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+						
+						
+						<thead class="thead" align="left">
+							<tr class="row">
+								<th class="entry" valign="top" width="20%" id="d11788e1268">Action</th>
+
+								<th class="entry" valign="top" width="80%" id="d11788e1271">Procedure</th>
+
+							</tr>
+
+						</thead>
+
+						<tbody class="tbody">
+							<tr class="row">
+								<td class="entry" valign="top" width="20%" headers="d11788e1268 ">
+									<p class="p">
+										<strong class="ph b">Copy</strong>
+									</p>
+
+								</td>
+
+								<td class="entry" valign="top" width="80%" headers="d11788e1271 ">
+									<div class="p">
+										<a name="topic_8_4_7__ol_vtf_hch_dk"><!-- --></a><ol class="ol" id="topic_8_4_7__ol_vtf_hch_dk">
+											<li class="li">In the <strong class="ph b">Job Designs</strong> window,
+												click <strong class="ph b">Designs</strong>. The
+												jobs are displayed in the <strong class="ph b">Job Designs</strong>
+												window.</li>
+
+											<li class="li">Check the checkbox next to the
+												job you want to copy.</li>
+
+											<li class="li">Click the <strong class="ph b">Copy</strong> button.</li>
+
+											<li class="li">In the <strong class="ph b">Job Design Editor</strong>
+												window, change the settings and then click <strong class="ph b">Save</strong> to save the
+												job settings.</li>
+
+										</ol>
+
+									</div>
+
+								</td>
+
+							</tr>
+
+							<tr class="row">
+								<td class="entry" valign="top" width="20%" headers="d11788e1268 ">
+									<p class="p">
+										<strong class="ph b">Edit</strong>
+									</p>
+
+								</td>
+
+								<td class="entry" valign="top" width="80%" headers="d11788e1271 ">
+									<div class="p">
+										<a name="topic_8_4_7__ol_xxr_hch_dk"><!-- --></a><ol class="ol" id="topic_8_4_7__ol_xxr_hch_dk">
+											<li class="li">In the <strong class="ph b">Job Designs</strong> window,
+												click <strong class="ph b">Designs</strong>. The
+												jobs are displayed in the <strong class="ph b">Job Designs</strong>
+												window.</li>
+
+											<li class="li">Check the checkbox next to the
+												job you want to edit.</li>
+
+											<li class="li">Click the <strong class="ph b">Edit</strong> button.</li>
+
+											<li class="li">In the <strong class="ph b">Job Design</strong> window,
+												change the settings and then click <strong class="ph b">Save</strong> to save the
+												job settings.</li>
+
+										</ol>
+
+									</div>
+
+								</td>
+
+							</tr>
+
+							<tr class="row">
+								<td class="entry" valign="top" width="20%" headers="d11788e1268 ">Delete</td>
+
+								<td class="entry" valign="top" width="80%" headers="d11788e1271 ">
+									<div class="p">
+										<a name="topic_8_4_7__ol_hjf_3ch_dk"><!-- --></a><ol class="ol" id="topic_8_4_7__ol_hjf_3ch_dk">
+											<li class="li">In the <strong class="ph b">Job Designs</strong> window,
+												click <strong class="ph b">Designs</strong>. The
+												jobs are displayed in the <strong class="ph b">Job Designs</strong>
+												window.</li>
+
+											<li class="li">Check the checkbox next to the
+												job you want to delete.</li>
+
+											<li class="li">Click the <strong class="ph b">Delete</strong> button.</li>
+
+											<li class="li" id="topic_8_4_7__li_88"><a name="topic_8_4_7__li_88"><!-- --></a>Click <strong class="ph b">OK</strong> to confirm the
+												deletion.</li>
+
+										</ol>
+
+									</div>
+
+								</td>
+
+							</tr>
+
+						</tbody>
+
+					</table>
+</div>
+
+
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+	<div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_8_5"><a name="topic_8_5"><!-- --></a>
+
+		<h2 class="title topictitle2">Displaying Results of Submitting a Job </h2>
+
+
+		<div class="body conbody">
+
+			<p class="p">
+				<strong class="ph b">To display the Job Submission History:</strong>
+			</p>
+
+
+			<p class="p">In the <strong class="ph b">Job Designs</strong> window, click the <strong class="ph b">History</strong> tab. The jobs are
+				displayed in the <strong class="ph b">Job Submissions History</strong> listed by Oozie job ID. </p>
+
+
+			<p class="p">
+				<strong class="ph b">To display Job Details:</strong>
+			</p>
+
+
+			<p class="p">In the <strong class="ph b">Job Submission History</strong> window, click an Oozie Job ID. The results of
+				the job display: </p>
+
+
+			<ul class="ul">
+
+				<li class="li">Actions - a list of actions in the job.</li>
+
+
+				<li class="li">Click <img class="image" src="/static/desktop/art/help/gear.png"/> to display the action configuration. In the action configuration for a
+					MapReduce action, click the value of the <samp class="ph codeph">mapred.output.dir</samp> property to display
+					the job output.</li>
+
+
+				<li class="li">In the root-node row, click the Id in the External Id column to view the job in
+					the Job Browser.</li>
+
+
+				<li class="li">Details - the job details. Click <img class="image" src="/static/desktop/art/help/gear.png"/> to display the Oozie application configuration.</li>
+
+
+				<li class="li">Definition - the Oozie application definition.</li>
+
+
+				<li class="li">Log - the output log.</li>
+
+
+			</ul>
+
+
+		</div>
+
+
+	</div>
+
+
+
+</body>
+</html>

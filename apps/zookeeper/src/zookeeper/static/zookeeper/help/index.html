@@ -1,0 +1,53 @@
+<html>
+<h1>ZooKeeper Browser</h1>
+<p>The main two features are:</p>
+<ul>
+<li>Listing of the ZooKeeper cluster stats and clients</li>
+<li>Browsing and edition of the ZNode hierarchy</li>
+</ul>
+
+<iframe frameborder="0" height="495" src="http://player.vimeo.com/video/79795356" width="900"></iframe>
+
+<p>ZooKeeper Browser requires the <a href="https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest">ZooKeeper
+REST</a>
+service to be running. Here is how to setup this one:</p>
+<p>First get and build ZooKeeper:</p>
+<pre>
+git clone https://github.com/apache/zookeeper
+cd zookeeper
+ant
+Buildfile: /home/hue/Development/zookeeper/build.xml
+
+init:
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/classes
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/lib
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/package/lib
+       [mkdir] Created dir: /home/hue/Development/zookeeper/build/test/lib
+
+...
+</pre>
+
+<p>And start the REST service:</p>
+<pre>
+cd src/contrib/rest
+nohup ant run&
+</pre>
+
+<p>If ZooKeeper and the REST service are not on the same machine as Hue, go
+update the <a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L581">Hue
+settings</a>
+and specify the correct hostnames and ports:</p>
+<pre>
+    [zookeeper]
+
+[[clusters]]
+
+[[[default]]]
+          # Zookeeper ensemble. Comma separated list of Host/Port.
+          # e.g. localhost:2181,localhost:2182,localhost:2183
+          ## host_ports=localhost:2181
+
+# The URL of the REST contrib service
+          ## rest_url=http://localhost:9998
+</pre>
+</html>

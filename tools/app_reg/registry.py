@@ -22,10 +22,7 @@ Registry for the applications
 import glob
 import logging
 import os
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 import common
 
@@ -37,11 +34,10 @@ class AppRegistry(object):
   """
   def __init__(self):
     """Open the existing registry"""
-    self._reg_path = os.path.join(common.INSTALL_ROOT, 'app.reg')
+    self._reg_path = os.path.join(common.HUE_APP_REG_DIR, 'app.reg')
     self._initialized = False
     self._apps = { }    # Map of name -> HueApp
     self._open()
-
 
   def _open(self):
     """Open the registry file. May raise OSError"""
@@ -57,13 +53,11 @@ class AppRegistry(object):
 
     self._initialized = True
 
-
   def _write(self, path):
     """Write out the registry to the given path"""
     outfile = file(path, 'w')
     json.dump(self._apps.values(), outfile, cls=AppJsonEncoder, indent=2)
     outfile.close()
-
 
   def contains(self, app):
     """Returns whether the app (of the same version) is in the registry"""
@@ -72,7 +66,6 @@ class AppRegistry(object):
       return existing.version == app.version
     except KeyError:
       return False
-
 
   def register(self, app):
     """register(app) -> True/False"""
@@ -95,7 +88,6 @@ class AppRegistry(object):
     self._apps[app.name] = app
     return True
 
-
   def unregister(self, app_name):
     """unregister(app_Name) -> HueApp. May raise KeyError"""
     assert self._initialized, "Registry not yet initialized"
@@ -104,25 +96,23 @@ class AppRegistry(object):
     del self._apps[app_name]
     return app
 
-
   def get_all_apps(self):
     """get_all_apps() -> List of HueApp"""
     return self._apps.values()
-
 
   def save(self):
     """Save and write out the registry"""
     assert self._initialized, "Registry not yet initialized"
 
-    tmp_path = self._reg_path + '.new'
-    self._write(tmp_path)
-    os.rename(tmp_path, self._reg_path)
+    self._write(self._reg_path)
     LOG.info('=== Saved registry at %s' % (self._reg_path,))
 
 
 class HueApp(object):
   """
   Represents an app.
+
+  Path provided should be absolute or relative to common.APPS_ROOT
   """
   @staticmethod
   def create(json):
@@ -143,18 +133,37 @@ class HueApp(object):
       raise TypeError
     return cmp((self.name, self.version), (other.name, other.version))
 
+  @property
+  def rel_path(self):
+    if os.path.isabs(self.path):
+      return os.path.relpath(self.path, common.APPS_ROOT)
+    else:
+      return self.path
+
+  @property
+  def abs_path(self):
+    if not os.path.isabs(self.path):
+      return os.path.abspath(os.path.join(common.APPS_ROOT, self.path))
+    else:
+      return self.path
+
+  def use_rel_path(self):
+    self.path = self.rel_path
+
+  def use_abs_path(self):
+    self.path = self.abs_path
+
   def jsonable(self):
     return dict(name=self.name, version=self.version, path=self.path,
                 desc=self.desc, author=self.author)
 
   def find_ext_pys(self):
     """find_ext_pys() -> A list of paths for all ext-py packages"""
-    return glob.glob(os.path.join(self.path, 'ext-py', '*'))
+    return glob.glob(os.path.join(self.abs_path, 'ext-py', '*'))
 
   def get_conffiles(self):
     """get_conffiles() -> A list of config (.ini) files"""
-    ini_files = glob.glob(os.path.join(self.path, 'conf', '*.ini'))
-    return [ os.path.abspath(ini) for ini in ini_files ]
+    return glob.glob(os.path.join(self.abs_path, 'conf', '*.ini'))
 
 
   def install_conf(self):
@@ -201,7 +210,7 @@ class HueApp(object):
 
   def uninstall_conf(self):
     """uninstall_conf() -> True/False"""
-    app_conf_dir = os.path.abspath(os.path.join(self.path, 'conf'))
+    app_conf_dir = os.path.abspath(os.path.join(self.abs_path, 'conf'))
     if not os.path.isdir(app_conf_dir):
       return True
 

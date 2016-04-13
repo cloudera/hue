@@ -26,6 +26,10 @@ def col_type(col):
     return "array <%s>" % col["array_type"]
   elif col["column_type"] == "map":
     return "map <%s, %s>" % (col["map_key_type"], col["map_value_type"])
+  elif col["column_type"] == "char":
+    return "char(%d)" % col["char_length"]
+  elif col["column_type"] == "varchar":
+    return "varchar(%d)" % col["varchar_length"]
   return col["column_type"]
 %>\
 <%def name="column_list(columns)">\
@@ -50,7 +54,7 @@ CREATE \
 % if not table.get("use_default_location", True):
 EXTERNAL \
 % endif
-TABLE `${ table["name"] | n }`
+TABLE `${ '%s.%s' % (database, table["name"]) | n }`
 ${column_list(columns)|n}
 % if table["comment"]:
 COMMENT "${table["comment"] | n}"

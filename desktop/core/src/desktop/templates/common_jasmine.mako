@@ -14,53 +14,53 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%namespace name="require" file="/require.mako" />
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Jasmine Spec Runner</title>
+  <title>Jasmine Spec Runner</title>
 
-    <link rel="stylesheet" type="text/css" href="/static/ext/css/jasmine.css">
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-1.2.0.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-html-1.2.0.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
-    <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-jquery-1.3.1.js"></script>
-    <script type="text/javascript" src="/static/ext/js/knockout-2.1.0.js"></script>
+  <link rel="shortcut icon" type="image/png" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.css') }">
 
-    <%block name="specs"/>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 
-    <script type="text/javascript">
-        (function() {
-            var jasmineEnv = jasmine.getEnv();
-            jasmineEnv.updateInterval = 1000;
+  <script src="${ static('desktop/js/ace/ace.js') }"></script>
+  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+  <script src="${ static('desktop/js/ace.extended.js') }"></script>
 
-            var htmlReporter = new jasmine.HtmlReporter();
+  ${ require.config() }
 
-            jasmineEnv.addReporter(htmlReporter);
+  <script type="text/javascript" charset="utf-8">
+    // Adds the jasmine dependencies to the existing require config.
+    require.config({
+      urlArgs: "random=" + Math.random(),
+      baseUrl: "${ static('') }",
+      paths: {
+        'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
+        'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
+        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+      },
+      shim: {
+        'jasmine-html': {
+          deps : ['jasmine']
+        },
+        'jasmine-boot': {
+          deps : ['jasmine', 'jasmine-html']
+        }
+      }
+    })
+  </script>
 
-            jasmineEnv.specFilter = function(spec) {
-                return htmlReporter.specFilter(spec);
-            };
-
-            var currentWindowOnload = window.onload;
-
-            window.onload = function() {
-                if (currentWindowOnload) {
-                    currentWindowOnload();
-                }
-                execJasmine();
-            };
-
-            function execJasmine() {
-                jasmineEnv.execute();
-            }
-
-        })();
-    </script>
-
+  <%block name="specs"/>
 </head>
 
 <body>
-    <%block name="fixtures"/>
+  <%block name="fixtures"/>
 </body>
 </html>

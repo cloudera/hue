@@ -15,12 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Utilities for Thrift
-import desktop.lib.eventlet_util
 
 import Queue
 import logging
-import select
 import socket
 import threading
 import time
@@ -29,12 +26,16 @@ import sys
 
 from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
-from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
+from thrift.transport.TSSLSocket import TSSLSocket
+from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
-from desktop.lib.exceptions import StructuredThriftTransportException
+from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
+
+from desktop.lib.python_util import create_synchronous_io_multiplexer
+from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_sasl import TSaslClientTransport
-import desktop.lib.exceptions as exceptions
+from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
@@ -45,6 +46,7 @@ MAX_RECURSION_DEPTH = 50
 # depends on the number of millis the call took.
 WARN_LEVEL_CALL_DURATION_MS = 5000
 INFO_LEVEL_CALL_DURATION_MS = 1000
+
 
 class LifoQueue(Queue.Queue):
     '''
@@ -67,31 +69,72 @@ class LifoQueue(Queue.Queue):
     def _get(self):
         return self.queue.pop()
 
+
 class ConnectionConfig(object):
   """ Struct-like class encapsulating the configuration of a Thrift client. """
   def __init__(self, klass, host, port, service_name,
                use_sasl=False,
+               use_ssl=False,
                kerberos_principal="thrift",
-               timeout_seconds=45):
+               mechanism='GSSAPI',
+               username='hue',
+               password='hue',
+               ca_certs=None,
+               keyfile=None,
+               certfile=None,
+               validate=False,
+               timeout_seconds=45,
+               transport='buffered',
+               multiple=False,
+               transport_mode='socket',
+               http_url=''):
     """
     @param klass The thrift client class
     @param host Host to connect to
     @param port Port to connect to
     @param service_name A human-readable name to describe the service
-    @param use_sasl If true, will use Kerberos over SASL to authenticate
+    @param use_sasl If true, will use KERBEROS or PLAIN over SASL to authenticate
+    @param use_ssl If true, will use ca_certs, keyfile, and certfile to create TLS connection
+    @param mechanism: GSSAPI or PLAIN if SASL
+    @param username: username if PLAIN SASL or LDAP only
+    @param password: password if PLAIN LDAP only
     @param kerberos_principal The Kerberos service name to connect to.
               NOTE: for a service like fooservice/foo.blah.com@REALM only
               specify "fooservice", NOT the full principal name.
+    @param ca_certs certificate authority certificates
+    @param keyfile private key file
+    @param certfile certificate file
+    @param validate Validate the certificate received from server
     @param timeout_seconds Timeout for thrift calls
+    @param transport string representation of thrift transport to use
+    @param multiple Whether Use MultiplexedProtocol
+    @param transport_mode Can be socket or http
+    @param Url used when using http transport mode
     """
     self.klass = klass
     self.host = host
     self.port = port
     self.service_name = service_name
     self.use_sasl = use_sasl
+    self.use_ssl = use_ssl
+    self.mechanism = mechanism
+    self.username = username
+    self.password = password
     self.kerberos_principal = kerberos_principal
+    self.ca_certs = ca_certs
+    self.keyfile = keyfile
+    self.certfile = certfile
+    self.validate = validate
     self.timeout_seconds = timeout_seconds
+    self.transport = transport
+    self.multiple = multiple
+    self.transport_mode = transport_mode
+    self.http_url = http_url
 
+  def __str__(self):
+    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
+                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport,
+                               self.multiple, self.transport_mode, self.http_url]))
 
 class ConnectionPooler(object):
   """
@@ -115,8 +158,7 @@ class ConnectionPooler(object):
     self.poolsize = poolsize
     self.dictlock = threading.Lock()
 
-  def get_client(self, conf,
-                 get_client_timeout=None):
+  def get_client(self, conf, get_client_timeout=None):
     """
     Could block while we wait for the pool to become non-empty.
 
@@ -142,11 +184,19 @@ class ConnectionPooler(object):
       try:
         if _get_pool_key(conf) not in self.pooldict:
           q = LifoQueue(self.poolsize)
-          self.pooldict[_get_pool_key(conf)] = q
           for i in xrange(self.poolsize):
             client = construct_superclient(conf)
             client.CID = i
             q.put(client, False)
+
+          # Wait until the queue has been filled with connections before adding
+          # it to the pool. This is done last because any exceptions thrown
+          # by the client construction could result in there being no
+          # connections available in this pool. When `get_client` is called next,
+          # it would skip this block because the key has a value, but then it
+          # would deadlock later because there are no connections for it to
+          # fetch from the pool.
+          self.pooldict[_get_pool_key(conf)] = q
       finally:
         self.dictlock.release()
 
@@ -154,6 +204,7 @@ class ConnectionPooler(object):
 
     start_pool_get_time = time.time()
     has_waited_for = 0
+
     while connection is None:
       if get_client_timeout is not None:
         this_round_timeout = max(min(get_client_timeout - has_waited_for, 1), 0)
@@ -183,11 +234,11 @@ class ConnectionPooler(object):
     self.pooldict[_get_pool_key(conf)].put(client)
 
 def _get_pool_key(conf):
-   """
-   Given a ConnectionConfig, return the tuple used as the key in the dictionary
-   of connections by the ConnectionPooler class.
-   """
-   return (conf.klass, conf.host, conf.port)
+  """
+  Given a ConnectionConfig, return the tuple used as the key in the dictionary
+  of connections by the ConnectionPooler class.
+  """
+  return (conf.klass, conf.host, conf.port)
 
 def construct_superclient(conf):
   """
@@ -204,35 +255,52 @@ def connect_to_thrift(conf):
 
   Returns a tuple of (service, protocol, transport)
   """
-  sock = TSocket(conf.host, conf.port)
+  if conf.transport_mode == 'http':
+    mode = THttpClient(conf.http_url)
+  else:
+    if conf.use_ssl:
+      mode = TSSLSocket(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
+    else:
+      mode = TSocket(conf.host, conf.port)
+
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)
-    sock.setTimeout(conf.timeout_seconds*1000.0)
-  if conf.use_sasl:
+    mode.setTimeout(conf.timeout_seconds * 1000.0)
+
+  if conf.transport_mode == 'http':
+    if conf.use_sasl and conf.mechanism != 'PLAIN':
+      mode.set_kerberos_auth()
+    else:
+      mode.set_basic_auth(conf.username, conf.password)
+
+  if conf.transport_mode == 'socket' and conf.use_sasl:
     def sasl_factory():
       saslc = sasl.Client()
-      saslc.setAttr("host", conf.host)
-      saslc.setAttr("service", conf.kerberos_principal)
+      saslc.setAttr("host", str(conf.host))
+      saslc.setAttr("service", str(conf.kerberos_principal))
+      if conf.mechanism == 'PLAIN':
+        saslc.setAttr("username", str(conf.username))
+        saslc.setAttr("password", str(conf.password)) # Defaults to 'hue' for a non-empty string unless using LDAP
       saslc.init()
       return saslc
-
-    transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
+    transport = TSaslClientTransport(sasl_factory, conf.mechanism, mode)
+  elif conf.transport == 'framed':
+    transport = TFramedTransport(mode)
   else:
-    transport = TBufferedTransport(sock)
+    transport = TBufferedTransport(mode)
 
   protocol = TBinaryProtocol(transport)
+  if conf.multiple:
+    protocol = TMultiplexedProtocol(protocol, conf.service_name)
   service = conf.klass(protocol)
   return service, protocol, transport
 
 
 _connection_pool = ConnectionPooler()
 
-def get_client(klass, host, port, service_name,
-               **kwargs):
-  conf = ConnectionConfig(
-    klass, host, port, service_name,
-    **kwargs)
+def get_client(klass, host, port, service_name, **kwargs):
+  conf = ConnectionConfig(klass, host, port, service_name, **kwargs)
   return PooledClient(conf)
 
 def _grab_transport_from_wrapper(outer_transport):
@@ -240,6 +308,8 @@ def _grab_transport_from_wrapper(outer_transport):
     return outer_transport._TBufferedTransport__trans
   elif isinstance(outer_transport, TSaslClientTransport):
     return outer_transport._trans
+  elif isinstance(outer_transport, TFramedTransport):
+    return outer_transport._TFramedTransport__trans
   else:
     raise Exception("Unknown transport type: " + outer_transport.__class__)
 
@@ -250,60 +320,74 @@ class PooledClient(object):
   def __init__(self, conf):
     self.conf = conf
 
-  def __getattr__(self, attr):
-    if attr in self.__dict__:
-      return self.__dict__[attr]
+  def __getattr__(self, attr_name):
+    if attr_name in self.__dict__:
+      return self.__dict__[attr_name]
 
     # Fetch the thrift client from the pool
-    superclient = _connection_pool.get_client(self.conf)
+    superclient = _connection_pool.get_client(self.conf,
+        get_client_timeout=self.conf.timeout_seconds)
 
-    res = getattr(superclient, attr)
-    if not callable(res):
-      # It's a simple attribute. We can put the superclient back in the pool.
-      _connection_pool.return_client(self.conf, superclient)
-      return res
-    else:
-      # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
-      # and return the connection to the pool when done.
-      def wrapper(*args, **kwargs):
+    # Fetch the attribute. If it's callable, wrap it in a wrapper that re-gets
+    # the client.
+    try:
+      attr = getattr(superclient, attr_name)
+
+      if callable(attr):
+        return self._wrap_callable(attr_name)
+      else:
+        return attr
+    finally:
+      self._return_client(superclient)
+
+  def _wrap_callable(self, attr_name):
+    # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
+    # and return the connection to the pool when done.
+    def wrapper(*args, **kwargs):
+      superclient = _connection_pool.get_client(self.conf)
+
+      try:
+        attr = getattr(superclient, attr_name)
+
         try:
-          try:
-            # Poke it to see if it's closed on the other end. This can happen if a connection
-            # sits in the connection pool longer than the read timeout of the server.
-            sock = _grab_transport_from_wrapper(superclient.transport).handle
-            if sock:
-              rlist,wlist,xlist = select.select([sock], [], [], 0)
-              if rlist:
-                # the socket is readable, meaning there is either data from a previous call
-                # (i.e our protocol is out of sync), or the connection was shut down on the
-                # remote side. Either way, we need to reopen the connection.
-                # If the socket was closed remotely, btw, socket.read() will return
-                # an empty string.  This is a fairly normal condition, btw, since
-                # there are timeouts on both the server and client sides.
-                superclient.transport.close()
-                superclient.transport.open()
+          # Poke it to see if it's closed on the other end. This can happen if a connection
+          # sits in the connection pool longer than the read timeout of the server.
+          sock = self.conf.transport_mode != 'http' and _grab_transport_from_wrapper(superclient.transport).handle
+          if sock and create_synchronous_io_multiplexer().read([sock]):
+            # the socket is readable, meaning there is either data from a previous call
+            # (i.e our protocol is out of sync), or the connection was shut down on the
+            # remote side. Either way, we need to reopen the connection.
+            # If the socket was closed remotely, btw, socket.read() will return
+            # an empty string.  This is a fairly normal condition, btw, since
+            # there are timeouts on both the server and client sides.
+            superclient.transport.close()
+            superclient.transport.open()
 
-            superclient.set_timeout(self.conf.timeout_seconds)
-            ret = res(*args, **kwargs)
-            return ret
-          except TApplicationException, e:
-            # Unknown thrift exception... typically IO errors
-            logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
-            raise exceptions.StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
-          except socket.error, e:
-            logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
-            raise exceptions.StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
-          except TTransportException, e:
-            logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
-            raise exceptions.StructuredThriftTransportException(e, error_code=502)
-          except Exception, e:
-            # Stack tends to be only noisy here.
-            logging.info("Thrift saw exception: " + str(e), exc_info=False)
-            raise
-        finally:
-          _connection_pool.return_client(self.conf, superclient)
-      return wrapper
+          superclient.set_timeout(self.conf.timeout_seconds)
 
+          return attr(*args, **kwargs)
+        except TApplicationException, e:
+          # Unknown thrift exception... typically IO errors
+          logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
+          raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
+        except socket.error, e:
+          logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
+          raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
+        except TTransportException, e:
+          logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
+          raise StructuredThriftTransportException(e, error_code=502)
+        except Exception, e:
+          # Stack tends to be only noisy here.
+          logging.info("Thrift saw exception: " + str(e), exc_info=False)
+          raise
+      finally:
+        self._return_client(superclient)
+    wrapper.attr = attr_name # Save the name of the attribute as it is replaced by 'wrapper'
+
+    return wrapper
+
+  def _return_client(self, superclient):
+    _connection_pool.return_client(self.conf, superclient)
 
 
 class SuperClient(object):
@@ -434,7 +518,7 @@ def thrift2json(tft):
       N.B.: For maximal compatibility, the key type for map should be a basic type
       rather than a struct or container type. There are some languages which do not
       support more complex key types in their native map types. In addition the
-      JSON protocol only supports key types that are base types. 
+      JSON protocol only supports key types that are base types.
   I believe this ought to be true for sets, as well.
   """
   if isinstance(tft,type(None)):
@@ -470,7 +554,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
   Recursive implementation method of jsonable2thrift.
 
   type_enum corresponds to TType.  spec_args is part of the
-  thrift_spec explained in Thrift's code generator.  See 
+  thrift_spec explained in Thrift's code generator.  See
   compiler/cpp/src/generate/t_py_generator.cc .
   default is the default value.
 
@@ -492,7 +576,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
     """
     Helper function to check bounds.
 
-    The Thrift IDL specifies how many bytes numbers can be, and always uses 
+    The Thrift IDL specifies how many bytes numbers can be, and always uses
     signed integers.  This makes sure that the Thrift struct that comes out
     conforms to that schema.
     """
@@ -544,7 +628,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
         # thrift_spec is indexed by thrift tag id, so None shows up
         continue
       _, cur_type_enum, cur_name, cur_spec_args, cur_default = spec
-      value = _jsonable2thrift_helper(jsonable.get(cur_name), 
+      value = _jsonable2thrift_helper(jsonable.get(cur_name),
         cur_type_enum, cur_spec_args, cur_default, recursion_depth + 1)
       setattr(out, cur_name, value)
     return out
@@ -579,7 +663,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
 
   else:
     raise Exception("Unrecognized type: %s.  Value was %s." % (repr(type_enum), repr(jsonable)))
-    
+
 def jsonable2thrift(jsonable, thrift_class):
   """
   Converts a JSON-able x that represents a thrift struct
@@ -590,9 +674,9 @@ def jsonable2thrift(jsonable, thrift_class):
   This is compatible with thrift2json.
   """
   return _jsonable2thrift_helper(
-    jsonable, 
-    TType.STRUCT, 
-    (thrift_class, thrift_class.thrift_spec), 
+    jsonable,
+    TType.STRUCT,
+    (thrift_class, thrift_class.thrift_spec),
     default=None,
     recursion_depth=0
   )

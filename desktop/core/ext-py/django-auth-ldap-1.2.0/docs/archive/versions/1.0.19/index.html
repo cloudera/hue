@@ -1,0 +1,1030 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django authentication using LDAP &mdash; django-auth-ldap 1.0.19 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.19',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="django-auth-ldap 1.0.19 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">django-auth-ldap 1.0.19 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-authentication-using-ldap">
+<h1>Django authentication using LDAP<a class="headerlink" href="#django-authentication-using-ldap" title="Permalink to this headline">¶</a></h1>
+<p>This authentication backend enables a Django project to authenticate against any
+LDAP server. To use it, add <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">django_auth_ldap.backend.LDAPBackend</span></tt></a> to
+AUTHENTICATION_BACKENDS. It is not necessary to add <cite>django_auth_ldap</cite> to
+INSTALLED_APPLICATIONS unless you would like to run the unit tests. LDAP
+configuration can be as simple as a single distinguished name template, but
+there are many rich options for working with
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> objects, groups, and permissions. This
+backend depends on the <a class="reference external" href="http://www.python-ldap.org/">python-ldap</a> module.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> does not inherit from
+<tt class="xref py py-class docutils literal"><span class="pre">ModelBackend</span></tt>. It is possible to use
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> exclusively by configuring it
+to draw group membership from the LDAP server. However, if you would like to
+assign permissions to individual users or add users to groups within Django,
+you&#8217;ll need to have both backends installed:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="n">AUTHENTICATION_BACKENDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django_auth_ldap.backend.LDAPBackend&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.backends.ModelBackend&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-basic-authentication">
+<h2>Configuring basic authentication<a class="headerlink" href="#configuring-basic-authentication" title="Permalink to this headline">¶</a></h2>
+<p>If your LDAP server isn&#8217;t running locally on the default port, you&#8217;ll want to
+start by setting <a class="reference internal" href="#auth-ldap-server-uri"><em>AUTH_LDAP_SERVER_URI</em></a> to point to your server.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_SERVER_URI</span> <span class="o">=</span> <span class="s">&quot;ldap://ldap.example.com&quot;</span>
+</pre></div>
+</div>
+<p>That done, the first step is to authenticate a username and password against the
+LDAP service. There are two ways to do this, called search/bind and simply bind.
+The first one involves connecting to the LDAP server either anonymously or with
+a fixed account and searching for the distinguished name of the authenticating
+user. Then we can attempt to bind again with the user&#8217;s password. The second
+method is to derive the user&#8217;s DN from his username and attempt to bind as the
+user directly.</p>
+<p>Because LDAP searches appear elsewhere in the configuration, the
+<a class="reference internal" href="#django_auth_ldap.config.LDAPSearch" title="django_auth_ldap.config.LDAPSearch"><tt class="xref py py-class docutils literal"><span class="pre">LDAPSearch</span></tt></a> class is provided to encapsulate
+search information. In this case, the filter parameter should contain the
+placeholder <tt class="docutils literal"><span class="pre">%(user)s</span></tt>. A simple configuration for the search/bind approach
+looks like this (some defaults included for completeness):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ldap</span>
+<span class="kn">from</span> <span class="nn">django_auth_ldap.config</span> <span class="kn">import</span> <span class="n">LDAPSearch</span>
+
+<span class="n">AUTH_LDAP_BIND_DN</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="n">AUTH_LDAP_BIND_PASSWORD</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+<span class="n">AUTH_LDAP_USER_SEARCH</span> <span class="o">=</span> <span class="n">LDAPSearch</span><span class="p">(</span><span class="s">&quot;ou=users,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span><span class="p">,</span> <span class="s">&quot;(uid=</span><span class="si">%(user)s</span><span class="s">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will perform an anonymous bind, search under
+<tt class="docutils literal"><span class="pre">&quot;ou=users,dc=example,dc=com&quot;</span></tt> for an object with a uid matching the user&#8217;s
+name, and try to bind using that DN and the user&#8217;s password. The search must
+return exactly one result or authentication will fail. If you can&#8217;t search
+anonymously, you can set <a class="reference internal" href="#auth-ldap-bind-dn"><em>AUTH_LDAP_BIND_DN</em></a> to the distinguished name of
+an authorized user and <a class="reference internal" href="#auth-ldap-bind-password"><em>AUTH_LDAP_BIND_PASSWORD</em></a> to the password.</p>
+<p>To skip the search phase, set <a class="reference internal" href="#auth-ldap-user-dn-template"><em>AUTH_LDAP_USER_DN_TEMPLATE</em></a> to a template
+that will produce the authenticating user&#8217;s DN directly. This template should
+have one placeholder, <tt class="docutils literal"><span class="pre">%(user)s</span></tt>. If the previous example had used
+<tt class="docutils literal"><span class="pre">ldap.SCOPE_ONELEVEL</span></tt>, the following would be a more straightforward (and
+efficient) equivalent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_USER_DN_TEMPLATE</span> <span class="o">=</span> <span class="s">&quot;uid=</span><span class="si">%(user)s</span><span class="s">,ou=users,dc=example,dc=com&quot;</span>
+</pre></div>
+</div>
+<p>LDAP is fairly flexible when it comes to matching DNs.
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> make an effort to accommodate
+this by forcing usernames to lower case when creating Django users and trimming
+whitespace when authenticating.</p>
+<p>By default, all LDAP operations are performed with the <a class="reference internal" href="#auth-ldap-bind-dn"><em>AUTH_LDAP_BIND_DN</em></a>
+and <a class="reference internal" href="#auth-ldap-bind-password"><em>AUTH_LDAP_BIND_PASSWORD</em></a> credentials, not with the user&#8217;s. Otherwise,
+the LDAP connection would be bound as the authenticating user during login
+requests and as the default credentials during other requests, so you would see
+inconsistent LDAP attributes depending on the nature of the Django view. If
+you&#8217;re willing to accept the inconsistency in order to retrieve attributes
+while bound as the authenticating user. see
+<a class="reference internal" href="#auth-ldap-bind-as-authenticating-user"><em>AUTH_LDAP_BIND_AS_AUTHENTICATING_USER</em></a>.</p>
+<p>By default, LDAP connections are unencrypted and make no attempt to protect
+sensitive information, such as passwords. When communicating with an LDAP server
+on localhost or on a local network, this might be fine. If you need a secure
+connection to the LDAP server, you can either use an <tt class="docutils literal"><span class="pre">ldaps://</span></tt> URL or enable
+the StartTLS extension. The latter is generally the preferred mechanism. To
+enable StartTLS, set <a class="reference internal" href="#auth-ldap-start-tls"><em>AUTH_LDAP_START_TLS</em></a> to <tt class="docutils literal"><span class="pre">True</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_START_TLS</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-groups">
+<h2>Working with groups<a class="headerlink" href="#working-with-groups" title="Permalink to this headline">¶</a></h2>
+<p>Working with groups in LDAP can be a tricky business, mostly because there are
+so many different kinds. This module includes an extensible API for working with
+any kind of group and includes implementations for the most common ones.
+<a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> is a base class whose concrete
+subclasses can determine group membership for particular grouping mechanisms.
+Three built-in subclasses cover most grouping mechanisms:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#django_auth_ldap.config.PosixGroupType" title="django_auth_ldap.config.PosixGroupType"><tt class="xref py py-class docutils literal"><span class="pre">PosixGroupType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.MemberDNGroupType" title="django_auth_ldap.config.MemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">MemberDNGroupType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.NestedMemberDNGroupType" title="django_auth_ldap.config.NestedMemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">NestedMemberDNGroupType</span></tt></a></li>
+</ul>
+</div></blockquote>
+<p>posixGroup objects are somewhat specialized, so they get their own class. The
+other two cover mechanisms whereby a group object stores a list of its members
+as distinguished names. This includes groupOfNames, groupOfUniqueNames, and
+Active Directory groups, among others. The nested variant allows groups to
+contain other groups, to as many levels as you like. For convenience and
+readability, several trivial subclasses of the above are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#django_auth_ldap.config.GroupOfNamesType" title="django_auth_ldap.config.GroupOfNamesType"><tt class="xref py py-class docutils literal"><span class="pre">GroupOfNamesType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.NestedGroupOfNamesType" title="django_auth_ldap.config.NestedGroupOfNamesType"><tt class="xref py py-class docutils literal"><span class="pre">NestedGroupOfNamesType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.GroupOfUniqueNamesType" title="django_auth_ldap.config.GroupOfUniqueNamesType"><tt class="xref py py-class docutils literal"><span class="pre">GroupOfUniqueNamesType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.NestedGroupOfUniqueNamesType" title="django_auth_ldap.config.NestedGroupOfUniqueNamesType"><tt class="xref py py-class docutils literal"><span class="pre">NestedGroupOfUniqueNamesType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.ActiveDirectoryGroupType" title="django_auth_ldap.config.ActiveDirectoryGroupType"><tt class="xref py py-class docutils literal"><span class="pre">ActiveDirectoryGroupType</span></tt></a></li>
+<li><a class="reference internal" href="#django_auth_ldap.config.NestedActiveDirectoryGroupType" title="django_auth_ldap.config.NestedActiveDirectoryGroupType"><tt class="xref py py-class docutils literal"><span class="pre">NestedActiveDirectoryGroupType</span></tt></a></li>
+</ul>
+</div></blockquote>
+<p>To get started, you&#8217;ll need to provide some basic information about your LDAP
+groups. <a class="reference internal" href="#auth-ldap-group-search"><em>AUTH_LDAP_GROUP_SEARCH</em></a> is an
+<a class="reference internal" href="#django_auth_ldap.config.LDAPSearch" title="django_auth_ldap.config.LDAPSearch"><tt class="xref py py-class docutils literal"><span class="pre">LDAPSearch</span></tt></a> object that identifies the set of
+relevant group objects. That is, all groups that users might belong to as well
+as any others that we might need to know about (in the case of nested groups,
+for example). <a class="reference internal" href="#auth-ldap-group-type"><em>AUTH_LDAP_GROUP_TYPE</em></a> is an instance of the class
+corresponding to the type of group that will be returned by
+<a class="reference internal" href="#auth-ldap-group-search"><em>AUTH_LDAP_GROUP_SEARCH</em></a>. All groups referenced elsewhere in the
+configuration must be of this type and part of the search results.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ldap</span>
+<span class="kn">from</span> <span class="nn">django_auth_ldap.config</span> <span class="kn">import</span> <span class="n">LDAPSearch</span><span class="p">,</span> <span class="n">GroupOfNamesType</span>
+
+<span class="n">AUTH_LDAP_GROUP_SEARCH</span> <span class="o">=</span> <span class="n">LDAPSearch</span><span class="p">(</span><span class="s">&quot;ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span><span class="p">,</span> <span class="s">&quot;(objectClass=groupOfNames)&quot;</span>
+<span class="p">)</span>
+<span class="n">AUTH_LDAP_GROUP_TYPE</span> <span class="o">=</span> <span class="n">GroupOfNamesType</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The simplest use of groups is to limit the users who are allowed to log in. If
+<a class="reference internal" href="#auth-ldap-require-group"><em>AUTH_LDAP_REQUIRE_GROUP</em></a> is set, then only users who are members of that
+group will successfully authenticate. <a class="reference internal" href="#auth-ldap-deny-group"><em>AUTH_LDAP_DENY_GROUP</em></a> is the
+reverse: if given, members of this group will be rejected.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_REQUIRE_GROUP</span> <span class="o">=</span> <span class="s">&quot;cn=enabled,ou=groups,dc=example,dc=com&quot;</span>
+<span class="n">AUTH_LDAP_DENY_GROUP</span> <span class="o">=</span> <span class="s">&quot;cn=disabled,ou=groups,dc=example,dc=com&quot;</span>
+</pre></div>
+</div>
+<p>More advanced uses of groups are covered in the next two sections.</p>
+</div>
+<div class="section" id="user-objects">
+<h2>User objects<a class="headerlink" href="#user-objects" title="Permalink to this headline">¶</a></h2>
+<p>Authenticating against an external source is swell, but Django&#8217;s auth module is
+tightly bound to the <tt class="xref py py-class docutils literal"><span class="pre">django.contrib.auth.models.User</span></tt> model. Thus, when
+a user logs in, we have to create a <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt>
+object to represent him in the database. Because the LDAP search is
+case-insenstive, the default implementation also searches for existing Django
+users with an iexact query and new users are created with lowercase usernames.
+See <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.get_or_create_user" title="django_auth_ldap.backend.LDAPBackend.get_or_create_user"><tt class="xref py py-meth docutils literal"><span class="pre">get_or_create_user()</span></tt></a> if you&#8217;d
+like to override this behavior.</p>
+<p>The only required field for a user is the username, which we obviously have. The
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> model is picky about the characters
+allowed in usernames, so <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> includes
+a pair of hooks,
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.ldap_to_django_username" title="django_auth_ldap.backend.LDAPBackend.ldap_to_django_username"><tt class="xref py py-meth docutils literal"><span class="pre">ldap_to_django_username()</span></tt></a> and
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.django_to_ldap_username" title="django_auth_ldap.backend.LDAPBackend.django_to_ldap_username"><tt class="xref py py-meth docutils literal"><span class="pre">django_to_ldap_username()</span></tt></a>, to
+translate between LDAP usernames and Django usernames. You&#8217;ll need this, for
+example, if your LDAP names have periods in them. You can subclass
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> to implement these hooks; by
+default the username is not modified. <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt>
+objects that are authenticated by <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a>
+will have an <tt class="xref py py-attr docutils literal"><span class="pre">ldap_username</span></tt> attribute
+with the original (LDAP) username.
+<tt class="xref py py-attr docutils literal"><span class="pre">username</span></tt> will, of course, be the Django
+username.</p>
+<p>LDAP directories tend to contain much more information about users that you may
+wish to propagate. A pair of settings, <a class="reference internal" href="#auth-ldap-user-attr-map"><em>AUTH_LDAP_USER_ATTR_MAP</em></a> and
+<a class="reference internal" href="#auth-ldap-profile-attr-map"><em>AUTH_LDAP_PROFILE_ATTR_MAP</em></a>, serve to copy directory information into
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> and profile objects. These are
+dictionaries that map user and profile model keys, respectively, to
+(case-insensitive) LDAP attribute names:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_USER_ATTR_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="s">&quot;givenName&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="s">&quot;sn&quot;</span><span class="p">}</span>
+<span class="n">AUTH_LDAP_PROFILE_ATTR_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;home_directory&quot;</span><span class="p">:</span> <span class="s">&quot;homeDirectory&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Only string fields can be mapped to attributes. Boolean fields can be defined by
+group membership:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_USER_FLAGS_BY_GROUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;is_active&quot;</span><span class="p">:</span> <span class="s">&quot;cn=active,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="s">&quot;is_staff&quot;</span><span class="p">:</span> <span class="s">&quot;cn=staff,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="s">&quot;is_superuser&quot;</span><span class="p">:</span> <span class="s">&quot;cn=superuser,ou=groups,dc=example,dc=com&quot;</span>
+<span class="p">}</span>
+
+<span class="n">AUTH_LDAP_PROFILE_FLAGS_BY_GROUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;is_awesome&quot;</span><span class="p">:</span> <span class="s">&quot;cn=awesome,ou=django,ou=groups,dc=example,dc=com&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>By default, all mapped user fields will be updated each time the user logs in.
+To disable this, set <a class="reference internal" href="#auth-ldap-always-update-user"><em>AUTH_LDAP_ALWAYS_UPDATE_USER</em></a> to <tt class="docutils literal"><span class="pre">False</span></tt>. If you
+need to populate a user outside of the authentication process—for example, to
+create associated model objects before the user logs in for the first time—you
+can call <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.populate_user" title="django_auth_ldap.backend.LDAPBackend.populate_user"><tt class="xref py py-meth docutils literal"><span class="pre">django_auth_ldap.backend.LDAPBackend.populate_user()</span></tt></a>. You&#8217;ll
+need an instance of <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a>, which you
+should feel free to create yourself.
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.populate_user" title="django_auth_ldap.backend.LDAPBackend.populate_user"><tt class="xref py py-meth docutils literal"><span class="pre">populate_user()</span></tt></a> returns the new
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> or <cite>None</cite> if the user could not be
+found in LDAP.</p>
+<p>If you need to access multi-value attributes or there is some other reason that
+the above is inadequate, you can also access the user&#8217;s raw LDAP attributes.
+<tt class="docutils literal"><span class="pre">user.ldap_user</span></tt> is an object with four public properties. The group
+properties are, of course, only valid if groups are configured.</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">dn</span></tt>: The user&#8217;s distinguished name.</li>
+<li><tt class="docutils literal"><span class="pre">attrs</span></tt>: The user&#8217;s LDAP attributes as a dictionary of lists of string
+values. The dictionaries are modified to use case-insensitive keys.</li>
+<li><tt class="docutils literal"><span class="pre">group_dns</span></tt>: The set of groups that this user belongs to, as DNs.</li>
+<li><tt class="docutils literal"><span class="pre">group_names</span></tt>: The set of groups that this user belongs to, as simple
+names. These are the names that will be used if
+<a class="reference internal" href="#auth-ldap-mirror-groups"><em>AUTH_LDAP_MIRROR_GROUPS</em></a> is used.</li>
+</ul>
+</div></blockquote>
+<p>Python-ldap returns all attribute values as utf8-encoded strings. For
+convenience, this module will try to decode all values into Unicode strings. Any
+string that can not be successfully decoded will be left as-is; this may apply
+to binary values such as Active Directory&#8217;s objectSid.</p>
+<p>If you would like to perform any additional population of user or profile
+objects, django_auth_ldap exposes two custom signals to help:
+<a class="reference internal" href="#django_auth_ldap.backend.populate_user" title="django_auth_ldap.backend.populate_user"><tt class="xref py py-data docutils literal"><span class="pre">populate_user</span></tt></a> and
+<a class="reference internal" href="#django_auth_ldap.backend.populate_user_profile" title="django_auth_ldap.backend.populate_user_profile"><tt class="xref py py-data docutils literal"><span class="pre">populate_user_profile</span></tt></a>. These are sent after
+the backend has finished populating the respective objects and before they are
+saved to the database. You can use this to propagate additional information from
+the LDAP directory to the user and profile objects any way you like.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Users created by <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will have an
+unusable password set. This will only happen when the user is created, so if
+you set a valid password in Django, the user will be able to log in through
+<tt class="xref py py-class docutils literal"><span class="pre">ModelBackend</span></tt> (if configured) even if
+he is rejected by LDAP. This is not generally recommended, but could be
+useful as a fail-safe for selected users in case the LDAP server is
+unavailable.</p>
+</div>
+</div>
+<div class="section" id="permissions">
+<h2>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h2>
+<p>Groups are useful for more than just populating the user&#8217;s <tt class="docutils literal"><span class="pre">is_*</span></tt> fields.
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> would not be complete without
+some way to turn a user&#8217;s LDAP group memberships into Django model permissions.
+In fact, there are two ways to do this.</p>
+<p>Ultimately, both mechanisms need some way to map LDAP groups to Django groups.
+Implementations of <a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> will have an
+algorithm for deriving the Django group name from the LDAP group. Clients that
+need to modify this behavior can subclass the
+<a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> class. All of the built-in
+implementations take a <tt class="docutils literal"><span class="pre">name_attr</span></tt> argument to <tt class="docutils literal"><span class="pre">__init__</span></tt>, which
+specifies the LDAP attribute from which to take the Django group name. By
+default, the <tt class="docutils literal"><span class="pre">cn</span></tt> attribute is used.</p>
+<p>The least invasive way to map group permissions is to set
+<a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a> to <tt class="docutils literal"><span class="pre">True</span></tt>.
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will then find all of the LDAP
+groups that a user belongs to, map them to Django groups, and load the
+permissions for those groups. You will need to create the Django groups
+yourself, generally through the admin interface.</p>
+<p>To minimize traffic to the LDAP server,
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> can make use of Django&#8217;s cache
+framework to keep a copy of a user&#8217;s LDAP group memberships. To enable this
+feature, set <a class="reference internal" href="#auth-ldap-cache-groups"><em>AUTH_LDAP_CACHE_GROUPS</em></a> to <tt class="docutils literal"><span class="pre">True</span></tt>. You can also set
+<a class="reference internal" href="#auth-ldap-group-cache-timeout"><em>AUTH_LDAP_GROUP_CACHE_TIMEOUT</em></a> to override the timeout of cache entries
+(in seconds).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">AUTH_LDAP_CACHE_GROUPS</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">AUTH_LDAP_GROUP_CACHE_TIMEOUT</span> <span class="o">=</span> <span class="mi">300</span>
+</pre></div>
+</div>
+<p>The second way to turn LDAP group memberships into permissions is to mirror the
+groups themselves. If <a class="reference internal" href="#auth-ldap-mirror-groups"><em>AUTH_LDAP_MIRROR_GROUPS</em></a> is <tt class="docutils literal"><span class="pre">True</span></tt>, then every
+time a user logs in, <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will update
+the database with the user&#8217;s LDAP groups. Any group that doesn&#8217;t exist will be
+created and the user&#8217;s Django group membership will be updated to exactly match
+his LDAP group membership. Note that if the LDAP server has nested groups, the
+Django database will end up with a flattened representation.</p>
+<p>This approach has two main differences from <a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a>.
+First, <a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a> will query for LDAP group membership
+either for every request or according to the cache timeout. With group
+mirroring, membership will be updated when the user authenticates. This may not
+be appropriate for sites with long session timeouts. The second difference is
+that with <a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a>, there is no way for clients to
+determine a user&#8217;s group memberships, only their permissions. If you want to
+make decisions based directly on group membership, you&#8217;ll have to mirror the
+groups.</p>
+<p><a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> has one more feature pertaining
+to permissions, which is the ability to handle authorization for users that it
+did not authenticate. For example, you might be using Django&#8217;s RemoteUserBackend
+to map externally authenticated users to Django users. By setting
+<a class="reference internal" href="#auth-ldap-authorize-all-users"><em>AUTH_LDAP_AUTHORIZE_ALL_USERS</em></a>,
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will map these users to LDAP
+users in the normal way in order to provide authorization information. Note that
+this does <em>not</em> work with <a class="reference internal" href="#auth-ldap-mirror-groups"><em>AUTH_LDAP_MIRROR_GROUPS</em></a>; group mirroring is a
+feature of authentication, not authorization.</p>
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> uses the standard logging module
+to log debug and warning messages to the logger named <tt class="docutils literal"><span class="pre">'django_auth_ldap'</span></tt>. If
+you need debug messages to help with configuration issues, you should add a
+handler to this logger. Note that this logger is initialized with a level of
+NOTSET, so you may need to change the level of the logger in order to get debug
+messages.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;django_auth_ldap&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-options">
+<h2>More options<a class="headerlink" href="#more-options" title="Permalink to this headline">¶</a></h2>
+<p>Miscellaneous settings for <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#auth-ldap-global-options"><em>AUTH_LDAP_GLOBAL_OPTIONS</em></a>: A dictionary of options to pass to
+python-ldap via <tt class="docutils literal"><span class="pre">ldap.set_option()</span></tt>.</li>
+<li><a class="reference internal" href="#auth-ldap-connection-options"><em>AUTH_LDAP_CONNECTION_OPTIONS</em></a>: A dictionary of options to pass to
+each LDAPObject instance via <tt class="docutils literal"><span class="pre">LDAPObject.set_option()</span></tt>.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> is carefully designed not to
+require a connection to the LDAP service for every request. Of course, this
+depends heavily on how it is configured. If LDAP traffic or latency is a concern
+for your deployment, this section has a few tips on minimizing it, in decreasing
+order of impact.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><strong>Cache groups</strong>. If <a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a> is <tt class="docutils literal"><span class="pre">True</span></tt>, the
+default behavior is to reload a user&#8217;s group memberships on every
+request. This is the safest behavior, as any membership change takes
+effect immediately, but it is expensive. If possible, set
+<a class="reference internal" href="#auth-ldap-cache-groups"><em>AUTH_LDAP_CACHE_GROUPS</em></a> to <tt class="docutils literal"><span class="pre">True</span></tt> to remove most of this traffic.
+Alternatively, you might consider using <a class="reference internal" href="#auth-ldap-mirror-groups"><em>AUTH_LDAP_MIRROR_GROUPS</em></a>
+and relying on <tt class="xref py py-class docutils literal"><span class="pre">ModelBackend</span></tt> to
+supply group permissions.</li>
+<li><strong>Don&#8217;t access user.ldap_user.*</strong>. These properties are only cached
+on a per-request basis. If you can propagate LDAP attributes to a
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> or profile object, they will
+only be updated at login. <tt class="docutils literal"><span class="pre">user.ldap_user.attrs</span></tt> triggers an LDAP
+connection for every request in which it&#8217;s accessed. If you&#8217;re not using
+<a class="reference internal" href="#auth-ldap-user-dn-template"><em>AUTH_LDAP_USER_DN_TEMPLATE</em></a>, then accessing <tt class="docutils literal"><span class="pre">user.ldap_user.dn</span></tt>
+will also trigger an LDAP connection.</li>
+<li><strong>Use simpler group types</strong>. Some grouping mechanisms are more expensive
+than others. This will often be outside your control, but it&#8217;s important
+to note that the extra functionality of more complex group types like
+<a class="reference internal" href="#django_auth_ldap.config.NestedGroupOfNamesType" title="django_auth_ldap.config.NestedGroupOfNamesType"><tt class="xref py py-class docutils literal"><span class="pre">NestedGroupOfNamesType</span></tt></a> is not free and
+will generally require a greater number and complexity of LDAP queries.</li>
+<li><strong>Use direct binding</strong>. Binding with
+<a class="reference internal" href="#auth-ldap-user-dn-template"><em>AUTH_LDAP_USER_DN_TEMPLATE</em></a> is a little bit more efficient than
+relying on <a class="reference internal" href="#auth-ldap-user-search"><em>AUTH_LDAP_USER_SEARCH</em></a>. Specifically, it saves two LDAP
+operations (one bind and one search) per login.</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="example-configuration">
+<h2>Example configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Here is a complete example configuration from <tt class="file docutils literal"><span class="pre">settings.py</span></tt> that exercises
+nearly all of the features. In this example, we&#8217;re authenticating against a
+global pool of users in the directory, but we have a special area set aside for
+Django groups (ou=django,ou=groups,dc=example,dc=com). Remember that most of
+this is optional if you just need simple authentication. Some default settings
+and arguments are included for completeness.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ldap</span>
+<span class="kn">from</span> <span class="nn">django_auth_ldap.config</span> <span class="kn">import</span> <span class="n">LDAPSearch</span><span class="p">,</span> <span class="n">GroupOfNamesType</span>
+
+
+<span class="c"># Baseline configuration.</span>
+<span class="n">AUTH_LDAP_SERVER_URI</span> <span class="o">=</span> <span class="s">&quot;ldap://ldap.example.com&quot;</span>
+
+<span class="n">AUTH_LDAP_BIND_DN</span> <span class="o">=</span> <span class="s">&quot;cn=django-agent,dc=example,dc=com&quot;</span>
+<span class="n">AUTH_LDAP_BIND_PASSWORD</span> <span class="o">=</span> <span class="s">&quot;phlebotinum&quot;</span>
+<span class="n">AUTH_LDAP_USER_SEARCH</span> <span class="o">=</span> <span class="n">LDAPSearch</span><span class="p">(</span><span class="s">&quot;ou=users,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span><span class="p">,</span> <span class="s">&quot;(uid=</span><span class="si">%(user)s</span><span class="s">)&quot;</span><span class="p">)</span>
+<span class="c"># or perhaps:</span>
+<span class="c"># AUTH_LDAP_USER_DN_TEMPLATE = &quot;uid=%(user)s,ou=users,dc=example,dc=com&quot;</span>
+
+<span class="c"># Set up the basic group parameters.</span>
+<span class="n">AUTH_LDAP_GROUP_SEARCH</span> <span class="o">=</span> <span class="n">LDAPSearch</span><span class="p">(</span><span class="s">&quot;ou=django,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="n">ldap</span><span class="o">.</span><span class="n">SCOPE_SUBTREE</span><span class="p">,</span> <span class="s">&quot;(objectClass=groupOfNames)&quot;</span>
+<span class="p">)</span>
+<span class="n">AUTH_LDAP_GROUP_TYPE</span> <span class="o">=</span> <span class="n">GroupOfNamesType</span><span class="p">(</span><span class="n">name_attr</span><span class="o">=</span><span class="s">&quot;cn&quot;</span><span class="p">)</span>
+
+<span class="c"># Simple group restrictions</span>
+<span class="n">AUTH_LDAP_REQUIRE_GROUP</span> <span class="o">=</span> <span class="s">&quot;cn=enabled,ou=django,ou=groups,dc=example,dc=com&quot;</span>
+<span class="n">AUTH_LDAP_DENY_GROUP</span> <span class="o">=</span> <span class="s">&quot;cn=disabled,ou=django,ou=groups,dc=example,dc=com&quot;</span>
+
+<span class="c"># Populate the Django user from the LDAP directory.</span>
+<span class="n">AUTH_LDAP_USER_ATTR_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="s">&quot;givenName&quot;</span><span class="p">,</span>
+    <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="s">&quot;sn&quot;</span><span class="p">,</span>
+    <span class="s">&quot;email&quot;</span><span class="p">:</span> <span class="s">&quot;mail&quot;</span>
+<span class="p">}</span>
+
+<span class="n">AUTH_LDAP_PROFILE_ATTR_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;employee_number&quot;</span><span class="p">:</span> <span class="s">&quot;employeeNumber&quot;</span>
+<span class="p">}</span>
+
+<span class="n">AUTH_LDAP_USER_FLAGS_BY_GROUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;is_active&quot;</span><span class="p">:</span> <span class="s">&quot;cn=active,ou=django,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="s">&quot;is_staff&quot;</span><span class="p">:</span> <span class="s">&quot;cn=staff,ou=django,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+    <span class="s">&quot;is_superuser&quot;</span><span class="p">:</span> <span class="s">&quot;cn=superuser,ou=django,ou=groups,dc=example,dc=com&quot;</span>
+<span class="p">}</span>
+
+<span class="n">AUTH_LDAP_PROFILE_FLAGS_BY_GROUP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;is_awesome&quot;</span><span class="p">:</span> <span class="s">&quot;cn=awesome,ou=django,ou=groups,dc=example,dc=com&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c"># This is the default, but I like to be explicit.</span>
+<span class="n">AUTH_LDAP_ALWAYS_UPDATE_USER</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># Use LDAP group membership to calculate group permissions.</span>
+<span class="n">AUTH_LDAP_FIND_GROUP_PERMS</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># Cache group memberships for an hour to minimize LDAP traffic</span>
+<span class="n">AUTH_LDAP_CACHE_GROUPS</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">AUTH_LDAP_GROUP_CACHE_TIMEOUT</span> <span class="o">=</span> <span class="mi">3600</span>
+
+
+<span class="c"># Keep ModelBackend around for per-user permissions and maybe a local</span>
+<span class="c"># superuser.</span>
+<span class="n">AUTHENTICATION_BACKENDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django_auth_ldap.backend.LDAPBackend&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.backends.ModelBackend&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="settings">
+<h3>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="auth-ldap-always-update-user">
+<span id="id1"></span><h4>AUTH_LDAP_ALWAYS_UPDATE_USER<a class="headerlink" href="#auth-ldap-always-update-user" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">True</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, the fields of a <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> object
+will be updated with the latest values from the LDAP directory every time the
+user logs in. Otherwise the <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> object
+will only be populated when it is automatically created.</p>
+</div>
+<div class="section" id="auth-ldap-authorize-all-users">
+<span id="id2"></span><h4>AUTH_LDAP_AUTHORIZE_ALL_USERS<a class="headerlink" href="#auth-ldap-authorize-all-users" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will be able furnish
+permissions for any Django user, regardless of which backend authenticated it.</p>
+</div>
+<div class="section" id="auth-ldap-bind-as-authenticating-user">
+<span id="id3"></span><h4>AUTH_LDAP_BIND_AS_AUTHENTICATING_USER<a class="headerlink" href="#auth-ldap-bind-as-authenticating-user" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, authentication will leave the LDAP connection bound as the
+authenticating user, rather than forcing it to re-bind with the default
+credentials after authentication succeeds. This may be desirable if you do not
+have global credentials that are able to access the user&#8217;s attributes.
+django-auth-ldap never stores the user&#8217;s password, so this only applies to
+requests where the user is authenticated. Thus, the downside to this setting is
+that LDAP results may vary based on whether the user was authenticated earlier
+in the Django view, which could be surprising to code not directly concerned
+with authentication.</p>
+</div>
+<div class="section" id="auth-ldap-bind-dn">
+<span id="id4"></span><h4>AUTH_LDAP_BIND_DN<a class="headerlink" href="#auth-ldap-bind-dn" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">''</span></tt> (Empty string)</p>
+<p>The distinguished name to use when binding to the LDAP server (with
+<a class="reference internal" href="#auth-ldap-bind-password"><em>AUTH_LDAP_BIND_PASSWORD</em></a>). Use the empty string (the default) for an
+anonymous bind. To authenticate a user, we will bind with that user&#8217;s DN and
+password, but for all other LDAP operations, we will be bound as the DN in this
+setting. For example, if <a class="reference internal" href="#auth-ldap-user-dn-template"><em>AUTH_LDAP_USER_DN_TEMPLATE</em></a> is not set, we&#8217;ll use
+this to search for the user. If <a class="reference internal" href="#auth-ldap-find-group-perms"><em>AUTH_LDAP_FIND_GROUP_PERMS</em></a> is <tt class="docutils literal"><span class="pre">True</span></tt>,
+we&#8217;ll also use it to determine group membership.</p>
+</div>
+<div class="section" id="auth-ldap-bind-password">
+<span id="id5"></span><h4>AUTH_LDAP_BIND_PASSWORD<a class="headerlink" href="#auth-ldap-bind-password" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">''</span></tt> (Empty string)</p>
+<p>The password to use with <a class="reference internal" href="#auth-ldap-bind-dn"><em>AUTH_LDAP_BIND_DN</em></a>.</p>
+</div>
+<div class="section" id="auth-ldap-cache-groups">
+<span id="id6"></span><h4>AUTH_LDAP_CACHE_GROUPS<a class="headerlink" href="#auth-ldap-cache-groups" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, LDAP group membership will be cached using Django&#8217;s cache
+framework. The cache timeout can be customized with
+<a class="reference internal" href="#auth-ldap-group-cache-timeout"><em>AUTH_LDAP_GROUP_CACHE_TIMEOUT</em></a>.</p>
+</div>
+<div class="section" id="auth-ldap-connection-options">
+<span id="id7"></span><h4>AUTH_LDAP_CONNECTION_OPTIONS<a class="headerlink" href="#auth-ldap-connection-options" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A dictionary of options to pass to each connection to the LDAP server via
+<tt class="docutils literal"><span class="pre">LDAPObject.set_option()</span></tt>. Keys are <tt class="docutils literal"><span class="pre">ldap.OPT_*</span></tt> constants.</p>
+</div>
+<div class="section" id="auth-ldap-deny-group">
+<span id="id8"></span><h4>AUTH_LDAP_DENY_GROUP<a class="headerlink" href="#auth-ldap-deny-group" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>The distinguished name of a group; authentication will fail for any user
+that belongs to this group.</p>
+</div>
+<div class="section" id="auth-ldap-find-group-perms">
+<span id="id9"></span><h4>AUTH_LDAP_FIND_GROUP_PERMS<a class="headerlink" href="#auth-ldap-find-group-perms" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will furnish group
+permissions based on the LDAP groups the authenticated user belongs to.
+<a class="reference internal" href="#auth-ldap-group-search"><em>AUTH_LDAP_GROUP_SEARCH</em></a> and <a class="reference internal" href="#auth-ldap-group-type"><em>AUTH_LDAP_GROUP_TYPE</em></a> must also be set.</p>
+</div>
+<div class="section" id="auth-ldap-global-options">
+<span id="id10"></span><h4>AUTH_LDAP_GLOBAL_OPTIONS<a class="headerlink" href="#auth-ldap-global-options" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A dictionary of options to pass to <tt class="docutils literal"><span class="pre">ldap.set_option()</span></tt>. Keys are
+<tt class="docutils literal"><span class="pre">ldap.OPT_*</span></tt> constants.</p>
+</div>
+<div class="section" id="auth-ldap-group-cache-timeout">
+<span id="id11"></span><h4>AUTH_LDAP_GROUP_CACHE_TIMEOUT<a class="headerlink" href="#auth-ldap-group-cache-timeout" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>If <a class="reference internal" href="#auth-ldap-cache-groups"><em>AUTH_LDAP_CACHE_GROUPS</em></a> is <tt class="docutils literal"><span class="pre">True</span></tt>, this is the cache timeout for
+group memberships. If <tt class="docutils literal"><span class="pre">None</span></tt>, the global cache timeout will be used.</p>
+</div>
+<div class="section" id="auth-ldap-group-search">
+<span id="id12"></span><h4>AUTH_LDAP_GROUP_SEARCH<a class="headerlink" href="#auth-ldap-group-search" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>An <a class="reference internal" href="#django_auth_ldap.config.LDAPSearch" title="django_auth_ldap.config.LDAPSearch"><tt class="xref py py-class docutils literal"><span class="pre">LDAPSearch</span></tt></a> object that finds all LDAP
+groups that users might belong to. If your configuration makes any references to
+LDAP groups, this and <a class="reference internal" href="#auth-ldap-group-type"><em>AUTH_LDAP_GROUP_TYPE</em></a> must be set.</p>
+</div>
+<div class="section" id="auth-ldap-group-type">
+<span id="id13"></span><h4>AUTH_LDAP_GROUP_TYPE<a class="headerlink" href="#auth-ldap-group-type" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>An <a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> instance describing the type
+of group returned by <a class="reference internal" href="#auth-ldap-group-search"><em>AUTH_LDAP_GROUP_SEARCH</em></a>.</p>
+</div>
+<div class="section" id="auth-ldap-mirror-groups">
+<span id="id14"></span><h4>AUTH_LDAP_MIRROR_GROUPS<a class="headerlink" href="#auth-ldap-mirror-groups" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, <a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> will mirror a user&#8217;s
+LDAP group membership in the Django database. Any time a user authenticates, we
+will create all of his LDAP groups as Django groups and update his Django group
+membership to exactly match his LDAP group membership. If the LDAP server has
+nested groups, the Django database will end up with a flattened representation.</p>
+</div>
+<div class="section" id="auth-ldap-profile-attr-map">
+<span id="id15"></span><h4>AUTH_LDAP_PROFILE_ATTR_MAP<a class="headerlink" href="#auth-ldap-profile-attr-map" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A mapping from user profile field names to LDAP attribute names. A user&#8217;s
+profile will be populated from his LDAP attributes at login.</p>
+</div>
+<div class="section" id="auth-ldap-profile-flags-by-group">
+<span id="id16"></span><h4>AUTH_LDAP_PROFILE_FLAGS_BY_GROUP<a class="headerlink" href="#auth-ldap-profile-flags-by-group" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A mapping from boolean profile field names to distinguished names of LDAP
+groups. The corresponding field in a user&#8217;s profile is set to <tt class="docutils literal"><span class="pre">True</span></tt> or
+<tt class="docutils literal"><span class="pre">False</span></tt> according to whether the user is a member of the group.</p>
+</div>
+<div class="section" id="auth-ldap-require-group">
+<span id="id17"></span><h4>AUTH_LDAP_REQUIRE_GROUP<a class="headerlink" href="#auth-ldap-require-group" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>The distinguished name of a group; authentication will fail for any user that
+does not belong to this group.</p>
+</div>
+<div class="section" id="auth-ldap-server-uri">
+<span id="id18"></span><h4>AUTH_LDAP_SERVER_URI<a class="headerlink" href="#auth-ldap-server-uri" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">ldap://localhost</span></tt></p>
+<p>The URI of the LDAP server. This can be any URI that is supported by your
+underlying LDAP libraries.</p>
+</div>
+<div class="section" id="auth-ldap-start-tls">
+<span id="id19"></span><h4>AUTH_LDAP_START_TLS<a class="headerlink" href="#auth-ldap-start-tls" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt>, each connection to the LDAP server will call start_tls to enable
+TLS encryption over the standard LDAP port. There are a number of configuration
+options that can be given to <a class="reference internal" href="#auth-ldap-global-options"><em>AUTH_LDAP_GLOBAL_OPTIONS</em></a> that affect the
+TLS connection. For example, <tt class="docutils literal"><span class="pre">ldap.OPT_X_TLS_REQUIRE_CERT</span></tt> can be set to
+<tt class="docutils literal"><span class="pre">ldap.OPT_X_TLS_NEVER</span></tt> to disable certificate verification, perhaps to allow
+self-signed certificates.</p>
+</div>
+<div class="section" id="auth-ldap-user-attr-map">
+<span id="id20"></span><h4>AUTH_LDAP_USER_ATTR_MAP<a class="headerlink" href="#auth-ldap-user-attr-map" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A mapping from <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> field names to LDAP
+attribute names. A users&#8217;s <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> object will
+be populated from his LDAP attributes at login.</p>
+</div>
+<div class="section" id="auth-ldap-user-dn-template">
+<span id="id21"></span><h4>AUTH_LDAP_USER_DN_TEMPLATE<a class="headerlink" href="#auth-ldap-user-dn-template" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>A string template that describes any user&#8217;s distinguished name based on the
+username. This must contain the placeholder <tt class="docutils literal"><span class="pre">%(user)s</span></tt>.</p>
+</div>
+<div class="section" id="auth-ldap-user-flags-by-group">
+<span id="id22"></span><h4>AUTH_LDAP_USER_FLAGS_BY_GROUP<a class="headerlink" href="#auth-ldap-user-flags-by-group" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">{}</span></tt></p>
+<p>A mapping from boolean <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> field names to
+distinguished names of LDAP groups. The corresponding field is set to <tt class="docutils literal"><span class="pre">True</span></tt>
+or <tt class="docutils literal"><span class="pre">False</span></tt> according to whether the user is a member of the group.</p>
+</div>
+<div class="section" id="auth-ldap-user-search">
+<span id="id23"></span><h4>AUTH_LDAP_USER_SEARCH<a class="headerlink" href="#auth-ldap-user-search" title="Permalink to this headline">¶</a></h4>
+<p>Default: <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<p>An <a class="reference internal" href="#django_auth_ldap.config.LDAPSearch" title="django_auth_ldap.config.LDAPSearch"><tt class="xref py py-class docutils literal"><span class="pre">LDAPSearch</span></tt></a> object that will locate a user
+in the directory. The filter parameter should contain the placeholder
+<tt class="docutils literal"><span class="pre">%(user)s</span></tt> for the username. It must return exactly one result for
+authentication to succeed.</p>
+</div>
+</div>
+<div class="section" id="module-django_auth_ldap">
+<span id="module-properties"></span><h3>Module Properties<a class="headerlink" href="#module-django_auth_ldap" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django_auth_ldap.version">
+<tt class="descclassname">django_auth_ldap.</tt><tt class="descname">version</tt><a class="headerlink" href="#django_auth_ldap.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The library&#8217;s current version number as a 3-tuple.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="django_auth_ldap.version_string">
+<tt class="descclassname">django_auth_ldap.</tt><tt class="descname">version_string</tt><a class="headerlink" href="#django_auth_ldap.version_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>The library&#8217;s current version number as a string.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_auth_ldap.config">
+<span id="configuration"></span><h3>Configuration<a class="headerlink" href="#module-django_auth_ldap.config" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django_auth_ldap.config.LDAPSearch">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">LDAPSearch</tt><a class="headerlink" href="#django_auth_ldap.config.LDAPSearch" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="django_auth_ldap.config.LDAPSearch.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>base_dn</em>, <em>scope</em>, <em>filterstr='(objectClass=*)'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.LDAPSearch.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">base_dn</span></tt>: The distinguished name of the search base.</li>
+<li><tt class="docutils literal"><span class="pre">scope</span></tt>: One of <tt class="docutils literal"><span class="pre">ldap.SCOPE_*</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">filterstr</span></tt>: An optional filter string (e.g. &#8216;(objectClass=person)&#8217;).
+In order to be valid, <tt class="docutils literal"><span class="pre">filterstr</span></tt> must be enclosed in parentheses.</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.LDAPGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">LDAPGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.LDAPGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base class for objects that will determine group membership for various
+LDAP grouping mechanisms. Implementations are provided for common group
+types or you can write your own. See the source code for subclassing notes.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.LDAPGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.LDAPGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, LDAP groups will be mapped to Django groups by taking the
+first value of the cn attribute. You can specify a different attribute
+with <tt class="docutils literal"><span class="pre">name_attr</span></tt>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.PosixGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">PosixGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.PosixGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of <a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> that
+handles the <tt class="docutils literal"><span class="pre">posixGroup</span></tt> object class. This checks for both primary group
+and group membership.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.PosixGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.PosixGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.MemberDNGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">MemberDNGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.MemberDNGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of
+<a class="reference internal" href="#django_auth_ldap.config.LDAPGroupType" title="django_auth_ldap.config.LDAPGroupType"><tt class="xref py py-class docutils literal"><span class="pre">LDAPGroupType</span></tt></a> that handles grouping
+mechanisms wherein the group object contains a list of its member DNs.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.MemberDNGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>member_attr</em>, <em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.MemberDNGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">member_attr</span></tt>: The attribute on the group object that contains a
+list of member DNs. &#8216;member&#8217; and &#8216;uniqueMember&#8217; are common examples.</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.NestedMemberDNGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">NestedMemberDNGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.NestedMemberDNGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to <a class="reference internal" href="#django_auth_ldap.config.MemberDNGroupType" title="django_auth_ldap.config.MemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">MemberDNGroupType</span></tt></a>, except this
+allows groups to contain other groups as members. Group hierarchies will be
+traversed to determine membership.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.NestedMemberDNGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>member_attr</em>, <em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.NestedMemberDNGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>As above.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.GroupOfNamesType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">GroupOfNamesType</tt><a class="headerlink" href="#django_auth_ldap.config.GroupOfNamesType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of <a class="reference internal" href="#django_auth_ldap.config.MemberDNGroupType" title="django_auth_ldap.config.MemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">MemberDNGroupType</span></tt></a>
+that handles the <tt class="docutils literal"><span class="pre">groupOfNames</span></tt> object class. Equivalent to
+<tt class="docutils literal"><span class="pre">MemberDNGroupType('member')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.GroupOfNamesType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.GroupOfNamesType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.NestedGroupOfNamesType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">NestedGroupOfNamesType</tt><a class="headerlink" href="#django_auth_ldap.config.NestedGroupOfNamesType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of
+<a class="reference internal" href="#django_auth_ldap.config.NestedMemberDNGroupType" title="django_auth_ldap.config.NestedMemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">NestedMemberDNGroupType</span></tt></a> that handles the
+<tt class="docutils literal"><span class="pre">groupOfNames</span></tt> object class. Equivalent to
+<tt class="docutils literal"><span class="pre">NestedMemberDNGroupType('member')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.NestedGroupOfNamesType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.NestedGroupOfNamesType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.GroupOfUniqueNamesType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">GroupOfUniqueNamesType</tt><a class="headerlink" href="#django_auth_ldap.config.GroupOfUniqueNamesType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of <a class="reference internal" href="#django_auth_ldap.config.MemberDNGroupType" title="django_auth_ldap.config.MemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">MemberDNGroupType</span></tt></a>
+that handles the <tt class="docutils literal"><span class="pre">groupOfUniqueNames</span></tt> object class. Equivalent to
+<tt class="docutils literal"><span class="pre">MemberDNGroupType('uniqueMember')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.GroupOfUniqueNamesType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.GroupOfUniqueNamesType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.NestedGroupOfUniqueNamesType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">NestedGroupOfUniqueNamesType</tt><a class="headerlink" href="#django_auth_ldap.config.NestedGroupOfUniqueNamesType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of
+<a class="reference internal" href="#django_auth_ldap.config.NestedMemberDNGroupType" title="django_auth_ldap.config.NestedMemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">NestedMemberDNGroupType</span></tt></a> that handles the
+<tt class="docutils literal"><span class="pre">groupOfUniqueNames</span></tt> object class. Equivalent to
+<tt class="docutils literal"><span class="pre">NestedMemberDNGroupType('uniqueMember')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.NestedGroupOfUniqueNamesType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.NestedGroupOfUniqueNamesType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.ActiveDirectoryGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">ActiveDirectoryGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.ActiveDirectoryGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of <a class="reference internal" href="#django_auth_ldap.config.MemberDNGroupType" title="django_auth_ldap.config.MemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">MemberDNGroupType</span></tt></a>
+that handles Active Directory groups. Equivalent to
+<tt class="docutils literal"><span class="pre">MemberDNGroupType('member')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.ActiveDirectoryGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.ActiveDirectoryGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.config.NestedActiveDirectoryGroupType">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.config.</tt><tt class="descname">NestedActiveDirectoryGroupType</tt><a class="headerlink" href="#django_auth_ldap.config.NestedActiveDirectoryGroupType" title="Permalink to this definition">¶</a></dt>
+<dd><p>A concrete subclass of
+<a class="reference internal" href="#django_auth_ldap.config.NestedMemberDNGroupType" title="django_auth_ldap.config.NestedMemberDNGroupType"><tt class="xref py py-class docutils literal"><span class="pre">NestedMemberDNGroupType</span></tt></a> that handles
+Active Directory groups. Equivalent to
+<tt class="docutils literal"><span class="pre">NestedMemberDNGroupType('member')</span></tt>.</p>
+<dl class="method">
+<dt id="django_auth_ldap.config.NestedActiveDirectoryGroupType.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>name_attr='cn'</em><big>)</big><a class="headerlink" href="#django_auth_ldap.config.NestedActiveDirectoryGroupType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-django_auth_ldap.backend">
+<span id="backend"></span><h3>Backend<a class="headerlink" href="#module-django_auth_ldap.backend" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django_auth_ldap.backend.populate_user">
+<tt class="descclassname">django_auth_ldap.backend.</tt><tt class="descname">populate_user</tt><a class="headerlink" href="#django_auth_ldap.backend.populate_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a Django signal that is sent when clients should perform additional
+customization of a <tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> object. It is
+sent after a user has been authenticated and the backend has finished
+populating it, and just before it is saved. The client may take this
+opportunity to populate additional model fields, perhaps based on
+<tt class="docutils literal"><span class="pre">ldap_user.attrs</span></tt>. This signal has two keyword arguments: <tt class="docutils literal"><span class="pre">user</span></tt> is the
+<tt class="xref py py-class docutils literal"><span class="pre">User</span></tt> object and <tt class="docutils literal"><span class="pre">ldap_user</span></tt> is the
+same as <tt class="docutils literal"><span class="pre">user.ldap_user</span></tt>. The sender is the
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> class.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="django_auth_ldap.backend.populate_user_profile">
+<tt class="descclassname">django_auth_ldap.backend.</tt><tt class="descname">populate_user_profile</tt><a class="headerlink" href="#django_auth_ldap.backend.populate_user_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#django_auth_ldap.backend.populate_user" title="django_auth_ldap.backend.populate_user"><tt class="xref py py-data docutils literal"><span class="pre">populate_user</span></tt></a>, but sent for the user
+profile object. This will only be sent if the user has an existing profile.
+As with <a class="reference internal" href="#django_auth_ldap.backend.populate_user" title="django_auth_ldap.backend.populate_user"><tt class="xref py py-data docutils literal"><span class="pre">populate_user</span></tt></a>, it is sent after the
+backend has finished setting properties and before the object is saved. This
+signal has two keyword arguments: <tt class="docutils literal"><span class="pre">profile</span></tt> is the user profile object and
+<tt class="docutils literal"><span class="pre">ldap_user</span></tt> is the same as <tt class="docutils literal"><span class="pre">user.ldap_user</span></tt>. The sender is the
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_auth_ldap.backend.LDAPBackend">
+<em class="property">class </em><tt class="descclassname">django_auth_ldap.backend.</tt><tt class="descname">LDAPBackend</tt><a class="headerlink" href="#django_auth_ldap.backend.LDAPBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend" title="django_auth_ldap.backend.LDAPBackend"><tt class="xref py py-class docutils literal"><span class="pre">LDAPBackend</span></tt></a> has one method that may be
+called directly and several that may be overridden in subclasses.</p>
+<dl class="method">
+<dt id="django_auth_ldap.backend.LDAPBackend.populate_user">
+<tt class="descname">populate_user</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#django_auth_ldap.backend.LDAPBackend.populate_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates the Django user for the given LDAP username. This connects to
+the LDAP directory with the default credentials and attempts to populate
+the indicated Django user as if they had just logged in.
+<a class="reference internal" href="#auth-ldap-always-update-user"><em>AUTH_LDAP_ALWAYS_UPDATE_USER</em></a> is ignored (assumed <tt class="docutils literal"><span class="pre">True</span></tt>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_auth_ldap.backend.LDAPBackend.get_or_create_user">
+<tt class="descname">get_or_create_user</tt><big>(</big><em>self</em>, <em>username</em>, <em>ldap_user</em><big>)</big><a class="headerlink" href="#django_auth_ldap.backend.LDAPBackend.get_or_create_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a username and an LDAP user object, this must return the
+associated Django User object. The <tt class="docutils literal"><span class="pre">username</span></tt> argument has already
+been passed through
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.ldap_to_django_username" title="django_auth_ldap.backend.LDAPBackend.ldap_to_django_username"><tt class="xref py py-meth docutils literal"><span class="pre">ldap_to_django_username()</span></tt></a>.
+You can get information about the LDAP user via <tt class="docutils literal"><span class="pre">ldap_user.dn</span></tt> and
+<tt class="docutils literal"><span class="pre">ldap_user.attrs</span></tt>. The return value must be the same as
+<tt class="docutils literal"><span class="pre">User.objects.get_or_create()</span></tt>: a (User, created) two-tuple.</p>
+<p>The default implementation calls <tt class="docutils literal"><span class="pre">User.objects.get_or_create()</span></tt>, using
+a case-insensitive query and creating new users with lowercase
+usernames. Subclasses are welcome to associate LDAP users to Django
+users any way they like.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_auth_ldap.backend.LDAPBackend.ldap_to_django_username">
+<tt class="descname">ldap_to_django_username</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#django_auth_ldap.backend.LDAPBackend.ldap_to_django_username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a valid Django username based on the given LDAP username (which
+is what the user enters). By default, <tt class="docutils literal"><span class="pre">username</span></tt> is returned
+unchanged. This can be overriden by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django_auth_ldap.backend.LDAPBackend.django_to_ldap_username">
+<tt class="descname">django_to_ldap_username</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#django_auth_ldap.backend.LDAPBackend.django_to_ldap_username" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inverse of
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.ldap_to_django_username" title="django_auth_ldap.backend.LDAPBackend.ldap_to_django_username"><tt class="xref py py-meth docutils literal"><span class="pre">ldap_to_django_username()</span></tt></a>.
+If this is not symmetrical to
+<a class="reference internal" href="#django_auth_ldap.backend.LDAPBackend.ldap_to_django_username" title="django_auth_ldap.backend.LDAPBackend.ldap_to_django_username"><tt class="xref py py-meth docutils literal"><span class="pre">ldap_to_django_username()</span></tt></a>,
+the behavior is undefined.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (c) 2009, Peter Sagerson
+All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:</p>
+<ul class="simple">
+<li>Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.</li>
+</ul>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#8220;AS IS&#8221; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django authentication using LDAP</a><ul>
+<li><a class="reference internal" href="#configuring-basic-authentication">Configuring basic authentication</a></li>
+<li><a class="reference internal" href="#working-with-groups">Working with groups</a></li>
+<li><a class="reference internal" href="#user-objects">User objects</a></li>
+<li><a class="reference internal" href="#permissions">Permissions</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#more-options">More options</a></li>
+<li><a class="reference internal" href="#performance">Performance</a></li>
+<li><a class="reference internal" href="#example-configuration">Example configuration</a></li>
+<li><a class="reference internal" href="#reference">Reference</a><ul>
+<li><a class="reference internal" href="#settings">Settings</a><ul>
+<li><a class="reference internal" href="#auth-ldap-always-update-user">AUTH_LDAP_ALWAYS_UPDATE_USER</a></li>
+<li><a class="reference internal" href="#auth-ldap-authorize-all-users">AUTH_LDAP_AUTHORIZE_ALL_USERS</a></li>
+<li><a class="reference internal" href="#auth-ldap-bind-as-authenticating-user">AUTH_LDAP_BIND_AS_AUTHENTICATING_USER</a></li>
+<li><a class="reference internal" href="#auth-ldap-bind-dn">AUTH_LDAP_BIND_DN</a></li>
+<li><a class="reference internal" href="#auth-ldap-bind-password">AUTH_LDAP_BIND_PASSWORD</a></li>
+<li><a class="reference internal" href="#auth-ldap-cache-groups">AUTH_LDAP_CACHE_GROUPS</a></li>
+<li><a class="reference internal" href="#auth-ldap-connection-options">AUTH_LDAP_CONNECTION_OPTIONS</a></li>
+<li><a class="reference internal" href="#auth-ldap-deny-group">AUTH_LDAP_DENY_GROUP</a></li>
+<li><a class="reference internal" href="#auth-ldap-find-group-perms">AUTH_LDAP_FIND_GROUP_PERMS</a></li>
+<li><a class="reference internal" href="#auth-ldap-global-options">AUTH_LDAP_GLOBAL_OPTIONS</a></li>
+<li><a class="reference internal" href="#auth-ldap-group-cache-timeout">AUTH_LDAP_GROUP_CACHE_TIMEOUT</a></li>
+<li><a class="reference internal" href="#auth-ldap-group-search">AUTH_LDAP_GROUP_SEARCH</a></li>
+<li><a class="reference internal" href="#auth-ldap-group-type">AUTH_LDAP_GROUP_TYPE</a></li>
+<li><a class="reference internal" href="#auth-ldap-mirror-groups">AUTH_LDAP_MIRROR_GROUPS</a></li>
+<li><a class="reference internal" href="#auth-ldap-profile-attr-map">AUTH_LDAP_PROFILE_ATTR_MAP</a></li>
+<li><a class="reference internal" href="#auth-ldap-profile-flags-by-group">AUTH_LDAP_PROFILE_FLAGS_BY_GROUP</a></li>
+<li><a class="reference internal" href="#auth-ldap-require-group">AUTH_LDAP_REQUIRE_GROUP</a></li>
+<li><a class="reference internal" href="#auth-ldap-server-uri">AUTH_LDAP_SERVER_URI</a></li>
+<li><a class="reference internal" href="#auth-ldap-start-tls">AUTH_LDAP_START_TLS</a></li>
+<li><a class="reference internal" href="#auth-ldap-user-attr-map">AUTH_LDAP_USER_ATTR_MAP</a></li>
+<li><a class="reference internal" href="#auth-ldap-user-dn-template">AUTH_LDAP_USER_DN_TEMPLATE</a></li>
+<li><a class="reference internal" href="#auth-ldap-user-flags-by-group">AUTH_LDAP_USER_FLAGS_BY_GROUP</a></li>
+<li><a class="reference internal" href="#auth-ldap-user-search">AUTH_LDAP_USER_SEARCH</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django_auth_ldap">Module Properties</a></li>
+<li><a class="reference internal" href="#module-django_auth_ldap.config">Configuration</a></li>
+<li><a class="reference internal" href="#module-django_auth_ldap.backend">Backend</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">django-auth-ldap 1.0.19 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Peter Sagerson.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

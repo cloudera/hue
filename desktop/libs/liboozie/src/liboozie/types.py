@@ -28,11 +28,11 @@ from cStringIO import StringIO
 from time import mktime
 
 from desktop.lib import i18n
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse
-from liboozie.utils import parse_timestamp
+from liboozie.utils import parse_timestamp, format_time
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -48,14 +48,17 @@ class Action(object):
   def _fixup(self): pass
 
   def is_finished(self):
-    return self.status in ('OK', 'SUCCEEDED')
+    return self.status in ('OK', 'SUCCEEDED', 'DONE')
 
   @classmethod
   def create(self, action_class, action_dict):
-    if ControlFlowAction.is_control_flow(action_dict['type']):
+    if ControlFlowAction.is_control_flow(action_dict.get('type')):
       return ControlFlowAction(action_dict)
     else:
       return action_class(action_dict)
+
+  def __str__(self):
+    return '%s - %s' % (self.type, self.name)
 
 
 class ControlFlowAction(Action):
@@ -84,13 +87,14 @@ class ControlFlowAction(Action):
 
   @classmethod
   def is_control_flow(self, action_type):
-    return action_type is not None and ':' in action_type
+    return action_type is not None and (':' in action_type)
 
   def _fixup(self):
     """
     Fixup:
       - time fields as struct_time
       - config dict
+      - protect externalId
     """
     super(ControlFlowAction, self)._fixup()
 
@@ -100,8 +104,82 @@ class ControlFlowAction(Action):
       self.endTime = parse_timestamp(self.endTime)
     if self.retries:
       self.retries = int(self.retries)
+    if self.externalId and not re.match('job_.*', self.externalId):
+      self.externalId = None
 
     self.conf_dict = {}
+
+
+class WorkflowAction(Action):
+  _ATTRS = [
+    'conf',
+    'consoleUrl',
+    'data',
+    'endTime',
+    'errorCode',
+    'errorMessage',
+    'externalId',
+    'externalStatus',
+    'id',
+    'name',
+    'retries',
+    'startTime',
+    'status',
+    'trackerUri',
+    'transition',
+    'type',
+    'externalChildIDs',
+  ]
+
+  def _fixup(self):
+    """
+    Fixup:
+      - time fields as struct_time
+      - config dict
+    """
+    super(WorkflowAction, self)._fixup()
+
+    if self.startTime:
+      self.startTime = parse_timestamp(self.startTime)
+    if self.endTime:
+      self.endTime = parse_timestamp(self.endTime)
+    if self.retries:
+      self.retries = int(self.retries)
+
+    if self.conf:
+      xml = StringIO(i18n.smart_str(self.conf))
+      self.conf_dict = hadoop.confparse.ConfParse(xml)
+    else:
+      self.conf_dict = {}
+
+  def get_absolute_url(self):
+    related_job_ids = []
+
+    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
+      related_job_ids.append('coordinator_job_id=%s' % self.oozie_coordinator.id)
+    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
+      related_job_ids.append('bundle_job_id=%s' % self.oozie_bundle.id)
+
+    if related_job_ids:
+      extra_params = '?' + '&'.join(related_job_ids)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_workflow_action', kwargs={'action': self.id}) + extra_params
+
+  def get_absolute_log_url(self):
+    url = None
+    if self.externalId and re.match('job_.*', self.externalId):
+      url = self.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': self.externalId}) or ''
+    return url
+
+  def get_external_id_url(self):
+    url = None
+    if self.externalId and self.externalId.endswith('W'):
+      url = reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.externalId}) or ''
+    elif self.externalId and re.match('job_.*', self.externalId):
+      url = reverse('jobbrowser.views.single_job', kwargs={'job': self.externalId}) or ''
+    return url
 
 
 class CoordinatorAction(Action):
@@ -146,25 +224,35 @@ class CoordinatorAction(Action):
     else:
       self.conf_dict = {}
 
+    self.title = ' %s-%s'% (self.actionNumber, format_time(self.nominalTime))
 
-class WorkflowAction(Action):
+
+class BundleAction(Action):
   _ATTRS = [
-    'conf',
-    'consoleUrl',
-    'data',
-    'endTime',
-    'errorCode',
-    'errorMessage',
-    'externalId',
-    'externalStatus',
-    'id',
-    'name',
-    'retries',
-    'startTime',
-    'status',
-    'trackerUri',
-    'transition',
-    'type',
+      'startTime',
+      'actions',
+      'frequency',
+      'concurrency',
+      'pauseTime',
+      'group',
+      'toString',
+      'consoleUrl',
+      'mat_throttling',
+      'status',
+      'conf',
+      'user',
+      'timeOut',
+      'coordJobPath',
+      'timeUnit',
+      'coordJobId',
+      'coordJobName',
+      'nextMaterializedTime',
+      'coordExternalId',
+      'acl',
+      'lastAction',
+      'executionPolicy',
+      'timeZone',
+      'endTime'
   ]
 
   def _fixup(self):
@@ -173,14 +261,10 @@ class WorkflowAction(Action):
       - time fields as struct_time
       - config dict
     """
-    super(WorkflowAction, self)._fixup()
+    super(BundleAction, self)._fixup()
 
-    if self.startTime:
-      self.startTime = parse_timestamp(self.startTime)
-    if self.endTime:
-      self.endTime = parse_timestamp(self.endTime)
-    if self.retries:
-      self.retries = int(self.retries)
+    self.type = 'coord-action'
+    self.name = self.coordJobName
 
     if self.conf:
       xml = StringIO(i18n.smart_str(self.conf))
@@ -188,14 +272,26 @@ class WorkflowAction(Action):
     else:
       self.conf_dict = {}
 
-    if self.externalId is not None and not re.match('job_.*', self.externalId):
-      self.externalId = None
+  def get_progress(self):
+    """How much more time before the next action."""
+    if self.lastAction is None:
+      return 0
+      
+    next = mktime(parse_timestamp(self.lastAction))
+    start = mktime(parse_timestamp(self.startTime))
+    end = mktime(parse_timestamp(self.endTime))
+
+    if end != start:
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
+    else:
+      progress = 100
+
+    return progress
 
 
 class Job(object):
-  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', 'PREP', # Workflow
-                          'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
-                          ])
+  MAX_LOG_SIZE = 3500 * 20 # 20 pages
+
   """
   Accessing log and definition will trigger Oozie API calls.
   """
@@ -234,7 +330,7 @@ class Job(object):
     """Get the log lazily, trigger Oozie API call at the first access."""
     if self._log is None:
       self._log = self._api.get_job_log(self.id)
-    return self._log
+    return self._log[-Job.MAX_LOG_SIZE:]
   log = property(_get_log)
 
   def _get_definition(self):
@@ -276,7 +372,7 @@ class Job(object):
   def check_request_permission(self, request):
     """Raise PopupException if request user doesn't have permission to modify workflow"""
     if not request.user.is_superuser and request.user.username != self.user:
-      access_warn(request, _('Insufficient permission'))
+      access_warn(request, _('Insufficient permission.'))
       raise PopupException(_("Permission denied. User %(username)s cannot modify user %(user)s's job.") %
                            dict(username=request.user.username, user=self.user))
 
@@ -287,10 +383,85 @@ class Job(object):
     return [action for action in self.actions if not ControlFlowAction.is_control_flow(action.type)]
 
   def is_running(self):
-    return self.status in Job.RUNNING_STATUSES
+    return self.status in Workflow.RUNNING_STATUSES | Coordinator.RUNNING_STATUSES | Bundle.RUNNING_STATUSES
 
   def __str__(self):
     return '%s - %s' % (self.id, self.status)
+
+  @property
+  def has_sla(self):
+    return '<sla:info>' in self.definition
+
+
+class Workflow(Job):
+  _ATTRS = [
+    'actions',
+    'appName',
+    'appPath',
+    'conf',
+    'consoleUrl',
+    'createdTime',
+    'endTime',
+    'externalId',
+    'group',
+    'id',
+    'lastModTime',
+    'run',
+    'startTime',
+    'status',
+    'user',
+    'acl',
+    'parentId'
+  ]
+  ACTION = WorkflowAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'KILLED', 'FAILED'])
+
+  def _fixup(self):
+    super(Workflow, self)._fixup()
+
+    if self.createdTime:
+      self.createdTime = parse_timestamp(self.createdTime)
+    if self.lastModTime:
+      self.lastModTime = parse_timestamp(self.lastModTime)
+    if self.run:
+      self.run = int(self.run)
+
+  @property
+  def type(self):
+    return 'Workflow'
+
+  def get_parent_job_id(self):
+    if self.parentId and '@' in self.parentId:
+      return self.parentId.split('@')[0]
+    return self.parentId
+
+  def get_absolute_url(self, format='html'):
+    extra_params = []
+
+    if format == 'json':
+      extra_params.append('format=json')
+    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
+      extra_params.append('coordinator_job_id=%s' % self.oozie_coordinator.id)
+    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
+      extra_params.append('bundle_job_id=%s' % self.oozie_bundle.id)
+
+    if extra_params:
+      extra_params = '?' + '&'.join(extra_params)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id}) + extra_params
+
+  def get_progress(self, full_node_list=None):
+    if self.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
+      return 100 # Case of decision nodes
+    else:
+      if full_node_list is not None:            # Should remove the un-reached branches if decision node
+        total_actions = len(full_node_list) - 1 # -1 because of Kill node
+      else:
+        total_actions = len(self.actions)
+      return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
 
 
 class Coordinator(Job):
@@ -318,8 +489,12 @@ class Coordinator(Job):
     'timeUnit',
     'timeZone',
     'user',
+    'bundleId',
+    'total'
   ]
   ACTION = CoordinatorAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'DONEWITHERROR', 'KILLED', 'FAILED'])
 
   def _fixup(self):
     super(Coordinator, self)._fixup()
@@ -329,6 +504,10 @@ class Coordinator(Job):
     else:
       self.nextMaterializedTime = self.startTime
 
+    if self.pauseTime:
+      self.pauseTime = parse_timestamp(self.pauseTime)
+
+
     # For when listing/mixing all the jobs together
     self.id = self.coordJobId
     self.appName = self.coordJobName
@@ -337,8 +516,22 @@ class Coordinator(Job):
   def type(self):
     return 'Coordinator'
 
-  def get_absolute_url(self):
-    return reverse('oozie:list_oozie_coordinator', kwargs={'job_id': self.id})
+  def get_absolute_url(self, oozie_bundle=None, format='html'):
+    extra_params = []
+
+    if format == 'json':
+      extra_params.append('format=json')
+    if oozie_bundle:
+      extra_params.append('bundle_job_id=%s' % oozie_bundle.id)
+    if hasattr(self, 'bundleId') and self.bundleId:
+      extra_params.append('bundle_job_id=%s' % self.bundleId)
+
+    if extra_params:
+      extra_params = '?' + '&'.join(extra_params)
+    else:
+      extra_params = ''
+
+    return reverse('oozie:list_oozie_coordinator', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self):
     """How much more time before the final materialization."""
@@ -347,58 +540,101 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      return int((1 - (end - next) / (end - start)) * 100)
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
     else:
-      return 100
+      progress = 100
+
+    # Manage case of a rerun
+    action_count = float(len(self.actions))
+    if action_count != 0 and progress == 100:
+      progress = int(sum([action.is_finished() for action in self.actions]) / action_count * 100)
+
+    return progress
+
+  @classmethod
+  def aggreate(cls, actions):
+    if not actions:
+      return []
+
+    result = []
+    first = prev = actions[0]
+
+    for a in actions[1:]:
+      if int(a) != int(prev) + 1:
+        result.append('-'.join((first, prev)))
+        first = a
+      prev = a
+
+    result.append('-'.join((first, prev)))
+
+    return result
+
+  @property
+  def human_frequency(self):
+    from oozie.models import Coordinator
+    return Coordinator.CRON_MAPPING.get(self.frequency, self.frequency)
 
 
-class Workflow(Job):
+class Bundle(Job):
   _ATTRS = [
-    'actions',
-    'appName',
-    'appPath',
-    'conf',
-    'consoleUrl',
-    'createdTime',
-    'endTime',
-    'externalId',
-    'group',
-    'id',
-    'lastModTime',
-    'run',
-    'startTime',
     'status',
-    'user',
+    'toString',
+    'group',
+    'conf',
+    'bundleJobName',
+    'startTime',
+    'bundleCoordJobs',
+    'kickoffTime',
     'acl',
-    'parentId'
+    'bundleJobPath',
+    'createdTime',
+    'timeOut',
+    'consoleUrl',
+    'bundleExternalId',
+    'timeUnit',
+    'pauseTime',
+    'bundleJobId',
+    'endTime',
+    'user',
   ]
-  ACTION = WorkflowAction
+
+  ACTION = BundleAction
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'RUNNINGWITHERROR', 'SUSPENDED', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PAUSED', 'PAUSEDWITHERROR', 'PREPPAUSED'])
+  FINISHED_STATUSES = set(['SUCCEEDED', 'DONEWITHERROR', 'KILLED', 'FAILED'])
 
   def _fixup(self):
-    super(Workflow, self)._fixup()
+    self.actions = self.bundleCoordJobs
 
-    if self.createdTime:
-      self.createdTime = parse_timestamp(self.createdTime)
-    if self.lastModTime:
-      self.lastModTime = parse_timestamp(self.lastModTime)
-    if self.run:
-      self.run = int(self.run)
+    super(Bundle, self)._fixup()
+
+    # For when listing/mixing all the jobs together
+    self.id = self.bundleJobId
+    self.appName = self.bundleJobName
 
   @property
   def type(self):
-    return 'Workflow'
+    return 'Bundle'
 
-  def get_absolute_url(self):
-    return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id})
+  def get_absolute_url(self, format='html'):
+    extra_params = ''
+    if format == 'json':
+      extra_params = '?format=json'
+
+    return reverse('oozie:list_oozie_bundle', kwargs={'job_id': self.id}) + extra_params
 
   def get_progress(self):
-    """How many actions are finished on the total of actions."""
-    return int(sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100)
+    progresses = [action.get_progress() for action in self.actions]
+    count = len(progresses)
+
+    if count != 0:
+      return sum(progresses) / float(count)
+    else:
+      return 0
 
 
 class JobList(object):
   """
-  Represents a list of Oozie jobs (Workflows or Coordinator).
+  Represents a list of Oozie jobs (Workflows or Coordinators or Bundles).
   """
   _ATTRS = [
     'offset',
@@ -410,12 +646,12 @@ class JobList(object):
   def __init__(self, klass, jobs_key, api, json_dict, filters=None):
     """
     json_dict is the oozie json.
-    filters is (optionally) the dictionary of filters used to select this list
+    filters is (optionally) the list of filters used to select this list
     """
     self._api = api
     self.offset = int(json_dict['offset'])
     self.total = int(json_dict['total'])
-    self.jobs = [ klass(self._api, wf_dict) for wf_dict in json_dict[jobs_key] ]
+    self.jobs = [klass(self._api, wf_dict) for wf_dict in json_dict[jobs_key]]
     self.filters = filters
 
 
@@ -427,4 +663,9 @@ class WorkflowList(JobList):
 class CoordinatorList(JobList):
   def __init__(self, api, json_dict, filters=None):
     super(CoordinatorList, self).__init__(Coordinator, 'coordinatorjobs', api, json_dict, filters)
+
+
+class BundleList(JobList):
+  def __init__(self, api, json_dict, filters=None):
+    super(BundleList, self).__init__(Bundle, 'bundlejobs', api, json_dict, filters)
 

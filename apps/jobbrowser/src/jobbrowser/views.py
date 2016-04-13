@@ -14,155 +14,306 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Implements simple jobbrowser api
-#
+
 import re
 import time
 import logging
 import string
-from urllib import quote_plus
+import urlparse
 
-from desktop.lib.paginator import Paginator
-from desktop.lib.django_util import render_json, render, copy_query_dict
-from desktop.lib.exceptions import PopupException, MessageException
-from desktop.lib.conf import coerce_bool
+from urllib import quote_plus
+from lxml import html
 
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 from desktop.log.access import access_warn, access_log_level
+from desktop.lib.rest.http_client import RestException
+from desktop.lib.rest.resource import Resource
+from desktop.lib.django_util import JsonResponse, render_json, render, copy_query_dict
+from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.lib.exceptions import MessageException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
+from hadoop import cluster
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
+from hadoop.yarn.clients import get_log_client
+import hadoop.yarn.resource_manager_api as resource_manager_api
+
+from jobbrowser.conf import SHARE_JOBS
+from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
+from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs, can_kill_job
+from jobbrowser.yarn_models import Application
+
+import urllib2
 
 
-from jobbrowser import conf
-from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
-
-from django.utils.translation import ugettext as _
-
-##################################
-## View end-points
-
-__DEFAULT_OBJ_PER_PAGINATION = 10
+LOG = logging.getLogger(__name__)
 
 
 def check_job_permission(view_func):
   """
   Ensure that the user has access to the job.
-  Assumes that the wrapped function takes a 'jobid' param.
+  Assumes that the wrapped function takes a 'jobid' param named 'job'.
   """
   def decorate(request, *args, **kwargs):
-    jobid = kwargs['jobid']
-    job = Job.from_id(jt=request.jt, jobid=jobid)
-    if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
-      and job.user != request.user.username:
-      raise PopupException(_("You don't have the permissions to access"
-                             " job %(id)s") % dict(id=jobid))
+    jobid = kwargs['job']
+    try:
+      job = get_api(request.user, request.jt).get_job(jobid=jobid)
+    except ApplicationNotRunning, e:
+      if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
+        rm_api = resource_manager_api.get_resource_manager(request.user)
+        job = Application(e.job, rm_api)
+      else:
+        # reverse() seems broken, using request.path but beware, it discards GET and POST info
+        return job_not_assigned(request, jobid, request.path)
+    except JobExpired, e:
+      raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
+    except Exception, e:
+      msg = 'Could not find job %s.'
+      LOG.exception(msg % jobid)
+      raise PopupException(_(msg) % jobid, detail=e)
+
+    if not SHARE_JOBS.get() and not request.user.is_superuser \
+        and job.user != request.user.username and not can_view_job(request.user.username, job):
+      raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
+    kwargs['job'] = job
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
 
-@check_job_permission
-def single_job(request, jobid):
-  """
-  We get here from /jobs/jobid
-  """
-  job = Job.from_id(jt=request.jt, jobid=jobid)
 
+def job_not_assigned(request, jobid, path):
+  if request.GET.get('format') == 'json':
+    result = {'status': -1, 'message': ''}
+
+    try:
+      get_api(request.user, request.jt).get_job(jobid=jobid)
+      result['status'] = 0
+    except ApplicationNotRunning, e:
+      result['status'] = 1
+    except Exception, e:
+      result['message'] = _('Error polling job %s: %s') % (jobid, e)
+
+    return JsonResponse(result, encoder=JSONEncoderForHTML)
+  else:
+    return render('job_not_assigned.mako', request, {'jobid': jobid, 'path': path})
+
+
+def jobs(request):
+  user = request.GET.get('user', request.user.username)
+  state = request.GET.get('state')
+  text = request.GET.get('text')
+  retired = request.GET.get('retired')
+
+  if request.GET.get('format') == 'json':
+    try:
+      # Limit number of jobs to be 10,000
+      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=10000)
+    except Exception, ex:
+      ex_message = str(ex)
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
+      elif 'Could not connect to' in ex_message:
+        raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
+      else:
+        raise PopupException(ex)
+    json_jobs = {
+      'jobs': [massage_job_for_json(job, request) for job in jobs],
+    }
+    return JsonResponse(json_jobs, encoder=JSONEncoderForHTML)
+
+  return render('jobs.mako', request, {
+    'request': request,
+    'state_filter': state,
+    'user_filter': user,
+    'text_filter': text,
+    'retired': retired,
+    'filtered': not (state == 'all' and user == '' and text == ''),
+    'is_yarn': cluster.is_yarn()
+  })
+
+def massage_job_for_json(job, request):
+  job = {
+    'id': job.jobId,
+    'shortId': job.jobId_short,
+    'name': hasattr(job, 'jobName') and job.jobName or '',
+    'status': job.status,
+    'url': job.jobId and reverse('jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
+    'logs': job.jobId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
+    'queueName': hasattr(job, 'queueName') and job.queueName or _('N/A'),
+    'priority': hasattr(job, 'priority') and job.priority.lower() or _('N/A'),
+    'user': job.user,
+    'isRetired': job.is_retired,
+    'isMR2': job.is_mr2,
+    'mapProgress': hasattr(job, 'mapProgress') and job.mapProgress or '',
+    'reduceProgress': hasattr(job, 'reduceProgress') and job.reduceProgress or '',
+    'setupProgress': hasattr(job, 'setupProgress') and job.setupProgress or '',
+    'cleanupProgress': hasattr(job, 'cleanupProgress') and job.cleanupProgress or '',
+    'desiredMaps': job.desiredMaps,
+    'desiredReduces': job.desiredReduces,
+    'applicationType': hasattr(job, 'applicationType') and job.applicationType or None,
+    'mapsPercentComplete': int(job.maps_percent_complete) if job.maps_percent_complete else '',
+    'finishedMaps': job.finishedMaps,
+    'finishedReduces': job.finishedReduces,
+    'reducesPercentComplete': int(job.reduces_percent_complete) if job.reduces_percent_complete else '',
+    'jobFile': hasattr(job, 'jobFile') and job.jobFile or '',
+    'launchTimeMs': hasattr(job, 'launchTimeMs') and job.launchTimeMs or 0,
+    'launchTimeFormatted': hasattr(job, 'launchTimeFormatted') and job.launchTimeFormatted or '',
+    'startTimeMs': hasattr(job, 'startTimeMs') and job.startTimeMs or 0,
+    'startTimeFormatted': hasattr(job, 'startTimeFormatted') and job.startTimeFormatted or '',
+    'finishTimeMs': hasattr(job, 'finishTimeMs') and job.finishTimeMs or 0,
+    'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
+    'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
+    'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
+    'canKill': can_kill_job(job, request.user),
+    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
+  }
+  return job
+
+
+def massage_task_for_json(task):
+  task = {
+    'id': task.taskId,
+    'shortId': task.taskId_short,
+    'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
+    'logs': task.taskAttemptIds and reverse('jobbrowser.views.single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
+    'type': task.taskType
+  }
+  return task
+
+
+def single_spark_job(request, job):
+  if request.REQUEST.get('format') == 'json':
+    json_job = {
+      'job': massage_job_for_json(job, request)
+    }
+    return JsonResponse(json_job, encoder=JSONEncoderForHTML)
+  else:
+    return render('job.mako', request, {
+      'request': request,
+      'job': job
+    })
+
+@check_job_permission
+def single_job(request, job):
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
+
+  if job.applicationType == 'SPARK':
+    return single_spark_job(request, job)
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
   failed_tasks.sort(cmp_exec_time)
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
   recent_tasks.sort(cmp_exec_time, reverse=True)
 
-  return render("job.mako", request, {
+  if request.REQUEST.get('format') == 'json':
+    json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
+    json_recent_tasks = [massage_task_for_json(task) for task in recent_tasks]
+    json_job = {
+      'job': massage_job_for_json(job, request),
+      'failedTasks': json_failed_tasks,
+      'recentTasks': json_recent_tasks
+    }
+    return JsonResponse(json_job, encoder=JSONEncoderForHTML)
+
+  return render('job.mako', request, {
     'request': request,
     'job': job,
-    'failed_tasks': failed_tasks[:5],
-    'recent_tasks': recent_tasks[:5]
+    'failed_tasks': failed_tasks and failed_tasks[:5] or [],
+    'recent_tasks': recent_tasks and recent_tasks[:5] or [],
   })
+
 
 @check_job_permission
-def job_counters(request, jobid):
-  """
-  We get here from /jobs/jobid/counters
-  """
-  job = Job.from_id(jt=request.jt, jobid=jobid)
-  return render("counters.html", request, {"counters":job.counters})
-
-def jobs(request):
-  """
-  We get here from /jobs?filterargs
-  """
-  check_permission = not conf.SHARE_JOBS.get() and not request.user.is_superuser
-
-  user = request.GET.get('user', request.user.username)
-  filters = {}
-  if user != '':
-    filters['user'] = user
-
-  jobs = get_matching_jobs(request, check_permission, **filters)
-
-  matching_jobs = sort_if_necessary(request, jobs)
-  state = request.GET.get('state', 'all')
-  text = request.GET.get('text', '')
-  retired = request.GET.get('retired', '')
-  return render("jobs.mako", request, {
-    'jobs':matching_jobs,
-    'request': request,
-    'state_filter': state,
-    'user_filter': user,
-    'text_filter': text,
-    'retired': retired,
-    'filtered': not (state == 'all' and user == '' and text == '')
-  })
-
-def dock_jobs(request):
-  username = request.user.username
-  matching_jobs = get_job_count_by_state(request, username)
-  return render("jobs_dock_info.mako", request, {
-    'jobs':matching_jobs
-  }, force_template=True)
-register_status_bar_view(dock_jobs)
+def job_counters(request, job):
+  return render("counters.html", request, {"counters": job.counters})
 
 
 @access_log_level(logging.WARN)
-def kill_job(request, jobid):
-  """
-  We get here from /jobs/jobid/kill
-  """
+@check_job_permission
+def kill_job(request, job):
   if request.method != "POST":
-    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s)") % dict(method=request.method))
-  job = Job.from_id(jt=request.jt, jobid=jobid)
+    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
+
   if job.user != request.user.username and not request.user.is_superuser:
     access_warn(request, _('Insufficient permission'))
-    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") %
-                           dict(username=request.user.username, user=job.user))
+    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
 
-  job.kill()
+  try:
+    job.kill()
+  except Exception, e:
+    LOG.exception('Killing job')
+    raise PopupException(e)
+
   cur_time = time.time()
+  api = get_api(request.user, request.jt)
+
   while time.time() - cur_time < 15:
-    job = Job.from_id(jt=request.jt, jobid=jobid)
+    job = api.get_job(jobid=job.jobId)
 
     if job.status not in ["RUNNING", "QUEUED"]:
       if request.REQUEST.get("next"):
         return HttpResponseRedirect(request.REQUEST.get("next"))
+      elif request.REQUEST.get("format") == "json":
+        return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
       else:
         raise MessageException("Job Killed")
     time.sleep(1)
-    job = Job.from_id(jt=request.jt, jobid=jobid)
 
-  raise Exception(_("Job did not appear as killed within 15 seconds"))
+  raise Exception(_("Job did not appear as killed within 15 seconds."))
+
 
 @check_job_permission
-def job_single_logs(request, jobid):
-  """
-  We get here from /jobs/jobid/logs
-  """
-  job = Job.from_id(jt=request.jt, jobid=jobid)
+def job_attempt_logs(request, job, attempt_index=0):
+  return render("job_attempt_logs.mako", request, {
+    "attempt_index": attempt_index,
+    "job": job,
+  })
 
+
+@check_job_permission
+def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0):
+  """For async log retrieval as Yarn servers are very slow"""
+
+  try:
+    attempt_index = int(attempt_index)
+    attempt = job.job_attempts['jobAttempt'][attempt_index]
+    log_link = attempt['logsLink']
+  except (KeyError, RestException), e:
+    raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
+
+  link = '/%s/' % name
+  params = {}
+  if offset and int(offset) >= 0:
+    params['start'] = offset
+
+  root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+  debug_info = ''
+  try:
+    response = root.get(link, params=params)
+    log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+  except Exception, e:
+    log = _('Failed to retrieve log: %s' % e)
+    try:
+      debug_info = '\nLog Link: %s' % log_link
+      debug_info += '\nHTML Response: %s' % response
+      LOG.error(debug_info)
+    except:
+      LOG.exception('failed to create debug info')
+
+  response = {'log': LinkJobLogs._make_hdfs_links(log), 'debug': debug_info}
+
+  return JsonResponse(response)
+
+
+@check_job_permission
+def job_single_logs(request, job):
+  """
+  Try to smartly detect the most useful task attempt (e.g. Oozie launcher, failed task) and get its MR logs.
+  """
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
 
@@ -172,21 +323,27 @@ def job_single_logs(request, jobid):
   failed_tasks.sort(cmp_exec_time)
   if failed_tasks:
     task = failed_tasks[0]
+    if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
+      task = failed_tasks[1]
   else:
-    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',), task_types=('map', 'reduce',))
+    task_states = ['running', 'succeeded']
+    if job.is_mr2:
+      task_states.append('scheduled')
+    recent_tasks = job.filter_tasks(task_states=task_states, task_types=('map', 'reduce',))
     recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]
 
-  if task is None:
-    raise PopupException(_("No tasks found for job %(id)s") % dict(id=jobid))
+  if task is None or not task.taskAttemptIds:
+    raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
-  return single_task_attempt_logs(request, **{'jobid': jobid, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
+  return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
+
 
 @check_job_permission
-def tasks(request, jobid):
+def tasks(request, job):
   """
-  We get here from /jobs/jobid/tasks?filterargs, with the options being:
+  We get here from /jobs/job/tasks?filterargs, with the options being:
     page=<n>            - Controls pagination. Defaults to 1.
     tasktype=<type>     - Type can be one of hadoop.job_tracker.VALID_TASK_TYPES
                           ("map", "reduce", "job_cleanup", "job_setup")
@@ -194,42 +351,30 @@ def tasks(request, jobid):
                           ("succeeded", "failed", "running", "pending", "killed")
     tasktext=<text>     - Where <text> is a string matching info on the task
   """
-  # Get the filter parameters
   ttypes = request.GET.get('tasktype')
   tstates = request.GET.get('taskstate')
   ttext = request.GET.get('tasktext')
-  task_types = None
-  if ttypes:
-    task_types = set(ttypes.split(','))
-  task_states = None
-  if tstates:
-    task_states = set(tstates.split(','))
-
   pagenum = int(request.GET.get('page', 1))
-  if pagenum < 0:
-    pagenum = 1
+  pagenum = pagenum > 0 and pagenum or 1
 
-  # Fetch the list of tasks
-  task_list = TaskList.select(request.jt,
-                              jobid,
-                              task_types,
-                              task_states,
-                              ttext,
-                              __DEFAULT_OBJ_PER_PAGINATION,
-                              __DEFAULT_OBJ_PER_PAGINATION * (pagenum - 1))
+  filters = {
+    'task_types': ttypes and set(ttypes.split(',')) or None,
+    'task_states': tstates and set(tstates.split(',')) or None,
+    'task_text': ttext,
+    'pagenum': pagenum,
+  }
 
-  paginator = Paginator(task_list, __DEFAULT_OBJ_PER_PAGINATION, total=task_list.numTotalTasks)
-  page = paginator.page(pagenum)
+  jt = get_api(request.user, request.jt)
 
-  # We need to pass the parameters back to the template to generate links
-  filter_params = copy_query_dict(
-        request.GET, ('tasktype', 'taskstate', 'tasktext')).urlencode()
+  task_list = jt.get_tasks(job.jobId, **filters)
+
+  filter_params = copy_query_dict(request.GET, ('tasktype', 'taskstate', 'tasktext')).urlencode()
 
   return render("tasks.mako", request, {
     'request': request,
     'filter_params': filter_params,
-    'jobid':jobid,
-    'page': page,
+    'job': job,
+    'task_list': task_list,
     'tasktype': ttypes,
     'taskstate': tstates,
     'tasktext': ttext
@@ -237,11 +382,10 @@ def tasks(request, jobid):
 
 
 @check_job_permission
-def single_task(request, jobid, taskid):
-  """
-  We get here from /jobs/jobid/tasks/taskid
-  """
-  job_link = JobLinkage(request.jt, jobid)
+def single_task(request, job, taskid):
+  jt = get_api(request.user, request.jt)
+
+  job_link = jt.get_job_link(job.jobId)
   task = job_link.get_task(taskid)
 
   return render("task.mako", request, {
@@ -250,63 +394,87 @@ def single_task(request, jobid, taskid):
   })
 
 @check_job_permission
-def single_task_attempt(request, jobid, taskid, attemptid):
-  """
-  We get here from /jobs/jobid/tasks/taskid/attempts/attemptid
-  """
-  job_link = JobLinkage(request.jt, jobid)
+def single_task_attempt(request, job, taskid, attemptid):
+  jt = get_api(request.user, request.jt)
+
+  job_link = jt.get_job_link(job.jobId)
   task = job_link.get_task(taskid)
+
   try:
     attempt = task.get_attempt(attemptid)
-  except KeyError:
-    raise KeyError(_("Cannot find attempt '%(id)s' in task") % dict(id=attemptid))
+  except (KeyError, RestException), e:
+    raise PopupException(_("Cannot find attempt '%(id)s' in task") % {'id': attemptid}, e)
 
-  return render("attempt.mako", request,
-    {
-      "attempt":attempt,
-      "taskid":taskid,
+  return render("attempt.mako", request, {
+      "attempt": attempt,
+      "taskid": taskid,
       "joblnk": job_link,
       "task": task
     })
 
 @check_job_permission
-def single_task_attempt_logs(request, jobid, taskid, attemptid):
-  """
-  We get here from /jobs/jobid/tasks/taskid/attempts/attemptid/logs
-  """
-  job_link = JobLinkage(request.jt, jobid)
+def single_task_attempt_logs(request, job, taskid, attemptid):
+  jt = get_api(request.user, request.jt)
+
+  job_link = jt.get_job_link(job.jobId)
   task = job_link.get_task(taskid)
+
   try:
     attempt = task.get_attempt(attemptid)
-  except KeyError:
-    raise KeyError(_("Cannot find attempt '%(id)s' in task") % dict(id=attemptid))
+  except (KeyError, RestException), e:
+    raise KeyError(_("Cannot find attempt '%(id)s' in task") % {'id': attemptid}, e)
+
+  first_log_tab = 0
 
   try:
     # Add a diagnostic log
-    diagnostic_log = ", ".join(task.diagnosticMap[attempt.attemptId])
-    logs = [ diagnostic_log ]
+    if job_link.is_mr2:
+      diagnostic_log = attempt.diagnostics
+    else:
+      diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
+    logs = [diagnostic_log]
     # Add remaining logs
-    logs += [ section.strip() for section in attempt.get_task_log() ]
+    logs += [section.strip() for section in attempt.get_task_log()]
+    log_tab = [i for i, log in enumerate(logs) if log]
+    if log_tab:
+      first_log_tab = log_tab[0]
   except TaskTrackerNotFoundException:
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
-    logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
-  return render("attempt_logs.mako", request,
-    {
-      "attempt":attempt,
-      "taskid":taskid,
+    logs = [_("Failed to retrieve log. TaskTracker not found.")] * 4
+  except urllib2.URLError:
+    logs = [_("Failed to retrieve log. TaskTracker not ready.")] * 4
+
+  context = {
+      "attempt": attempt,
+      "taskid": taskid,
       "joblnk": job_link,
       "task": task,
-      "logs": logs
-    })
+      "logs": logs,
+      "first_log_tab": first_log_tab,
+  }
+
+  if request.GET.get('format') == 'python':
+    return context
+  else:
+    context['logs'] = [LinkJobLogs._make_links(log) for i, log in enumerate(logs)]
+
+  if request.GET.get('format') == 'json':
+    response = {
+      "logs": context['logs'],
+      "isRunning": job.status.lower() in ('running', 'pending', 'prep')
+    }
+    return JsonResponse(response)
+  else:
+    return render("attempt_logs.mako", request, context)
 
 @check_job_permission
-def task_attempt_counters(request, jobid, taskid, attemptid):
+def task_attempt_counters(request, job, taskid, attemptid):
   """
   We get here from /jobs/jobid/tasks/taskid/attempts/attemptid/counters
   (phew!)
   """
-  job_link = JobLinkage(request.jt, jobid)
+  job_link = JobLinkage(request.jt, job.jobId)
   task = job_link.get_task(taskid)
   attempt = task.get_attempt(attemptid)
   counters = {}
@@ -318,6 +486,7 @@ def task_attempt_counters(request, jobid, taskid, attemptid):
 def kill_task_attempt(request, attemptid):
   """
   We get here from /jobs/jobid/tasks/taskid/attempts/attemptid/kill
+  TODO: security
   """
   ret = request.jt.kill_task_attempt(request.jt.thriftattemptid_from_string(attemptid))
   return render_json({})
@@ -326,16 +495,29 @@ def trackers(request):
   """
   We get here from /trackers
   """
-  trackers = sort_if_necessary(request, get_tasktrackers(request))
+  trackers = get_tasktrackers(request)
 
   return render("tasktrackers.mako", request, {'trackers':trackers})
 
 def single_tracker(request, trackerid):
-  """
-  We get here from /trackers/trackerid
-  """
-  tracker = Tracker.from_name(request.jt, trackerid)
+  jt = get_api(request.user, request.jt)
+
+  try:
+    tracker = jt.get_tracker(trackerid)
+  except Exception, e:
+    raise PopupException(_('The tracker could not be contacted.'), detail=e)
   return render("tasktracker.mako", request, {'tracker':tracker})
+
+def container(request, node_manager_http_address, containerid):
+  jt = get_api(request.user, request.jt)
+
+  try:
+    tracker = jt.get_tracker(node_manager_http_address, containerid)
+  except Exception, e:
+    # TODO: add a redirect of some kind
+    raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
+  return render("container.mako", request, {'tracker':tracker})
+
 
 def clusterstatus(request):
   """
@@ -350,12 +532,12 @@ def queues(request):
   return render("queues.html", request, { "queuelist" : request.jt.queues()})
 
 @check_job_permission
-def set_job_priority(request, jobid):
+def set_job_priority(request, job):
   """
-  We get here from /jobs/jobid/setpriority?priority=PRIORITY
+  We get here from /jobs/job/setpriority?priority=PRIORITY
   """
   priority = request.GET.get("priority")
-  jid = request.jt.thriftjobid_from_string(jobid)
+  jid = request.jt.thriftjobid_from_string(job.jobId)
   request.jt.set_job_priority(jid, ThriftJobPriority._NAMES_TO_VALUES[priority])
   return render_json({})
 
@@ -366,7 +548,7 @@ def make_substitutions(conf):
   Substitute occurences of ${foo} with conf[foo], recursively, in all the values
   of the conf dict.
 
-  Note that the Java code may also substitute Java properties in, which 
+  Note that the Java code may also substitute Java properties in, which
   this code does not have.
   """
   r = re.compile(CONF_VARIABLE_REGEX)
@@ -389,6 +571,10 @@ def make_substitutions(conf):
 ##################################
 ## Helper functions
 
+def get_shorter_id(hadoop_job_id):
+  return "_".join(hadoop_job_id.split("_")[-2:])
+
+
 def format_counter_name(s):
   """
   Makes counter/config names human readable:
@@ -404,13 +590,7 @@ def format_counter_name(s):
   return string.capwords(re.sub('_', ' ', splitCamels(s)).lower())
 
 
-def sort_if_necessary(request, items):
-  if request.GET.get("sortkey"):
-    items.sort(key=lambda x: getattr(x, request.GET.get("sortkey")), reverse=request.GET.has_key("sortrev"))
-  return items
-
-def get_state_link(request, option=None, val='',
-                    VALID_OPTIONS = ("state", "user", "text", "taskstate")):
+def get_state_link(request, option=None, val='', VALID_OPTIONS = ("state", "user", "text", "taskstate")):
   """
     constructs the query string for the state of the current query for the jobs page.
     pass in the request, and an optional option/value pair; these are used for creating
@@ -431,67 +611,17 @@ def get_state_link(request, option=None, val='',
   return "&".join([ "%s=%s" % (key, quote_plus(value)) for key, value in states.iteritems() ])
 
 
-def _filter_jobs_by_req(joblist, request, **kwargs):
-  """
-  Unpacks filter arguments from the request object and optional
-  keyword arguments, and supplies the resulting filter to _filter_jobs.
-  """
-  args = {}
-  for x in ["jobid_exact", "jobid_substr", "pools", "user", "tasks", "text"]:
-    if x in kwargs:
-      args[x] = kwargs[x]
-    else:
-      args[x] = request.GET.get(x)
-  return _filter_jobs(joblist, **args)
+## All Unused below
 
+# DEAD?
+def dock_jobs(request):
+  username = request.user.username
+  matching_jobs = get_job_count_by_state(request, username)
+  return render("jobs_dock_info.mako", request, {
+    'jobs': matching_jobs
+  }, force_template=True)
+register_status_bar_view(dock_jobs)
 
-def _filter_jobs(jobs, jobid_exact=None, jobid_substr=None, pools=None, user=None, tasks=None, text=None):
-  # TODO(henry): this naive version can be replaced with something
-  # more flexible. (i.e. use getattr with a dict of values, check
-  # the type and do the right kind of test)
-  """
-  Return the set in jobs that match the supplied parameters (any of which may be
-  None). If jobid is supplied will only return exact id matches if exactid = True.
-
-  All other parameters are substring matched.
-  """
-  def predicate(job):
-    """
-    Return True if a ThriftJobInProgress structure matches the supplied filters.
-
-    If a filter argument is None, everything matches it.
-    """
-    if jobid_exact and jobid_exact != job.jobID.asString:
-      return False
-    if jobid_substr and jobid_substr not in job.jobID.asString:
-      return False
-    if pools and pools not in job.profile.queueName:
-      return False
-    if user and user not in job.profile.user:
-      return False
-    if tasks and not True: # TODO: figure out what Nutron wants to happen here
-      return False
-    if text:
-      search = text.lower()
-      # These fields are chosen to match those displayed by the JT UI
-      saw_text = False
-      for t in [job.profile.user,
-                job.profile.name,
-                job.jobID.asString,
-                job.profile.queueName,
-                job.priorityAsString
-                ]:
-        if search in t.lower():
-          saw_text = True
-          break
-      if not saw_text:
-        return False
-    return True
-
-  return filter(predicate, jobs)
-
-##################################
-## Task trackers
 
 def get_tasktrackers(request):
   """
@@ -500,55 +630,12 @@ def get_tasktrackers(request):
   return [ Tracker(tracker) for tracker in request.jt.all_task_trackers().trackers]
 
 
-##################################
-## Jobs
-
 def get_single_job(request, jobid):
   """
   Returns the job which matches jobid.
   """
   return Job.from_id(jt=request.jt, jobid=jobid)
 
-
-def get_matching_jobs(request, check_permission=False, **kwargs):
-  """
-  Returns an array of jobs where the returned
-  jobs are matched by the provided filter arguments.
-
-  If a filter argument is in kwargs it will supersede the same argument
-  in the request object.
-
-  Filter arguments may be jobid, pools, user, tasks, text and state.
-
-  Filter by user ownership if check_permission is set to true.
-  """
-  jobfunc = {"completed" : (request.jt.completed_jobs, ThriftJobState.SUCCEEDED),
-             # Succeeded and completed are synonyms here.
-             "succeeded" : (request.jt.completed_jobs, ThriftJobState.SUCCEEDED),
-             "running" : (request.jt.running_jobs, ThriftJobState.RUNNING),
-             "failed" : (request.jt.failed_jobs, ThriftJobState.FAILED),
-             "killed" : (request.jt.killed_jobs, ThriftJobState.KILLED),
-             "all" : (request.jt.all_jobs, None)}
-  if 'state' in kwargs:
-    selection = kwargs['state']
-  else:
-    selection = request.GET.get("state", "all")
-
-  if 'retired' in kwargs:
-    retired_arg = kwargs['retired']
-  else:
-    retired_arg = request.GET.get("retired", None)
-
-  retired = coerce_bool(retired_arg)
-
-  joblist = jobfunc[selection][0]().jobs
-
-  if retired == True:
-    joblist += request.jt.retired_jobs(jobfunc[selection][1]).jobs
-
-  return [Job.from_thriftjob(request.jt, j)
-          for j in _filter_jobs_by_req(joblist, request, **kwargs)
-          if not check_permission or request.user.is_superuser or j.profile.user == request.user.username]
 
 def get_job_count_by_state(request, username):
   """
@@ -571,9 +658,6 @@ def get_job_count_by_state(request, username):
   return res
 
 
-##################################
-## JobBrowser views
-
 def jobbrowser(request):
   """
   jobbrowser.jsp - a - like.
@@ -583,7 +667,7 @@ def jobbrowser(request):
     return lambda job: job.status == state
 
   status = request.jt.cluster_status()
-  alljobs = get_matching_jobs(request)
+  alljobs = [] #get_matching_jobs(request)
   runningjobs = filter(check_job_state('RUNNING'), alljobs)
   completedjobs = filter(check_job_state('COMPLETED'), alljobs)
   failedjobs = filter(check_job_state('FAILED'), alljobs)
