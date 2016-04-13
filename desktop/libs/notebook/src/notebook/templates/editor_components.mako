@@ -19,6 +19,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 from desktop.views import _ko
+from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
 <%namespace name="require" file="/require.mako" />
@@ -43,6 +44,7 @@ from desktop.views import _ko
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
+%if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/queryBuilder.css') }">
@@ -50,6 +52,8 @@ from desktop.views import _ko
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
 <script src="${ static('desktop/js/queryBuilder.js') }"></script>
 <script>
+
+
   // query-builder-menu is the class to use
   // Callback will run after each rule add, just focus to the queryBuilder tab
   QueryBuilder.bindMenu('.query-builder-menu', function () {
@@ -79,6 +83,7 @@ from desktop.views import _ko
 
 </script>
 <!-- End query builder imports -->
+%endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -347,6 +352,7 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+%if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -359,6 +365,7 @@ ${ hueIcons.symbols() }
     <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
+%endif
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { wasAssistVisible = true; $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
@@ -503,7 +510,9 @@ ${ hueIcons.symbols() }
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
+        %if ENABLE_QUERY_BUILDER.get():
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        %endif
       </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane active" id="queryHistory">
@@ -561,7 +570,7 @@ ${ hueIcons.symbols() }
           </div>
           <!-- /ko -->
         </div>
-
+        %if ENABLE_QUERY_BUILDER.get():
         <div class="tab-pane margin-top-10" id="queryBuilderTab">
           <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
           <table id="queryBuilder" class="table table-condensed">
@@ -578,6 +587,7 @@ ${ hueIcons.symbols() }
             <button class="btn btn-primary disable-feedback" data-bind="click: generateQuery">${_('Build query')}</button>
           </div>
         </div>
+        %endif
       </div>
 
     </div>
