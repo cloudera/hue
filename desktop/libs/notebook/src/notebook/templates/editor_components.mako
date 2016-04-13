@@ -1138,17 +1138,17 @@ ${ hueIcons.symbols() }
 
       <ul class="dropdown-menu less-padding">
         <li>
-          <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
+          <a href="javascript:void(0)" data-bind="click: explain, style: { color: statement() === '' || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
             <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Format the current SQL query') }">
+          <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': statement() === '' }" title="${ _('Format the current SQL query') }">
             <i class="fa fa-fw fa-indent"></i> ${_('Format')}
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
+          <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': statement() === '' }" title="${ _('Clear the current editor') }">
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
           </a>
         </li>

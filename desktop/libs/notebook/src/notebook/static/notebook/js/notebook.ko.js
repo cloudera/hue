@@ -662,6 +662,11 @@
 
     self.explain = function () {
       logGA('explain');
+
+      if (self.statement() == '' || self.status() == 'running' || self.status() === 'loading') {
+        return;
+      }
+
       self.result.clear();
       self.status('ready');
 
