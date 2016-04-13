@@ -26,6 +26,8 @@ from django.core.urlresolvers import reverse
 
 from useradmin.models import HuePermission, GroupPermission
 
+from security.api.hive import _to_sentry_privilege
+
 
 class TestSecurity():
 
@@ -47,3 +49,17 @@ class TestSecurity():
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
     check(client, assert_true)
+
+  def test_permissions(self):
+    privilege = {
+      'privilegeScope': 'URI',
+      'serverName': 'server1',
+      'dbName': 'default',
+      'tableName': 'sample_07',
+      'columnName': '',
+      'URI': u'/tmp/à',
+      'action': 'ALL',
+      'timestamp': 0,
+      'grantOption': 0
+    }
+    _to_sentry_privilege(privilege)
