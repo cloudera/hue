@@ -69,9 +69,10 @@ $(BLD_DIR_DOC)/user-guide: $(wildcard user-guide/*.md)
 	@mkdir -p $@
 	@cp -r user-guide/images $@
 	@cp docbook.css $@
+	@cp bootplus.css $@
 	@for x in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
-	  $$x > $(BLD_DIR_DOC)/$$x ; done
+	  $$x > $(BLD_DIR_DOC)/$$x -x toc ; done
 	@(cd $@; for file in *.md; do mv $${file} $${file/\.md/.html}; done)
 	@echo "--- Generated $@"
 
