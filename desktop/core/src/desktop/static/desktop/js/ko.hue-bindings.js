@@ -1398,7 +1398,7 @@
 
       ace().on('change', function () {
         if (autoExpand) {
-          var maxAutoLines = Math.floor(($(window).height() - 200) / 16);
+          var maxAutoLines = Math.floor((($(window).height() - 80) / 2) / 16);
           if (ace().session.getLength() > editorHeight) {
             if (ace().session.getLength() < maxAutoLines) {
               $target.height((ace().session.getLength() + 1) * 16);
