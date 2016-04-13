@@ -605,7 +605,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
-    <div class="assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
+    <div class="assist-db-header-actions">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
@@ -625,7 +625,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-databases-template">
     <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() || isSearchVisible() }">
-      <div class="assist-inner-header" data-bind="visible: ! hasErrors()">
+      <div class="assist-inner-header">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
