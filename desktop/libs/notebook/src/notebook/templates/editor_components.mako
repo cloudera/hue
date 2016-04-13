@@ -52,17 +52,31 @@ from desktop.views import _ko
 <script>
   // query-builder-menu is the class to use
   // Callback will run after each rule add, just focus to the queryBuilder tab
-  QueryBuilder.bindMenu('.query-builder-menu', function() {
+  QueryBuilder.bindMenu('.query-builder-menu', function () {
     $("a[href='#queryBuilderTab']").click();
   });
   function generateQuery() {
-      var result = QueryBuilder.buildHiveQuery();
-      if (result.status == "fail") {
-          $("#invalidQueryBuilder").modal("show");
-      } else {
-          replaceAce(result.query);
-      }
+    var result = QueryBuilder.buildHiveQuery();
+    if (result.status == "fail") {
+      $("#invalidQueryBuilder").modal("show");
+    } else {
+      replaceAce(result.query);
+    }
   }
+
+  window.setInterval(function(){
+    if ($('#queryBuilder tbody').length > 0 && $('#queryBuilder tbody').find('tr').length > 0){
+      $('.button-panel').show();
+      $('#queryBuilder').show();
+      $('#queryBuilderAlert').hide();
+    }
+    else {
+      $('.button-panel').hide();
+      $('#queryBuilder').hide();
+      $('#queryBuilderAlert').show();
+    }
+  }, 500);
+
 </script>
 <!-- End query builder imports -->
 
@@ -342,7 +356,7 @@ ${ hueIcons.symbols() }
     <p>${_('Query requires a select or an aggregate.')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Ok')}</a>
+    <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -548,13 +562,21 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-        <div class="tab-pane" id="queryBuilderTab">
-          <!--form onsubmit="generateQuery(); return false;"-->
-            <table id="queryBuilder"></table>
-            <div class="button-panel">
-              <button class="btn btn-primary disable-feedback" onclick="generateQuery()">${_('Build query')}</button>
-            </div>
-          <!--/form-->
+        <div class="tab-pane margin-top-10" id="queryBuilderTab">
+          <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
+          <table id="queryBuilder" class="table table-condensed">
+            <thead>
+              <tr>
+                <th width="10%">${ _('Table') }</th>
+                <th>${ _('Column') }</th>
+                <th width="10%">${ _('Operation') }</th>
+                <th width="1%">&nbsp;</th>
+              </tr>
+            </thead>
+          </table>
+          <div class="button-panel">
+            <button class="btn btn-primary disable-feedback" data-bind="click: generateQuery">${_('Build query')}</button>
+          </div>
         </div>
       </div>
 
