@@ -3695,4 +3695,49 @@
     }
   };
 
+  ko.bindingHandlers.highlight = {
+    update: function (element, valueAccessor, allBindingsAccessor) {
+
+      var value = ko.unwrap(valueAccessor());
+
+      var options = ko.unwrap(allBindingsAccessor());
+
+      if (value !== undefined) { // allows highlighting static code
+
+        window.setTimeout(function () {
+          var res = [];
+
+          var Tokenizer = ace.require('ace/tokenizer').Tokenizer;
+          var Rules;
+          if (options.flavor() == 'impala') {
+            Rules = ace.require('ace/mode/impala_highlight_rules').ImpalaHighlightRules;
+          }
+          else {
+            Rules = ace.require('ace/mode/hive_highlight_rules').HiveHighlightRules;
+          }
+          var Text = ace.require('ace/layer/text').Text;
+
+          var tok = new Tokenizer(new Rules().getRules());
+          var lines = value.split('\n');
+
+          lines.forEach(function (line) {
+            var renderedTokens = [];
+            var tokens = tok.getLineTokens(line);
+
+            if (tokens && tokens.tokens.length) {
+              new Text(document.createElement('div')).$renderSimpleLine(renderedTokens, tokens.tokens);
+            }
+
+            res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + ' </div>');
+          });
+
+
+          element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
+        }, 0)
+      }
+
+    }
+
+  };
+
 }));

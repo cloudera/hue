@@ -518,7 +518,7 @@ ${ hueIcons.symbols() }
                 <td style="width: 25px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}">
                   <i class="fa fa-fw fa-bolt inactive-action" data-bind="css: {'fa-unlink': status == 'expired', 'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
                 </td>
-                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><code data-bind="text: query" class="history-item"></code></td>
+                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
               </tr>
             </tbody>
           </table>

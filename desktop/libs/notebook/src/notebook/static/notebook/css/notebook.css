@@ -943,10 +943,8 @@ h4.header {
   background-color: #f7f7f9;
 }
 
-code.history-item {
-  white-space: normal;
-  border: none;
-  color: #666;
+.history-item .ace-hue {
+  background-color: transparent!important;
 }
 
 .player-toolbar img {
