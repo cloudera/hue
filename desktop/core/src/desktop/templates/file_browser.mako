@@ -576,18 +576,44 @@ from desktop.views import _ko
               </ul>
               <div class="fb-primary-col">
                 <svg class="hi">
-                  <!-- ko if: isDirectory() -->
+                  <!-- ko if: isDirectory -->
                   <use xlink:href="#hi-folder"></use>
                   <!-- /ko -->
-                  <!-- ko if: ! isDirectory() && definition().type === 'query-hive' -->
+                  <!-- ko ifnot: isDirectory -->
+                  <!-- ko switch: definition().type -->
+                  <!-- ko case: 'query-hive' -->
                   <use xlink:href="#hi-file-hive"></use>
                   <!-- /ko -->
-                  <!-- ko if: ! isDirectory() && definition().type === 'query-impala' -->
+                  <!-- ko case: 'query-impala' -->
                   <use xlink:href="#hi-file-impala"></use>
                   <!-- /ko -->
-                  <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
+                  <!-- ko case: 'link-workflow' -->
+                  <use xlink:href="#hi-file-job-designer"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'notebook' -->
+                  <use xlink:href="#hi-file-notebook"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'oozie-bundle2' -->
+                  <use xlink:href="#hi-file-oozie-bundle"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'oozie-coordinator2' -->
+                  <use xlink:href="#hi-file-oozie-coordinator"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'oozie-workflow2' -->
+                  <use xlink:href="#hi-file-oozie-workflow"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'link-pigscript' -->
+                  <use xlink:href="#hi-file-pig"></use>
+                  <!-- /ko -->
+                  <!-- ko case: 'search-dashboard' -->
+                  <use xlink:href="#hi-file-search"></use>
+                  <!-- /ko -->
+                  <!-- ko case: $default -->
                   <use xlink:href="#hi-file"></use>
                   <!-- /ko -->
+                  <!-- /ko -->
+                  <!-- /ko -->
+
                   <!-- ko if: (isShared() || isSharedWithMe()) && selected() -->
                   <use xlink:href="#hi-share-addon-selected"></use>
                   <!-- /ko -->
@@ -617,7 +643,8 @@ from desktop.views import _ko
     (function (factory) {
       if(typeof require === "function") {
         define('fileBrowser', [
-          'knockout'
+          'knockout',
+          'ko.switch-case'
         ], factory);
       } else {
         factory(ko);
