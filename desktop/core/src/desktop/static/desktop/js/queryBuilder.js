@@ -358,7 +358,7 @@
             QueryBuilder.callbackOnRuleAdd = callbackOnRuleAdd;
             $.contextMenu({
                 selector: selectorClass,
-                trigger: 'left',
+                trigger: 'right',
                 zIndex: 1000,
                 build: function($trigger, e) {
                     // Get the database, table, and column
