@@ -106,7 +106,7 @@ def _to_sentry_privilege(privilege):
       'dbName': privilege['dbName'],
       'tableName': privilege['tableName'],
       'columnName': privilege['columnName'],
-      'URI': _massage_uri(privilege['URI']),
+      'URI': _massage_uri(privilege['URI'].encode('utf-8')),
       'action': privilege['action'],
       'createTime': privilege['timestamp'],
       'grantOption': 1 if privilege['grantOption'] else 0,
@@ -129,7 +129,7 @@ def _hive_add_privileges(user, role, privileges):
             'scope': privilege.get('privilegeScope'),
             'table': privilege.get('tableName'),
             'column': privilege.get('columnName'),
-            'URI': privilege.get('URI'),
+            'URI': privilege.get('URI').encode('utf-8'),
             'server': privilege.get('serverName'),
             'grantOption': privilege.get('grantOption') == 1
         })
