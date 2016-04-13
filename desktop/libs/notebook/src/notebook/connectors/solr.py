@@ -54,7 +54,7 @@ class SolrApi(Api):
     api = NativeSolrApi(SOLR_URL.get(), self.user.username)
 
     collection = self.options.get('collection') or snippet.get('database')
-    if collection == 'default':
+    if not collection or collection == 'default':
       collection = api.collections2()[0]
 
     response = api.sql(collection, snippet['statement'])
@@ -129,7 +129,7 @@ class SolrApi(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     from search.conf import SOLR_URL
     api = NativeSolrApi(SOLR_URL.get(), self.user.username)
-    assist = Assist(self.user, api)
+    assist = Assist(self, self.user, api)
     response = {'status': -1}
 
     if database is None:
