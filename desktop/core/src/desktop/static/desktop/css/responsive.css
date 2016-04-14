@@ -31,9 +31,26 @@ body {
   overflow-y: hidden;
 }
 
+.main-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: hidden;
+}
+
 .top-nav {
+  display: flex;
+  flex: 0 0 35px;
   background-color: #31516a;
   width: 100%;
-  height: 35px;
   padding: 10px;
+}
+
+.page-content {
+  display: flex;
+  flex:2;
+  background-color: #FFF;
 }
