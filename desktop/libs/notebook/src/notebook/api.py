@@ -301,6 +301,7 @@ def get_history(request):
   response = {'status': -1}
 
   doc_type = request.GET.get('doc_type')
+  limit = max(request.GET.get('len', 50), 100)
 
   response['status'] = 0
   response['history'] = [{
@@ -308,8 +309,8 @@ def get_history(request):
       'id': doc.id,
       'uuid': doc.uuid,
       'data': Notebook(document=doc).get_data(),
-      'absoluteUrl': doc.get_absolute_url()
-      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:25]]
+      'absoluteUrl': doc.get_absolute_url(),
+      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:limit]]
   response['message'] = _('History fetched')
 
   return JsonResponse(response)

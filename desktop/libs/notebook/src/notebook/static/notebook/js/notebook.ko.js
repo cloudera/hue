@@ -240,7 +240,7 @@
           self.queriesHasErrors(true);
         },
         page: self.queriesCurrentPage(),
-        limit: 25,
+        limit: 50,
         type: 'query-' + self.type()
       });
     }
@@ -537,11 +537,11 @@
       }
     };
 
-    self.lastExecuted = 0;
+    self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000 || self.statement() == '') {
+      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || self.statement() == '') {
         return;
       }
 
@@ -555,7 +555,7 @@
         chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti
       };
       $(document).trigger("executeStarted", self);
-      self.lastExecuted = now;
+      self.lastExecuted(now);
       $(".jHueNotify").hide();
       logGA('execute/' + self.type());
 
@@ -1256,7 +1256,8 @@
 
     self.fetchHistory = function () {
       $.get("/notebook/api/get_history", {
-        doc_type: self.selectedSnippet()
+        doc_type: self.selectedSnippet(),
+        limit: 50
       }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
