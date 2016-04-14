@@ -46,7 +46,7 @@ body {
   flex: 0 0 2.5em;
   background-color: #31516a;
   width: 100%;
-  padding: 1em;
+  padding: 1em 0;
 }
 
 .content-wrapper {
@@ -57,7 +57,9 @@ body {
 }
 
 .left-nav {
-  flex: 0 0 0em;
+  flex: 0 0 0;
+  overflow-x: hidden;
+  white-space: nowrap;
   background-color: lightgrey;
   -webkit-transition: 0.4s flex;
   -moz-transition: 0.4s flex;
@@ -108,7 +110,7 @@ h6 {
  * @link https://github.com/jonsuh/hamburgers
  */
 .hamburger {
-  padding: 0.4em 1em 0.4em 0.4em;
+  padding: 0.4em 1em 0.4em 1.4em;
   display: inline-block;
   cursor: pointer;
   transition-property: opacity, -webkit-filter;

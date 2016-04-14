@@ -77,7 +77,7 @@
 
   <div class="content-wrapper">
     <div class="left-nav">
-
+       contents
     </div>
     <div class="page-content">
       <h1>responsive</h1>
