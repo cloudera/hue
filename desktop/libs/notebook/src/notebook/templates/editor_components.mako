@@ -1196,11 +1196,13 @@ ${ hueIcons.symbols() }
 
 <script type="text/html" id="property">
   <div data-bind="visibleOnHover: { selector: '.hover-actions' }, css: { 'spark-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
-    <label class="control-label" data-bind="text: label, style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }"></label>
+    <label class="control-label" data-bind="style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }">
+      <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
+    </label>
     <div class="controls" style="margin-right:10px;" data-bind="style: { 'margin-left' : typeof inline === 'undefined' || inline ? '140px' : '' }">
       <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
     </div>
-    <!-- ko ifnot: typeof remove === "undefined" -->
+    <!-- ko if: typeof remove !== "undefined" -->
     <div class="hover-actions spark-property-remove">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
         <i class="fa fa-times"></i>
@@ -1810,21 +1812,20 @@ ${ hueIcons.symbols() }
                 </a>
               </div>
               <!-- /ko -->
-              <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <div style="display:block; width:100%;">
                 <!-- ko foreach: properties -->
                   <!-- ko template: {
                     name: 'property',
                     data: {
-                      type: $root.getSessionProperties(name()).type,
-                      label: $root.getSessionProperties(name()).nice_name,
+                      type: type(),
+                      label: nice_name,
+                      helpText: help_text,
                       value: value,
-                      remove: function () { $parent.properties.remove($data) }
+                      visibleObservable: ko.observable()
                     }
                   } --><!-- /ko -->
                 <!-- /ko -->
               </div>
-              <!-- /ko -->
               <div style="clear:both; padding-left: 120px;">
                 <!-- ko if: availableNewProperties().length -->
                 <select data-bind="options: availableNewProperties,
@@ -1840,10 +1841,10 @@ ${ hueIcons.symbols() }
                 </a>
                 <!-- /ko -->
                 <a style="float: right;" class="btn pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }">
-                  <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
+                  <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate Session') }
                 </a>
                 <a style="margin-right: 5px; float: right;" class="btn pointer" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }">
-                  <i class="fa fa-times"></i> ${ _('Close') }
+                  <i class="fa fa-times"></i> ${ _('Close Session') }
                 </a>
               </div>
               <!-- /ko -->
