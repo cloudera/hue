@@ -2241,6 +2241,10 @@ div.navigator .pull-right .nav {
   color: #aaa;
 }
 
+.inactive-action:hover {
+  text-decoration: none;
+}
+
 .inactive-action.disabled {
   color: #eee !important;
   cursor: default !important;

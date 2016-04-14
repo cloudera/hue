@@ -1799,20 +1799,25 @@ ${ hueIcons.symbols() }
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-              <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
-              <!-- ko if: type()== 'impala' && typeof properties != 'undefined' -->
+            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
+            <div class="session-actions">
+              <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
+              <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
+              <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+            </div>
+            <!-- ko if: type()== 'impala' && typeof properties != 'undefined' -->
 
-              <ul class="nav nav-list" style="border: none; padding: 0;">
-                <li class="nav-header">${ _('address')}</li>
-              </ul>
-              <div style="margin: 2px" data-bind="with: ko.utils.arrayFirst(properties(), function(item) { return item.key() == 'http_addr' });">
-                <a data-bind="attr: {'href': window.location.protocol + '//' + $data.value().replace(/^(https?):\/\//, '')}" target="_blank">
-                  <span data-bind="text: $data.value().replace(/^(https?):\/\//, '')"></span>
-                  <i class="fa fa-external-link"></i>
-                </a>
-              </div>
-              <!-- /ko -->
-              <div style="display:block; width:100%;">
+            <ul class="nav nav-list" style="border: none; padding: 0;">
+              <li class="nav-header">${ _('address')}</li>
+            </ul>
+            <div style="margin: 2px" data-bind="with: ko.utils.arrayFirst(properties(), function(item) { return item.key() == 'http_addr' });">
+              <a data-bind="attr: {'href': window.location.protocol + '//' + $data.value().replace(/^(https?):\/\//, '')}" target="_blank">
+                <span data-bind="text: $data.value().replace(/^(https?):\/\//, '')"></span>
+                <i class="fa fa-external-link"></i>
+              </a>
+            </div>
+            <!-- /ko -->
+            <div style="width:100%;">
                 <!-- ko foreach: properties -->
                   <!-- ko template: {
                     name: 'property',
@@ -1840,12 +1845,6 @@ ${ hueIcons.symbols() }
                   <i class="fa fa-plus"></i>
                 </a>
                 <!-- /ko -->
-                <a style="float: right;" class="btn pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }">
-                  <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate Session') }
-                </a>
-                <a style="margin-right: 5px; float: right;" class="btn pointer" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }">
-                  <i class="fa fa-times"></i> ${ _('Close Session') }
-                </a>
               </div>
               <!-- /ko -->
             <!-- /ko -->
@@ -2464,6 +2463,7 @@ ${ hueIcons.symbols() }
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
+      userId: ${ user.id },
       assistAvailable: true,
       snippetViewSettings: {
         default: {
