@@ -17,12 +17,18 @@
 */
 
 .hueBreadcrumb {
-  /*padding: 12px 14px;*/
 }
 
 .hueBreadcrumbBar {
   padding: 0;
-  /*margin: 12px;*/
+}
+
+.hueBreadcrumbBar li {
+  padding: 12px;
+}
+
+.hueBreadcrumbBar li:first-child {
+  padding-left: 0;
 }
 
 .hueBreadcrumbBar a {
@@ -86,6 +92,7 @@ h2.card-heading {
 
 .metastore-main {
   padding: 20px;
+  padding-top: 10px;
 }
 
 .metastore-main h3 {
@@ -124,3 +131,30 @@ h2.card-heading {
 .empty-message {
   padding: 10px;
 }
+
+.editable-breadcrumbs {
+  cursor: text;
+}
+
+.editable-breadcrumbs:hover {
+  background-color: #F0F0F0;
+}
+
+.editable-breadcrumb-input {
+  padding: 0!important;
+}
+
+.editable-breadcrumb-input input {
+  font-size: 22.75px;
+  height: 36px;
+  margin: 0;
+  margin-top: 3px;
+  padding-left: 11px;
+  border-radius: 2px;
+  border: 1px solid #EEE;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-weight: 300;
+}
+

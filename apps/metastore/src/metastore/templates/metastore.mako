@@ -43,6 +43,7 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
@@ -76,9 +77,16 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </li>
     <!-- ko with: table -->
-    <li>
-      <span style="padding-left:12px" data-bind="text: name"></span>
+    <li class="editable-breadcrumbs" title="${_('Edit path')}" data-bind="click: function(){ $parent.editingTable(true); }, visible: !$parent.editingTable()">
+      <span data-bind="text: name"></span>
     </li>
+    <!-- /ko -->
+    <!-- ko if: editingTable -->
+      <!-- ko with: table -->
+      <li class="editable-breadcrumb-input">
+        <input type="text" data-bind="hivechooser: {data: name, database: $parent.name, skipColumns: true, onChange: function(val){ $parent.setTableByName(val); $parent.editingTable(false); }}" autocomplete="off" />
+      </li>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
   </ul>

@@ -2115,34 +2115,57 @@
   ko.bindingHandlers.hivechooser = {
     init: function (element, valueAccessor, allBindingsAccessor, vm) {
       var self = $(element);
-      self.val(valueAccessor()());
-
-      function setPathFromAutocomplete(path) {
-        self.val(path);
-        valueAccessor()(path);
-        self.blur();
+      var options = ko.unwrap(valueAccessor());
+      var complexConfiguration = false;
+      if (typeof options === 'function'){
+        self.val(options());
+      }
+      else {
+        if (options.data){
+          self.val(options.data);
+          complexConfiguration = true;
+        }
+        else {
+          self.val(options);
+        }
       }
 
-      self.on("blur", function () {
-        valueAccessor()(self.val());
-      });
-
-      self.jHueGenericAutocomplete({
-        showOnFocus: true,
-        home: "/",
-        onPathChange: function (path) {
-          setPathFromAutocomplete(path);
-        },
-        onEnter: function (el) {
-          setPathFromAutocomplete(el.val());
-        },
-        onBlur: function () {
-          if (self.val().lastIndexOf(".") == self.val().length - 1) {
-            self.val(self.val().substr(0, self.val().length - 1));
-          }
-          valueAccessor()(self.val());
+      if (complexConfiguration) {
+        self.jHueGenericAutocomplete({
+          showOnFocus: true,
+          skipColumns: options.skipColumns,
+          startingPath: options.database + '.',
+          rewriteVal: true,
+          onPathChange: options.onChange
+        });
+      }
+      else {
+        function setPathFromAutocomplete(path) {
+          self.val(path);
+          valueAccessor()(path);
+          self.blur();
         }
-      });
+        self.on("blur", function () {
+          valueAccessor()(self.val());
+        });
+        self.jHueGenericAutocomplete({
+          showOnFocus: true,
+          home: "/",
+          onPathChange: function (path) {
+            setPathFromAutocomplete(path);
+          },
+          onEnter: function (el) {
+            setPathFromAutocomplete(el.val());
+          },
+          onBlur: function () {
+            if (self.val().lastIndexOf(".") == self.val().length - 1) {
+              self.val(self.val().substr(0, self.val().length - 1));
+            }
+            valueAccessor()(self.val());
+          }
+        });
+      }
+
     }
   }
 
