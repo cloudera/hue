@@ -137,8 +137,12 @@ ${ assist.assistPanel() }
           </td>
           <!-- /ko -->
           <td>
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}" class="editable editable-click editable-empty">
-              ${ _('Add a comment...') }</span>
+            % if has_write_access:
+              <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}" class="editable editable-click editable-empty">
+                ${ _('Add a comment...') }</span>
+            % else:
+              <span data-bind="text: comment"></span>
+            % endif
           </td>
         </tr>
       </tbody>
@@ -757,9 +761,13 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-describe-table">
   <div class="clearfix"></div>
 
-  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'bottom', emptytext: '${ _ko('Add a description...') }', inputclass:'input-xxlarge', rows: 10 }" class="editable editable-click editable-empty" data-type="textarea">
+  % if has_write_access:
+  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'bottom', emptytext: '${ _ko('Add a description...') }', inputclass:'input-xlarge', rows: 10 }" class="editable editable-click editable-empty" data-type="textarea">
     ${ _('Add a description...') }
   </span>
+  % else:
+    <span data-bind="text: comment"></span>
+  %endif
 
   <ul class="nav nav-pills margin-top-30">
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
