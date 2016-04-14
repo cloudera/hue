@@ -65,6 +65,14 @@ def is_alive(request):
   return HttpResponse('')
 
 
+def responsive(request):
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('responsive.mako', request, {
+    'apps': apps,
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
 def home(request):
   docs = _get_docs(request.user)
 
