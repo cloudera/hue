@@ -59,6 +59,7 @@ class Notebook(object):
       self.data = json.dumps({
           'name': 'My Notebook',
           'description': '',
+          'type': 'notebook',
           'snippets': [],
       })
 
