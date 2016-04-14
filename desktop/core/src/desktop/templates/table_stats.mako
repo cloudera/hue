@@ -169,7 +169,10 @@ from desktop.views import _ko
         var self = this;
         self.params = params;
         var $targetElement = $(element);
-        var $statsContainer = $('<div>').appendTo($('body'));
+        var $statsContainer = $('#statsContainer');
+        if ($statsContainer.length === 0) {
+          $statsContainer = $('<div>').attr('id', 'statsContainer').appendTo($('body'));
+        }
 
         self.i18n = {
           errorLoadingStats: "${ _('There was a problem loading the stats.') }",
