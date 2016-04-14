@@ -994,3 +994,11 @@ h4.header {
 .tooltip {
   z-index: 3000 !important;
 }
+
+.session-actions {
+  display: inline-block;
+  font-size: 13px;
+  margin-top: -3px;
+  margin-left: 15px;
+  vertical-align: text-top;
+}

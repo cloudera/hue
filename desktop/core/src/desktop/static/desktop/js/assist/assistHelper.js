@@ -31,6 +31,7 @@
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
+  var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 
   /**
    * @param {Object} i18n
@@ -180,6 +181,26 @@
   };
 
   /**
+   * @param {string} url
+   * @param {Object} data
+   * @param {Object} options
+   * @param {function} [options.successCallback]
+   * @param {function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   */
+  AssistHelper.prototype.simplePost = function (url, data, options) {
+    var self = this;
+    $.post(CONFIG_SAVE_API, data, function (data) {
+      if (self.successResponseIsError(data)) {
+        self.assistErrorCallback(options)(data);
+      } else if (typeof options.successCallback !== 'undefined') {
+        options.successCallback(data);
+      }
+    })
+    .fail(self.assistErrorCallback(options));
+  };
+
+  /**
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
@@ -235,6 +256,29 @@
       queueForFunction[id] = [];
     }
     return queueForFunction[id];
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} [options.successCallback]
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.app
+   * @param {Object} options.properties
+   * @param {boolean} [options.isDefault]
+   * @param {Number} [options.groupId]
+   * @param {Number} [options.userId]
+   */
+  AssistHelper.prototype.saveConfiguration = function (options) {
+    var self = this;
+    self.simplePost(CONFIG_SAVE_API, {
+      app: options.app,
+      properties: ko.mapping.toJSON(options.properties),
+      is_default: options.isDefault,
+      group_id: options.groupId,
+      user_id: options.userId
+    }, options);
   };
 
   /**
@@ -349,17 +393,10 @@
    */
   AssistHelper.prototype.createDocumentsFolder = function (options) {
     var self = this;
-    $.post("/desktop/api2/doc/mkdir", {
+    self.simplePost("/desktop/api2/doc/mkdir", {
       parent_uuid: ko.mapping.toJSON(options.parentUuid),
       name: ko.mapping.toJSON(options.name)
-    }, function (data) {
-      if (! self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    })
-    .fail(self.assistErrorCallback(options));
+    }, options);
   };
 
   /**
@@ -410,17 +447,10 @@
    */
   AssistHelper.prototype.moveDocument = function (options) {
     var self = this;
-    $.post("/desktop/api2/doc/move", {
+    self.simplePost("/desktop/api2/doc/move", {
       source_doc_uuid: ko.mapping.toJSON(options.sourceId),
       destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
-    }, function (data) {
-      if (! self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    })
-    .fail(self.assistErrorCallback(options));
+    }, options);
   };
 
   /**
@@ -434,17 +464,10 @@
    */
   AssistHelper.prototype.deleteDocument = function (options) {
     var self = this;
-    $.post("/desktop/api2/doc/delete", {
+    self.simplePost("/desktop/api2/doc/delete", {
       uuid: ko.mapping.toJSON(options.uuid),
       skip_trash: ko.mapping.toJSON(options.skipTrash || false)
-    }, function (data) {
-      if (! self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    })
-    .fail(self.assistErrorCallback(options));
+    }, options);
   };
 
   /**
