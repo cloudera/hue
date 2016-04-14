@@ -154,7 +154,7 @@ ${ require.config() }
 
 </%def>
 
-<%def name="topBar(mode='notebook', editor_type='hive')">
+<%def name="topBar(mode='notebook', editor_type='notebook')">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
