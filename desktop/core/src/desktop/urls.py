@@ -92,6 +92,8 @@ dynamic_patterns += patterns('desktop.views',
 
   # Mobile
   (r'^assist_m', 'assist_m'),
+  # Responsive
+  (r'^responsive', 'responsive'),
 
   # Jasmine
   (r'^jasmine', 'jasmine'),
