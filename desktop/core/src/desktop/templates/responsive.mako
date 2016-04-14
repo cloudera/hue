@@ -69,15 +69,75 @@
         <span class="hamburger-inner"></span>
       </span>
     </a>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img
+    <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img
         src="${ static('desktop/art/hue-logo-mini-white.png') }"
         data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
         data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+    <span style="color:white">
+
+    <span style="font-size: 130%" title="Query data">
+      <a href="${ url('notebook:new') }">+ Query</a>
+    </span>
+
+    [Hive..]
+    [Search..]
+
+    <input class="input-xxlarge"></input>
+
+    [clusters]
+
+    ${ user.username }
+
+    <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
+    <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
+
+    [? | About Hue]
+
+    [Profile | Log out]
+    </span>
   </div>
 
   <div class="content-wrapper">
     <div class="left-nav">
-       contents
+      Query
+      <br/>
+      [Hive, Impala, Pig, PySpark, Solr, MapReduce...]<br/>
+      [Query 1, Query 2, Query 3, Query 4]<br/>
+
+      <br/>
+
+      Search<br/>
+      [Dashboards]<br/>
+      [Dashboard 1, Dashboard 2, Dashboard 3, Dashboard 4]<br/>
+
+      <br/>
+
+      Browse<br/>
+      [Tables]<br/>
+      [Files]<br/>
+      [Indexes]<br/>
+      [HBase]<br/>
+
+      <br/>
+
+      Jobs<br/>
+      [YARN, MR, Hive, Impala, Spark, Sqoop, Pig]<br/>
+
+      <br/>
+
+      Schedules<br/>
+      [Dashboards]<br/>
+      [Workflows]<br/>
+
+      <br/>
+      [Custom App 1]<br/>
+      [Custom App 2]<br/>
+      <span style="position: fixed; bottom: 0">
+      Import File<br/>
+      Import Database<br/>
+      [+]
+      <br/>&nbsp
+      </span>
     </div>
     <div class="page-content">
       <h1>responsive</h1>
