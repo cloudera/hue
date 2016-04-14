@@ -1781,7 +1781,10 @@ from django.utils.translation import ugettext as _
 
       if (location.hash != null && location.hash.length > 1) {
         var targetPath = "";
-        var hash = window.location.hash.substring(1).replace(/(<([^>]+)>)/ig, "");
+        var hash = window.location.hash.substring(1);
+        if (hash.search(/(<([^>]+)>)/ig) > -1) {
+          hash = encodeURI(hash);
+        }
         if (hash != null && hash != "") {
           targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}";
           if (hash.indexOf("!!") != 0) {
@@ -1855,7 +1858,10 @@ from django.utils.translation import ugettext as _
 
       $(window).bind("hashchange", function () {
         var targetPath = "";
-        var hash = window.location.hash.substring(1).replace(/(<([^>]+)>)/ig, "");
+        var hash = window.location.hash.substring(1);
+        if (hash.search(/(<([^>]+)>)/ig) > -1) {
+          hash = encodeURI(hash);
+        }
 
         if (hash != null && hash != "") {
           addPathToHistory(hash);
