@@ -22,18 +22,43 @@
 
 ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
 
+
+<div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="nav-collapse">
+        <ul class="nav editor-nav">
+          <li class="currentApp">
+              <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
+              % if editor_type == 'impala':
+                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                ${ _('Impala Queries') }
+              % elif editor_type == 'rdbms':
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                ${ _('SQL Queries') }
+              % elif editor_type == 'pig':
+                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+                ${ _('Pig Scripts') }
+              % elif editor_type in ('beeswax', 'hive'):
+                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                ${ _('Hive Queries') }
+              % else:
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                ${ _('Notebooks') }
+              % endif
+              </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div id="editor">
 
-<div class="container-fluid">
+<div class="container-fluid margin-top-20">
   <div class="card card-small">
-  % if editor_type == 'impala':
-    <h1 class="card-heading simple">${ _('Impala Queries') }</h1>
-  % elif editor_type == 'hive':
-    <h1 class="card-heading simple">${ _('Hive Queries') }</h1>
-  % else:
-    <h1 class="card-heading simple">${ _('Notebooks') }</h1>
-  % endif
-
   <%actionbar:render>
     <%def name="search()">
       <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
