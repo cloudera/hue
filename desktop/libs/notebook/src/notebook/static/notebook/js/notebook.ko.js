@@ -826,7 +826,7 @@
           self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        $(document).trigger("error", xhr.responseText || textStatus);
         self.status('failed');
       });
     };
@@ -908,7 +908,7 @@
           self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        $(document).trigger("error", xhr.responseText || textStatus);
         self.status('failed');
       });
     };
