@@ -27,16 +27,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
   <meta name="description" content="">
   <meta name="author" content="">
 
+  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/responsive.css') }" rel="stylesheet">
 
   <!--[if lt IE 9]>
   <script type="text/javascript">
-    if (document.documentMode && document.documentMode < 9){
+    if (document.documentMode && document.documentMode < 9) {
       location.href = "${ url('desktop.views.unsupported') }";
     }
   </script>
@@ -56,99 +58,105 @@
       location.href = "${ url('desktop.views.unsupported') }";
     }
   </script>
+</head>
 
-  <script src="${ static('desktop/js/hue.utils.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+<body>
 
-  <script type="text/javascript" charset="utf-8">
-    moment.locale(window.navigator.userLanguage || window.navigator.language);
-    localeFormat = function (time) {
-      if (typeof ko !== 'undefined' && ko.isObservable(time)) {
-        return moment(time()).format("L LT");
-      }
-      return moment(time).format("L LT");
+<div class="top-nav">
+  <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img
+      src="${ static('desktop/art/hue-logo-mini-white.png') }"
+      data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
+      data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+</div>
+
+<div class="container">
+  <div>
+    <h1>responsive</h1>
+  </div>
+</div><!-- /.container -->
+
+<script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
+<script src="${ static('desktop/js/hue.utils.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+
+<script type="text/javascript" charset="utf-8">
+  moment.locale(window.navigator.userLanguage || window.navigator.language);
+  localeFormat = function (time) {
+    if (typeof ko !== 'undefined' && ko.isObservable(time)) {
+      return moment(time()).format("L LT");
     }
+    return moment(time).format("L LT");
+  }
 
-    //Add CSRF Token to all XHR Requests
-    var xrhsend = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function (data) {
-      this.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-      return xrhsend.apply(this, arguments);
-    }
+  //Add CSRF Token to all XHR Requests
+  var xrhsend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function (data) {
+    this.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+    return xrhsend.apply(this, arguments);
+  }
 
-    // sets global assistHelper TTL
-    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
+  // sets global assistHelper TTL
+  $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
-    $(document).ready(function () {
+  $(document).ready(function () {
 ##       // forces IE's ajax calls not to cache
 ##       if ($.browser.msie) {
 ##         $.ajaxSetup({ cache: false });
 ##       }
 
-      // prevents framebusting and clickjacking
-      if (self == top){
-        $("body").css({
-          'display': 'block',
-          'visibility': 'visible'
-        });
-      } else {
-        top.location = self.location;
+    // prevents framebusting and clickjacking
+    if (self == top) {
+      $("body").css({
+        'display': 'block',
+        'visibility': 'visible'
+      });
+    } else {
+      top.location = self.location;
+    }
+
+    %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
+      var idleTimer;
+
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function () {
+              // Check if logged out
+              $.get('/desktop/debug/is_idle');
+            }, ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000 + 1000
+      )
+        ;
       }
 
-      %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
-        var idleTimer;
-        function resetIdleTimer() {
-          clearTimeout(idleTimer);
-          idleTimer = setTimeout(function () {
-            // Check if logged out
-            $.get('/desktop/debug/is_idle');
-          }, (${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000) + 1000);
-        }
+      $(document).on('mousemove', resetIdleTimer);
+      $(document).on('keydown', resetIdleTimer);
+      $(document).on('click', resetIdleTimer);
+      resetIdleTimer();
+    %endif
 
-        $(document).on('mousemove', resetIdleTimer);
-        $(document).on('keydown', resetIdleTimer);
-        $(document).on('click', resetIdleTimer);
-        resetIdleTimer();
-      %endif
+    % if 'jobbrowser' in apps:
+      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+      var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
-      % if 'jobbrowser' in apps:
-        var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
-        var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
-
-        function checkJobBrowserStatus(){
-          $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function(data){
-            if (data != null && data.jobs != null){
-              if (data.jobs.length > 0){
-                $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
-              }
-              else {
-                $("#jobBrowserCount").addClass("hide");
-              }
+      function checkJobBrowserStatus() {
+        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function (data) {
+          if (data != null && data.jobs != null) {
+            if (data.jobs.length > 0) {
+              $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
             }
-            checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
-          }).fail(function () {
-            window.clearTimeout(checkJobBrowserStatusIdx);
-          });
-        }
-      % endif
-    });
-  </script>
-</head>
-<body>
-
-
-
-
-
-
-Responsive contents
-
-
-
-
-
+            else {
+              $("#jobBrowserCount").addClass("hide");
+            }
+          }
+          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+        }).fail(function () {
+          window.clearTimeout(checkJobBrowserStatusIdx);
+        });
+      }
+    % endif
+  });
+</script>
 
 <script type="text/javascript">
 
@@ -159,7 +167,7 @@ Responsive contents
       if (xhr.responseText === '/* login required */' && !isLoginRequired) {
         isLoginRequired = true;
         $('body').children(':not(#login-modal)').addClass('blurred');
-        if ($('#login-modal').length > 0){
+        if ($('#login-modal').length > 0) {
           $('#login-modal').modal('show');
           window.setTimeout(function () {
             $('.jHueNotify').remove();
@@ -192,33 +200,32 @@ Responsive contents
     $(".modal:visible").find("input:not(.disable-autofocus):visible:first").focus();
   });
 
-%if collect_usage:
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-40351920-1']);
+    %if collect_usage:
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-40351920-1']);
 
-  // We collect only 2 path levels: not hostname, no IDs, no anchors...
-  var _pathName = location.pathname;
-  var _splits = _pathName.substr(1).split("/");
-  _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
+      // We collect only 2 path levels: not hostname, no IDs, no anchors...
+      var _pathName = location.pathname;
+      var _splits = _pathName.substr(1).split("/");
+      _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
-  _gaq.push(['_trackPageview', '/remote/${ version }/' + _pathName]);
+      _gaq.push(['_trackPageview', '/remote/${ version }/' + _pathName]);
 
-  (function () {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-  })();
+      (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
 
-  function trackOnGA(path) {
-    if (typeof _gaq != "undefined" && _gaq != null) {
-      _gaq.push(['_trackPageview', '/remote/${ version }/' + path]);
-    }
-  }
-%endif
-
+      function trackOnGA(path) {
+        if (typeof _gaq != "undefined" && _gaq != null) {
+          _gaq.push(['_trackPageview', '/remote/${ version }/' + path]);
+        }
+      }
+    %endif
 </script>
 </body>
 </html>
