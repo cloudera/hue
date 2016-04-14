@@ -951,6 +951,18 @@ h4.header {
   display: none;
 }
 
+.history-status {
+  width: 20px;
+}
+
+.history-status .fa-check {
+  color: #b5cf6b;
+}
+
+.history-status .fa-fighter-jet {
+  color: #fdae6b;
+}
+
 .player-toolbar img {
   margin-top: 12px;
 }
