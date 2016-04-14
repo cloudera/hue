@@ -923,7 +923,6 @@ ${ hueIcons.symbols() }
   <div style="overflow:auto">
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
       <li class="nav-header pointer" data-bind="click: toggleResultSettings" title="${_('Hide columns')}">${_('columns')}</li>
-      </a>
     </ul>
     <ul class="unstyled" data-bind="foreach: result.meta">
       <li data-bind="visible: name != ''">
@@ -974,7 +973,7 @@ ${ hueIcons.symbols() }
 
       <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 130px;">
         <div>
-          <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;overflow:auto;">
+          <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;">
             <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
             <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
             <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
