@@ -531,7 +531,20 @@ ${ hueIcons.symbols() }
               <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid) } }">
                 <td style="width: 100px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
                 <td style="width: 25px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}">
-                  <i class="fa fa-fw fa-bolt inactive-action" data-bind="css: {'fa-unlink': status == 'expired', 'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
+                  <!-- ko switch: status -->
+                  <!-- ko case: 'running' -->
+                  <div class="history-status" data-bind="tooltip : { title: '${ _("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                  <!-- /ko -->
+                  <!-- ko case: 'failed' -->
+                  <div class="history-status" data-bind="tooltip : { title: '${ _("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                  <!-- /ko -->
+                  <!-- ko case: 'available' -->
+                  <div class="history-status" data-bind="tooltip : { title: '${ _("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                  <!-- /ko -->
+                  <!-- ko case: 'expired' -->
+                  <div class="history-status" data-bind="tooltip : { title: '${ _("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                  <!-- /ko -->
+                  <!-- /ko -->
                 </td>
                 <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
               </tr>
@@ -1938,7 +1951,8 @@ ${ hueIcons.symbols() }
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
-    "ko.hue-bindings"
+    "ko.hue-bindings",
+    "ko.switch-case"
   ], function (ko, charts, EditorViewModel) {
 
     ko.options.deferUpdates = true;
