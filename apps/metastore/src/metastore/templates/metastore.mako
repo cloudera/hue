@@ -116,7 +116,8 @@ ${ assist.assistPanel() }
               tableName: table.name,
               columnName: name,
               fieldType: type,
-              assistHelper: table.assistHelper
+              assistHelper: table.assistHelper,
+              showViewMore: false
             } }"></span>
           </td>
   ##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
@@ -469,7 +470,8 @@ ${ assist.assistPanel() }
                   databaseName: database.name,
                   tableName: name,
                   fieldType: type,
-                  assistHelper: assistHelper
+                  assistHelper: assistHelper,
+                  showViewMore: false
                 } }"></span></td>
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>

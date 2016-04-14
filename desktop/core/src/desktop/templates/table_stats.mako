@@ -95,7 +95,7 @@ from desktop.views import _ko
           <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }, visible: showAnalysis">
             <a class="inactive-action" href="#analysisTab" data-toggle="tab"><span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>${_('Analysis')} </a>
           </li>
-          <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
+          <!-- ko if: showViewMore && (sourceType === 'hive' || sourceType === 'impala') -->
           <li class="pull-right">
             <a class="more-link" target="_blank" data-bind="attr: { 'href': '/metastore/table/' + database + '/' + table }">
               <span class="fa fa-external-link" ></span> ${ _('View more...') }
@@ -247,6 +247,7 @@ from desktop.views import _ko
               tableName: self.params.tableName,
               columnName: self.params.columnName,
               assistHelper: self.params.assistHelper,
+              showViewMore: typeof self.params.showViewMore === 'undefined' || self.params.showViewMore,
               type: self.params.fieldType
             }));
 
