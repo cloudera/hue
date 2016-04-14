@@ -496,7 +496,7 @@ ${ hueIcons.symbols() }
     </div>
 
     <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
-      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired.") }</pre>
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
     </div>
 
     <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
