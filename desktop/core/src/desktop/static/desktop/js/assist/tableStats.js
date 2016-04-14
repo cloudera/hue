@@ -46,6 +46,7 @@
     self.column = options.columnName || null;
     self.assistHelper = options.assistHelper;
     self.type = options.type;
+    self.showViewMore = options.showViewMore;
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
     self.isView = /view/i.test(options.type);
 
