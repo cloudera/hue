@@ -62,18 +62,18 @@
 
 <body>
 
-<div class="top-nav">
-  <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img
-      src="${ static('desktop/art/hue-logo-mini-white.png') }"
-      data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
-      data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
-</div>
+<div class="main-page">
+  <div class="top-nav">
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img
+        src="${ static('desktop/art/hue-logo-mini-white.png') }"
+        data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
+        data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+  </div>
 
-<div class="container">
-  <div>
+  <div class="page-content">
     <h1>responsive</h1>
   </div>
-</div><!-- /.container -->
+</div>
 
 <script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
