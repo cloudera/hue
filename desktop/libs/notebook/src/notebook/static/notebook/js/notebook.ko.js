@@ -712,24 +712,30 @@
       //self.fetchResultMetadata(rows);
     };
 
+    self.isFetchingData = false;
     self.fetchResultData = function (rows, startOver) {
-      logGA('fetchResult/' + rows + '/' + startOver);
-      $.post("/notebook/api/fetch_result_data", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
-        snippet: ko.mapping.toJSON(self.getContext()),
-        rows: rows,
-        startOver: startOver
-      }, function (data) {
-        data = JSON.bigdataParse(data);
-        if (data.status == 0) {
-          self.loadData(data, rows);
-        } else {
-          self._ajaxError(data);
-          $(document).trigger("renderDataError", {snippet: self});
-        }
-      }, 'text').fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
+      if (!self.isFetchingData) {
+        self.isFetchingData = true;
+        logGA('fetchResult/' + rows + '/' + startOver);
+        $.post("/notebook/api/fetch_result_data", {
+          notebook: ko.mapping.toJSON(notebook.getContext()),
+          snippet: ko.mapping.toJSON(self.getContext()),
+          rows: rows,
+          startOver: startOver
+        }, function (data) {
+          data = JSON.bigdataParse(data);
+          if (data.status == 0) {
+            self.loadData(data, rows);
+          } else {
+            self._ajaxError(data);
+            $(document).trigger("renderDataError", {snippet: self});
+          }
+        }, 'text').fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.isFetchingData = false;
+        });
+      }
     };
 
     self.loadData = function (data, rows) {
