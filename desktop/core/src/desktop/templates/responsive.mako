@@ -64,14 +64,24 @@
 
 <div class="main-page">
   <div class="top-nav">
+    <a class="hamburger hamburger--squeeze pull-left" type="button">
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </a>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img
         src="${ static('desktop/art/hue-logo-mini-white.png') }"
         data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
         data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
   </div>
 
-  <div class="page-content">
-    <h1>responsive</h1>
+  <div class="content-wrapper">
+    <div class="left-nav">
+
+    </div>
+    <div class="page-content">
+      <h1>responsive</h1>
+    </div>
   </div>
 </div>
 
@@ -82,6 +92,12 @@
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
+
+  $(".hamburger").click(function () {
+    $(this).toggleClass("is-active");
+    $(".left-nav").toggleClass("left-nav-visible");
+  })
+
   moment.locale(window.navigator.userLanguage || window.navigator.language);
   localeFormat = function (time) {
     if (typeof ko !== 'undefined' && ko.isObservable(time)) {
