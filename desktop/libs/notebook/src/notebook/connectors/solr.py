@@ -63,7 +63,13 @@ class SolrApi(Api):
     if info.get('EXCEPTION'):
       raise QueryError(info['EXCEPTION'])
 
-    data = [[cell for cell in doc.values()] for doc in response['result-set']['docs']]
+    headers = []
+    for row in response['result-set']['docs']:
+      for col in row.keys():
+        if col not in headers:
+          headers.append(col)
+
+    data = [[doc.get(col) for col in headers] for doc in response['result-set']['docs']]
     has_result_set = bool(data)
 
     return {
@@ -77,7 +83,7 @@ class SolrApi(Api):
           'name': col,
           'type': '',
           'comment': ''
-        } for col in response['result-set']['docs'][0].keys()] if has_result_set else [],
+        } for col in headers] if has_result_set else [],
         'type': 'table'
       },
       'statement_id': 0,
