@@ -21,6 +21,11 @@
   from desktop.views import login_modal
 %>
 
+<%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="assist" file="/assist.mako" />
+<%namespace name="require" file="/require.mako" />
+<%namespace name="hueIcons" file="/hue_icons.mako" />
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -62,6 +67,8 @@
 
 <body>
 
+${ hueIcons.symbols() }
+
 <div class="main-page">
   <div class="top-nav">
     <a class="hamburger hamburger--squeeze pull-left" type="button">
@@ -69,31 +76,28 @@
         <span class="hamburger-inner"></span>
       </span>
     </a>
-    <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img
-        src="${ static('desktop/art/hue-logo-mini-white.png') }"
-        data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
-        data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+    <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
     <span style="color:white">
 
-    <span style="font-size: 130%" title="Query data">
-      <a href="${ url('notebook:new') }">+ Query</a>
-    </span>
+      <span style="font-size: 130%" title="Query data">
+        <a href="${ url('notebook:new') }">+ Query</a>
+      </span>
 
-    [Hive..]
-    [Search..]
+      [Hive..]
+      [Search..]
 
-    <input class="input-xxlarge"></input>
+      <input class="input-xxlarge"></input>
 
-    [clusters]
+      [clusters]
 
-    ${ user.username }
+      ${ user.username }
 
-    <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
-    <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
+      <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
+      <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
 
-    [? | About Hue]
+      [? | About Hue]
 
-    [Profile | Log out]
+      [Profile | Log out]
     </span>
   </div>
 
@@ -139,7 +143,33 @@
       <br/>&nbsp
       </span>
     </div>
+    <div class="assist-panel" data-bind="css: { 'assist-hidden' : ! isAssistVisible() }">
+      <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isAssistVisible(false) }">
+        <i class="fa fa-chevron-left"></i>
+      </a>
+
+      <div class="assist" data-bind="component: {
+        name: 'assist-panel',
+        params: {
+          user: user,
+          sql: {
+            sourceTypes: sqlSourceTypes,
+            activeSourceType: activeSqlSourceType,
+            navigationSettings: {
+              openDatabase: false,
+              openItem: false,
+              showStats: true
+            },
+          }
+        }
+      }"></div>
+    </div>
+    <div class="resizer" data-bind="splitDraggable : { appName: 'notebook', leftPanelVisible: isAssistVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+
     <div class="page-content">
+      <a href="javascript: void(0);" title="${_('Toggle Assist')}" class="pointer show-assist" style="display:none;">
+        <i class="fa fa-chevron-right"></i>
+      </a>
       <h1>responsive</h1>
     </div>
   </div>
@@ -150,8 +180,46 @@
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
+
+${ require.config() }
+${ tableStats.tableStats() }
+${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
+
+  require([
+    'knockout',
+    'assistPanel',
+    'ko.hue-bindings',
+    'knockout-sortable',
+    'ko.switch-case'
+  ], function (ko) {
+
+
+    var isAssistVisible = ko.observable(true);
+    isAssistVisible.subscribe(function (newValue) {
+      if (!newValue) {
+        $('.show-assist').show();
+      }
+    });
+
+    $('.show-assist').click(function () {
+      isAssistVisible(true);
+      $('.show-assist').hide();
+    })
+    ko.applyBindings({
+      isAssistVisible: isAssistVisible,
+      user: '${ user.username }',
+      sqlSourceTypes: [{
+        type: 'hive', name: 'Hive'
+      },{
+        type: 'impala', name: 'Impala'
+      }],
+      activeSqlSourceType: 'hive'
+    }, $('.assist-panel')[0]);
+
+  });
 
   $(".hamburger").click(function () {
     $(this).toggleClass("is-active");
