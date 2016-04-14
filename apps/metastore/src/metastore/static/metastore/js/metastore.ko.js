@@ -86,6 +86,7 @@
 
     self.selectedTables = ko.observableArray();
 
+    self.editingTable = ko.observable(false);
     self.table = ko.observable(null);
     
     self.addTags = function () {

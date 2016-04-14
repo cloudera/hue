@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /*
- * jHue HDFS autocomplete plugin
- * augment a textbox into an HDFS autocomplete
+ * jHue generic autocomplete plugin
+ * augment a textbox into an generic hive/solr autocomplete
  */
 
 (function ($, window, document, undefined) {
@@ -32,7 +32,9 @@
         },
         smartTooltip: "",
         smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
-        showOnFocus: false
+        showOnFocus: false,
+        startingPath: '',
+        rewriteVal: false
       };
 
   function Plugin(element, options) {
@@ -84,7 +86,7 @@
     _el.keydown(function (e) {
       if (e.keyCode == 9) {
         e.preventDefault();
-        showHiveAutocomplete(function () {
+        showAutocomplete(function () {
           var path = _el.val();
           if (path.indexOf(".") > -1) {
             path = path.substr(path.lastIndexOf(".") + 1);
@@ -165,7 +167,7 @@
       }
       if ((e.keyCode == 32 && e.ctrlKey) || e.keyCode == 191) {
         smartTooltipMaker();
-        showHiveAutocomplete();
+        showAutocomplete();
       }
       if (e.keyCode == 13) {
         _pauseBlur = true;
@@ -182,7 +184,7 @@
 
     if (_this.options.showOnFocus){
       _el.on("focus", function(){
-        showHiveAutocomplete();
+        showAutocomplete();
       });
     }
 
@@ -205,8 +207,11 @@
     }
     var _currentFiles = [];
 
-    function showHiveAutocomplete(callback) {
+    function showAutocomplete(callback) {
       var path = _el.val();
+      if (_this.options.startingPath != ''){
+        path = _this.options.startingPath + path;
+      }
       var autocompleteUrl = BASE_PATH;
 
       if (path != "" && path.indexOf(".") == -1) {
@@ -214,7 +219,7 @@
       }
 
       if (path != "" && path.lastIndexOf(".") != path.length - 1) {
-        path = path.substring(0, _el.val().lastIndexOf("."));
+        path = path.substring(0, (_this.options.startingPath + _el.val()).lastIndexOf("."));
       }
 
       if (_this.options.serverType != "SOLR") {
@@ -286,7 +291,7 @@
               if ($(this).html().indexOf("database") > -1){
                 _el.val(item + ".");
                 _this.options.onPathChange(_el.val());
-                showHiveAutocomplete();
+                showAutocomplete();
               }
 
               if ($(this).html().indexOf("table") > -1){
@@ -299,14 +304,19 @@
                   }
                 }
                 else {
-                  _el.val(_el.val() + item);
+                  if (_this.options.rewriteVal) {
+                    _el.val(item);
+                  }
+                  else {
+                    _el.val(_el.val() + item);
+                  }
                 }
                 if (! _this.options.skipColumns){
                   _el.val(_el.val() + ".");
                 }
                 _this.options.onPathChange(_el.val());
                 if (! _this.options.skipColumns) {
-                  showHiveAutocomplete();
+                  showAutocomplete();
                 }
                 else {
                   _this.options.onEnter(_el);
@@ -359,7 +369,7 @@
         _el.val(_el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
         if ($(possibleMatches[0]).html().indexOf("folder") > -1) {
           _el.val(_el.val() + "/");
-          showHiveAutocomplete();
+          showAutocomplete();
         }
       }
       else if (possibleMatches.length > 1) {
