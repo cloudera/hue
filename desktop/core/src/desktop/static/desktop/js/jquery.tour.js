@@ -43,7 +43,7 @@
               }, ...
             ],
             video: "http://player.vimeo.com/xxxxx", <-- instead of the steps you can specify a video and it will be displayed in a modal
-            blog: "http://gethue.tumblr.com/yyyyy" <-- if specified, a link to this with a "Read more about it..." label will be placed under the video in the modal. if video is empty, the link will be automagically opened
+            blog: "http://gethue.com/yyyyy" <-- if specified, a link to this with a "Read more about it..." label will be placed under the video in the modal. if video is empty, the link will be automagically opened
           }, ...
         ]
       });
