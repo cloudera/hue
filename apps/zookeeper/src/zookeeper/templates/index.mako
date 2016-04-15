@@ -64,11 +64,19 @@ ${ shared.menubar() }
     <tbody>
     % for host, stats in overview[c].items():
       <tr>
+      % if stats:
         <td><a href="${ url('zookeeper:clients', id=c, host=host) }" data-row-selector="true">${ host }</a></td>
         <td>${stats.get('zk_server_state', '')}</td>
         <td>${stats.get('zk_avg_latency', '')}</td>
         <td>${stats.get('zk_watch_count', '')}</td>
         <td>${stats.get('zk_version', '')}</td>
+      % else:
+	<td><a href="${ url('zookeeper:clients', id=c, host=host) }" style="color:red" data-row-selector="true">${ host }</a></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      % endif
       </tr>
     % endfor
     </tbody>

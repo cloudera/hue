@@ -15,11 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import socket
 import re
 
 from StringIO import StringIO
-
+LOG = logging.getLogger(__name__)
 
 class Session(object):
 
@@ -43,6 +44,7 @@ class ZooKeeperStats(object):
     def __init__(self, host='localhost', port='2181', timeout=1):
         self._address = (host, int(port))
         self._timeout = timeout
+        self._host = host
 
     def get_stats(self):
         """ Get ZooKeeper server stats as a map """
@@ -84,13 +86,14 @@ class ZooKeeperStats(object):
         """ Send a 4letter word command to the server """
         s = self._create_socket()
         s.settimeout(self._timeout)
-
-        s.connect(self._address)
-        s.send(cmd)
-
-        data = s.recv(2048)
-        s.close()
-
+        data = ""
+        try:
+	    s.connect(self._address)
+	    s.send(cmd)
+	    data = s.recv(2048)
+	    s.close()
+        except Exception, e:
+	    LOG.error('Problem connecting to host %s, exception raised : %s' % (self._host, e))
         return data
 
     def _parse(self, data):
@@ -109,9 +112,11 @@ class ZooKeeperStats(object):
 
     def _parse_stat(self, data):
         """ Parse the output from the 'stat' 4letter word command """
-        h = StringIO(data)
 
         result = {}
+        if not data:
+	    return result
+        h = StringIO(data)
 
         version = h.readline()
         if version:
