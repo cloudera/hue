@@ -800,15 +800,20 @@ from django.utils.translation import ugettext as _
       return {
         url: breadcrumb.url,
         label: breadcrumb.label,
-        show: function () {
-          if (this.url == null || this.url == "") {
-            // forcing root on empty breadcrumb url
-            this.url = "/";
-          }
+        show: function (breadcrumb, e) {
+          var isLeftButton = (e.which || evt.button) === 1;
+          if (isLeftButton) {
+            e.stopPropagation();
+            e.preventDefault();
+            if (this.url == null || this.url == "") {
+              // forcing root on empty breadcrumb url
+              this.url = "/";
+            }
 
-          viewModel.targetPageNum(1);
-          viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
-          location.hash = this.url;
+            viewModel.targetPageNum(1);
+            viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
+            location.hash = this.url;
+          }
         }
       }
     };

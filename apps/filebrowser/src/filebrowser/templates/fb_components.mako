@@ -25,8 +25,8 @@ from django.utils.translation import ugettext as _
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
             <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
-                <li data-bind="visible: label.slice(-1) == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
-                <li data-bind="visible: label.slice(-1) != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
+                <li data-bind="visible: label.slice(-1) == '/'"><a data-bind="click: show, attr:{'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"><span class="divider" data-bind="text: label"></span></a></li>
+                <li data-bind="visible: label.slice(-1) != '/'"><a data-bind="text: label, click: show, attr:{'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span></li>
             </ul>
             <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" />
         </li>
