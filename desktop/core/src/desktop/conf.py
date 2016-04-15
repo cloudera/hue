@@ -295,7 +295,7 @@ REDIRECT_WHITELIST = Config(
          "For example, to restrict to your local domain and FQDN, the following value can be used:"
          "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
   type=list_of_compiled_res(skip_empty=True),
-  default='^\/.*$')
+  default='^(\/[a-zA-Z0-9]+.*|\/)$')
 
 USE_X_FORWARDED_HOST = Config(
   key="use_x_forwarded_host",
