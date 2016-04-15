@@ -3721,25 +3721,26 @@
 
   ko.bindingHandlers.highlight = {
     update: function (element, valueAccessor, allBindingsAccessor) {
-
       var value = ko.unwrap(valueAccessor());
-
       var options = ko.unwrap(allBindingsAccessor());
 
-      if (value !== undefined) { // allows highlighting static code
-
-        window.setTimeout(function () {
+      if (typeof value !== 'undefined') { // allows highlighting static code
+        ace.require([
+          'ace/mode/impala_highlight_rules',
+          'ace/mode/hive_highlight_rules',
+          'ace/tokenizer',
+          'ace/layer/text'
+        ], function (impalaRules, hiveRules, tokenizer, text) {
           var res = [];
 
-          var Tokenizer = ace.require('ace/tokenizer').Tokenizer;
+          var Tokenizer = tokenizer.Tokenizer;
           var Rules;
           if (options.flavor() == 'impala') {
-            Rules = ace.require('ace/mode/impala_highlight_rules').ImpalaHighlightRules;
+            Rules = impalaRules.ImpalaHighlightRules;
+          } else {
+            Rules = hiveRules.HiveHighlightRules;
           }
-          else {
-            Rules = ace.require('ace/mode/hive_highlight_rules').HiveHighlightRules;
-          }
-          var Text = ace.require('ace/layer/text').Text;
+          var Text = text.Text;
 
           var tok = new Tokenizer(new Rules().getRules());
           var lines = value.split('\n');
@@ -3753,15 +3754,12 @@
             }
 
             res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + ' </div>');
-          });
-
+          })
 
           element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
-        }, 0)
+        });
       }
-
     }
-
   };
 
 }));
