@@ -103,7 +103,7 @@ ${ hueIcons.symbols() }
 
   <div class="content-wrapper">
     <div class="left-nav">
-      Query
+      <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'editor'); }">Query</a><br/>
       <br/>
       [Hive, Impala, Pig, PySpark, Solr, MapReduce...]<br/>
       [Query 1, Query 2, Query 3, Query 4]<br/>
@@ -116,7 +116,7 @@ ${ hueIcons.symbols() }
 
       <br/>
 
-      Browse<br/>
+      <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'metastore'); }">Browse</a><br/>
       [Tables]<br/>
       [Files]<br/>
       [Indexes]<br/>
@@ -170,7 +170,7 @@ ${ hueIcons.symbols() }
       <a href="javascript: void(0);" title="${_('Toggle Assist')}" class="pointer show-assist" style="display:none;">
         <i class="fa fa-chevron-right"></i>
       </a>
-      <h1>responsive</h1>
+      <div data-bind='component: currentApp'></div>
     </div>
   </div>
 </div>
@@ -181,6 +181,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
 
 ${ require.config() }
 ${ tableStats.tableStats() }
@@ -191,11 +192,28 @@ ${ assist.assistPanel() }
   require([
     'knockout',
     'assistPanel',
+    'text',
     'ko.hue-bindings',
     'knockout-sortable',
-    'ko.switch-case'
+    'ko.switch-case',
+    'desktop/js/ko.editor',
+    'desktop/js/ko.metastore'
   ], function (ko) {
 
+    var OnePageViewModel = function () {
+      var self = this;
+
+      self.currentApp = ko.observable('editor');
+
+      huePubSub.subscribe('switch.app', function (name) {
+        console.log(name);
+        self.currentApp(name);
+      })
+    }
+
+    ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+
+    ko.applyBindings({}, $('.left-nav')[0])
 
     var isAssistVisible = ko.observable(true);
     isAssistVisible.subscribe(function (newValue) {

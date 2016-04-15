@@ -73,6 +73,22 @@ def responsive(request):
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
+def ko_editor(request):
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('ko_editor.mako', request, {
+    'apps': apps,
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
+def ko_metastore(request):
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('ko_metastore.mako', request, {
+    'apps': apps,
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
 def home(request):
   docs = _get_docs(request.user)
 
