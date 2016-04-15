@@ -56,18 +56,12 @@ class TestHiveserver2Api(object):
             "status": "running",
             "database": "default",
             "properties": {
-                "files": [{
-                    "path": "/user/test/myudfs.jar",
-                    "type": "jar"
-                }],
+                "files": [],
                 "functions": [{
                     "class_name": "org.hue.udf.MyUpper",
                     "name": "myUpper"
                 }],
-                "settings": [{
-                    "value": "spark",
-                    "key": "hive.execution.engine"
-                }]
+                "settings": []
             },
             "result": {
                 "handle": {
@@ -89,9 +83,64 @@ class TestHiveserver2Api(object):
             "id": "9b50e364-f7b2-303d-e924-db8b0bd9866d"
         }
     """ % {'statement': statement}
+    session_json = """
+            {
+                "type": "hive",
+                "properties": [
+                    {
+                        "multiple": true,
+                        "value": [
+                            {
+                                "path": "/user/test/myudfs.jar",
+                                "type": "jar"
+                            }
+                        ],
+                        "nice_name": "Files",
+                        "key": "files",
+                        "help_text": "Add one or more files, jars, or archives to the list of resources.",
+                        "type": "hdfs-files"
+                    },
+                    {
+                        "multiple": true,
+                        "value": [
+                            {
+                                "class_name": "org.hue.udf.MyUpper",
+                                "name": "myUpper"
+                            }
+                        ],
+                        "nice_name": "Functions",
+                        "key": "functions",
+                        "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
+                        "type": "functions"
+                    },
+                    {
+                        "multiple": true,
+                        "value": [
+                            {
+                                "value": "spark",
+                                "key": "hive.execution.engine"
+                            }
+                        ],
+                        "nice_name": "Settings",
+                        "key": "settings",
+                        "help_text": "Hive and Hadoop configuration properties.",
+                        "type": "settings",
+                        "options": [
+                            "hive.map.aggr",
+                            "hive.exec.compress.output",
+                            "hive.exec.parallel",
+                            "hive.execution.engine",
+                            "mapreduce.job.queuename"
+                        ]
+                    }
+                ],
+                "id": 30
+            }
+    """
 
     snippet = json.loads(snippet_json)
-    hql_query = self.api._prepare_hql_query(snippet, statement)
+    session = json.loads(session_json)
+    hql_query = self.api._prepare_hql_query(snippet, statement, session)
 
     assert_equal([{'key': 'hive.execution.engine', 'value': 'spark'}], hql_query.settings)
     assert_equal([{'type': 'jar', 'path': '/user/test/myudfs.jar'}], hql_query.file_resources)

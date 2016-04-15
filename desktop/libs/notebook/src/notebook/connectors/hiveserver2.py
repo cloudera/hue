@@ -183,8 +183,8 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     statement = self._get_current_statement(db, snippet)
-
-    query = self._prepare_hql_query(snippet, statement.pop('statement'))
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, statement.pop('statement'), session)
 
     try:
       db.use(query.database)
@@ -347,7 +347,8 @@ class HS2Api(Api):
   def explain(self, notebook, snippet):
     db = self._get_db(snippet)
     response = self._get_current_statement(db, snippet)
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     explanation = db.explain(query)
 
@@ -369,11 +370,12 @@ class HS2Api(Api):
     return '/filebrowser/view=%s' % target_file
 
 
-  def export_data_as_table(self, snippet, destination):
+  def export_data_as_table(self, notebook, snippet, destination):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     if not query.hql_query.strip().lower().startswith('select'):
       raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
@@ -392,11 +394,12 @@ class HS2Api(Api):
     return hql, success_url
 
 
-  def export_large_data_to_hdfs(self, snippet, destination):
+  def export_large_data_to_hdfs(self, notebook, snippet, destination):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
-    query = self._prepare_hql_query(snippet, response.pop('statement'))
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     if not query.hql_query.strip().lower().startswith('select'):
       raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
@@ -433,18 +436,27 @@ class HS2Api(Api):
     return upgraded_properties
 
 
+  def _get_session(self, notebook, type='hive'):
+    session = next((session for session in notebook['sessions'] if session['type'] == type), None)
+    return session
+
+
   def _get_hive_execution_engine(self, notebook, snippet):
     # Get hive.execution.engine from snippet properties, if none, then get from session
     properties = snippet['properties']
     settings = properties.get('settings', [])
 
     if not settings:
-      session = next((session for session in notebook['sessions'] if session['type'] == 'hive'), None)
+      session = self._get_session(notebook, 'hive')
       if not session:
         raise Exception(_('Cannot get jobs, failed to find active HS2 session for user: %s') % self.user.username)
-      settings = session['properties']
+      properties = session['properties']
+      settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
 
-    engine = next((setting['value'] for setting in settings if setting['key'] == 'hive.execution.engine'), DEFAULT_HIVE_ENGINE)
+    if settings:
+      engine = next((setting['value'] for setting in settings if setting['key'] == 'hive.execution.engine'), DEFAULT_HIVE_ENGINE)
+    else:
+      engine = DEFAULT_HIVE_ENGINE
 
     return engine
 
@@ -499,10 +511,21 @@ class HS2Api(Api):
     return resp
 
 
-  def _prepare_hql_query(self, snippet, statement):
+  def _prepare_hql_query(self, snippet, statement, session):
     settings = snippet['properties'].get('settings', None)
     file_resources = snippet['properties'].get('files', None)
     functions = snippet['properties'].get('functions', None)
+    properties = session['properties']
+
+    if not settings:
+      settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
+
+    if not file_resources:
+      settings = next((prop['value'] for prop in properties if prop['key'] == 'files'), None)
+
+    if not functions:
+      settings = next((prop['value'] for prop in properties if prop['key'] == 'functions'), None)
+
     database = snippet.get('database') or 'default'
 
     return hql_query(
