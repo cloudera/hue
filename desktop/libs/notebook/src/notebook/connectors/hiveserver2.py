@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cStringIO
 import logging
 import re
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -303,7 +306,7 @@ class HS2Api(Api):
 
   def _get_statements(self, hql_query):
     hql_query = strip_trailing_semicolon(hql_query)
-    hql_query_sio = cStringIO.StringIO(hql_query)
+    hql_query_sio = StringIO.StringIO(hql_query)
 
     statements = []
     for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):
