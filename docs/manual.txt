@@ -41,7 +41,7 @@ overly restrictive firewalls. For small clusters of less than 10 nodes,
 you can use your existing master node as the Hue Server.
 
 You can download the Hue tarball here:
-gethue.tumblr.com/tagged/release
+https://github.com/cloudera/hue/releases
 
 Hue Dependencies
 ^^^^^^^^^^^^^^^^
