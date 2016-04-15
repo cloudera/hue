@@ -507,23 +507,28 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
-<script type="text/html" id="query-history">
-  <!-- ko if: $root.editorMode -->
-  <div class="query-history-container" data-bind="slideVisible: $parent.showHistory, onComplete: function(){ redrawFixedHeaders(200); }" style="display: none;">
+<script type="text/html" id="query-tabs">
+  <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs">
-        <li class="active" data-bind="click: function(){ currentQueryTab('queryHistory'); }">
+        <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
-        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
         %if ENABLE_QUERY_BUILDER.get():
-        <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
         %endif
+        <!-- ko if: result.hasSomeResults -->
+        <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}"><a class="inactive-action" href="#queryResults" data-toggle="tab">${_('Results')}</a></li>
+        <!-- /ko -->
+        <!-- ko if: result.explanation().length > 0 -->
+        <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+        <!-- /ko -->
       </ul>
       <div class="tab-content" style="border: none">
-        <div class="tab-pane active" id="queryHistory">
+        <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}">
           <!-- ko if: $parent.history().length === 0 -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
           <!-- /ko -->
@@ -555,7 +560,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-        <div class="tab-pane" id="savedQueries">
+        <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}">
           <!-- ko spinner: loadingQueries --><!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
@@ -592,7 +597,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
         %if ENABLE_QUERY_BUILDER.get():
-        <div class="tab-pane margin-top-10" id="queryBuilderTab">
+        <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: {'active': currentQueryTab() == 'queryBuilderTab'}">
           <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
           <table id="queryBuilder" class="table table-condensed">
             <thead>
@@ -609,11 +614,18 @@ ${ hueIcons.symbols() }
           </div>
         </div>
         %endif
+        <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
+          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+        </div>
+        <!-- ko if: result.explanation().length > 0 -->
+        <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
+          <!-- ko template: { name: 'snippet-explain' } --><!-- /ko -->
+        </div>
+        <!-- /ko -->
       </div>
 
     </div>
   </div>
-  <!-- /ko -->
 </script>
 
 <script type="text/html" id="notebook-snippet-header">
@@ -671,9 +683,14 @@ ${ hueIcons.symbols() }
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
           <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko if: $root.editorMode -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: 'query-history' --><!-- /ko -->
+          <!-- ko template: 'query-tabs' --><!-- /ko -->
+          <!-- /ko -->
+          <!-- ko ifnot: $root.editorMode -->
+          <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- /ko -->
 
           <div class="clearfix"></div>
         </div>
@@ -943,15 +960,11 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
-<script type="text/html" id="snippet-results">
-  <!-- ko if: result.explanation().length > 0 -->
-    <div class="snippet-row">
-      <div class="result-body">
-        <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
-      </div>
-    </div>
-  <!-- /ko -->
+<script type="text/html" id="snippet-explain">
+  <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
+</script>
 
+<script type="text/html" id="snippet-results">
   <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
     <div class="snippet-left-bar">
       <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls' }--><!-- /ko -->
@@ -1174,18 +1187,13 @@ ${ hueIcons.symbols() }
       </ul>
       <!-- /ko -->
     </div>
-    <!-- ko if: $root.editorMode -->
-      <a class="snippet-side-btn" data-bind="click: function() { hideFixedHeaders(); $parent.showHistory(!$parent.showHistory()); }, css: {'blue': $parent.showHistory() }" title="${ _('Show query history') }">
-        <i class="fa fa-fw fa-history"></i>
-      </a>
-    <!-- /ko -->
   </div>
 </script>
 
 <script type="text/html" id="snippet-result-controls">
   <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
-      <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
+      <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); huePubSub.publish('redraw.fixed.headers'); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
         <i class="fa fa-fw fa-th"></i>
       </a>
     </div>
@@ -2132,6 +2140,11 @@ ${ hueIcons.symbols() }
       splitDraggableTimeout = window.setTimeout(function(){
         redrawFixedHeaders(100);
       }, 200);
+    });
+
+    huePubSub.subscribe('redraw.fixed.headers', function(){
+      hideFixedHeaders();
+      redrawFixedHeaders(200);
     });
 
     window.redrawFixedHeaders = redrawFixedHeaders;

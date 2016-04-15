@@ -211,7 +211,7 @@
       }
     };
 
-    self.currentQueryTab = ko.observable('queryHistory');
+    self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
 
     self.errorLoadingQueries = ko.observable(false);
     self.loadingQueries = ko.observable(false);
@@ -247,6 +247,7 @@
 
     var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
+      huePubSub.publish('redraw.fixed.headers');
       if (newValue === 'savedQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
         fetchQueries();
       }
@@ -379,6 +380,9 @@
     }
 
     self.result = new Result(snippet, snippet.result);
+    if (!self.result.hasSomeResults()) {
+      self.currentQueryTab('queryHistory');
+    }
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
     self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
     var defaultShowLogs = false;
@@ -545,8 +549,6 @@
         return;
       }
 
-      notebook.showHistory(false);
-
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
@@ -586,6 +588,7 @@
         notebook: vm.editorMode ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
+        self.currentQueryTab('queryResults');
         self.statusForButtons('executed');
         if (vm.editorMode && data.history_id) {
           hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
@@ -657,7 +660,6 @@
       logGA('clear');
       self.ace().setValue('', 1);
       self.result.clear();
-      notebook.showHistory(true);
     };
 
     self.explain = function () {
@@ -675,7 +677,7 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
-          notebook.showHistory(false);
+          self.currentQueryTab('queryExplain');
           self.result.fetchedOnce(true);
           self.result.explanation(data.explanation);
         } else {
@@ -993,8 +995,7 @@
     });
 
     self.history = ko.observableArray([]);
-    // TODO: Move showHistory, fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
-    self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
+    // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
 
     self.getSession = function (session_type) {
       var _s = null;
@@ -1275,12 +1276,6 @@
       });
     };
 
-    self.showHistory.subscribe(function (val) {
-      if (val) {
-        self.fetchHistory();
-      }
-    });
-
     self.schedule = function() {
       logGA('schedule');
       $.post("/oozie/editor/document/schedule/", {
@@ -1299,7 +1294,6 @@
         doc_type: self.selectedSnippet()
       }, function (data) {
         self.history.removeAll();
-        self.showHistory(false);
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
@@ -1362,11 +1356,7 @@
         self.addSnippet(snippet);
       });
       if (vm.editorMode) {
-        if (notebook.snippets.length == 0) {
-          self.showHistory(true); // Show history when new query
-        } else if (self.showHistory()) {
-          self.fetchHistory(); // Show on saved query with history selected
-        }
+        self.fetchHistory();
       }
     }
   };
