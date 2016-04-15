@@ -371,41 +371,18 @@ def import_documents(request):
   documents = json.loads(documents)
   docs = []
 
-  home_dir = Directory.objects.get_home_directory(request.user)
+  uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
 
   for doc in documents:
-    # If doc is not owned by current user, make a copy of the document
+
+    # If doc is not owned by current user, make a copy of the document with current user as owner
     if doc['fields']['owner'][0] != request.user.username:
-      doc['fields']['owner'] = [request.user.username]
-      doc['pk'] = None
-      doc['fields']['version'] = 1
-      doc['fields']['uuid'] = uuid_default()
-      doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+      doc = _copy_document_with_owner(doc, request.user, uuids_map)
     else:  # Update existing doc or create new
-      try:
-        existing_doc = Document2.objects.get_by_uuid(doc['fields']['uuid'], owner=request.user)
-        doc['pk'] = existing_doc.pk
-      except FilesystemException, e:
-        LOG.warn('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
-        doc['pk'] = None
-        doc['fields']['version'] = 1
-
-      # Verify that parent exists, log warning and nullify parent if not found
-      if doc['fields']['parent_directory']:
-        uuid, version, is_history = doc['fields']['parent_directory']
-        if not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
-          LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
-          doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
-
-    # Verify that dependencies exist, raise critical error if any dependency not found
-    if doc['fields']['dependencies']:
-      for uuid, version, is_history in doc['fields']['dependencies']:
-        if not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
-          raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+      doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
 
     # Set last modified date to now
     doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
-
     docs.append(doc)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
@@ -449,6 +426,73 @@ def _get_dependencies(documents, deps_mode=True):
         stack.extend(deps_set - doc_set)
 
   return doc_set
+
+
+def _copy_document_with_owner(doc, owner, uuids_map):
+  home_dir = Directory.objects.get_home_directory(owner)
+
+  doc['fields']['owner'] = [owner.username]
+  doc['pk'] = None
+  doc['fields']['version'] = 1
+
+  # Retrieve from the import_uuids_map if it's already been reassigned, or assign a new UUID and map it
+  old_uuid = doc['fields']['uuid']
+  if uuids_map[old_uuid] is None:
+    uuids_map[old_uuid] = uuid_default()
+  doc['fields']['uuid'] = uuids_map[old_uuid]
+
+  # Remap parent directory if needed
+  parent_uuid = doc['fields']['parent_directory'][0]
+  if parent_uuid not in uuids_map.keys():
+    LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
+             parent_uuid)
+    doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+  else:
+    if uuids_map[parent_uuid] is None:
+      uuids_map[parent_uuid] = uuid_default()
+    doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
+
+  # Remap dependencies if needed
+  idx = 0
+  for dep_uuid, dep_version, dep_is_history in doc['fields']['dependencies']:
+    if dep_uuid not in uuids_map.keys():
+      LOG.warn('Could not find dependency UUID: %s in JSON import, may cause integrity errors if not found.' % dep_uuid)
+    else:
+      if uuids_map[dep_uuid] is None:
+        uuids_map[dep_uuid] = uuid_default()
+      doc['fields']['dependencies'][idx][0] = uuids_map[dep_uuid]
+    idx += 1
+
+  return doc
+
+
+def _create_or_update_document_with_owner(doc, owner, uuids_map):
+  home_dir = Directory.objects.get_home_directory(owner)
+
+  try:
+    existing_doc = Document2.objects.get_by_uuid(doc['fields']['uuid'], owner=owner)
+    doc['pk'] = existing_doc.pk
+  except FilesystemException, e:
+    LOG.warn('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
+    doc['pk'] = None
+    doc['fields']['version'] = 1
+
+  # Verify that parent exists, log warning and set parent to user's home directory if not found
+  if doc['fields']['parent_directory']:
+    uuid, version, is_history = doc['fields']['parent_directory']
+    if uuid not in uuids_map.keys() and \
+            not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
+      LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
+      doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+
+  # Verify that dependencies exist, raise critical error if any dependency not found
+  if doc['fields']['dependencies']:
+    for uuid, version, is_history in doc['fields']['dependencies']:
+      if not uuid in uuids_map.keys() and \
+              not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
+        raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+
+  return doc
 
 
 def _filter_documents(request, queryset, flatten=True):
