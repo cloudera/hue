@@ -164,6 +164,6 @@ class Api(object):
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
 
-  def export_data_as_table(self, snippet, destination): raise NotImplementedError()
+  def export_data_as_table(self, notebook, snippet, destination): raise NotImplementedError()
 
-  def export_large_data_to_hdfs(self, snippet, destination): raise NotImplementedError()
+  def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
