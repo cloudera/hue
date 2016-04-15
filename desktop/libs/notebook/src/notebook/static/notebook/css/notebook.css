@@ -949,6 +949,9 @@ h4.header {
 .history-item .ace_invalid {
   display: none;
 }
+.history-item .ace_line {
+  white-space: normal;
+}
 
 .history-status {
   width: 20px;
