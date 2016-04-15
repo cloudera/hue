@@ -95,6 +95,10 @@ dynamic_patterns += patterns('desktop.views',
   # Responsive
   (r'^responsive', 'responsive'),
 
+  # KO components, change to doc?name=ko_editor or similar
+  (r'^ko_editor', 'ko_editor'),
+  (r'^ko_metastore', 'ko_metastore'),
+
   # Jasmine
   (r'^jasmine', 'jasmine'),
 
