@@ -23,7 +23,11 @@
 }(this, function (ko, AssistHelper, Autocompleter) {
 
   var NOTEBOOK_MAPPING = {
-    ignore: ["ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user"]
+    ignore: [
+      "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user",
+      "availableDatabases", "hasProperties", "viewSettings", "aceMode", "snippetImage", "errorLoadingQueries",
+      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta"
+    ]
   };
 
   var Result = function (snippet, result) {
@@ -597,12 +601,12 @@
           notebook.uuid(data.history_uuid);
 
           notebook.history.push( // TODO append to beginning
-            self._makeHistoryRecord(
-                url,
-                self.statement_raw(),
-                self.lastExecuted(),
-                self.status(),
-                notebook.uuid()
+            notebook._makeHistoryRecord(
+              url,
+              self.statement_raw(),
+              self.lastExecuted(),
+              self.status(),
+              notebook.uuid()
             )
           );
         }
