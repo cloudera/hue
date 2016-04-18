@@ -27,6 +27,7 @@ from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
 
 from notebook.connectors.hiveserver2 import HiveConfiguration, ImpalaConfiguration
+from notebook.connectors.spark_shell import SparkConfiguration
 
 
 LOG = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ def api_error_handler(func):
 def get_configurable():
   # TODO: Use metaclasses to self-register configurable apps
   app_configs = {}
-  config_classes = [HiveConfiguration, ImpalaConfiguration]
+  config_classes = [HiveConfiguration, ImpalaConfiguration, SparkConfiguration]
 
   for config_cls in config_classes:
     if not hasattr(config_cls, 'APP_NAME') or not hasattr(config_cls, 'PROPERTIES'):
