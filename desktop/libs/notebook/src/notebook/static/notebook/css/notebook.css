@@ -965,10 +965,6 @@ h4.header {
   color: #fdae6b;
 }
 
-.player-toolbar img {
-  margin-top: 12px;
-}
-
 .table-results table > thead > tr > td:first-child, .table-results table > tbody > tr > td:first-child {
   background-color: #f9f9f9;
 }

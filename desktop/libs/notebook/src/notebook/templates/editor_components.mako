@@ -210,10 +210,6 @@ ${ hueIcons.symbols() }
         </a>
         % endif
 
-        <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-          <i class="fa fa-expand"></i>
-        </a>
-
         % if mode != 'editor':
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
@@ -221,7 +217,7 @@ ${ hueIcons.symbols() }
           </a>
           <ul class="dropdown-menu pull-right">
             <li>
-              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isFullscreenMode(true); $root.isPlayerMode(true);}">
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
               </a>
             </li>
@@ -315,16 +311,13 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
-
-
-<div class="player-toolbar" data-bind="visible: $root.isPlayerMode()" style="display: none;">
-  <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
-  <img src="${ static('desktop/art/icon_hue_48.png') }" />
-  <!-- ko if: $root.selectedNotebook() -->
-  <h4 data-bind="text: $root.selectedNotebook().name"></h4>
-  <!-- /ko -->
-</div>
-
+ <div class="player-toolbar" data-bind="visible: $root.isPlayerMode() && $root.isFullscreenMode()" style="display: none;">
+    <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); $root.isFullscreenMode(false);  }"><i class="fa fa-times"></i></div>
+    <img src="${ static('desktop/art/icon_hue_48.png') }" />
+    <!-- ko if: $root.selectedNotebook() -->
+    <h4 data-bind="text: $root.selectedNotebook().name"></h4>
+    <!-- /ko -->
+  </div>
 </%def>
 
 
@@ -375,13 +368,13 @@ ${ hueIcons.symbols() }
 </div>
 %endif
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { wasAssistVisible = true; $root.isLeftPanelVisible(true); }">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
-  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }" >
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPlayerMode() ? '0' : '20px' }" >
     <div class="vertical-full">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook'}">
       </div>
@@ -391,7 +384,7 @@ ${ hueIcons.symbols() }
 
 <script type="text/html" id="notebook">
   <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; isLeftPanelVisible(false) }">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isLeftPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: {
@@ -513,7 +506,7 @@ ${ hueIcons.symbols() }
       <ul class="nav nav-tabs">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
-            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
@@ -521,7 +514,12 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
         %endif
         <!-- ko if: result.hasSomeResults -->
-        <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}"><a class="inactive-action" href="#queryResults" data-toggle="tab">${_('Results')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
+          <a class="inactive-action" href="#queryResults" data-toggle="tab">${_('Results')}
+            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Expand results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && !$root.isPlayerMode(), click: function(){ $root.isPlayerMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
+            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="snippet-icon fa fa-compress"></i></div>
+          </a>
+        </li>
         <!-- /ko -->
         <!-- ko if: result.explanation().length > 0 -->
         <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
@@ -1579,7 +1577,7 @@ ${ hueIcons.symbols() }
             includeNavigator: false,
             parentId: 'snippet_' + snippet.id(),
             mainScrollable: '.right-panel',
-            stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
+            stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
             clonedContainerPosition: "fixed"
           });
           $(el).jHueHorizontalScrollbar();
@@ -1623,7 +1621,7 @@ ${ hueIcons.symbols() }
         includeNavigator: false,
         parentId: 'snippet_' + snippet.id(),
         mainScrollable: '.right-panel',
-        stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
+        stickToTopPosition: vm.isPlayerMode() ? (vm.isFullscreenMode() ? 48 : 0) : 73,
         clonedContainerPosition: "fixed"
       });
       $(el).jHueHorizontalScrollbar();
@@ -2107,7 +2105,7 @@ ${ hueIcons.symbols() }
               fixedFirstColumn: true,
               includeNavigator: false,
               mainScrollable: '.right-panel',
-              stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
+              stickToTopPosition: viewModel.isPlayerMode() ? 1 : 73,
               parentId: 'snippet_' + snippet.id(),
               clonedContainerPosition: "fixed"
             });
@@ -2369,6 +2367,11 @@ ${ hueIcons.symbols() }
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
 
+      function exitPlayerMode() {
+        viewModel.isPlayerMode(false);
+        viewModel.isFullscreenMode(false);
+      }
+
       viewModel.isPlayerMode.subscribe(function (value) {
         if (value){
           $(".jHueNotify").hide();
@@ -2376,7 +2379,13 @@ ${ hueIcons.symbols() }
           viewModel.isLeftPanelVisible(false);
           $(".navigator").hide();
           $(".add-snippet").hide();
-          $(".main-content").css("top", "50px");
+          if (viewModel.isFullscreenMode()){
+            $(".main-content").css("top", "50px");
+          }
+          else {
+            $(".main-content").css("top", "1px");
+          }
+          $(window).bind("keydown", "esc", exitPlayerMode);
         }
         else {
           viewModel.isLeftPanelVisible(wasAssistVisible);
@@ -2388,7 +2397,13 @@ ${ hueIcons.symbols() }
           %else:
           $(".main-content").css("top", "82px");
           %endif
+          redrawFixedHeaders(200);
+          $(window).unbind("keydown", exitPlayerMode);
         }
+      });
+
+      huePubSub.subscribe('assist.set.manual.visibility', function () {
+        wasAssistVisible = viewModel.isLeftPanelVisible();
       });
 
       viewModel.isLeftPanelVisible.subscribe(function (value) {

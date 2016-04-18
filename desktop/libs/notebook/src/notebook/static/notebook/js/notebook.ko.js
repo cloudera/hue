@@ -1369,6 +1369,7 @@
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
+    self.isFullscreenMode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url);
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
 
