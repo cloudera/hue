@@ -1324,6 +1324,7 @@
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
+          hueUtils.changeURL('/notebook/editor');
         }
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
