@@ -1030,24 +1030,24 @@ ${ hueIcons.symbols() }
           <table class="table table-condensed margin-top-10 history-table">
             <tbody data-bind="foreach: $parent.history">
               <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid) } }">
-                <td style="width: 100px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
-                <td style="width: 25px" class="muted" data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}">
+                <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
+                <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                   <!-- ko switch: status -->
                   <!-- ko case: 'running' -->
-                  <div class="history-status" data-bind="tooltip : { title: '${ _("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'failed' -->
-                  <div class="history-status" data-bind="tooltip : { title: '${ _("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'available' -->
-                  <div class="history-status" data-bind="tooltip : { title: '${ _("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'expired' -->
-                  <div class="history-status" data-bind="tooltip : { title: '${ _("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- /ko -->
                 </td>
-                <td data-bind="style:{'border-top-width': $index()==0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
+                <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
               </tr>
             </tbody>
           </table>

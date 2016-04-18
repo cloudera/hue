@@ -380,7 +380,7 @@
     }
 
     self.result = new Result(snippet, snippet.result);
-    if (!self.result.hasSomeResults()) {
+    if (! self.result.hasSomeResults()) {
       self.currentQueryTab('queryHistory');
     }
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
@@ -591,9 +591,20 @@
         self.currentQueryTab('queryResults');
         self.statusForButtons('executed');
         if (vm.editorMode && data.history_id) {
-          hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
+          var url = '/notebook/editor?editor=' + data.history_id;
+          hueUtils.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
+
+          notebook.history.push( // TODO append to beginning
+            self._makeHistoryRecord(
+                url,
+                self.statement_raw(),
+                self.lastExecuted(),
+                self.status(),
+                notebook.uuid()
+            )
+          );
         }
         if (data.status == 0) {
           self.result.handle(data.handle);
@@ -1263,17 +1274,29 @@
         var parsedHistory = [];
         if (data && data.history){
           data.history.forEach(function(nbk){
-            parsedHistory.push({
-              url: nbk.absoluteUrl,
-              query: nbk.data.snippets[0].statement_raw.substring(0, 1000) + (nbk.data.snippets[0].statement_raw.length > 1000 ? '...' : ''),
-              lastExecuted: nbk.data.snippets[0].lastExecuted,
-              status: nbk.data.snippets[0].status,
-              uuid: nbk.uuid
-            });
+            parsedHistory.push(
+              self._makeHistoryRecord(
+                nbk.absoluteUrl,
+                nbk.data.snippets[0].statement_raw,
+                nbk.data.snippets[0].lastExecuted,
+                nbk.data.snippets[0].status,
+                nbk.uuid
+              )
+            );
           });
         }
         self.history(parsedHistory);
       });
+    };
+
+    self._makeHistoryRecord = function(url, statement, lastExecuted, status, uuid) {
+      return {
+          url: url,
+          query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
+          lastExecuted: lastExecuted,
+          status: status,
+          uuid: uuid
+      };
     };
 
     self.schedule = function() {
