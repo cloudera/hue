@@ -73,7 +73,7 @@ def notebook(request):
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
-          'session_properties': SparkApi.PROPERTIES,
+          'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
       }),
       'is_yarn_mode': is_yarn_mode,

@@ -990,6 +990,7 @@ h4.header {
 #helpModal .tab-content {
   min-height: 355px;
   max-height: 355px;
+}
 
 .tooltip {
   z-index: 3000 !important;

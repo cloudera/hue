@@ -517,6 +517,7 @@ class HS2Api(Api):
     functions = snippet['properties'].get('functions', None)
     properties = session['properties']
 
+    # Get properties from session if not defined in snippet
     if not settings:
       settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
 
