@@ -521,10 +521,10 @@ class HS2Api(Api):
       settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
 
     if not file_resources:
-      settings = next((prop['value'] for prop in properties if prop['key'] == 'files'), None)
+      file_resources = next((prop['value'] for prop in properties if prop['key'] == 'files'), None)
 
     if not functions:
-      settings = next((prop['value'] for prop in properties if prop['key'] == 'functions'), None)
+      functions = next((prop['value'] for prop in properties if prop['key'] == 'functions'), None)
 
     database = snippet.get('database') or 'default'
 
