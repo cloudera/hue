@@ -43,8 +43,6 @@ from django_auth_ldap.backend import LDAPBackend
 from django_auth_ldap.config import LDAPSearch
 
 import desktop.conf
-from desktop import metrics
-from liboauth.metrics import oauth_authentication_time
 
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
@@ -294,7 +292,6 @@ class PamBackend(DesktopBackendBase):
   login will become the superuser.
   """
 
-  @metrics.pam_authentication_time
   def authenticate(self, username, password):
     username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
 
