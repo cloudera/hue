@@ -600,7 +600,7 @@
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
 
-          notebook.history.push( // TODO append to beginning
+          notebook.history.unshift(
             notebook._makeHistoryRecord(
               url,
               self.statement_raw(),
@@ -675,6 +675,8 @@
       logGA('clear');
       self.ace().setValue('', 1);
       self.result.clear();
+      self.status('ready');
+      hueUtils.changeURL('/notebook/editor');
     };
 
     self.explain = function () {
