@@ -1079,7 +1079,7 @@ DJANGO_EMAIL_BACKEND = Config(
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='use_new_editor',
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_('Choose whether to show the new SQL editor.')
 )
