@@ -1096,30 +1096,30 @@
       $.post("/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
         session: ko.mapping.toJSON(session) // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
-        }, function (data) {
-          if (data.status == 0) {
-            ko.mapping.fromJS(data.session, {}, session);
-            if (self.getSession(session.type()) == null) {
-              self.addSession(session);
-            }
-            $.each(self.getSnippets(session.type()), function(index, snippet) {
-              snippet.status('ready');
-            });
-            if (callback) {
-              setTimeout(callback, 500);
-            }
-          } else if (data.status == 401) {
-            $(document).trigger("showAuthModal", {'type': session.type()});
+      }, function (data) {
+        if (data.status == 0) {
+          ko.mapping.fromJS(data.session, {}, session);
+          if (self.getSession(session.type()) == null) {
+            self.addSession(session);
           }
-          else {
-            fail(data.message);
+          $.each(self.getSnippets(session.type()), function(index, snippet) {
+            snippet.status('ready');
+          });
+          if (callback) {
+            setTimeout(callback, 500);
           }
-        }).fail(function (xhr) {
-          fail(xhr.responseText);
-        }).complete(function(xhr, status) {
-          self.creatingSessionLocks.remove(session.type());
-        })
-      };
+        } else if (data.status == 401) {
+          $(document).trigger("showAuthModal", {'type': session.type()});
+        }
+        else {
+          fail(data.message);
+        }
+      }).fail(function (xhr) {
+        fail(xhr.responseText);
+      }).complete(function(xhr, status) {
+        self.creatingSessionLocks.remove(session.type());
+      })
+    };
 
     self.authSession = function () {
       self.createSession(new Session(vm, {
@@ -1342,7 +1342,7 @@
     }
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
-      if (self.type() == 'query' && self.snippets().length == 1) {
+      if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
         huePubSub.publish('assist.set.database', {
           source: self.snippets()[0].type(),
           name: self.snippets()[0].database()
