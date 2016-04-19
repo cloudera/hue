@@ -183,9 +183,9 @@ ${ hueIcons.symbols() }
       <div class="pull-right">
 
         <div class="btn-group">
-          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { saveNotebook() } else { $('#saveAsModal').modal('show');} }"><i class="fa fa-save"></i></a>
+          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id() && ! $root.selectedNotebook().isHistory()) { saveNotebook() } else { $('#saveAsModal').modal('show');} }"><i class="fa fa-save"></i></a>
 
-          <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
+          <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() && ! $root.selectedNotebook().isHistory() -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
@@ -296,6 +296,9 @@ ${ hueIcons.symbols() }
             % endif
           </li>
           <!-- ko with: selectedNotebook -->
+          <li data-bind="visible: isHistory" style="display: none">
+            <a title="${ _('Query history query') }"><i class="fa fa-fw fa-history"></i></a>
+          </li>
           <li class="query-name">
             <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
           </li>
@@ -1034,16 +1037,16 @@ ${ hueIcons.symbols() }
                 <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                   <!-- ko switch: status -->
                   <!-- ko case: 'running' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'failed' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'available' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- ko case: 'expired' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
                   <!-- /ko -->
                   <!-- /ko -->
                 </td>
