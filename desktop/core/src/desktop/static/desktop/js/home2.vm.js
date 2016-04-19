@@ -53,6 +53,7 @@
       app: 'documents',
       user: self.user,
       superuser: self.superuser,
+      activeSort: ko.observable('lastModifiedDesc'),
       definition: {
         name: '/'
       }

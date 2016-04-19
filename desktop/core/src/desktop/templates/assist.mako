@@ -1066,6 +1066,7 @@ from desktop.views import _ko
           assistHelper: options.assistHelper,
           app: 'documents',
           user: options.user,
+          activeSort: ko.observable('name'),
           definition: {
             name: '/',
             type: 'directory'

@@ -171,12 +171,19 @@ from desktop.views import _ko
 
     .fb-primary-col {
       flex: 1;
-      height: 42px;
       vertical-align: middle;
       padding-left: 8px;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+    }
+
+    .fb-header .fb-primary-col {
+      height: 30px;
+    }
+
+    .fb-row .fb-primary-col {
+      height: 42px;
     }
 
     .fb-primary-col .fa {
@@ -529,12 +536,12 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <!-- ko if: entries().length > 0 -->
       <div class="fb-header">
-        <div class="fb-primary-col">${ _('Name') }</div>
+        <div class="fb-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
         <div class="fb-attr-group">
           <div class="pull-right">
-            <div class="fb-attr-col fb-type">${ _('Type') }</div>
-            <div class="fb-attr-col fb-owner">${ _('Owner') }</div>
-            <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
+            <div class="fb-attr-col fb-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
+            <div class="fb-attr-col fb-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
+            <div class="fb-attr-col fb-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
           </div>
         </div>
       </div>
