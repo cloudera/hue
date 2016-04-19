@@ -2830,6 +2830,12 @@ ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 shareViewModel = initSharing("#documentShareModal");
 shareViewModel.setDocId(${doc_id});
 
+$('.left-panel').on('mousewheel', function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+});
+
 % if not beeswax_conf.USE_GET_LOG_API.get() and app_name != 'impala':
   viewModel.shouldAppendLogs = true;
 % endif
