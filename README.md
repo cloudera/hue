@@ -96,6 +96,7 @@ __CentOS/RHEL:__
 * asciidoc
 * cyrus-sasl-devel
 * cyrus-sasl-gssapi
+* cyrus-sasl-plain
 * gcc
 * gcc-c++
 * krb5-devel
