@@ -123,7 +123,11 @@ var configs = (function($) {
         attrs['values'] = ($.isArray(attrs['values'])) ? attrs['values'] : attrs['values'].split(',');
       }
       if ('value' in attrs) {
-        attrs.value = decodeURIComponent(attrs.value);
+        try {
+          attrs.value = decodeURIComponent(attrs.value);
+        }
+        catch (e) {
+        }
       }
       return attrs;
     }
