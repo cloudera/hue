@@ -968,3 +968,16 @@ h4.header {
 .table-results table > thead > tr > td:first-child, .table-results table > tbody > tr > td:first-child {
   background-color: #f9f9f9;
 }
+
+#helpModal th:first-child {
+  width: 25%;
+}
+
+#helpModal th:last-child {
+  width: 50%;
+}
+
+#helpModal .tab-content {
+  min-height: 355px;
+  max-height: 355px;
+}
