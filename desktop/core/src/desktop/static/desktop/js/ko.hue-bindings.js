@@ -3750,7 +3750,14 @@
             var tokens = tok.getLineTokens(line);
 
             if (tokens && tokens.tokens.length) {
-              new Text(document.createElement('div')).$renderSimpleLine(renderedTokens, tokens.tokens);
+              try {
+                new Text(document.createElement('div')).$renderSimpleLine(renderedTokens, tokens.tokens);
+              }
+              catch (e) {
+                if (console && console.warn) {
+                  console.warn(line, 'This line has some parsing errors and it has been skipped.');
+                }
+              }
             }
 
             res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + ' </div>');
