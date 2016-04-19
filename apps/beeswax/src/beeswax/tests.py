@@ -85,6 +85,8 @@ from beeswax.hive_site import get_metastore
 
 LOG = logging.getLogger(__name__)
 
+def _list_dir_without_temp_files(fs, target_dir):
+  return [f for f in fs.listdir(target_dir) if not f.startswith('.')]
 
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
@@ -1058,12 +1060,9 @@ for x in sys.stdin:
 
       # Check that data is right
       if verify:
-        target_ls = self.cluster.fs.listdir(target_dir)[1:]
-        assert_true(len(target_ls) >= 1)
-        data_buf = ""
-
-
+        target_ls = _list_dir_without_temp_files(self.cluster.fs, target_dir)
         assert_equal(len(target_ls), 1)
+        data_buf = ""
 
         for target in target_ls:
           target_file = self.cluster.fs.open(target_dir + '/' + target)
