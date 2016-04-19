@@ -599,6 +599,7 @@
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
+          notebook.isHistory(true);
 
           notebook.history.unshift(
             notebook._makeHistoryRecord(
