@@ -25,6 +25,33 @@
   }
 }(this, function (ko, HueDocument) {
 
+  var sorts = {
+    nameAsc: function (a, b) {
+      return a.definition().name.localeCompare(b.definition().name);
+    },
+    nameDesc: function (a, b) {
+      return sorts.nameAsc(b, a);
+    },
+    typeAsc: function (a, b) {
+      return a.definition().type.localeCompare(b.definition().type);
+    },
+    typeDesc: function (a, b) {
+      return sorts.typeAsc(b, a);
+    },
+    ownerAsc: function (a, b) {
+      return a.definition().owner.localeCompare(b.definition().owner);
+    },
+    ownerDesc: function (a, b) {
+      return sorts.ownerAsc(b, a);
+    },
+    lastModifiedAsc: function (a, b) {
+      return a.definition().last_modified_ts - b.definition().last_modified_ts;
+    },
+    lastModifiedDesc: function (a, b) {
+      return sorts.lastModifiedAsc(b, a);
+    }
+  };
+
   /**
    *
    * @param {Object} options
@@ -116,6 +143,8 @@
 
     self.entries = ko.observableArray([]);
 
+    self.activeSort = options.activeSort;
+
     self.selectedEntries = ko.pureComputed(function () {
       return $.grep(self.entries(), function (entry) {
         return entry.selected();
@@ -161,7 +190,23 @@
     if (! self.isTrash() && ! self.isTrashed()) {
       $('#createDirectoryModal').modal('show');
     }
-  }
+  };
+
+  HueFileEntry.prototype.setSort = function (name) {
+    var self = this;
+    if (self.activeSort().indexOf(name) === -1) {
+      if (name === 'lastModified') {
+        self.activeSort('lastModifiedDesc');
+      } else {
+        self.activeSort(name + 'Asc')
+      }
+    } else if (self.activeSort().indexOf('Asc') !== -1) {
+      self.activeSort(name + 'Desc');
+    } else {
+      self.activeSort(name + 'Asc');
+    }
+    self.entries.sort(sorts[self.activeSort()]);
+  };
 
   HueFileEntry.prototype.showSharingModal = function (entry) {
     var self = this;
@@ -337,15 +382,7 @@
             }
           });
 
-          newEntries.sort(function (a, b) {
-            if (a.isDirectory() && ! b.isDirectory()) {
-              return -1;
-            }
-            if (b.isDirectory() && ! a.isDirectory()) {
-              return 1;
-            }
-            return a.definition().name.localeCompare(b.definition().name);
-          });
+          newEntries.sort(sorts[self.activeSort()]);
           self.entries(newEntries);
           if (! self.parent && data.parent) {
             self.parent = self.createNewEntry({
