@@ -31,6 +31,7 @@ from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExp
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
+from notebook.views import upgrade_session_properties
 
 
 LOG = logging.getLogger(__name__)
@@ -335,15 +336,7 @@ def open_notebook(request):
 
   notebook_id = request.GET.get('notebook')
   notebook = Notebook(document=Document2.objects.get(id=notebook_id))
-
-  # Check session properties format and upgrade if necessary
-  data = notebook.get_data()
-  for session in data['sessions']:
-    api = get_api(request, session)
-    if 'type' in session and hasattr(api, 'upgrade_properties'):
-      properties = session.get('properties', None)
-      session['properties'] = api.upgrade_properties(session['type'], properties)
-  notebook.data = json.dumps(data)
+  notebook = upgrade_session_properties(request, notebook)
 
   response['status'] = 0
   response['notebook'] = notebook.get_json()
