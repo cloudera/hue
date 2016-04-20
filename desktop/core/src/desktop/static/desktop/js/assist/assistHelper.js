@@ -190,7 +190,7 @@
    */
   AssistHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
-    $.post(CONFIG_SAVE_API, data, function (data) {
+    $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
       } else if (typeof options.successCallback !== 'undefined') {
