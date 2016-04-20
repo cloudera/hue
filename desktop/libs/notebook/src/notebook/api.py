@@ -92,6 +92,10 @@ def execute(request):
       history = _historify(notebook, request.user)
       response['history_id'] = history.id
       response['history_uuid'] = history.uuid
+      if notebook['isSaved']: # Keep track of history of saved queries
+        response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
+      print notebook['isSaved']
+      print notebook
 
   # Materialize and HTML escape results
   if response['handle'].get('sync') and response['handle']['result'].get('data'):
@@ -242,12 +246,17 @@ def save_notebook(request):
   if parent_uuid:
     parent_directory = Document2.objects.get_by_uuid(parent_uuid)
 
-  if notebook.get('id'):
+  if notebook.get('parentUuid'):
+    notebook_doc = Document2.objects.get(uuid=notebook['parentUuid']) # TODO security
+  elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
 
+  notebook['isSaved'] = True
+  notebook['isHistory'] = False
+  notebook['id'] = notebook_doc.id
   notebook_doc1 = notebook_doc.doc.get()
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
@@ -275,11 +284,11 @@ def _historify(notebook, user):
     is_history=True
   )
 
-  print notebook['parentUuid']
-  if notebook['parentUuid']:
-    parent_doc = Document2.objects.get(uuid=notebook['parentUuid'])
-    if parent_doc.can_write(user):
-      history_doc.dependencies.add(parent_doc)
+  # Link history of saved query
+  if notebook['isSaved']:
+    parent_doc = Document2.objects.get(uuid=notebook.get('parentUuid') or notebook['uuid']) # From previous history query or initial saved query
+    notebook['parentUuid'] = parent_doc.uuid
+    history_doc.dependencies.add(parent_doc)
 
   Document.objects.link(
     history_doc,

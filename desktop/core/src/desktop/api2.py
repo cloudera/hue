@@ -141,6 +141,7 @@ def get_document(request):
     'document': document.to_dict(),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
     'children': [],
+    'dependencies': [dependency.uuid for dependency in document.dependencies.all()],
     'data': ''
   }
 
