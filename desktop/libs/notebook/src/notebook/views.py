@@ -85,12 +85,14 @@ def editor(request):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
 
-  if editor_id:
+  if editor_id:  # Open existing saved editor document
     editor = Notebook(document=Document2.objects.get(id=editor_id))
     editor_type = editor.get_data()['type'].rsplit('-', 1)[-1]
-  else:
+    editor = upgrade_session_properties(request, notebook=editor)
+  else:  # Create new editor
     editor = Notebook()
     data = editor.get_data()
+
     data['name'] = ''
     data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
     editor.data = json.dumps(data)
@@ -215,3 +217,17 @@ def install_examples(request):
     response['message'] = _('A POST request is required.')
 
   return JsonResponse(response)
+
+
+def upgrade_session_properties(request, notebook):
+  # Upgrade session data if using old format
+  data = notebook.get_data()
+
+  for session in data.get('sessions', []):
+    api = get_api(request, session)
+    if 'type' in session and hasattr(api, 'upgrade_properties'):
+      properties = session.get('properties', None)
+      session['properties'] = api.upgrade_properties(session['type'], properties)
+
+  notebook.data = json.dumps(data)
+  return notebook
