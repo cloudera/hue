@@ -137,8 +137,8 @@ def execute_and_watch(request):
   action = request.GET['action']
   destination = request.GET['destination']
 
-  notebook = Notebook(document=Document2.objects.get(id=notebook_id))
-  snippet = notebook.get_data()['snippets'][snippet_id]
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id)).get_data()
+  snippet = notebook['snippets'][snippet_id]
   editor_type = snippet['type']
 
   api = get_api(request, snippet)
