@@ -1295,9 +1295,9 @@
             parsedHistory.push(
               self._makeHistoryRecord(
                 nbk.absoluteUrl,
-                nbk.data.snippets[0].statement_raw,
-                nbk.data.snippets[0].lastExecuted,
-                nbk.data.snippets[0].status,
+                nbk.data.statement_raw,
+                nbk.data.lastExecuted,
+                nbk.data.status,
                 nbk.uuid
               )
             );
