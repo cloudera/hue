@@ -357,7 +357,7 @@ from desktop.views import _ko
           </div>
 
           <div class="span6">
-            <h4 class="muted" style="margin-top:0px">${_('Modify')}</h4>
+            <h4 class="muted" style="margin-top: 0">${_('Modify')}</h4>
             <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.write.users">
               <li>
@@ -568,13 +568,12 @@ from desktop.views import _ko
       <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
         ${ _('There was an error loading the documents')}
       </div>
-      <div class="fb-empty animated" style="display: none;" data-bind="visible: loading">
+      <div class="fb-empty animated" style="display: none;" data-bind="visible: entries().length === 0 && loading()">
         <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
       </div>
       <!-- /ko -->
 
-
-      <div class="fb-list" data-bind="with: activeEntry">
+      <div class="fb-list" data-bind="with: activeEntry" >
         <ul class="fb-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
