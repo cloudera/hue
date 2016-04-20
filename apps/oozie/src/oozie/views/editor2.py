@@ -330,7 +330,7 @@ def action_parameters(request):
         elif node_data['type'] == 'pig':
           parameters = parameters.union(set(find_dollar_variables(data)))
     elif node_data['type'] == 'hive-document':
-      notebook = Notebook(document=Document2.objects.get_by_uuid(uuid=node_data['properties']['uuid']))
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=request.user, uuid=node_data['properties']['uuid']))
       parameters = parameters.union(set(find_dollar_braced_variables(notebook.get_str())))
 
     response['status'] = 0
@@ -655,7 +655,7 @@ def submit_coordinator(request, doc_id):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_doc = Document2.objects.get_by_uuid(uuid=coordinator.data['properties']['workflow'])
+    wf_doc = Document2.objects.get_by_uuid(user=request.user, uuid=coordinator.data['properties']['workflow'])
     wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
@@ -859,7 +859,7 @@ def schedule_document(request):
 
   uuid = request.POST.get('uuid')
 
-  document = Document2.objects.get_by_uuid(uuid=uuid)
+  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
   notebook = Notebook(document=document)
   parameters = find_dollar_braced_variables(notebook.get_str())
 

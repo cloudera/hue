@@ -3139,7 +3139,7 @@ class TestOozieSubmissions(OozieBase):
 
   def test_submit_hiveserver2_action(self):
     wf_uuid = "c1c3cba9-edec-fb6f-a526-9f80b66fe993"
-    wf = Document2.objects.get_by_uuid(uuid=wf_uuid)
+    wf = Document2.objects.get(uuid=wf_uuid)
     wf.data.replace('hive2://localhost:10000/default', _get_hiveserver2_url())
     wf.save()
 
@@ -3163,7 +3163,7 @@ class TestOozieSubmissions(OozieBase):
 
   def test_submit_spark_action(self):
     wf_uuid = "2d667ab2-70f9-c2bf-0726-abe84fa7130d"
-    wf = Document2.objects.get_by_uuid(uuid=wf_uuid)
+    wf = Document2.objects.get(uuid=wf_uuid)
 
     # Somewhere we delete those by mistake
     doc = Document.objects.link(wf, owner=wf.owner, name=wf.name, description=wf.description, extra='workflow2')

@@ -242,7 +242,7 @@ def save_notebook(request):
   parent_uuid = notebook.get('parent_uuid', None)
   parent_directory = Document2.objects.get_home_directory(request.user)
   if parent_uuid:
-    parent_directory = Document2.objects.get_by_uuid(parent_uuid)
+    parent = Document2.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
 
   if notebook.get('parentUuid'):
     notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])

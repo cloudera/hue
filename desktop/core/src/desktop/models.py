@@ -892,29 +892,28 @@ class Document2Manager(models.Manager, Document2QueryMixin):
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
-  def get_by_uuid(self, uuid, owner=None):
+  def get_by_uuid(self, user, uuid, perm_type='read'):
     """
     Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
     This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
-    WARNING: This does not check for read/write permissions!
 
+    :param user: User to check permissions against
     :param uuid
-    :param owner: optional filter
+    :param perm_type: permission type to check against
     """
-    docs = self.filter(uuid=uuid)
-
-    if owner:
-      docs = docs.filter(owner=owner)
-
-    docs = docs.order_by('-last_modified')
+    docs = self.filter(uuid=uuid).order_by('-last_modified')
 
     if not docs.exists():
-      clause = ''
-      if owner:
-        clause = _(' and owner %s ') % owner.username
-      raise FilesystemException(_('Document with UUID %(uuid)s%(clause)s not found.') % {'uuid': uuid, 'clause': clause})
+      raise FilesystemException(_('Document with UUID %s not found.') % uuid)
 
-    return docs[0]
+    latest_doc = docs[0]
+
+    if perm_type == 'write':
+      latest_doc.can_write_or_exception(user)
+    else:
+      latest_doc.can_read_or_exception(user)
+
+    return latest_doc
 
   def get_history(self, user, doc_type):
     return self.documents(user, perms='owned', include_history=True).filter(type=doc_type, is_history=True)
@@ -941,6 +940,8 @@ class Document2Manager(models.Manager, Document2QueryMixin):
           raise FilesystemException(_('Requested invalid path for user %s: %s') % (user.username, path))
         except Document2.MultipleObjectsReturned:
           raise FilesystemException(_('Duplicate documents found for user %s at path: %s') % (user.username, path))
+
+    doc.can_read_or_exception(user)
 
     return doc
 

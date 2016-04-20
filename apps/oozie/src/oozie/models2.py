@@ -2459,7 +2459,9 @@ class Coordinator(Job):
 
   @property
   def workflow(self):
-    wf_doc = Document2.objects.get_by_uuid(uuid=self.data['properties']['workflow'])
+    if self.document is None:
+      raise PopupException(_('Cannot return workflow since document attribute is None.'))
+    wf_doc = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.uuid)
     return Workflow(document=wf_doc)
 
   def get_absolute_url(self):
