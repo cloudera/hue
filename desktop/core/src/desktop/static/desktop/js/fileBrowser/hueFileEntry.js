@@ -269,6 +269,7 @@
     var self = this;
     return new HueFileEntry($.extend({
       activeEntry: self.activeEntry,
+      activeSort: self.activeSort,
       trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: self.app,
