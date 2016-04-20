@@ -734,7 +734,7 @@
 
     self.isFetchingData = false;
     self.fetchResultData = function (rows, startOver) {
-      if (!self.isFetchingData) {
+      if (! self.isFetchingData) {
         self.isFetchingData = true;
         logGA('fetchResult/' + rows + '/' + startOver);
         $.post("/notebook/api/fetch_result_data", {
@@ -999,6 +999,7 @@
 
     self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : null);
     self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
+    self.parentUuid = ko.observable(typeof notebook.parentUuid != "undefined" && notebook.parentUuid != null ? notebook.parentUuid : null);
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
@@ -1184,6 +1185,7 @@
      return {
          id: self.id,
          uuid: self.uuid,
+         parentUuid: self.parentUuid,
          sessions: self.sessions,
          type: self.type
       };
