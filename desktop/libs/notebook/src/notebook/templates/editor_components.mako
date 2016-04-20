@@ -183,9 +183,9 @@ ${ hueIcons.symbols() }
       <div class="pull-right">
 
         <div class="btn-group">
-          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id() && ! $root.selectedNotebook().isHistory()) { saveNotebook() } else { $('#saveAsModal').modal('show');} }"><i class="fa fa-save"></i></a>
+          <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
 
-          <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() && ! $root.selectedNotebook().isHistory() -->
+          <!-- ko if: $root.canSave -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
