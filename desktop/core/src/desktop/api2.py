@@ -132,12 +132,9 @@ def get_document(request):
   with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
 
   if uuid:
-    document = Document2.objects.get_by_uuid(uuid)
+    document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
   else:  # Find by path
     document = Document2.objects.get_by_path(user=request.user, path=path)
-
-  # Check if user has read permissions
-  document.can_read_or_exception(request.user)
 
   response = {
     'document': document.to_dict(),
@@ -187,12 +184,8 @@ def move_document(request):
   if not source_doc_uuid or not destination_doc_uuid:
     raise PopupException(_('move_document requires source_doc_uuid and destination_doc_uuid'))
 
-  source = Document2.objects.get_by_uuid(uuid=source_doc_uuid)
-  destination = Directory.objects.get_by_uuid(uuid=destination_doc_uuid)
-
-  # Check if user has write permissions for both source and destination
-  source.can_write_or_exception(request.user)
-  destination.can_write_or_exception(request.user)
+  source = Document2.objects.get_by_uuid(user=request.user, uuid=source_doc_uuid, perm_type='write')
+  destination = Directory.objects.get_by_uuid(user=request.user, uuid=destination_doc_uuid, perm_type='write')
 
   doc = source.move(destination, request.user)
 
@@ -211,10 +204,7 @@ def create_directory(request):
   if not parent_uuid or not name:
     raise PopupException(_('create_directory requires parent_uuid and name'))
 
-  parent_dir = Directory.objects.get_by_uuid(uuid=parent_uuid)
-
-  # Check if user has write permissions for parent directory
-  parent_dir.can_write_or_exception(request.user)
+  parent_dir = Directory.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
 
   directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
 
@@ -232,8 +222,7 @@ def update_document(request):
   if not uuid:
     raise PopupException(_('update_document requires uuid'))
 
-  document = Document2.objects.get_by_uuid(uuid=uuid)
-  document.can_write_or_exception(request.user)
+  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid, perm_type='write')
 
   whitelisted_attrs = ['name', 'description']
 
@@ -268,10 +257,7 @@ def delete_document(request):
   if not uuid:
     raise PopupException(_('delete_document requires uuid'))
 
-  document = Document2.objects.get_by_uuid(uuid=uuid)
-
-  # Check if user has write permissions for given document
-  document.can_write_or_exception(request.user)
+  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid, perm_type='write')
 
   if skip_trash:
     document.delete()
@@ -297,7 +283,7 @@ def share_document(request):
   if not uuid or not perms_dict:
     raise PopupException(_('share_document requires uuid and perms_dict'))
 
-  doc = Document2.objects.get_by_uuid(uuid=uuid)
+  doc = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
 
   for name, perm in perms_dict.iteritems():
     users = groups = None
@@ -476,11 +462,19 @@ def _copy_document_with_owner(doc, owner, uuids_map):
 
 def _create_or_update_document_with_owner(doc, owner, uuids_map):
   home_dir = Directory.objects.get_home_directory(owner)
+  create_new = False
 
   try:
-    existing_doc = Document2.objects.get_by_uuid(doc['fields']['uuid'], owner=owner)
-    doc['pk'] = existing_doc.pk
+    owned_docs = Document2.objects.filter(uuid=doc['fields']['uuid'], owner=owner).order_by('-last_modified')
+    if owned_docs.exists():
+      existing_doc = owned_docs[0]
+      doc['pk'] = existing_doc.pk
+    else:
+      create_new = True
   except FilesystemException, e:
+    create_new = True
+
+  if create_new:
     LOG.warn('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
     doc['pk'] = None
     doc['fields']['version'] = 1

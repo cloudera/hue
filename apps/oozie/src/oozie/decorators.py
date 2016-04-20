@@ -54,7 +54,7 @@ def check_document_access_permission():
         if doc_id is not None:
           doc2 = Document2.objects.get(id=doc_id)
         elif uuid is not None:
-          doc2 = Document2.objects.get_by_uuid(uuid)
+          doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
 
         if doc2:
           doc2.doc.get().can_read_or_exception(request.user)

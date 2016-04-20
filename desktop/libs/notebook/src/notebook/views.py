@@ -168,7 +168,7 @@ def delete(request):
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
   for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(uuid=notebook['uuid'])
+    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
     doc = doc2.doc.get()
     doc.can_write_or_exception(request.user)
 
@@ -183,7 +183,7 @@ def copy(request):
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
   for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(uuid=notebook['uuid'])
+    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
     doc = doc2.doc.get()
 
     name = doc2.name + '-copy'

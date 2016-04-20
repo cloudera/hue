@@ -178,7 +178,7 @@ class Submission(object):
         # Don't support more than one level sub-workflow
         if action.data['type'] == 'subworkflow':
           from oozie.models2 import Workflow
-          workflow = Workflow(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['workflow']))
+          workflow = Workflow(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           workspace = sub_deploy.deploy()
 
@@ -186,7 +186,7 @@ class Submission(object):
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
         elif action.data['type'] == 'hive-document':
           from notebook.models import Notebook
-          notebook = Notebook(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['uuid']))
+          notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
 
           self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_str())
           #self.data['properties']['script_path'] = _generate_hive_script(self.data['uuid']) #'workspace_%s' % workflow.uui
