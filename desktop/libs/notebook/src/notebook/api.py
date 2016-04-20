@@ -306,13 +306,24 @@ def get_history(request):
   limit = max(request.GET.get('len', 50), 100)
 
   response['status'] = 0
-  response['history'] = [{
-      'name': doc.name,
-      'id': doc.id,
-      'uuid': doc.uuid,
-      'data': Notebook(document=doc).get_data(),
-      'absoluteUrl': doc.get_absolute_url(),
-      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:limit]]
+  history = []
+  for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:limit]:
+    notebook = Notebook(document=doc).get_data()
+    if 'snippets' in notebook:
+      history.append({
+        'name': doc.name,
+        'id': doc.id,
+        'uuid': doc.uuid,
+        'data': {
+            'statement_raw': notebook['snippets'][0]['statement_raw'][:1001],
+            'lastExecuted':  notebook['snippets'][0]['lastExecuted'],
+            'status':  notebook['snippets'][0]['status']
+        },
+        'absoluteUrl': doc.get_absolute_url(),
+      })
+    else:
+      LOG.error('Incomplete History Notebook: %s' % notebook)
+  response['history'] = history
   response['message'] = _('History fetched')
 
   return JsonResponse(response)
