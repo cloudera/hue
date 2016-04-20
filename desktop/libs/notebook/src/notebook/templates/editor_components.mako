@@ -1483,7 +1483,7 @@ ${ hueIcons.symbols() }
         <!-- /ko -->
       </div>
 
-      <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 130px;">
+      <div class="row-fluid table-results" data-bind="visible: result.type() == 'table', style: {'min-height': $root.editorMode ? '230px' : '130px'}" style="display: none; max-height: 400px;">
         <div>
           <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;">
             <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
