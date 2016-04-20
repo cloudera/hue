@@ -262,7 +262,6 @@ from desktop.views import _ko
       flex-flow: column nowrap;
       align-items: stretch;
       height:100%;
-      min-height: 100vh;
     }
 
     .assist-flex-header {
