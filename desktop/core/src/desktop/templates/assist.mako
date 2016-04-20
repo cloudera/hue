@@ -1206,7 +1206,7 @@ from desktop.views import _ko
               })
         };
 
-        self.onlySql = params.onlySql;
+        self.onlySql = true; // params.onlySql; - Only show SQL until Hue 4
         self.loading = ko.observable(false);
 
         self.availablePanels = [
