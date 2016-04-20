@@ -176,10 +176,12 @@ from desktop.views import _ko
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      padding-right: 20px;
     }
 
     .fb-header .fb-primary-col {
       height: 30px;
+      line-height: 30px;
     }
 
     .fb-row .fb-primary-col {
@@ -204,11 +206,20 @@ from desktop.views import _ko
       height: 30px;
     }
 
+    .fb-row .fb-attr-group {
+      height: 42px;
+    }
+
     .fb-attr-col {
       display: inline-block;;
       height: 30px;
       line-height: 30px;
       vertical-align: middle;
+      padding-right: 20px;
+    }
+
+    .fb-row .fb-attr-col {
+      margin-bottom: 2px;
     }
 
     .fb-shared-icon-active {
@@ -538,11 +549,9 @@ from desktop.views import _ko
       <div class="fb-header">
         <div class="fb-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
         <div class="fb-attr-group">
-          <div class="pull-right">
-            <div class="fb-attr-col fb-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
-            <div class="fb-attr-col fb-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
-            <div class="fb-attr-col fb-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
-          </div>
+          <div class="fb-attr-col fb-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
+          <div class="fb-attr-col fb-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
+          <div class="fb-attr-col fb-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
         </div>
       </div>
       <!-- /ko -->
@@ -611,29 +620,27 @@ from desktop.views import _ko
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="fb-attr-group">
-                <div class="pull-right">
-                  <!-- ko with: definition -->
-                  <div class="fb-attr-col fb-type">
-                    <!-- ko switch: type -->
-                    <!-- ko case: 'directory' -->${ _('Directory')}<!-- /ko -->
-                    <!-- ko case: 'link-pigscript' -->${ _('Pig Script')}<!-- /ko -->
-                    <!-- ko case: 'link-workflow' -->${ _('Job Design')}<!-- /ko -->
-                    <!-- ko case: 'notebook' -->${ _('Notebook')}<!-- /ko -->
-                    <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle')}<!-- /ko -->
-                    <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator')}<!-- /ko -->
-                    <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow')}<!-- /ko -->
-                    <!-- ko case: 'query-hive' -->${ _('Hive Query')}<!-- /ko -->
-                    <!-- ko case: 'query-impala' -->${ _('Impala Query')}<!-- /ko -->
-                    <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard')}<!-- /ko -->
-                    <!-- ko case: $default -->
-                    <!-- ko text: $value --><!-- /ko -->
-                    <!-- /ko -->
-                    <!-- /ko -->
-                  </div>
-                  <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
-                  <div class="fb-attr-col fb-modified" data-bind="text: localeFormat(last_modified)"></div>
+                <!-- ko with: definition -->
+                <div class="fb-attr-col fb-type">
+                  <!-- ko switch: type -->
+                  <!-- ko case: 'directory' -->${ _('Directory')}<!-- /ko -->
+                  <!-- ko case: 'link-pigscript' -->${ _('Pig Script')}<!-- /ko -->
+                  <!-- ko case: 'link-workflow' -->${ _('Job Design')}<!-- /ko -->
+                  <!-- ko case: 'notebook' -->${ _('Notebook')}<!-- /ko -->
+                  <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle')}<!-- /ko -->
+                  <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator')}<!-- /ko -->
+                  <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow')}<!-- /ko -->
+                  <!-- ko case: 'query-hive' -->${ _('Hive Query')}<!-- /ko -->
+                  <!-- ko case: 'query-impala' -->${ _('Impala Query')}<!-- /ko -->
+                  <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard')}<!-- /ko -->
+                  <!-- ko case: $default -->
+                  <!-- ko text: $value --><!-- /ko -->
+                  <!-- /ko -->
                   <!-- /ko -->
                 </div>
+                <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
+                <div class="fb-attr-col fb-modified" data-bind="text: localeFormat(last_modified)"></div>
+                <!-- /ko -->
               </div>
             </div>
           </li>
