@@ -124,10 +124,12 @@ def get_document(request):
                   Default to "-last_modified".
     text=<frag> - Search for fragment "frag" in names and descriptions.
     data=<false|true> - Return all the data of the document. Default to false.
+    dependencies=<false|true> - Return all the dependencies and dependents of the document. Default to false.
   """
   path = request.GET.get('path', '/')
   uuid = request.GET.get('uuid')
   with_data = request.GET.get('data', 'false').lower() == 'true'
+  with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
 
   if uuid:
     document = Document2.objects.get_by_uuid(uuid)
@@ -141,12 +143,17 @@ def get_document(request):
     'document': document.to_dict(),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
     'children': [],
-    'dependencies': [dependency.uuid for dependency in document.dependencies.all()],
+    'dependencies': [],
+    'dependents': [],
     'data': ''
   }
 
   if with_data:
     response['data'] = json.loads(document.data)
+
+  if with_dependencies:
+    response['dependencies'] = [dependency.uuid for dependency in document.dependencies.all()]
+    response['dependents'] = [dependent.uuid for dependent in document.dependents.all()]
 
   # Get children documents if this is a directory
   if document.is_directory:
