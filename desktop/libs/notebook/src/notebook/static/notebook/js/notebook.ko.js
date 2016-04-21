@@ -1000,11 +1000,11 @@
     var self = this;
 
     self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : null);
-    self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());    
+    self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
-    self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);	
+    self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.parentUuid = ko.observable(typeof notebook.parentUuid != "undefined" && notebook.parentUuid != null ? notebook.parentUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.snippets = ko.observableArray();
@@ -1423,13 +1423,12 @@
     self.successUrl = ko.observable(options.success_url);
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.canSave = ko.computed(function() {
-        // Saved query or history but history coming from a saved query
-        return self.selectedNotebook() && (
-        		  self.selectedNotebook().isSaved() ||
-        		  //(! self.selectedNotebook().isSaved() && self.selectedNotebook().isHistory() && self.selectedNotebook().parentUuid()) ||
-      			  (self.selectedNotebook().isHistory() && self.selectedNotebook().parentUuid())
-        );
-      });
+      // Saved query or history but history coming from a saved query
+      return self.selectedNotebook() && (
+         self.selectedNotebook().isSaved() ||
+         (self.selectedNotebook().isHistory() && self.selectedNotebook().parentUuid())
+      );
+    });
 
     self.sqlSourceTypes = [];
 

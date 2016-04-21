@@ -94,8 +94,6 @@ def execute(request):
       response['history_uuid'] = history.uuid
       if notebook['isSaved']: # Keep track of history of saved queries
         response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
-      print notebook['isSaved']
-      print notebook
 
   # Materialize and HTML escape results
   if response['handle'].get('sync') and response['handle']['result'].get('data'):
@@ -247,7 +245,8 @@ def save_notebook(request):
     parent_directory = Document2.objects.get_by_uuid(parent_uuid)
 
   if notebook.get('parentUuid'):
-    notebook_doc = Document2.objects.get(uuid=notebook['parentUuid']) # TODO security
+    notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])
+    notebook_doc.can_read_or_exception(notebook['parentUuid'])
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
