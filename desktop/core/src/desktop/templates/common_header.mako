@@ -687,4 +687,3 @@ if USE_NEW_EDITOR.get():
     <button class="close">&times;</button>
     <span class="message"></span>
 </div>
-

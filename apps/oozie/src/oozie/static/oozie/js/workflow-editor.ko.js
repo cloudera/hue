@@ -493,9 +493,13 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow.loadNodes(workflow_json);
 
     $.get('/desktop/api2/docs/?type=query-hive&sort=last_modified&limit=100', function(data) {
-      $.each(data.documents, function(index, query) {
-        self.hiveQueries.push(ko.mapping.fromJS(query));
-      });
+      if (data && data.documents) {
+        var queries = [];
+        $.each(data.documents, function(index, query) {
+          queries.push(ko.mapping.fromJS(query));
+        });
+        self.hiveQueries(queries);
+      }
     });
   };
 

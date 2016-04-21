@@ -941,7 +941,7 @@
       <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
         <a data-bind="attr: {href: absoluteUrl()}" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
-        <span data-bind='text: description'></span>
+        <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -950,9 +950,8 @@
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
         <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
-          <span data-bind='text: name'></span>
-          <br/>
-          <span data-bind='text: description'></span>
+          <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
+          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
         <!-- /ko -->
         <!-- /ko -->
 
@@ -1888,5 +1887,3 @@
 </script>
 
 </%def>
-
-

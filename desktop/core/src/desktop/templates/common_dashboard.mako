@@ -297,4 +297,3 @@
   <script src="${ static('desktop/js/ko.charts.js') }" type="text/javascript" charset="utf-8"></script>
 
 </%def>
-
