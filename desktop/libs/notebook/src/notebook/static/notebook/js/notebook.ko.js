@@ -600,7 +600,6 @@
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
-//          notebook.isSaved(true);
           notebook.parentUuid(data.history_parent_uuid);
 
           notebook.history.unshift(
@@ -609,6 +608,7 @@
               self.statement_raw(),
               self.lastExecuted(),
               self.status(),
+              notebook.name(),
               notebook.uuid()
             )
           );
@@ -1303,6 +1303,7 @@
                 nbk.data.statement_raw,
                 nbk.data.lastExecuted,
                 nbk.data.status,
+                nbk.name,
                 nbk.uuid
               )
             );
@@ -1312,12 +1313,13 @@
       });
     };
 
-    self._makeHistoryRecord = function(url, statement, lastExecuted, status, uuid) {
+    self._makeHistoryRecord = function(url, statement, lastExecuted, status, name, uuid) {
       return {
           url: url,
           query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
           lastExecuted: lastExecuted,
           status: status,
+          name: name,
           uuid: uuid
       };
     };

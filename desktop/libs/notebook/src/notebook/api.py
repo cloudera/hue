@@ -37,7 +37,7 @@ from notebook.views import upgrade_session_properties
 LOG = logging.getLogger(__name__)
 
 
-DEFAULT_HISTORY_NAME = _('Query history')
+DEFAULT_HISTORY_NAME = ''
 
 
 @require_POST
@@ -275,7 +275,7 @@ def save_notebook(request):
 
 def _historify(notebook, user):
   query_type = notebook['type']
-  name = notebook['name'] if notebook['name'] and notebook['name'].strip() != '' else DEFAULT_HISTORY_NAME
+  name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
 
   history_doc = Document2.objects.create(
     name=name,
@@ -326,7 +326,8 @@ def get_history(request):
         'data': {
             'statement_raw': notebook['snippets'][0]['statement_raw'][:1001],
             'lastExecuted':  notebook['snippets'][0]['lastExecuted'],
-            'status':  notebook['snippets'][0]['status']
+            'status':  notebook['snippets'][0]['status'],
+            'parentUuid': notebook.get('parentUuid', '')
         },
         'absoluteUrl': doc.get_absolute_url(),
       })
