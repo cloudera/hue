@@ -31,6 +31,11 @@ from desktop.views import _ko
       border-right: 1px solid transparent !important;
       border-left: 1px solid transparent !important;
     }
+
+    .samples-table th {
+      background-color: #FFF !important;
+      border: none !important;
+    }
   </style>
 
   <script type="text/html" id="table-stats">
@@ -113,7 +118,7 @@ from desktop.views import _ko
               <div class="alert">${ _('The selected table has no data.') }</div>
               <!-- /ko -->
               <!-- ko if: rows.length > 0 -->
-              <table class="table table-striped table-condensed">
+              <table class="samples-table table table-striped table-condensed ">
                 <tr>
                   <th style="width: 10px"></th>
                   <!-- ko foreach: headers -->
