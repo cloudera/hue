@@ -270,7 +270,7 @@ ${ workflow.render() }
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           <!-- ko if: type() == 'hive' -->
-          <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: value"></select>
+         <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
           <!-- /ko -->
 
           <!-- ko if: type() == 'distcp' -->
@@ -430,6 +430,7 @@ ${ workflow.render() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/select2.min.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
 
@@ -442,6 +443,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/select2.full.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
