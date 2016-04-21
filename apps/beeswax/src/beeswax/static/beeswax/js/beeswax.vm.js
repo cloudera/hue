@@ -594,7 +594,14 @@ function BeeswaxViewModel(server, assistHelper) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        $(document).trigger('watched.query', data);
+        if (data.status != 0) {
+          self.setErrors(data.message, data.errors);
+          self.design.isRunning(false);
+          $(document).trigger('error.query');
+        }
+        else {
+          $(document).trigger('watched.query', data);
+        }
       },
       error: function(jqXHR, status, errorThrown) {
         self.design.isRunning(false);
