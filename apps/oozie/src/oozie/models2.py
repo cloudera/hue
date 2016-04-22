@@ -33,7 +33,7 @@ from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document2
+from desktop.models import DefaultConfiguration, Document2
 
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
@@ -85,11 +85,12 @@ class Job(object):
     return '%s' % force_unicode(self.name)
 
 
-class Workflow(Job):
-  XML_FILE_NAME = 'workflow.xml'
-  PROPERTY_APP_PATH = 'oozie.wf.application.path'
+class WorkflowConfiguration(object):
+
+  APP_NAME = 'oozie-workflow'
+
   SLA_DEFAULT = [
-      {'key': 'enabled', 'value': False}, # Always first element
+      {'key': 'enabled', 'value': False},  # Always first element
       {'key': 'nominal-time', 'value': '${nominal_time}'},
       {'key': 'should-start', 'value': ''},
       {'key': 'should-end', 'value': '${30 * MINUTES}'},
@@ -99,9 +100,85 @@ class Workflow(Job):
       {'key': 'notification-msg', 'value': ''},
       {'key': 'upstream-apps', 'value': ''},
   ]
+
+  PROPERTIES = [
+    {
+      "multiple": True,
+      "value": [
+        {
+          'name': 'oozie.use.system.libpath',
+          'value': True
+        }
+      ],
+      "nice_name": _("Variables"),
+      "key": "parameters",
+      "help_text": _("Add one or more Oozie workflow job parameters."),
+      "type": "parameters"
+    }, {
+      "multiple": False,
+      "value": '',
+      "nice_name": _("Workspace"),
+      "key": "deployment_dir",
+      "help_text": _("Specify the deployment directory."),
+      "type": "hdfs-files"
+    }, {
+      "multiple": True,
+      "value": [],
+      "nice_name": _("Hadoop Properties"),
+      "key": "properties",
+      "help_text": _("Hadoop configuration properties."),
+      "type": "settings"
+    }, {
+      "multiple": False,
+      "value": True,
+      "nice_name": _("Show graph arrows"),
+      "key": "show_arrows",
+      "help_text": _("Toggles display of graph arrows."),
+      "type": "boolean"
+    }, {
+      "multiple": False,
+      "value": "uri:oozie:workflow:0.5",
+      "nice_name": _("Version"),
+      "key": "schema_version",
+      "help_text": _("Oozie XML Schema Version"),
+      "type": "string",
+      "options": [
+        "uri:oozie:workflow:0.5",
+        "uri:oozie:workflow:0.4.5",
+        "uri:oozie:workflow:0.4",
+      ]
+    }, {
+      "multiple": False,
+      "value": '',
+      "nice_name": _("Job XML"),
+      "key": "job_xml",
+      "help_text": _("Oozie Job XML file"),
+      "type": "hdfs-files"
+    }, {
+      "multiple": False,
+      "value": False,
+      "nice_name": _("SLA Enabled"),
+      "key": "sla_enabled",
+      "help_text": _("SLA Enabled"),
+      "type": "boolean"
+    }, {
+      "multiple": False,
+      "value": SLA_DEFAULT,
+      "nice_name": _("SLA Configuration"),
+      "key": "sla",
+      "help_text": _("Oozie SLA properties"),
+      "type": "settings",
+      "options": [prop['key'] for prop in SLA_DEFAULT]
+    }
+  ]
+
+
+class Workflow(Job):
+  XML_FILE_NAME = 'workflow.xml'
+  PROPERTY_APP_PATH = 'oozie.wf.application.path'
   HUE_ID = 'hue-id-w'
 
-  def __init__(self, data=None, document=None, workflow=None):
+  def __init__(self, data=None, document=None, workflow=None, user=None):
     self.document = document
 
     if document is not None:
@@ -109,6 +186,11 @@ class Workflow(Job):
     elif data is not None:
       self.data = data
     else:
+      if not workflow:
+        workflow = self.get_default_workflow()
+
+      workflow['properties'] = self.get_workflow_properties_for_user(user, workflow)
+
       self.data = json.dumps({
           'layout': [{
               "size":12, "rows":[
@@ -119,27 +201,90 @@ class Workflow(Job):
               "drops":[ "temp"],
               "klass":"card card-home card-column span12"
           }],
-          'workflow': workflow if workflow is not None else {
-              "id": None,
-              "uuid": None,
-              "name": "My Workflow",
-              "properties": {
-                  "description": "",
-                  "job_xml": "",
-                  "sla_enabled": False,
-                  "schema_version": "uri:oozie:workflow:0.5",
-                  "properties": [],
-                  "sla": Workflow.SLA_DEFAULT,
-                  "show_arrows": True,
-                  "wf1_id": None
-              },
-              "nodes":[
-                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
-                  {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]},
-                  {"id":"17c9c895-5a16-7443-bb81-f34b30b21548","name":"Kill","type":"kill-widget","properties":{'message': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]')},"children":[]}
-              ]
-          }
+          'workflow': workflow
       })
+
+  @classmethod
+  def get_application_path_key(cls):
+    return 'oozie.wf.application.path'
+
+  @classmethod
+  def gen_workflow_data_from_xml(cls, user, oozie_workflow):
+    node_list = []
+    try:
+      node_list = generate_v2_graph_nodes(oozie_workflow.definition)
+    except MalformedWfDefException, e:
+      LOG.exception("Could not find any nodes in Workflow definition. Maybe it's malformed?")
+    except InvalidTagWithNamespaceException, e:
+      LOG.exception(
+        "Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s" % {
+          'namespace': e.namespace,
+          'namespaces': e.namespaces
+        })
+
+    _to_lowercase(node_list)
+    adj_list = _create_graph_adjaceny_list(node_list)
+
+    node_hierarchy = ['start']
+    _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
+
+    _update_adj_list(adj_list)
+
+    wf_rows = _create_workflow_layout(node_hierarchy, adj_list)
+    data = {'layout': [{}], 'workflow': {}}
+    if wf_rows:
+      data['layout'][0]['rows'] = wf_rows
+
+    wf_nodes = []
+    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes)
+    data['workflow']['nodes'] = wf_nodes
+    data['workflow']['id'] = "123"
+    data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None).update({
+      'deployment_dir': '/user/hue/oozie/workspaces/hue-oozie-1452553957.19'
+    })
+
+    return data
+
+  @classmethod
+  def get_default_workflow(cls):
+    return {
+      "id": None,
+      "uuid": None,
+      "name": "My Workflow",
+      "nodes": [
+        {"id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "name": "Start", "type": "start-widget", "properties": {},
+         "children": [{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
+        {"id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "name": "End", "type": "end-widget", "properties": {},
+         "children": []},
+        {"id": "17c9c895-5a16-7443-bb81-f34b30b21548", "name": "Kill", "type": "kill-widget",
+         "properties": {'message': _('Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]')},
+         "children": []}
+      ]
+    }
+
+  @classmethod
+  def get_workflow_properties_for_user(cls, user, workflow=None):
+    workflow = workflow if workflow is not None else {}
+    properties = workflow.get('properties', None)
+    if not properties:
+      config = None
+      if user is not None:
+        config = DefaultConfiguration.objects.get_configuration_for_user(app=WorkflowConfiguration.APP_NAME, user=user)
+
+      if config is not None:
+        properties = config.properties_dict
+      else:
+        properties = cls.get_properties()
+
+      properties.update({
+        'wf1_id': None,
+        'description': ''
+      })
+    return properties
+
+  @staticmethod
+  def get_properties():
+    return dict((prop['key'], prop['value']) for prop in WorkflowConfiguration.PROPERTIES)
 
   @property
   def id(self):
@@ -149,70 +294,10 @@ class Workflow(Job):
   def uuid(self):
     return self.document.uuid
 
-  def get_json(self):
-    _data = self.get_data()
-
-    return json.dumps(_data)
-
-  def get_data(self):
-    _data = json.loads(self.data)
-
-    if self.document is not None:
-      _data['workflow']['id'] = self.document.id
-      _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid',))
-    else:
-      _data['workflow']['dependencies'] = []
-
-    if 'parameters' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['parameters'] = [
-          {'name': 'oozie.use.system.libpath', 'value': True},
-      ]
-    if 'show_arrows' not in _data['workflow']['properties']:
-      _data['workflow']['properties']['show_arrows'] = True
-
-    for node in _data['workflow']['nodes']:
-      if 'credentials' in node['properties']: # If node is an Action
-        if 'retry_max' not in node['properties']: # When displaying a workflow
-          node['properties']['retry_max'] = []
-        if 'retry_interval' not in node['properties']:
-          node['properties']['retry_interval'] = []
-
-      # Backward compatibility
-      _upgrade_older_node(node)
-
-    return _data
-
-  def to_xml(self, mapping=None):
-    if mapping is None:
-      mapping = {}
-    tmpl = 'editor2/gen/workflow.xml.mako'
-
-    data = self.get_data()
-    nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if node.name == 'End'] # End at the end
-    node_mapping = dict([(node.id, node) for node in nodes])
-
-    sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
-    workflow_mapping = dict([(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
-
-    xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
-              'wf': self,
-              'workflow': data['workflow'],
-              'nodes': nodes,
-              'mapping': mapping,
-              'node_mapping': node_mapping,
-              'workflow_mapping': workflow_mapping
-          }))
-    return force_unicode(xml.strip())
-
   @property
   def name(self):
     _data = self.get_data()
     return _data['workflow']['name']
-
-  def update_name(self, name):
-    _data = self.get_data()
-    _data['workflow']['name'] = name
-    self.data = json.dumps(_data)
 
   @property
   def deployment_dir(self):
@@ -223,15 +308,6 @@ class Workflow(Job):
   def parameters(self):
     _data = self.get_data()
     return _data['workflow']['properties']['parameters']
-
-  def override_subworkflow_id(self, sub_wf_action, workflow_id):
-    _data = self.get_data()
-
-    action = [_action for _action in _data['workflow']['nodes'] if _action['id'] == sub_wf_action.id]
-    if action:
-      action[0]['properties']['job_properties'].append({'name': Workflow.HUE_ID, 'value': workflow_id})
-
-    self.data = json.dumps(_data)
 
   @property
   def sla_enabled(self):
@@ -270,6 +346,80 @@ class Workflow(Job):
       params.update(node.find_parameters())
 
     return dict([(param, '') for param in list(params)])
+
+  def get_json(self):
+    _data = self.get_data()
+
+    return json.dumps(_data)
+
+  def get_data(self):
+    _data = json.loads(self.data)
+
+    if self.document is not None:
+      _data['workflow']['id'] = self.document.id
+      _data['workflow']['dependencies'] = list(self.document.dependencies.values('uuid', ))
+    else:
+      _data['workflow']['dependencies'] = []
+
+    if 'parameters' not in _data['workflow']['properties']:
+      _data['workflow']['properties']['parameters'] = [
+        {'name': 'oozie.use.system.libpath', 'value': True},
+      ]
+    if 'show_arrows' not in _data['workflow']['properties']:
+      _data['workflow']['properties']['show_arrows'] = True
+
+    for node in _data['workflow']['nodes']:
+      if 'credentials' in node['properties']:  # If node is an Action
+        if 'retry_max' not in node['properties']:  # When displaying a workflow
+          node['properties']['retry_max'] = []
+        if 'retry_interval' not in node['properties']:
+          node['properties']['retry_interval'] = []
+
+      # Backward compatibility
+      _upgrade_older_node(node)
+
+    return _data
+
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+    tmpl = 'editor2/gen/workflow.xml.mako'
+
+    data = self.get_data()
+    nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if
+                                                                   node.name == 'End']  # End at the end
+    node_mapping = dict([(node.id, node) for node in nodes])
+
+    sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
+    workflow_mapping = dict(
+      [(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
+
+    xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
+      'wf': self,
+      'workflow': data['workflow'],
+      'nodes': nodes,
+      'mapping': mapping,
+      'node_mapping': node_mapping,
+      'workflow_mapping': workflow_mapping
+    }))
+    return force_unicode(xml.strip())
+
+  def get_absolute_url(self):
+    return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
+
+  def override_subworkflow_id(self, sub_wf_action, workflow_id):
+    _data = self.get_data()
+
+    action = [_action for _action in _data['workflow']['nodes'] if _action['id'] == sub_wf_action.id]
+    if action:
+      action[0]['properties']['job_properties'].append({'name': Workflow.HUE_ID, 'value': workflow_id})
+
+    self.data = json.dumps(_data)
+
+  def update_name(self, name):
+    _data = self.get_data()
+    _data['workflow']['name'] = name
+    self.data = json.dumps(_data)
 
   def set_workspace(self, user):
     _data = json.loads(self.data)
@@ -340,100 +490,6 @@ class Workflow(Job):
           "nodes": [start_node, submit_node, end_node, kill_node]
       }
     })
-
-  def get_absolute_url(self):
-    return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
-
-  @classmethod
-  def get_application_path_key(cls):
-    return 'oozie.wf.application.path'
-
-  @classmethod
-  def gen_workflow_data_from_xml(cls, user, oozie_workflow):
-    node_list = []
-    try:
-      node_list = generate_v2_graph_nodes(oozie_workflow.definition)
-    except MalformedWfDefException, e:
-      LOG.exception("Could not find any nodes in Workflow definition. Maybe it's malformed?")
-    except InvalidTagWithNamespaceException, e:
-      LOG.exception("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s" % {
-      'namespace': e.namespace,
-      'namespaces': e.namespaces
-    })
-
-    _to_lowercase(node_list)
-    adj_list = _create_graph_adjaceny_list(node_list)
-
-    node_hierarchy = ['start']
-    _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
-
-    _update_adj_list(adj_list)
-
-    wf_rows = _create_workflow_layout(node_hierarchy, adj_list)
-    data = {'layout': [{}], 'workflow': {}}
-    if wf_rows:
-      data['layout'][0]['rows'] = wf_rows
-
-    wf_nodes = []
-    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes)
-    data['workflow']['nodes'] = wf_nodes
-    data['workflow']['id'] = "123"
-    data['workflow']['properties'] = json.loads("""{
-      "job_xml": "",
-      "description": "",
-      "wf1_id": null,
-      "sla_enabled": false,
-      "deployment_dir": "/user/hue/oozie/workspaces/hue-oozie-1452553957.19",
-      "schema_version": "uri:oozie:workflow:0.5",
-      "sla": [
-        {
-          "key": "enabled",
-          "value": false
-        },
-        {
-          "key": "nominal-time",
-          "value": "${nominal_time}"
-        },
-        {
-          "key": "should-start",
-          "value": ""
-        },
-        {
-          "key": "should-end",
-          "value": "${30 * MINUTES}"
-        },
-        {
-          "key": "max-duration",
-          "value": ""
-        },
-        {
-          "key": "alert-events",
-          "value": ""
-        },
-        {
-          "key": "alert-contact",
-          "value": ""
-        },
-        {
-          "key": "notification-msg",
-          "value": ""
-        },
-        {
-          "key": "upstream-apps",
-          "value": ""
-        }
-      ],
-      "show_arrows": true,
-      "parameters": [
-        {
-          "name": "oozie.use.system.libpath",
-          "value": true
-        }
-      ],
-      "properties": []
-    }""")
-
-    return data
 
 
 # Updates node_list to lowercase names
@@ -691,7 +747,7 @@ class Node():
     if 'archives' not in self.data['properties']:
       self.data['properties']['archives'] = []
     if 'sla' not in self.data['properties']:
-      self.data['properties']['sla'] = Workflow.SLA_DEFAULT
+      self.data['properties']['sla'] = WorkflowConfiguration.SLA_DEFAULT
     if 'retry_max' not in self.data['properties']:
       self.data['properties']['retry_max'] = []
     if 'retry_interval' not in self.data['properties']:
@@ -729,7 +785,7 @@ class Action(object):
   @classmethod
   def get_fields(cls):
     credentials = [cls.DEFAULT_CREDENTIALS] if hasattr(cls, 'DEFAULT_CREDENTIALS') else []
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', credentials)]
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', WorkflowConfiguration.SLA_DEFAULT), ('credentials', credentials)]
 
 
 class StartNode(Action):
@@ -2302,7 +2358,7 @@ class Coordinator(Job):
                   {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%M')},
                   {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M')}
               ],
-              'sla': Workflow.SLA_DEFAULT
+              'sla': WorkflowConfiguration.SLA_DEFAULT
           }
       }
 

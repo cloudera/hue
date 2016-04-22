@@ -93,7 +93,7 @@ SESSION_TIMEOUT_S = Config(
 
 CONFIG_WHITELIST = Config(
   key='config_whitelist',
-  default='debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s',
+  default='debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s,request_pool',
   type=coerce_csv,
   help=_t('A comma-separated list of white-listed Impala configuration properties that users are authorized to set.')
 )
