@@ -413,7 +413,7 @@ from desktop.views import _ko
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, draggableText: { text: editorText,  meta: {'table': tableName, 'database': databaseName} }"></span></a>
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
@@ -434,7 +434,7 @@ from desktop.views import _ko
           <!-- ko if: definition.isView -->
             <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span data-bind="css: {'query-builder-menu': definition.isColumn}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText }"></span>
+          <span data-bind="css: {'query-builder-menu': definition.isColumn}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
         </a>
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
         <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->

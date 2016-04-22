@@ -1330,19 +1330,27 @@ ${ hueIcons.symbols() }
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
-          snippet: $data,
-          openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
-          expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
-          onBlur: saveTemporarySnippet,
-          highlightedRange: result.statement_range,
-          aceOptions: {
-            showLineNumbers: $root.editorMode,
-            showGutter: $root.editorMode,
-            maxLines: $root.editorMode ? null : 25,
-            minLines: $root.editorMode ? null : 3
-          }
-        }"></div>
-      </div>
+        snippet: $data,
+        openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
+        expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
+        onBlur: saveTemporarySnippet,
+        highlightedRange: result.statement_range,
+        aceOptions: {
+          showLineNumbers: $root.editorMode,
+          showGutter: $root.editorMode,
+          maxLines: $root.editorMode ? null : 25,
+          minLines: $root.editorMode ? null : 3
+        }
+      }"></div>
+      <ul class="table-drop-menu hue-context-menu">
+        <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
+        <li class="divider"></li>
+        <li class="editor-drop-select"><a href="javascript:void(0);">${ _('SELECT FROM ') } <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-insert"><a href="javascript:void(0);">${ _('INSERT INTO') } <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-update"><a href="javascript:void(0);">${ _('UPDATE') } <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-delete"><a href="javascript:void(0);">${ _('DELETE FROM') } <span class="editor-drop-identifier"></span>...</a></li>
+      </ul>
+    </div>
     <div class="clearfix"></div>
     <ul data-bind="foreach: variables" class="unstyled inline">
         <li>
