@@ -1155,7 +1155,7 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="snippet">
-  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible(), selector: '.hover-actions' }">
+  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode, selector: '.hover-actions' }">
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode || inFocus, selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
@@ -1639,28 +1639,28 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type ="text/html" id="snippet-execution-controls">
-  <div class="snippet-actions" style="position: absolute; bottom: 0" data-bind="css: {'snippet-actions-compact': !$root.editorMode}">
+  <div class="snippet-actions" style="position: absolute; bottom: 0">
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
-      <i class="fa fa-fw fa-repeat"></i>
+      <i class="fa fa-fw fa-repeat snippet-side-single"></i>
     </a>
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode && result.statements_count() > 1">
       <span data-bind="text: result.statement_id() + 1"></span>/<span data-bind="text: result.statements_count()"></span>
     </div>
     <a class="snippet-side-btn blue" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Stop the currently running statement') }">
-      <i class="fa fa-fw fa-stop" data-bind="css: {'fa-spin': statusForButtons() == 'canceling'}"></i>
+      <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
     <a class="snippet-side-btn" data-bind="attr: {'title': $root.editorMode && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }">
-      <i class="fa fa-fw fa-play" data-bind="css: {'fa-spin': statusForButtons() == 'executing'}"></i>
+      <i class="fa fa-fw fa-play snippet-side-single"></i>
     </a>
-    <div class="dropdown">
-      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
+    <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }">
+      <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
         <i class="fa fa-fw fa-map-o"></i>
       </a>
       <!-- ko if: isSqlDialect -->
-      <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '' }">
+      <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '', 'blue': currentQueryTab() == 'queryExplain' }">
         <i class="fa fa-caret-down"></i>
       </a>
 
