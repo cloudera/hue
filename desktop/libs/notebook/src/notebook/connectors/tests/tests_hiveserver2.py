@@ -240,7 +240,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
         "id": 1234,
         "sessions": [{"type": "hive", "properties": [], "id": "1234"}],
         "type": "query-hive",
-        "name": "Test Hiveserver2 Editor"
+        "name": "Test Hiveserver2 Editor",
+        "isSaved": false,
+        "parentUuid": null
       }
     """
     self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
