@@ -76,15 +76,7 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": False,
       "multiple": False,
-      "value": '1',
-    }, {
-      "name": "totalExecutorCores",
-      "nice_name": _("Total Executor Cores"),
-      "help_text": _("number of cluster cores used by executor, only in standalone mode (Default: 1))"),
-      "type": "number",
-      "is_yarn": False,
-      "multiple": False,
-      "value": '1',
+      "value": '1G',
     },
     # YARN-only properties
     {
@@ -94,15 +86,7 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
-      "value": '1',
-    }, {
-      "name": "numExecutors",
-      "nice_name": _("Executors Number"),
-      "help_text": _("Number of executors to launch, only in cluster mode (Default: 2)"),
-      "type": "number",
-      "is_yarn": True,
-      "multiple": False,
-      "value": '2',
+      "value": 1,
     }, {
       "name": "executorMemory",
       "nice_name": _("Executor Memory"),
@@ -110,7 +94,7 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": True,
       "multiple": False,
-      "value": '1',
+      "value": '1G',
     }, {
       "name": "executorCores",
       "nice_name": _("Executor Cores"),
@@ -118,7 +102,7 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
-      "value": '1',
+      "value": 1,
     }, {
       "name": "queue",
       "nice_name": _("Queue"),
