@@ -1142,7 +1142,7 @@ ${ hueIcons.symbols() }
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 -->
     <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"  title="${ _('Selected database') }"></span> <i class="fa fa-caret-down"></i></a>
-    <div class="dropdown-menu" style="overflow-y: scroll; height: 200px;">
+    <div class="dropdown-menu" style="overflow-y: scroll; min-width: 170px; min-height: 34px; max-height: 200px;">
       <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: availableDatabases, minHeight: 34, container: '.dropdown-menu' }">
         <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a></li>
       </ul>
