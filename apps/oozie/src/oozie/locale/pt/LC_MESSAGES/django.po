@@ -3375,8 +3375,8 @@ msgstr "Programar"
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:31
 #: src/oozie/templates/editor/edit_bundle.mako:113
 #: src/oozie/templates/editor/edit_coordinator.mako:126
-msgid "UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day."
-msgstr "Hora UTC apenas (por exemplo, se quiser 22:00 PST (UTC+8), defina-a 8 horas depois para 06:00 do dia seguinte."
+msgid "UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to 6am the next day."
+msgstr "Hora UTC apenas (por exemplo, se quiser 22:00 PST (UTC-8), defina-a 8 horas depois para 06:00 do dia seguinte."
 
 #: src/oozie/templates/editor/create_coordinator.mako:211
 #: src/oozie/templates/editor/edit_bundle.mako:472
