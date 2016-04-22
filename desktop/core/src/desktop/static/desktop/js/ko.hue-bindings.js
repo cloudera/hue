@@ -61,7 +61,10 @@
       var $helper = $("<div>").text(ko.isObservable(options.text) ? options.text() : options.text).css("z-index", "99999");
       $element.draggable({
         helper: function () { return $helper },
-        appendTo: "body"
+        appendTo: "body",
+        start: function () {
+          huePubSub.publish('draggable.text.meta', options.meta);
+        }
       });
     }
   };
@@ -2890,6 +2893,62 @@
         }
       });
 
+      var $tableDropMenu = $el.next('.table-drop-menu');
+      var $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier')
+
+
+      var hideDropMenu = function () {
+        $tableDropMenu.css('opacity', 0);
+        window.setTimeout(function () {
+          $tableDropMenu.hide();
+        }, 300);
+      };
+
+      $(document).click(function (event) {
+        if ($tableDropMenu.find($(event.target)).length === 0) {
+          hideDropMenu();
+        };
+      });
+
+      var lastMeta = {};
+      huePubSub.subscribe('draggable.text.meta', function (meta) {
+        lastMeta = meta;
+        if (typeof meta !== 'undefined' && typeof meta.table !== 'undefined') {
+          $identifierDropMenu.text(meta.table)
+        }
+      });
+
+      var setFromDropMenu = function (text) {
+        var before = editor.getTextBeforeCursor();
+        if (before.length > 0 && before.charAt(before.length - 1) !== ' ') {
+          text = " " + text;
+        }
+        editor.session.insert(editor.getCursorPosition(), text);
+        hideDropMenu();
+        editor.focus();
+      }
+
+      $tableDropMenu.find('.editor-drop-value').click(function () {
+        setFromDropMenu(lastMeta.table);
+      });
+
+      $tableDropMenu.find('.editor-drop-select').click(function () {
+        setFromDropMenu('SELECT * FROM ' + lastMeta.table + ';');
+        $tableDropMenu.hide();
+      });
+
+      $tableDropMenu.find('.editor-drop-insert').click(function () {
+        setFromDropMenu('INSERT INTO ' + lastMeta.table + ' VALUES ();');
+      });
+
+      $tableDropMenu.find('.editor-drop-update').click(function () {
+        setFromDropMenu('UPDATE ' + lastMeta.table + ' SET ');
+      });
+
+      $tableDropMenu.find('.editor-drop-delete').click(function () {
+        setFromDropMenu('DELETE FROM ' + lastMeta.table + ' WHERE ');
+      });
+
       $el.droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
@@ -2897,16 +2956,39 @@
           var text = ui.helper.text();
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
-          if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
-            text = " " + text;
+          if (/.*;|^\s*$/.test(before)) {
+            $('.table-drop-menu').show();
+
+            $tableDropMenu.css('top', 0);
+            $tableDropMenu.css('left', 0);
+            $tableDropMenu.css('opacity', 0);
+            $tableDropMenu.show();
+            var menuWidth = $tableDropMenu.outerWidth(true)
+            if (e.clientX + menuWidth > $(window).width()) {
+              $tableDropMenu.css('left', e.clientX - menuWidth);
+            } else {
+              $tableDropMenu.css('left', e.clientX);
+            }
+
+            var menuHeight = $tableDropMenu.outerHeight(true);
+            if (e.clientY + menuHeight > $(window).height()) {
+              $tableDropMenu.css('top', $(window).height() - menuHeight);
+            } else {
+              $tableDropMenu.css('top', e.clientY);
+            }
+            $tableDropMenu.css('opacity', 1);
+          } else {
+            if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
+              text = " " + text;
+            }
+            var after = editor.getTextAfterCursor();
+            if (after.length > 0 && after.charAt(0) !== ' ' && text.charAt(text.length - 1) !== ' ') {
+              text += " ";
+            }
+            editor.session.insert(position, text);
+            position.column += text.length;
+            editor.clearSelection();
           }
-          var after = editor.getTextAfterCursor();
-          if (after.length > 0 && after.charAt(0) !== ' ' && text.charAt(text.length - 1) !== ' ') {
-            text += " ";
-          }
-          editor.session.insert(position, text);
-          position.column += text.length;
-          editor.clearSelection();
         }
       });
 
