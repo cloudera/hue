@@ -38,6 +38,9 @@ from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default
 
+from notebook.connectors.base import Notebook
+from notebook.views import upgrade_session_properties
+
 
 LOG = logging.getLogger(__name__)
 
@@ -146,7 +149,14 @@ def get_document(request):
   }
 
   if with_data:
-    response['data'] = json.loads(document.data)
+    data = json.loads(document.data)
+    # Upgrade session properties for Hive and Impala
+    if document.type.startswith('query'):
+      notebook = Notebook(document=document)
+      notebook = upgrade_session_properties(request, notebook)
+      data = json.loads(notebook.data)
+
+    response['data'] = data
 
   if with_dependencies:
     response['dependencies'] = [dependency.uuid for dependency in document.dependencies.all()]
