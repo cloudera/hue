@@ -875,11 +875,8 @@ table.airy tr td {
   color: #338bb8;
 }
 
-.snippet-actions-compact > .snippet-side-btn {
-  line-height: 20px;
-  height: 20px;
-  min-height: 20px;
-  padding: 0 4px;
+.snippet-side-single {
+  padding: 0 3px;
 }
 
 .execution-timer {
