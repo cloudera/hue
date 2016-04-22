@@ -689,7 +689,7 @@
         return;
       }
 
-      self.result.clear();
+      self.result.explanation('');
       self.status('ready');
 
       $.post("/notebook/api/explain", {
