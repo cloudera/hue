@@ -29,6 +29,11 @@ from desktop.models import DefaultConfiguration
 from notebook.connectors.hiveserver2 import HiveConfiguration, ImpalaConfiguration
 from notebook.connectors.spark_shell import SparkConfiguration
 
+try:
+  from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration
+except ImportError, e:
+  OozieWorkflowConfiguration = None
+
 
 LOG = logging.getLogger(__name__)
 
@@ -53,6 +58,10 @@ def get_configurable():
   # TODO: Use metaclasses to self-register configurable apps
   app_configs = {}
   config_classes = [HiveConfiguration, ImpalaConfiguration, SparkConfiguration]
+
+  # Optional configurable classes from installed apps
+  if OozieWorkflowConfiguration is not None:
+    config_classes.append(OozieWorkflowConfiguration)
 
   for config_cls in config_classes:
     if not hasattr(config_cls, 'APP_NAME') or not hasattr(config_cls, 'PROPERTIES'):

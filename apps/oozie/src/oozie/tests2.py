@@ -25,14 +25,15 @@ from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
-from desktop.lib.test_utils import add_permission, remove_from_group
-from desktop.models import Document2
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
+from desktop.models import DefaultConfiguration, Document2
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
-from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
+from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
+    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
-from desktop.lib.django_test_util import make_logged_in_client
 
 
 LOG = logging.getLogger(__name__)
@@ -345,7 +346,7 @@ LIMIT $limit"""))
                   {'name': 'start_date', 'value': ''},
                   {'name': 'end_date', 'value': ''}
               ],
-              'sla': Workflow.SLA_DEFAULT
+              'sla': WorkflowConfiguration.SLA_DEFAULT
           }
       }
     wf_doc3 = Document2.objects.create(name='test', type='oozie-coordinator2', owner=User.objects.get(username='test'), data=data)
@@ -415,10 +416,87 @@ LIMIT $limit"""))
       wf_doc.delete()
 
 
-class TestExternalWorkflowGraph():
+  def test_workflow_properties(self):
+    # Test that a new workflow will be initialized with default properties if no saved configs exist
+    wf = Workflow(user=self.user)
+    data = json.loads(wf.data)
+    assert_equal(data['workflow']['properties'], Workflow.get_workflow_properties_for_user(self.user))
+
+    # Setup a test Default configuration, NOTE: this is an invalid format for testing only
+    properties = [
+      {
+        'multiple': False,
+        'value': '/user/test/oozie',
+        'nice_name': 'Workspace',
+        'key': 'deployment_dir',
+        'help_text': 'Specify the deployment directory.',
+        'type': 'hdfs-files'
+      }, {
+        'multiple': True,
+        'value': [
+            {
+              'value': 'test',
+              'key': 'mapred.queue.name'
+            }
+        ],
+        'nice_name': 'Hadoop Properties',
+        'key': 'properties',
+        'help_text': 'Hadoop configuration properties.',
+        'type': 'settings'
+      }
+    ]
+    config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME, properties=json.dumps(properties), is_default=True)
+    config.save()
+    wf_props = config.properties_dict
+    wf_props.update({'wf1_id': None, 'description': ''})
+
+    # Test that a new workflow will be initialized with Default saved config if it exists
+    wf = Workflow(user=self.user)
+    data = json.loads(wf.data)
+    assert_equal(data['workflow']['properties'], wf_props)
+
+    # Test that a new workflow will be initialized with Group saved config if it exists
+    properties = [
+        {
+            'multiple': True,
+            'value': [
+                {
+                    'value': 'org.myorg.WordCount.Map',
+                    'key': 'mapred.mapper.class'
+                },
+                {
+                    'value': 'org.myorg.WordCount.Reduce',
+                    'key': 'mapred.reducer.class'
+                }
+            ],
+            'nice_name': 'Hadoop Properties',
+            'key': 'properties',
+            'help_text': 'Hadoop configuration properties.',
+            'type': 'settings'
+        }
+    ]
+    config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME,
+                                  properties=json.dumps(properties),
+                                  is_default=False,
+                                  group=self.user.groups.first())
+    config.save()
+    wf_props = config.properties_dict
+    wf_props.update({'wf1_id': None, 'description': ''})
+
+    # Test that a new workflow will be initialized with Default saved config if it exists
+    wf = Workflow(user=self.user)
+    data = json.loads(wf.data)
+    assert_equal(data['workflow']['properties'], wf_props)
+
+class TestExternalWorkflowGraph(object):
 
   def setUp(self):
     self.wf = Workflow()
+
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "oozie")
+    add_to_group("test")
+    self.user = User.objects.get(username='test')
 
   def test_graph_generation_from_xml(self):
     f = open('apps/oozie/src/oozie/test_data/xslt2/test-workflow.xml')
@@ -573,7 +651,7 @@ class TestExternalWorkflowGraph():
         <end name="End"/>
     </workflow-app>"""
 
-    workflow_data = Workflow.gen_workflow_data_from_xml('test', self.wf)
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
 
     assert_true(len(workflow_data['layout'][0]['rows']) == 6)
     assert_true(len(workflow_data['workflow']['nodes']) == 14)
@@ -600,7 +678,7 @@ class TestExternalWorkflowGraph():
         <end name="End"/>
     </workflow-app>"""
 
-    workflow_data = Workflow.gen_workflow_data_from_xml('test', self.wf)
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
 
     assert_true(len(workflow_data['layout'][0]['rows']) == 4)
     assert_true(len(workflow_data['workflow']['nodes']) == 4)

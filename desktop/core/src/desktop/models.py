@@ -120,9 +120,21 @@ class DefaultConfiguration(models.Model):
 
   @property
   def properties_list(self):
+    """
+    :return: Deserialized properties as a list of property objects
+    """
     if not self.properties:
       self.properties = json.dumps([])
     return json.loads(self.properties)
+
+  @property
+  def properties_dict(self):
+    """
+    :return: Deserialized properties as a dict of key: value pairs
+    """
+    if not self.properties:
+      self.properties = json.dumps([])
+    return dict((prop['key'], prop['value']) for prop in json.loads(self.properties))
 
   def to_dict(self):
     return {

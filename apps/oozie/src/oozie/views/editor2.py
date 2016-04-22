@@ -228,7 +228,7 @@ def save_workflow(request):
 
   if workflow['properties'].get('imported'): # We save and old format workflow to the latest
     workflow['properties']['imported'] = False
-    workflow_instance = Workflow(workflow=workflow)
+    workflow_instance = Workflow(workflow=workflow, user=request.user)
     _import_workspace(request.fs, request.user, workflow_instance)
     workflow['properties']['deployment_dir'] = workflow_instance.deployment_dir
     response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
@@ -364,7 +364,7 @@ def gen_xml_workflow(request):
   try:
     workflow_json = json.loads(request.POST.get('workflow', '{}'))
 
-    workflow = Workflow(workflow=workflow_json)
+    workflow = Workflow(workflow=workflow_json, user=request.user)
 
     response['status'] = 0
     response['xml'] = workflow.to_xml()
