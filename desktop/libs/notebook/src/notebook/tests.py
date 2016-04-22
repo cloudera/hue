@@ -57,7 +57,9 @@ class TestNotebookApi(object):
         "type": "query-hive",
         "id": 50010,
         "snippets": [],
-        "uuid": "5982a274-de78-083c-2efc-74f53dce744c"
+        "uuid": "5982a274-de78-083c-2efc-74f53dce744c",
+        "isSaved": false,
+        "parentUuid": null
     }
     """
 
