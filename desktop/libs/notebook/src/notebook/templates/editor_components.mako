@@ -1050,7 +1050,7 @@ ${ hueIcons.symbols() }
                   <!-- /ko -->
                   <!-- /ko -->
                 </td>
-                <td style="width: 25px" class="muted" data-bind="text: name"></td>
+                <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name, length: 30}"></td>
                 <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
               </tr>
             </tbody>

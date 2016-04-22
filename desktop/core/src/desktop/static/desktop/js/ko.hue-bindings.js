@@ -3851,4 +3851,20 @@
     }
   };
 
+  ko.bindingHandlers.ellipsis = {
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      var value = ko.unwrap(valueAccessor());
+      var $element = $(element);
+      var chopLength = value.length ? value.length : 30;
+      var text = typeof value === 'object' ? value.data : value;
+      if (text.length > chopLength) {
+        $element.attr('title', text);
+        $element.text(text.substr(0, chopLength) + '...');
+      }
+      else {
+        $element.text(text);
+      }
+    }
+};
+
 }));
