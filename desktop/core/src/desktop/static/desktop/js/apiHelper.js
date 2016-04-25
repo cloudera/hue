@@ -32,6 +32,7 @@
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
+  var CONFIG_APPS_API = '/desktop/api/configurations/apps';
 
   /**
    * @param {Object} i18n
@@ -201,6 +202,26 @@
   };
 
   /**
+   * @param {string} url
+   * @param {Object} data
+   * @param {Object} options
+   * @param {function} [options.successCallback]
+   * @param {function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.simpleGet = function (url, data, options) {
+    var self = this;
+    $.get(url, data, function (data) {
+      if (self.successResponseIsError(data)) {
+        self.assistErrorCallback(options)(data);
+      } else if (typeof options.successCallback !== 'undefined') {
+        options.successCallback(data);
+      }
+    })
+    .fail(self.assistErrorCallback(options));
+  };
+
+  /**
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
@@ -256,6 +277,17 @@
       queueForFunction[id] = [];
     }
     return queueForFunction[id];
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} [options.successCallback]
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.fetchConfigurations = function (options) {
+    var self = this;
+    self.simpleGet(CONFIG_APPS_API, {}, options);
   };
 
   /**
