@@ -23,7 +23,8 @@ from sentry_generic_policy_service import SentryGenericPolicyService
 from sentry_generic_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TAuthorizable, TCreateSentryRoleRequest, \
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TAlterSentryRoleDeleteGroupsRequest, \
-    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TDropPrivilegesRequest, TRenamePrivilegesRequest
+    TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TDropPrivilegesRequest, TRenamePrivilegesRequest, \
+    TListSentryPrivilegesByAuthRequest
 
 from libsentry.sentry_site import get_sentry_server_authentication,\
   get_sentry_server_principal
@@ -175,13 +176,9 @@ class SentryClient(object):
 
 
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
-#     authorizableSet = [TAuthorizable(**authorizable) for authorizable in authorizableSet]
-#     if roleSet is not None:
-#       roleSet = TSentryActiveRoleSet(**roleSet)
-#
-#     request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
-#     return self.client.list_sentry_privileges_by_authorizable(request)
-    return type('Response', (object,), {
-        'status': type('Status', (object,), {'value': 0}),
-        'privilegesMapByAuth': {}
-    })
+    authorizableSet = [TAuthorizable(**authorizable) for authorizable in authorizableSet]
+    if roleSet is not None:
+      roleSet = TSentryActiveRoleSet(**roleSet)
+
+    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
+    return self.client.list_sentry_privileges_by_authorizable(request)
