@@ -950,8 +950,16 @@ from django.utils.translation import ugettext as _
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
         $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.selectedFile().path, function (data) {
-          self.contentSummary(ko.mapping.fromJS(data));
-          self.isLoadingSummary(false);
+          if (data.status == 0) {
+            self.contentSummary(ko.mapping.fromJS(data.summary));
+            self.isLoadingSummary(false);
+          } else {
+            $(document).trigger("error", data.message);
+            $("#contentSummaryModal").modal("hide");
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+          $("#contentSummaryModal").modal("hide");
         });
       }
 
