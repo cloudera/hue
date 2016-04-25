@@ -1235,60 +1235,6 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
-<script type="text/html" id="property">
-  <div data-bind="visibleOnHover: { selector: '.hover-actions' }, css: { 'spark-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
-    <label class="control-label" data-bind="style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }">
-      <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
-    </label>
-    <div class="controls" style="margin-right:10px;" data-bind="style: { 'margin-left' : typeof inline === 'undefined' || inline ? '140px' : '' }">
-      <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
-    </div>
-    <!-- ko if: typeof remove !== "undefined" -->
-    <div class="hover-actions spark-property-remove">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
-        <i class="fa fa-times"></i>
-      </a>
-    </div>
-    <!-- /ko -->
-  </div>
-</script>
-
-<script type="text/html" id="property-jvm">
-  <div data-bind="component: { name: 'jvm-memory-input', params: { value: value } }"></div>
-</script>
-
-<script type="text/html" id="property-number">
-  <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown', attr: { 'title': typeof title === 'undefined' ? '' : title }"/>
-</script>
-
-<script type="text/html" id="property-string">
-  <input class="input-small" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
-</script>
-
-<script type="text/html" id="property-csv">
-  <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
-</script>
-
-<script type="text/html" id="property-settings">
-  <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
-</script>
-
-<script type="text/html" id="property-hdfs-files">
-  <div data-bind="component: { name: 'hdfs-file-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
-</script>
-
-<script type="text/html" id="property-csv-hdfs-files">
-  <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-csv-hdfs-file-input', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
-</script>
-
-<script type="text/html" id="property-csv-hdfs-file-input">
-  <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
-</script>
-
-<script type="text/html" id="property-functions">
-  <div data-bind="component: { name: 'function-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
-</script>
-
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
