@@ -517,8 +517,15 @@ def stat(request, path):
 def content_summary(request, path):
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
-    stats = request.fs.get_content_summary(path)
-    return JsonResponse(stats.summary)
+
+    response = {'status': -1, 'message': '', 'summary': None}
+    try:
+        stats = request.fs.get_content_summary(path)
+        response['status'] = 0
+        response['summary'] = stats.summary
+    except WebHdfsException, e:
+        response['message'] = _("The file could not be saved") + e.message.splitlines()[0]
+    return JsonResponse(response)
 
 
 def display(request, path):
