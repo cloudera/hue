@@ -175,10 +175,11 @@ class SentryClient(object):
     return self.client.list_sentry_privileges_for_provider(request)
 
 
-  def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
-    authorizableSet = [TAuthorizable(**authorizable) for authorizable in authorizableSet]
+  def list_sentry_privileges_by_authorizable(self, serviceName, authorizableSet, groups=None, roleSet=None):
+    authorizableSet = ['%s->%s' % (_auth['type'], _auth['name']) for _authSet in authorizableSet for _auth in _authSet['authorizables']]
+
     if roleSet is not None:
       roleSet = TSentryActiveRoleSet(**roleSet)
 
-    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
+    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, serviceName=serviceName, authorizablesSet=set(authorizableSet), groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)

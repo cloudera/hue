@@ -352,12 +352,13 @@ def list_sentry_privileges_by_authorizable(request):
 
   try:
     groups = [request.POST['groupName']] if request.POST['groupName'] else None
+    serviceName = request.POST['server']
     authorizableSet = [json.loads(request.POST['authorizableHierarchy'])]
     component = request.POST['component']
 
     _privileges = []
 
-    for authorizable, roles in get_api(request.user, component).list_sentry_privileges_by_authorizable(authorizableSet=authorizableSet, groups=groups):
+    for authorizable, roles in get_api(request.user, component).list_sentry_privileges_by_authorizable(serviceName=serviceName, authorizableSet=authorizableSet, groups=groups):
       for role, privileges in roles.iteritems():
         for privilege in privileges:
           privilege['roleName'] = role
