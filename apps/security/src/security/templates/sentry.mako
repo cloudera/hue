@@ -57,25 +57,25 @@ ${ layout.menubar(section=component) }
 
     <!-- ko if: $root.component() == 'hive' -->
       <div class="inline-block" style="vertical-align: middle">
-        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions()[0]) }">
-          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db', 'fa-check-circle-o': privilegeType() == 'db'}"></i>
+        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('DATABASE'); action($root.availableActions()[0]) }">
+          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'DATABASE', 'fa-check-circle-o': privilegeType() == 'DATABASE'}"></i>
         </a>
       </div>
-      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
+      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'DATABASE'" placeholder="dbName.tableName <CTRL+SPACE>">
 
       <div class="inline-block" style="vertical-align: middle">
-        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
-          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri', 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
+        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('URI'); action('ALL'); }">
+          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'URI', 'fa-check-circle-o': privilegeType() == 'URI'}"></i>
         </a>
       </div>
 
-      <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'uri'" placeholder="URI">
+      <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'URI'" placeholder="URI">
 
-      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
+      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'DATABASE')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
     <!-- ko if: $root.component() == 'solr' -->
-      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path, enable: privilegeType() == 'db'" placeholder="collection name <CTRL+SPACE>">
-      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
+      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection name <CTRL+SPACE>">
+      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'COLLECTION')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
     <div class="new-line-if-small">
@@ -103,21 +103,22 @@ ${ layout.menubar(section=component) }
     </div>
     <!-- /ko -->
 
-    <span class="muted" data-bind="text: privilegeScope, attr: {title: moment(timestamp()).fromNow()}"></span>
+    <span class="muted" data-bind="text: privilegeType, attr: {title: moment(timestamp()).fromNow()}"></span>
 
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
 
     <!-- ko if: $root.component() == 'hive' -->
-      <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
+      <span data-bind="visible: metastorePath() != '' && privilegeType() == 'DATABASE'">
         <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
       </span>
       <br/>
 
       server=<span data-bind="text: serverName"></span>
 
-      <!-- ko if: privilegeType() == 'db' -->
+      <!-- ko if: privilegeType() == 'DATABASE' -->
+        // TODO
         <span data-bind="visible: dbName">
           <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
         </span>
@@ -129,7 +130,7 @@ ${ layout.menubar(section=component) }
         </span>
       <!-- /ko -->
 
-      <!-- ko if: privilegeType() == 'uri' -->
+      <!-- ko if: privilegeType() == 'URI' -->
         <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
       <!-- /ko -->
 
@@ -604,7 +605,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     function deletePrivilegeModal(role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
-          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE'); }
+        return privilege.status() == 'deleted' && (privilege.privilegeType() == 'SERVER' || privilege.privilegeType() == 'DATABASE'); }
       );
       if (cascadeDeletes.length > 0 ) {
         viewModel.roleToUpdate(role);
