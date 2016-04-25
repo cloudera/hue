@@ -76,6 +76,8 @@ def list_groups(request):
 def list_permissions(request):
   return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
+def list_configurations(request):
+  return render("list_configurations.mako", request, {})
 
 def list_for_autocomplete(request):
   if request.ajax:

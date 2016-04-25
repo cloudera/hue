@@ -60,6 +60,7 @@ def is_selected(section, matcher):
               <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
 				      <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
 				      <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
+              <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
               %endif
             </ul>
           </div>
