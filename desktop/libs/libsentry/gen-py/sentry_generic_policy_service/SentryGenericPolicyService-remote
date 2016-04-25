@@ -33,6 +33,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print('  TListSentryRolesResponse list_sentry_roles_by_group(TListSentryRolesRequest request)')
   print('  TListSentryPrivilegesResponse list_sentry_privileges_by_role(TListSentryPrivilegesRequest request)')
   print('  TListSentryPrivilegesForProviderResponse list_sentry_privileges_for_provider(TListSentryPrivilegesForProviderRequest request)')
+  print('  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(TListSentryPrivilegesByAuthRequest request)')
   print('  TDropPrivilegesResponse drop_sentry_privilege(TDropPrivilegesRequest request)')
   print('  TRenamePrivilegesResponse rename_sentry_privilege(TRenamePrivilegesRequest request)')
   print('')
@@ -144,6 +145,12 @@ elif cmd == 'list_sentry_privileges_for_provider':
     print('list_sentry_privileges_for_provider requires 1 args')
     sys.exit(1)
   pp.pprint(client.list_sentry_privileges_for_provider(eval(args[0]),))
+
+elif cmd == 'list_sentry_privileges_by_authorizable':
+  if len(args) != 1:
+    print('list_sentry_privileges_by_authorizable requires 1 args')
+    sys.exit(1)
+  pp.pprint(client.list_sentry_privileges_by_authorizable(eval(args[0]),))
 
 elif cmd == 'drop_sentry_privilege':
   if len(args) != 1:
