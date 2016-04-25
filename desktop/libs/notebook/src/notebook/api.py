@@ -322,12 +322,13 @@ def get_history(request):
         'name': doc.name,
         'id': doc.id,
         'uuid': doc.uuid,
+        'type': doc.type,
         'data': {
             'statement_raw': notebook['snippets'][0]['statement_raw'][:1001],
             'lastExecuted':  notebook['snippets'][0]['lastExecuted'],
             'status':  notebook['snippets'][0]['status'],
             'parentUuid': notebook.get('parentUuid', '')
-        },
+        } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),
       })
     else:

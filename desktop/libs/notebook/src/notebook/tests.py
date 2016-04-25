@@ -150,7 +150,7 @@ class TestNotebookApi(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
     assert_equal(3, len(data['history']), data)
-    assert_true(all(doc['data']['type'] == 'query-hive' for doc in data['history']), data)
+    assert_true(all(doc['type'] == 'query-hive' for doc in data['history']), data)
 
     # TODO: test that query history for shared query only returns docs accessible by current user
 
