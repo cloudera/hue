@@ -195,6 +195,7 @@ struct TSentryActiveRoleSet {
 1: required bool all,
 2: required set<string> roles,
 }
+
 struct TListSentryPrivilegesForProviderRequest {
 1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string component, # The request is issued to which component
@@ -203,9 +204,54 @@ struct TListSentryPrivilegesForProviderRequest {
 5: required TSentryActiveRoleSet roleSet,
 6: optional list<TAuthorizable>  authorizables # authorizable hierarchys
 }
+
 struct TListSentryPrivilegesForProviderResponse {
 1: required TSentryResponseStatus status
 2: required set<string> privileges
+}
+
+# Map of role:set<privileges> for the given authorizable
+# Optionally use the set of groups to filter the roles
+struct TSentryPrivilegeMap {
+1: required map<string, set<TSentryPrivilege>> privilegeMap
+}
+
+struct TListSentryPrivilegesByAuthRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
+
+# User on whose behalf the request is issued
+2: required string requestorUserName,
+
+# The request is issued to which component
+3: required string component,
+
+# The privilege belongs to which service
+4: required string serviceName,
+
+# The authorizable hierarchys, it is represented as a string. e.g
+# resourceType1=resourceName1->resourceType2=resourceName2->resourceType3=resourceName3
+5: required set<string> authorizablesSet,
+
+# The requested groups. For admin, the requested groups can be empty, if so it is
+# treated as a wildcard query. Otherwise, it is a query on this specifc groups.
+# For non-admin user, the requested groups must be the groups they are part of.
+6: optional set<string> groups,
+
+# The active role set.
+7: optional TSentryActiveRoleSet roleSet
+}
+
+struct TListSentryPrivilegesByAuthResponse {
+1: required sentry_common_service.TSentryResponseStatus status,
+
+# Will not be set in case of an error. Otherwise it will be a
+# <Authorizables, <Role, Set<Privileges>>> mapping. For non-admin
+# requestor, the roles are intersection of active roles and granted roles.
+# For admin requestor, the roles are filtered based on the active roles
+# and requested group from TListSentryPrivilegesByAuthRequest.
+# The authorizable hierarchys is represented as a string in the form
+# of the request.
+2: optional map<string, TSentryPrivilegeMap> privilegesMapByAuth
 }
 
 service SentryGenericPolicyService
@@ -224,6 +270,8 @@ service SentryGenericPolicyService
   TListSentryPrivilegesResponse list_sentry_privileges_by_role(1:TListSentryPrivilegesRequest request)
 
   TListSentryPrivilegesForProviderResponse list_sentry_privileges_for_provider(1:TListSentryPrivilegesForProviderRequest request)
+
+  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(1:TListSentryPrivilegesByAuthRequest request);
 
   TDropPrivilegesResponse drop_sentry_privilege(1:TDropPrivilegesRequest request);
 
