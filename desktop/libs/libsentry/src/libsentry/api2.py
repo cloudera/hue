@@ -162,8 +162,8 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
-    response = self.client.list_sentry_privileges_by_authorizable(authorizableSet, groups, roleSet)
+  def list_sentry_privileges_by_authorizable(self, serviceName, authorizableSet, groups=None, roleSet=None):
+    response = self.client.list_sentry_privileges_by_authorizable(serviceName, authorizableSet, groups, roleSet)
 
     if response.status.value != 0:
       raise SentryException(response)

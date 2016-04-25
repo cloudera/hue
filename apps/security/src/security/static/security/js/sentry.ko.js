@@ -1152,9 +1152,15 @@ var SentryViewModel = function (initial) {
     if (optionalPath != null) {
       var paths = optionalPath.split(/[.]/);
 
-      if (paths[0]) { authorizables.push({'type': 'db', 'name': paths[0]}); }
-      if (paths[1]) { authorizables.push({'type': 'table', 'name': paths[1]}); }
-      if (paths[2]) { authorizables.push({'type': 'column', 'name': paths[2]}); }
+      if (paths[0]) {
+        authorizables.push({'type': 'db', 'name': paths[0]});
+      }
+      if (paths[1]) {
+        authorizables.push({'type': 'table', 'name': paths[1]});
+      }
+      if (paths[2]) {
+        authorizables.push({'type': 'column', 'name': paths[2]});
+      }
     } else {
       authorizables.push({'type': 'column', 'name': self.assist.db()});
       authorizables.push({'type': 'table', 'name': self.assist.table()});
@@ -1222,7 +1228,8 @@ var SentryViewModel = function (initial) {
       type: "POST",
       url: "/security/api/sentry/list_sentry_privileges_by_authorizable",
       data: {
-        groupName: $('#selectedGroup').val(),
+        server: self.server(),
+    	groupName: $('#selectedGroup').val(),
         roleSet: ko.mapping.toJSON({all: true, roles: []}),
         authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path)),
         component: self.component()
