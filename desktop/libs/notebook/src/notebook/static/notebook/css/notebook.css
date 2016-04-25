@@ -751,30 +751,6 @@ table.airy tr td {
   min-width: 350px;
 }
 
-.spark-property {
-  display: inline-block;
-  vertical-align: top;
-  padding-top:10px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.spark-property-remove {
-  position: absolute;
-  top: -8px;
-  z-index: 1000;
-  right: 0;
-}
-
-.property-help {
-  display: inline-block;
-  width: 10px;
-  height: 14px;
-  margin-left: 7px;
-  font-size: 14px;
-  color: #888;
-}
-
 .hover-dropdown {
   display: inline-block;
   position: relative;

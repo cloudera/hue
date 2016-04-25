@@ -19,10 +19,11 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="koComponents" file="/ko_components.mako" />
+<%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
+<%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
 ${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
 
@@ -39,12 +40,8 @@ ${ editorComponents.commonHTML() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
-${ koComponents.csvListInput() }
-${ koComponents.keyValueListInput() }
-${ koComponents.hdfsFileListInput() }
-${ koComponents.functionListInput() }
-${ koComponents.jvmMemoryInput() }
-${ koComponents.downloadSnippetResults() }
+${ configKoComponents.config() }
+${ notebookKoComponents.downloadSnippetResults() }
 
 ${ editorComponents.commonJS() }
 
