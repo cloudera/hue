@@ -243,7 +243,7 @@ def save_notebook(request):
 
   if notebook.get('parentUuid'):
     notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])
-    notebook_doc.can_read_or_exception(notebook['parentUuid'])
+    notebook_doc.can_read_or_exception(request.user)
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
