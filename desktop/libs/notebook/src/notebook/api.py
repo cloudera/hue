@@ -239,10 +239,7 @@ def save_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
-  parent_uuid = notebook.get('parent_uuid', None)
-  parent_directory = Document2.objects.get_home_directory(request.user)
-  if parent_uuid:
-    parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
+  directory_uuid = request.POST.get('directory_uuid', None)
 
   if notebook.get('parentUuid'):
     notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])
@@ -253,6 +250,11 @@ def save_notebook(request):
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
 
+    if directory_uuid:
+      notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=directory_uuid, perm_type='write')
+    else:
+      notebook_doc.parent_directory = Document2.objects.get_home_directory(request.user)
+
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
@@ -260,7 +262,6 @@ def save_notebook(request):
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
   notebook_doc.description = notebook_doc1.description = notebook['description']
-  notebook_doc.parent_directory = parent_directory
   notebook_doc.save()
   notebook_doc1.save()
 

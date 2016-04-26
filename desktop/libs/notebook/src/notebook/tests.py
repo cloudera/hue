@@ -70,21 +70,23 @@ class TestNotebookApi(object):
 
 
   def test_save_notebook(self):
-    # Test that saving an existing document with a new parent will update the parent_directory
+    # Test that saving a new document with a new parent will set the parent_directory
     home_dir = Document2.objects.get_home_directory(self.user)
     assert_equal(home_dir.uuid, self.doc2.parent_directory.uuid)
 
     new_dir = Directory.objects.create(name='new_dir', owner=self.user, parent_directory=home_dir)
-    self.notebook['parent_uuid'] = new_dir.uuid
-    notebook_json = json.dumps(self.notebook)
-    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json, 'parent_uuid': new_dir.uuid})
+    notebook_cp = self.notebook.copy()
+    notebook_cp.pop('id')
+    notebook_json = json.dumps(notebook_cp)
+
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json, 'directory_uuid': new_dir.uuid})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
-    doc = Document2.objects.get(pk=self.doc2.id)
+    doc = Document2.objects.get(pk=data['id'])
     assert_equal(new_dir.uuid, doc.parent_directory.uuid)
 
-    # Test that saving a new document with a specific parent will map it to that parent directory
+    # Test that saving a new document with no parent will map it to its home dir
     notebook_json = """
       {
         "selectedSnippet": "hive",
@@ -100,11 +102,10 @@ class TestNotebookApi(object):
         ],
         "type": "query-hive",
         "id": null,
-        "parent_uuid": "%(uuid)s",
         "snippets": [],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
-    """ % {'uuid': new_dir.uuid}
+    """
 
     response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
     data = json.loads(response.content)
@@ -112,7 +113,7 @@ class TestNotebookApi(object):
     assert_equal(0, data['status'], data)
     id = data['id']
     doc = Document2.objects.get(pk=id)
-    assert_equal(new_dir.uuid, doc.parent_directory.uuid)
+    assert_equal(Document2.objects.get_home_directory(self.user).uuid, doc.parent_directory.uuid)
 
 
   def test_historify(self):
