@@ -14,14 +14,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import StringIO
+
 """
 Common library to export either CSV or XLS.
 """
 import gc
 import logging
-import tablib
 import openpyxl
+import re
+import StringIO
+import tablib
 
 from django.http import StreamingHttpResponse
 from django.utils.encoding import smart_str
@@ -30,13 +32,21 @@ from desktop.lib import i18n
 
 LOG = logging.getLogger(__name__)
 
+XLS_ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
+
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
 
-def encode_row(row, encoding=None):
-  return [smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace') for cell in row]
+def encode_row(row, encoding=None, is_xls=False):
+  encoded_row = []
+  for cell in row:
+    if is_xls and isinstance(cell, str):
+      cell = re.sub(XLS_ILLEGAL_CHARS, '?', cell)
+    cell = smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
+    encoded_row.append(cell)
+  return encoded_row
 
 
 def dataset(headers, data, encoding=None):
@@ -82,12 +92,12 @@ def create_generator(content_generator, format, encoding=None):
     for _headers, _data in content_generator:
       # Write headers to workbook once
       if _headers and row_ctr == 0:
-        worksheet.append(encode_row(_headers, encoding))
+        worksheet.append(encode_row(_headers, encoding, is_xls=True))
         row_ctr += 1
 
       # Write row data to workbook
       for row in _data:
-        worksheet.append(encode_row(row, encoding))
+        worksheet.append(encode_row(row, encoding, is_xls=True))
         row_ctr += 1
 
     yield xls_dataset(workbook).xls
