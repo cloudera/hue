@@ -583,6 +583,8 @@
         }
       });
 
+      self.currentQueryTab('queryHistory');
+
       if (self.result.fetchedOnce()) {
         self.close();
         self.statusForButtons('executed');
@@ -592,7 +594,6 @@
         notebook: vm.editorMode ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
-        self.currentQueryTab('queryResults');
         self.statusForButtons('executed');
         if (vm.editorMode && data.history_id) {
           var url = '/notebook/editor?editor=' + data.history_id;
@@ -762,6 +763,10 @@
 
     self.loadData = function (data, rows) {
       rows -= data.result.data.length;
+
+      if (data.result.data.length > 0) {
+        self.currentQueryTab('queryResults');
+      }
 
       var _initialIndex = self.result.data().length;
       var _tempData = [];
