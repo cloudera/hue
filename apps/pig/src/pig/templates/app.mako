@@ -192,6 +192,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
             <div id="queryColumn" class="span9">
               <a id="navigatorShow" href="#" title="${_('Show the assist')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:30px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
               <form id="queryForm">
+                ${ csrf_token(request) | n,unicode }
                 <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
               </form>
             </div>
@@ -346,6 +347,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
             <h3><span data-bind="text: currentScript().name"></span></h3>
           </div>
           <form class="form-inline" style="padding-left: 10px">
+            ${ csrf_token(request) | n,unicode }
             <label>
               ${ _('Script name') } &nbsp;
               <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
