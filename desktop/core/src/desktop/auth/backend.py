@@ -173,7 +173,9 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   ModelBackend.
   """
   def authenticate(self, username=None, password=None):
+    username = force_username_case(username)
     user = super(AllowFirstUserDjangoBackend, self).authenticate(username, password)
+
     if user is not None:
       if user.is_active:
         user = rewrite_user(user)
@@ -263,6 +265,7 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
   Log automatically users without a session with a new user account.
   """
   def authenticate(self, username, password):
+    username = force_username_case(username)
     user = super(DemoBackend, self).authenticate(username, password)
 
     if not user:
