@@ -346,8 +346,9 @@ class TestDocument2(object):
 
 
   def test_api_get_data(self):
-    doc_data = json.dumps({'info': 'hello'})
-    doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=doc_data)
+    doc_data = {'info': 'hello', 'is_history': False}
+    doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=json.dumps(doc_data))
+    doc_data.update({'id': doc.id})
 
     response = self.client.get('/desktop/api2/doc/', {
         'uuid': doc.uuid,
@@ -364,7 +365,7 @@ class TestDocument2(object):
     data = json.loads(response.content)
 
     assert_true('data' in data, data)
-    assert_equal(data['data'], json.loads(doc_data))
+    assert_equal(data['data'], doc_data)
 
 
 class TestDocument2Permissions(object):
