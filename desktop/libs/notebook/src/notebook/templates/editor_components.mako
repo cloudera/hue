@@ -205,9 +205,22 @@ ${ hueIcons.symbols() }
         </a>
 
         % if mode == 'editor':
-        <a class="btn pointer" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().schedule() }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
-          <i class="fa fa-fw fa-calendar"></i>
-        </a>
+        <div class="btn-group">
+          <a class="btn" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().schedule() }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
+            <i class="fa fa-fw fa-calendar"></i>
+          </a>
+
+           <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().dependentsWorkflows().length > 0 -->
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+            <ul class="dropdown-menu" data-bind="foreach: $root.selectedNotebook().dependentsWorkflows">
+              <li>
+                <a class="pointer" data-bind="attr: { 'href': absoluteUrl }">
+                  <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> <span data-bind="text: name"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- /ko -->
+          </div>
         % endif
 
         % if mode != 'editor':
