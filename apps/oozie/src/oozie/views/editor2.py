@@ -218,13 +218,15 @@ def save_workflow(request):
     workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user, description=workflow['properties']['description'])
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
-  # Excludes all the sub-workflow dependencies. Contains list of history and coordinator dependencies.
-  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type='oozie-workflow2'))
+  # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
+  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive']))
 
-  subworkflows = [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget']
-  if subworkflows:
-    subworkflow_dependencies = Document2.objects.filter(uuid__in=subworkflows)
-    workflow_doc.dependencies.add(*subworkflow_dependencies)
+  dependencies = \
+      [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
+      [node['properties']['uuid'] for node in workflow['nodes'] if node['type'] == 'hive-document-widget']
+  if dependencies:
+    dependency_docs = Document2.objects.filter(uuid__in=dependencies)
+    workflow_doc.dependencies.add(*dependency_docs)
 
   if workflow['properties'].get('imported'): # We save and old format workflow to the latest
     workflow['properties']['imported'] = False
@@ -876,7 +878,6 @@ def schedule_document(request):
   Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
   workflow_doc.dependencies.add(document)
-  workflow_doc.save()
 
   response = {
     'status': 0,
