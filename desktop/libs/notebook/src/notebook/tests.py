@@ -77,16 +77,17 @@ class TestNotebookApi(object):
     new_dir = Directory.objects.create(name='new_dir', owner=self.user, parent_directory=home_dir)
     notebook_cp = self.notebook.copy()
     notebook_cp.pop('id')
+    notebook_cp['directoryUuid'] = new_dir.uuid
     notebook_json = json.dumps(notebook_cp)
 
-    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json, 'directory_uuid': new_dir.uuid})
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
     doc = Document2.objects.get(pk=data['id'])
     assert_equal(new_dir.uuid, doc.parent_directory.uuid)
 
-    # Test that saving a new document with no parent will map it to its home dir
+    # Test that saving a new document with a no parent will map it to its home dir
     notebook_json = """
       {
         "selectedSnippet": "hive",
@@ -111,8 +112,7 @@ class TestNotebookApi(object):
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
-    id = data['id']
-    doc = Document2.objects.get(pk=id)
+    doc = Document2.objects.get(pk=data['id'])
     assert_equal(Document2.objects.get_home_directory(self.user).uuid, doc.parent_directory.uuid)
 
 

@@ -299,6 +299,9 @@ ${ hueIcons.symbols() }
           <li data-bind="visible: isHistory" style="display: none">
             <a title="${ _('Query history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
+          <li data-bind="visible: directoryUuid" style="display: none">
+            <a title="${ _('Open home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }"><i class="fa fa-fw fa-folder-o"></i></a>
+          </li>
           <li class="query-name">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
