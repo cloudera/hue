@@ -159,8 +159,8 @@ def get_document(request):
     response['data'] = data
 
   if with_dependencies:
-    response['dependencies'] = [dependency.uuid for dependency in document.dependencies.all()]
-    response['dependents'] = [dependent.uuid for dependent in document.dependents.all()]
+    response['dependencies'] = [dependency.to_dict() for dependency in document.dependencies.all()]
+    response['dependents'] = [dependent.to_dict() for dependent in document.dependents.all()]
 
   # Get children documents if this is a directory
   if document.is_directory:

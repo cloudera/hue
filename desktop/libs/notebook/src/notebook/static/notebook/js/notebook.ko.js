@@ -32,7 +32,8 @@
     ignore: [
       "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user",
       "availableDatabases", "hasProperties", "viewSettings", "aceMode", "snippetImage", "errorLoadingQueries",
-      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta"
+      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta",
+      "dependents"
     ]
   };
 
@@ -1030,6 +1031,10 @@
       }
     });
     self.directoryUuid = ko.observable(typeof notebook.directoryUuid != "undefined" && notebook.directoryUuid != null ? notebook.directoryUuid : null);
+    self.dependents = ko.mapping.fromJS(typeof notebook.dependents != "undefined" && notebook.dependents != null ? notebook.dependents : []);
+    self.dependentsWorkflows = ko.computed(function() {
+      return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-workflow2' ;})
+    });
 
     self.loadingHistory = ko.observable(true);
     self.history = ko.observableArray(typeof notebook.fetchedHistory != "undefined" && notebook.fetchedHistory != null ? notebook.fetchedHistory : []);
@@ -1588,8 +1593,10 @@
     self.openNotebook = function (uuid) {
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
-        data: true
+        data: true,
+        dependencies: true
       }, function (data) {
+    	data.data.dependents = data.dependents
         var notebook = data.data;
         notebook.fetchedHistory = self.selectedNotebook().history();
         self.loadNotebook(notebook);

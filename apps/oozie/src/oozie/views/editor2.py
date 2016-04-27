@@ -863,7 +863,7 @@ def schedule_document(request):
   notebook = Notebook(document=document)
   parameters = find_dollar_braced_variables(notebook.get_str())
 
-  name = 'Schedule of ' + document.name
+  name = _('Schedule of ') + document.name
 
   params = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
 
@@ -874,6 +874,9 @@ def schedule_document(request):
 
   workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=request.user, data=data)
   Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
+  workflow_doc.dependencies.add(document)
+  workflow_doc.save()
 
   response = {
     'status': 0,
