@@ -317,6 +317,10 @@ LIMIT $limit"""))
     wf_doc2 = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[4], self.user)
     wf_doc1.dependencies.add(wf_doc2)
 
+    # Add Hive query dependency
+    query_doc = Document2.objects.create(name='Hive SQL', type='query-hive', owner=self.user)
+    wf_doc1.dependencies.add(query_doc)
+
     # Add coordinator dependency
     data = {
           'id': None,
@@ -352,19 +356,21 @@ LIMIT $limit"""))
     wf_doc3 = Document2.objects.create(name='test', type='oozie-coordinator2', owner=User.objects.get(username='test'), data=data)
     wf_doc1.dependencies.add(wf_doc3)
 
-    assert_true(len(wf_doc1.dependencies.all()) == 3)
+    assert_true(len(wf_doc1.dependencies.all()) == 4)
 
-    wf_doc1.save()
+    wf_doc1.save() # TODO test is actually not testing, we would need to call the save view of a workflow
 
     # Validating dependencies after saving the workflow
-    assert_true(len(wf_doc1.dependencies.all()) == 3)
+    assert_true(len(wf_doc1.dependencies.all()) == 4)
     assert_true(len(wf_doc1.dependencies.filter(type='oozie-coordinator2')) > 0)
+    assert_equal(wf_doc1.dependencies.filter(type='query-hive').count(), 1)
     assert_true(len(wf_doc1.dependencies.filter(Q(is_history=False) & Q(type='oozie-workflow2'))) > 0)
     assert_true(len(wf_doc1.dependencies.filter(Q(is_history=True) & Q(type='oozie-workflow2'))) > 0)
 
     wf_doc1.delete()
     wf_doc2.delete()
     wf_doc3.delete()
+    query_doc.delete()
 
   def test_editor_access_permissions(self):
     group = 'no_editor'
