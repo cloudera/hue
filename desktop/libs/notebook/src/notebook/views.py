@@ -56,11 +56,15 @@ def notebooks(request):
 @check_document_access_permission()
 def notebook(request):
   notebook_id = request.GET.get('notebook')
+  directory_uuid = request.GET.get('directory_uuid')
 
   if notebook_id:
     notebook = Notebook(document=Document2.objects.get(id=notebook_id))
   else:
     notebook = Notebook()
+    data = notebook.get_data()
+    data['directoryUuid'] = directory_uuid
+    notebook.data = json.dumps(data)    
 
   is_yarn_mode = False
   try:
@@ -84,6 +88,7 @@ def notebook(request):
 def editor(request):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+  directory_uuid = request.GET.get('directory_uuid')
 
   if editor_id:  # Open existing saved editor document
     editor = Notebook(document=Document2.objects.get(id=editor_id))
@@ -95,6 +100,7 @@ def editor(request):
 
     data['name'] = ''
     data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
+    data['directoryUuid'] = directory_uuid
     editor.data = json.dumps(data)
 
   return render('editor.mako', request, {

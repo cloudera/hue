@@ -239,7 +239,6 @@ def save_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
-  directory_uuid = request.POST.get('directory_uuid', None)
 
   if notebook.get('parentUuid'):
     notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])
@@ -250,8 +249,8 @@ def save_notebook(request):
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
 
-    if directory_uuid:
-      notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=directory_uuid, perm_type='write')
+    if notebook.get('directoryUuid'):
+      notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=notebook.get('directoryUuid'), perm_type='write')
     else:
       notebook_doc.parent_directory = Document2.objects.get_home_directory(request.user)
 
@@ -270,7 +269,6 @@ def save_notebook(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
-
 
 
 def _historify(notebook, user):

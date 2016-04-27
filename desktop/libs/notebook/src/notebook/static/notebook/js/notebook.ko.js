@@ -1029,6 +1029,7 @@
         return new Session(vm, value.data);
       }
     });
+    self.directoryUuid = ko.observable(typeof notebook.directoryUuid != "undefined" && notebook.directoryUuid != null ? notebook.directoryUuid : null);
 
     self.loadingHistory = ko.observable(true);
     self.history = ko.observableArray(typeof notebook.fetchedHistory != "undefined" && notebook.fetchedHistory != null ? notebook.fetchedHistory : []);
