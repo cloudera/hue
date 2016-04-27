@@ -23,17 +23,13 @@ import json
 import urllib
 import cgi
 import logging
-import sys
 
-from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
-from desktop.auth.backend import DesktopBackendBase
-from desktop.auth.backend import rewrite_user
+from desktop.auth.backend import force_username_case, DesktopBackendBase
+from desktop.conf import AUTH
 from useradmin.models import get_profile, get_default_user_group, UserProfile
-from hadoop.fs.exceptions import WebHdfsException
 
 import liboauth.conf
 import liboauth.metrics
@@ -53,14 +49,19 @@ class OAuthBackend(DesktopBackendBase):
     username = access_token['screen_name']
     password = access_token['oauth_token_secret']
 
+    username = force_username_case(username)
+
     try:
+      if AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
 
       if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
-        is_super=True
+        is_super = True
       else:
-        is_super=False
+        is_super = False
 
       # Could save oauth_token detail in the user profile here
       user = find_or_create_user(username, password)
