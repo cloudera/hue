@@ -492,7 +492,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
 
-    $.get('/desktop/api2/docs/?type=query-hive&sort=last_modified&limit=100', function(data) {
+    $.get('/desktop/api2/docs/?type=query-hive&sort=-last_modified&limit=100', function(data) {
       if (data && data.documents) {
         var queries = [];
         $.each(data.documents, function(index, query) {
