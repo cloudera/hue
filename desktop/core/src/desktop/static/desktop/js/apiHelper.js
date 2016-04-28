@@ -295,6 +295,13 @@
     self.simpleGet(CONFIG_APPS_API, {}, options);
   };
 
+  ApiHelper.prototype.saveGlobalConfiguration = function (options) {
+    var self = this;
+    self.simplePost(CONFIG_APPS_API, {
+      configuration: ko.mapping.toJSON(options.configuration)
+    }, options);
+  };
+
   /**
    * @param {Object} options
    * @param {Function} [options.successCallback]
