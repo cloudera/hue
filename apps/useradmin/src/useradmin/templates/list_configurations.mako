@@ -34,14 +34,11 @@ ${layout.menubar(section='configurations')}
     <h1 class="card-heading simple">${ _('Configurations') }</h1>
     <%actionbar:render>
       <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application, group, etc...')}" data-bind="visible: !loading() && !hasErrors(), textInput: searchQuery">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application, group, etc...')}" data-bind="textInput: searchQuery">
       </%def>
     </%actionbar:render>
 
-    <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-    <h4 style="width: 100%; text-align: center;" data-bind="visible: !loading() && hasErrors()">${ _('There was an error loading the configurations') }</h4>
-
-    <table class="table table-striped table-condensed datatables" data-bind="visible: !loading() && !hasErrors()">
+    <table class="table table-striped table-condensed datatables">
       <thead>
       <tr>
         <th>${ _('Application') }</th>
@@ -49,10 +46,9 @@ ${layout.menubar(section='configurations')}
         <th>${ _('Groups') }</th>
       </tr>
       </thead>
-      <tbody data-bind="foreach: appKeys">
-      <tr class="tableRow pointer" data-bind="click: function () { $parent.selectedApp($parent.filteredApps()[$data]) }">
-        <td data-bind="text: $data"></td>
-        <!-- ko with: $parent.filteredApps()[$data] -->
+      <tbody data-bind="foreach: filteredApps">
+      <tr class="tableRow pointer" data-bind="click: function () { $parent.edit($data); }">
+        <td data-bind="text: name"></td>
         <!-- ko if: $data.default -->
         <td>${ _('defined') }</td>
         <!-- /ko -->
@@ -64,7 +60,6 @@ ${layout.menubar(section='configurations')}
         <!-- /ko -->
         <!-- ko ifnot: $data.groups -->
         <td>&nbsp;</td>
-        <!-- /ko -->
         <!-- /ko -->
       </tr>
       </tbody>
@@ -83,16 +78,42 @@ ${layout.menubar(section='configurations')}
 
 <script id="edit-app" type="text/html">
   <!-- ko with: selectedApp -->
-  <div class="card card-small">
+  <div class="card card-small" style="padding-bottom: 68px;">
     <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
-    <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
+    <h4 class="margin-left-20 simple">${ _('Global') }</h4>
+    <div class="form-horizontal" style="width:100%;">
+      <!-- ko foreach: properties -->
+      <!-- ko template: { name: 'property', data: { type: type(), label: nice_name, helpText: help_text, value: value, visibleObservable: ko.observable() } } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <h4 class="margin-left-20 simple">${ _('Group specific') }</h4>
+    <!-- ko foreach: groupConfigurations -->
+    <div class="form-horizontal" style="width:100%;">
+      <div>
+        <select data-bind="options: availableGroups, optionsText: 'name', optionsValue: 'id', value: group"></select>
+      </div>
+      <!-- ko foreach: properties -->
+      <!-- ko template: { name: 'property', data: { type: type(), label: nice_name, helpText: help_text, value: value, visibleObservable: ko.observable() } } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
+    <a class="pointer" data-bind="click: addGroup">
+      <i class="fa fa-plus"></i>
+    </a>
   </div>
   <!-- /ko -->
+  <div class="form-actions">
+    <button class="btn btn-primary" data-bind="click: save">${_('Update configuration')}</button>
+    <button class="btn" data-bind="click: function () { selectedApp(null) }">${_('Cancel')}</button>
+  </div>
 </script>
 
 <div class="container-fluid">
-  <!-- ko template: { if: !selectedApp(), name: 'app-list' } --><!-- /ko -->
-  <!-- ko template: { if: selectedApp(), name: 'edit-app' } --><!-- /ko -->
+  <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+  <h4 style="width: 100%; text-align: center;" data-bind="visible: !loading() && hasErrors()">${ _('There was an error loading the configurations') }</h4>
+  <!-- ko template: { if: !loading() && !hasErrors() && !selectedApp(), name: 'app-list' } --><!-- /ko -->
+  <!-- ko template: { if: !loading() && !hasErrors() && selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
 
 ${ require.config() }
@@ -103,8 +124,30 @@ ${ configKoComponents.config() }
     'knockout',
     'desktop/js/apiHelper',
     'knockout-mapping',
-    'ko.hue-bindings'
+    'ko.hue-bindings',
+    'knockout-sortable'
   ], function (ko, apiHelper) {
+
+    var GroupConfiguration = function (properties, availableGroups) {
+      var self = this;
+      self.properties = ko.mapping.fromJS(properties);
+      self.availableGroups = availableGroups;
+      self.group = ko.observable();
+    };
+
+    var AppConfiguration = function (app, availableGroups) {
+      var self = this;
+      self.name = app.name;
+      self.availableProperties = app.properties;
+      self.properties = ko.mapping.fromJS(app.properties);
+      self.availableGroups = availableGroups;
+      self.groupConfigurations = ko.observableArray();
+    };
+
+    AppConfiguration.prototype.addGroup = function () {
+      var self = this;
+      self.groupConfigurations.push(new GroupConfiguration(self.availableProperties, self.availableGroups));
+    };
 
     var ConfigurationsViewModel = function () {
       var self = this;
@@ -114,20 +157,46 @@ ${ configKoComponents.config() }
       self.hasErrors = ko.observable(false);
       self.loading = ko.observable(false);
       self.apps = ko.observableArray();
-      self.groups = ko.observableArray();
+      self.groups = {};
       self.searchQuery = ko.observable();
       self.selectedApp = ko.observable();
       self.filteredApps = ko.pureComputed(function () {
         return self.apps();
       });
 
-      self.appKeys = ko.pureComputed(function () {
-        return Object.keys(self.filteredApps()).filter(function (key) {
-          return key.indexOf('__') !== 0;
-        });
-      });
-
       self.load();
+    };
+
+    ConfigurationsViewModel.prototype.edit = function (app) {
+      var self = this;
+      self.selectedApp(new AppConfiguration(app, self.groups));
+    };
+
+    ConfigurationsViewModel.prototype.save = function () {
+      var self = this;
+      var data = {};
+      self.apps().forEach(function (app) {
+        data[app.name] = app;
+      });
+      data[self.selectedApp().name] = {
+        properties: ko.mapping.toJS(self.selectedApp().properties),
+        groups: {}
+      };
+      self.selectedApp().groupConfigurations().forEach(function (groupConfig) {
+        data[self.selectedApp().name].groups[groupConfig.group()] = ko.mapping.toJS(groupConfig.properties);
+      });
+      self.apiHelper.saveGlobalConfiguration({
+        successCallback: function(data) {
+          var apps = [];
+          $.each(data.apps, function (appName, app) {
+            app.name = appName;
+            apps.push(app);
+          });
+          self.apps(apps);
+          self.selectedApp(null);
+        },
+        configuration: data
+      })
     };
 
     ConfigurationsViewModel.prototype.load = function () {
@@ -135,6 +204,7 @@ ${ configKoComponents.config() }
       if (self.loading()) {
         return;
       }
+      self.selectedApp(null);
       self.loading(true);
       self.hasErrors(false);
 
@@ -143,15 +213,17 @@ ${ configKoComponents.config() }
         self.loading(false);
       };
 
-      self.assistHelper.fetchUsersAndGroups({
+      self.apiHelper.fetchUsersAndGroups({
         successCallback: function (usersAndGroups) {
-          self.groups(usersAndGroups.groups);
-          self.assistHelper.fetchConfigurations({
+          self.groups = usersAndGroups.groups;
+          self.apiHelper.fetchConfigurations({
             successCallback: function (data) {
+              var apps = [];
               $.each(data.apps, function (appName, app) {
                 app.name = appName;
+                apps.push(app);
               });
-              self.apps(ko.mapping.fromJS(data.apps));
+              self.apps(apps);
               self.loading(false);
             },
             errorCallback: errorCallback
