@@ -244,7 +244,12 @@ ${ fileBrowser.fileBrowser() }
         } else if (location.getParameter('path')) {
           viewModel.openPath(location.getParameter('path'));
         } else {
-          viewModel.activeEntry().load();
+          viewModel.activeEntry().load(function () {
+            if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().definition().type === 'directory') {
+              viewModel.activeEntry(viewModel.activeEntry().entries()[0]);
+              viewModel.activeEntry().load();
+            }
+          });
         }
       };
       window.onpopstate = loadUrlParam;
