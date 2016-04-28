@@ -580,6 +580,11 @@
       $(".jHueNotify").hide();
       logGA('execute/' + self.type());
 
+      if (self.result.fetchedOnce()) {
+        self.close();
+        self.statusForButtons('executed');
+      }
+
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
@@ -599,11 +604,6 @@
       });
 
       self.currentQueryTab('queryHistory');
-
-      if (self.result.fetchedOnce()) {
-        self.close();
-        self.statusForButtons('executed');
-      }
 
       $.post("/notebook/api/execute", {
         notebook: vm.editorMode ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
