@@ -1026,40 +1026,52 @@ ${ hueIcons.symbols() }
       </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}">
-          <!-- ko if: $parent.history().length === 0 -->
-          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
+          <!-- ko if: $parent.loadingHistory -->
+          <div style="padding: 20px">
+            <i class="fa fa-spinner fa-spin muted"></i>
+          </div>
           <!-- /ko -->
-          <!-- ko if: $parent.history().length > 0 -->
-          <table class="table table-condensed margin-top-10 history-table">
-            <tbody data-bind="foreach: $parent.history">
-              <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid) } }">
-                <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
-                <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
-                  <!-- ko switch: status -->
-                  <!-- ko case: 'running' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'failed' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'available' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'expired' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- /ko -->
-                </td>
-                <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name, length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
-                <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
-              </tr>
-            </tbody>
-          </table>
+
+          <!-- ko ifnot: $parent.loadingHistory -->
+            <!-- ko if: $parent.history().length === 0 -->
+            <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
+            <!-- /ko -->
+            <!-- ko if: $parent.history().length > 0 -->
+            <table class="table table-condensed margin-top-10 history-table">
+              <tbody data-bind="foreach: $parent.history">
+                <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid) } }">
+                  <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
+                  <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
+                    <!-- ko switch: status -->
+                    <!-- ko case: 'running' -->
+                    <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                    <!-- /ko -->
+                    <!-- ko case: 'failed' -->
+                    <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                    <!-- /ko -->
+                    <!-- ko case: 'available' -->
+                    <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                    <!-- /ko -->
+                    <!-- ko case: 'expired' -->
+                    <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                  </td>
+                  <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name, length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
+                  <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query, flavor: $parent.type" class="history-item"></div></td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
 
         <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}">
-          <!-- ko spinner: loadingQueries --><!-- /ko -->
+          <!-- ko if: loadingQueries -->
+          <div style="padding: 20px">
+            <i class="fa fa-spinner fa-spin muted"></i>
+          </div>
+          <!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
