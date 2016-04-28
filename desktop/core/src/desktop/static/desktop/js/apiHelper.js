@@ -221,6 +221,11 @@
     .fail(self.assistErrorCallback(options));
   };
 
+  ApiHelper.prototype.fetchUsersAndGroups = function (options) {
+    var self = this;
+    self.simpleGet('/desktop/api/users/autocomplete', {}, options);
+  };
+
   /**
    * @param {Object} options
    * @param {Function} options.successCallback
