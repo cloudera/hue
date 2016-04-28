@@ -300,11 +300,13 @@ ${ hueIcons.symbols() }
             <a title="${ _('Query history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li class="query-name">
-            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></span></a>
+            <a href="javascript:void(0)">
+              <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
+            </a>
           </li>
           <li data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
-              <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
+              <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
             </a>
           </li>
           <!-- /ko -->
