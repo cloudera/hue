@@ -2888,7 +2888,7 @@ ${ hueIcons.symbols() }
       var i18n = {
         errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
       }
-      viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
+      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
 
@@ -2954,12 +2954,10 @@ ${ hueIcons.symbols() }
         redrawFixedHeaders(200);
       });
 
-      if (viewModel.editorMode) {
-        viewModel.selectedNotebook().snippets()[0].variables.subscribe(function (newValue) {
-          hideFixedHeaders();
-          redrawFixedHeaders(200);
-        });
-      }
+      $(document).on("updateResultHeaders", function (e) {
+        hideFixedHeaders();
+        redrawFixedHeaders(200);
+      });
 
       $(document).on("showAuthModal", function (e, data) {
         viewModel.authSessionUsername('${ user.username }');

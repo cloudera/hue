@@ -897,9 +897,9 @@ class Document2Manager(models.Manager, Document2QueryMixin):
   def get_query_set(self):
     return Document2QuerySet(self.model, using=self._db)
 
-  # TODO prevent get
+  # TODO prevent get() in favor of this
   def document(self, user, doc_id):
-    return self.documents(user, include_trashed=True).get(id=doc_id)
+    return self.documents(user, include_trashed=True, include_history=True).get(id=doc_id)
 
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
