@@ -22,6 +22,7 @@ import gc
 import logging
 import openpyxl
 import re
+import six
 import StringIO
 import tablib
 
@@ -42,9 +43,10 @@ def nullify(cell):
 def encode_row(row, encoding=None, is_xls=False):
   encoded_row = []
   for cell in row:
-    if is_xls and isinstance(cell, str):
+    if is_xls and isinstance(cell, six.string_types):
       cell = re.sub(XLS_ILLEGAL_CHARS, '?', cell)
-    cell = smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
+    if isinstance(cell, six.string_types):
+      cell = smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
     encoded_row.append(cell)
   return encoded_row
 
