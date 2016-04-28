@@ -1034,3 +1034,8 @@ h4.header {
   font-size: 60px;
   color: #DDD;
 }
+
+.notebook-name-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
