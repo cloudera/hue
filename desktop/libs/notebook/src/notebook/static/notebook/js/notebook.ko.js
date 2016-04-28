@@ -1040,10 +1040,9 @@
     self.dependentsWorkflows = ko.computed(function() {
       return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-workflow2' ;})
     });
-
-    self.history = ko.observableArray(typeof notebook.fetchedHistory != "undefined" && notebook.fetchedHistory != null ? notebook.fetchedHistory : []);
+    self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
     self.loadingHistory = ko.observable(self.history().length == 0);
-    // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
+    // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
     self.getSession = function (session_type) {
       var _s = null;
       $.each(self.sessions(), function (index, s) {
@@ -1434,7 +1433,7 @@
       $.each(notebook.snippets, function (index, snippet) {
         self.addSnippet(snippet);
       });
-      if (vm.editorMode && (typeof notebook.fetchedHistory === "undefined" || notebook.fetchedHistory == null)) {
+      if (vm.editorMode && self.history().length == 0) {
         self.fetchHistory();
       }
     }
@@ -1606,9 +1605,6 @@
       }, function (data) {
         data.data.dependents = data.dependents
         var notebook = data.data;
-        if (self.selectedNotebook()) { // Do not reload history on each query reload
-          notebook.fetchedHistory = self.selectedNotebook().history();
-        }
         self.loadNotebook(notebook);
         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
       });
