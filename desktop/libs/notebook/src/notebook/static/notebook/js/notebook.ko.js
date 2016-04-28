@@ -834,7 +834,7 @@
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
-        if (self.status() == 'canceled') {
+        if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else if (data.status == 0) {
           self.status(data.query_status.status);
