@@ -226,6 +226,7 @@
     self.queries = ko.observableArray();
 
     var fetchQueries = function () {
+      var QUERIES_PER_PAGE = 50;
       if (self.loadingQueries()) {
         return;
       }
@@ -234,7 +235,7 @@
       self.queriesHasErrors(false);
       self.getAssistHelper().searchDocuments({
         successCallback: function (result) {
-          self.queriesTotalPages(Math.ceil(result.count / 25));
+          self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
           self.queries(result.documents);
           self.loadingQueries(false);
           self.queriesHasErrors(false);
@@ -244,7 +245,7 @@
           self.queriesHasErrors(true);
         },
         page: self.queriesCurrentPage(),
-        limit: 50,
+        limit: QUERIES_PER_PAGE,
         type: 'query-' + self.type()
       });
     }
