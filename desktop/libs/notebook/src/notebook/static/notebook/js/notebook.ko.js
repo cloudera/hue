@@ -1024,8 +1024,8 @@
       }
     });
 
-    self.history = ko.observableArray([]);
     self.loadingHistory = ko.observable(true);
+    self.history = ko.observableArray(typeof notebook.fetchedHistory != "undefined" && notebook.fetchedHistory != null ? notebook.fetchedHistory : []);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
     self.getSession = function (session_type) {
       var _s = null;
@@ -1417,7 +1417,7 @@
       $.each(notebook.snippets, function (index, snippet) {
         self.addSnippet(snippet);
       });
-      if (vm.editorMode) {
+      if (vm.editorMode && (typeof notebook.fetchedHistory === "undefined" || notebook.fetchedHistory == null)) {
         self.fetchHistory();
       }
     }
@@ -1582,9 +1582,11 @@
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true
-       }, function(data) {
-         self.loadNotebook(data.data);
-         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+      }, function (data) {
+        var notebook = data.data;
+        notebook.fetchedHistory = self.selectedNotebook().history();
+        self.loadNotebook(notebook);
+        hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
       });
     };
 
