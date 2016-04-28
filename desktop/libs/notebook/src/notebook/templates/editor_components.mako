@@ -1114,8 +1114,8 @@ ${ hueIcons.symbols() }
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
-            <tr>
-              <td style="width: 16%"><a href="javascript: void(0);" data-bind="ellipsis: {data: name, length: 30}, click: function() { $root.openNotebook(uuid) }"></a></td>
+            <tr class="pointer" data-bind="click: function() { $root.openNotebook(uuid) }">
+              <td style="width: 16%"><span data-bind="ellipsis: {data: name, length: 30}"></span></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
               <td style="width: 16%"><span data-bind="text: localeFormat(last_modified)"></span></td>
