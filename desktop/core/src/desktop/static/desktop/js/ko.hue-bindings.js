@@ -2574,12 +2574,6 @@
         if (options.updateOnInput){
           snippet.statement_raw(editor.getValue());
         }
-      });
-
-      editor.on("focus", function () {
-        snippet.inFocus(true);
-        $(".ace-editor").data("last-active-editor", false);
-        $el.data("last-active-editor", true);
         if (editor.session.$backMarkers) {
           for (var marker in editor.session.$backMarkers) {
             if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
@@ -2587,6 +2581,12 @@
             }
           }
         }
+      });
+
+      editor.on("focus", function () {
+        snippet.inFocus(true);
+        $(".ace-editor").data("last-active-editor", false);
+        $el.data("last-active-editor", true);
       });
 
       editor.selection.on("changeSelection", function () {
