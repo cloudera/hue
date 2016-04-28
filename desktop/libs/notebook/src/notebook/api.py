@@ -377,13 +377,21 @@ def close_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
 
-  for session in notebook['sessions']:
+  for session in [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]:
     try:
       response['result'].append(get_api(request, session).close_session(session))
     except QueryExpired:
       pass
     except Exception, e:
       LOG.exception('Error closing session %s' % str(e))
+
+  for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
+    try:
+      response['result'] = get_api(request, snippet).close_statement(snippet)
+    except QueryExpired:
+      pass
+    except Exception, e:
+      LOG.exception('Error closing statement %s' % str(e))
 
   response['status'] = 0
   response['message'] = _('Notebook closed successfully')
