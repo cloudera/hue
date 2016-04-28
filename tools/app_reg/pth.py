@@ -68,6 +68,12 @@ class PthFile(object):
       self._entries.add(module_path)
       LOG.debug('Add to %s: %s' % (self._path, module_path))
 
+      # Add gen-py path if found
+      gen_py_path = os.path.join(app.abs_path, 'gen-py')
+      if os.path.exists(gen_py_path):
+        self._entries.add(gen_py_path)
+        LOG.debug('Add to %s: %s' % (self._path, gen_py_path))
+
       # Eggs could be in ext-py/<pkg>/dist/*.egg
       for py in app.find_ext_pys():
         ext_eggs = glob.glob(os.path.join(py, 'dist', '*.egg'))
@@ -85,6 +91,12 @@ class PthFile(object):
       module_path = self._relpath(os.path.join(app.abs_path, 'src'))
       self._entries.add(module_path)
       LOG.debug('Add to %s: %s' % (self._path, module_path))
+
+      # Add gen-py path if found
+      gen_py_path = self._relpath(os.path.join(app.abs_path, 'gen-py'))
+      if os.path.exists(os.path.join(app.abs_path, 'gen-py')):
+        self._entries.add(gen_py_path)
+        LOG.debug('Add to %s: %s' % (self._path, gen_py_path))
 
       # Eggs could be in ext-py/<pkg>/dist/*.egg
       for py in app.find_ext_pys():
