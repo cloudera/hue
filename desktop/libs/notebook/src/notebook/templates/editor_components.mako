@@ -2245,9 +2245,13 @@ ${ hueIcons.symbols() }
         }
       });
       $(rawDatum.counts()).each(function (cnt, item) {
+        var val = item[_idxValue] * 1;
+        if (isNaN(val)) {
+          val = 0;
+        }
         _data.push({
           label: hueUtils.html2text(item[_idxLabel]),
-          value: item[_idxValue],
+          value: val,
           obj: item
         });
       });
