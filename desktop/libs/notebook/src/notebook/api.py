@@ -87,6 +87,8 @@ def execute(request):
       _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
       if 'handle' in response: # No failure
         _snippet['result']['handle'] = response['handle']
+        _snippet['result']['statements_count'] = response['handle']['statements_count']
+        _snippet['result']['statement_id'] = response['handle']['statement_id']
       else:
         _snippet['status'] = 'failed'
       history = _historify(notebook, request.user)
