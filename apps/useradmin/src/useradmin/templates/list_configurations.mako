@@ -28,7 +28,8 @@ from django.contrib.auth.models import Group
 ${commonheader(_('Configurations'), "useradmin", user) | n,unicode}
 ${layout.menubar(section='configurations')}
 
-<div class="container-fluid">
+
+<script id="app-list" type="text/html">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Configurations') }</h1>
     <%actionbar:render>
@@ -42,42 +43,56 @@ ${layout.menubar(section='configurations')}
 
     <table class="table table-striped table-condensed datatables" data-bind="visible: !loading() && !hasErrors()">
       <thead>
-        <tr>
-          <th>${ _('Application') }</th>
-          <th>${ _('Default') }</th>
-          <th>${ _('Groups') }</th>
-        </tr>
+      <tr>
+        <th>${ _('Application') }</th>
+        <th>${ _('Default') }</th>
+        <th>${ _('Groups') }</th>
+      </tr>
       </thead>
       <tbody data-bind="foreach: appKeys">
-        <tr class="tableRow">
-          <td data-bind="text: $data"></td>
-          <!-- ko with: $parent.filteredApps()[$data] -->
-          <!-- ko if: $data.default -->
-          <td>${ _('defined') }</td>
-          <!-- /ko -->
-          <!-- ko ifnot: $data.default -->
-          <td>&nbsp;</td>
-          <!-- /ko -->
-          <!-- ko if: $data.groups -->
-          <td data-bind="text: Object.keys(groups()).join(', ');"></td>
-          <!-- /ko -->
-          <!-- ko ifnot: $data.groups -->
-          <td>&nbsp;</td>
-          <!-- /ko -->
-          <!-- /ko -->
-        </tr>
+      <tr class="tableRow pointer" data-bind="click: function () { $parent.selectedApp($parent.filteredApps()[$data]) }">
+        <td data-bind="text: $data"></td>
+        <!-- ko with: $parent.filteredApps()[$data] -->
+        <!-- ko if: $data.default -->
+        <td>${ _('defined') }</td>
+        <!-- /ko -->
+        <!-- ko ifnot: $data.default -->
+        <td>&nbsp;</td>
+        <!-- /ko -->
+        <!-- ko if: $data.groups -->
+        <td data-bind="text: Object.keys(groups()).join(', ');"></td>
+        <!-- /ko -->
+        <!-- ko ifnot: $data.groups -->
+        <td>&nbsp;</td>
+        <!-- /ko -->
+        <!-- /ko -->
+      </tr>
       </tbody>
       <tfoot class="hide">
-        <tr>
-          <td colspan="3">
-            <div class="alert">
-              ${_('There are no configurations matching the search criteria.')}
-            </div>
-          </td>
-        </tr>
+      <tr>
+        <td colspan="3">
+          <div class="alert">
+            ${_('There are no configurations matching the search criteria.')}
+          </div>
+        </td>
+      </tr>
       </tfoot>
     </table>
   </div>
+</script>
+
+<script id="edit-app" type="text/html">
+  <!-- ko with: selectedApp -->
+  <div class="card card-small">
+    <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
+    <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
+  </div>
+  <!-- /ko -->
+</script>
+
+<div class="container-fluid">
+  <!-- ko template: { if: !selectedApp(), name: 'app-list' } --><!-- /ko -->
+  <!-- ko template: { if: selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
 
 ${ require.config() }
@@ -99,7 +114,9 @@ ${ configKoComponents.config() }
       self.hasErrors = ko.observable(false);
       self.loading = ko.observable(false);
       self.apps = ko.observableArray();
+      self.groups = ko.observableArray();
       self.searchQuery = ko.observable();
+      self.selectedApp = ko.observable();
       self.filteredApps = ko.pureComputed(function () {
         return self.apps();
       });
@@ -110,26 +127,38 @@ ${ configKoComponents.config() }
         });
       });
 
-      self.loadApps();
+      self.load();
     };
 
-    ConfigurationsViewModel.prototype.loadApps = function () {
+    ConfigurationsViewModel.prototype.load = function () {
       var self = this;
       if (self.loading()) {
         return;
       }
       self.loading(true);
       self.hasErrors(false);
-      self.assistHelper.fetchConfigurations({
-        successCallback: function (data) {
-          self.apps(ko.mapping.fromJS(data.apps));
-          self.loading(false);
+
+      var errorCallback = function () {
+        self.hasErrors(true);
+        self.loading(false);
+      };
+
+      self.assistHelper.fetchUsersAndGroups({
+        successCallback: function (usersAndGroups) {
+          self.groups(usersAndGroups.groups);
+          self.assistHelper.fetchConfigurations({
+            successCallback: function (data) {
+              $.each(data.apps, function (appName, app) {
+                app.name = appName;
+              });
+              self.apps(ko.mapping.fromJS(data.apps));
+              self.loading(false);
+            },
+            errorCallback: errorCallback
+          })
         },
-        errorCallback: function () {
-          self.hasErrors(true);
-          self.loading(false);
-        }
-      })
+        errorCallback: errorCallback
+      });
     };
 
     ko.applyBindings(new ConfigurationsViewModel());
