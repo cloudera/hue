@@ -1025,6 +1025,7 @@
     });
 
     self.history = ko.observableArray([]);
+    self.loadingHistory = ko.observable(true);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
     self.getSession = function (session_type) {
       var _s = null;
@@ -1299,6 +1300,7 @@
     };
 
     self.fetchHistory = function () {
+      self.loadingHistory(true);
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
         limit: 50
@@ -1319,6 +1321,8 @@
           });
         }
         self.history(parsedHistory);
+      }).always(function(){
+        self.loadingHistory(false);
       });
     };
 
