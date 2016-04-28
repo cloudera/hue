@@ -43,8 +43,11 @@ def check_document_access_permission():
 
       try:
         if notebook_id:
-          document = Document2.objects.get(id=notebook_id)
-          document.can_read_or_exception(request.user)
+          if str(notebook_id).isdigit():
+            document = Document2.objects.get(id=notebook_id)
+            document.can_read_or_exception(request.user)
+          else:
+            Document2.objects.get_by_uuid(user=request.user, uuid=notebook_id)
       except Document2.DoesNotExist:
         raise PopupException(_('Document %(id)s does not exist') % {'id': notebook_id})
 

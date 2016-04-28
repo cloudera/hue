@@ -113,6 +113,11 @@ def check_status(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  if not snippet:
+    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['id'])
+    notebook = Notebook(document=nb_doc).get_data()
+    snippet = notebook['snippets'][0]
+
   try:
     response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
     response['status'] = 0
