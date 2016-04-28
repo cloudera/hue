@@ -551,17 +551,17 @@ ${ dashboard.layout_skeleton() }
         <div style="margin-top:3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
              data-bind="click: function(){ $root.collection.template.showChart(false); $root.collection.template.showGrid(true); }, css: {'active': $root.collection.template.showGrid() }" title="${_('Grid')}">
-            <i class="fa fa-th"></i>
+            <i class="fa fa-th fa-fw"></i>
           </a>
         </div>
 
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
              data-bind="css: {'active': $root.collection.template.showChart() }, click: function(){ $root.collection.template.showChart(true); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
-            <i class="hcha hcha-bar-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-            <i class="hcha hcha-line-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
+            <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart fa-fw" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
                style="display: none;"></i>
-            <i class="hcha hcha-pie-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
+            <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
                style="display: none;"></i>
             <i class="fa fa-fw fa-map-marker" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP"
                style="display: none;"></i>
@@ -576,19 +576,19 @@ ${ dashboard.layout_skeleton() }
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
-                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+                <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+                <i class="hcha hcha-line-chart fa-fw"></i> ${_('Lines')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+                <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
               </a>
             </li>
             <li>
@@ -602,7 +602,7 @@ ${ dashboard.layout_skeleton() }
 
         <div>
           <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList())}, css: { 'blue' : $root.collection.template.showFieldList() }"><i
-              class="fa fa-cog"></i></a>
+              class="fa fa-cog fa-fw"></i></a>
         </div>
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
@@ -612,7 +612,7 @@ ${ dashboard.layout_skeleton() }
           <input type="hidden" name="type" value="">
           <div class="dropdown">
             <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
-              <i class="fa fa-download"></i>
+              <i class="fa fa-download fa-fw"></i>
             </a>
             <ul class="dropdown-menu">
               <li>
