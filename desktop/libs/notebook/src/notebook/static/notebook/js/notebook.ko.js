@@ -334,6 +334,9 @@
     });
 
     self.variables = ko.mapping.fromJS(typeof snippet.variables != "undefined" && snippet.variables != null ? snippet.variables : []);
+    self.variables.subscribe(function (newValue) {
+      $(document).trigger("updateResultHeaders", self);
+    });
     self.variableNames = ko.computed(function () {
       var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
 
@@ -372,11 +375,13 @@
         self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
       });
 
-      self.variables.sort(function (left, right) {
-        var leftIndex = newVal.indexOf(left.name());
-        var rightIndex = newVal.indexOf(right.name());
-        return leftIndex == rightIndex ? 0 : (leftIndex < rightIndex ? -1 : 1);
-      });
+      if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
+        self.variables.sort(function (left, right) {
+          var leftIndex = newVal.indexOf(left.name());
+          var rightIndex = newVal.indexOf(right.name());
+          return leftIndex == rightIndex ? 0 : (leftIndex < rightIndex ? -1 : 1);
+        });
+      }
     });
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() && self.selectedStatement() ? self.selectedStatement() : self.statement_raw();
@@ -1036,8 +1041,8 @@
       return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-workflow2' ;})
     });
 
-    self.loadingHistory = ko.observable(true);
     self.history = ko.observableArray(typeof notebook.fetchedHistory != "undefined" && notebook.fetchedHistory != null ? notebook.fetchedHistory : []);
+    self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
     self.getSession = function (session_type) {
       var _s = null;
@@ -1436,7 +1441,7 @@
   };
 
 
-  function EditorViewModel(notebooks, options, i18n) {
+  function EditorViewModel(editor_id, notebooks, options, i18n) {
     var self = this;
     self.i18n = i18n;
     self.user = options.user;
@@ -1568,7 +1573,10 @@
     };
 
     self.init = function () {
-      if (notebooks.length > 0) {
+      if (editor_id) {
+        self.openNotebook(editor_id);
+      }
+      else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]);
         if (self.selectedNotebook().snippets().length === 0 && self.editorMode) { // Add snippet in new Editor
           self.selectedNotebook().newSnippet();
@@ -1596,9 +1604,11 @@
         data: true,
         dependencies: true
       }, function (data) {
-    	data.data.dependents = data.dependents
+        data.data.dependents = data.dependents
         var notebook = data.data;
-        notebook.fetchedHistory = self.selectedNotebook().history();
+        if (self.selectedNotebook()) { // Do not reload history on each query reload
+          notebook.fetchedHistory = self.selectedNotebook().history();
+        }
         self.loadNotebook(notebook);
         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
       });

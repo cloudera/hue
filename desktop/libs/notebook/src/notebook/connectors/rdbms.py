@@ -50,7 +50,7 @@ class RdbmsApi(Api):
 
     table = db.execute_statement(snippet['statement'])  # TODO: execute statement stub in Rdbms
 
-    data = table.rows()
+    data = list(table.rows())
     has_result_set = data is not None
 
     return {

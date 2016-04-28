@@ -135,7 +135,10 @@ def get_document(request):
   with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
 
   if uuid:
-    document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+    if uuid.isdigit():
+      document = Document2.objects.document(user=request.user, doc_id=uuid)
+    else:
+      document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
   else:  # Find by path
     document = Document2.objects.get_by_path(user=request.user, path=path)
 

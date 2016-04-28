@@ -90,10 +90,11 @@ def editor(request):
   editor_type = request.GET.get('type', 'hive')
   directory_uuid = request.GET.get('directory_uuid')
 
+  notebooks_json = '{}'
+
   if editor_id:  # Open existing saved editor document
     editor = Notebook(document=Document2.objects.get(id=editor_id))
     editor_type = editor.get_data()['type'].rsplit('-', 1)[-1]
-    editor = upgrade_session_properties(request, notebook=editor)
   else:  # Create new editor
     editor = Notebook()
     data = editor.get_data()
@@ -102,9 +103,11 @@ def editor(request):
     data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
     data['directoryUuid'] = directory_uuid
     editor.data = json.dumps(data)
+    notebooks_json = json.dumps([editor.get_data()])
 
   return render('editor.mako', request, {
-      'notebooks_json': json.dumps([editor.get_data()]),
+      'editor_id': editor_id or None,
+      'notebooks_json': notebooks_json,
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
