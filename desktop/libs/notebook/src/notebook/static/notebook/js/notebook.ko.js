@@ -1342,15 +1342,32 @@
       });
     };
 
+    self.updateHistory = function () {
+      // TODO fetch list
+
+      // Update statuses
+      $.each(
+        $.grep(self.history(), function(item) { return item.status() == 'available' || item.status() == 'running' || item.status() == 'starting'; }), function(index, item) {
+          $.post("/notebook/api/check_status", {
+            notebook: ko.mapping.toJSON({id: item.uuid()}),
+          }, function (data) {
+            var status = data.status == -3 ? 'expired' : data.query_status.status;
+            if (item.status() != status) {
+              item.status(status);
+            }
+        });
+      });
+    };
+
     self._makeHistoryRecord = function(url, statement, lastExecuted, status, name, uuid) {
-      return {
+      return ko.mapping.fromJS({
           url: url,
           query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
           lastExecuted: lastExecuted,
           status: status,
           name: name,
           uuid: uuid
-      };
+      });
     };
 
     self.schedule = function() {
