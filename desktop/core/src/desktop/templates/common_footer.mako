@@ -54,8 +54,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     $(document).ajaxComplete(function (event, xhr, settings) {
       if (xhr.responseText === '/* login required */' && !isLoginRequired) {
         isLoginRequired = true;
+        $('.blurred').removeClass('blurred');
         $('body').children(':not(#login-modal)').addClass('blurred');
-        if ($('#login-modal').length > 0){
+        if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')){
           $('#login-modal').modal('show');
           window.setTimeout(function () {
             $('.jHueNotify').remove();

@@ -76,6 +76,7 @@
   min-height: 44px;
   font-weight: normal;
   text-shadow: none;
+  margin-left: 0;
 }
 
 .login-header {
