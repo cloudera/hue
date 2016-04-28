@@ -271,6 +271,8 @@
       }
     };
 
+    huePubSub.subscribe('fetch.queries.after.save', fetchQueries);
+
 
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
@@ -1211,6 +1213,7 @@
           self.isHistory(false);
           $(document).trigger("info", data.message);
           if (vm.editorMode){
+            huePubSub.publish('fetch.queries.after.save');
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
           else {
