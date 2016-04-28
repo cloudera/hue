@@ -310,10 +310,15 @@ ${ hueIcons.symbols() }
           </li>
           <!-- ko with: selectedNotebook -->
           <li data-bind="visible: isHistory" style="display: none">
-            <a title="${ _('Query history query') }"><i class="fa fa-fw fa-history"></i></a>
+            <!-- ko if: parentUuid -->
+              <a title="${ _('Open saved query') }" data-bind="click: function() { $root.openNotebook(parentUuid()) }" style="cursor: pointer"><i class="fa fa-fw fa-history"></i></a>
+            <!-- /ko -->
+            <!-- ko ifnot: parentUuid -->
+              <a title="${ _('Query history') }"><i class="fa fa-fw fa-history"></i></a>
+            <!-- /ko -->
           </li>
           <li data-bind="visible: directoryUuid" style="display: none">
-            <a title="${ _('Open home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }"><i class="fa fa-fw fa-folder-o"></i></a>
+            <a title="${ _('Open home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
           </li>
           <li class="query-name">
             <a href="javascript:void(0)">

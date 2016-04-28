@@ -189,6 +189,18 @@ def get_document(request):
 
 
 @api_error_handler
+def open_document(request):
+  doc_id = request.GET.get('id')
+
+  if doc_id.isdigit():
+    document = Document2.objects.document(user=request.user, doc_id=doc_id)
+  else:
+    document = Document2.objects.get_by_uuid(user=request.user, uuid=doc_id)
+
+  return redirect(document.get_absolute_url())
+
+
+@api_error_handler
 @require_POST
 def move_document(request):
   source_doc_uuid = json.loads(request.POST.get('source_doc_uuid'))
