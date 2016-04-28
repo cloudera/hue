@@ -300,7 +300,7 @@ ${ hueIcons.symbols() }
             <a title="${ _('Query history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li class="query-name">
-            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
+            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></span></a>
           </li>
           <li data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
