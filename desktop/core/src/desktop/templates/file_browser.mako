@@ -815,8 +815,13 @@ from desktop.views import _ko
                 })
               }
             },
-            stop: function () {
+            stop: function (event) {
               $('.fb-drag-select').remove();
+              var elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
+              var elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
+              if (elementAtStart.nodeName === "A" && elementAtStop.nodeName === "A" && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 8) {
+                $(elementAtStop).trigger('click');
+              }
             },
             helper: function (event) {
               if (boundEntry.selected()) {
