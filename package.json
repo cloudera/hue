@@ -1,0 +1,23 @@
+{
+  "name": "hue",
+  "version": "3.10.0",
+  "description": "Let’s Big Data. Hue is an open source Web interface for analyzing data with Hadoop and Spark.",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "npm i -g phantomjs-prebuilt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudera/hue.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://issues.cloudera.org"
+  },
+  "homepage": "http://gethue.com",
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine-reporters": "^2.1.1"
+  }
+}

@@ -96,6 +96,7 @@ tools/jenkins/oozie.sql
 apps/logs
 java-lib/
 dependency-reduced-pom.xml
+junitresults*
 
 
 # Sublime Text temp files
@@ -106,3 +107,4 @@ dependency-reduced-pom.xml
 
 # Node Modules
 node_modules/
+

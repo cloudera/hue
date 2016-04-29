@@ -44,14 +44,15 @@
       paths: {
         'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
         'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
-        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot',
+        'jasmine-junit': 'desktop/ext/js/jasmine-2.3.4/junit_reporter'
       },
       shim: {
         'jasmine-html': {
           deps : ['jasmine']
         },
         'jasmine-boot': {
-          deps : ['jasmine', 'jasmine-html']
+          deps : ['jasmine', 'jasmine-html', 'jasmine-junit']
         }
       }
     })

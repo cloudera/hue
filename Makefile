@@ -277,6 +277,8 @@ ext-clean:
 ###############################################
 # Misc (some used by automated test scripts)
 ###############################################
+js-test:
+	$(ROOT)/node_modules/jasmine-reporters/bin/phantomjs.runner.sh http://localhost:8000/jasmine
 
 java-test:
 	mvn -f desktop/libs/hadoop/java/pom.xml test $(MAVEN_OPTIONS)
@@ -290,4 +292,6 @@ test-slow: java-test
 
 start-dev:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue runserver_plus
+
+
 # END DEV ONLY >>>>

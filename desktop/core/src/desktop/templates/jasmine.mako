@@ -25,6 +25,13 @@
       'desktop/spec/sqlAutocompleterSpec',
       'desktop/spec/hdfsAutocompleterSpec'
     ], function() {
+      if (/PhantomJS/.test(window.navigator.userAgent)) {
+        console.log("PhantomJS environment detected.");
+        jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
+            savePath: '../../../',
+            consolidateAll: false
+        }));
+      }
       window.onload();
     });
   });
