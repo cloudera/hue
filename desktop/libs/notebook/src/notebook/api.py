@@ -247,8 +247,8 @@ def save_notebook(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
 
-  if notebook.get('parentUuid'): # We save into the original saved query, not into the query history
-    notebook_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['parentUuid'])
+  if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
+    notebook_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['parentSavedQueryUuid'])
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
@@ -290,8 +290,8 @@ def _historify(notebook, user):
 
   # Link history of saved query
   if notebook['isSaved']:
-    parent_doc = Document2.objects.get(uuid=notebook.get('parentUuid') or notebook['uuid']) # From previous history query or initial saved query
-    notebook['parentUuid'] = parent_doc.uuid
+    parent_doc = Document2.objects.get(uuid=notebook.get('parentSavedQueryUuid') or notebook['uuid']) # From previous history query or initial saved query
+    notebook['parentSavedQueryUuid'] = parent_doc.uuid
     history_doc.dependencies.add(parent_doc)
 
   Document.objects.link(
@@ -332,7 +332,7 @@ def get_history(request):
             'statement_raw': notebook['snippets'][0]['statement_raw'][:1001],
             'lastExecuted':  notebook['snippets'][0]['lastExecuted'],
             'status':  notebook['snippets'][0]['status'],
-            'parentUuid': notebook.get('parentUuid', '')
+            'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),
       })

@@ -616,7 +616,7 @@
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
-          notebook.parentUuid(data.history_parent_uuid);
+          notebook.parentSavedQueryUuid(data.history_parent_uuid);
 
           notebook.history.unshift(
             notebook._makeHistoryRecord(
@@ -1025,7 +1025,7 @@
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
-    self.parentUuid = ko.observable(typeof notebook.parentUuid != "undefined" && notebook.parentUuid != null ? notebook.parentUuid : null); // History parent
+    self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
@@ -1212,7 +1212,7 @@
      return {
          id: self.id,
          uuid: self.uuid,
-         parentUuid: self.parentUuid,
+         parentSavedQueryUuid: self.parentSavedQueryUuid,
          isSaved: self.isSaved,
          sessions: self.sessions,
          type: self.type
@@ -1472,7 +1472,7 @@
       // Saved query or history but history coming from a saved query
       return self.selectedNotebook() && (
          self.selectedNotebook().isSaved() ||
-         (self.selectedNotebook().isHistory() && self.selectedNotebook().parentUuid())
+         (self.selectedNotebook().isHistory() && self.selectedNotebook().parentSavedQueryUuid())
       );
     });
 
@@ -1640,7 +1640,7 @@
     self.saveAsNotebook = function () {
       self.selectedNotebook().id(null);
       self.selectedNotebook().uuid(UUID());
-      self.selectedNotebook().parentUuid(null);
+      self.selectedNotebook().parentSavedQueryUuid(null);
       self.saveNotebook();
     };
   }
