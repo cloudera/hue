@@ -243,6 +243,12 @@ ${ fileBrowser.fileBrowser() }
           viewModel.openUuid(location.getParameter('uuid'));
         } else if (location.getParameter('path')) {
           viewModel.openPath(location.getParameter('path'));
+        } else if (viewModel.activeEntry() && viewModel.activeEntry().loaded()) {
+          var rootEntry = viewModel.activeEntry();
+          while (rootEntry && ! rootEntry.isRoot()) {
+            rootEntry = rootEntry.parent;
+          }
+          viewModel.activeEntry(rootEntry);
         } else {
           viewModel.activeEntry().load(function () {
             if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().definition().type === 'directory') {
@@ -256,9 +262,9 @@ ${ fileBrowser.fileBrowser() }
       loadUrlParam();
 
       viewModel.activeEntry.subscribe(function (newEntry) {
-        if (newEntry.definition().uuid && ! newEntry.isRoot()) {
+        if (typeof newEntry !== 'undefined' && newEntry.definition().uuid && ! newEntry.isRoot()) {
           hueUtils.changeURL('/home?uuid=' + newEntry.definition().uuid);
-        } else if (newEntry.isRoot()) {
+        } else if (typeof newEntry === 'undefined' || newEntry.isRoot()) {
           hueUtils.changeURL('/home');
         }
       });
