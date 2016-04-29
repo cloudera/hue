@@ -247,9 +247,8 @@ def save_notebook(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
 
-  if notebook.get('parentUuid'):
-    notebook_doc = Document2.objects.get(uuid=notebook['parentUuid'])
-    notebook_doc.can_read_or_exception(request.user)
+  if notebook.get('parentUuid'): # We save into the original saved query, not into the query history
+    notebook_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['parentUuid'])
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
