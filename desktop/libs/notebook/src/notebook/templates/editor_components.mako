@@ -318,7 +318,7 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
           </li>
           <li data-bind="visible: directoryUuid" style="display: none">
-            <a title="${ _('Open home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
+            <a title="${ _('Open in home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
           </li>
           <li class="query-name">
             <a href="javascript:void(0)">
