@@ -124,7 +124,7 @@ ${ assist.assistPanel() }
               tableName: table.name,
               columnName: name,
               fieldType: type,
-              assistHelper: table.assistHelper,
+              apiHelper: table.apiHelper,
               showViewMore: false
             } }"></span>
           </td>
@@ -478,7 +478,7 @@ ${ assist.assistPanel() }
                   databaseName: database.name,
                   tableName: name,
                   fieldType: type,
-                  assistHelper: assistHelper,
+                  apiHelper: apiHelper,
                   showViewMore: false
                 } }"></span></td>
               <td>

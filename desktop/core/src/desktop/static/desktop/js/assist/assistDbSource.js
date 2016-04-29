@@ -25,7 +25,7 @@
   /**
    * @param {Object} options
    * @param {Object} options.i18n
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {string} options.type
    * @param {string} options.name
    * @param {Object} options.navigationSettings
@@ -36,7 +36,7 @@
     var self = this;
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.sourceType = options.type;
     self.name = options.name;
 
@@ -100,7 +100,7 @@
         if (!newValue.hasEntries() && !newValue.loading()) {
           newValue.loadEntries()
         }
-        self.assistHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', newValue.definition.name)
+        self.apiHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', newValue.definition.name)
         huePubSub.publish("assist.database.set", {
           source: self.sourceType,
           name: newValue.definition.name
@@ -144,7 +144,7 @@
         self.selectedDatabase(dbIndex[databaseName]);
         return;
       }
-      var lastSelectedDb = self.assistHelper.getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
+      var lastSelectedDb = self.apiHelper.getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
       if (lastSelectedDb && dbIndex[lastSelectedDb]) {
         self.selectedDatabase(dbIndex[lastSelectedDb]);
       } else if (self.databases().length > 0) {
@@ -160,7 +160,7 @@
       var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       self.selectedDatabase(null);
       self.databases([]);
-      self.assistHelper.loadDatabases({
+      self.apiHelper.loadDatabases({
         sourceType: self.sourceType,
         successCallback: function(data) {
           self.hasErrors(false);

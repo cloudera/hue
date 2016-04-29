@@ -737,7 +737,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('pig/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/assist/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
@@ -955,7 +955,7 @@ ${ commonshare() | n,unicode }
         CodeMirror.isHCatHint = false;
         CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
       }
-    }
+    };
     codeMirror = CodeMirror(function (elt) {
       scriptEditor.parentNode.replaceChild(elt, scriptEditor);
     }, {
@@ -1030,10 +1030,10 @@ ${ commonshare() | n,unicode }
     var availableTables = '';
 
     % if autocomplete_base_url != '':
-      var assistHelper = AssistHelper.getInstance({
+      var apiHelper = ApiHelper.getInstance({
         user: '${ user }'
       });
-      assistHelper.fetchTables({
+      apiHelper.fetchTables({
         successCallback: function (data) {
           if (data && data.status == 0 && data.tables_meta) {
             availableTables = data.tables_meta.map(function (t) {

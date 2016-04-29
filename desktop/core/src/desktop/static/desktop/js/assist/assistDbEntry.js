@@ -261,7 +261,7 @@
       self.loading(false);
     };
 
-    self.assistDbSource.assistHelper.fetchPanelData({
+    self.assistDbSource.apiHelper.fetchPanelData({
       sourceType: self.assistDbSource.sourceType,
       hierarchy: self.getHierarchy(),
       successCallback: successCallback,

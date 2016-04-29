@@ -18,17 +18,17 @@
   if(typeof define === "function" && define.amd) {
     define([
       'knockout',
-      'desktop/js/assist/assistHelper'
+      'desktop/js/apiHelper'
     ], factory);
   } else {
-    root.EditorViewModel = factory(ko, assistHelper);
+    root.EditorViewModel = factory(ko, apiHelper);
   }
-}(this, function (ko, AssistHelper) {
+}(this, function (ko, ApiHelper) {
 
   /**
    * @param {Object} options
    * @param {string} options.name
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {string} [options.tableName]
    * @param {string} [options.tableComment]
    * @param {Object} options.i18n
@@ -40,7 +40,7 @@
    */
   function MetastoreDatabase(options) {
     var self = this;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
     self.name = options.name;
 
@@ -125,7 +125,7 @@
     }
 
     self.loading(true);
-    self.assistHelper.fetchTables({
+    self.apiHelper.fetchTables({
       sourceType: 'hive',
       databaseName: self.name,
       successCallback: function (data) {
@@ -135,7 +135,7 @@
             name: tableMeta.name,
             type: tableMeta.type,
             comment: tableMeta.comment,
-            assistHelper: self.assistHelper,
+            apiHelper: self.apiHelper,
             i18n: self.i18n,
             optimizerEnabled: optimizerEnabled
           })
@@ -228,7 +228,7 @@
 
   /**
    * @param {Object} options
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {MetastoreTable} options.metastoreTable
    */
   function MetastoreTablePartitions(options) {
@@ -237,7 +237,7 @@
     self.keys = ko.observableArray();
     self.values = ko.observableArray();
     self.metastoreTable = options.metastoreTable;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(true);
@@ -253,7 +253,7 @@
     if (self.loaded()) {
       return;
     }
-    self.assistHelper.fetchPartitions({
+    self.apiHelper.fetchPartitions({
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
       successCallback: function (data) {
@@ -273,7 +273,7 @@
 
   /**
    * @param {Object} options
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {MetastoreTable} options.metastoreTable
    * @param {Object} options.i18n
    * @param {string} options.i18n.errorFetchingTableSample
@@ -283,7 +283,7 @@
     self.rows = ko.observableArray();
     self.headers = ko.observableArray();
     self.metastoreTable = options.metastoreTable;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
 
     self.loaded = ko.observable(false);
@@ -300,7 +300,7 @@
     if (self.loaded()) {
       return;
     }
-    self.assistHelper.fetchTableSample({
+    self.apiHelper.fetchTableSample({
       sourceType: "hive",
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
@@ -329,7 +329,7 @@
    * @param {string} options.name
    * @param {string} options.type
    * @param {string} options.comment
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {Object} options.i18n
    * @param {string} options.i18n.errorFetchingTableDetails
    * @param {string} options.i18n.errorFetchingTableFields
@@ -340,7 +340,7 @@
   function MetastoreTable(options) {
     var self = this;
     self.database = options.database;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
     self.optimizerEnabled = options.optimizerEnabled;
     self.name = options.name;
@@ -360,12 +360,12 @@
     self.columns = ko.observableArray();
     self.favouriteColumns = ko.observableArray();
     self.samples = new MetastoreTableSamples({
-      assistHelper: self.assistHelper,
+      apiHelper: self.apiHelper,
       i18n: self.i18n,
       metastoreTable: self
     });
     self.partitions = new MetastoreTablePartitions({
-      assistHelper: self.assistHelper,
+      apiHelper: self.apiHelper,
       metastoreTable: self
     });
     self.tableDetails = ko.observable();
@@ -394,7 +394,7 @@
         return;
       }
       self.refreshingTableStats(true);
-      self.assistHelper.refreshTableStats({
+      self.apiHelper.refreshTableStats({
         tableName: self.name,
         databaseName: self.database.name,
         sourceType: "hive",
@@ -404,7 +404,7 @@
         errorCallback: function (data) {
           self.refreshingTableStats(false);
           $.jHueNotify.error(self.i18n.errorRefreshingTableStats);
-          console.error('assistHelper.refreshTableStats error');
+          console.error('apiHelper.refreshTableStats error');
           console.error(data);
         }
       })
@@ -413,7 +413,7 @@
     self.fetchFields = function () {
       var self = this;
       self.loadingColumns(true);
-      self.assistHelper.fetchFields({
+      self.apiHelper.fetchFields({
         sourceType: "hive",
         databaseName: self.database.name,
         tableName: self.name,
@@ -437,7 +437,7 @@
     self.fetchDetails = function () {
       var self = this;
       self.loadingDetails(true);
-      self.assistHelper.fetchTableDetails({
+      self.apiHelper.fetchTableDetails({
         sourceType: "hive",
         databaseName: self.database.name,
         tableName: self.name,
@@ -630,9 +630,9 @@
   function MetastoreViewModel(options) {
     var self = this;
     self.assistAvailable = ko.observable(true);
-    self.assistHelper = AssistHelper.getInstance(options);
+    self.apiHelper = ApiHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
-    self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
 
     self.optimizerEnabled.subscribe(function (newValue) {
@@ -675,13 +675,13 @@
         return;
       }
       self.loading(true);
-      self.assistHelper.loadDatabases({
+      self.apiHelper.loadDatabases({
         sourceType: 'hive',
         successCallback: function (databaseNames) {
           self.databases($.map(databaseNames, function (name) {
             return new MetastoreDatabase({
               name: name,
-              assistHelper: self.assistHelper,
+              apiHelper: self.apiHelper,
               i18n: self.i18n,
               optimizerEnabled: self.optimizerEnabled
             })

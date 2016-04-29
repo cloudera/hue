@@ -221,7 +221,7 @@ if USE_NEW_EDITOR.get():
 
     $.fn.dataTableExt.sErrMode = "throw";
 
-    // sets global assistHelper TTL
+    // sets global apiHelper TTL
     $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
     $(document).ready(function () {

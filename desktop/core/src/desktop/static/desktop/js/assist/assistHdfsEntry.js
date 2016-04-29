@@ -28,14 +28,14 @@
    * @param {string} options.definition.name
    * @param {string} options.definition.type (file, dir)
    * @param {AssistHdfsEntry} options.parent
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @constructor
    */
   function AssistHdfsEntry (options) {
     var self = this;
 
     self.definition = options.definition;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.parent = options.parent;
     self.path = '';
     if (self.parent !== null) {
@@ -85,7 +85,7 @@
         return new AssistHdfsEntry({
           definition: file,
           parent: self,
-          assistHelper: self.assistHelper
+          apiHelper: self.apiHelper
         })
       }));
       self.loaded = true;
@@ -103,7 +103,7 @@
       }
     };
 
-    self.assistHelper.fetchHdfsPath({
+    self.apiHelper.fetchHdfsPath({
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback

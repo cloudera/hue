@@ -1175,7 +1175,7 @@
     updateWhenRendered: function (element, valueAccessor) {
       var self = this;
       var options = ko.unwrap(valueAccessor());
-      var assistHelper = options.assistHelper;
+      var apiHelper = options.apiHelper;
       var panelDefinitions = options.panels;
 
       var $container = $(element);
@@ -1212,7 +1212,7 @@
         return;
       }
 
-      var panelRatios = assistHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
+      var panelRatios = apiHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
 
       var totalRatios = 0;
       $.each($allPanels, function (idx, panel) {
@@ -1377,7 +1377,7 @@
             $allPanels.each(function (idx, panel) {
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
-            assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
+            apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
             $('.assist-flex-fill').getNiceScroll().resize();
           }
         });
@@ -2486,7 +2486,7 @@
       var $el = $(element);
       var options = ko.unwrap(valueAccessor());
       var snippet = options.snippet;
-      var assistHelper = snippet.getAssistHelper();
+      var apiHelper = snippet.getApiHelper();
       var aceOptions = options.aceOptions || {};
 
       $el.text(snippet.statement_raw());
@@ -2606,7 +2606,7 @@
       var refreshTables = function() {
         currentAssistTables = {};
         if (snippet.database()) {
-          assistHelper.fetchTables({
+          apiHelper.fetchTables({
             sourceType: snippet.type(),
             databaseName: snippet.database(),
             successCallback: function(data) {

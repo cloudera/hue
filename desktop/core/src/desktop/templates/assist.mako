@@ -401,7 +401,7 @@ from desktop.views import _ko
           tableName: tableName,
           columnName: columnName,
           fieldType: definition.type,
-          assistHelper: assistDbSource.assistHelper
+          apiHelper: assistDbSource.apiHelper
         } }"></span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem || (navigationSettings.openDatabase && definition.isDatabase), click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
@@ -410,7 +410,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
-        <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
+        <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, apiHelper: assistDbSource.apiHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, draggableText: { text: editorText,  meta: {'table': tableName, 'database': databaseName} }"></span></a>
@@ -774,7 +774,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-panel-template">
     <!-- ko if: (searchInput() === '' && !searchHasFocus()) || ! navigatorEnabled() -->
-    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper, noFixedHeights: onlySql }">
+    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, apiHelper: apiHelper, noFixedHeights: onlySql }">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
@@ -861,14 +861,14 @@ from desktop.views import _ko
           'knockout',
           'desktop/js/assist/assistDbSource',
           'desktop/js/assist/assistHdfsEntry',
-          'desktop/js/assist/assistHelper',
+          'desktop/js/apiHelper',
           'desktop/js/fileBrowser/hueFileEntry',
           'tableStats'
         ], factory);
       } else {
-        factory(ko, AssistDbSource, AssistHdfsEntry, AssistHelper, HueFileEntry);
+        factory(ko, AssistDbSource, AssistHdfsEntry, ApiHelper, HueFileEntry);
       }
-    }(function (ko, AssistDbSource, AssistHdfsEntry, AssistHelper, HueFileEntry) {
+    }(function (ko, AssistDbSource, AssistHdfsEntry, ApiHelper, HueFileEntry) {
 
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
@@ -900,7 +900,7 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {AssistHelper} options.assistHelper
+       * @param {ApiHelper} options.apiHelper
        * @param {string} options.type
        * @param {number} options.minHeight
        * @param {string} options.icon
@@ -917,7 +917,7 @@ from desktop.views import _ko
         self.panelData = options.panelData;
 
         self.visible = ko.observable(options.visible);
-        options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
+        options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
         self.templateName = 'assist-' + self.type + '-inner-panel';
 
         var loadWhenVisible = function () {
@@ -935,7 +935,7 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {AssistHelper} options.assistHelper
+       * @param {ApiHelper} options.apiHelper
        * @param {Object} options.i18n
        * @param {Object[]} options.sourceTypes - All the available SQL source types
        * @param {string} options.sourceTypes[].name - Example: Hive SQL
@@ -949,14 +949,14 @@ from desktop.views import _ko
        **/
       function AssistDbPanel (options) {
         var self = this;
-        self.assistHelper = options.assistHelper;
+        self.apiHelper = options.apiHelper;
         self.i18n = options.i18n;
 
         self.sources = ko.observableArray();
         var sourceIndex = {};
         $.each(options.sourceTypes, function (idx, sourceType) {
           sourceIndex[sourceType.type] = new AssistDbSource({
-            assistHelper: self.assistHelper,
+            apiHelper: self.apiHelper,
             i18n: self.i18n,
             type: sourceType.type,
             name: sourceType.name,
@@ -1010,13 +1010,13 @@ from desktop.views import _ko
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
             newSource.initDatabases();
-            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+            self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
           } else {
-            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource');
+            self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
           }
         });
 
-        var storageSourceType = self.assistHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+        var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
 
         if (! self.selectedSource()) {
           if (options.activeSourceType) {
@@ -1050,7 +1050,7 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {AssistHelper} options.assistHelper
+       * @param {ApiHelper} options.apiHelper
        * @param {string} options.user
        * @param {Object} options.i18n
        * @constructor
@@ -1062,7 +1062,7 @@ from desktop.views import _ko
         self.activeEntry(new HueFileEntry({
           activeEntry: self.activeEntry,
           trashEntry: ko.observable,
-          assistHelper: options.assistHelper,
+          apiHelper: options.apiHelper,
           app: 'documents',
           user: options.user,
           activeSort: ko.observable('name'),
@@ -1075,16 +1075,16 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {AssistHelper} options.assistHelper
+       * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
       function AssistHdfsPanel (options) {
         var self = this;
-        self.assistHelper = options.assistHelper;
+        self.apiHelper = options.apiHelper;
 
         self.selectedHdfsEntry = ko.observable();
         var reload = function () {
-          var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
           var parts = lastKnownPath.split('/');
           parts.shift();
 
@@ -1094,7 +1094,7 @@ from desktop.views import _ko
               type: 'dir'
             },
             parent: null,
-            assistHelper: self.assistHelper
+            apiHelper: self.apiHelper
           });
 
           currentEntry.loadDeep(parts, function (entry) {
@@ -1107,7 +1107,7 @@ from desktop.views import _ko
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
-          self.assistHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
+          self.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
         });
 
         huePubSub.subscribe('assist.hdfs.refresh', function () {
@@ -1142,7 +1142,7 @@ from desktop.views import _ko
             'notebook' : "${ _('Notebook') }"
           }
         };
-        self.assistHelper = AssistHelper.getInstance({
+        self.apiHelper = ApiHelper.getInstance({
           i18n: i18n,
           user: params.user
         });
@@ -1211,10 +1211,10 @@ from desktop.views import _ko
         self.availablePanels = [
           new AssistInnerPanel({
             panelData: new AssistDbPanel($.extend({
-              assistHelper: self.assistHelper,
+              apiHelper: self.apiHelper,
               i18n: i18n
             }, params.sql)),
-            assistHelper: self.assistHelper,
+            apiHelper: self.apiHelper,
             name: '${ _("SQL") }',
             type: 'db',
             icon: 'fa-database',
@@ -1226,9 +1226,9 @@ from desktop.views import _ko
         if (! self.onlySql) {
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistHdfsPanel({
-              assistHelper: self.assistHelper
+              apiHelper: self.apiHelper
             }),
-            assistHelper: self.assistHelper,
+            apiHelper: self.apiHelper,
             name: '${ _("HDFS") }',
             type: 'hdfs',
             icon: 'fa-folder-o',
@@ -1242,10 +1242,10 @@ from desktop.views import _ko
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
               user: params.user,
-              assistHelper: self.assistHelper,
+              apiHelper: self.apiHelper,
               i18n: i18n
             }),
-            assistHelper: self.assistHelper,
+            apiHelper: self.apiHelper,
             name: '${ _("Documents") }',
             type: 'documents',
             icon: 'fa-files-o',

@@ -29,7 +29,7 @@
    * @param {string} options.i18n.errorLoadingStats
    * @param {string} options.i18n.errorLoadingTerms
    * @param {string} options.i18n.errorRefreshingStats
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {string} options.sourceType
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -44,7 +44,7 @@
     self.database = options.databaseName;
     self.table = options.tableName;
     self.column = options.columnName || null;
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.type = options.type;
     self.showViewMore = options.showViewMore;
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
@@ -67,7 +67,7 @@
     self.showAnalysis = ko.observable(false);
 
     if (self.column === null) {
-      self.assistHelper.fetchTableDetails({
+      self.apiHelper.fetchTableDetails({
         tableName: ko.isObservable(self.table) ? self.table() : self.table,
         databaseName: ko.isObservable(self.database) ? self.database() : self.database,
         sourceType: self.sourceType,
@@ -133,7 +133,7 @@
       self.loadingStats(false);
     };
 
-    self.assistHelper.fetchStats({
+    self.apiHelper.fetchStats({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
       databaseName: ko.isObservable(self.database) ? self.database() : self.database,
       tableName: ko.isObservable(self.table) ? self.table() : self.table,
@@ -155,7 +155,7 @@
       self.fetchSamples();
     } else {
       var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
-      self.assistHelper.refreshTableStats({
+      self.apiHelper.refreshTableStats({
         sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
         databaseName: ko.isObservable(self.database) ? self.database() : self.database,
         tableName: ko.isObservable(self.table) ? self.table() : self.table,
@@ -182,7 +182,7 @@
     }
 
     self.loadingTerms(true);
-    self.assistHelper.fetchTerms({
+    self.apiHelper.fetchTerms({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
       databaseName: ko.isObservable(self.database) ? self.database() : self.database,
       tableName: ko.isObservable(self.table) ? self.table() : self.table,
@@ -219,7 +219,7 @@
     self.loadingSamples(true);
     self.samples({});
 
-    self.assistHelper.fetchTableSample({
+    self.apiHelper.fetchTableSample({
       sourceType: self.sourceType,
       databaseName: ko.isObservable(self.database) ? self.database() : self.database,
       tableName: ko.isObservable(self.table) ? self.table() : self.table,

@@ -41,12 +41,12 @@
 
     // Speed up by caching the databases
     var initDatabases = function () {
-      self.snippet.getAssistHelper().loadDatabases({
+      self.snippet.getApiHelper().loadDatabases({
         sourceType: self.snippet.type(),
         silenceErrors: true,
         successCallback: function () {
           if (self.optEnabled) {
-            $.each(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
+            $.each(self.snippet.getApiHelper().lastKnownDatabases[self.snippet.type()], function (idx, db) {
               if (db === 'default') {
                 $.post('/metadata/api/optimizer_api/top_tables', {
                   database: db
@@ -96,7 +96,7 @@
         if (ref.indexOf('.') > 0) {
           var refParts = ref.split('.');
 
-          if(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()].indexOf(refParts[0]) > -1) {
+          if(self.snippet.getApiHelper().lastKnownDatabases[self.snippet.type()].indexOf(refParts[0]) > -1) {
             return {
               database: refParts.shift(),
               table: refParts.join('.')
@@ -256,7 +256,7 @@
         if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
           fetchImpalaFields(remainingParts, topValues);
         } else {
-          self.snippet.getAssistHelper().fetchFields({
+          self.snippet.getApiHelper().fetchFields({
             sourceType: self.snippet.type(),
             databaseName: database,
             tableName: tableName,
@@ -292,7 +292,7 @@
       };
 
       if (fields.length === 1 && !self.optEnabled) {
-        self.snippet.getAssistHelper().fetchTableSample({
+        self.snippet.getApiHelper().fetchTableSample({
           sourceType: self.snippet.type(),
           databaseName: database,
           tableName: tableName,
@@ -395,7 +395,7 @@
       if (! excludeDatabases && ! self.oldEditor) {
         // No FROM prefix
         prependedFields = prependedFields.concat(fields);
-        fields = $.map(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function(database) {
+        fields = $.map(self.snippet.getApiHelper().lastKnownDatabases[self.snippet.type()], function(database) {
           return {
             name: database + ".",
             type: "database"
@@ -512,7 +512,7 @@
     var impalaFieldRef = impalaSyntax && beforeCursor.slice(-1) === '.';
 
     if (keywordBeforeCursor === "USE") {
-      var databases = self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()];
+      var databases = self.snippet.getApiHelper().lastKnownDatabases[self.snippet.type()];
       databases.sort();
       callback($.map(databases, function(db, idx) {
         return {
@@ -572,14 +572,14 @@
       var dbRefMatch = beforeCursor.match(/.*from\s+([^\.\s]+).$/i);
       var partialMatch = beforeCursor.match(/.*from\s+([\S]+)$/i);
       var partialTableOrDb = null;
-      if (dbRefMatch && self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()].indexOf(dbRefMatch[1]) > -1) {
+      if (dbRefMatch && self.snippet.getApiHelper().lastKnownDatabases[self.snippet.type()].indexOf(dbRefMatch[1]) > -1) {
         database = dbRefMatch[1];
       } else if (dbRefMatch && partialMatch) {
         partialTableOrDb = partialMatch[1].toLowerCase();
         database = self.snippet.database();
       }
 
-      self.snippet.getAssistHelper().fetchTables({
+      self.snippet.getApiHelper().fetchTables({
         sourceType: self.snippet.type(),
         databaseName: database,
         successCallback: function (data) {
@@ -705,7 +705,7 @@
 
       var getFields = function (database, remainingParts, fields) {
         if (remainingParts.length == 0) {
-          self.snippet.getAssistHelper().fetchFields({
+          self.snippet.getApiHelper().fetchFields({
             sourceType: self.snippet.type(),
             databaseName: database,
             tableName: tableName,
@@ -782,7 +782,7 @@
             var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
             if (mapOrArrayMatch !== null) {
               fields.push(mapOrArrayMatch[1]);
-              self.snippet.getAssistHelper().fetchFields({
+              self.snippet.getApiHelper().fetchFields({
                 sourceType: self.snippet.type(),
                 databaseName: database,
                 tableName: tableName,
@@ -843,7 +843,7 @@
             };
             // For impala we have to fetch info about each field as we don't know
             // whether it's a map or array for hive the [ and ] gives it away...
-            self.snippet.getAssistHelper().fetchFields({
+            self.snippet.getApiHelper().fetchFields({
               sourceType: self.snippet.type(),
               databaseName: database,
               tableName: tableName,
