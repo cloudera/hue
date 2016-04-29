@@ -147,10 +147,12 @@ ${ comps.menubar() }
                     <td>${_('Jobs')}</td>
                     <td><a href="${job.trackingUrl}">${job.trackingUrl}</a></td>
                   </tr>
+                  % if hasattr(job, 'amHostHttpAddress'):
                   <tr>
                     <td>${_('Host')}</td>
                     <td><a href="http://${job.amHostHttpAddress}">http://${job.amHostHttpAddress}</a></td>
                   </tr>
+                  % endif
                   <tr>
                     <td>${_('Queue Name')}</td>
                     <td>${job.queueName}</td>
@@ -468,21 +470,17 @@ ${ comps.menubar() }
                 <tbody>
 
                   % if job.trackingUrl:
-
                   <tr>
                     <td>${_('Jobs')}</td>
                     <td><a href="${job.trackingUrl}">${job.trackingUrl}</a></td>
                   </tr>
-
                   % endif
 
                   % if hasattr(job, 'amHostHttpAddress'):
-
                   <tr>
                     <td>${_('Host')}</td>
                     <td><a href="http://${job.amHostHttpAddress}">http://${job.amHostHttpAddress}</a></td>
                   </tr>
-
                   %endif
 
                   <tr>
