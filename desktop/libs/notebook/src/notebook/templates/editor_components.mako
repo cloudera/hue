@@ -212,7 +212,7 @@ ${ hueIcons.symbols() }
 
            <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().dependentsWorkflows().length > 0 -->
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            <ul class="dropdown-menu" data-bind="foreach: $root.selectedNotebook().dependentsWorkflows">
+            <ul class="dropdown-menu pull-right" data-bind="foreach: $root.selectedNotebook().dependentsWorkflows">
               <li>
                 <a class="pointer" data-bind="attr: { 'href': absoluteUrl }">
                   <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> <span data-bind="text: name"></span>
