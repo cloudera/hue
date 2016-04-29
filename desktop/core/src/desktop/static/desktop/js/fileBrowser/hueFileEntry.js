@@ -175,6 +175,17 @@
     });
   }
 
+  HueFileEntry.prototype.addDirectoryParamToUrl = function (url) {
+    var self = this;
+    if (! self.definition() || self.isRoot()) {
+      return url;
+    }
+    if (url.indexOf('?') !== -1) {
+      return url + '&directory_uuid=' + self.definition().uuid;
+    }
+    return url + '?directory_uuid=' + self.definition().uuid;
+  };
+
   HueFileEntry.prototype.beforeContextOpen = function () {
     var self = this;
     if (! self.selected()) {
