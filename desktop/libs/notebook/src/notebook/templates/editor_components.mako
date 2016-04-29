@@ -1677,11 +1677,11 @@ ${ hueIcons.symbols() }
     <a class="snippet-side-btn" data-bind="attr: {'title': $root.editorMode && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }">
       <i class="fa fa-fw fa-play snippet-side-single"></i>
     </a>
+    <!-- ko if: isSqlDialect -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }">
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
         <i class="fa fa-fw fa-map-o"></i>
       </a>
-      <!-- ko if: isSqlDialect -->
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '', 'blue': currentQueryTab() == 'queryExplain' }">
         <i class="fa fa-caret-down"></i>
       </a>
@@ -1708,8 +1708,8 @@ ${ hueIcons.symbols() }
           </a>
         </li>
       </ul>
-      <!-- /ko -->
     </div>
+    <!-- /ko -->
   </div>
 </script>
 
