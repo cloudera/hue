@@ -22,13 +22,17 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
-from libsolr.api import SolrApi as NativeSolrApi
-
 from notebook.connectors.base import Api, QueryError
 from notebook.models import escape_rows
 
 
 LOG = logging.getLogger(__name__)
+
+
+try:
+  from libsolr.api import SolrApi as NativeSolrApi
+except ImportError, e:
+  LOG.exception('Search is not enabled')
 
 
 def query_error_handler(func):

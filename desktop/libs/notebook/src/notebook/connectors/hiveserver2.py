@@ -27,7 +27,6 @@ else:
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.conf import APP_BLACKLIST
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
