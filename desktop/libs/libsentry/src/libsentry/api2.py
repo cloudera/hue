@@ -174,7 +174,7 @@ class SentryApi(object):
       _roles = {}
       for role, privileges in roles.privilegeMap.iteritems():
         _roles[role] = [self._massage_privilege(privilege) for privilege in privileges]
-      _privileges.append((self._massage_authorizable(authorizable), _roles))
+      _privileges.append((self._massage_string_authorizable(authorizable), _roles))
 
     return _privileges
 
@@ -211,6 +211,10 @@ class SentryApi(object):
 
   def _massage_authorizable(self, authorizables):
     return [{'type': auth.type, 'name': auth.name} for auth in authorizables]
+
+
+  def _massage_string_authorizable(self, authorizables):
+    return [{'type': auth.split('=')[0], 'name': auth.split('=')[1]} for auth in authorizables.split('->')]
 
 
 class SentryException(Exception):
