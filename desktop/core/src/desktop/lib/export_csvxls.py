@@ -20,6 +20,7 @@ Common library to export either CSV or XLS.
 """
 import gc
 import logging
+import numbers
 import openpyxl
 import re
 import six
@@ -45,8 +46,9 @@ def encode_row(row, encoding=None, is_xls=False):
   for cell in row:
     if is_xls and isinstance(cell, six.string_types):
       cell = re.sub(XLS_ILLEGAL_CHARS, '?', cell)
-    if isinstance(cell, six.string_types):
-      cell = smart_str(nullify(cell), encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
+    cell = nullify(cell)
+    if not isinstance(cell, numbers.Number):
+      cell = smart_str(cell, encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
     encoded_row.append(cell)
   return encoded_row
 
