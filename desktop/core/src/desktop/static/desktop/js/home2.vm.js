@@ -18,14 +18,14 @@
   if(typeof define === "function" && define.amd) {
     define([
       'knockout',
-      'desktop/js/assist/assistHelper',
+      'desktop/js/apiHelper',
       'desktop/js/fileBrowser/hueFileEntry',
       'knockout-mapping'
     ], factory);
   } else {
-    root.HomeViewModel = factory(ko, assistHelper, HueFileEntry);
+    root.HomeViewModel = factory(ko, apiHelper, HueFileEntry);
   }
-}(this, function (ko, AssistHelper, HueFileEntry) {
+}(this, function (ko, ApiHelper, HueFileEntry) {
 
 
   /**
@@ -40,16 +40,16 @@
 
     self.user = options.user;
     self.superuser = options.superuser;
-    self.assistHelper = AssistHelper.getInstance(options);
+    self.apiHelper = ApiHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
-    self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
     self.activeEntry(new HueFileEntry({
       activeEntry: self.activeEntry,
       trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
+      apiHelper: self.apiHelper,
       app: 'documents',
       user: self.user,
       superuser: self.superuser,

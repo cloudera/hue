@@ -16,9 +16,9 @@
 define([
   'knockout',
   'desktop/js/hdfsAutocompleter',
-  'desktop/js/Assist/assistHelper',
+  'desktop/js/apiHelper',
   'desktop/spec/autocompleterTestUtils'
-], function(ko, HdfsAutocompleter, AssistHelper, testUtils) {
+], function(ko, HdfsAutocompleter, ApiHelper, testUtils) {
   describe("hdfsAutocompleter.js", function() {
     var subject;
 
@@ -26,7 +26,7 @@ define([
       responseForUrls: {}
     };
 
-    var assistHelper = AssistHelper.getInstance({
+    var apiHelper = ApiHelper.getInstance({
       i18n: {},
       user: 'testUser'
     });
@@ -36,7 +36,7 @@ define([
       database: ko.observable("database_one"),
       isSqlDialect: function () { return true; },
       getContext: function () { return ko.mapping.fromJS(null) },
-      getAssistHelper: function () { return assistHelper }
+      getApiHelper: function () { return apiHelper }
     };
 
 

@@ -177,23 +177,23 @@ ${ assist.assistPanel() }
   require([
     "knockout",
     "ko.charts",
-    "desktop/js/assist/assistHelper",
+    "desktop/js/apiHelper",
     "assistPanel",
     "tableStats",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
     "ko.hue-bindings"
-  ], function (ko, charts, AssistHelper) {
+  ], function (ko, charts, ApiHelper) {
 
     ko.options.deferUpdates = true;
 
     function PartitionViewModel(options, partition_keys_json, partition_values_json) {
       var self = this;
-      self.assistHelper = AssistHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance(options);
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
 
       self.isLoading = ko.observable(false);

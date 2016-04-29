@@ -95,7 +95,7 @@
         }
       };
 
-      self.snippet.getAssistHelper().fetchHdfsPath({
+      self.snippet.getApiHelper().fetchHdfsPath({
         pathParts: parts,
         successCallback: successCallback,
         silenceErrors: true,

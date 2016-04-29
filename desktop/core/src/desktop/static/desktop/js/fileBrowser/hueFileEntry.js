@@ -55,7 +55,7 @@
   /**
    *
    * @param {Object} options
-   * @param {AssistHelper} options.assistHelper
+   * @param {ApiHelper} options.apiHelper
    * @param {Object} options.definition
    * @param {Function} options.activeEntry - The observable keeping track of the current open directory
    * @param {Function} options.trashEntry - The observable keeping track of the trash directory
@@ -71,7 +71,7 @@
     self.trashEntry = options.trashEntry;
     self.parent = options.parent;
     self.definition = ko.observable(options.definition);
-    self.assistHelper = options.assistHelper;
+    self.apiHelper = options.apiHelper;
     self.app = options.app;
     self.user = options.user;
     self.userGroups = options.userGroups;
@@ -229,7 +229,7 @@
   HueFileEntry.prototype.loadDocument = function () {
     var self = this;
     self.document(new HueDocument({
-      assistHelper: self.assistHelper,
+      apiHelper: self.apiHelper,
       fileEntry: self
     }));
     self.document().load();
@@ -244,7 +244,7 @@
       var moveNext = function () {
         if (entries.length > 0) {
           var nextId = entries.shift().definition().uuid;
-          self.assistHelper.moveDocument({
+          self.apiHelper.moveDocument({
             successCallback: function () {
               moveNext();
             },
@@ -271,7 +271,7 @@
       activeEntry: self.activeEntry,
       activeSort: self.activeSort,
       trashEntry: self.trashEntry,
-      assistHelper: self.assistHelper,
+      apiHelper: self.apiHelper,
       app: self.app,
       user: self.user,
       superuser: self.superuser
@@ -302,7 +302,7 @@
 
     resultEntry.loading(true);
 
-    self.assistHelper.searchDocuments({
+    self.apiHelper.searchDocuments({
       uuid: owner.uuid,
       query: query,
       successCallback: function (data) {
@@ -364,7 +364,7 @@
     self.loading(true);
 
     if (self.app === 'documents') {
-      self.assistHelper.fetchDocuments({
+      self.apiHelper.fetchDocuments({
         uuid: self.definition().uuid,
         successCallback: function(data) {
           self.definition(data.document);
@@ -443,7 +443,7 @@
       var deleteNext = function () {
         if (self.entriesToDelete().length > 0) {
           var nextUuid = self.entriesToDelete().shift().definition().uuid;
-          self.assistHelper.deleteDocument({
+          self.apiHelper.deleteDocument({
             uuid: nextUuid,
             skipTrash: deleteForever,
             successCallback: function () {
@@ -483,7 +483,7 @@
       self.uploading(true);
       self.uploadComplete(false);
       self.uploadFailed(false);
-      self.assistHelper.uploadDocument({
+      self.apiHelper.uploadDocument({
         formData: new FormData($('#importDocumentsForm')[0]),
         successCallback: function () {
           self.uploading(false);
@@ -545,7 +545,7 @@
   HueFileEntry.prototype.createDirectory = function (name) {
     var self = this;
     if (name && self.app === 'documents') {
-      self.assistHelper.createDocumentsFolder({
+      self.apiHelper.createDocumentsFolder({
         successCallback: self.load.bind(self),
         parentUuid: self.definition().uuid,
         name: name

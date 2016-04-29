@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function BeeswaxViewModel(server, assistHelper) {
+function BeeswaxViewModel(server, apiHelper) {
   var self = this;
 
   var DESIGN_DEFAULTS = {

@@ -803,7 +803,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/sqlAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/tableStats.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/assist/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1196,7 +1196,7 @@ var i18n = {
 var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
 var notebook = editorViewModel.newNotebook();
 var snippet = notebook.newSnippet(snippetType);
-var assistHelper = snippet.getAssistHelper();
+var apiHelper = snippet.getApiHelper();
 var autocompleter = new Autocompleter({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
@@ -1204,7 +1204,7 @@ var autocompleter = new Autocompleter({
   optEnabled: false
 });
 
-var totalStorageUserPrefix = assistHelper.getTotalStorageUserPrefix(snippetType);
+var totalStorageUserPrefix = apiHelper.getTotalStorageUserPrefix(snippetType);
 
 var escapeOutput = function (str) {
   return $('<span>').text(str).html().trim();
@@ -2824,7 +2824,7 @@ function setupCodeMirrorSubscription() {
 }
 
 // Knockout
-viewModel = new BeeswaxViewModel("${app_name}", assistHelper);
+viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 shareViewModel = initSharing("#documentShareModal");

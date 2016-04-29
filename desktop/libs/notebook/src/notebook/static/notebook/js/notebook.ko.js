@@ -16,11 +16,17 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assist/assistHelper', 'desktop/js/autocompleter', 'knockout-mapping', 'ko.charts'], factory);
+    define([
+      'knockout',
+      'desktop/js/apiHelper',
+      'desktop/js/autocompleter',
+      'knockout-mapping',
+      'ko.charts'
+    ], factory);
   } else {
-    root.EditorViewModel = factory(ko, AssistHelper, Autocompleter);
+    root.EditorViewModel = factory(ko, ApiHelper, Autocompleter);
   }
-}(this, function (ko, AssistHelper, Autocompleter) {
+}(this, function (ko, ApiHelper, Autocompleter) {
 
   var NOTEBOOK_MAPPING = {
     ignore: [
@@ -195,8 +201,8 @@
       return vm.getSnippetViewSettings(self.type()).placeHolder;
     };
 
-    self.getAssistHelper = function() {
-      return AssistHelper.getInstance(vm);
+    self.getApiHelper = function() {
+      return ApiHelper.getInstance(vm);
     };
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
@@ -205,7 +211,7 @@
 
     var updateDatabases = function () {
       if (self.isSqlDialect()) {
-        self.getAssistHelper().loadDatabases({
+        self.getApiHelper().loadDatabases({
           sourceType: self.type(),
           silenceErrors: true,
           successCallback: self.availableDatabases
@@ -233,7 +239,7 @@
       lastQueriesPage = self.queriesCurrentPage();
       self.loadingQueries(true);
       self.queriesHasErrors(false);
-      self.getAssistHelper().searchDocuments({
+      self.getApiHelper().searchDocuments({
         successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
           self.queries(result.documents);
@@ -1267,8 +1273,8 @@
     };
 
     self.saveDefaultUserProperties = function (session) {
-      var assistHelper = AssistHelper.getInstance();
-      assistHelper.saveConfiguration({
+      var apiHelper = ApiHelper.getInstance();
+      apiHelper.saveConfiguration({
         app: session.type(),
         properties: session.properties,
         userId: vm.userId
@@ -1516,7 +1522,7 @@
     self.assistAvailable = ko.observable(options.assistAvailable);
 
     self.isLeftPanelVisible = ko.observable();
-    AssistHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    ApiHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 

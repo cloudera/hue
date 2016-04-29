@@ -18,7 +18,7 @@
   if(typeof define === "function" && define.amd) {
     define(['knockout'], factory);
   } else {
-    root.AssistHelper = factory(ko);
+    root.ApiHelper = factory(ko);
   }
 }(this, function (ko) {
 
@@ -41,7 +41,7 @@
    *
    * @constructor
    */
-  function AssistHelper (i18n, user) {
+  function ApiHelper (i18n, user) {
     var self = this;
     self.i18n = i18n;
     self.user = user;
@@ -58,7 +58,7 @@
     });
   }
 
-  AssistHelper.prototype.hasExpired = function (timestamp) {
+  ApiHelper.prototype.hasExpired = function (timestamp) {
     return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
   };
 
@@ -66,7 +66,7 @@
    * @param {string} sourceType
    * @returns {string}
    */
-  AssistHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
+  ApiHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
     var self = this;
     return sourceType + "_" + self.user;
   };
@@ -77,7 +77,7 @@
    * @param {string} id
    * @param {*} [value] - Optional, undefined and null will remove the value
    */
-  AssistHelper.prototype.setInTotalStorage = function(owner, id, value) {
+  ApiHelper.prototype.setInTotalStorage = function(owner, id, value) {
     var self = this;
     var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
     if (typeof value !== 'undefined' && value !== null) {
@@ -96,7 +96,7 @@
    * @param {*} [defaultValue]
    * @returns {*}
    */
-  AssistHelper.prototype.getFromTotalStorage = function(owner, id, defaultValue) {
+  ApiHelper.prototype.getFromTotalStorage = function(owner, id, defaultValue) {
     var self = this;
     var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
     return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
@@ -108,7 +108,7 @@
    * @param {Observable} observable
    * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
    */
-  AssistHelper.prototype.withTotalStorage = function(owner, id, observable, defaultValue, noInit) {
+  ApiHelper.prototype.withTotalStorage = function(owner, id, observable, defaultValue, noInit) {
     var self = this;
 
     var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
@@ -130,7 +130,7 @@
    * @param {number} [response.status]
    * @returns {boolean} - True if actually an error
    */
-  AssistHelper.prototype.successResponseIsError = function (response) {
+  ApiHelper.prototype.successResponseIsError = function (response) {
     return typeof response !== 'undefined' && (response.status === -1 || response.status === 500 || response.code === 503 || response.code === 500);
   };
 
@@ -140,7 +140,7 @@
    * @param {boolean} [options.silenceErrors]
    * @returns {Function}
    */
-  AssistHelper.prototype.assistErrorCallback = function (options) {
+  ApiHelper.prototype.assistErrorCallback = function (options) {
     return function (errorResponse) {
       var errorMessage = 'Unknown error occurred';
       if (errorResponse !== 'undefined') {
@@ -188,7 +188,7 @@
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    */
-  AssistHelper.prototype.simplePost = function (url, data, options) {
+  ApiHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
     $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
@@ -209,7 +209,7 @@
    *
    * @param {string[]} options.pathParts
    */
-  AssistHelper.prototype.fetchHdfsPath = function (options) {
+  ApiHelper.prototype.fetchHdfsPath = function (options) {
     var self = this;
     var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + HDFS_PARAMETERS;
 
@@ -243,7 +243,7 @@
     }));
   };
 
-  AssistHelper.prototype.getFetchQueue = function (fetchFunction, identifier) {
+  ApiHelper.prototype.getFetchQueue = function (fetchFunction, identifier) {
     var self = this;
     if (! self.fetchQueue[fetchFunction]) {
       self.fetchQueue[fetchFunction] = {};
@@ -270,7 +270,7 @@
    * @param {Number} [options.groupId]
    * @param {Number} [options.userId]
    */
-  AssistHelper.prototype.saveConfiguration = function (options) {
+  ApiHelper.prototype.saveConfiguration = function (options) {
     var self = this;
     self.simplePost(CONFIG_SAVE_API, {
       app: options.app,
@@ -289,7 +289,7 @@
    *
    * @param {string} [options.uuid]
    */
-  AssistHelper.prototype.fetchDocuments = function (options) {
+  ApiHelper.prototype.fetchDocuments = function (options) {
     var self = this;
 
     var queue = self.getFetchQueue('fetchDocuments', options.uuid);
@@ -334,7 +334,7 @@
    * @param {int} [options.page]
    * @param {int} [options.limit]
    */
-  AssistHelper.prototype.searchDocuments = function (options) {
+  ApiHelper.prototype.searchDocuments = function (options) {
     var self = this;
     $.ajax({
       url: DOCUMENTS_SEARCH_API,
@@ -364,7 +364,7 @@
    *
    * @param {number} options.uuid
    */
-  AssistHelper.prototype.fetchDocument = function (options) {
+  ApiHelper.prototype.fetchDocument = function (options) {
     var self = this;
     $.ajax({
       url: DOCUMENTS_API,
@@ -391,7 +391,7 @@
    * @param {string} options.parentUuid
    * @param {string} options.name
    */
-  AssistHelper.prototype.createDocumentsFolder = function (options) {
+  ApiHelper.prototype.createDocumentsFolder = function (options) {
     var self = this;
     self.simplePost("/desktop/api2/doc/mkdir", {
       parent_uuid: ko.mapping.toJSON(options.parentUuid),
@@ -408,7 +408,7 @@
    *
    * @param {FormData} options.formData
    */
-  AssistHelper.prototype.uploadDocument = function (options) {
+  ApiHelper.prototype.uploadDocument = function (options) {
     var self = this;
     $.ajax({
       url: '/desktop/api2/doc/import',
@@ -445,7 +445,7 @@
    * @param {number} options.sourceId - The ID of the source document
    * @param {number} options.destinationId - The ID of the target document
    */
-  AssistHelper.prototype.moveDocument = function (options) {
+  ApiHelper.prototype.moveDocument = function (options) {
     var self = this;
     self.simplePost("/desktop/api2/doc/move", {
       source_doc_uuid: ko.mapping.toJSON(options.sourceId),
@@ -462,7 +462,7 @@
    * @param {string} options.uuid
    * @param {string} [options.skipTrash] - Default false
    */
-  AssistHelper.prototype.deleteDocument = function (options) {
+  ApiHelper.prototype.deleteDocument = function (options) {
     var self = this;
     self.simplePost("/desktop/api2/doc/delete", {
       uuid: ko.mapping.toJSON(options.uuid),
@@ -480,7 +480,7 @@
    * @param {string[]} [options.fields]
    * @param {boolean} [options.clearAll]
    */
-  AssistHelper.prototype.clearDbCache = function (options) {
+  ApiHelper.prototype.clearDbCache = function (options) {
     var self = this;
     self.invalidateImpala = options.invalidateImpala || 'cache';
     if (options.clearAll) {
@@ -510,7 +510,7 @@
    *
    * @param {string} options.sourceType
    **/
-  AssistHelper.prototype.loadDatabases = function (options) {
+  ApiHelper.prototype.loadDatabases = function (options) {
     var self = this;
 
     var loadFunction = function () {
@@ -561,7 +561,7 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    */
-  AssistHelper.prototype.fetchPartitions = function (options) {
+  ApiHelper.prototype.fetchPartitions = function (options) {
     var self = this;
     $.ajax({
       url: "/metastore/table/" + options.databaseName + "/" + options.tableName + "/partitions",
@@ -593,7 +593,7 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    */
-  AssistHelper.prototype.fetchTableDetails = function (options) {
+  ApiHelper.prototype.fetchTableDetails = function (options) {
     var self = this;
     $.ajax({
       url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
@@ -627,7 +627,7 @@
    * @param {string} [options.columnName]
    * @param {Object} [options.editor] - Ace editor
    */
-  AssistHelper.prototype.fetchTableSample = function (options) {
+  ApiHelper.prototype.fetchTableSample = function (options) {
     var self = this;
     var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
 
@@ -678,7 +678,7 @@
    * @param {string} options.tableName
    * @param {string} options.columnName
    */
-  AssistHelper.prototype.refreshTableStats = function (options) {
+  ApiHelper.prototype.refreshTableStats = function (options) {
     var self = this;
     var pollRefresh = function (url) {
       $.post(url, function (data) {
@@ -714,7 +714,7 @@
    * @param {string} options.tableName
    * @param {string} options.columnName
    */
-  AssistHelper.prototype.fetchStats = function (options) {
+  ApiHelper.prototype.fetchStats = function (options) {
     var self = this;
     $.ajax({
       url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/stats/" + ( options.columnName || ""),
@@ -746,7 +746,7 @@
    * @param {string} options.tableName
    * @param {string} options.columnName
    */
-  AssistHelper.prototype.fetchTerms = function (options) {
+  ApiHelper.prototype.fetchTerms = function (options) {
     var self = this;
     $.ajax({
       url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/terms/" + options.columnName + "/" + (options.prefixFilter || ""),
@@ -776,7 +776,7 @@
    *
    * @param {string} options.databaseName
    */
-  AssistHelper.prototype.fetchTables = function (options) {
+  ApiHelper.prototype.fetchTables = function (options) {
     var self = this;
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
@@ -811,7 +811,7 @@
    * @param {string} options.tableName
    * @param {string[]} options.fields
    */
-  AssistHelper.prototype.fetchFields = function (options) {
+  ApiHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
     fetchAssistData.bind(self)($.extend({}, options, {
@@ -830,7 +830,7 @@
    *
    * @param {string[]} options.hierarchy
    */
-  AssistHelper.prototype.fetchPanelData = function (options) {
+  ApiHelper.prototype.fetchPanelData = function (options) {
     var self = this;
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
@@ -945,11 +945,11 @@
      * @param {string} options.i18n.errorLoadingTablePreview
      * @param {string} options.user
      *
-     * @returns {AssistHelper}
+     * @returns {ApiHelper}
      */
     getInstance: function (options) {
       if (instance === null) {
-        instance = new AssistHelper(options.i18n, options.user);
+        instance = new ApiHelper(options.i18n, options.user);
       }
       return instance;
     }

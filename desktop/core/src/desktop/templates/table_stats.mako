@@ -254,7 +254,7 @@ from desktop.views import _ko
               databaseName: self.params.databaseName,
               tableName: self.params.tableName,
               columnName: self.params.columnName,
-              assistHelper: self.params.assistHelper,
+              apiHelper: self.params.apiHelper,
               showViewMore: typeof self.params.showViewMore === 'undefined' || self.params.showViewMore,
               type: self.params.fieldType
             }));
