@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from libsolr.api import SolrApi as NativeSolrApi
-except ImportError, e:
+except (ImportError, AttributeError), e:
   LOG.exception('Search is not enabled')
 
 
