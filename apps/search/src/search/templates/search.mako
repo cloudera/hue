@@ -2624,13 +2624,6 @@ function multiSerieDataTransformerGrid(rawDatum) {
   return _datum;
 }
 
-function toggleDocDetails(doc) {
-  doc.showDetails(! doc.showDetails());
-
-  if (doc.details().length == 0) {
-    viewModel.getDocument(doc);
-  }
-}
 
 function resizeFieldsList() {
   $(".fields-list").css("max-height", Math.max($("#result-container").height(), 230));
@@ -2642,6 +2635,18 @@ function resizeFieldsList() {
     }
   }, 100);
 }
+
+function toggleDocDetails(doc) {
+  doc.showDetails(! doc.showDetails());
+
+  if (doc.details().length == 0) {
+    viewModel.getDocument(doc, resizeFieldsList);
+  }
+  else {
+    window.setTimeout(resizeFieldsList, 0);
+  }
+}
+
 
 function queryTypeahead(query, process) {
   var _source = viewModel.collection.template.fieldsNames();

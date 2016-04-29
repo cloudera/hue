@@ -1643,7 +1643,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   }
 
-  self.getDocument = function (doc) {
+  self.getDocument = function (doc, callback) {
     $.post("/search/get_document", {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
@@ -1678,6 +1678,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       doc.details(details);
       doc.originalDetails(ko.toJSON(doc.details()));
+      if (callback) {
+        callback(details);
+      }
     }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
