@@ -231,6 +231,7 @@ class Workflow(Job):
     _update_adj_list(adj_list)
 
     wf_rows = _create_workflow_layout(node_hierarchy, adj_list)
+
     data = {'layout': [{}], 'workflow': {}}
     if wf_rows:
       data['layout'][0]['rows'] = wf_rows
@@ -239,7 +240,8 @@ class Workflow(Job):
     _dig_nodes(node_hierarchy, adj_list, user, wf_nodes)
     data['workflow']['nodes'] = wf_nodes
     data['workflow']['id'] = "123"
-    data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None).update({
+    data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None)
+    data['workflow']['properties'].update({
       'deployment_dir': '/user/hue/oozie/workspaces/hue-oozie-1452553957.19'
     })
 
@@ -496,11 +498,9 @@ class Workflow(Job):
 # To avoid case-sensitive failures
 def _to_lowercase(node_list):
   for node in node_list:
-    node['node_type'] = node['node_type'].lower()
-    node['name'] = node['name'].lower()
-    node['ok_to'] = node['ok_to'].lower()
-    if 'error_to' in node.keys():
-      node['error_to'] = node['error_to'].lower()
+    for key in node.keys():
+      if type(node[key]) is str:
+        node[key] = node[key].lower()
 
 def _update_adj_list(adj_list):
   uuids = {}
@@ -579,10 +579,12 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties['sla'] = ''
 
       children = []
-      if node['node_type'] == 'fork':
+      if node['node_type'] in ('fork', 'decision'):
         for key in node.keys():
           if key.startswith('path'):
             children.append({'to': adj_list[node[key]]['uuid'], 'condition': '${ 1 gt 0 }'})
+        if node['node_type'] == 'decision':
+          children.append({'to': adj_list[node['default']]['uuid'], 'condition': '${ 1 gt 0 }'})
       else:
         if node.get('ok_to'):
           children.append({'to': adj_list[node['ok_to']]['uuid']})
@@ -607,8 +609,8 @@ def _create_workflow_layout(nodes, adj_list, size=12):
     if type(node) != list:
       wf_rows.append({"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
     else:
-      if adj_list[node[0]]['node_type'] == 'fork':
-        wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+      if adj_list[node[0]]['node_type'] in ('fork', 'decision'):
+        wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
 
         wf_rows.append({
           "id": str(uuid.uuid4()),
@@ -630,45 +632,52 @@ def _create_workflow_layout(nodes, adj_list, size=12):
              for col in [_create_workflow_layout(item, adj_list, size) for item in node[1]]
           ]
         })
-
-        wf_rows.append({"widgets":[{"size":size, "name": 'Join', "id":  adj_list[node[2]]['uuid'], "widgetType": "%s-widget" % adj_list[node[2]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        if adj_list[node[0]]['node_type'] == 'fork':
+          wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[2]]['name'], "id":  adj_list[node[2]]['uuid'], "widgetType": "%s-widget" % adj_list[node[2]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
         wf_rows.append(_create_workflow_layout(node, adj_list, size))
   return wf_rows
 
-
 def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
 
-  if adj_list[curr_node]['node_type'] == 'join':
+  _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy)
+
+  # Add End and Kill nodes to node_hierarchy
+  node_hierarchy.append([adj_list[key]['name'] for key in adj_list.keys() if adj_list[key]['node_type'] == 'kill'])
+  node_hierarchy.append([adj_list[key]['name'] for key in adj_list.keys() if adj_list[key]['node_type'] == 'end'])
+
+
+def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy):
+
+  if not curr_node or adj_list[curr_node]['node_type'] in ('join', 'end', 'kill'):
     return curr_node
 
-  elif adj_list[curr_node]['node_type'] == 'end':
-    kill_node_name = [k for (k, v) in adj_list.iteritems() if v['node_type'] == 'kill']
-    node_hierarchy.append(kill_node_name)
-    node_hierarchy.append([adj_list[curr_node]['name']])
-    return node_hierarchy
-
-  elif adj_list[curr_node]['node_type'] == 'fork':
-    fork_nodes = []
-    fork_nodes.append(curr_node)
+  elif adj_list[curr_node]['node_type'] in ('fork', 'decision'):
+    branch_nodes = []
+    branch_nodes.append(curr_node)
 
     join_node = None
     children = []
     for key in adj_list[curr_node].keys():
       if key.startswith('path'):
         child = []
-        join_node = _get_hierarchy_from_adj_list(adj_list, adj_list[curr_node][key], child)
-        children.append(child)
+        return_node = _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node][key], child)
+        join_node = return_node if not join_node else join_node
+        if child:
+          children.append(child)
 
-    fork_nodes.append(children)
-    fork_nodes.append(join_node)
+    branch_nodes.append(children)
+    if adj_list[curr_node]['node_type'] == 'fork':
+      branch_nodes.append(join_node)
+      node_hierarchy.append(branch_nodes)
+      return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[join_node]['ok_to'], node_hierarchy)
 
-    node_hierarchy.append(fork_nodes)
-    return _get_hierarchy_from_adj_list(adj_list, adj_list[join_node]['ok_to'], node_hierarchy)
+    node_hierarchy.append(branch_nodes)
+    return join_node
 
   else:
     node_hierarchy.append(curr_node)
-    return _get_hierarchy_from_adj_list(adj_list, adj_list[curr_node]['ok_to'], node_hierarchy)
+    return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node]['ok_to'], node_hierarchy)
 
 
 def _create_graph_adjaceny_list(nodes):
