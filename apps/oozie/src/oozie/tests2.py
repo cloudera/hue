@@ -526,7 +526,7 @@ class TestExternalWorkflowGraph():
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'fork-widget')
     assert_equal(workflow_data['workflow']['nodes'][0]['name'], 'start-3f10')
 
-  def test_gen_workflow_data_for_email(self):
+  def test_gen_workflow_data_from_xml_for_email(self):
     self.wf.definition = """<workflow-app name="My_Workflow" xmlns="uri:oozie:workflow:0.5">
         <start to="email-0377"/>
         <kill name="Kill">
@@ -552,3 +552,96 @@ class TestExternalWorkflowGraph():
     assert_true(len(workflow_data['workflow']['nodes']) == 4)
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'email-widget')
     assert_equal(workflow_data['workflow']['nodes'][0]['name'], 'start-3f10')
+
+  def test_gen_workflow_data_from_xml_for_decision_node(self):
+    self.wf.definition = """<workflow-app xmlns="uri:oozie:workflow:0.5" name="capture-output-wf">
+      <credentials>
+        <credential name="hive2" type="hive2">
+          <property>
+            <name>hive2.jdbc.url</name>
+            <value>jdbc:hive2://huetest-1.gce.cloudera.com:10000/default</value>
+          </property>
+          <property>
+            <name>hive2.server.principal</name>
+            <value>hive/huetest-1.gce.cloudera.com@GCE.CLOUDERA.COM</value>
+          </property>
+        </credential>
+      </credentials>
+
+        <start to="fork1"/>
+
+        <fork name="fork1">
+            <path start="capture-shell"/>
+            <path start="hive-node"/>
+        </fork>
+        <action name="capture-shell">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>capture-shell.sh</exec>
+                <file>capture-shell.sh#capture-shell.sh</file>
+                <capture-output/>
+            </shell>
+            <ok to="join1"/>
+            <error to="fail"/>
+        </action>
+        <action name="hive-node" cred="hive2">
+            <hive2 xmlns="uri:oozie:hive2-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <jdbc-url>jdbc:hive2://huetest-1.gce.cloudera.com:10000/default</jdbc-url>
+                <script>/user/cconner/chris1.sql</script>
+            </hive2>
+            <ok to="join1"/>
+            <error to="fail"/>
+        </action>
+
+        <join name="join1" to="email1"/>
+
+        <action name="email1">
+            <email xmlns="uri:oozie:email-action:0.1">
+                <to>oozie@admin1.sec.cloudera.com</to>
+                <subject>capture output workflow</subject>
+                <body>yay</body>
+            </email>
+            <ok to="java-decision"/>
+            <error to="fail"/>
+        </action>
+
+        <action name='java-decision'>
+            <java>
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <configuration>
+                    <property>
+                        <name>mapred.job.queue.name</name>
+                        <value>${queueName}</value>
+                    </property>
+                </configuration>
+                <main-class>com.test.CurrentTime</main-class>
+                <capture-output/>
+            </java>
+            <ok to="java-decision1" />
+            <error to="fail" />
+        </action>
+        <decision name="java-decision1">
+               <switch>
+               <case to="end">${(wf:actionData('java-decision')['key1'] == "true")}</case>
+               <default to="fail" />
+               </switch>
+        </decision>
+
+        <kill name="fail">
+            <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <end name="end"/>
+    </workflow-app>
+    """
+
+    workflow_data = Workflow.gen_workflow_data_from_xml('test', self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 10)
+    assert_true(len(workflow_data['workflow']['nodes']) == 10)
+    assert_equal(workflow_data['layout'][0]['rows'][6]['widgets'][0]['widgetType'], 'decision-widget')
+    assert_equal(workflow_data['workflow']['nodes'][7]['type'], 'decision-widget')
+    assert_true(len(workflow_data['workflow']['nodes'][7]['children']) == 2)
