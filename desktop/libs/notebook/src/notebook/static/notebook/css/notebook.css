@@ -1019,6 +1019,13 @@ h4.header {
 .notebook-name-input {
   width: 220px;
 }
+
 pre {
   font-size: 11px;
+}
+
+.history-filter {
+  border-radius: 9px!important;
+  min-height: 17px!important;
+  height: 17px!important;
 }
