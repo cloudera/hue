@@ -19,7 +19,7 @@
 
 <%block name="specs">
   <script type="text/javascript" charset="utf-8">
-  require(['jasmine-boot', 'jasmine'], function () {
+  require(['jasmine-boot', 'jasmine', 'mock-ajax'], function () {
     // Add specs below
     require([
       'desktop/spec/sqlAutocompleterSpec',
