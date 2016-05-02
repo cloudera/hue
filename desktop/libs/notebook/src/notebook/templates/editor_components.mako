@@ -1064,7 +1064,7 @@ ${ hueIcons.symbols() }
               <tbody data-bind="foreach: $parent.history">
                 <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid()) } }">
                   <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
-                    <span data-bind="text: moment(lastExecuted()).fromNow(), attr: {title: moment(lastExecuted()).format('LLL')}"></span>
+                    <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
                   </td>
                   <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <!-- ko switch: status -->

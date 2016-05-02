@@ -1342,12 +1342,14 @@
       });
     };
 
+    self.updateHistoryRunning = false;
     self.updateHistory = function () {
-      // TODO fetch list
+      if (!self.updateHistoryRunning) {
+        var items = $.grep(self.history(), function (item) {
+          return item.status() == 'running' || item.status() == 'starting';
+        });
 
-      // Update statuses
-      $.each(
-        $.grep(self.history(), function(item) { return item.status() == 'available' || item.status() == 'running' || item.status() == 'starting'; }), function(index, item) {
+        function updateHistoryCall(item) {
           $.post("/notebook/api/check_status", {
             notebook: ko.mapping.toJSON({id: item.uuid()}),
           }, function (data) {
@@ -1355,8 +1357,20 @@
             if (item.status() != status) {
               item.status(status);
             }
-        });
-      });
+          }).always(function () {
+            if (items.length > 0) {
+              window.setTimeout(function () {
+                updateHistoryCall(items.pop());
+              }, 1000);
+            }
+            self.updateHistoryRunning = (items.length > 0);
+          });
+        }
+
+        if (items.length > 0) {
+          updateHistoryCall(items.pop());
+        }
+      }
     };
 
     self._makeHistoryRecord = function(url, statement, lastExecuted, status, name, uuid) {
@@ -1452,6 +1466,8 @@
       });
       if (vm.editorMode && self.history().length == 0) {
         self.fetchHistory();
+        window.clearInterval(vm.updateHistoryInterval);
+        vm.updateHistoryInterval = window.setInterval(self.updateHistory, 20000);
       }
     }
   };
@@ -1554,6 +1570,7 @@
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
     self.editorMode = options.mode == 'editor';
+    self.updateHistoryInterval = null;
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
