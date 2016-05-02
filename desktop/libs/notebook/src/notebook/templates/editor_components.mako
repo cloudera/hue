@@ -1185,7 +1185,7 @@ ${ hueIcons.symbols() }
       </ul>
     </div>
     <!-- /ko -->
-    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
+    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></a>
   </div>
