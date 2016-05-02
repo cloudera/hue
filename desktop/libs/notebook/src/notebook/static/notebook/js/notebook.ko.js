@@ -695,7 +695,6 @@
       self.ace().setValue('', 1);
       self.result.clear();
       self.status('ready');
-      hueUtils.changeURL('/notebook/editor');
     };
 
     self.explain = function () {
@@ -1611,10 +1610,9 @@
         self.openNotebook(editor_id);
       }
       else if (notebooks.length > 0) {
-        self.loadNotebook(notebooks[0]);
-        if (self.selectedNotebook().snippets().length === 0 && self.editorMode) { // Add snippet in new Editor
-          self.selectedNotebook().newSnippet();
-        }
+        self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
+      } else {
+        self.newNotebook();
       }
     };
 
@@ -1646,9 +1644,18 @@
     };
 
     self.newNotebook = function () {
-      var notebook = new Notebook(self, {});
-      self.selectedNotebook(notebook);
-      return notebook;
+      $.post("/notebook/api/create_notebook", {
+        type: options.editor_type,
+        directory_uuid: window.location.getParameter('directory_uuid')
+      }, function (data) {
+        self.loadNotebook(data.notebook);
+        self.selectedNotebook().newSnippet();
+        if (self.editorMode) {
+          hueUtils.changeURL('/notebook/editor');
+        } else {
+          hueUtils.changeURL('/notebook/notebook');
+        }
+      });
     };
 
     self.saveNotebook = function () {

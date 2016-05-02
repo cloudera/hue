@@ -56,15 +56,6 @@ def notebooks(request):
 @check_document_access_permission()
 def notebook(request):
   notebook_id = request.GET.get('notebook')
-  directory_uuid = request.GET.get('directory_uuid')
-
-  if notebook_id:
-    notebook = Notebook(document=Document2.objects.get(id=notebook_id))
-  else:
-    notebook = Notebook()
-    data = notebook.get_data()
-    data['directoryUuid'] = directory_uuid
-    notebook.data = json.dumps(data)    
 
   is_yarn_mode = False
   try:
@@ -74,7 +65,8 @@ def notebook(request):
     LOG.exception('Spark is not enabled')
 
   return render('notebook.mako', request, {
-      'notebooks_json': json.dumps([notebook.get_data()]),
+      'editor_id': notebook_id or None,
+      'notebooks_json': '{}',
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
@@ -88,30 +80,19 @@ def notebook(request):
 def editor(request):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
-  directory_uuid = request.GET.get('directory_uuid')
-
-  notebooks_json = '{}'
 
   if editor_id:  # Open existing saved editor document
-    editor = Notebook(document=Document2.objects.get(id=editor_id))
-    editor_type = editor.get_data()['type'].rsplit('-', 1)[-1]
-  else:  # Create new editor
-    editor = Notebook()
-    data = editor.get_data()
-
-    data['name'] = ''
-    data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
-    data['directoryUuid'] = directory_uuid
-    editor.data = json.dumps(data)
-    notebooks_json = json.dumps([editor.get_data()])
+    document = Document2.objects.get(id=editor_id)
+    editor_type = document.type.rsplit('-', 1)[-1]
 
   return render('editor.mako', request, {
       'editor_id': editor_id or None,
-      'notebooks_json': notebooks_json,
+      'notebooks_json': '{}',
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
           'is_optimizer_enabled': has_optimizer(),
+          'editor_type': editor_type
       }),
       'editor_type': editor_type,
   })
