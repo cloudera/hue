@@ -1346,7 +1346,7 @@
     self.updateHistory = function () {
       if (!self.updateHistoryRunning) {
         var items = $.grep(self.history(), function (item) {
-          return item.status() == 'running' || item.status() == 'starting';
+          return item.status() == 'available' || item.status() == 'running' || item.status() == 'starting';
         });
 
         function updateHistoryCall(item) {
@@ -1368,6 +1368,7 @@
         }
 
         if (items.length > 0) {
+          self.updateHistoryRunning = true;
           updateHistoryCall(items.pop());
         }
       }
