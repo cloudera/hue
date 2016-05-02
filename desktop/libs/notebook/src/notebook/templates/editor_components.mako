@@ -1028,6 +1028,8 @@ ${ hueIcons.symbols() }
       <ul class="nav nav-tabs">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
+            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="visible: $parent.history().length > 0, click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); }"><i class="snippet-icon fa fa-search"></i></div>
+            <input class="input-small history-filter" type="text" data-bind="visible: $parent.historyFilterVisible, value: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
@@ -1060,8 +1062,11 @@ ${ hueIcons.symbols() }
             <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
             <!-- /ko -->
             <!-- ko if: $parent.history().length > 0 -->
+              <!-- ko if: $parent.history().length > 0 && $parent.filteredHistory().length == 0 -->
+                <div class="muted margin-left-10 margin-top-10">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
+              <!-- /ko -->
             <table class="table table-condensed margin-top-10 history-table">
-              <tbody data-bind="foreach: $parent.history">
+              <tbody data-bind="foreach: $parent.filteredHistory">
                 <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid()) } }">
                   <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>

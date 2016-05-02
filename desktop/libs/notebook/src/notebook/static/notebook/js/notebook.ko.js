@@ -1040,6 +1040,14 @@
       return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-workflow2' ;})
     });
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
+    self.historyFilter = ko.observable('');
+    self.historyFilterVisible = ko.observable(false);
+    self.historyFilter.extend({ rateLimit: 300 });
+    self.filteredHistory = ko.computed(function () {
+      return ko.utils.arrayFilter(self.history(), function (item) {
+        return item.name().toLowerCase().indexOf(self.historyFilter()) > -1 || item.query().toLowerCase().indexOf(self.historyFilter()) > -1
+      });
+    });
     self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
     self.getSession = function (session_type) {
