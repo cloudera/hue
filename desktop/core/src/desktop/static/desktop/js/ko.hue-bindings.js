@@ -3926,4 +3926,30 @@
     }
   };
 
+
+  ko.bindingHandlers.momentFromNow = {
+    update: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      var $element = $(element);
+
+      var value = typeof options.data === 'function' ? options.data() : options.data;
+
+      function render() {
+        $element.text(moment(value).fromNow());
+        if (options.titleFormat) {
+          $element.attr('title', moment(value).format(options.titleFormat));
+        }
+      }
+
+      render();
+
+      if (options.interval) {
+        window.clearInterval($element.data('momentInterval'));
+        $element.data('momentInterval', window.setInterval(render, options.interval));
+      }
+    }
+  };
+
+
+
 }));
