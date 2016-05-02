@@ -1649,8 +1649,12 @@
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
-        self.selectedNotebook().newSnippet();
         if (self.editorMode) {
+          self.selectedNotebook().newSnippet();
+          if (window.location.getParameter('new') == '') {
+            self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
+            $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
+          }
           hueUtils.changeURL('/notebook/editor');
         } else {
           hueUtils.changeURL('/notebook/notebook');

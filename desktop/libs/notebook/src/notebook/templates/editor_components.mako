@@ -2844,11 +2844,6 @@ ${ hueIcons.symbols() }
       ko.applyBindings(viewModel);
       viewModel.init();
 
-      if (viewModel.editorMode && window.location.getParameter('type') != '' && window.location.getParameter('new') == '') {
-        viewModel.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + window.location.getParameter('type')));
-        $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + window.location.getParameter('type'), '');
-      }
-
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
           $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
