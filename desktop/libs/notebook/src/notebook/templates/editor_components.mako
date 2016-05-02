@@ -322,12 +322,12 @@ ${ hueIcons.symbols() }
           </li>
           <li class="query-name">
             <a href="javascript:void(0)">
-              <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
+              <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
             </a>
           </li>
           <li data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
-              <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
+              <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
             </a>
           </li>
           <!-- /ko -->
