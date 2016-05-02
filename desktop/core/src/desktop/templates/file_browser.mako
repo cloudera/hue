@@ -292,7 +292,7 @@ from desktop.views import _ko
     }
 
     .large-as-modal {
-      width: 542px;
+      width: 95%;
     }
 
     @-webkit-keyframes fb-search-visible {
