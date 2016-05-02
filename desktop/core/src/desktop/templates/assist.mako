@@ -675,10 +675,10 @@ from desktop.views import _ko
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
-      <!-- ko if: sourceType === 'impala' -->
+      <!-- ko if: sourceType === 'impala' && typeof databaseName !== 'undefined'-->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
-      <!-- ko if: sourceType !== 'impala' -->
+      <!-- ko if: sourceType !== 'impala' || typeof databaseName === 'undefined' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
       <!-- /ko -->

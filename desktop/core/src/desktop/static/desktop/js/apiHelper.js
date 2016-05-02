@@ -509,6 +509,7 @@
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {string} [options.database]
    **/
   ApiHelper.prototype.loadDatabases = function (options) {
     var self = this;
@@ -544,9 +545,9 @@
     };
 
     if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidateAndFlush') {
-      $.post(IMPALA_INVALIDATE_API, { flush_all: true }, loadFunction);
+      $.post(IMPALA_INVALIDATE_API, { flush_all: true, database: options.database }, loadFunction);
     } else if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidate') {
-      $.post(IMPALA_INVALIDATE_API, {flush_all: false}, loadFunction);
+      $.post(IMPALA_INVALIDATE_API, { flush_all: false, database: options.database }, loadFunction);
     } else {
       loadFunction();
     }

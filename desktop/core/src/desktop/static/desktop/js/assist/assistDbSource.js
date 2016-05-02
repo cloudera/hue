@@ -169,7 +169,8 @@
         errorCallback: function() {
           self.hasErrors(true);
           updateDatabases([]);
-        }
+        },
+        database: lastSelectedDb
       });
     };
 
