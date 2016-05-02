@@ -520,7 +520,7 @@ body {
 }
 
 .logs {
-  padding: 3px;
+  padding: 9.5px;
   font-size: 11px;
   height: 80px;
   overflow-y: auto;
@@ -1038,4 +1038,8 @@ h4.header {
 .notebook-name-desc {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+pre {
+  font-size: 11px;
 }
