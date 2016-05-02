@@ -47,6 +47,7 @@ urlpatterns = patterns('notebook.views',
 
 # APIs
 urlpatterns += patterns('notebook.api',
+  url(r'^api/create_notebook/?$', 'create_notebook', name='create_notebook'),
   url(r'^api/create_session/?$', 'create_session', name='create_session'),
   url(r'^api/close_session/?$', 'close_session', name='close_session'),
   url(r'^api/execute/?$', 'execute', name='execute'),

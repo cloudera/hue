@@ -266,11 +266,11 @@ ${ hueIcons.symbols() }
         &nbsp;&nbsp;&nbsp;
 
         % if mode == 'editor':
-        <a class="btn" href="${ url('notebook:editor') }?type=${ editor_type }&new=true" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook(true); }" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % else:
-        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="javascript:void(0)" data-bind="click: newNotebook" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % endif
@@ -1669,6 +1669,11 @@ ${ hueIcons.symbols() }
         <li>
           <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': statement() === '' }" title="${ _('Clear the current editor') }">
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: $root.newNotebook" title="${ _('Open a new query') }">
+            <i class="fa fa-fw fa-file-o"></i> ${_('New query')}
           </a>
         </li>
         <li>

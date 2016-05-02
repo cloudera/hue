@@ -41,6 +41,30 @@ DEFAULT_HISTORY_NAME = ''
 
 
 @require_POST
+@api_error_handler
+def create_notebook(request):
+  response = {'status': -1}
+
+  editor_type = request.POST.get('type', 'notebook')
+  directory_uuid = request.POST.get('directory_uuid')
+
+  editor = Notebook()
+  data = editor.get_data()
+
+  if editor_type != 'notebook':
+    data['name'] = ''
+    data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
+
+  data['directoryUuid'] = directory_uuid
+  editor.data = json.dumps(data)
+
+  response['notebook'] = editor.get_data()
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def create_session(request):
