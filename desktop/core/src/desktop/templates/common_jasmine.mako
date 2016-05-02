@@ -44,14 +44,18 @@
       paths: {
         'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
         'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
-        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot',
+        'mock-ajax':  'desktop/ext/js/jasmine-2.3.4/mock-ajax'
       },
       shim: {
         'jasmine-html': {
-          deps : ['jasmine']
+          deps: ['jasmine']
         },
         'jasmine-boot': {
-          deps : ['jasmine', 'jasmine-html']
+          deps: ['jasmine', 'jasmine-html']
+        },
+        'mock-ajax': {
+          deps: ['jasmine-boot']
         }
       }
     })
