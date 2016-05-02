@@ -87,7 +87,13 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('notebook:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      % if editor_type != 'notebook':
+        <a href="${ url('notebook:editor') }?type=${ editor_type }" class="btn">
+      % else:
+        <a href="${ url('notebook:new') }" class="btn">
+      % endif
+        <i class="fa fa-plus-circle"></i> ${ _('Create') }
+      </a>
       <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
         <i class="fa fa-upload"></i> ${ _('Import') }
       </a>
