@@ -49,6 +49,87 @@ from desktop.views import _ko
     }
   </style>
 
+  <script type="text/html" id="property-selector-template">
+    <!-- ko foreach: selectedProperties -->
+    <!-- ko template: {
+      name: 'property',
+      data: {
+        type: type(),
+        label: nice_name,
+        helpText: help_text,
+        value: value,
+        visibleObservable: $parent.visibleObservable
+      }
+    } --><!-- /ko -->
+    <!-- /ko -->
+    <div data-bind="visible: availableProperties().length > 0">
+      <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: 'Choose a property...', value: propertyToAdd"></select>
+      <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
+        <a class="inactive-action pointer" data-bind="click: addProperty">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function PropertySelectorViewModel(params) {
+          var self = this;
+          var allProperties = params.properties;
+
+          self.selectedProperties = ko.observableArray();
+          self.availableProperties = ko.observableArray();
+          self.propertyToAdd = ko.observable();
+
+          var setInitialProperties = function () {
+            self.selectedProperties([]);
+            self.availableProperties([]);
+            allProperties().forEach(function (property) {
+              if (property.value().length > 0) {
+                self.selectedProperties.push(property);
+              } else {
+                self.availableProperties.push(property);
+              }
+            });
+          };
+
+          setInitialProperties();
+          self.selectedProperties = ko.observableArray();
+          self.visibleObservable = params.visibleObservable || ko.observable();
+
+          self.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              setInitialProperties();
+            }
+          });
+        }
+
+        PropertySelectorViewModel.prototype.addProperty = function () {
+          var self = this;
+          if (self.propertyToAdd()) {
+            self.selectedProperties.push(self.propertyToAdd());
+            self.availableProperties.remove(self.propertyToAdd());
+            self.propertyToAdd(null);
+          }
+        };
+
+        ko.components.register('property-selector', {
+          viewModel: PropertySelectorViewModel,
+          template: { element: 'property-selector-template' }
+        });
+      }());
+    }));
+  </script>
+
   <script type="text/html" id="property">
     <div data-bind="visibleOnHover: { selector: '.hover-actions' }, css: { 'config-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
       <label class="control-label" data-bind="style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }">

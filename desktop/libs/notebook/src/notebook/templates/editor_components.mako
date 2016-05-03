@@ -1813,35 +1813,24 @@ ${ hueIcons.symbols() }
             </div>
             <!-- /ko -->
             <div style="width:100%;">
-                <!-- ko foreach: properties -->
-                  <!-- ko template: {
-                    name: 'property',
-                    data: {
-                      type: type(),
-                      label: nice_name,
-                      helpText: help_text,
-                      value: value,
-                      visibleObservable: ko.observable()
-                    }
-                  } --><!-- /ko -->
-                <!-- /ko -->
-              </div>
-              <div style="clear:both; padding-left: 120px;">
-                <!-- ko if: availableNewProperties().length -->
-                <select data-bind="options: availableNewProperties,
-                         optionsText: 'nice_name',
-                         optionsValue: 'name',
-                         value: selectedSessionProperty,
-                         optionsCaption: '${ _ko('Choose a property...') }'"></select>
-                <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
-                    properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
-                    selectedSessionProperty('');
-                  }" style="margin-left:10px;vertical-align: text-top;">
-                  <i class="fa fa-plus"></i>
-                </a>
-                <!-- /ko -->
-              </div>
+              <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+            </div>
+            <div style="clear:both; padding-left: 120px;">
+              <!-- ko if: availableNewProperties().length -->
+              <select data-bind="options: availableNewProperties,
+                       optionsText: 'nice_name',
+                       optionsValue: 'name',
+                       value: selectedSessionProperty,
+                       optionsCaption: '${ _ko('Choose a property...') }'"></select>
+              <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+                  properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
+                  selectedSessionProperty('');
+                }" style="margin-left:10px;vertical-align: text-top;">
+                <i class="fa fa-plus"></i>
+              </a>
               <!-- /ko -->
+            </div>
+            <!-- /ko -->
             <!-- /ko -->
             <br/>
           </fieldset>
