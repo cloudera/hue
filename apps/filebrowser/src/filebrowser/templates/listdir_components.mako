@@ -1020,7 +1020,12 @@ from django.utils.translation import ugettext as _
 
         $("*[rel='tooltip']").tooltip({ placement:"left" });
 
-        $(window).scrollTop(0);
+        if ($('.row-highlighted').length > 0) {
+          $(window).scrollTop($('.row-highlighted:eq(0)').offset().top - 150);
+        }
+        else {
+          $(window).scrollTop(0);
+        }
 
         resetActionbar();
       };
