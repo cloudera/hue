@@ -779,6 +779,7 @@ ${ assist.assistPanel() }
     <span data-bind="text: comment"></span>
   %endif
 
+
   <ul class="nav nav-pills margin-top-30">
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
@@ -797,6 +798,11 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     <!-- /ko -->
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
+    <!-- ko with: samples -->
+      <!-- ko if: loaded() && rows().length && $root.currentTab() === 'table-sample' -->
+        <li class="pull-right"><a class="pointer" data-bind="click: function () { location.href = '/notebook/browse/' + $root.database().name + '/' + $root.database().table().name; }"><i class="fa fa-external-link"></i> ${ _('Open in editor') }</a>
+      <!-- /ko -->
+    <!-- /ko -->
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
