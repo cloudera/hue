@@ -81,9 +81,6 @@ def create_table(request, database='default'):
         proposed_query = proposed_query.decode('utf-8')
         table_name = form.table.cleaned_data['name']
         return _submit_create_and_load(request, proposed_query, table_name, None, False, database=database)
-      else:
-        all_errors = '\n'.join(_collect_multiform_errors(form))
-        raise PopupException(_("Failed to create table due to validation errors."), detail=all_errors)
   else:
     form.bind()
 
@@ -96,19 +93,6 @@ def create_table(request, database='default'):
     'has_tables': len(dbms.get(request.user).get_tables()) > 0,
     'database': database,
   })
-
-
-def _collect_multiform_errors(multiform):
-  all_errors = []
-  for name, subform in multiform.get_subforms():
-    if isinstance(subform.errors, ErrorDict):
-      all_errors.extend(['%(field)s: %(msg)s' % {'field': k, 'msg': v[0]} for k, v in subform.errors.items()])
-    elif isinstance(subform.errors, list):
-      for error in subform.errors:
-        all_errors.extend(['%(field)s: %(msg)s' % {'field': k, 'msg': v[0]} for k, v in error.items()])
-    else:
-      all_errors.append(str(subform.errors))
-  return all_errors
 
 
 IMPORT_PEEK_SIZE = 5 * 1024**2
