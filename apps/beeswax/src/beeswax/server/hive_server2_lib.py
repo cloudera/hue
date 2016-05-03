@@ -724,8 +724,21 @@ class HiveServerClient:
     else:
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
 
-    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
-    self.close_operation(operation_handle)
+    try:
+      (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+      self.close_operation(operation_handle)
+    except Exception, e:
+      if 'cannot find field' in str(e): # Workaround until Hive 2.0 and HUE-3751
+        (desc_results, desc_schema), operation_handle = self.execute_statement('USE `%s`' % database)
+        self.close_operation(operation_handle)
+        if partition_spec:
+          query = 'DESCRIBE FORMATTED ``%s` PARTITION(%s)' % (table_name, partition_spec)
+        else:
+          query = 'DESCRIBE FORMATTED `%s`' % table_name
+        (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+        self.close_operation(operation_handle)
+      else:
+        raise e
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
