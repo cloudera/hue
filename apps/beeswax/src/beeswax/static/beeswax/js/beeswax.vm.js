@@ -643,8 +643,11 @@ function BeeswaxViewModel(server, apiHelper) {
           self.setErrors(data.message, data.errors);
           self.design.isRunning(false);
           $(document).trigger('error.query');
-        }
-        else {
+          $(document).trigger("error", data.message);
+          if (typeof window.console !== 'undefined') {
+            console.error(data.message);
+          }
+        } else {
           $(document).trigger('watched.query', data);
         }
       },
