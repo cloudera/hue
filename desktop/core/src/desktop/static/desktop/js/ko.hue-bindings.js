@@ -3848,7 +3848,7 @@
               }
             }
 
-            res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + ' </div>');
+            res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + '&nbsp;</div>');
           })
 
           element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
