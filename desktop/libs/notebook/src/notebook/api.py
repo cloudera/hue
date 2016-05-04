@@ -340,7 +340,7 @@ def get_history(request):
   response = {'status': -1}
 
   doc_type = request.GET.get('doc_type')
-  limit = max(request.GET.get('len', 50), 100)
+  limit = min(request.GET.get('len', 50), 100)
 
   response['status'] = 0
   history = []

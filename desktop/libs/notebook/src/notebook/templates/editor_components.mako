@@ -206,7 +206,7 @@ ${ hueIcons.symbols() }
 
         % if mode == 'editor':
         <div class="btn-group">
-          <a class="btn" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().schedule() }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
+          <a class="btn" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { $root.selectedNotebook().schedule() } }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
             <i class="fa fa-fw fa-calendar"></i>
           </a>
 
