@@ -991,7 +991,7 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="snippet-log">
-  <div class="snippet-log-container margin-bottom-10" data-bind="slideVisible: showLogs() && status() != 'ready' && status() != 'loading', onComplete: function(){ redrawFixedHeaders(200); }" style="display: none;">
+  <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
