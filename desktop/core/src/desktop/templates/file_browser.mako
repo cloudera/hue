@@ -170,7 +170,7 @@ from desktop.views import _ko
     }
 
     .fb-primary-col {
-      flex: 1;
+      flex: 2;
       vertical-align: middle;
       padding-left: 8px;
       white-space: nowrap;

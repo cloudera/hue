@@ -153,9 +153,10 @@ ${ fileBrowser.fileBrowser() }
 </div>
 
 <div id="documentList" class="main-content">
-  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true); }" style="display:none;">
-    <i class="fa fa-chevron-right"></i>
-  </a>
+##   Uncoment to enable the assist panel
+##   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true); }" style="display:none;">
+##     <i class="fa fa-chevron-right"></i>
+##   </a>
 
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
