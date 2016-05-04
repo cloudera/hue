@@ -880,7 +880,7 @@ from desktop.views import _ko
         var self = this;
         self.activeEntry = params.activeEntry;
 
-        self.searchQuery = ko.observable().extend({ throttle: 500 });;
+        self.searchQuery = ko.observable().extend({ throttle: 500 });
         self.searchQuery.subscribe(function (query) {
           self.activeEntry().search(query);
         });
@@ -892,6 +892,14 @@ from desktop.views import _ko
           self.searchVisible(false);
         });
 
+        $(document).click(function (event) {
+          var $target = $(event.target);
+          if ($target.parents('.fb-entries, .fb-folder-actions, .fb-header, .fb-search-container, .modal').length === 0) {
+            self.activeEntry().selectedEntries().forEach(function (entry) {
+              entry.selected(false);
+            });
+          }
+        });
       }
 
       ko.components.register('file-browser', {
