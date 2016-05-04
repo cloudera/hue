@@ -21,6 +21,7 @@ import logging
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -43,9 +44,15 @@ def notebooks(request):
   editor_type = request.GET.get('type', 'notebook')
 
   if editor_type != 'notebook':
-    notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra__startswith='query')) if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type]
+    if USE_NEW_EDITOR.get():
+      notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['query-%s' % editor_type])]
+    else:
+      notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra__startswith='query')) if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type]
   else:
-    notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook')) if not d.content_object.is_history]
+    if USE_NEW_EDITOR.get():
+      notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['notebook'])]
+    else:
+      notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook')) if not d.content_object.is_history]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML),
