@@ -576,7 +576,7 @@ from desktop.views import _ko
       <div class="fb-list" data-bind="with: activeEntry" >
         <ul class="fb-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
-            <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
+            <div class="fb-row" data-bind="contextMenu: { scrollContainer: '.fb-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
