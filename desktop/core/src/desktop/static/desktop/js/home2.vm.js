@@ -41,8 +41,9 @@
     self.user = options.user;
     self.superuser = options.superuser;
     self.apiHelper = ApiHelper.getInstance(options);
-    self.isLeftPanelVisible = ko.observable();
-    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.isLeftPanelVisible = ko.observable(false);
+    // Uncomment to enable the assist panel
+    // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
