@@ -207,7 +207,7 @@ ${ commonimportexport(request) | n,unicode }
         window.location.reload();
         $('#deleteWf').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        $(document).trigger("error", xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText);
       });
     };
 

@@ -205,7 +205,7 @@ ${ commonimportexport(request) | n,unicode }
       }, function() {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        $(document).trigger("error", xhr.status == 500 ? JSON.parse(xhr.responseText).message : xhr.responseText);
       });
     };
 
