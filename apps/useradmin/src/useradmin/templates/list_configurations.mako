@@ -16,6 +16,7 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from desktop.views import _ko
 from useradmin.models import group_permissions
 from django.contrib.auth.models import Group
 %>
@@ -49,14 +50,14 @@ ${layout.menubar(section='configurations')}
       <tbody data-bind="foreach: filteredApps">
       <tr class="tableRow pointer" data-bind="click: function () { $parent.edit($data); }">
         <td data-bind="text: name"></td>
-        <!-- ko if: $data.default -->
+        <!-- ko if: actualDefaultOverrides().length > 0 -->
         <td>${ _('defined') }</td>
         <!-- /ko -->
-        <!-- ko ifnot: $data.default -->
+        <!-- ko if: actualDefaultOverrides().length == 0 -->
         <td>&nbsp;</td>
         <!-- /ko -->
         <!-- ko if: $data.groups -->
-        <td data-bind="text: Object.keys(groups()).join(', ');"></td>
+        <td data-bind="text: overriddenGroupNames"></td>
         <!-- /ko -->
         <!-- ko ifnot: $data.groups -->
         <td>&nbsp;</td>
@@ -82,25 +83,23 @@ ${layout.menubar(section='configurations')}
     <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
     <h4 class="margin-left-20 simple">${ _('Global') }</h4>
     <div class="form-horizontal" style="width:100%;">
-      <!-- ko foreach: properties -->
-      <!-- ko template: { name: 'property', data: { type: type(), label: nice_name, helpText: help_text, value: value, visibleObservable: ko.observable() } } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko component: { name: 'property-selector', params: { properties: $data.default } } --><!-- /ko -->
     </div>
 
-    <h4 class="margin-left-20 simple">${ _('Group specific') }</h4>
-    <!-- ko foreach: groupConfigurations -->
-    <div class="form-horizontal" style="width:100%;">
-      <div>
-        <select data-bind="options: availableGroups, optionsText: 'name', optionsValue: 'id', value: group"></select>
-      </div>
-      <!-- ko foreach: properties -->
-      <!-- ko template: { name: 'property', data: { type: type(), label: nice_name, helpText: help_text, value: value, visibleObservable: ko.observable() } } --><!-- /ko -->
-      <!-- /ko -->
+    <!-- ko foreach: groups -->
+    <h4 class="margin-left-20 simple" style="    border-bottom: 1px solid #e5e5e5;">${ _('Group configuration - ') }<!-- ko text: group.name --><!-- /ko --></h4>
+    <div class="margin-left-20 form-horizontal" style="width:100%;">
+      <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
     </div>
     <!-- /ko -->
-    <a class="pointer" data-bind="click: addGroup">
-      <i class="fa fa-plus"></i>
-    </a>
+    <div class="margin-left-20 margin-top-20" data-bind="visible: availableGroups().length > 0">
+      <select data-bind="options: availableGroups, optionsText: 'name', optionsCaption: '${ _ko('Add group override...') }', value: groupToAdd"></select>
+      <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
+        <a class="inactive-action pointer" data-bind="click: addGroup">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+    </div>
   </div>
   <!-- /ko -->
   <div class="form-actions">
@@ -128,25 +127,46 @@ ${ configKoComponents.config() }
     'knockout-sortable'
   ], function (ko, apiHelper) {
 
-    var GroupConfiguration = function (properties, availableGroups) {
+    var AppConfiguration = function (app, allGroups) {
       var self = this;
-      self.properties = ko.mapping.fromJS(properties);
-      self.availableGroups = availableGroups;
-      self.group = ko.observable();
-    };
+      self.rawProperties = app.properties;
+      self.rawApp = app;
+      ko.mapping.fromJS(app, {}, self);
 
-    var AppConfiguration = function (app, availableGroups) {
-      var self = this;
-      self.name = app.name;
-      self.availableProperties = app.properties;
-      self.properties = ko.mapping.fromJS(app.properties);
-      self.availableGroups = availableGroups;
-      self.groupConfigurations = ko.observableArray();
+      self.availableGroups = ko.pureComputed(function () {
+        var selectedGroupIndex = {};
+        self.groups().forEach(function (groupConfig) {
+          selectedGroupIndex[groupConfig.group.id()] = true;
+        });
+        return $.grep(allGroups, function(group) {
+          return !selectedGroupIndex[group.id];
+        });
+      });
+
+      self.groupToAdd = ko.observable();
+
+      self.actualDefaultOverrides = ko.pureComputed(function () {
+        return $.grep(self.default(), function (defaultOverride) {
+          return ko.mapping.toJSON(defaultOverride.defaultValue()) !== ko.mapping.toJSON(defaultOverride.value())
+        });
+      });
+
+      self.overriddenGroupNames = ko.pureComputed(function () {
+        return $.map(self.groups(), function (groupConfig) {
+          return groupConfig.group.name();
+        }).join(', ');
+      });
     };
 
     AppConfiguration.prototype.addGroup = function () {
       var self = this;
-      self.groupConfigurations.push(new GroupConfiguration(self.availableProperties, self.availableGroups));
+      if (self.groupToAdd()) {
+        self.groups.push(ko.mapping.fromJS({
+          group: self.groupToAdd(),
+          properties: self.rawProperties
+        }));
+        self.groupToAdd(null);
+      }
     };
 
     var ConfigurationsViewModel = function () {
@@ -163,40 +183,98 @@ ${ configKoComponents.config() }
       self.filteredApps = ko.pureComputed(function () {
         return self.apps();
       });
-
       self.load();
     };
 
     ConfigurationsViewModel.prototype.edit = function (app) {
       var self = this;
-      self.selectedApp(new AppConfiguration(app, self.groups));
+      self.selectedApp(new AppConfiguration(app.rawApp, self.groups));
     };
 
     ConfigurationsViewModel.prototype.save = function () {
       var self = this;
       var data = {};
       self.apps().forEach(function (app) {
-        data[app.name] = app;
+        data[app.name()] = app;
       });
-      data[self.selectedApp().name] = {
-        properties: ko.mapping.toJS(self.selectedApp().properties),
-        groups: {}
-      };
-      self.selectedApp().groupConfigurations().forEach(function (groupConfig) {
-        data[self.selectedApp().name].groups[groupConfig.group()] = ko.mapping.toJS(groupConfig.properties);
+
+      data[self.selectedApp().name()] = self.selectedApp();
+
+      $.each(data, function (app, appConfig) {
+        appConfig.default(appConfig.actualDefaultOverrides());
+        var actualGroups = {};
+        appConfig.groups().forEach(function (groupConfig) {
+          var actualGroupOverrides = $.grep(groupConfig.properties(), function (property) {
+            return ko.mapping.toJSON(property.defaultValue) !== ko.mapping.toJSON(property.value())
+          });
+          if (actualGroupOverrides.length > 0) {
+            actualGroups[groupConfig.group.id()] = actualGroupOverrides;
+          }
+        });
+        data[app] = ko.mapping.toJS(appConfig);
+        data[app].groups = actualGroups;
       });
+
       self.apiHelper.saveGlobalConfiguration({
         successCallback: function(data) {
-          var apps = [];
-          $.each(data.apps, function (appName, app) {
-            app.name = appName;
-            apps.push(app);
-          });
-          self.apps(apps);
+          self.updateFromData(data);
           self.selectedApp(null);
         },
         configuration: data
       })
+    };
+
+    ConfigurationsViewModel.prototype.updateFromData = function (data) {
+      var self = this;
+      var apps = [];
+      var groupIndex = {};
+      self.groups.forEach(function (group) {
+        groupIndex[group.id] = group;
+      });
+      $.each(data.configuration, function (appName, app) {
+
+        // Merge base properties with default properties into default
+        var defaultIndex = {};
+        app.default.forEach(function (defaultProperty) {
+          defaultIndex[defaultProperty.name] = defaultProperty;
+        });
+        app.name = appName;
+        if (typeof app.default === 'undefined') {
+          app.default = [];
+        }
+        app.properties.forEach(function (property) {
+          if (!defaultIndex[property.name]) {
+            app.default.push(property);
+          }
+        });
+
+        if (typeof app.groups === 'undefined') {
+          app.groups = [];
+        } else {
+          var groups = [];
+          $.each(app.groups, function (groupId, groupValues) {
+            var groupPropertyIndex = {};
+            groupValues.forEach(function (groupValue) {
+              groupPropertyIndex[groupValue.name] = groupValue;
+            });
+            // Merge the base properties into any existing group config
+            app.properties.forEach(function (property) {
+              if (!groupPropertyIndex[property.name]){
+                groupValues.push(property);
+              }
+            });
+
+            groups.push({
+              group: groupIndex[groupId],
+              properties: groupValues
+            })
+          });
+          delete app.groups;
+          app.groups = groups;
+        }
+        apps.push(new AppConfiguration(app, self.groups));
+      });
+      self.apps(apps);
     };
 
     ConfigurationsViewModel.prototype.load = function () {
@@ -218,12 +296,7 @@ ${ configKoComponents.config() }
           self.groups = usersAndGroups.groups;
           self.apiHelper.fetchConfigurations({
             successCallback: function (data) {
-              var apps = [];
-              $.each(data.apps, function (appName, app) {
-                app.name = appName;
-                apps.push(app);
-              });
-              self.apps(apps);
+              self.updateFromData(data);
               self.loading(false);
             },
             errorCallback: errorCallback
