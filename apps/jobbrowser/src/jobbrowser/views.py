@@ -282,6 +282,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
     attempt_index = int(attempt_index)
     attempt = job.job_attempts['jobAttempt'][attempt_index]
     log_link = attempt['logsLink']
+    # Reformat log link to use YARN RM, replace node addr with node ID addr
+    log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
 
