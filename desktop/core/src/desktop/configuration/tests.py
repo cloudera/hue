@@ -8,7 +8,7 @@
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,115 +47,142 @@ class TestDefaultConfiguration(object):
     DefaultConfiguration.objects.all().delete()
 
 
-  def test_save_default_configuration(self):
-    app = 'hive'
-    is_default = True
-    properties = [
-        {
-          "multiple": True,
-          "value": [],
-          "nice_name": "Settings",
-          "key": "settings",
-          "help_text": "Impala configuration properties.",
-          "type": "settings",
-          "options": []
-        }
-    ]
-
-    # Create new default configuration
-    configs = DefaultConfiguration.objects.filter(app=app, is_default=is_default)
-    assert_equal(configs.count(), 0)
-
-    response = self.client.post("/desktop/api/configurations/save", {
-        'app': 'hive',
-        'properties': json.dumps(properties),
-        'is_default': is_default})
-    content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_true('configuration' in content, content)
-
-    config = DefaultConfiguration.objects.get(app=app, is_default=is_default)
-    assert_equal(config.properties_list, properties, config.properties_list)
-
-    # Update same default configuration
-    properties = {
-        'settings': [{'key': 'hive.execution.engine', 'value': 'mr'}]
+  def test_update_default_and_group_configurations(self):
+    configuration = {
+      'hive': {
+        'default': [
+          {
+            'multiple': True,
+            'value': [],
+            'nice_name': 'Settings',
+            'key': 'settings',
+            'help_text': 'Hive configuration properties.',
+            'type': 'settings',
+            'options': []
+          }
+        ]
+      }
     }
 
-    response = self.client.post("/desktop/api/configurations/save", {
-        'app': 'hive',
-        'properties': json.dumps(properties),
-        'is_default': is_default})
+    # Verify no default configuration found for app
+    configs = DefaultConfiguration.objects.filter(app='hive', is_default=True)
+    assert_equal(configs.count(), 0)
+
+    # Save configuration
+    response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
     content = json.loads(response.content)
     assert_equal(content['status'], 0, content)
     assert_true('configuration' in content, content)
 
-    config = DefaultConfiguration.objects.get(app=app, is_default=is_default)
-    assert_equal(config.properties_list, properties, config.properties_list)
+    config = DefaultConfiguration.objects.get(app='hive', is_default=True)
+    assert_equal(config.properties_list, configuration['hive']['default'], config.properties_list)
+
+    # Update with group configuration
+    configuration = {
+      'hive': {
+        'default': [
+          {
+            'multiple': True,
+            'value': [{'key': 'hive.execution.engine', 'value': 'mr'}],
+            'nice_name': 'Settings',
+            'key': 'settings',
+            'help_text': 'Hive configuration properties.',
+            'type': 'settings',
+            'options': []
+          }
+        ],
+        'groups': {
+          str(self.group.id): [
+            {
+              'multiple': True,
+              'value': [{'key': 'hive.execution.engine', 'value': 'spark'}],
+              'nice_name': 'Settings',
+              'key': 'settings',
+              'help_text': 'Hive configuration properties.',
+              'type': 'settings',
+              'options': []
+            }
+          ]
+        }
+      }
+    }
+
+    response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
+    content = json.loads(response.content)
+    assert_equal(content['status'], 0, content)
+    assert_true('configuration' in content, content)
+
+    config = DefaultConfiguration.objects.get(app='hive', is_default=True)
+    assert_equal(config.properties_list, configuration['hive']['default'], config.properties_list)
+
+    config = DefaultConfiguration.objects.get(app='hive', group=self.group)
+    assert_equal(config.properties_list, configuration['hive']['groups'][str(self.group.id)], config.properties_list)
 
 
   def test_get_default_configurations(self):
     app = 'hive'
     properties = [
-        {
-            "multiple": True,
-            "value": [{
-                "path": "/user/test/myudfs.jar",
-                "type": "jar"
-            }],
-            "nice_name": "Files",
-            "key": "files",
-            "help_text": "Add one or more files, jars, or archives to the list of resources.",
-            "type": "hdfs-files"
-        },
-        {
-            "multiple": True,
-            "value": [{
-                "class_name": "org.hue.udf.MyUpper",
-                "name": "myUpper"
-            }],
-            "nice_name": "Functions",
-            "key": "functions",
-            "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
-            "type": "functions"
-        },
-        {
-            "multiple": True,
-            "value": [{
-                "key": "mapreduce.job.queuename",
-                "value": "mr"
-            }],
-            "nice_name": "Settings",
-            "key": "settings",
-            "help_text": "Hive and Hadoop configuration properties.",
-            "type": "settings",
-            "options": [
-                "hive.map.aggr",
-                "hive.exec.compress.output",
-                "hive.exec.parallel",
-                "hive.execution.engine",
-                "mapreduce.job.queuename"
-            ]
-        }
+      {
+        "multiple": True,
+        "value": [{
+          "path": "/user/test/myudfs.jar",
+          "type": "jar"
+        }],
+        "nice_name": "Files",
+        "key": "files",
+        "help_text": "Add one or more files, jars, or archives to the list of resources.",
+        "type": "hdfs-files"
+      },
+      {
+        "multiple": True,
+        "value": [{
+          "class_name": "org.hue.udf.MyUpper",
+          "name": "myUpper"
+        }],
+        "nice_name": "Functions",
+        "key": "functions",
+        "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
+        "type": "functions"
+      },
+      {
+        "multiple": True,
+        "value": [{
+          "key": "mapreduce.job.queuename",
+          "value": "mr"
+        }],
+        "nice_name": "Settings",
+        "key": "settings",
+        "help_text": "Hive and Hadoop configuration properties.",
+        "type": "settings",
+        "options": [
+          "hive.map.aggr",
+          "hive.exec.compress.output",
+          "hive.exec.parallel",
+          "hive.execution.engine",
+          "mapreduce.job.queuename"
+        ]
+      }
     ]
+    configuration = {
+      app: {
+        'default': properties
+      }
+    }
 
     # No configurations returns null
     response = self.client.get("/desktop/api/configurations/user", {
-        'app': 'hive',
-        'user_id': self.user.id})
+      'app': 'hive',
+      'user_id': self.user.id})
     content = json.loads(response.content)
     assert_equal(content['status'], 0, content)
     assert_equal(content['configuration'], None, content)
 
     # Creating a default configuration returns default
-    response = self.client.post("/desktop/api/configurations/save", {
-        'app': 'hive',
-        'properties': json.dumps(properties),
-        'is_default': True})
+    response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
 
     response = self.client.get("/desktop/api/configurations/user", {
-        'app': 'hive',
-        'user_id': self.user.id})
+      'app': 'hive',
+      'user_id': self.user.id})
     content = json.loads(response.content)
     assert_equal(content['status'], 0, content)
     assert_equal(content['configuration']['app'], 'hive', content)
@@ -165,44 +192,55 @@ class TestDefaultConfiguration(object):
     assert_equal(content['configuration']['properties'], properties, content)
 
     # Creating a group configuration returns group config
-    properties = {
-        'settings': [{'key': 'hive.execution.engine', 'value': 'mr'}]
+    group_properties = [{
+      'multiple': True,
+      'value': [{'key': 'hive.execution.engine', 'value': 'spark'}],
+      'nice_name': 'Settings',
+      'key': 'settings',
+      'help_text': 'Hive configuration properties.',
+      'type': 'settings',
+      'options': []
+    }]
+    configuration = {
+      app: {
+        'default': properties,
+        'groups': {
+          str(self.group.id): group_properties
+        }
+      }
     }
-    response = self.client.post("/desktop/api/configurations/save", {
-        'app': 'hive',
-        'properties': json.dumps(properties),
-        'is_default': False,
-        'group_id': self.group.id})
+
+    response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
 
     response = self.client.get("/desktop/api/configurations/user", {
-        'app': 'hive',
-        'user_id': self.user.id})
+      'app': 'hive',
+      'user_id': self.user.id})
     content = json.loads(response.content)
     assert_equal(content['status'], 0, content)
     assert_equal(content['configuration']['app'], 'hive', content)
     assert_equal(content['configuration']['is_default'], False, content)
     assert_equal(content['configuration']['user'], None, content)
     assert_equal(content['configuration']['group'], self.group.name, content)
-    assert_equal(content['configuration']['properties'], properties, content)
+    assert_equal(content['configuration']['properties'], group_properties, content)
 
     # Creating a user configuration returns user config
-    properties = {
-        'files': [{'type': 'JAR', 'path': '/user/test/udfs.jar'}],
-        'settings': [{'key': 'hive.execution.engine', 'value': 'spark'}]
-    }
-    response = self.client.post("/desktop/api/configurations/save", {
-        'app': 'hive',
-        'properties': json.dumps(properties),
-        'is_default': False,
-        'user_id': self.user.id})
+    user_properties = [{
+      'files': [{'type': 'JAR', 'path': '/user/test/udfs.jar'}],
+      'settings': [{'key': 'hive.execution.engine', 'value': 'spark'}]
+    }]
+    response = self.client.post("/desktop/api/configurations/user", {
+      'app': 'hive',
+      'user_id': self.user.id,
+      'properties': json.dumps(user_properties)
+    })
 
     response = self.client.get("/desktop/api/configurations/user", {
-        'app': 'hive',
-        'user_id': self.user.id})
+      'app': 'hive',
+      'user_id': self.user.id})
     content = json.loads(response.content)
     assert_equal(content['status'], 0, content)
     assert_equal(content['configuration']['app'], 'hive', content)
     assert_equal(content['configuration']['is_default'], False, content)
     assert_equal(content['configuration']['user'], self.user.username, content)
     assert_equal(content['configuration']['group'], None, content)
-    assert_equal(content['configuration']['properties'], properties, content)
+    assert_equal(content['configuration']['properties'], user_properties, content)

@@ -126,11 +126,8 @@ dynamic_patterns += patterns('desktop.api2',
 
 # Default Configurations
 dynamic_patterns += patterns('desktop.configuration.api',
-  (r'^desktop/api/configurations/apps?$', 'get_configurable_apps'),
-
-  (r'^desktop/api/configurations/?$', 'search_default_configurations'),
-  (r'^desktop/api/configurations/user/?$', 'get_default_configuration_for_user'),
-  (r'^desktop/api/configurations/save/?$', 'save_default_configuration'),
+  (r'^desktop/api/configurations/?$', 'default_configurations'),
+  (r'^desktop/api/configurations/user/?$', 'app_configuration_for_user'),
   (r'^desktop/api/configurations/delete/?$', 'delete_default_configuration'),
 )
 
