@@ -437,6 +437,7 @@
       }
     });
     self.showLogs.subscribe(function (val) {
+      huePubSub.publish('redraw.fixed.headers');
       if (val) {
         self.getLogs();
       }
