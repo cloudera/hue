@@ -337,11 +337,9 @@ def export_documents(request):
   else:
     selection = json.loads(request.POST.get('documents'))
 
-  # If non admin, only export documents the user owns
-  docs = Document2.objects
-  if not request.user.is_superuser:
-    docs = docs.filter(owner=request.user)
-  docs = docs.filter(id__in=selection).order_by('-id')
+  # Only export documents the user has permissions to read
+  docs = Document2.objects.documents(user=request.user, perms='both', include_history=True, include_trashed=True).\
+    filter(id__in=selection).order_by('-id')
 
   # Add any dependencies to the set of exported documents
   export_doc_set = _get_dependencies(docs)
