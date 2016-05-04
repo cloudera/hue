@@ -182,6 +182,17 @@ from desktop.views import _ko
       transition: color 0.2s ease;
     }
 
+    .assist-breadcrumb-text {
+      font-size: 14px;
+      line-height: 16px;
+      vertical-align: top;
+    }
+
+    .assist-breadcrumb-back {
+      font-size: 15px;
+      margin-right:8px;
+    }
+
     .assist-tables-counter {
       color: #d1d1d1;
       font-weight: normal;
@@ -452,11 +463,24 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-db-breadcrumb">
     <div class="assist-flex-header assist-breadcrumb">
+      <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length === 1 -->
+      <i class="fa fa-server assist-breadcrumb-text"></i>
+      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+      <!-- /ko -->
+      <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length > 1 -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i data-bind="visible: selectedSource() && ! selectedSource().selectedDatabase()" style="display:none;font-size: 14px;line-height: 16px;vertical-align: top;" class="fa fa-server"></i>
-        <i data-bind="visible: selectedSource() && selectedSource().selectedDatabase()" style="display:none;font-size: 14px;line-height: 16px;vertical-align: top;" class="fa fa-database"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: breadcrumb"></span></a>
+        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-server assist-breadcrumb-text"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: selectedSource()  && selectedSource().selectedDatabase() -->
+      <a data-bind="click: back">
+        <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
+        <i class="fa fa-database assist-breadcrumb-text"></i>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+      </a>
+      <!-- /ko -->
     </div>
   </script>
 
