@@ -32,7 +32,7 @@
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
-  var CONFIG_APPS_API = '/desktop/api/configurations/apps';
+  var CONFIG_APPS_API = '/desktop/api/configurations';
 
   /**
    * @param {Object} i18n

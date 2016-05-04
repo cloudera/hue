@@ -62,7 +62,7 @@ from desktop.views import _ko
       }
     } --><!-- /ko -->
     <!-- /ko -->
-    <div data-bind="visible: availableProperties().length > 0">
+    <div class="config-property margin-left-10" data-bind="visible: availableProperties().length > 0">
       <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: 'Choose a property...', value: propertyToAdd"></select>
       <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
         <a class="inactive-action pointer" data-bind="click: addProperty">
@@ -94,7 +94,7 @@ from desktop.views import _ko
             self.selectedProperties([]);
             self.availableProperties([]);
             allProperties().forEach(function (property) {
-              if (property.value().length > 0) {
+              if (property.defaultValue && ko.mapping.toJSON(property.value) !== ko.mapping.toJSON(property.defaultValue)) {
                 self.selectedProperties.push(property);
               } else {
                 self.availableProperties.push(property);
@@ -103,7 +103,6 @@ from desktop.views import _ko
           };
 
           setInitialProperties();
-          self.selectedProperties = ko.observableArray();
           self.visibleObservable = params.visibleObservable || ko.observable();
 
           self.visibleObservable.subscribe(function (newValue) {
