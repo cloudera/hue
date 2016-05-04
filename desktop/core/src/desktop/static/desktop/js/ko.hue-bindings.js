@@ -247,11 +247,58 @@
    *
    */
   ko.bindingHandlers.contextMenu = {
+    initContextMenu: function ($menu, $scrollContainer) {
+      var active = false;
+
+      var currentLeft = 0;
+      var currentTop = 0;
+
+      var adjustForScroll = function () {
+        $menu.css('top', currentTop - $scrollContainer.scrollTop());
+        $menu.css('left', currentLeft - $scrollContainer.scrollLeft());
+      }
+
+      return {
+        show: function (event) {
+          $menu.css('top', 0);
+          $menu.css('left', 0);
+          $menu.css('opacity', 0);
+          $menu.show();
+          var menuWidth = $menu.outerWidth(true)
+          if (event.clientX + menuWidth > $(window).width()) {
+            currentLeft = event.clientX - menuWidth - $scrollContainer.scrollLeft()
+          } else {
+            currentLeft = event.clientX;
+          }
+          $menu.css('left', currentLeft);
+
+          var menuHeight = $menu.outerHeight(true);
+          if (event.clientY + menuHeight > $(window).height()) {
+            currentTop = $(window).height() - menuHeight - $scrollContainer.scrollTop();
+          } else {
+            currentTop = event.clientY;
+          }
+          $menu.css('top', currentTop);
+          $menu.css('opacity', 1);
+          active = true;
+          $scrollContainer.on('scroll', adjustForScroll);
+        },
+        hide: function () {
+          if (active) {
+            $scrollContainer.off('scroll', adjustForScroll);
+            $menu.css('opacity', 0);
+            window.setTimeout(function () {
+              $menu.hide();
+            }, 300);
+            active = false;
+          }
+        }
+      }
+    },
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var $element = $(element);
       var options = valueAccessor();
       var $menu = $element.find(options.menuSelector);
-      var active = false;
 
       bindingContext.$altDown = ko.observable(false);
 
@@ -263,6 +310,10 @@
         bindingContext.$altDown(false);
       });
 
+      var $scrollContainer = $(options.scrollContainer).length > 0 ? $(options.scrollContainer) : $(window);
+
+      var menu = ko.bindingHandlers.contextMenu.initContextMenu($menu, $scrollContainer);
+
       element.addEventListener("contextmenu", function(event) {
         if(document.selection && document.selection.empty) {
           document.selection.empty();
@@ -273,55 +324,27 @@
         if (typeof options.beforeOpen === 'function') {
           options.beforeOpen.bind(viewModel)();
         }
-        $menu.css('top', 0);
-        $menu.css('left', 0);
-        $menu.css('opacity', 0);
-        $menu.show();
-        var menuWidth = $menu.outerWidth(true)
-        if (event.clientX + menuWidth > $(window).width()) {
-          $menu.css('left', event.clientX - menuWidth);
-        } else {
-          $menu.css('left', event.clientX);
-        }
-
-        var menuHeight = $menu.outerHeight(true);
-        if (event.clientY + menuHeight > $(window).height()) {
-          $menu.css('top', $(window).height() - menuHeight);
-        } else {
-          $menu.css('top', event.clientY);
-        }
-        $menu.css('opacity', 1);
-        active = true;
+        menu.show(event);
         huePubSub.publish('contextmenu-active', element);
         event.preventDefault();
         event.stopPropagation();
       });
 
-      var hideMenu = function () {
-        if (active) {
-          $menu.css('opacity', 0);
-          window.setTimeout(function () {
-            $menu.hide();
-          }, 300);
-          active = false;
-        }
-      };
-
       huePubSub.subscribe('contextmenu-active', function (origin) {
         if (origin !== element) {
-          hideMenu();
+          menu.hide();
         }
       });
       document.addEventListener("contextmenu", function (event) {
-        hideMenu();
+        menu.hide();
       });
       $menu.click(function (e) {
-        hideMenu();
+        menu.hide();
         e.stopPropagation();
       });
       $(document).click(function (event) {
         if ($element.find($(event.target)).length === 0) {
-          hideMenu();
+          menu.hide();
         };
       });
     }
@@ -2924,13 +2947,15 @@
         }
       });
 
+      var menu = ko.bindingHandlers.contextMenu.initContextMenu($tableDropMenu, $('.right-panel'));
+
       var setFromDropMenu = function (text) {
         var before = editor.getTextBeforeCursor();
         if (before.length > 0 && before.charAt(before.length - 1) !== ' ') {
           text = " " + text;
         }
         editor.session.insert(editor.getCursorPosition(), text);
-        hideDropMenu();
+        menu.hide();
         editor.focus();
       }
 
@@ -2963,26 +2988,7 @@
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
           if (/.*;|^\s*$/.test(before)) {
-            $('.table-drop-menu').show();
-
-            $tableDropMenu.css('top', 0);
-            $tableDropMenu.css('left', 0);
-            $tableDropMenu.css('opacity', 0);
-            $tableDropMenu.show();
-            var menuWidth = $tableDropMenu.outerWidth(true)
-            if (e.clientX + menuWidth > $(window).width()) {
-              $tableDropMenu.css('left', e.clientX - menuWidth);
-            } else {
-              $tableDropMenu.css('left', e.clientX);
-            }
-
-            var menuHeight = $tableDropMenu.outerHeight(true);
-            if (e.clientY + menuHeight > $(window).height()) {
-              $tableDropMenu.css('top', $(window).height() - menuHeight);
-            } else {
-              $tableDropMenu.css('top', e.clientY);
-            }
-            $tableDropMenu.css('opacity', 1);
+            menu.show(event);
           } else {
             if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
               text = " " + text;
