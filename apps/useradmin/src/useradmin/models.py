@@ -322,6 +322,12 @@ def install_sample_user():
   except Exception, ex:
     LOG.exception('Failed to get or create sample user')
 
+  # If sample user doesn't belong to default group, add to default group
+  default_group = get_default_user_group()
+  if user is not None and default_group is not None and default_group not in user.groups.all():
+    user.groups.add(default_group)
+    user.save()
+
   fs = cluster.get_hdfs()
   # If home directory doesn't exist for sample user, create it
   try:
