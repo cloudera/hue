@@ -295,7 +295,7 @@ def split_statements(hql):
 
   if current and current != ';':
     current = current.strip()
-    statements.append(((start_row, start_col), (end_row, end_col), current))
+    statements.append(((start_row, start_col), (end_row, end_col+1), current))
 
   return statements
 
