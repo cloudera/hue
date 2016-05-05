@@ -68,7 +68,14 @@ ${layout.menubar(section='log_view')}
         <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
       </%def>
       <%def name="creation()">
-        <label class="checkbox" style="display: inline-block; margin-right: 10px"><input id="wrapLogs" type="checkbox" checked="checked">${_('Wrap logs')}</label>
+        ${ _('Host') }: <span style="display: inline-block; margin-right: 10px">${ hostname }</span>
+
+        <label class="checkbox" for="forcedDebug" style="display: inline-block; margin-right: 10px">${_('Force DEBUG level')}</label>
+        <input type="checkbox" id="forcedDebug" data-bind="checked: forcedDebug" style="vertical-align: middle">
+
+        <label class="checkbox" for="wrap" style="display: inline-block; margin-right: 10px">${_('Wrap logs')}</label>
+        <input id="wrapLogs" id="wrap" type="checkbox" checked="checked">
+
         <a href="/desktop/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
       </%def>
     </%actionbar:render>
@@ -85,8 +92,47 @@ ${layout.menubar(section='log_view')}
 
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+
+
 <script>
+  var LiveDebugging = function () {
+    var self = this;
+
+    self.forcedDebug = ko.observable(false);
+    self.forcedDebug.subscribe(function(newValue) {
+      self.toggleLogLevel();
+    });
+
+    self.getDebugLevel = function() {
+      $.get("/desktop/get_debug_level", function(data) { self.forcedDebug(data.debug_all); });
+    };
+
+    self.toggleLogLevel = function() {
+      var _url = "";
+      if (self.forcedDebug()) {
+        _url = "/desktop/set_all_debug";
+      } else {
+        _url = "/desktop/reset_all_debug";
+      }
+
+      $.post(_url, {}, function(data) {
+        if (data,status != 0) {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+  }
+
+  var viewModel;
+
   $(document).ready(function () {
+    viewModel = new LiveDebugging();
+    ko.applyBindings(viewModel);
+
+    viewModel.getDebugLevel();
 
     resizeScrollingLogs();
 
