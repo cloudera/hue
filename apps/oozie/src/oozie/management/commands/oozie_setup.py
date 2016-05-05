@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
 from lxml import etree
@@ -25,6 +26,7 @@ from django.utils.translation import ugettext as _
 
 from hadoop import cluster
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from liboozie.submittion import create_directories
 from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR, ENABLE_V2
@@ -144,6 +146,24 @@ class Command(NoArgsCommand):
       owner=self.user,
       name=Document2.EXAMPLES_DIR
     )
+
+    if USE_NEW_EDITOR.get():
+      docs = Document.objects.get_docs(self.user, Workflow).filter(owner=self.user)
+      for doc in docs:
+        if doc.content_object:
+          data = doc.content_object.data_dict
+          data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+          data = json.dumps(data)
+
+          doc2 = Document2.objects.create(
+            owner=self.user,
+            parent_directory=examples_dir,
+            name=doc.name,
+            type='link-workflow',
+            description=doc.description,
+            data=data)
+
+          LOG.info('Successfully installed sample link to jobsub: %s' % (doc2.name,))
 
     # Share oozie examples with default group
     oozie_examples = Document2.objects.filter(
