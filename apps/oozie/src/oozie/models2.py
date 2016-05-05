@@ -570,11 +570,8 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties['user'] = '%s@%s' % (node.get('ssh').get('user'), node.get('ssh').get('host'))
         properties['ssh_command'] = node.get('ssh').get('command')
       elif node['node_type'] == 'fs':
-        #TBD: all
-        properties['deletes'] = [{'value': f['name']} for f in json.loads(node.get('deletes'))]
-        properties['mkdirs'] = [{'value': f['name']} for f in json.loads(node.get('mkdirs'))]
-        properties['moves'] = json.loads(node.get('moves'))
-        properties['touchzs'] = [{'value': f['name']} for f in json.loads(node.get('touchzs'))]
+        fs_props = node.get('fs')
+        # TBD: gather props for different fs operations
       elif node['node_type'] == 'email':
         properties['to'] = node.get('email').get('to')
         properties['subject'] = node.get('email').get('subject')
