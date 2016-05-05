@@ -33,7 +33,8 @@
       "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user",
       "availableDatabases", "hasProperties", "viewSettings", "aceMode", "snippetImage", "errorLoadingQueries",
       "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta",
-      "dependents"
+      "dependents", "canWrite",
+      "filteredHistory", "queries"
     ]
   };
 

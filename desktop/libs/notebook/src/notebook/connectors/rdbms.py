@@ -72,7 +72,7 @@ class RdbmsApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'available'}
+    return {'status': 'expired'}
 
 
   @query_error_handler
