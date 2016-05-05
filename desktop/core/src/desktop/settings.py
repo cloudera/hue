@@ -209,7 +209,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # of having multiple apps.  If your app needs
 # to store data related to users, it should
 # manage its own table with an appropriate foreign key.
-AUTH_PROFILE_MODULE=None
+AUTH_PROFILE_MODULE = None
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.

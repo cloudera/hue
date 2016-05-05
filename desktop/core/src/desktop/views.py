@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import re
+import socket
 import sys
 import tempfile
 import time
@@ -33,7 +34,7 @@ from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 import django.views.debug
 
 import desktop.conf
@@ -49,8 +50,10 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
+from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import UserPreferences, Settings
 from desktop import appmanager
+
 
 
 LOG = logging.getLogger(__name__)
@@ -99,12 +102,13 @@ def log_view(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
+  hostname = socket.gethostname()
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
-      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", "")))
+      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", ""), hostname=hostname))
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")], query=''))
+  return render('logs.mako', request, dict(log=[_("No logs found!")], query='', hostname=hostname))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
@@ -518,6 +522,31 @@ def check_config_ajax(request):
                 request,
                 dict(error_list=error_list),
                 force_template=True)
+
+
+def get_debug_level(request):
+  return JsonResponse({'status': 0, 'debug_all': _get_all_debug()})
+
+
+@require_POST
+def set_all_debug(request):
+  if not request.user.is_superuser:
+    return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
+
+  _set_all_debug()
+
+  return JsonResponse({'status': 0, 'debug_all': True})
+
+
+@require_POST
+def reset_all_debug(request):
+  if not request.user.is_superuser:
+    return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
+
+  _reset_all_debug()
+
+  return JsonResponse({'status': 0, 'debug_all': False})
+
 
 # This is a global non-view for inline KO i18n
 def _ko(str=""):
