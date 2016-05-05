@@ -30,9 +30,9 @@
 
   var NOTEBOOK_MAPPING = {
     ignore: [
-      "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user",
-      "availableDatabases", "hasProperties", "viewSettings", "aceMode", "snippetImage", "errorLoadingQueries",
-      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta",
+      "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "selectedStatement", "user",
+      "availableDatabases", "hasProperties", "aceMode", "snippetImage", "errorLoadingQueries",
+      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta", "cleanedNumericMeta",
       "dependents", "canWrite",
       "filteredHistory", "queries"
     ]
@@ -1231,8 +1231,18 @@
 
     self.save = function () {
       logGA('save');
+
+      // Remove the result data from the snippets
+      var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
+      $.each(cp.snippets, function(index, item) {
+        item.result.data.length = 0; // item.result.clear() does not work for some reason
+        item.result.meta.length = 0;
+        item.result.logs = '';
+        item.result.fetchedOnce = false;
+      });
+
       $.post("/notebook/api/notebook/save", {
-        "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
+        "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode
       }, function (data) {
         if (data.status == 0) {
@@ -1240,7 +1250,7 @@
           self.isSaved(true);
           self.isHistory(false);
           $(document).trigger("info", data.message);
-          if (vm.editorMode){
+          if (vm.editorMode) {
             huePubSub.publish('fetch.queries.after.save');
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
