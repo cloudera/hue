@@ -143,7 +143,7 @@ def get_document(request):
     document = Document2.objects.get_by_path(user=request.user, path=path)
 
   response = {
-    'document': document.to_dict(),
+    'document': document.to_dict(request.user),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
     'children': [],
     'dependencies': [],
