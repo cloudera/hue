@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.5" xmlns:hive="uri:oozie:hive-action:0.4" exclude-result-prefixes="workflow hive">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:hive="uri:oozie:hive-action:0.4">
 
 <xsl:template match="hive:hive">
 
