@@ -52,6 +52,7 @@ class SparkConfiguration(object):
       "type": "csv-hdfs-files",
       "is_yarn": False,
       "multiple": True,
+      "defaultValue": [],
       "value": [],
     }, {
       "name": "files",
@@ -60,6 +61,7 @@ class SparkConfiguration(object):
       "type": "csv-hdfs-files",
       "is_yarn": False,
       "multiple": True,
+      "defaultValue": [],
       "value": [],
     }, {
       "name": "pyFiles",
@@ -68,6 +70,7 @@ class SparkConfiguration(object):
       "type": "csv-hdfs-files",
       "is_yarn": False,
       "multiple": True,
+      "defaultValue": [],
       "value": [],
     }, {
       "name": "driverMemory",
@@ -76,6 +79,7 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": False,
       "multiple": False,
+      "defaultValue": '1G',
       "value": '1G',
     },
     # YARN-only properties
@@ -86,6 +90,7 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
+      "defaultValue": 1,
       "value": 1,
     }, {
       "name": "executorMemory",
@@ -94,6 +99,7 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": True,
       "multiple": False,
+      "defaultValue": '1G',
       "value": '1G',
     }, {
       "name": "executorCores",
@@ -102,6 +108,7 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
+      "defaultValue": 1,
       "value": 1,
     }, {
       "name": "queue",
@@ -110,6 +117,7 @@ class SparkConfiguration(object):
       "type": "string",
       "is_yarn": True,
       "multiple": False,
+      "defaultValue": 'default',
       "value": 'default',
     }, {
       "name": "archives",
@@ -118,6 +126,7 @@ class SparkConfiguration(object):
       "type": "csv-hdfs-files",
       "is_yarn": True,
       "multiple": True,
+      "defaultValue": [],
       "value": [],
     }
   ]

@@ -104,6 +104,12 @@ class WorkflowConfiguration(object):
   PROPERTIES = [
     {
       "multiple": True,
+      "defaultValue": [
+        {
+          'name': 'oozie.use.system.libpath',
+          'value': True
+        }
+      ],
       "value": [
         {
           'name': 'oozie.use.system.libpath',
@@ -116,6 +122,7 @@ class WorkflowConfiguration(object):
       "type": "parameters"
     }, {
       "multiple": False,
+      "defaultValue": '',
       "value": '',
       "nice_name": _("Workspace"),
       "key": "deployment_dir",
@@ -123,6 +130,7 @@ class WorkflowConfiguration(object):
       "type": "hdfs-files"
     }, {
       "multiple": True,
+      "defaultValue": [],
       "value": [],
       "nice_name": _("Hadoop Properties"),
       "key": "properties",
@@ -130,6 +138,7 @@ class WorkflowConfiguration(object):
       "type": "settings"
     }, {
       "multiple": False,
+      "defaultValue": True,
       "value": True,
       "nice_name": _("Show graph arrows"),
       "key": "show_arrows",
@@ -137,6 +146,7 @@ class WorkflowConfiguration(object):
       "type": "boolean"
     }, {
       "multiple": False,
+      "defaultValue": "uri:oozie:workflow:0.5",
       "value": "uri:oozie:workflow:0.5",
       "nice_name": _("Version"),
       "key": "schema_version",
@@ -149,6 +159,7 @@ class WorkflowConfiguration(object):
       ]
     }, {
       "multiple": False,
+      "defaultValue": '',
       "value": '',
       "nice_name": _("Job XML"),
       "key": "job_xml",
@@ -156,6 +167,7 @@ class WorkflowConfiguration(object):
       "type": "hdfs-files"
     }, {
       "multiple": False,
+      "defaultValue": False,
       "value": False,
       "nice_name": _("SLA Enabled"),
       "key": "sla_enabled",
@@ -163,6 +175,7 @@ class WorkflowConfiguration(object):
       "type": "boolean"
     }, {
       "multiple": False,
+      "defaultValue": SLA_DEFAULT,
       "value": SLA_DEFAULT,
       "nice_name": _("SLA Configuration"),
       "key": "sla",

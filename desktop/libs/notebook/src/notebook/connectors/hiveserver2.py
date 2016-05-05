@@ -82,6 +82,7 @@ class HiveConfiguration(object):
   PROPERTIES = [
     {
       "multiple": True,
+      "defaultValue": [],
       "value": [],
       "nice_name": _("Files"),
       "key": "files",
@@ -89,6 +90,7 @@ class HiveConfiguration(object):
       "type": "hdfs-files"
     }, {
       "multiple": True,
+      "defaultValue": [],
       "value": [],
       "nice_name": _("Functions"),
       "key": "functions",
@@ -96,6 +98,7 @@ class HiveConfiguration(object):
       "type": "functions"
     }, {
       "multiple": True,
+      "defaultValue": [],
       "value": [],
       "nice_name": _("Settings"),
       "key": "settings",
@@ -113,6 +116,7 @@ class ImpalaConfiguration(object):
   PROPERTIES = [
     {
       "multiple": True,
+      "defaultValue": [],
       "value": [],
       "nice_name": _("Settings"),
       "key": "settings",
