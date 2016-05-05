@@ -100,12 +100,17 @@ def close_session(request):
 @api_error_handler
 def execute(request):
   response = {'status': -1}
+  result = None
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
     response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+
+    # Retrieve and remove the result from the handle
+    if response['handle'].get('sync'):
+      result = response['handle'].pop('result')
   finally:
     if notebook['type'].startswith('query-'):
       _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
@@ -122,9 +127,10 @@ def execute(request):
       if notebook['isSaved']: # Keep track of history of saved queries
         response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
 
-  # Materialize and HTML escape results
-  if response['handle'].get('sync') and response['handle']['result'].get('data'):
-    response['handle']['result']['data'] = escape_rows(response['handle']['result']['data'])
+  # Inject and HTML escape results
+  if result is not None:
+    response['result'] = result
+    response['result']['data'] = escape_rows(result['data'])
 
   response['status'] = 0
 

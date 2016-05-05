@@ -636,7 +636,7 @@
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.sync) {
-            self.loadData(data.handle, 100);
+            self.loadData(data.result, 100);
             self.status('success');
             self.progress(100);
           } else {
@@ -770,7 +770,7 @@
         }, function (data) {
           data = JSON.bigdataParse(data);
           if (data.status == 0) {
-            self.loadData(data, rows);
+            self.loadData(data.result, rows);
           } else {
             self._ajaxError(data);
             $(document).trigger("renderDataError", {snippet: self});
@@ -783,35 +783,35 @@
       }
     };
 
-    self.loadData = function (data, rows) {
-      rows -= data.result.data.length;
+    self.loadData = function (result, rows) {
+      rows -= result.data.length;
 
-      if (data.result.data.length > 0) {
+      if (result.data.length > 0) {
         self.currentQueryTab('queryResults');
       }
 
       var _initialIndex = self.result.data().length;
       var _tempData = [];
-      $.each(data.result.data, function (index, row) {
+      $.each(result.data, function (index, row) {
         row.unshift(_initialIndex + index + 1);
         self.result.data.push(row);
         _tempData.push(row);
       });
 
-      self.result.images(typeof data.result.images != "undefined" && data.result.images != null ? data.result.images : []);
+      self.result.images(typeof result.images != "undefined" && result.images != null ? result.images : []);
 
       $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
       if (! self.result.fetchedOnce()) {
-        data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
-        self.result.meta(data.result.meta);
-        self.result.type(data.result.type);
+        result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
+        self.result.meta(result.meta);
+        self.result.type(result.type);
         self.result.fetchedOnce(true);
       }
 
-      self.result.hasMore(data.result.has_more);
+      self.result.hasMore(result.has_more);
 
-      if (data.result.has_more && rows > 0) {
+      if (result.has_more && rows > 0) {
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
