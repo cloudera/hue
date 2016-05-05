@@ -346,7 +346,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(2, data['handle']['statements_count'], data)
     assert_equal(False, data['handle']['has_more_statements'], data)
     assert_equal({'row': 1, 'column': 0}, data['handle']['start'], data)
-    assert_equal({'row': 1, 'column': 32}, data['handle']['end'], data)
+    assert_equal({'row': 1, 'column': 33}, data['handle']['end'], data)
 
 
   def test_explain(self):
