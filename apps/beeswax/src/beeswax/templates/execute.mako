@@ -809,7 +809,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/assist/assistDbSource.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocompleter.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1193,10 +1192,27 @@ var i18n = {
   errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
 };
 
-var editorViewModel = new EditorViewModel([], [], editorViewModelOptions, i18n);
-var notebook = editorViewModel.newNotebook();
-var snippet = notebook.newSnippet(snippetType);
-var apiHelper = snippet.getApiHelper();
+var apiHelper = ApiHelper.getInstance({
+  user: HIVE_AUTOCOMPLETE_USER,
+  i18n: i18n
+});
+
+var editorViewModel = {
+  sqlSourceTypes: [{
+    type: snippetType,
+    name: HIVE_AUTOCOMPLETE_APP == "impala" ? "Impala" : "Hive"
+  }]
+};
+
+var snippet = {
+  type: ko.observable(snippetType),
+  isSqlDialect: ko.observable(true),
+  getApiHelper: function() {
+    return apiHelper;
+  },
+  database: ko.observable()
+};
+
 var autocompleter = new Autocompleter({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
@@ -2826,6 +2842,19 @@ function setupCodeMirrorSubscription() {
 // Knockout
 viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
+
+var handleAssistSelection = function (databaseDef) {
+  if (databaseDef.source === snippetType && snippet.database() !== databaseDef.name) {
+    snippet.database(databaseDef.name);
+  }
+};
+
+huePubSub.subscribe("assist.database.set", handleAssistSelection);
+huePubSub.subscribe("assist.database.selected", handleAssistSelection);
+
+if (! snippet.database()) {
+  huePubSub.publish("assist.get.database", snippetType);
+}
 
 shareViewModel = initSharing("#documentShareModal");
 shareViewModel.setDocId(${doc_id});
