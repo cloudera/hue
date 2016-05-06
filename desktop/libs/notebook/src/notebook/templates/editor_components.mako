@@ -1666,11 +1666,13 @@ ${ hueIcons.symbols() }
             <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
+        <!-- ko if: formatEnabled -->
         <li>
           <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': statement() === '' }" title="${ _('Format the current SQL query') }">
             <i class="fa fa-fw fa-indent"></i> ${_('Format')}
           </a>
         </li>
+        <!-- /ko -->
         <li>
           <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': statement() === '' }" title="${ _('Clear the current editor') }">
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
