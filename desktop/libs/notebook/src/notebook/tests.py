@@ -56,7 +56,7 @@ class TestNotebookApi(object):
         ],
         "type": "query-hive",
         "id": 50010,
-        "snippets": [],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "5982a274-de78-083c-2efc-74f53dce744c",
         "isSaved": false,
         "parentUuid": null
@@ -144,7 +144,7 @@ class TestNotebookApi(object):
     assert_equal(3, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
 
     # History should not return history objects that don't have the given doc type
-    Document2.objects.create(name='Impala History', type='query-impala', owner=self.user, is_history=True)
+    Document2.objects.create(name='Impala History', type='query-impala', data=self.notebook_json, owner=self.user, is_history=True)
 
     # Verify that get_history API returns history objects for given type and current user
     response = self.client.get(reverse('notebook:get_history'), {'doc_type': 'hive'})
