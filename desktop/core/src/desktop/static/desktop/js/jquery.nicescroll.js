@@ -1614,6 +1614,7 @@
 
           } else {
 
+            var properDebounce = -1;
             var checkSelectionScroll = function(e) {
               if (!self.selectiondrag) return;
 
@@ -1629,9 +1630,8 @@
               var rt = -Math.floor(self.selectiondrag.df / 6) * 2;
               self.doScrollBy(rt);
 
-              self.debounced("doselectionscroll", function() {
-                checkSelectionScroll();
-              }, 50);
+              window.clearTimeout(properDebounce);
+              properDebounce = window.setTimeout(checkSelectionScroll, 50);
             };
 
             if ("getSelection" in document) { // A grade - Major browsers
