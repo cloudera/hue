@@ -708,6 +708,7 @@
       }
 
       self.result.explanation('');
+      self.progress(0);
       self.status('ready');
 
       $.post("/notebook/api/explain", {
