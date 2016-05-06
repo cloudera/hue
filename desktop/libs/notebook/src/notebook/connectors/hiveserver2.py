@@ -136,6 +136,11 @@ class HS2Api(Api):
 
     session = Session.objects.get_session(self.user, application=application)
 
+    response = {
+      'type': lang,
+      'id': session.id
+    }
+
     if session is None:
       session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
 
@@ -146,11 +151,14 @@ class HS2Api(Api):
       else:
         properties = self.get_properties(lang)
 
-    return {
-        'type': lang,
-        'id': session.id,
-        'properties': properties
-    }
+    response['properties'] = properties
+
+    if lang == 'impala':
+      impala_settings = session.get_formatted_properties()
+      http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+      response['http_addr'] = http_addr
+
+    return response
 
 
   @query_error_handler
