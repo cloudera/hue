@@ -428,6 +428,21 @@
     }
   };
 
+  HueFileEntry.prototype.emptyTrash = function () {
+    var self = this;
+    if (self.trashEntry()) {
+      if (! self.trashEntry().loaded()) {
+        self.trashEntry().load(function () {
+          self.entriesToDelete(self.trashEntry().entries());
+          $('#deleteEntriesModal').modal('show');
+        })
+      } else {
+        self.entriesToDelete(self.trashEntry().entries());
+        $('#deleteEntriesModal').modal('show');
+      }
+    }
+  };
+
   HueFileEntry.prototype.moveToTrash = function () {
     var self = this;
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
