@@ -1099,8 +1099,8 @@ class Document2(models.Model):
       LOG.warn('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
     return url
 
-  def to_dict(self, user=None):
-    data = {
+  def to_dict(self):
+    return {
       'owner': self.owner.username,
       'name': self.name,
       'path': urlencode(self.path or '/'),
@@ -1116,12 +1116,6 @@ class Document2(models.Model):
       'isSelected': False,
       'absoluteUrl': self.get_absolute_url(),
     }
-
-    if user is not None:
-      data['can_read'] = self.can_read(user)
-      data['can_write'] = self.can_write(user)
-
-    return data
 
   def get_history(self):
     return self.dependencies.filter(is_history=True).order_by('-last_modified')
