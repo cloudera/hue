@@ -151,6 +151,11 @@ def get_document(request):
     'data': ''
   }
 
+  response['user_perms'] = {
+    'can_read': document.can_read(request.user),
+    'can_write': document.can_write(request.user)
+  }
+
   if with_data:
     data = json.loads(document.data)
     # Upgrade session properties for Hive and Impala
