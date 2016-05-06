@@ -624,7 +624,7 @@
           notebook.history.unshift(
             notebook._makeHistoryRecord(
               url,
-              self.statement_raw(),
+              data.handle.statement,
               self.lastExecuted(),
               self.status(),
               notebook.name(),
@@ -1348,7 +1348,7 @@
             parsedHistory.push(
               self._makeHistoryRecord(
                 nbk.absoluteUrl,
-                nbk.data.statement_raw,
+                nbk.data.statement,
                 nbk.data.lastExecuted,
                 nbk.data.status,
                 nbk.name,

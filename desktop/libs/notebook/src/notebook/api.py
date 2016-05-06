@@ -111,8 +111,9 @@ def execute(request):
       _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
       if 'handle' in response: # No failure
         _snippet['result']['handle'] = response['handle']
-        _snippet['result']['statements_count'] = response['handle']['statements_count']
-        _snippet['result']['statement_id'] = response['handle']['statement_id']
+        _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
+        _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
+        _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']) # For non HS2, as non multi query yet
       else:
         _snippet['status'] = 'failed'
       history = _historify(notebook, request.user)
@@ -347,13 +348,19 @@ def get_history(request):
   for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:limit]:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
+      try:
+        statement = notebook['snippets'][0]['result']['handle']['statement']
+        if type(statement) == dict: # Old format
+          statement = notebook['snippets'][0]['statement_raw']
+      except KeyError: # Old format
+        statement = notebook['snippets'][0]['statement_raw']
       history.append({
         'name': doc.name,
         'id': doc.id,
         'uuid': doc.uuid,
         'type': doc.type,
         'data': {
-            'statement_raw': notebook['snippets'][0]['statement_raw'][:1001],
+            'statement': statement[:1001],
             'lastExecuted':  notebook['snippets'][0]['lastExecuted'],
             'status':  notebook['snippets'][0]['status'],
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
