@@ -2771,10 +2771,11 @@
           };
 
           this.onClick = function (e) {
-            if (this.link && (e.altKey || e.metaKey || e.ctrlKey)) {
+            if (this.link && e.shiftKey) {
               this.link.editor = this.editor;
+              this.editor.session.selection.clearSelection();
               this._signal("open", this.link);
-              this.clear()
+              this.clear();
             }
           };
 
@@ -2811,15 +2812,12 @@
       editor.hueLink.on("open", function (token) {
         if (token.value === " * " && token.columns.length > 0) {
           editor.session.replace(token.range, token.columns.join(", "))
-        }
-        else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
-          window.open("/filebrowser/#" + token.value.replace(/'/gi, ""));
-        }
-        else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
-          window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
-        }
-        else {
-          window.open("/metastore/table/" + snippet.database() + "/" + token.value);
+        } else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
+          window.open("/filebrowser/#" + token.value.replace(/'/gi, ""), '_blank');
+        } else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
+          window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""), '_blank');
+        } else {
+          window.open("/metastore/table/" + snippet.database() + "/" + token.value, '_blank');
         }
       });
 
