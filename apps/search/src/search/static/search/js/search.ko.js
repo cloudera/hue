@@ -860,7 +860,7 @@ var Collection = function (vm, collection) {
       iterable = self.template.fields();
     }
     return $.map(iterable, function (field) {
-      if (field.name() != '' && extraCheck(field.type())) {
+      if (typeof field !== 'undefined' && field.name() != '' && extraCheck(field.type())) {
         return field;
       }
     }).sort(function (a, b) {
