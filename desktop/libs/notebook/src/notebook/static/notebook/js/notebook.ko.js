@@ -1374,8 +1374,8 @@
           $.post("/notebook/api/check_status", {
             notebook: ko.mapping.toJSON({id: item.uuid()}),
           }, function (data) {
-            var status = data.status == -3 ? 'expired' : data.query_status.status;
-            if (item.status() != status) {
+            var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : null);
+            if (status && item.status() != status) {
               item.status(status);
             }
           }).always(function () {
