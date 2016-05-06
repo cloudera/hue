@@ -1320,8 +1320,8 @@ ${ hueIcons.symbols() }
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
-        openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
-        expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
+        openIt: '${ _ko("Shift + Click to open it") }',
+        expandStar: '${ _ko("Shift + Click to replace with all columns") }',
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         aceOptions: {
