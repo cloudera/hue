@@ -3026,6 +3026,16 @@ ${ hueIcons.symbols() }
         }
       });
 
+      $(document).on('click', '.resultTable tbody tr', function () {
+        if ($(this).hasClass('selected')) {
+          $(this).removeClass('selected');
+        }
+        else {
+          $('.resultTable tbody tr.selected').removeClass('selected');
+          $(this).addClass('selected');
+        }
+      });
+
       function resizeToggleResultSettings (snippet) {
         var _dtElement;
         if (snippet.showGrid()) {

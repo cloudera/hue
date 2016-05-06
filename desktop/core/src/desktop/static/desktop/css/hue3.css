@@ -1005,6 +1005,11 @@ div.box {
   background-color: #EFEFEF;
 }
 
+.table tr.selected, .table tr.selected td {
+  background-color: #DBE8F1!important;
+}
+
+
 .nounderline:hover {
   text-decoration: none;
 }
