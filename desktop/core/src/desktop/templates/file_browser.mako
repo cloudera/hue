@@ -494,12 +494,17 @@ from desktop.views import _ko
               <li class="active"><div class="fb-drop-target">${ _('My documents') }</div></li>
               <!-- /ko -->
 
+              <!-- ko if: definition().isSearchResult -->
+              <li class="active"><div class="fb-drop-target">${ _('Result for') }: <!-- ko text: definition().name --><!-- /ko --></div></li>
+              <!-- /ko -->
+              <!-- ko ifnot: definition().isSearchResult -->
               <!-- ko foreach: breadcrumbs -->
               <li><div class="fb-drop-target" data-bind="fileDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
-              <!-- ko ifNot: isRoot -->
+              <!-- ko ifnot: isRoot -->
               <li class="active"><div class="fb-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
+              <!-- /ko -->
               <!-- /ko -->
             </ul>
           </div>
