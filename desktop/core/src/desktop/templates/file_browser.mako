@@ -473,14 +473,24 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times</a>
+        <!-- ko if: entriesToDelete().length === 0 -->
+        <h3>${ _('The trash is empty') }</h3>
+        <!-- /ko -->
+        <!-- ko if: entriesToDelete().length > 0 -->
         <h3>${ _('Do you really want to delete') }
           <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].definition().name"></span><!-- /ko -->
           <!-- ko if: entriesToDelete().length > 1 --> <span data-bind="text: entriesToDelete().length"></span> ${ _('entries') }<!-- /ko -->
         ?</h3>
+        <!-- /ko -->
       </div>
       <div class="modal-footer">
+        <!-- ko if: entriesToDelete().length === 0 -->
+        <input type="button" class="btn" data-dismiss="modal" value="${ _('Close') }">
+        <!-- /ko -->
+        <!-- ko if: entriesToDelete().length > 0 -->
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
         <input type="submit" data-bind="click: function() { removeDocuments(true); }" class="btn btn-danger" value="${_('Yes')}"/>
+        <!-- /ko -->
       </div>
       <!-- /ko -->
     </div>
@@ -557,7 +567,14 @@ from desktop.views import _ko
           <div style="margin-top: 2px"><a class="inactive-action fb-action" title="${_('Download')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a></div>
           <div><a class="inactive-action fb-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
           <!-- ko if: app === 'documents' -->
-          <div class="margin-left-20"><a class="inactive-action fb-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a></div>
+          <div class="margin-left-20" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
+            <a class="inactive-action fb-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
+              <i class="fa fa-fw fa-trash-o"></i>
+            </a>
+            <ul class="hue-context-menu">
+              <li><a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a></li>
+            </ul>
+          </div>
           <!-- /ko -->
         </div>
         <!-- /ko -->
