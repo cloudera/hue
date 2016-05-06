@@ -75,9 +75,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     huePubSub.subscribe('hue.login.result', function (response) {
       if (response.auth) {
-        $('#login-modal').modal('hide');
-        $.jHueNotify.info('${ _('You have signed in successfully!') }');
-        $('#login-modal .login-error').addClass('hide');
+        if ($('#login-modal #id_username').val() !== LOGGED_USERNAME) { //LOGGED_USERNAME is in common_header
+          location.reload();
+        }
+        else {
+          $('#login-modal').modal('hide');
+          $.jHueNotify.info('${ _('You have signed in successfully!') }');
+          $('#login-modal .login-error').addClass('hide');
+        }
       }
       else {
         $('#login-modal .login-error').removeClass('hide');
