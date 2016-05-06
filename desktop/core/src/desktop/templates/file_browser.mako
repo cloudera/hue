@@ -39,11 +39,14 @@ from desktop.views import _ko
 
     .fb-action-bar,
     .fb-header {
+      -ms-flex: 0 0 auto;
       flex: 0 0 auto;
       overflow: hidden;
       padding: 2px;
       clear: both;
-      display:flex;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
     }
 
@@ -65,6 +68,7 @@ from desktop.views import _ko
     }
 
     .fb-list {
+      -ms-flex: 1 1 auto;
       flex: 1 1 auto;
       overflow-y: scroll;
       overflow-x: hidden;
@@ -163,13 +167,16 @@ from desktop.views import _ko
     }
 
     .fb-row {
-      display:flex;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
       width: 100%;
       height: 100%;
     }
 
     .fb-primary-col {
+      -ms-flex: 2;
       flex: 2;
       vertical-align: middle;
       padding-left: 8px;
@@ -199,6 +206,7 @@ from desktop.views import _ko
     }
 
     .fb-attr-group {
+      -ms-flex: 1;
       flex: 1;
       white-space: nowrap;
       float: right;
