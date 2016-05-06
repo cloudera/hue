@@ -185,7 +185,7 @@ class HS2Api(Api):
 
     statement = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
-    query = self._prepare_hql_query(snippet, statement.pop('statement'), session)
+    query = self._prepare_hql_query(snippet, statement['statement'], session)
 
     try:
       db.use(query.database)
