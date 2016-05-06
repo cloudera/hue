@@ -511,12 +511,12 @@ from desktop.views import _ko
         </h4>
         <!-- ko if: searchVisible -->
         <div class="fb-search-container">
-          <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="textInput: searchQuery, clearable: searchQuery">
+          <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
         </div>
         <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <div><a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
+          <div><a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
             <span class="dropdown">
@@ -905,6 +905,7 @@ from desktop.views import _ko
         });
 
         self.searchVisible = ko.observable(false);
+        self.searchFocus = ko.observable(false);
 
         huePubSub.subscribe('file.browser.directory.opened', function () {
           self.searchQuery('');
