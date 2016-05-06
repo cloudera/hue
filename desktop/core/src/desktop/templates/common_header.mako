@@ -107,6 +107,8 @@ if USE_NEW_EDITOR.get():
 
   <script type="text/javascript" charset="utf-8">
 
+    var LOGGED_USERNAME = '${ user.username }';
+
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
       labels: {
