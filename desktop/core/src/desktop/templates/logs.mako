@@ -99,10 +99,12 @@ ${layout.menubar(section='log_view')}
   var LiveDebugging = function () {
     var self = this;
 
-    self.forcedDebug = ko.observable(false);
+    self.forcedDebug = ko.observable();
     self.forcedDebug.subscribe(function(newValue) {
-      self.toggleLogLevel();
-    });
+      if (newValue != null) {
+        self.toggleLogLevel();
+      }
+    }, this, "beforeChange");
 
     self.getDebugLevel = function() {
       $.get("/desktop/get_debug_level", function(data) { self.forcedDebug(data.debug_all); });
@@ -130,7 +132,7 @@ ${layout.menubar(section='log_view')}
 
   $(document).ready(function () {
     viewModel = new LiveDebugging();
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $(".action-main-bar")[0]);
 
     viewModel.getDebugLevel();
 
