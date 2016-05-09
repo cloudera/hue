@@ -2992,6 +2992,11 @@
         setFromDropMenu('DELETE FROM ' + lastMeta.table + ' WHERE ');
       });
 
+      var draggableMeta = {};
+      huePubSub.subscribe('draggable.text.meta', function (meta) {
+        draggableMeta = meta;
+      });
+
       $el.droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
@@ -2999,7 +3004,7 @@
           var text = ui.helper.text();
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
-          if (/.*;|^\s*$/.test(before)) {
+          if (draggableMeta.table && ! draggableMeta.column && /.*;|^\s*$/.test(before)) {
             menu.show(event);
           } else {
             if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
