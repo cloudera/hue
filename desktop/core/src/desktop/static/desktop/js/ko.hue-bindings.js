@@ -59,12 +59,26 @@
       $element.addClass("draggableText");
 
       var $helper = $("<div>").text(ko.isObservable(options.text) ? options.text() : options.text).css("z-index", "99999");
+      var dragStartX = -1;
+      var dragStartY = -1;
       $element.draggable({
         helper: function () { return $helper },
         appendTo: "body",
-        start: function () {
+        start: function (event) {
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
           huePubSub.publish('draggable.text.meta', options.meta);
-        }
+        },
+        stop: function (event) {
+          if (Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 10) {
+            $helper.remove();
+            var elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
+            var elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
+            if (elementAtStart === elementAtStop) {
+              $(elementAtStop).trigger('click');
+            }
+          }
+        },
       });
     }
   };
@@ -374,7 +388,7 @@
             clickedOnce = false;
             clearTimeout(singleClickTimeout);
             clearTimeout(dblClickTimeout);
-          } else {
+          } else if (clickHandlerFunction) {
             clickedOnce = true;
             singleClickTimeout = window.setTimeout(function() {
               clickHandlerFunction.apply(viewModel, clickArgs);
