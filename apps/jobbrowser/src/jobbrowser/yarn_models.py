@@ -365,7 +365,7 @@ class Attempt:
 
       # Replace log path tokens with actual container properties if available
       if hasattr(self, 'nodeHttpAddress') and 'nodeId' in attempt:
-        node_url = '%s://%s:%s' % (node_url.split('://')[0], self.nodeHttpAddress.split(':')[0], attempt['nodeId'].split(':')[1])
+        node_url = '%s://%s' % (node_url.split('://')[0], self.nodeHttpAddress)
       container_id = self.assignedContainerId if hasattr(self, 'assignedContainerId') else container_id
 
       log_link = '%(node_url)s/%(logs_path)s/%(container)s/%(user)s' % {

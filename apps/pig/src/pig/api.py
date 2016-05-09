@@ -175,13 +175,14 @@ class OozieApi(object):
       try:
         if action.externalId:
           data = job_single_logs(request, **{'job': action.externalId})
-          if data:
+
+          if data and 'logs' in data:
             matched_logs = self._match_logs(data)
             logs[action.name] = LinkJobLogs._make_links(matched_logs)
             is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
 
       except Exception, e:
-        LOG.error('An error happen while watching the job running: %(error)s' % {'error': e})
+        LOG.error('An error occurred while watching the job running: %(error)s' % {'error': e})
         is_really_done = True
 
     workflow_actions = []
