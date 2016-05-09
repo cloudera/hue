@@ -1240,11 +1240,13 @@
 
       // Remove the result data from the snippets
       var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
-      $.each(cp.snippets, function(index, item) {
-        item.result.data.length = 0; // item.result.clear() does not work for some reason
-        item.result.meta.length = 0;
-        item.result.logs = '';
-        item.result.fetchedOnce = false;
+      $.each(cp.snippets, function(index, snippet) {
+        snippet.result.data.length = 0; // snippet.result.clear() does not work for some reason
+        snippet.result.meta.length = 0;
+        snippet.result.logs = '';
+        snippet.result.fetchedOnce = false;
+        snippet.progress = 0; // Remove progress
+        snippet.jobs.length = 0;
       });
 
       $.post("/notebook/api/notebook/save", {
