@@ -999,8 +999,8 @@ class HiveAction(Action):
 
 def _get_hiveserver2_url():
   try:
-    from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT
-    return 'jdbc:hive2://%s:%s/default' % (HIVE_SERVER_HOST.get(), HIVE_SERVER_PORT.get())
+    from beeswax.hive_site import hiveserver2_jdbc_url
+    return hiveserver2_jdbc_url()
   except Exception, e:
     # Might fail is Hive is disabled
     LOG.warn('Could not guess HiveServer2 URL: %s' % smart_str(e))

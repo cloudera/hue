@@ -47,6 +47,8 @@ _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
 _CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.doAs'
 
 _CNF_HIVESERVER2_USE_SSL = 'hive.server2.use.SSL'
+_CNF_HIVESERVER2_TRUSTSTORE_PATH = 'hive.server2.truststore.path'
+_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD = 'hive.server2.truststore.password'
 
 _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
@@ -130,7 +132,14 @@ def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'FALSE').upper() == 'TRUE'
 
 def hiveserver2_jdbc_url():
-  return 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(),
+                                            beeswax.conf.HIVE_SERVER_PORT.get())
+  if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
+    return '%s;ssl=true;sslTrustStore=%s;trustStorePassword=%s' % (urlbase,
+            get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH),
+            get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD))
+  else:
+     return urlbase
 
 def hiveserver2_use_ssl():
   return get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE'
