@@ -2963,7 +2963,7 @@
 
       var setFromDropMenu = function (text) {
         var before = editor.getTextBeforeCursor();
-        if (before.length > 0 && before.charAt(before.length - 1) !== ' ') {
+        if (/\S+$/.test(before)) {
           text = " " + text;
         }
         editor.session.insert(editor.getCursorPosition(), text);
@@ -3007,7 +3007,7 @@
           if (draggableMeta.table && ! draggableMeta.column && /.*;|^\s*$/.test(before)) {
             menu.show(event);
           } else {
-            if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
+            if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
               text = " " + text;
             }
             var after = editor.getTextAfterCursor();
