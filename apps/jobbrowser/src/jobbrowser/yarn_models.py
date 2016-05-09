@@ -245,7 +245,11 @@ class Job(object):
   @property
   def full_job_conf(self):
     if not hasattr(self, '_full_job_conf'):
-      self._full_job_conf = self.api.conf(self.id)['conf']
+      try:
+        conf = self.api.conf(self.id)
+        self._full_job_conf = conf['conf']
+      except TypeError, e:
+        LOG.exception('YARN API call failed to return all the data: %s' % conf)
     return self._full_job_conf
 
   @property
