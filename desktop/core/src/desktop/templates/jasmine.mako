@@ -15,20 +15,5 @@
 ## limitations under the License.
 ##
 
-<%inherit file="common_jasmine.mako"/>
-
-<%block name="specs">
-  <script type="text/javascript" charset="utf-8">
-  require(['jasmine-boot', 'jasmine', 'mock-ajax'], function () {
-    // Add specs below
-    require([
-      'desktop/spec/sqlAutocompleterSpec',
-      'desktop/spec/hdfsAutocompleterSpec',
-      'desktop/spec/apiHelperSpec'
-    ], function() {
-      window.onload();
-    });
-  });
-  </script>
-</%block>
+<%include file="jasmineRunner.html"/>
 

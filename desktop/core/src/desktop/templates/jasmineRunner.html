@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Jasmine Spec Runner</title>
+
+  <link rel="shortcut icon" type="image/png" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png">
+  <link rel="stylesheet" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine.css">
+
+  <script type="text/javascript" src="../static/desktop/ext/js/jquery/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/jquery.migration.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/hue.utils.js"></script>
+  <script type="text/javascript" src="../static/desktop/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
+
+  <script src="../static/desktop/js/ace/ace.js"></script>
+  <script src="../static/desktop/js/ace/ext-language_tools.js"></script>
+  <script src="../static/desktop/js/ace.extended.js"></script>
+
+
+  <script src="../static/desktop/ext/js/require.js"></script>
+  <script>
+    define('jquery', [], function() {
+      return jQuery;
+    });
+    require.config({
+      urlArgs: "bust=" + (new Date()).getTime(),
+      baseUrl: "../static/",
+      paths: {
+        "jquery.ui.sortable": "desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min",
+        "knockout": "desktop/ext/js/knockout.min",
+        "ko.charts" : "desktop/js/ko.charts",
+        "knockout-mapping" : "desktop/ext/js/knockout-mapping.min",
+        "knockout-sortable" : "desktop/ext/js/knockout-sortable.min",
+        "ko.editable" : "desktop/js/ko.editable",
+        "ko.switch-case" : "desktop/js/ko.switch-case",
+        "ko.hue-bindings" : "desktop/js/ko.hue-bindings"
+      },
+      shim: {
+        "knockout": { exports: "ko" },
+        "knockout-mapping": { deps: ["knockout"] },
+        "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
+        "ko.editable": { deps: ["knockout"] },
+        "ko.switch-case": { deps: ["knockout"] },
+        "ace.extended": { deps: ["ace"] },
+        "ace.ext-language-tools": { deps: ["ace"] }
+      },
+      deps: ["knockout", "knockout-mapping"],
+      callback: function(ko, mapping) {
+        ko.mapping = mapping;
+        window.hueDebug = {
+          ko: ko,
+          viewModel: function () {
+            return ko.dataFor(document.body);
+          }
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript" charset="utf-8">
+    // Adds the jasmine dependencies to the existing require config.
+    require.config({
+      urlArgs: "random=" + Math.random(),
+      baseUrl: "../static/",
+      paths: {
+        'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
+        'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
+        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot',
+        'jasmine-junit': 'desktop/ext/js/jasmine-2.3.4/junit_reporter',
+        'jasmine-terminal': 'desktop/ext/js/jasmine-2.3.4/terminal_reporter',
+        'mock-ajax':  'desktop/ext/js/jasmine-2.3.4/mock-ajax'
+      },
+      shim: {
+        'jasmine-html': {
+          deps: ['jasmine']
+        },
+        'jasmine-boot': {
+          deps: ['jasmine', 'jasmine-html', 'jasmine-junit', 'jasmine-terminal']
+        },
+        'mock-ajax': {
+          deps: ['jasmine-boot']
+        }
+      }
+    })
+  </script>
+
+
+  <script type="text/javascript" charset="utf-8">
+    require(['jasmine-boot', 'jasmine', 'mock-ajax'], function () {
+      // Add specs below
+      require([
+        'desktop/spec/sqlAutocompleterSpec',
+        'desktop/spec/hdfsAutocompleterSpec',
+        'desktop/spec/apiHelperSpec'
+      ], function () {
+        if (/PhantomJS/.test(window.navigator.userAgent)) {
+          console.log("Running Jasmine tests with JUnitXmlReporter and TerminalReporter");
+          jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
+            savePath: '../../',
+            consolidateAll: false
+          }));
+          jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter());
+        }
+        window.onload();
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+
+</body>
+</html>

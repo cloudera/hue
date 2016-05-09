@@ -278,6 +278,9 @@ ext-clean:
 # Misc (some used by automated test scripts)
 ###############################################
 
+js-test:
+	$(ROOT)/tools/jasmine/phantomjs.runner.sh $(ROOT)/desktop/core/src/desktop/templates/jasmineRunner.html
+
 java-test:
 	mvn -f desktop/libs/hadoop/java/pom.xml test $(MAVEN_OPTIONS)
 

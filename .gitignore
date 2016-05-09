@@ -106,3 +106,5 @@ dependency-reduced-pom.xml
 
 # Node Modules
 node_modules/
+
+junitresults*
