@@ -35,5 +35,5 @@ HIVE_V2 = Config(
 SOLR_V2 = Config(
   key="solr_v2",
   help=_("Use Sentry generic API V2 for Solr."),
-  default=False,
+  default=True,
   type=coerce_bool)
