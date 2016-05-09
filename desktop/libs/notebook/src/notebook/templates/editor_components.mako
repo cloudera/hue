@@ -1067,7 +1067,7 @@ ${ hueIcons.symbols() }
               <!-- /ko -->
             <table class="table table-condensed margin-top-10 history-table">
               <tbody data-bind="foreach: $parent.filteredHistory">
-                <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $root.openNotebook(uuid()) } }">
+                <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'pointer': uuid() != $root.selectedNotebook().uuid() }">
                   <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
                   </td>
@@ -1119,7 +1119,7 @@ ${ hueIcons.symbols() }
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
-            <tr class="pointer" data-bind="click: function() { $root.openNotebook(uuid) }">
+            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid); } }, css: { 'pointer': uuid != $root.selectedNotebook().uuid() }">
               <td style="width: 16%"><span data-bind="ellipsis: {data: name, length: 30}"></span></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
