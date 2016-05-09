@@ -197,7 +197,6 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-
         &nbsp;&nbsp;&nbsp;
 
         <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
@@ -310,15 +309,18 @@ ${ hueIcons.symbols() }
           </li>
           <!-- ko with: selectedNotebook -->
           <li data-bind="visible: isHistory" style="display: none">
-            <!-- ko if: parentSavedQueryUuid -->
-              <a title="${ _('Open saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" style="cursor: pointer"><i class="fa fa-fw fa-history"></i></a>
-            <!-- /ko -->
-            <!-- ko ifnot: parentSavedQueryUuid -->
-              <a title="${ _('Query history') }"><i class="fa fa-fw fa-history"></i></a>
-            <!-- /ko -->
+            <a title="${ _('This is a Query history') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li data-bind="visible: directoryUuid" style="display: none">
-            <a title="${ _('Open in home directory') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
+            <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
+          </li>
+          <li data-bind="visible: parentSavedQueryUuid" style="display: none">
+            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" style="cursor: pointer">
+              <i class="fa fa-fw fa-file-o"></i>
+            </a>
+          </li>
+          <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none">
+            <a title="${ _('This is a Saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
           <li class="query-name">
             <a href="javascript:void(0)">
