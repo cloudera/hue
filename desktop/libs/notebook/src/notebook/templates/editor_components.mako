@@ -3077,7 +3077,10 @@ ${ hueIcons.symbols() }
             else {
               _dt = _el.dataTable();
             }
-            _dt.fnAddData(options.data);
+            try {
+              _dt.fnAddData(options.data);
+            }
+            catch (e) {}
             var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
             _dtElement.animate({opacity: '1'}, 50);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
