@@ -38,10 +38,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-      <i class="fa fa-expand"></i>
-    </a>
-    &nbsp;&nbsp;
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
@@ -50,6 +46,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <i class="fa fa-save"></i>
     </a>
     % endif
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+      <i class="fa fa-expand"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;
     <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-cog"></i>
