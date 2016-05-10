@@ -233,6 +233,13 @@
     self.queriesTotalPages = ko.observable(1);
     self.queries = ko.observableArray();
 
+    self.queriesFilter = ko.observable('');
+    self.queriesFilterVisible = ko.observable(false);
+    self.queriesFilter.extend({ rateLimit: 300 });
+    self.queriesFilter.subscribe(function(val){
+      fetchQueries();
+    });
+
     var fetchQueries = function () {
       var QUERIES_PER_PAGE = 50;
       if (self.loadingQueries()) {
@@ -254,7 +261,8 @@
         },
         page: self.queriesCurrentPage(),
         limit: QUERIES_PER_PAGE,
-        type: 'query-' + self.type()
+        type: 'query-' + self.type(),
+        query: self.queriesFilter()
       });
     }
 

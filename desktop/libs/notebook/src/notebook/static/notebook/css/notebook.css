@@ -1028,4 +1028,6 @@ pre {
   border-radius: 9px!important;
   min-height: 17px!important;
   height: 17px!important;
+  margin-right: 5px;
+  margin-left: -5px;
 }
