@@ -91,9 +91,10 @@ class TestDefaultConfiguration(object):
             'options': []
           }
         ],
-        'groups': {
-          str(self.group.id): [
-            {
+        'groups': [
+          {
+            'group_ids': [self.group.id],
+            'properties': {
               'multiple': True,
               'value': [{'key': 'hive.execution.engine', 'value': 'spark'}],
               'nice_name': 'Settings',
@@ -102,8 +103,8 @@ class TestDefaultConfiguration(object):
               'type': 'settings',
               'options': []
             }
-          ]
-        }
+          }
+        ]
       }
     }
 
@@ -115,8 +116,8 @@ class TestDefaultConfiguration(object):
     config = DefaultConfiguration.objects.get(app='hive', is_default=True)
     assert_equal(config.properties_list, configuration['hive']['default'], config.properties_list)
 
-    config = DefaultConfiguration.objects.get(app='hive', group=self.group)
-    assert_equal(config.properties_list, configuration['hive']['groups'][str(self.group.id)], config.properties_list)
+    config = DefaultConfiguration.objects.get(app='hive', groups__in=[self.group])
+    assert_equal(config.properties_list, configuration['hive']['groups'][0]['properties'], config.properties_list)
 
 
   def test_get_default_configurations(self):
@@ -188,7 +189,7 @@ class TestDefaultConfiguration(object):
     assert_equal(content['configuration']['app'], 'hive', content)
     assert_equal(content['configuration']['is_default'], True, content)
     assert_equal(content['configuration']['user'], None, content)
-    assert_equal(content['configuration']['group'], None, content)
+    assert_equal(content['configuration']['group_ids'], [], content)
     assert_equal(content['configuration']['properties'], properties, content)
 
     # Creating a group configuration returns group config
@@ -204,9 +205,12 @@ class TestDefaultConfiguration(object):
     configuration = {
       app: {
         'default': properties,
-        'groups': {
-          str(self.group.id): group_properties
-        }
+        'groups': [
+          {
+            'group_ids': [self.group.id],
+            'properties': group_properties
+          }
+        ]
       }
     }
 
@@ -220,7 +224,7 @@ class TestDefaultConfiguration(object):
     assert_equal(content['configuration']['app'], 'hive', content)
     assert_equal(content['configuration']['is_default'], False, content)
     assert_equal(content['configuration']['user'], None, content)
-    assert_equal(content['configuration']['group'], self.group.name, content)
+    assert_equal(content['configuration']['group_ids'], [self.group.id], content)
     assert_equal(content['configuration']['properties'], group_properties, content)
 
     # Creating a user configuration returns user config
@@ -242,5 +246,5 @@ class TestDefaultConfiguration(object):
     assert_equal(content['configuration']['app'], 'hive', content)
     assert_equal(content['configuration']['is_default'], False, content)
     assert_equal(content['configuration']['user'], self.user.username, content)
-    assert_equal(content['configuration']['group'], None, content)
+    assert_equal(content['configuration']['group_ids'], [], content)
     assert_equal(content['configuration']['properties'], user_properties, content)

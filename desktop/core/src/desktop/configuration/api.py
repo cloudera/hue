@@ -130,37 +130,17 @@ def app_configuration_for_user(request):
 @api_error_handler
 @require_POST
 def delete_default_configuration(request):
-  app = request.POST.get('app')
-  is_default = request.POST.get('is_default', 'false')
-  group_id = request.POST.get('group_id')
-  user_id = request.POST.get('user_id')
+  config_id = request.POST.get('id')
 
-  if not app or not (is_default or group_id or user_id):
-    raise PopupException(_('save_default_configuration requires app and is_default, group_id or user_id'))
-
-  if is_default and is_default.lower() == 'true':
-    kwargs = {'app': app, 'is_default': True}
-  elif group_id:
-    try:
-      group = Group.objects.get(id=int(group_id))
-      kwargs = {'app': app, 'is_default': False, 'group': group}
-    except Group.DoesNotExist, e:
-      raise PopupException(_('Could not find group with ID: %s') % group_id)
-  elif user_id:
-    try:
-      user = User.objects.get(id=int(user_id))
-      kwargs = {'app': app, 'is_default': False, 'user': user}
-    except User.DoesNotExist, e:
-      raise PopupException(_('Could not find user with ID: %s') % user_id)
-  else:
-    raise PopupException(_('Cannot find configuration for %(app)s with: is_default=%(is_default)s, group_id=%(group_id)s, user_id=%(user_id)s') %
-                         {'app': app, 'is_default': is_default, 'group_id': group_id, 'user_id': user_id})
+  if not config_id:
+    raise PopupException(_('delete_default_configuration requires id of configuration.'))
 
   try:
-    DefaultConfiguration.objects.get(**kwargs).delete()
+    config_id = int(config_id)
+    config = DefaultConfiguration.objects.get(id=config_id)
+    config.delete()
   except DefaultConfiguration.DoesNotExist, e:
-    raise PopupException(_('Cannot find configuration for %(app)s with: is_default=%(is_default)s, group_id=%(group_id)s, user_id=%(user_id)s') %
-                         {'app': app, 'is_default': is_default, 'group_id': group_id, 'user_id': user_id})
+    raise PopupException(_('Could not find configuration with ID: %d') % config_id)
 
   return JsonResponse({
     'status': 0,
@@ -191,10 +171,13 @@ def _get_default_configurations():
       app_configs[app_name].update({'default': default_config.properties_list})
 
     # Get group configs
-    if DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).exists():
-      app_configs[app_name].update({'groups': {}})
-      for grp_config in DefaultConfiguration.objects.filter(app=app_name, group__isnull=False).all():
-        app_configs[app_name]['groups'].update({grp_config.group.id: grp_config.properties_list})
+    if DefaultConfiguration.objects.filter(app=app_name, groups__isnull=False).exists():
+      app_configs[app_name].update({'groups': []})
+      for grp_config in DefaultConfiguration.objects.filter(app=app_name, groups__isnull=False).all():
+        app_configs[app_name]['groups'].append({
+          'group_ids': [group.id for group in grp_config.groups.all()],
+          'properties': grp_config.properties_list
+        })
 
   return app_configs
 
@@ -218,7 +201,7 @@ def _update_default_and_group_configurations(configurations):
   """
   with transaction.atomic():
     # delete all previous default and group configurations
-    DefaultConfiguration.objects.filter(Q(is_default=True) | Q(group__isnull=False)).delete()
+    DefaultConfiguration.objects.filter(Q(is_default=True) | Q(groups__isnull=False)).delete()
 
     for app, configs in configurations.items():
       if 'default' in configs:
@@ -227,23 +210,29 @@ def _update_default_and_group_configurations(configurations):
         LOG.info('Saved default configuration for app: %s' % app)
 
       if 'groups' in configs:
-        for group_id, properties in configs['groups'].items():
+        for group_config in configs['groups']:
+          group_ids = group_config.get('group_ids')
+          properties = group_config.get('properties')
           try:
-            group = Group.objects.get(id=int(group_id))
+            groups = [Group.objects.get(id=group_id) for group_id in group_ids]
+            _save_configuration(app, properties, is_default=False, groups=groups)
           except Group.DoesNotExist, e:
-            raise PopupException(_('Could not find group with ID: %s') % group_id)
-          _save_configuration(app, properties, is_default=False, group=group)
-          LOG.info('Saved group configuration for app: %s and group_id: %s' % (app, group_id))
+            raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
 
   return _get_default_configurations()
 
 
-def _save_configuration(app, properties, is_default=False, group=None, user=None):
-  if not (is_default or group or user):
-    raise PopupException(_('_save_configuration requires app, properties, and is_default, group_id or user_id'))
+def _save_configuration(app, properties, is_default=False, groups=None, user=None):
+  if not (is_default or groups or user):
+    raise PopupException(_('_save_configuration requires app, properties, and is_default, groups or user_id'))
 
-  kwargs = {'app': app, 'is_default': is_default, 'group': group, 'user': user}
-  config, created = DefaultConfiguration.objects.get_or_create(**kwargs)
+  if is_default or user is not None:
+    kwargs = {'app': app, 'is_default': is_default, 'user': user}
+    config, created = DefaultConfiguration.objects.get_or_create(**kwargs)
+  else:  # group config
+    config = DefaultConfiguration.objects.create(app=app, is_default=False, user=None)
+    config.groups.add(*groups)
+
   config.properties = json.dumps(properties)
   config.save()
   return config

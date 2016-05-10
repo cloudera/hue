@@ -87,7 +87,7 @@ class DefaultConfigurationManager(models.Manager):
     except DefaultConfiguration.DoesNotExist:
       pass
 
-    configs = super(DefaultConfigurationManager, self).get_queryset().filter(app=app, group__in=user.groups.all())
+    configs = super(DefaultConfigurationManager, self).get_queryset().filter(app=app, groups__in=user.groups.all())
     if configs.count() > 0:
       return configs[0]
 
@@ -108,14 +108,13 @@ class DefaultConfiguration(models.Model):
   properties = models.TextField(default='[]', help_text=_t('JSON-formatted default properties values.'))
 
   is_default = models.BooleanField(default=False, db_index=True)
-  group = models.ForeignKey(auth_models.Group, blank=True, null=True, db_index=True)
+  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='defaultconfiguration_groups')
   user = models.ForeignKey(auth_models.User, blank=True, null=True, db_index=True)
 
   objects = DefaultConfigurationManager()
 
   class Meta:
-    unique_together = ('app', 'is_default', 'group', 'user')
-    ordering = ["app", "-is_default", "group", "user"]
+    ordering = ["app", "-is_default", "user"]
 
 
   @property
@@ -138,10 +137,11 @@ class DefaultConfiguration(models.Model):
 
   def to_dict(self):
     return {
+      'id': self.id,
       'app': self.app,
       'properties': self.properties_list,
       'is_default': self.is_default,
-      'group': self.group.name if self.group else None,
+      'group_ids': [group.id for group in self.groups.all()],
       'user': self.user.username if self.user else None
     }
 
