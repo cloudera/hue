@@ -1031,11 +1031,16 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="visible: $parent.history().length > 0, click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); }"><i class="snippet-icon fa fa-search"></i></div>
-            <input class="input-small history-filter" type="text" data-bind="visible: $parent.historyFilterVisible, value: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <input class="input-small history-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
-        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}">
+          <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
+            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); }"><i class="snippet-icon fa fa-search"></i></div>
+            <input class="input-small history-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          </a>
+        </li>
         %if ENABLE_QUERY_BUILDER.get():
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
         %endif
@@ -1107,10 +1112,13 @@ ${ hueIcons.symbols() }
           <!-- ko if: queriesHasErrors() -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
-          <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length === 0 -->
+          <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
           <!-- /ko -->
-          <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length > 0 -->
+          <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
+          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
+          <!-- /ko -->
+          <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed margin-top-10">
             <thead>
               <tr>
@@ -1129,6 +1137,7 @@ ${ hueIcons.symbols() }
             </tr>
             </tbody>
           </table>
+          <!-- /ko -->
           <div class="pagination" data-bind="visible: queriesTotalPages() > 1">
             <ul>
               <li data-bind="css: { 'disabled' : queriesCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: prevQueriesPage">${ _("Prev") }</a></li>
@@ -1136,7 +1145,6 @@ ${ hueIcons.symbols() }
               <li data-bind="css: { 'disabled' : queriesCurrentPage() === queriesTotalPages() }"><a href="javascript: void(0);" data-bind="click: nextQueriesPage">${ _("Next") }</a></li>
             </ul>
           </div>
-          <!-- /ko -->
         </div>
         %if ENABLE_QUERY_BUILDER.get():
         <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: {'active': currentQueryTab() == 'queryBuilderTab'}">
