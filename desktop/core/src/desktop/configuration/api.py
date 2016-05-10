@@ -173,7 +173,7 @@ def _get_default_configurations():
     # Get group configs
     if DefaultConfiguration.objects.filter(app=app_name, groups__isnull=False).exists():
       app_configs[app_name].update({'groups': []})
-      for grp_config in DefaultConfiguration.objects.filter(app=app_name, groups__isnull=False).all():
+      for grp_config in DefaultConfiguration.objects.filter(app=app_name, groups__isnull=False).distinct():
         app_configs[app_name]['groups'].append({
           'group_ids': [group.id for group in grp_config.groups.all()],
           'properties': grp_config.properties_list
