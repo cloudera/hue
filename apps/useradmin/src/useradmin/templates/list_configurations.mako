@@ -33,13 +33,8 @@ ${layout.menubar(section='configurations')}
 <script id="app-list" type="text/html">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Configurations') }</h1>
-    <%actionbar:render>
-      <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application, group, etc...')}" data-bind="textInput: searchQuery">
-      </%def>
-    </%actionbar:render>
 
-    <table class="table table-striped table-condensed datatables">
+    <table class="table table-striped table-condensed datatables margin-top-20">
       <thead>
       <tr>
         <th>${ _('Application') }</th>
@@ -81,30 +76,51 @@ ${layout.menubar(section='configurations')}
   <!-- ko with: selectedApp -->
   <div class="card card-small" style="padding-bottom: 68px;">
     <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
-    <h4 class="margin-left-20 simple">${ _('Global') }</h4>
-    <div class="form-horizontal" style="width:100%;">
-      <!-- ko component: { name: 'property-selector', params: { properties: $data.default } } --><!-- /ko -->
+    <div class="margin-top-20 form-horizontal">
+      <div class="control-group">
+        <label class="control-label">${ _('Global Properties') }</label>
+        <div class="controls">
+          <!-- ko component: { name: 'property-selector', params: { properties: $data.default } } --><!-- /ko -->
+        </div>
+      </div>
     </div>
 
     <!-- ko foreach: groups -->
-    <h4 class="margin-left-20 simple" style="    border-bottom: 1px solid #e5e5e5;">${ _('Group configuration - ') }<!-- ko text: group.name --><!-- /ko --></h4>
-    <div class="margin-left-20 form-horizontal" style="width:100%;">
-      <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+    <h4 class="margin-left-20 simple" style="border-bottom: 1px solid #e5e5e5;">${ _('Group override') }</h4>
+    <div class="form-horizontal margin-top-20">
+      <div class="control-group">
+        <label class="control-label">${ _('Groups') }</label>
+        <div class="controls">
+          <!-- ko component: { name: 'multi-group-selector',
+            params: {
+              width: 500,
+              height: 198,
+              options: allGroups,
+              optionsValue: 'id',
+              optionsText: 'name',
+              selectedOptions: group_ids,
+            }
+          } --><!-- /ko -->
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${ _('Properties') }</label>
+        <div class="controls">
+          <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+        </div>
+      </div>
     </div>
     <!-- /ko -->
-    <div class="margin-left-20 margin-top-20" data-bind="visible: availableGroups().length > 0">
-      <select data-bind="options: availableGroups, optionsText: 'name', optionsCaption: '${ _ko('Add group override...') }', value: groupToAdd"></select>
-      <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
-        <a class="inactive-action pointer" data-bind="click: addGroup">
-          <i class="fa fa-plus"></i>
-        </a>
-      </div>
+    <div class="margin-left-20 margin-top-20">
+      <a class="inactive-action pointer" href="javascript:void(0)" data-bind="click: addGroupOverride">
+        <i class="fa fa-plus"></i> ${ _('Add group override') }
+      </a>
     </div>
   </div>
   <!-- /ko -->
   <div class="form-actions">
-    <button class="btn btn-primary" data-bind="click: save">${_('Update configuration')}</button>
-    <button class="btn" data-bind="click: function () { selectedApp(null) }">${_('Cancel')}</button>
+    <button class="btn btn-primary" data-bind="click: save">${ _('Update configuration') }</button>
+    <button class="btn" data-bind="click: function () { selectedApp(null) }">${ _('Cancel') }</button>
   </div>
 </script>
 
@@ -127,23 +143,24 @@ ${ configKoComponents.config() }
     'knockout-sortable'
   ], function (ko, apiHelper) {
 
+    var GroupOverride = function (group, allGroups) {
+      var self = this;
+      self.allGroups = allGroups;
+      ko.mapping.fromJS(group, {}, self);
+    };
+
     var AppConfiguration = function (app, allGroups) {
       var self = this;
       self.rawProperties = app.properties;
       self.rawApp = app;
-      ko.mapping.fromJS(app, {}, self);
-
-      self.availableGroups = ko.pureComputed(function () {
-        var selectedGroupIndex = {};
-        self.groups().forEach(function (groupConfig) {
-          selectedGroupIndex[groupConfig.group.id()] = true;
-        });
-        return $.grep(allGroups, function(group) {
-          return !selectedGroupIndex[group.id];
-        });
-      });
-
-      self.groupToAdd = ko.observable();
+      self.allGroups = allGroups;
+      ko.mapping.fromJS(app, {
+        'groups': {
+          create: function(options) {
+            return new GroupOverride(options.data, self.allGroups);
+          }
+        }
+      }, self);
 
       self.actualDefaultOverrides = ko.pureComputed(function () {
         return $.grep(self.default(), function (defaultOverride) {
@@ -152,21 +169,27 @@ ${ configKoComponents.config() }
       });
 
       self.overriddenGroupNames = ko.pureComputed(function () {
-        return $.map(self.groups(), function (groupConfig) {
-          return groupConfig.group.name();
-        }).join(', ');
+        var groups = {};
+        var groupIndex = {};
+        self.allGroups().forEach(function (group) {
+          groupIndex[group.id] = group.name;
+        })
+
+        self.groups().forEach(function (groupOverride) {
+          groupOverride.group_ids().forEach(function (id) {
+            groups[groupIndex[id]] = true;
+          })
+        })
+        return Object.keys(groups).sort().join(', ');
       });
     };
 
-    AppConfiguration.prototype.addGroup = function () {
+    AppConfiguration.prototype.addGroupOverride = function () {
       var self = this;
-      if (self.groupToAdd()) {
-        self.groups.push(ko.mapping.fromJS({
-          group: self.groupToAdd(),
-          properties: self.rawProperties
-        }));
-        self.groupToAdd(null);
-      }
+      self.groups.push(new GroupOverride({
+        group_ids: [],
+        properties: self.rawProperties
+      }, self.allGroups));
     };
 
     var ConfigurationsViewModel = function () {
@@ -177,7 +200,7 @@ ${ configKoComponents.config() }
       self.hasErrors = ko.observable(false);
       self.loading = ko.observable(false);
       self.apps = ko.observableArray();
-      self.groups = {};
+      self.allGroups = ko.observableArray();
       self.searchQuery = ko.observable();
       self.selectedApp = ko.observable();
       self.filteredApps = ko.pureComputed(function () {
@@ -188,7 +211,7 @@ ${ configKoComponents.config() }
 
     ConfigurationsViewModel.prototype.edit = function (app) {
       var self = this;
-      self.selectedApp(new AppConfiguration(app.rawApp, self.groups));
+      self.selectedApp(new AppConfiguration(app.rawApp, self.allGroups));
     };
 
     ConfigurationsViewModel.prototype.save = function () {
@@ -202,13 +225,16 @@ ${ configKoComponents.config() }
 
       $.each(data, function (app, appConfig) {
         appConfig.default(appConfig.actualDefaultOverrides());
-        var actualGroups = {};
+        var actualGroups = [];
         appConfig.groups().forEach(function (groupConfig) {
           var actualGroupOverrides = $.grep(groupConfig.properties(), function (property) {
-            return ko.mapping.toJSON(property.defaultValue) !== ko.mapping.toJSON(property.value())
+            return property.defaultValue().toString() !== property.value().toString()
           });
-          if (actualGroupOverrides.length > 0) {
-            actualGroups[groupConfig.group.id()] = actualGroupOverrides;
+          if (actualGroupOverrides.length > 0 && groupConfig.group_ids().length > 0) {
+            actualGroups.push({
+              group_ids: ko.mapping.toJS(groupConfig.group_ids),
+              properties: actualGroupOverrides
+            });
           }
         });
         data[app] = ko.mapping.toJS(appConfig);
@@ -228,9 +254,10 @@ ${ configKoComponents.config() }
       var self = this;
       var apps = [];
       var groupIndex = {};
-      self.groups.forEach(function (group) {
+      self.allGroups().forEach(function (group) {
         groupIndex[group.id] = group;
       });
+
       $.each(data.configuration, function (appName, app) {
 
         app.name = appName;
@@ -253,27 +280,20 @@ ${ configKoComponents.config() }
           app.groups = [];
         } else {
           var groups = [];
-          $.each(app.groups, function (groupId, groupValues) {
+          app.groups.forEach(function (group) {
             var groupPropertyIndex = {};
-            groupValues.forEach(function (groupValue) {
-              groupPropertyIndex[groupValue.name] = groupValue;
-            });
+            group.properties.forEach(function (groupProperty) {
+              groupPropertyIndex[groupProperty.name] = groupProperty;
+            })
             // Merge the base properties into any existing group config
             app.properties.forEach(function (property) {
               if (!groupPropertyIndex[property.name]){
-                groupValues.push(property);
+                group.properties.push(property);
               }
             });
-
-            groups.push({
-              group: groupIndex[groupId],
-              properties: groupValues
-            })
           });
-          delete app.groups;
-          app.groups = groups;
         }
-        apps.push(new AppConfiguration(app, self.groups));
+        apps.push(new AppConfiguration(app, self.allGroups));
       });
       self.apps(apps);
     };
@@ -294,7 +314,7 @@ ${ configKoComponents.config() }
 
       self.apiHelper.fetchUsersAndGroups({
         successCallback: function (usersAndGroups) {
-          self.groups = usersAndGroups.groups;
+          self.allGroups(usersAndGroups.groups);
           self.apiHelper.fetchConfigurations({
             successCallback: function (data) {
               self.updateFromData(data);
