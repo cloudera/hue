@@ -1654,6 +1654,10 @@
     };
 
     self.loadNotebook = function (notebook) {
+      if (self.checkStatusTimeout != null) {
+        clearTimeout(self.checkStatusTimeout);
+        self.checkStatusTimeout = null;
+      }
       var notebook = new Notebook(self, notebook);
       if (notebook.snippets().length > 0) {
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
