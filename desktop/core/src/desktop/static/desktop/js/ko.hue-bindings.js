@@ -405,7 +405,7 @@
   };
 
   ko.bindingHandlers.logScroller = {
-    init: function (element, valueAccessor) {
+    init: function (element, valueAccessor, allBindings) {
       var $element = $(element);
 
       $element.on("scroll", function () {
@@ -431,6 +431,12 @@
       logValue.subscribe(function () {
         window.setTimeout(autoLogScroll, 200);
       });
+
+      if (typeof allBindings().logScrollerVisibilityEvent !== 'undefined'){
+        allBindings().logScrollerVisibilityEvent.subscribe(function () {
+          window.setTimeout(autoLogScroll, 0);
+        });
+      }
 
       autoLogScroll();
     }
