@@ -689,7 +689,7 @@
     };
 
     self.formatEnabled = ko.pureComputed(function () {
-      return self.statement_raw && self.statement_raw().length < 400000; // ie: 5000 lines at 80 chars per line
+      return self.statement_raw && self.statement_raw() != null && self.statement_raw().length < 400000; // ie: 5000 lines at 80 chars per line
     });
 
     self.format = function () {
