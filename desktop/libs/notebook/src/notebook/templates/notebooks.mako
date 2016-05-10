@@ -145,7 +145,18 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
+      % if editor_type == 'pig':
+      <h3 id="deleteNotebookMessage">${ _('Delete the selected script(s)?') }</h3>
+      % elif editor_type in ('beeswax', 'hive', 'rdbms', 'impala'):
+      <!-- ko if: selectedJobs().length == 1 -->
+      <h3 id="deleteNotebookMessage">${ _('Delete the selected query?') }</h3>
+      <!-- /ko -->
+      <!-- ko if: selectedJobs().length >1 -->
+      <h3 id="deleteNotebookMessage">${ _('Delete the selected queries?') }</h3>
+      <!-- /ko -->
+      % else:
       <h3 id="deleteNotebookMessage">${ _('Delete the selected notebook(s)?') }</h3>
+      % endif
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
