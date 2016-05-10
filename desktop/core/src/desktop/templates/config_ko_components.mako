@@ -27,9 +27,12 @@ from desktop.views import _ko
     .config-property {
       display: inline-block;
       vertical-align: top;
-      padding-top:10px;
       margin-bottom: 20px;
       position: relative;
+    }
+
+    :not(.controls) > .config-property {
+      padding-top: 10px;
     }
 
     .config-property-remove {
@@ -72,9 +75,128 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="multi-group-selector-template">
+    <div class="jHueSelector" style="position: relative;" data-bind="style: { 'width': width + 'px' }">
+      <div class="jHueSelectorHeader" data-bind="style: { 'width': (width-8) + 'px' }">
+        <input style="float:right;position: relative; margin: 0;" type="text" placeholder="${_('Search')}" data-bind="textInput: searchQuery">
+        <label><input type="checkbox" data-bind="checked: allSelected">${_('Select all')}</label>
+      </div>
+      <div class="jHueSelectorBody" data-bind="style: { 'height': (height - 33) + 'px' }">
+        <ul>
+          <!-- ko foreach: searchResultKeys -->
+          <li class="selectorDivider"><strong data-bind="text: $data"></strong></li>
+          <!-- ko foreach: $parent.searchResult()[$data] -->
+          <li><label><input type="checkbox" class="selector" data-bind="checked: altChecked"><!-- ko text: label --><!-- /ko --></label></li>
+          <!-- /ko -->
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+  </script>
+
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function MultiGroupAlternative(alt, params, initiallyChecked) {
+          var self = this;
+          self.altChecked = ko.observable(initiallyChecked || false);
+          self.label = params.optionsText ? alt[params.optionsText] : alt;
+          var value = params.optionsValue ? alt[params.optionsValue] : alt;
+          self.altChecked.subscribe(function (newValue) {
+            if (newValue) {
+              params.selectedOptions.push(value);
+            } else {
+              params.selectedOptions.remove(value);
+            }
+          });
+        }
+
+        function MultiGroupSelectorViewModel(params) {
+          var self = this;
+          self.width = params.width || 600;
+          self.height = params.height || 300;
+
+          var textAccessor = function (alt) {
+            if (params.optionsText) {
+              return alt[params.optionsText];
+            }
+            return alt;
+          }
+
+          self.searchQuery = ko.observable();
+
+          var addToIndexedLists = function (index, key, value) {
+            if (! index[key]) {
+              index[key] = [];
+            }
+            index[key].push(value);
+          }
+
+          self.searchResult = ko.pureComputed(function () {
+            if (self.searchQuery()) {
+              var lowerQuery = self.searchQuery().toLowerCase();
+              var result = {};
+              Object.keys(self.addressBook()).forEach(function (key) {
+                self.addressBook()[key].forEach(function (alt) {
+                  if (alt.label.toLowerCase().indexOf(lowerQuery) !== -1) {
+                    addToIndexedLists(result, key, alt);
+                  }
+                });
+              });
+              return result;
+            }
+            return self.addressBook();
+          });
+
+          var initiallyCheckedIndex = {};
+          params.selectedOptions().forEach(function (alt) {
+            initiallyCheckedIndex[alt] = true;
+          });
+
+          self.addressBook = ko.pureComputed(function () {
+            var result = {}
+            ko.unwrap(params.options).forEach(function (alt) {
+              addToIndexedLists(result, textAccessor(alt).charAt(0).toUpperCase(), new MultiGroupAlternative(alt, params, initiallyCheckedIndex[params.optionsValue ? alt[params.optionsValue] : alt]));
+            });
+            Object.keys(result).forEach(function (key) {
+              result[key].sort();
+            })
+            return result;
+          });
+
+          self.searchResultKeys = ko.pureComputed(function () {
+            return Object.keys(self.searchResult()).sort();
+          })
+
+          self.allSelected = ko.observable(false);
+
+          self.allSelected.subscribe(function (newValue) {
+            self.searchResultKeys().forEach(function (key) {
+              self.searchResult()[key].forEach(function (alt) {
+                alt.altChecked(newValue);
+              })
+            })
+          })
+        }
+
+        ko.components.register('multi-group-selector', {
+          viewModel: MultiGroupSelectorViewModel,
+          template: {element: 'multi-group-selector-template'}
+        });
+      }());
+    }));
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
@@ -123,7 +245,7 @@ from desktop.views import _ko
 
         ko.components.register('property-selector', {
           viewModel: PropertySelectorViewModel,
-          template: { element: 'property-selector-template' }
+          template: {element: 'property-selector-template'}
         });
       }());
     }));
@@ -189,7 +311,7 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
@@ -251,7 +373,7 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
@@ -313,7 +435,7 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
@@ -374,7 +496,7 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
@@ -461,7 +583,7 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
-      if(typeof require === "function") {
+      if (typeof require === "function") {
         require(['knockout'], factory);
       } else {
         factory(ko);
