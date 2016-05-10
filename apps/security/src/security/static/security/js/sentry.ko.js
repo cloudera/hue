@@ -832,8 +832,10 @@ var SentryViewModel = function (initial) {
 
   self.availablePrivileges = ko.observableArray();
   self.availableActions = ko.observableArray();
+  self.availableSolrConfigActions = ko.observableArray();
   if (initial.component == 'solr') {
     self.availableActions(['QUERY', 'UPDATE', 'ALL']);
+    self.availableSolrConfigActions(['ALL']);
   } else {
     self.availableActions(['SELECT', 'INSERT', 'ALL']);
   }
