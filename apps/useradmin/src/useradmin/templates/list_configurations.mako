@@ -233,15 +233,16 @@ ${ configKoComponents.config() }
       });
       $.each(data.configuration, function (appName, app) {
 
-        // Merge base properties with default properties into default
-        var defaultIndex = {};
-        app.default.forEach(function (defaultProperty) {
-          defaultIndex[defaultProperty.name] = defaultProperty;
-        });
         app.name = appName;
+        var defaultIndex = {};
         if (typeof app.default === 'undefined') {
           app.default = [];
         }
+
+        // Merge base properties with default properties into default
+        app.default.forEach(function (defaultProperty) {
+          defaultIndex[defaultProperty.name] = defaultProperty;
+        });
         app.properties.forEach(function (property) {
           if (!defaultIndex[property.name]) {
             app.default.push(property);
