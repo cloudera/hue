@@ -73,9 +73,10 @@ ${ layout.menubar(section=component) }
 
       <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'DATABASE')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
+
     <!-- ko if: $root.component() == 'solr' -->
       <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection name <CTRL+SPACE>">
-      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'COLLECTION')" style="width: 100px; margin-bottom: 0"></select>
+      <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions, value: $data.action, enable: (privilegeType() == 'COLLECTION')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
     <div class="new-line-if-small">
