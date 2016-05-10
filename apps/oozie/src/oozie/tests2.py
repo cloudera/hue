@@ -446,7 +446,7 @@ LIMIT $limit"""))
         'nice_name': 'Workspace',
         'key': 'deployment_dir',
         'help_text': 'Specify the deployment directory.',
-        'type': 'hdfs-files'
+        'type': 'hdfs-file'
       }, {
         'multiple': True,
         'value': [
