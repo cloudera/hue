@@ -127,7 +127,7 @@ class WorkflowConfiguration(object):
       "nice_name": _("Workspace"),
       "key": "deployment_dir",
       "help_text": _("Specify the deployment directory."),
-      "type": "hdfs-files"
+      "type": "hdfs-file"
     }, {
       "multiple": True,
       "defaultValue": [],

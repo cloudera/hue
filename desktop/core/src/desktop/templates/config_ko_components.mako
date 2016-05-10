@@ -298,11 +298,26 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="property-csv-hdfs-files">
-    <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-csv-hdfs-file-input', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
+    <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-hdfs-file', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
   </script>
 
-  <script type="text/html" id="property-csv-hdfs-file-input">
-    <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+  <div id="chooseFile" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+    </div>
+    <div class="modal-body">
+      <div id="filechooser">
+      </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+  </div>
+
+  <script type="text/html" id="property-hdfs-file">
+    <div class="input-append">
+      <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
+    </div>
   </script>
 
   <script type="text/html" id="property-functions">
