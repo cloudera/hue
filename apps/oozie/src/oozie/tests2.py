@@ -491,10 +491,10 @@ LIMIT $limit"""))
             'type': 'settings'
         }
     ]
-    config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME,
-                                  properties=json.dumps(properties),
-                                  is_default=False,
-                                  group=self.user.groups.first())
+    config = DefaultConfiguration.objects.create(app=WorkflowConfiguration.APP_NAME,
+      properties=json.dumps(properties),
+      is_default=False)
+    config.groups.add([self.user.groups.first()])
     config.save()
     wf_props = config.properties_dict
     wf_props.update({'wf1_id': None, 'description': ''})
