@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -273,6 +274,37 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       owner=self.user,
       is_history=True,
       data=self.notebook_json)
+
+
+  def test_query_with_unicode(self):
+    statement = "SELECT * FROM sample_07 WHERE code='validé';"
+
+    snippet_json = json.loads("""
+        {
+            "status": "running",
+            "database": "default",
+            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+            "result": {
+                "type": "table",
+                "handle": {},
+                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+            },
+            "statement": "%(statement)s",
+            "type": "hive",
+            "properties": {
+                "files": [],
+                "functions": [],
+                "settings": []
+            }
+        }
+      """ % {'statement': statement})
+
+    notebook_json = json.loads(self.notebook_json)
+    notebook_json['snippets'] = [snippet_json]
+    response = self.client.post(reverse('notebook:execute'),
+                                {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
 
 
   def test_get_current_statement(self):

@@ -18,11 +18,7 @@
 import copy
 import logging
 import re
-import sys
-if sys.version_info < (2, 7):
-  import StringIO
-else:
-  import cStringIO as StringIO
+import StringIO
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
