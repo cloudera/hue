@@ -147,7 +147,7 @@ def _to_sentry_privilege(privilege):
       'component': privilege['component'],
       'serviceName': privilege['serverName'],
       'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']], # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
-      'action': privilege['action'],
+      'action': '*' if privilege['action'].upper() == 'ALL' else privilege['action'],
       'createTime': privilege['timestamp'],
       'grantorPrincipal': privilege['grantorPrincipal'],
       'grantOption': 1 if privilege['grantOption'] else 0,
