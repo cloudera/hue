@@ -23,7 +23,7 @@
 
 Returns a JSON response with `status` and `configuration` where configuration contains a dictionary of all configurable apps and their defined configuration, as well as any default and group saved configurations.
 
-Each record in `configuration` will map to a dictionary that contains a **required** `properties` record which maps to a list of defined properties for the app. Optionally, the app may also contain a `default` list of properties, and/or `group` properties where each configured group ID is returned with corresponding properties.
+Each record in `configuration` will map to a dictionary that contains a **required** `properties` record which maps to a list of defined properties for the app. Optionally, the app may also contain a `default` list of properties, and/or `group` properties where each object includes a list of group ID with corresponding properties.
 
 #### Example Request
 GET /desktop/api/configurations/
@@ -126,56 +126,84 @@ None
                     ]
                 }
             ],
-            "groups": {
-                "1": [
-                    {
-                        "multiple": true,
-                        "value": [
-                            {
-                                "path": "/user/test/myudfs.jar",
-                                "type": "jar"
-                            }
-                        ],
-                        "nice_name": "Files",
-                        "key": "files",
-                        "help_text": "Add one or more files, jars, or archives to the list of resources.",
-                        "type": "hdfs-files"
-                    },
-                    {
-                        "multiple": true,
-                        "value": [
-                            {
-                                "class_name": "org.hue.udf.MyUpper",
-                                "name": "myUpper"
-                            }
-                        ],
-                        "nice_name": "Functions",
-                        "key": "functions",
-                        "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
-                        "type": "functions"
-                    },
-                    {
-                        "multiple": true,
-                        "value": [
-                            {
-                                "key": "mapreduce.job.queuename",
-                                "value": "mr"
-                            }
-                        ],
-                        "nice_name": "Settings",
-                        "key": "settings",
-                        "help_text": "Hive and Hadoop configuration properties.",
-                        "type": "settings",
-                        "options": [
-                            "hive.map.aggr",
-                            "hive.exec.compress.output",
-                            "hive.exec.parallel",
-                            "hive.execution.engine",
-                            "mapreduce.job.queuename"
-                        ]
-                    }
-                ]
-            }
+            "groups": [
+                {
+                    "group_ids": [1, 2],
+                    "properties": [
+                        {
+                            "multiple": true,
+                            "value": [
+                                {
+                                    "path": "/user/test/myudfs.jar",
+                                    "type": "jar"
+                                }
+                            ],
+                            "nice_name": "Files",
+                            "key": "files",
+                            "help_text": "Add one or more files, jars, or archives to the list of resources.",
+                            "type": "hdfs-files"
+                        },
+                        {
+                            "multiple": true,
+                            "value": [
+                                {
+                                    "class_name": "org.hue.udf.MyUpper",
+                                    "name": "myUpper"
+                                }
+                            ],
+                            "nice_name": "Functions",
+                            "key": "functions",
+                            "help_text": "Add one or more registered UDFs (requires function name and fully-qualified class name).",
+                            "type": "functions"
+                        },
+                        {
+                            "multiple": true,
+                            "value": [
+                                {
+                                    "key": "mapreduce.job.queuename",
+                                    "value": "mr"
+                                }
+                            ],
+                            "nice_name": "Settings",
+                            "key": "settings",
+                            "help_text": "Hive and Hadoop configuration properties.",
+                            "type": "settings",
+                            "options": [
+                                "hive.map.aggr",
+                                "hive.exec.compress.output",
+                                "hive.exec.parallel",
+                                "hive.execution.engine",
+                                "mapreduce.job.queuename"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "group_ids": [3, 4, 5],
+                    "properties": [
+                        {
+                            "multiple": true,
+                            "value": [
+                                {
+                                    "key": "mapreduce.job.queuename",
+                                    "value": "mr"
+                                }
+                            ],
+                            "nice_name": "Settings",
+                            "key": "settings",
+                            "help_text": "Hive and Hadoop configuration properties.",
+                            "type": "settings",
+                            "options": [
+                                "hive.map.aggr",
+                                "hive.exec.compress.output",
+                                "hive.exec.parallel",
+                                "hive.execution.engine",
+                                "mapreduce.job.queuename"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     }
 }
@@ -365,7 +393,7 @@ GET /desktop/api/configurations/user/?app=hive&user_id=1
     "configuration": {
         "is_default": false,
         "app": "hive",
-        "group": "default",
+        "groups": [1],
         "properties": [
             {
                 "multiple": true,
@@ -497,7 +525,7 @@ POST /desktop/api/configurations/user
     "configuration": {
         "is_default": false,
         "app": "hive",
-        "group": null,
+        "groups": [],
         "properties": [
             {
                 "multiple": true,
