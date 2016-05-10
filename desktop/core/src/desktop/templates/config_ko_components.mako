@@ -281,6 +281,10 @@ from desktop.views import _ko
     <input class="input-small" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
   </script>
 
+  <script type="text/html" id="property-boolean">
+    <input class="input-small" type="checkbox" data-bind="checked: value" />
+  </script>
+
   <script type="text/html" id="property-csv">
     <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
   </script>
