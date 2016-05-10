@@ -3288,8 +3288,11 @@ def test_apply_natural_sort():
 
 def test_hiveserver2_jdbc_url():
   try:
+    hostname = socket.getfqdn()
+    beeswax.conf.HIVE_SERVER_HOST.set_for_testing(hostname)
+    beeswax.conf.HIVE_SERVER_PORT.set_for_testing('10000')
     url = hiveserver2_jdbc_url()
-    assert_equal(url, 'jdbc:hive2://localhost:10000/default')
+    assert_equal(url, 'jdbc:hive2://' + hostname + ':10000/default')
 
     beeswax.conf.HIVE_SERVER_HOST.set_for_testing('server-with-ssl-enabled.com')
     beeswax.conf.HIVE_SERVER_PORT.set_for_testing('10000')
