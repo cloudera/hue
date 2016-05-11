@@ -3,13 +3,14 @@ import string
 import time
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import NoReverseMatch
 from django.core.urlresolvers import reverse
 
 from axes.decorators import COOLOFF_TIME
 from axes.decorators import FAILURE_LIMIT
-from axes.models import AccessLog
+from axes.models import AccessAttempt, AccessLog
 from axes.signals import user_locked_out
 from axes.utils import reset
 
@@ -17,12 +18,13 @@ from axes.utils import reset
 class AccessAttemptTest(TestCase):
     """Test case using custom settings for testing
     """
+    VALID_USERNAME = 'valid-username'
     VALID_PASSWORD = 'valid-password'
     LOCKED_MESSAGE = 'Account locked: too many login attempts.'
     LOGIN_FORM_KEY = '<input type="submit" value="Log in" />'
 
-    def _login(self, is_valid=False, user_agent='test-browser'):
-        """Login a user. A valid credential is used when is_valid is True,
+    def _login(self, is_valid_username=False, is_valid_password=False, user_agent='test-browser', **kwargs):
+        """Login a user. A valid credential is used when is_valid_username is True,
         otherwise it will use a random string to make a failed login.
         """
         try:
@@ -30,19 +32,26 @@ class AccessAttemptTest(TestCase):
         except NoReverseMatch:
             admin_login = reverse('admin:index')
 
-        if is_valid:
+        if is_valid_username:
             # Use a valid username
-            username = self.user.username
+            username = self.VALID_USERNAME
         else:
             # Generate a wrong random username
             chars = string.ascii_uppercase + string.digits
             username = ''.join(random.choice(chars) for x in range(10))
 
-        response = self.client.post(admin_login, {
+        if is_valid_password:
+            password = self.VALID_PASSWORD
+        else:
+            password = 'invalid-password'
+
+        post_data = {
             'username': username,
-            'password': self.VALID_PASSWORD,
+            'password': password,
             'this_is_the_login_form': 1,
-        }, HTTP_USER_AGENT=user_agent)
+        }
+        post_data.update(kwargs)
+        response = self.client.post(admin_login, post_data, HTTP_USER_AGENT=user_agent)
 
         return response
 
@@ -50,7 +59,7 @@ class AccessAttemptTest(TestCase):
         """Create a valid user for login
         """
         self.user = User.objects.create_superuser(
-            username='valid-username',
+            username=self.VALID_USERNAME,
             email='test@example.com',
             password=self.VALID_PASSWORD,
         )
@@ -87,13 +96,13 @@ class AccessAttemptTest(TestCase):
     def test_valid_login(self):
         """Tests a valid login for a real username
         """
-        response = self._login(is_valid=True)
+        response = self._login(is_valid_username=True, is_valid_password=True)
         self.assertNotContains(response, self.LOGIN_FORM_KEY, status_code=302)
 
     def test_valid_logout(self):
         """Tests a valid logout and make sure the logout_time is updated
         """
-        response = self._login(is_valid=True)
+        response = self._login(is_valid_username=True, is_valid_password=True)
         self.assertEquals(AccessLog.objects.latest('id').logout_time, None)
 
         response = self.client.get(reverse('admin:logout'))
@@ -124,7 +133,7 @@ class AccessAttemptTest(TestCase):
         """Tests if can handle a long user agent
         """
         long_user_agent = 'ie6' * 1024
-        response = self._login(is_valid=True, user_agent=long_user_agent)
+        response = self._login(is_valid_username=True, is_valid_password=True, user_agent=long_user_agent)
         self.assertNotContains(response, self.LOGIN_FORM_KEY, status_code=302)
 
     def test_long_user_agent_not_valid(self):
@@ -183,3 +192,25 @@ class AccessAttemptTest(TestCase):
         # Make another lockout
         self.test_failure_limit_once()
         self.assertEquals(scope.signal_received, 2)
+
+    @override_settings(AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP=True)
+    def test_lockout_by_combination_user_and_ip(self):
+        """Tests the login lock with a valid username and invalid password
+        when AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP is True
+        """
+        for i in range(1, FAILURE_LIMIT):  # test until one try before the limit
+            response = self._login(is_valid_username=True, is_valid_password=False)
+            # Check if we are in the same login page
+            self.assertContains(response, self.LOGIN_FORM_KEY)
+
+        # So, we shouldn't have gotten a lock-out yet.
+        # But we should get one now
+        response = self._login(is_valid_username=True, is_valid_password=False)
+        self.assertContains(response, self.LOCKED_MESSAGE)
+
+    def test_log_data_truncated(self):
+        """Tests that query2str properly truncates data to the max_length (default 1024)
+        """
+        extra_data = {string.ascii_letters * x: x for x in range(0, 1000)}  # An impossibly large post dict
+        self._login(**extra_data)
+        self.assertEquals(len(AccessAttempt.objects.latest('id').post_data), 1024)
