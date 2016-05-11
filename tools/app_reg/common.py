@@ -44,7 +44,7 @@ ENV_PYTHON = os.path.join(VIRTUAL_ENV, 'bin', 'python')
 
 def cmp_version(ver1, ver2):
   """Compare two version strings in the form of 1.2.34"""
-  return cmp(ver1.split('.'), ver2.split('.'))
+  return cmp([int(v) for v in ver1.split('.')], [int(v) for v in ver2.split('.')])
 
 def _get_python_lib_dir():
   glob_path = os.path.join(VIRTUAL_ENV, 'lib', 'python*')
