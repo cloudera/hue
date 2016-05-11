@@ -162,7 +162,7 @@ class ProxyFS(object):
     return fs.mktemp(subdir=subdir, prefix=prefix, basedir=basedir)
 
   def purge_trash(self):
-    for fs in self.fs_set:
+    for fs in self._fs_set:
       if hasattr(fs, 'purge_trash'):
         fs.purge_trash()
 
