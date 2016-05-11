@@ -80,13 +80,22 @@ ENABLE_DBPROXY_SERVER = Config(
   key="enable_dbproxy_server",
   help=_t("Main flag to override the automatic starting of the DBProxy server."),
   type=bool,
-  default=True)
+  default=True
+)
 
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
   type=bool,
-  default=True)
+  default=True
+)
+
+ENABLE_QUERY_SCHEDULING = Config(
+  key="enable_query_scheduling",
+  help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
+  type=bool,
+  default=True
+)
 
 GITHUB_REMOTE_URL = Config(
     key="github_remote_url",

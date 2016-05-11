@@ -19,7 +19,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 from desktop.views import _ko
-from notebook.conf import ENABLE_QUERY_BUILDER
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 %>
 
 <%namespace name="require" file="/require.mako" />
@@ -203,7 +203,7 @@ ${ hueIcons.symbols() }
           <i class="fa fa-cogs"></i>
         </a>
 
-        % if mode == 'editor':
+        % if mode == 'editor' and ENABLE_QUERY_SCHEDULING.get():
         <div class="btn-group">
           <a class="btn" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { $root.selectedNotebook().schedule() } }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
             <i class="fa fa-fw fa-calendar"></i>
