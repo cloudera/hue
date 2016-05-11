@@ -8,7 +8,8 @@ from django.contrib.auth import logout
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.template.loader import get_template
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.utils import timezone as datetime
 from django.utils.translation import ugettext_lazy
 
@@ -106,8 +107,8 @@ def get_ip_address_from_request(request):
         if not x_forwarded_for.startswith(PRIVATE_IPS_PREFIX) and is_valid_ip(x_forwarded_for):
             ip_address = x_forwarded_for.strip()
     else:
-        for ip_raw in x_forwarded_for.split(','):
-            ip = ip_raw.strip()
+        ips = [ip.strip() for ip in x_forwarded_for.split(',')]
+        for ip in ips:
             if ip.startswith(PRIVATE_IPS_PREFIX):
                 continue
             elif not is_valid_ip(ip):
@@ -160,11 +161,15 @@ def query2str(items, max_length=1024):
 
     If there's a field called "password" it will be excluded from the output.
 
-    The length of the output is limited to max_length to avoid a DoS attack via excessively large payloads.
+    The length of the output is limited to max_length to avoid a DoS attack.
     """
 
-    return '\n'.join(['%s=%s' % (k, v) for k, v in six.iteritems(items)
-                      if k != PASSWORD_FORM_FIELD][:int(max_length/2)])[:max_length]
+    kvs = []
+    for k, v in items:
+        if k != PASSWORD_FORM_FIELD:
+            kvs.append(six.u('%s=%s') % (k, v))
+
+    return '\n'.join(kvs)[:max_length]
 
 
 def ip_in_whitelist(ip):
@@ -197,7 +202,7 @@ def is_user_lockable(request):
         return True
 
     if hasattr(user, 'nolockout'):
-        # need to invert since we need to return
+        # need to revert since we need to return
         # false for users that can't be blocked
         return not user.nolockout
 
@@ -205,7 +210,7 @@ def is_user_lockable(request):
         try:
             profile = user.get_profile()
             if hasattr(profile, 'nolockout'):
-                # need to invert since we need to return
+                # need to revert since we need to return
                 # false for users that can't be blocked
                 return not profile.nolockout
 
@@ -340,9 +345,8 @@ def lockout_response(request):
             'failure_limit': FAILURE_LIMIT,
             'username': request.POST.get(USERNAME_FORM_FIELD, '')
         }
-        template = get_template(LOCKOUT_TEMPLATE)
-        content = template.render(context, request)
-        return HttpResponse(content)
+        return render_to_response(LOCKOUT_TEMPLATE, context,
+                                  context_instance=RequestContext(request))
 
     LOCKOUT_URL = get_lockout_url()
     if LOCKOUT_URL:
@@ -366,15 +370,10 @@ def is_already_locked(request):
     if ip_in_blacklist(ip):
         return True
 
-    user_lockable = is_user_lockable(request)
-
-    if not user_lockable:
-        return False
-
     attempts = get_user_attempts(request)
-
+    user_lockable = is_user_lockable(request)
     for attempt in attempts:
-        if attempt.failures_since_start >= FAILURE_LIMIT and LOCK_OUT_AT_FAILURE:
+        if attempt.failures_since_start >= FAILURE_LIMIT and LOCK_OUT_AT_FAILURE and user_lockable:
             return True
 
     return False
@@ -399,11 +398,11 @@ def check_request(request, login_unsuccessful):
             for attempt in attempts:
                 attempt.get_data = '%s\n---------\n%s' % (
                     attempt.get_data,
-                    query2str(request.GET),
+                    query2str(request.GET.items()),
                 )
                 attempt.post_data = '%s\n---------\n%s' % (
                     attempt.post_data,
-                    query2str(request.POST)
+                    query2str(request.POST.items())
                 )
                 attempt.http_accept = request.META.get('HTTP_ACCEPT', '<unknown>')
                 attempt.path_info = request.META.get('PATH_INFO', '<unknown>')
@@ -462,8 +461,8 @@ def create_new_failure_records(request, failures):
         'user_agent': ua,
         'ip_address': ip,
         'username': username,
-        'get_data': query2str(request.GET),
-        'post_data': query2str(request.POST),
+        'get_data': query2str(request.GET.items()),
+        'post_data': query2str(request.POST.items()),
         'http_accept': request.META.get('HTTP_ACCEPT', '<unknown>'),
         'path_info': request.META.get('PATH_INFO', '<unknown>'),
         'failures_since_start': failures,
@@ -486,8 +485,8 @@ def create_new_trusted_record(request):
         user_agent=ua,
         ip_address=ip,
         username=username,
-        get_data=query2str(request.GET),
-        post_data=query2str(request.POST),
+        get_data=query2str(request.GET.items()),
+        post_data=query2str(request.POST.items()),
         http_accept=request.META.get('HTTP_ACCEPT', '<unknown>'),
         path_info=request.META.get('PATH_INFO', '<unknown>'),
         failures_since_start=0,
