@@ -7,7 +7,7 @@ viewdoc:
 	viewdoc
 pyroma:
 	pyroma .
-releasetest:
+testrelease:
 	python setup.py sdist --format=zip upload -r test
 release:
 	python setup.py sdist --format=zip upload
