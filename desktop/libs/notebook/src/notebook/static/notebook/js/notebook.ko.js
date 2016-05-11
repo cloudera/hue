@@ -655,7 +655,7 @@
             self.status('success');
             self.progress(100);
           } else {
-            self.checkStatus();
+            if (! notebook.unloaded()) { self.checkStatus(); };
           }
         } else {
           self._ajaxError(data, self.execute);
@@ -864,7 +864,7 @@
 
           if (self.status() == 'running' || self.status() == 'starting') {
             self.result.endTime(new Date());
-            self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
+            if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
           }
           else if (self.status() == 'available') {
             self.fetchResult(100);
@@ -1090,6 +1090,17 @@
         return snippet.type() == type;
       });
     };
+
+    self.unloaded = ko.observable(false);
+    self.unload = function() {
+      self.unloaded(true);
+      self.snippets().forEach(function(snippet){
+        if (snippet.checkStatusTimeout != null) {
+          clearTimeout(snippet.checkStatusTimeout);
+          snippet.checkStatusTimeout = null;
+        }
+      });
+    }
 
     self.restartSession = function (session, callback) {
       if (session.restarting()) {
@@ -1661,10 +1672,10 @@
     };
 
     self.loadNotebook = function (notebook, queryTab) {
-      if (self.checkStatusTimeout != null) {
-        clearTimeout(self.checkStatusTimeout);
-        self.checkStatusTimeout = null;
+      if (self.selectedNotebook() != null) {
+        self.selectedNotebook().unload();
       }
+
       var notebook = new Notebook(self, notebook);
       if (notebook.snippets().length > 0) {
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
