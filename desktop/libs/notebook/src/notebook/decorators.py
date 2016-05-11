@@ -86,16 +86,17 @@ def api_error_handler(func):
     except AuthenticationRequired, e:
       response['status'] = 401
     except ValidationError, e:
+      LOG.exception('Error validation %s' % func)
       response['status'] = -1
       response['message'] = e.message
     except QueryError, e:
-      LOG.exception('error running %s' % func)
+      LOG.exception('Error running %s' % func)
       response['status'] = 1
       response['message'] = force_unicode(str(e))
       if e.handle:
         response['handle'] = e.handle
     except Exception, e:
-      LOG.exception('error running %s' % func)
+      LOG.exception('Error running %s' % func)
       response['status'] = -1
       response['message'] = force_unicode(str(e))
     finally:
