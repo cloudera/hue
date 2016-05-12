@@ -341,7 +341,9 @@ def ssl_wrap_socket(sock, keyfile=None, certfile=None, cert_reqs=None,
     cnx = OpenSSL.SSL.Connection(ctx, sock)
     if isinstance(server_hostname, six.text_type):  # Platform-specific: Python 3
         server_hostname = server_hostname.encode('utf-8')
-    cnx.set_tlsext_host_name(server_hostname)
+    # Hue Patch: Only set the SNI hostname if PyOpenSSL supports it.
+    if hasattr(cnx, 'set_tlsext_host_name'):
+        cnx.set_tlsext_host_name(server_hostname)
     cnx.set_connect_state()
     while True:
         try:
