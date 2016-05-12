@@ -308,21 +308,24 @@ ${ hueIcons.symbols() }
             % endif
           </li>
           <!-- ko with: selectedNotebook -->
-          <li data-bind="visible: isHistory" style="display: none">
-            <a title="${ _('This is a Query history') }"><i class="fa fa-fw fa-history"></i></a>
+          <li class="no-horiz-padding">
+            <a>&nbsp;</a>
           </li>
-          <li data-bind="visible: directoryUuid" style="display: none">
-            <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" style="cursor: pointer"><i class="fa fa-fw fa-folder-o"></i></a>
+          <li data-bind="visible: isHistory" style="display: none" class="no-horiz-padding muted">
+            <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
-          <li data-bind="visible: parentSavedQueryUuid" style="display: none">
-            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" style="cursor: pointer">
+          <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
+            <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i></a>
+          </li>
+          <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
+            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
               <i class="fa fa-fw fa-file-o"></i>
             </a>
           </li>
-          <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none">
-            <a title="${ _('This is a Saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
+          <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
+            <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
-          <li class="query-name">
+          <li class="query-name no-horiz-padding" style="margin-left: 6px">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
             </a>
