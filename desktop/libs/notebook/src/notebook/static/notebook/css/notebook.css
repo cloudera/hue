@@ -1044,3 +1044,8 @@ pre {
 .no-horiz-padding:not(:first-child) a {
   margin-left: 0!important;
 }
+
+.collapse-results {
+  right: 20px;
+  top: 20px;
+}

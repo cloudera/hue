@@ -1189,15 +1189,12 @@ a#advanced-btn:hover {
   margin-top: -12px;
 }
 
-#jHueScrollUpAnchor {
+.hueAnchor {
   color: #FFFFFF;
   opacity: 0.65;
   filter: alpha(opacity=65);
-  display: none;
   position: fixed;
   z-index: 2147483647;
-  bottom: 20px;
-  right: 20px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
@@ -1207,10 +1204,16 @@ a#advanced-btn:hover {
   padding-right: 14px;
 }
 
-#jHueScrollUpAnchor:hover {
+.hueAnchor:hover {
   text-decoration: none;
   opacity: 0.85;
   filter: alpha(opacity=85);
+}
+
+#jHueScrollUpAnchor {
+  bottom: 20px;
+  right: 20px;
+  display: none;
 }
 
 #jHueTourMask {
