@@ -2673,6 +2673,7 @@ ${ hueIcons.symbols() }
           aceChecks--;
           if (aceChecks == 0) {
             hideHoverMsg(viewModel);
+            redrawFixedHeaders(200);
           }
         }
       }, 100);
@@ -2685,6 +2686,7 @@ ${ hueIcons.symbols() }
         snip.ace().setValue(content, 1);
       }
       hideHoverMsg(viewModel);
+      redrawFixedHeaders(200);
     }
     window.replaceAce = replaceAce;
 
