@@ -86,7 +86,10 @@ ${layout.menubar(section='configurations')}
     </div>
 
     <!-- ko foreach: groups -->
-    <h4 class="margin-left-20 simple" style="border-bottom: 1px solid #e5e5e5;">${ _('Group override') }</h4>
+    <h4 class="margin-left-20" style="display: inline-block;">${ _('Group override') }</h4>
+    <div class="config-actions">
+      <a class="inactive-action pointer margin-left-10" title="${ _('Remove') }" rel="tooltip" data-bind="click: function() { $parent.groups.remove($data) }"><i class="fa fa-times"></i> ${ _('Remove') }</a>
+    </div>
     <div class="form-horizontal margin-top-20">
       <div class="control-group">
         <label class="control-label">${ _('Groups') }</label>

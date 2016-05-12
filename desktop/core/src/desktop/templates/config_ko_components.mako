@@ -27,13 +27,10 @@ from desktop.views import _ko
 
   <style>
     .config-property {
+      display: inline-block;
       vertical-align: top;
       margin-bottom: 20px;
       position: relative;
-    }
-
-    :not(.controls) > .config-property {
-      padding-top: 10px;
     }
 
     .config-label {
@@ -49,10 +46,11 @@ from desktop.views import _ko
     }
 
     .config-property-remove {
-      position: absolute;
-      top: -8px;
-      z-index: 1000;
-      right: 0;
+      display: inline-block;
+      vertical-align: top;
+      position: relative;
+      margin-top: 6px;
+      margin-left: 10px;
     }
 
     .property-help {
@@ -74,21 +72,36 @@ from desktop.views import _ko
       padding-top: 6px !important;
       padding-bottom: 5px !important;
     }
+
+    .config-actions {
+      display: inline-block;
+      font-size: 13px;
+      margin-top: -3px;
+      margin-left: 15px;
+      vertical-align: text-top;
+    }
   </style>
 
   <script type="text/html" id="property-selector-template">
     <!-- ko foreach: selectedProperties -->
-    <!-- ko template: {
-      name: 'property',
-      data: {
-        type: type(),
-        label: nice_name,
-        helpText: help_text,
-        value: value,
-        property: $data,
-        visibleObservable: $parent.visibleObservable
-      }
-    } --><!-- /ko -->
+    <div>
+      <!-- ko template: {
+        name: 'property',
+        data: {
+          type: type(),
+          label: nice_name,
+          helpText: help_text,
+          value: value,
+          property: $data,
+          visibleObservable: $parent.visibleObservable
+        }
+      } --><!-- /ko -->
+      <div class="config-property-remove">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
+    </div>
     <!-- /ko -->
     <div class="margin-left-10" data-bind="visible: availableProperties().length > 0">
       <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: '${_ko('Add a property...')}', value: propertyToAdd"></select>
@@ -268,6 +281,13 @@ from desktop.views import _ko
           }
         };
 
+        PropertySelectorViewModel.prototype.removeProperty = function (property) {
+          var self = this;
+          property.value(property.defaultValue());
+          self.selectedProperties.remove(property);
+          self.availableProperties.push(property);
+        }
+
         ko.components.register('property-selector', {
           viewModel: PropertySelectorViewModel,
           template: {element: 'property-selector-template'}
@@ -284,13 +304,6 @@ from desktop.views import _ko
       <div class="config-controls">
         <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
       </div>
-      <!-- ko if: typeof remove !== "undefined" -->
-      <div class="hover-actions config-property-remove">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
-          <i class="fa fa-times"></i>
-        </a>
-      </div>
-      <!-- /ko -->
     </div>
   </script>
 
