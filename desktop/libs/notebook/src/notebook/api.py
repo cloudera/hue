@@ -375,7 +375,7 @@ def get_history(request):
       })
     else:
       LOG.error('Incomplete History Notebook: %s' % notebook)
-  response['history'] = history
+  response['history'] = sorted(history, key=lambda row: row['data']['lastExecuted'], reverse=True)
   response['message'] = _('History fetched')
 
   return JsonResponse(response)
