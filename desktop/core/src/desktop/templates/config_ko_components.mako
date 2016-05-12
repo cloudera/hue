@@ -35,6 +35,18 @@ from desktop.views import _ko
       padding-top: 10px;
     }
 
+    .config-label {
+      display: inline-block;
+      min-width: 100px;
+      margin: 4px 10px;
+      float:left;
+      text-align: right;
+    }
+
+    .config-controls {
+      display: inline-block;
+    }
+
     .config-property-remove {
       position: absolute;
       top: -8px;
@@ -66,7 +78,7 @@ from desktop.views import _ko
     } --><!-- /ko -->
     <!-- /ko -->
     <div class="config-property margin-left-10" data-bind="visible: availableProperties().length > 0">
-      <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: 'Choose a property...', value: propertyToAdd"></select>
+      <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: '${_ko('Add a property...')}', value: propertyToAdd"></select>
       <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
         <a class="inactive-action pointer" data-bind="click: addProperty">
           <i class="fa fa-plus"></i>
@@ -128,7 +140,7 @@ from desktop.views import _ko
               return alt[params.optionsText];
             }
             return alt;
-          }
+          };
 
           self.searchQuery = ko.observable();
 
@@ -137,7 +149,7 @@ from desktop.views import _ko
               index[key] = [];
             }
             index[key].push(value);
-          }
+          };
 
           self.searchResult = ko.pureComputed(function () {
             if (self.searchQuery()) {
@@ -161,19 +173,19 @@ from desktop.views import _ko
           });
 
           self.addressBook = ko.pureComputed(function () {
-            var result = {}
+            var result = {};
             ko.unwrap(params.options).forEach(function (alt) {
               addToIndexedLists(result, textAccessor(alt).charAt(0).toUpperCase(), new MultiGroupAlternative(alt, params, initiallyCheckedIndex[params.optionsValue ? alt[params.optionsValue] : alt]));
             });
             Object.keys(result).forEach(function (key) {
               result[key].sort();
-            })
+            });
             return result;
           });
 
           self.searchResultKeys = ko.pureComputed(function () {
             return Object.keys(self.searchResult()).sort();
-          })
+          });
 
           self.allSelected = ko.observable(false);
 
@@ -252,11 +264,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="property">
-    <div data-bind="visibleOnHover: { selector: '.hover-actions' }, css: { 'config-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
-      <label class="control-label" data-bind="style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }">
+    <div class="config-property" data-bind="visibleOnHover: { selector: '.hover-actions' }">
+      <label class="config-label">
         <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
       </label>
-      <div class="controls" style="margin-right:10px;" data-bind="style: { 'margin-left' : typeof inline === 'undefined' || inline ? '140px' : '' }">
+      <div class="config-controls">
         <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
       </div>
       <!-- ko if: typeof remove !== "undefined" -->
@@ -383,7 +395,7 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div style="min-width: 280px; margin-top: 5px;">
+    <div style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -445,7 +457,7 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div style="min-width: 280px; margin-top: 5px;">
+    <div style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -506,7 +518,7 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div style="min-width: 280px; margin-top: 5px;">
+    <div style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -593,7 +605,7 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div style="min-width: 280px; margin-top: 5px;">
+    <div style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
