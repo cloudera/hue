@@ -17,7 +17,7 @@
 
 import logging
 import sys
-
+import os
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class Jdbc():
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
-    self.gateway = JavaGateway()
+    self.gateway = JavaGateway.launch_gateway(classpath=os.environ['CLASSPATH'])
 
     self.jdbc_driver = driver_name
     self.db_url = url
@@ -62,6 +62,7 @@ class Jdbc():
 
   def connect(self):
     if self.conn is None:
+      self.gateway.jvm.Class.forName(self.jdbc_driver)
       self.conn = self.gateway.jvm.java.sql.DriverManager.getConnection(self.db_url, self.username, self.password)
 
   def cursor(self):
