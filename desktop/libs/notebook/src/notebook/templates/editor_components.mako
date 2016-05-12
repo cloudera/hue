@@ -1515,6 +1515,9 @@ ${ hueIcons.symbols() }
                 <tbody>
                 </tbody>
               </table>
+              <div data-bind="visible: status() == 'expired' && result.data() && result.data().length > 99, css: resultsKlass" style="display:none;">
+                <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
+              </div>
             </div>
 
             <div data-bind="visible: showChart" class="chart-container" style="display:none;">
