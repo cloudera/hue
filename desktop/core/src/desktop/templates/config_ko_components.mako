@@ -321,6 +321,10 @@ from desktop.views import _ko
     <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
   </script>
 
+  <script type="text/html" id="property-parameters">
+    <div data-bind="component: { name: 'name-value-list-input', params: { values: value, visibleObservable: visibleObservable, property: property } }"></div>
+  </script>
+
   <script type="text/html" id="property-settings">
     <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable, property: property } }"></div>
   </script>
@@ -479,6 +483,86 @@ from desktop.views import _ko
         ko.components.register('key-value-list-input', {
           viewModel: KeyValueListInputViewModel,
           template: { element: 'key-value-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+
+  <script type="text/html" id="name-value-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li style="clear:both;">
+        <!-- ko if: $parent.options.length > 0 -->
+        <div class="selectize-wrapper" style="min-width: 200px;">
+          <select placeholder="${ _('Name') }" data-bind="selectize: $parent.options, value: name, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
+        </div>
+        <!-- /ko -->
+        <div class="input-append" style="margin-bottom: 4px">
+          <!-- ko if: $parent.options.length === 0 -->
+          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <!-- /ko -->
+          <input type="text" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if (typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function NameValueListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          self.options = typeof params.property.options !== 'undefined' ? $.map(params.property.options(), function (option) {
+            return { value: option }
+          }) : [];
+
+          if (self.options.length > 0) {
+            self.values().forEach(function (value) {
+              if (self.options.indexOf(value.name()) === -1) {
+                self.options.push({ value: value.name() });
+              }
+            })
+          }
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.name() && value.value();
+              }))
+            }
+          });
+        }
+
+        NameValueListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            name: ko.observable(''),
+            value: ko.observable('')
+          };
+          self.values.push(newValue);
+        };
+
+        NameValueListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('name-value-list-input', {
+          viewModel: NameValueListInputViewModel,
+          template: { element: 'name-value-list-input-template' }
         });
       }());
     }));
