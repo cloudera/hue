@@ -1661,8 +1661,15 @@
       var notebook = new Notebook(self, notebook);
       if (notebook.snippets().length > 0) {
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
-        notebook.snippets().forEach(function(snippet){
+        notebook.snippets().forEach(function (snippet) {
           snippet.statement_raw.valueHasMutated();
+          if (snippet.result.handle().statements_count > 1 && snippet.result.handle().start != null && snippet.result.handle().end != null) {
+            snippet.result.statement_range({
+              start: snippet.result.handle().start,
+              end: snippet.result.handle().end
+            });
+            snippet.result.statement_range.valueHasMutated();
+          }
         });
         if (notebook.snippets()[0].result.data().length > 0) {
           $(document).trigger("redrawResults");
