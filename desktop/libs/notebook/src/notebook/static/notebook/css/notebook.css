@@ -1031,3 +1031,16 @@ pre {
   margin-right: 5px;
   margin-left: -5px;
 }
+
+.no-horiz-padding a {
+  padding-left: 0!important;
+  padding-right: 0!important;
+}
+
+.no-horiz-padding.muted a {
+ color: #AAA!important;
+}
+
+.no-horiz-padding:not(:first-child) a {
+  margin-left: 0!important;
+}

@@ -1105,7 +1105,7 @@ a#advanced-btn:hover {
 }
 
 .hand {
-  cursor: pointer;
+  cursor: pointer!important;
 }
 
 .hueCheckbox {
@@ -1817,7 +1817,7 @@ html.modal-open {
 }
 
 .pointer {
- cursor: pointer;
+ cursor: pointer!important;
 }
 
 .inline {
