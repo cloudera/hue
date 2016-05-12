@@ -23,9 +23,10 @@ from desktop.views import _ko
 
 <%def name="config()">
 
+  <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
+
   <style>
     .config-property {
-      display: inline-block;
       vertical-align: top;
       margin-bottom: 20px;
       position: relative;
@@ -37,7 +38,7 @@ from desktop.views import _ko
 
     .config-label {
       display: inline-block;
-      min-width: 100px;
+      min-width: 130px;
       margin: 4px 10px;
       float:left;
       text-align: right;
@@ -62,6 +63,17 @@ from desktop.views import _ko
       font-size: 14px;
       color: #888;
     }
+
+    .selectize-wrapper {
+      display: inline-block;
+      float:left;
+      margin-right: 4px;
+    }
+
+    .selectize-input {
+      padding-top: 6px !important;
+      padding-bottom: 5px !important;
+    }
   </style>
 
   <script type="text/html" id="property-selector-template">
@@ -73,11 +85,12 @@ from desktop.views import _ko
         label: nice_name,
         helpText: help_text,
         value: value,
+        property: $data,
         visibleObservable: $parent.visibleObservable
       }
     } --><!-- /ko -->
     <!-- /ko -->
-    <div class="config-property margin-left-10" data-bind="visible: availableProperties().length > 0">
+    <div class="margin-left-10" data-bind="visible: availableProperties().length > 0">
       <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: '${_ko('Add a property...')}', value: propertyToAdd"></select>
       <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
         <a class="inactive-action pointer" data-bind="click: addProperty">
@@ -209,7 +222,7 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if (typeof require === "function") {
-        require(['knockout'], factory);
+        require(['knockout', 'ko.selectize'], factory);
       } else {
         factory(ko);
       }
@@ -290,7 +303,14 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="property-string">
-    <input class="input-small" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
+    <!-- ko if: typeof property !== 'undefined' && typeof property.options !== 'undefined' && property.options().length > 0 -->
+    <div class="selectize-wrapper" style="min-width: 200px;">
+      <select placeholder="${ _('Key') }" data-bind="selectize: $.map($parent.options(), function (option) { return { value: option } }), value: value, options: $.map($parent.options(), function (option) { return { value: option } }), optionsText: 'value', optionsValue: 'value'"></select>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: typeof property === 'undefined' || typeof property.options() === 'undefined' || property.options().length === 0 -->
+    <input class="input" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="property-boolean">
@@ -302,7 +322,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="property-settings">
-    <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
+    <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable, property: property } }"></div>
   </script>
 
   <script type="text/html" id="property-hdfs-files">
@@ -328,7 +348,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="property-hdfs-file">
     <div class="input-append">
-      <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
+      <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
     </div>
   </script>
 
@@ -386,10 +406,17 @@ from desktop.views import _ko
 
   <script type="text/html" id="key-value-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
-      <li>
+      <li style="clear:both;">
+        <!-- ko if: $parent.options.length > 0 -->
+        <div class="selectize-wrapper" style="min-width: 200px;">
+          <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
+        </div>
+        <!-- /ko -->
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" style="width: 130px" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
-          <input type="text" style="width: 130px" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <!-- ko if: $parent.options.length === 0 -->
+          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <!-- /ko -->
+          <input type="text" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
@@ -415,6 +442,17 @@ from desktop.views import _ko
         function KeyValueListInputViewModel(params) {
           var self = this;
           self.values = params.values;
+          self.options = typeof params.property.options !== 'undefined' ? $.map(params.property.options(), function (option) {
+            return { value: option }
+          }) : [];
+
+          if (self.options.length > 0) {
+            self.values().forEach(function (value) {
+              if (self.options.indexOf(value.key()) === -1) {
+                self.options.push({ value: value.key() });
+              }
+            })
+          }
           params.visibleObservable.subscribe(function (newValue) {
             if (!newValue) {
               self.values($.grep(self.values(), function (value) {
@@ -450,7 +488,7 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" style="width: 110px" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
           <input type="text" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>

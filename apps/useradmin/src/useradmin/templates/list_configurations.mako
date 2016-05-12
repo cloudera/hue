@@ -126,7 +126,7 @@ ${layout.menubar(section='configurations')}
 
 <div class="container-fluid">
   <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-  <h4 style="width: 100%; text-align: center;" data-bind="visible: !loading() && hasErrors()">${ _('There was an error loading the configurations') }</h4>
+  <h4 style="width: 100%; text-align: center; display: none;" data-bind="visible: !loading() && hasErrors()">${ _('There was an error loading the configurations') }</h4>
   <!-- ko template: { if: !loading() && !hasErrors() && !selectedApp(), name: 'app-list' } --><!-- /ko -->
   <!-- ko template: { if: !loading() && !hasErrors() && selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
@@ -268,10 +268,10 @@ ${ configKoComponents.config() }
 
         // Merge base properties with default properties into default
         app.default.forEach(function (defaultProperty) {
-          defaultIndex[defaultProperty.name] = defaultProperty;
+          defaultIndex[defaultProperty.name || defaultProperty.nice_name] = defaultProperty;
         });
         app.properties.forEach(function (property) {
-          if (!defaultIndex[property.name]) {
+          if (!defaultIndex[property.name || property.nice_name]) {
             app.default.push(property);
           }
         });

@@ -58,6 +58,7 @@ input[type=submit] {
 
 @media all and (max-height: 800px) {
   .form-actions {
+    z-index: 2;
     border-top: 1px solid #F1F1F1;
     position: fixed;
     bottom: 0;
