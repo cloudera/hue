@@ -32,6 +32,7 @@ from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TM
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
+from django.conf import settings
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_sasl import TSaslClientTransport
@@ -423,8 +424,11 @@ class SuperClient(object):
             % (str(self.wrapped.__class__), attr, repr(args), repr(kwargs)))
           ret = res(*args, **kwargs)
           log_msg = repr(ret)
-          if len(log_msg) > 1000:
-            log_msg = log_msg[0:1000] + "..."
+
+          # Truncate log message, increase output in DEBUG mode
+          log_limit = 2000 if settings.DEBUG else 1000
+          log_msg = log_msg[:log_limit] + (log_msg[log_limit:] and '...')
+          
           duration = time.time() - st
 
           # Log the duration at different levels, depending on how long

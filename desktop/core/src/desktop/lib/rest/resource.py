@@ -82,8 +82,8 @@ class Resource(object):
       self._client.logger.debug(
           "%s Got response: %s%s" %
           (method,
-           smart_unicode(resp.content[:32], errors='replace'),
-           len(resp.content) > 32 and "..." or ""))
+           smart_unicode(resp.content[:1000], errors='replace'),
+           len(resp.content) > 1000 and "..." or ""))
 
     return self._format_response(resp)
 
