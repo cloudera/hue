@@ -366,7 +366,7 @@ def get_history(request):
         'uuid': doc.uuid,
         'type': doc.type,
         'data': {
-            'statement': statement[:1001],
+            'statement': statement[:1001] if statement else '',
             'lastExecuted': notebook['snippets'][0]['lastExecuted'],
             'status':  notebook['snippets'][0]['status'],
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
