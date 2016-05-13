@@ -26,6 +26,15 @@
 }(this, function (ko, HueDocument) {
 
   var sorts = {
+    defaultAsc: function (a, b) {
+      if (a.isDirectory() && !b.isDirectory()) {
+        return -1;
+      }
+      if (!a.isDirectory() && b.isDirectory()) {
+        return 1;
+      }
+      return sorts.nameAsc(a, b);
+    },
     nameAsc: function (a, b) {
       return a.definition().name.localeCompare(b.definition().name);
     },
@@ -211,10 +220,12 @@
       } else {
         self.activeSort(name + 'Asc')
       }
-    } else if (self.activeSort().indexOf('Asc') !== -1) {
+    } else if (name !== 'lastModified' && self.activeSort().indexOf('Asc') !== -1) {
       self.activeSort(name + 'Desc');
+    } else if (name === 'lastModified' && self.activeSort().indexOf('Desc') !== -1) {
+      self.activeSort('lastModifiedAsc');
     } else {
-      self.activeSort(name + 'Asc');
+      self.activeSort('defaultAsc');
     }
     self.entries.sort(sorts[self.activeSort()]);
   };

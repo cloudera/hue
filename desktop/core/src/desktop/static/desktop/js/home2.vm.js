@@ -54,7 +54,7 @@
       app: 'documents',
       user: self.user,
       superuser: self.superuser,
-      activeSort: ko.observable('lastModifiedDesc'),
+      activeSort: ko.observable('defaultAsc'),
       definition: {
         name: '/'
       }
