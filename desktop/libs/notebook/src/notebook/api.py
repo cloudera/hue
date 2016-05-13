@@ -19,6 +19,7 @@ import json
 import logging
 
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.forms import ValidationError
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
@@ -347,11 +348,16 @@ def get_history(request):
   response = {'status': -1}
 
   doc_type = request.GET.get('doc_type')
+  doc_text = request.GET.get('doc_text')
   limit = min(request.GET.get('len', 50), 100)
 
-  response['status'] = 0
+  docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+
+  if doc_text:
+    docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text))
+
   history = []
-  for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user).order_by('-last_modified')[:limit]:
+  for doc in docs.order_by('-last_modified')[:limit]:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
       try:
@@ -377,6 +383,7 @@ def get_history(request):
       LOG.error('Incomplete History Notebook: %s' % notebook)
   response['history'] = sorted(history, key=lambda row: row['data']['lastExecuted'], reverse=True)
   response['message'] = _('History fetched')
+  response['status'] = 0
 
   return JsonResponse(response)
 
