@@ -113,7 +113,7 @@ def _edit_workflow(request, doc, workflow):
       'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
-      'doc1_id': doc.doc.get().id if doc else -1,
+      'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user)),
       'history_json': json.dumps([{
@@ -245,7 +245,7 @@ def save_workflow(request):
 
   response['status'] = 0
   response['id'] = workflow_doc.id
-  response['doc1_id'] = workflow_doc1.id
+  response['doc_uuid'] = workflow_doc.uuid
   response['message'] = _('Page saved !')
 
   return JsonResponse(response)
@@ -514,7 +514,7 @@ def edit_coordinator(request):
       'coordinator_json': coordinator.to_json_for_html(),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
-      'doc1_id': doc.doc.get().id if doc else -1,
+      'doc_uuid': doc.uuid if doc else '',
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
@@ -712,7 +712,7 @@ def edit_bundle(request):
   return render('editor2/bundle_editor.mako', request, {
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
-      'doc1_id': doc.doc.get().id if doc else -1,
+      'doc_uuid': doc.uuid if doc else '',
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 

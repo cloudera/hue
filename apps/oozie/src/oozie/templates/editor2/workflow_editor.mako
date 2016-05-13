@@ -444,7 +444,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/select2.full.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
@@ -471,7 +471,7 @@ ${ dashboard.import_bindings() }
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
-  shareViewModel.setDocId(${ doc1_id });
+  shareViewModel.setDocUuid('${ doc_uuid }');
 
   viewModel.init();
   viewModel.workflow.tracker().markCurrentStateAsClean();

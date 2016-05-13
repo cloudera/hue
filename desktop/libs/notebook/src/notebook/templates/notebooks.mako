@@ -178,7 +178,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
   var Editor = function () {
@@ -238,7 +238,7 @@ ${ commonshare() | n,unicode }
     };
 
     self.prepareShareModal = function() {
-      shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
+      shareViewModel.setDocUuid(self.selectedJobs()[0].uuid());
       openShareModal();
     };
   }
@@ -251,7 +251,7 @@ ${ commonshare() | n,unicode }
     ko.applyBindings(viewModel, $("#editor")[0]);
 
     shareViewModel = initSharing("#documentShareModal");
-    shareViewModel.setDocId(-1);
+    shareViewModel.setDocUuid('');
 
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-notebook-modal').html(data);

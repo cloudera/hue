@@ -398,7 +398,7 @@ def list_oozie_workflow(request, job_id):
     'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML) if workflow_data else '',
     'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML) if credentials else '',
     'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
-    'doc1_id': doc.doc.get().id if doc else -1,
+    'doc_uuid': doc.uuid if doc else '',
     'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
     'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })

@@ -217,7 +217,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 ${ dashboard.import_bindings() }
 
@@ -234,7 +234,7 @@ ${ dashboard.import_bindings() }
   viewModel.bundle.tracker().markCurrentStateAsClean();
 
   var shareViewModel = initSharing("#documentShareModal");
-  shareViewModel.setDocId(${ doc1_id });
+  shareViewModel.setDocUuid('${ doc_uuid }');
 
   var tempCoordinator = null;
   function showChooseCoordinator(coord) {

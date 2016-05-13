@@ -35,7 +35,7 @@ var Collection = function (coll) {
   self.absoluteUrl = ko.observable(coll.absoluteUrl);
   self.owner = ko.observable(coll.owner);
   self.isOwner = ko.observable(coll.isOwner);
-  self.doc1_id = ko.observable(coll.doc1_id);
+  self.uuid = ko.observable(coll.uuid);
 
   self.selected = ko.observable(false);
   self.hovered = ko.observable(false);
