@@ -516,6 +516,10 @@
       self.chartYSingle(self.previousChartOptions.chartYSingle);
       self.chartMapLabel(self.previousChartOptions.chartMapLabel);
       self.chartYMulti(self.previousChartOptions.chartYMulti || []);
+      self.chartSorting(self.previousChartOptions.chartSorting);
+      self.chartScatterGroup(self.previousChartOptions.chartScatterGroup);
+      self.chartScatterSize(self.previousChartOptions.chartScatterSize);
+      self.chartScope(self.previousChartOptions.chartScope);
     });
 
     self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
@@ -580,11 +584,14 @@
       }
 
       self.previousChartOptions = {
-        chartScope: typeof self.chartScope() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
+        chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
         chartMapLabel: typeof self.chartMapLabel() !== "undefined" ? self.chartMapLabel() : self.previousChartOptions.chartMapLabel,
-        chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti
+        chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti,
+        chartSorting: typeof self.chartSorting() !== "undefined" ? self.chartSorting() : self.previousChartOptions.chartSorting,
+        chartScatterGroup: typeof self.chartScatterGroup() !== "undefined" ? self.chartScatterGroup() : self.previousChartOptions.chartScatterGroup,
+        chartScatterSize: typeof self.chartScatterSize() !== "undefined" ? self.chartScatterSize() : self.previousChartOptions.chartScatterSize
       };
       $(document).trigger("executeStarted", self);
       self.lastExecuted(now);
@@ -1670,6 +1677,17 @@
             });
             snippet.result.statement_range.valueHasMutated();
           }
+
+          snippet.previousChartOptions = {
+            chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
+            chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
+            chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
+            chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
+            chartScope: typeof snippet.chartScope() !== "undefined" ? snippet.chartScope() : snippet.previousChartOptions.chartScope,
+            chartSorting: typeof snippet.chartSorting() !== "undefined" ? snippet.chartSorting() : snippet.previousChartOptions.chartSorting,
+            chartScatterGroup: typeof snippet.chartScatterGroup() !== "undefined" ? snippet.chartScatterGroup() : snippet.previousChartOptions.chartScatterGroup,
+            chartScatterSize: typeof snippet.chartScatterSize() !== "undefined" ? snippet.chartScatterSize() : snippet.previousChartOptions.chartScatterSize
+          };
         });
         if (notebook.snippets()[0].result.data().length > 0) {
           $(document).trigger("redrawResults");
