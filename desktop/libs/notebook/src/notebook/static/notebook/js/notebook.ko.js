@@ -635,18 +635,8 @@
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
           notebook.parentSavedQueryUuid(data.history_parent_uuid);
-
-          notebook.history.unshift(
-            notebook._makeHistoryRecord(
-              url,
-              data.handle.statement,
-              self.lastExecuted(),
-              self.status(),
-              notebook.name(),
-              notebook.uuid()
-            )
-          );
         }
+
         if (data.status == 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
@@ -660,6 +650,17 @@
         } else {
           self._ajaxError(data, self.execute);
         }
+
+        notebook.history.unshift(
+          notebook._makeHistoryRecord(
+            url,
+            data.handle.statement,
+            self.lastExecuted(),
+            self.status(),
+            notebook.name(),
+            notebook.uuid()
+          )
+        );
 
         if (data.handle.statements_count != null) {
           self.result.statements_count(data.handle.statements_count);
