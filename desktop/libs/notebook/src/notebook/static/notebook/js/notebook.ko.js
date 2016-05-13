@@ -1653,7 +1653,7 @@
       }
     };
 
-    self.loadNotebook = function (notebook) {
+    self.loadNotebook = function (notebook, queryTab) {
       if (self.checkStatusTimeout != null) {
         clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
@@ -1674,11 +1674,16 @@
         if (notebook.snippets()[0].result.data().length > 0) {
           $(document).trigger("redrawResults");
         }
+        else {
+          if (queryTab){
+            notebook.snippets()[0].currentQueryTab(queryTab);
+          }
+        }
       }
       self.selectedNotebook(notebook);
     };
 
-    self.openNotebook = function (uuid) {
+    self.openNotebook = function (uuid, queryTab) {
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
@@ -1687,7 +1692,7 @@
         data.data.dependents = data.dependents;
         data.data.can_write = data.user_perms.can_write;
         var notebook = data.data;
-        self.loadNotebook(notebook);
+        self.loadNotebook(notebook, queryTab);
         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
       });
     };
