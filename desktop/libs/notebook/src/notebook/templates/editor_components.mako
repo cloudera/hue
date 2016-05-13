@@ -1132,7 +1132,7 @@ ${ hueIcons.symbols() }
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
-            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid); } }, css: { 'highlight': uuid == $root.selectedNotebook().uuid(), 'pointer': uuid != $root.selectedNotebook().uuid() }">
+            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid, 'savedQueries'); } }, css: { 'highlight': uuid == $root.selectedNotebook().uuid(), 'pointer': uuid != $root.selectedNotebook().uuid() }">
               <td style="width: 16%"><span data-bind="ellipsis: {data: name, length: 30}"></span></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
