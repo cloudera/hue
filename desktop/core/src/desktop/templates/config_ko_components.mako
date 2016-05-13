@@ -260,6 +260,7 @@ from desktop.views import _ko
                 self.availableProperties.push(property);
               }
             });
+            self.sort();
           };
 
           setInitialProperties();
@@ -272,12 +273,23 @@ from desktop.views import _ko
           });
         }
 
+        var niceNameSort = function (a, b) {
+          return a.nice_name().localeCompare(b.nice_name());
+        }
+
+        PropertySelectorViewModel.prototype.sort = function () {
+          var self = this;
+          self.availableProperties.sort(niceNameSort);
+          self.selectedProperties.sort(niceNameSort);
+        }
+
         PropertySelectorViewModel.prototype.addProperty = function () {
           var self = this;
           if (self.propertyToAdd()) {
             self.selectedProperties.push(self.propertyToAdd());
             self.availableProperties.remove(self.propertyToAdd());
             self.propertyToAdd(null);
+            self.sort();
           }
         };
 
@@ -286,6 +298,7 @@ from desktop.views import _ko
           property.value(property.defaultValue());
           self.selectedProperties.remove(property);
           self.availableProperties.push(property);
+          self.sort();
         }
 
         ko.components.register('property-selector', {

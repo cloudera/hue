@@ -262,7 +262,6 @@ ${ configKoComponents.config() }
       });
 
       $.each(data.configuration, function (appName, app) {
-
         app.name = appName;
         var defaultIndex = {};
         if (typeof app.default === 'undefined') {
@@ -298,6 +297,9 @@ ${ configKoComponents.config() }
         }
         apps.push(new AppConfiguration(app, self.allGroups));
       });
+      apps.sort(function (a, b) {
+        return a.name().localeCompare(b.name());
+      })
       self.apps(apps);
     };
 
