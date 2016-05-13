@@ -1077,7 +1077,7 @@ ${ hueIcons.symbols() }
               <!-- /ko -->
             <table class="table table-condensed margin-top-10 history-table">
               <tbody data-bind="foreach: $parent.filteredHistory">
-                <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'pointer': uuid() != $root.selectedNotebook().uuid() }">
+                <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
                   <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
                   </td>
@@ -1122,7 +1122,7 @@ ${ hueIcons.symbols() }
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
-          <table class="table table-condensed margin-top-10">
+          <table class="table table-condensed margin-top-10 history-table">
             <thead>
               <tr>
                 <th style="width: 16%">${ _("Name") }</th>
@@ -1132,7 +1132,7 @@ ${ hueIcons.symbols() }
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
-            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid); } }, css: { 'pointer': uuid != $root.selectedNotebook().uuid() }">
+            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid); } }, css: { 'highlight': uuid == $root.selectedNotebook().uuid(), 'pointer': uuid != $root.selectedNotebook().uuid() }">
               <td style="width: 16%"><span data-bind="ellipsis: {data: name, length: 30}"></span></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
