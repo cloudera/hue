@@ -1828,19 +1828,10 @@ ${ hueIcons.symbols() }
               <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
               <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
               <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+              <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
+              <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
+              <!-- /ko -->
             </div>
-            <!-- ko if: type()== 'impala' && typeof properties != 'undefined' -->
-
-            <ul class="nav nav-list" style="border: none; padding: 0;">
-              <li class="nav-header">${ _('address')}</li>
-            </ul>
-            <div style="margin: 2px" data-bind="with: ko.utils.arrayFirst(properties(), function(item) { return item.key() == 'http_addr' });">
-              <a data-bind="attr: {'href': window.location.protocol + '//' + $data.value().replace(/^(https?):\/\//, '')}" target="_blank">
-                <span data-bind="text: $data.value().replace(/^(https?):\/\//, '')"></span>
-                <i class="fa fa-external-link"></i>
-              </a>
-            </div>
-            <!-- /ko -->
             <div style="width:100%;">
               <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
             </div>
