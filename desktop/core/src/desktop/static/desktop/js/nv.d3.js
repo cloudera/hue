@@ -834,7 +834,7 @@ window.nv.tooltip.* also has various helper methods.
 
 
             container.style.left = left+'px';
-            container.style.top = top+'px';
+            container.style.top = Math.max(top, 0)+'px';
             container.style.opacity = 1;
             container.style.position = 'absolute'; 
 
