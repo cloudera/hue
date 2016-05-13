@@ -159,7 +159,7 @@ ${ commonimportexport(request) | n,unicode }
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 
 <script>
@@ -175,7 +175,7 @@ ${ commonimportexport(request) | n,unicode }
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   shareViewModel = initSharing("#documentShareModal");
-  shareViewModel.setDocId(-1);
+  shareViewModel.setDocUuid('');
 
   $(document).ready(function () {
     viewModel.updateCollections();
@@ -227,7 +227,7 @@ ${ commonimportexport(request) | n,unicode }
     };
 
     prepareShareModal = function() {
-      shareViewModel.setDocId(viewModel.selectedCollections()[0].doc1_id());
+      shareViewModel.setDocUuid(viewModel.selectedCollections()[0].uuid());
       openShareModal();
     };
   });

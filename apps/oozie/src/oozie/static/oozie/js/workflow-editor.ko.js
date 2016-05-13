@@ -1165,7 +1165,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             window.location.replace(data.url);
           }
           if (self.workflow.id() == null) {
-            shareViewModel.setDocId(data.doc1_id);
+            shareViewModel.setDocUuid(data.uuid);
           }
           self.workflow.id(data.id);
           $(document).trigger("info", data.message);
