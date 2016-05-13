@@ -924,6 +924,12 @@ h4.header {
   background-color: #f7f7f9;
 }
 
+.history-table tbody tr.highlight {
+  background-color: #f7f7f9;
+  border-left: 2px solid #CCC;
+  border-right: 2px solid #CCC;
+}
+
 .history-item .ace-hue {
   background-color: transparent!important;
 }
