@@ -266,10 +266,12 @@
 
       var currentLeft = 0;
       var currentTop = 0;
+      var openScrollTop = 0;
+      var openScrollLeft = 0;
 
       var adjustForScroll = function () {
-        $menu.css('top', currentTop - $scrollContainer.scrollTop());
-        $menu.css('left', currentLeft - $scrollContainer.scrollLeft());
+        $menu.css('top', currentTop - $scrollContainer.scrollTop() + openScrollTop);
+        $menu.css('left', currentLeft - $scrollContainer.scrollLeft() + openScrollLeft);
       }
 
       return {
@@ -278,9 +280,11 @@
           $menu.css('left', 0);
           $menu.css('opacity', 0);
           $menu.show();
+          openScrollTop = $scrollContainer.scrollTop();
+          openScrollLeft = $scrollContainer.scrollLeft();
           var menuWidth = $menu.outerWidth(true)
           if (event.clientX + menuWidth > $(window).width()) {
-            currentLeft = event.clientX - menuWidth - $scrollContainer.scrollLeft()
+            currentLeft = $(window).width() - menuWidth
           } else {
             currentLeft = event.clientX;
           }
@@ -288,7 +292,7 @@
 
           var menuHeight = $menu.outerHeight(true);
           if (event.clientY + menuHeight > $(window).height()) {
-            currentTop = $(window).height() - menuHeight - $scrollContainer.scrollTop();
+            currentTop = $(window).height() - menuHeight;
           } else {
             currentTop = event.clientY;
           }
