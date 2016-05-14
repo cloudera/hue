@@ -64,6 +64,9 @@ def ha_error_handler(func):
 
 
 def get_api(user, component):
+  if component == 'solr':
+    component = component.upper()
+
   client = _get_client(user.username, component)
 
   return SentryApi(client)

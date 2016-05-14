@@ -57,6 +57,9 @@ def get_conf(name='sentry'):
 def get_hive_sentry_provider():
   return get_conf(name='hive').get(_CONF_HIVE_PROVIDER, 'server1')
 
+def get_solr_sentry_provider():
+  return 'service1'
+
 
 def get_sentry_server_principal():
   # Get kerberos principal and replace host pattern
