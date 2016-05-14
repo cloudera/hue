@@ -19,7 +19,7 @@ import json
 
 from desktop.lib.django_util import render
 
-from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups
+from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
 
 
 def hive(request):
@@ -47,7 +47,7 @@ def _sentry(request, component):
       'initial': json.dumps({
           'component': component,
           'user': request.user.username,
-          'sentry_provider': get_hive_sentry_provider(),
+          'sentry_provider': get_solr_sentry_provider() if component == 'solr' else get_hive_sentry_provider(),
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
       'has_impersonation_perm': _has_impersonation_perm(request.user) and component == 'hive',
