@@ -64,10 +64,10 @@ def is_selected(section, matcher):
                 </a>
               </li>
               % if HIVE_V1.get():
-              <li class="${is_selected(section, 'hive1')}"><a href="${ url('security:hive') }">${_('Sentry Tables')}</a></li>
+              <li class="${is_selected(section, 'hive1')}"><a href="${ url('security:hive') }">${_('Hive Tables')}</a></li>
               % endif
               % if HIVE_V2.get():
-              <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive2') }">${_('Sentry Tables v2')}</a></li>
+              <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive2') }">${_('Hive Tables v2')}</a></li>
               % endif
               % if SOLR_V2.get():
               <li class="${is_selected(section, 'solr')}"><a href="${ url('security:solr') }">${_('Solr Collections')}</a></li>
