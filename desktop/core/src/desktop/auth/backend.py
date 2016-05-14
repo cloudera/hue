@@ -413,7 +413,7 @@ class LdapBackend(object):
     # Certificate-related config settings
     if ldap_config.LDAP_CERT.get():
       setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
-      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
     else:
       setattr(self._backend.settings, 'START_TLS', False)
