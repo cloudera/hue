@@ -10,7 +10,7 @@ Hue is an open source Web interface for analyzing data with any Apache Hadoop: [
 
 It features:
 
-   * SQL editors for Hive, Impala, MySQL, Oracle, PostGresl, SparkSQL, Solr SQL, Phoenix...
+   * SQL editors for Hive, Impala, MySQL, Oracle, PostgreSQL, SparkSQL, Solr SQL, Phoenix...
    * Dynamic Search dashboards with Solr
    * Spark and Hadoop notebooks
    * Scheduling of jobs and workflows through an Oozie Editor and Dashboard
