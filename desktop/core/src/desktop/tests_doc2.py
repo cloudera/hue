@@ -348,7 +348,7 @@ class TestDocument2(object):
   def test_api_get_data(self):
     doc_data = {'info': 'hello', 'is_history': False}
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=json.dumps(doc_data))
-    doc_data.update({'id': doc.id})
+    doc_data.update({'id': doc.id, 'uuid': doc.uuid})
 
     response = self.client.get('/desktop/api2/doc/', {
         'uuid': doc.uuid,
