@@ -31,6 +31,7 @@ from search.conf import SOLR_URL, SECURITY_ENABLED
 
 from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
+from search.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
@@ -106,15 +107,22 @@ class CollectionManagerController(object):
     return solr_cores
 
   def get_fields(self, collection_or_core_name):
-    try:
-      field_data = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).fields(collection_or_core_name)
-      fields = self._format_flags(field_data['schema']['fields'])
-    except:
-      LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core_name)
-      raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core_name)
+    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
     try:
-      uniquekey = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get()).uniquekey(collection_or_core_name)
+      field_data = api.fields(collection_or_core_name)
+      fields = self._format_flags(field_data['schema']['fields'])
+    except Exception, e:
+      LOG.warn('/luke call did not succeed: %s' % e)
+      try:
+        fields = api.schema_fields(collection_or_core_name)
+        fields = Collection2._make_luke_from_schema_fields(fields)
+      except:
+        LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core_name)
+        raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core_name)
+
+    try:
+      uniquekey = api.uniquekey(collection_or_core_name)
     except:
       LOG.exception(_('Could not fetch unique key for collection %s.') % collection_or_core_name)
       raise PopupException(_('Could not fetch unique key for collection %s. See logs for more info.') % collection_or_core_name)
