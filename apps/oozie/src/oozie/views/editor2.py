@@ -128,7 +128,7 @@ def _edit_workflow(request, doc, workflow):
 @check_editor_access_permission
 def new_workflow(request):
   doc = None
-  workflow = Workflow()
+  workflow = Workflow(user=request.user)
   workflow.set_workspace(request.user)
   workflow.check_workspace(request.fs, request.user)
 
@@ -349,7 +349,8 @@ def workflow_parameters(request):
   response = {'status': -1}
 
   try:
-    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid')))
+    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid')),
+                        user=request.user)
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
