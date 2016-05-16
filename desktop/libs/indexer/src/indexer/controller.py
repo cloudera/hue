@@ -73,6 +73,10 @@ class CollectionManagerController(object):
     return collection in self.get_collections()
 
   def get_collections(self):
+    solr_collections = {}
+    solr_aliases = {}
+    solr_cores = {}
+
     try:
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
@@ -83,10 +87,6 @@ class CollectionManagerController(object):
       else:
         solr_collections = {}
 
-      solr_cores = api.cores()
-      for name in solr_cores:
-        solr_cores[name]['isCoreOnly'] = True
-
       solr_aliases = api.aliases()
       for name in solr_aliases:
         solr_aliases[name] = {
@@ -94,11 +94,12 @@ class CollectionManagerController(object):
             'isAlias': True,
             'collections': solr_aliases[name]
         }
+
+      solr_cores = api.cores()
+      for name in solr_cores:
+        solr_cores[name]['isCoreOnly'] = True
     except Exception, e:
       LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
-      solr_collections = {}
-      solr_cores = {}
-      solr_aliases = {}
 
     solr_cores.update(solr_collections)
     solr_cores.update(solr_aliases)
