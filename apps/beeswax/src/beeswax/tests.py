@@ -3287,14 +3287,16 @@ def test_apply_natural_sort():
                                                             {'name': 'test_200', 'comment': 'Test'}])
 
 def test_hiveserver2_jdbc_url():
-  try:
-    hostname = socket.getfqdn()
-    beeswax.conf.HIVE_SERVER_HOST.set_for_testing(hostname)
+  hostname = socket.getfqdn()
+  resets = [
+    beeswax.conf.HIVE_SERVER_HOST.set_for_testing(hostname),
     beeswax.conf.HIVE_SERVER_PORT.set_for_testing('10000')
+  ]
+  try:
     url = hiveserver2_jdbc_url()
     assert_equal(url, 'jdbc:hive2://' + hostname + ':10000/default')
 
-    beeswax.conf.HIVE_SERVER_HOST.set_for_testing('server-with-ssl-enabled.com')
+    beeswax.conf.HIVE_SERVER_HOST.set_for_testing('server-with-ssl-enabled.com'),
     beeswax.conf.HIVE_SERVER_PORT.set_for_testing('10000')
     url = hiveserver2_jdbc_url()
     assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default')
@@ -3311,6 +3313,8 @@ def test_hiveserver2_jdbc_url():
     assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default')
   finally:
     beeswax.hive_site.reset()
+    for reset in resets:
+        reset()
 
 
 
