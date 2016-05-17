@@ -74,20 +74,22 @@ class Command(NoArgsCommand):
     except ImproperlyConfigured: # Connector not found
       sys.exit(3)
     except OperationalError, e:
-      self.stdout.write('Error accessing DB: %s' % e)
+      self.stderr.write('Error accessing DB: %s' % e)
+      error = str(e)
+
       # MySql
-      if e.args[0] == 2005: # "Unknown MySQL server host 'laaaocalhost' (111)"
+      if '2005' in error: # "Unknown MySQL server host 'laaaocalhost' (111)"
         sys.exit(5)
-      elif e.args[0] == 2002: # Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+      elif '2002' in error: # Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
         sys.exit(6)
-      elif e.args[0] == 1049: # "Unknown database 'huea'"
+      elif '1049' in error: # "Unknown database 'huea'"
         sys.exit(7)
-      elif e.args[0] == 1045: # "Access denied for user 'root'@'localhost' (using password: YES)"
+      elif '1045' in error: # "Access denied for user 'root'@'localhost' (using password: YES)"
         sys.exit(8)
       else: # Any connection error that we can't make sense of
         sys.exit(4)
     except Exception, e:
-      self.stdout.write('Error accessing DB: %s' % e)
+      self.stderr.write('Error accessing DB: %s' % e)
       error = str(e)
 
       # Oracle
