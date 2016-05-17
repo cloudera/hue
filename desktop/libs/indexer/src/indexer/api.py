@@ -88,6 +88,33 @@ def parse_fields(request):
 
   return JsonResponse(result)
 
+def autocomplete(request):
+  searcher = CollectionManagerController(request.user)
+  autocomplete = searcher.get_autocomplete()
+
+  massaged_collections = []
+
+  for collection in autocomplete['collections']:
+    massaged_collections.append({
+      'name': collection,
+      'isCollection': True,
+      'isConfig': False,
+    })
+
+  for config in autocomplete['configs']:
+    massaged_collections.append({
+      'name': config,
+      'isCollection': False,
+      'isConfig': True,
+    })
+
+  response = {
+    'status': 0,
+    'collections': massaged_collections
+  }
+
+  return JsonResponse(response)
+
 
 def collections(request):
   searcher = CollectionManagerController(request.user)
