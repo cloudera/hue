@@ -232,6 +232,8 @@ var Role = function (vm, role) {
 
   self.groups = ko.observableArray();
   self.originalGroups = ko.observableArray();
+  self.groups.extend({ rateLimit: 300 });
+  self.originalGroups.extend({ rateLimit: 300 });
   $.each(typeof role.groups != "undefined" && role.groups != null ? role.groups : [], function (index, group) {
     self.groups.push(group);
     self.originalGroups.push(group);
@@ -267,6 +269,7 @@ var Role = function (vm, role) {
   self.groupsChanged = ko.computed(function () {
     return !($(self.groups()).not(self.originalGroups()).length == 0 && $(self.originalGroups()).not(self.groups()).length == 0);
   });
+  self.groupsChanged.extend({ rateLimit: 300 });
 
   self.privilegesForView = ko.computed(function() {
     var _filter = vm.privilegeFilter().toLowerCase();
