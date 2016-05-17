@@ -203,7 +203,7 @@
       BASE_PATH = "/impala/api/autocomplete/";
     }
     if (_this.options.serverType == "SOLR"){
-      BASE_PATH = "/indexer/api/collections/";
+      BASE_PATH = "/indexer/api/autocomplete/";
     }
     var _currentFiles = [];
 
@@ -263,9 +263,10 @@
           if (! _isSkipColumns){
             $(_iterable).each(function (cnt, item) {
               if (_this.options.serverType == "SOLR") {
-                if (!item.isCoreOnly){
-                  _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa '+ _ico +'"></i> ' + item.name + '</li>');
+                if (item.isConfig) {
+                  _ico = 'fa-cogs';
                 }
+                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa '+ _ico +'"></i> ' + item.name + '</li>');
               }
               else {
                 _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
@@ -280,8 +281,13 @@
               var item = $(this).text().trim();
               var path = autocompleteUrl.substring(BASE_PATH.length);
 
-              if ($(this).html().indexOf("search") > -1) {
-                _el.val("collections." + item);
+              if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cogs") > -1) {
+                if ($(this).html().indexOf("search") > -1){
+                  _el.val("collections." + item);
+                }
+                else {
+                  _el.val("configs." + item);
+                }
                 _this.options.onPathChange(_el.val());
                 $("#jHueGenericAutocomplete").hide();
                 _hiveAutocompleteSelectedIndex = -1;

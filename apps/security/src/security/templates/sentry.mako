@@ -75,7 +75,7 @@ ${ layout.menubar(section=component) }
     <!-- /ko -->
 
     <!-- ko if: $root.component() == 'solr' -->
-      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection name <CTRL+SPACE>">
+      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection or config name <CTRL+SPACE>">
       <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions, value: $data.action, enable: (privilegeType() == 'COLLECTION')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 

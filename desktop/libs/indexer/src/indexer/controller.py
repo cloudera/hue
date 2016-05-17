@@ -106,6 +106,18 @@ class CollectionManagerController(object):
     solr_cores.update(solr_aliases)
     return solr_cores
 
+  def get_autocomplete(self):
+    autocomplete = {}
+    try:
+      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+      autocomplete['collections'] = api.collections2()
+      autocomplete['configs'] = api.configs()
+
+    except Exception, e:
+      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+
+    return autocomplete
+
   def get_fields(self, collection_or_core_name):
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
