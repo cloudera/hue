@@ -2594,7 +2594,14 @@
 
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
-      langTools.addCompleter(snippet.autocompleter);
+
+      editor.on("focus", function () {
+        editor.completers.length = 0;
+        editor.completers.push(langTools.snippetCompleter);
+        editor.completers.push(langTools.textCompleter);
+        editor.completers.push(langTools.keyWordCompleter);
+        editor.completers.push(snippet.autocompleter);
+      });
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
