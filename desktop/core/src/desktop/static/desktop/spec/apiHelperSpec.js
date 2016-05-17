@@ -28,5 +28,31 @@ define([
       var otherHelper = ApiHelper.getInstance();
       expect(subject == otherHelper).toBeTruthy();
     });
+
+    describe("success response that is actually an error", function () {
+      it("should not determine that a success response is an error response if status is 0", function () {
+        expect(subject.successResponseIsError({ status: 0 })).toBeFalsy();
+      });
+
+      it("should determine that a success response is an error response if status is -1", function () {
+        expect(subject.successResponseIsError({ status: -1 })).toBeTruthy();
+      });
+
+      it("should determine that a success response is an error response if status is 500", function () {
+        expect(subject.successResponseIsError({ status: 500 })).toBeTruthy();
+      });
+
+      it("should determine that a success response is an error response if code is 500", function () {
+        expect(subject.successResponseIsError({ code: 500 })).toBeTruthy();
+      });
+
+      it("should determine that a success response is an error response if code is 503", function () {
+        expect(subject.successResponseIsError({ code: 503 })).toBeTruthy();
+      });
+
+      it("should determine that a success response is an error response if it contains traceback", function () {
+        expect(subject.successResponseIsError({ traceback: {} })).toBeTruthy();
+      });
+    });
   });
 });
