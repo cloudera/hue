@@ -657,7 +657,12 @@ var Assist = function (vm, initial) {
       self.updatePathProperty(self.growingTree(), obj.path(), "isExpanded", obj.isExpanded());
     }
 
-    self.path(obj.path());
+    if (vm.component() === 'solr' && obj.path() !== '' && obj.path().indexOf('.') == -1) {
+      self.path(obj.path() + '.*');
+    }
+    else {
+      self.path(obj.path());
+    }
     $(document).trigger("changed.path");
 
     if (self.getTreeAdditionalDataForPath(obj.path()).loaded){
@@ -781,6 +786,10 @@ var Assist = function (vm, initial) {
 
   self.fetchAuthorizablesPath = function (optionalPath, loadCallback) {
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
+
+    if (vm.component() === 'solr' && _originalPath.indexOf('.*') > -1) {
+      _originalPath = _originalPath.split('.')[0];
+    }
 
     if (_originalPath.split(".").length < 4) {
       self.isLoadingTree(true);
