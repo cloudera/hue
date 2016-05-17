@@ -84,7 +84,10 @@ from desktop.views import _ko
       <div class="arrow" data-bind="style: { 'top': $parent.popoverArrowTop() + 'px'}"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: $parent.toggleStats"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType && !isView, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a> <i data-bind="visible: loadingStats" class='fa fa-spinner fa-spin'></i>
+        <!-- ko if: activeTab() === 'analysis' && !isComplexType && !isView -->
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
+        <!-- /ko -->
+        <i data-bind="visible: loadingStats" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
         <strong class="table-name" data-bind="text: table"></strong> ${ _(' table') }
         <!-- /ko -->
