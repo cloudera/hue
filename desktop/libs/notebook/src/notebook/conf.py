@@ -87,14 +87,14 @@ ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
   type=bool,
-  default=True
+  default=False
 )
 
 ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
   type=bool,
-  default=True
+  default=False
 )
 
 GITHUB_REMOTE_URL = Config(
