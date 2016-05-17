@@ -357,22 +357,22 @@ ${ layout.menubar(section=component) }
                       <i class="fa fa-plus"></i> ${ _('Add a group') }
                     </span>
                   </a>
+                  <div data-bind="visible: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles())">
+                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', onBlur: function(){ showEditGroups(false); } }" size="5" multiple="true" style="width: 400px"></select>
+                    &nbsp;
+                    <a class="pointer" data-bind="visible: groupsChanged() && !$root.isLoadingRoles(), click: resetGroups">
+                      <i class="fa fa-undo"></i>
+                    </a>
+                    <a class="pointer" data-bind="visible: groupsChanged() && !$root.isLoadingRoles(), click: saveGroups">
+                      <i class="fa fa-save"></i>
+                    </a>
+                  </div>
                   <!-- /ko -->
                   <!-- ko ifnot: $root.is_sentry_admin -->
                     <span data-bind="foreach: groups">
                       <span data-bind="text: $data"></span>
                     </span>
                   <!-- /ko -->
-                  <div data-bind="visible: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles())">
-                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', onBlur: function(){ showEditGroups(false); } }" size="5" multiple="true" style="width: 400px"></select>
-                    &nbsp;
-                    <a class="pointer" data-bind="visible: groupsChanged() && ! $root.isLoadingRoles(), click: resetGroups">
-                      <i class="fa fa-undo"></i>
-                    </a>
-                    <a class="pointer" data-bind="visible: groupsChanged && ! $root.isLoadingRoles(), click: saveGroups">
-                      <i class="fa fa-save"></i>
-                    </a>
-                  </div>
                 </td>
                 <td>
                 </td>
