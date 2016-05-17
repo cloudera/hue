@@ -92,12 +92,25 @@ var Privilege = function (vm, privilege) {
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
-      var path = $.map(self.authorizables(), function(authorizable) {
-        if (authorizable.name_() !== ''){
-          return authorizable.name_();
-        }
-      }).join(".");
-      return path;
+      if (vm.component() == 'solr') {
+        return $.map(self.authorizables(), function (authorizable) {
+          if (authorizable.name_() !== '') {
+            if (authorizable.type() === 'COLLECTION') {
+              return 'collections.' + authorizable.name_();
+            }
+            else {
+              return 'configs.' + authorizable.name_();
+            }
+          }
+        }).join("");
+      }
+      else {
+        return $.map(self.authorizables(), function (authorizable) {
+          if (authorizable.name_() !== '') {
+            return authorizable.name_();
+          }
+        }).join(".");
+      }
     },
     write: function (value) {
       var _parts = value.split(".");
@@ -246,7 +259,11 @@ var Role = function (vm, role) {
   }
 
   self.addPrivilege = function () {
-    self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
+    var privilege = new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true});
+    if (vm.assist.path()) {
+      privilege.path(vm.assist.path());
+    }
+    self.privileges.push(privilege);
   }
 
   self.resetGroups = function () {
