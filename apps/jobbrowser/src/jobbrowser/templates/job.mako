@@ -231,6 +231,10 @@ ${ comps.menubar() }
           <li class="white truncate" title="${job.applicationType or 'MR2'}">${job.applicationType or 'MR2'}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
+          % if job.conf_keys is not None and 'hive.server2.proxy.user' in job.conf_keys:
+          <li class="nav-header">${_('Proxy User')}</li>
+          <li class="white">${job.conf_keys['hive.server2.proxy.user']}</li>
+          % endif
           <li class="nav-header">${_('Status')}</li>
           <li class="white" id="jobStatus">&nbsp;</li>
           <li class="nav-header">${_('Logs')}</li>
