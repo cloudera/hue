@@ -33,8 +33,7 @@
       "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "selectedStatement", "user",
       "availableDatabases", "hasProperties", "aceMode", "snippetImage", "errorLoadingQueries",
       "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta", "cleanedNumericMeta",
-      "dependents", "canWrite",
-      "filteredHistory", "queries"
+      "dependents", "canWrite", "queries"
     ]
   };
 
@@ -1068,11 +1067,10 @@
     self.historyFilter = ko.observable('');
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: 300 });
-    self.filteredHistory = ko.computed(function () {
-      return ko.utils.arrayFilter(self.history(), function (item) {
-        return item.name().toLowerCase().indexOf(self.historyFilter()) > -1 || item.query().toLowerCase().indexOf(self.historyFilter()) > -1
-      });
+    self.historyFilter.subscribe(function(val){
+      self.fetchHistory();
     });
+
     self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
     self.getSession = function (session_type) {
@@ -1374,7 +1372,8 @@
       self.loadingHistory(true);
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
-        limit: 50
+        limit: 50,
+        doc_text: self.historyFilter()
       }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
