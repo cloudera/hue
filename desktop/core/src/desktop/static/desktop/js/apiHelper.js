@@ -132,7 +132,12 @@
    * @returns {boolean} - True if actually an error
    */
   ApiHelper.prototype.successResponseIsError = function (response) {
-    return typeof response !== 'undefined' && (response.status === -1 || response.status === 500 || response.code === 503 || response.code === 500);
+    return typeof response !== 'undefined' && (
+        typeof response.traceback !== 'undefined' ||
+        response.status === -1 ||
+        response.status === 500 ||
+        response.code === 503 ||
+        response.code === 500);
   };
 
   /**
