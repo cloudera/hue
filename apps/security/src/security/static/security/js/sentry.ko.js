@@ -138,8 +138,8 @@ var Privilege = function (vm, privilege) {
   });
 
   self.indexerPath = ko.computed(function () {
-    if (self.authorizables()[1] && self.authorizables()[1]['type'] == 'TABLE') {
-      return '/indexer/#edit/' + self.authorizables()[1];
+    if (self.authorizables().length > 0 && self.authorizables()[0].type() == 'COLLECTION') {
+      return '/indexer/#edit/' + self.authorizables()[0].name_();
     }
     else {
       return '/indexer/#manage';
