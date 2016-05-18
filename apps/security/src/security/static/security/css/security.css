@@ -323,3 +323,8 @@ h1.emptyMessage {
   margin-right: 6px;
   margin-top: 7px;
 }
+
+.typeahead.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
