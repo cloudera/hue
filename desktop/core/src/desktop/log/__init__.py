@@ -190,7 +190,7 @@ def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
   from log_buffer import FixedBufferHandler
 
-  BUFFER_SIZE = 10 * 1024 * 1024 # This is the size in characters, not bytes
+  BUFFER_SIZE = 500 * 200 # This is the size in characters, not bytes. Targets about 500 rows.
   buffer_handler = FixedBufferHandler(BUFFER_SIZE)
   _formatter = formatter.Formatter(LOG_FORMAT, DATE_FORMAT)
 
