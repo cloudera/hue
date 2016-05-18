@@ -144,7 +144,12 @@ ${ layout.menubar(section=component) }
           <!-- ko if: $index() > 0 -->
             <i class="fa fa-long-arrow-right"></i>
           <!-- /ko -->
-          <span data-bind="text: type"></span>=<span data-bind="text: name_"></span></span>
+          <!-- ko if: type() == 'COLLECTION' && name_() != '*' -->
+            <span data-bind="text: type"></span>=<a data-bind="attr: { href: $parent.indexerPath() }" target="_blank"><span data-bind="text: name_"></span></a></span>
+          <!-- /ko -->
+          <!-- ko ifnot: type() == 'COLLECTION' && name_() != '*' -->
+            <span data-bind="text: type"></span>=<span data-bind="text: name_"></span></span>
+          <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
