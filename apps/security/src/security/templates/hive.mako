@@ -65,7 +65,7 @@ ${ layout.menubar(section='hive1') }
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
       </a>
     </div>
-    <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
+    <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri', valueUpdate: 'afterkeydown'" placeholder="URI">
 
     <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
 
@@ -347,7 +347,7 @@ ${ layout.menubar(section='hive1') }
                   <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0), visible: $root.is_sentry_admin">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
                     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-                    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+                    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0 && isValid()" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>
@@ -389,8 +389,8 @@ ${ layout.menubar(section='hive1') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}">${ _('Save') }</button>
-    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}"">${ _('Update') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Save') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}"">${ _('Update') }</button>
   </div>
 </div>
 
