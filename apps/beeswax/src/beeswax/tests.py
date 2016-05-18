@@ -2967,18 +2967,18 @@ def test_hiveserver2_get_security():
     # Beeswax
     beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive', 'auth_username': 'hue', 'auth_password': None}
     beeswax_query_server.update(default_query_server)
-    assert_equal((True, 'PLAIN', 'hive', False, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((True, 'PLAIN', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # HiveServer2 LDAP passthrough
     beeswax_query_server.update({'auth_username': 'hueabcd', 'auth_password': 'abcd'})
-    assert_equal((True, 'PLAIN', 'hive', False, 'hueabcd', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((True, 'PLAIN', 'hive', True, 'hueabcd', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
     beeswax_query_server.update({'auth_username': 'hue', 'auth_password': None})
 
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
-    hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
-    assert_equal((False, 'NOSASL', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
+    hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'false'
+    assert_equal((False, 'NOSASL', 'hive', False, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
-    assert_equal((True, 'GSSAPI', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((True, 'GSSAPI', 'hive', False, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # Impala
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
