@@ -129,7 +129,7 @@ def get_hiveserver2_authentication():
   return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
 
 def hiveserver2_impersonation_enabled():
-  return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'FALSE').upper() == 'TRUE'
+  return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'TRUE').upper() == 'TRUE'
 
 def hiveserver2_jdbc_url():
   urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(),
@@ -139,7 +139,7 @@ def hiveserver2_jdbc_url():
             get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH),
             get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD))
   else:
-     return urlbase
+    return urlbase
 
 def hiveserver2_use_ssl():
   return get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE'

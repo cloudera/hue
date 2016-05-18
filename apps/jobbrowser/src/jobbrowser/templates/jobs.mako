@@ -23,7 +23,7 @@
 <%namespace name="components" file="jobbrowser_components.mako" />
 
 ${ commonheader(None, "jobbrowser", user) | n,unicode }
-${ components.menubar() }
+${ components.menubar(hiveserver2_impersonation_enabled) }
 
 <link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">
 
