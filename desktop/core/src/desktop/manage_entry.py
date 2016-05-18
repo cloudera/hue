@@ -34,6 +34,7 @@ def _deprecation_check(arg0):
 def entry():
   _deprecation_check(sys.argv[0])
 
+  from django.core.exceptions import ImproperlyConfigured
   from django.core.management import execute_from_command_line, find_commands, find_management_module
   from django.core.management import LaxOptionParser
   from django.core.management.base import BaseCommand
@@ -50,12 +51,17 @@ def entry():
   else:
     prof_id = str(os.getpid())
 
-  # Let django handle the normal execution
-  if os.getenv("DESKTOP_PROFILE"):
-    _profile(prof_id, lambda: execute_from_command_line(sys.argv))
-  else:
-    execute_from_command_line(sys.argv)
-
+  try:
+    # Let django handle the normal execution
+    if os.getenv("DESKTOP_PROFILE"):
+      _profile(prof_id, lambda: execute_from_command_line(sys.argv))
+    else:
+      execute_from_command_line(sys.argv)
+  except ImproperlyConfigured, e:
+    if len(sys.argv) > 1 and sys.argv[1] == 'is_db_alive' and 'oracle' in str(e).lower():
+      sys.exit(3)
+    else:
+      raise e
 
 def _profile(prof_id, func):
   """
