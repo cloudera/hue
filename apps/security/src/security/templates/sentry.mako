@@ -747,12 +747,16 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
-      $("#createRoleModal").on("hidden", function () {
+      $("#createRoleModal").on("show", function () {
+        $(document).trigger("create.typeahead");
+      });
+
+      $("#createRoleModal").on("hide", function () {
         $('#jHueGenericAutocomplete').hide();
         viewModel.resetCreateRole();
       });
 
-      $("#grantPrivilegeModal").on("hidden", function () {
+      $("#grantPrivilegeModal").on("hide", function () {
         viewModel.clearTempRoles();
       });
 
@@ -790,21 +794,27 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.isApplyingBulk(false);
       });
 
-      $(document).on("create.typeahead", function(){
+      $(document).on("create.typeahead", function () {
         $("#createRoleName").typeahead({
-            source: function (query) {
-              var _options = [];
-              viewModel.selectableRoles().forEach(function(item){
-                if (item.toLowerCase().indexOf(query.toLowerCase()) > -1){
-                  _options.push(item);
-                }
-              });
-              return _options;
-            },
-            'updater': function(item) {
-                return item;
-            }
+          source: function (query) {
+            var _options = [];
+            viewModel.selectableRoles().forEach(function (item) {
+              if (item.toLowerCase().indexOf(query.toLowerCase()) > -1) {
+                _options.push(item);
+              }
+            });
+            return _options;
+          },
+          minLength: 0,
+          'updater': function (item) {
+            return item;
+          }
         });
+      });
+      $(document).on('focus', '#createRoleName', function () {
+        if ($("#createRoleName").data('typeahead')){
+          $("#createRoleName").data('typeahead').lookup();
+        }
       });
       $(document).on("destroy.typeahead", function(){
         $('.typeahead').unbind();
