@@ -243,7 +243,10 @@ var Role = function (vm, role) {
     }
     else {
       var _filtered = ko.utils.arrayFilter(self.privileges(), function (priv) {
-        return priv.dbName().toLowerCase().indexOf(_filter) > -1 || priv.tableName().toLowerCase().indexOf(_filter) > -1 || priv.action().toLowerCase().indexOf(_filter) > -1;
+        return $.grep(priv.authorizables(), function(auth) {
+            return auth.name_().toLowerCase().indexOf(_filter) > -1;
+        }).length > 0 ||
+        priv.action().toLowerCase().indexOf(_filter) > -1;
       });
       return _filtered.slice(0, self.privilegesForViewTo());
     }
