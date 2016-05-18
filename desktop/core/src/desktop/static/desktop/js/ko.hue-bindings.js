@@ -2278,6 +2278,7 @@
   ko.bindingHandlers.filechooser = {
     init: function (element, valueAccessor, allBindingsAccessor, vm) {
       var self = $(element);
+      var options = ko.unwrap(allBindingsAccessor());
       self.attr("autocomplete", "off");
       if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
         self.val(valueAccessor().value ? valueAccessor().value(): valueAccessor()());
@@ -2304,12 +2305,28 @@
           }
           self.attr("data-original-title", self.data("fullPath"));
         });
+
+        if (options.valueUpdate && options.valueUpdate === 'afterkeydown') {
+          self.on('keyup', function () {
+            if (valueAccessor().value){
+              valueAccessor().value(self.val());
+            }
+            else {
+              valueAccessor()(self.val());
+            }
+          });
+        }
       }
       else {
         self.val(valueAccessor());
         self.on("blur", function () {
           valueAccessor(self.val());
         });
+        if (options.valueUpdate && options.valueUpdate === 'afterkeydown') {
+          self.on('keyup', function () {
+            valueAccessor(self.val());
+          });
+        }
       }
 
       self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal));
