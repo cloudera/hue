@@ -15,10 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-import time
 import logging
+import re
 import string
+import time
+import urllib2
 import urlparse
 
 from urllib import quote_plus
@@ -42,15 +43,19 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 from hadoop.yarn.clients import get_log_client
 import hadoop.yarn.resource_manager_api as resource_manager_api
 
+LOG = logging.getLogger(__name__)
+
+
+try:
+  from beeswax.hive_site import hiveserver2_impersonation_enabled
+except:
+  LOG.warn('Hive is not enabled')
+  def hiveserver2_impersonation_enabled(): return True
+
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs, can_kill_job
 from jobbrowser.yarn_models import Application
-
-import urllib2
-
-
-LOG = logging.getLogger(__name__)
 
 
 def check_job_permission(view_func):
@@ -131,7 +136,8 @@ def jobs(request):
     'text_filter': text,
     'retired': retired,
     'filtered': not (state == 'all' and user == '' and text == ''),
-    'is_yarn': cluster.is_yarn()
+    'is_yarn': cluster.is_yarn(),
+    'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
   })
 
 def massage_job_for_json(job, request):
