@@ -93,6 +93,7 @@ class Command(NoArgsCommand):
       error = str(e)
 
       # Oracle
+      # Note: we catch missing Oracle_cx module in manage_entry.py
       if 'ORA-12545' in error: # Connect failed because target host or object does not exist
         sys.exit(5)
       elif 'ORA-12541' in error: # TNS:no listener
