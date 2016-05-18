@@ -100,9 +100,9 @@ ${layout.menubar(section='log_view')}
     var self = this;
 
     self.forcedDebug = ko.observable();
-    self.forcedDebug.subscribe(function(newValue) {
-      if (newValue != null) {
-        self.toggleLogLevel();
+    self.forcedDebug.subscribe(function(oldValue) {
+      if (oldValue != null) {
+        self.setLogLevel(! oldValue);
       }
     }, this, "beforeChange");
 
@@ -110,9 +110,9 @@ ${layout.menubar(section='log_view')}
       $.get("/desktop/get_debug_level", function(data) { self.forcedDebug(data.debug_all); });
     };
 
-    self.toggleLogLevel = function() {
+    self.setLogLevel = function(set_debug) {
       var _url = "";
-      if (self.forcedDebug()) {
+      if (set_debug) {
         _url = "/desktop/set_all_debug";
       } else {
         _url = "/desktop/reset_all_debug";
