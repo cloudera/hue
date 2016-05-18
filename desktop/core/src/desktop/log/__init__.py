@@ -202,14 +202,13 @@ def fancy_logging():
 
 
 def get_all_debug():
-  from desktop.settings import ENV_DESKTOP_DEBUG # Circular dependency
   global FORCE_DEBUG
 
-  return FORCE_DEBUG or os.getenv(ENV_DESKTOP_DEBUG) != None
+  return FORCE_DEBUG
 
 
 def set_all_debug():
-  from desktop.settings import ENV_DESKTOP_DEBUG, ENV_HUE_PROCESS_NAME # Circular dependency
+  from desktop.settings import ENV_HUE_PROCESS_NAME # Circular dependency
   global FORCE_DEBUG
 
   FORCE_DEBUG = True
@@ -218,7 +217,7 @@ def set_all_debug():
 
 
 def reset_all_debug():
-  from desktop.settings import ENV_DESKTOP_DEBUG, ENV_HUE_PROCESS_NAME # Circular dependency
+  from desktop.settings import ENV_HUE_PROCESS_NAME # Circular dependency
   global FORCE_DEBUG
 
   FORCE_DEBUG = False
