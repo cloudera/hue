@@ -263,7 +263,7 @@ ${ layout.menubar(section='hive1') }
           <div data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <%actionbar:render>
               <%def name="search()">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search roles by name, groups, etc...')}" data-bind="value: $root.roleFilter, valueUpdate: 'afterkeydown'">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search roles by name, groups, etc...')}" data-bind="clearable: $root.roleFilter, valueUpdate: 'afterkeydown'">
               </%def>
 
               <%def name="actions()">
