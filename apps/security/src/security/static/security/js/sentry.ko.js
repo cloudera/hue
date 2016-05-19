@@ -224,6 +224,11 @@ var Role = function (vm, role) {
 
   self.showEditGroups = ko.observable(false);
   self.isEditing = ko.observable(false);
+  self.isValid = ko.computed(function () {
+    return $.grep(self.privileges(), function (privilege) {
+      return privilege.path() === '';
+    }).length === 0;
+  });
 
   self.privilegesChanged = ko.computed(function () {
     return $.grep(self.privileges(), function (privilege) {
@@ -301,44 +306,48 @@ var Role = function (vm, role) {
 
   self.create = function () {
     $(".jHueNotify").hide();
-    $.post("/security/api/sentry/create_role", {
-      role: ko.mapping.toJSON(self),
-      component: vm.component()
-    }, function (data) {
-      if (data.status == 0) {
-        $(document).trigger("info", data.message);
-        vm.showCreateRole(false);
-        self.reset();
-        var role = new Role(vm, data.role);
-        role.showPrivileges(true);
-        vm.originalRoles.unshift(role);
-        vm.list_sentry_privileges_by_authorizable();
-        $(document).trigger("created.role");
-      } else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+    if (self.isValid()) {
+      $.post("/security/api/sentry/create_role", {
+        role: ko.mapping.toJSON(self),
+        component: vm.component()
+      }, function (data) {
+        if (data.status == 0) {
+          $(document).trigger("info", data.message);
+          vm.showCreateRole(false);
+          self.reset();
+          var role = new Role(vm, data.role);
+          role.showPrivileges(true);
+          vm.originalRoles.unshift(role);
+          vm.list_sentry_privileges_by_authorizable();
+          $(document).trigger("created.role");
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   }
 
   self.update = function () {
     $(".jHueNotify").hide();
-    $.post("/security/api/sentry/save_privileges", {
-      role: ko.mapping.toJSON(self),
-      component: vm.component()
-    }, function (data) {
-      if (data.status == 0) {
-        $(document).trigger("info", data.message);
-        vm.showCreateRole(false);
-        vm.list_sentry_privileges_by_authorizable();
-        $(document).trigger("created.role");
-      } else {
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    });
+    if (self.isValid()) {
+      $.post("/security/api/sentry/save_privileges", {
+        role: ko.mapping.toJSON(self),
+        component: vm.component()
+      }, function (data) {
+        if (data.status == 0) {
+          $(document).trigger("info", data.message);
+          vm.showCreateRole(false);
+          vm.list_sentry_privileges_by_authorizable();
+          $(document).trigger("created.role");
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   }
 
   self.remove = function (role) {
