@@ -64,6 +64,9 @@
         return item.name != ''
       });
     });
+    self.hasManyColumns = ko.computed(function () {
+      return self.meta() && self.meta().length > 300;
+    });
     self.fetchedOnce = ko.observable(typeof result.fetchedOnce != "undefined" && result.fetchedOnce != null ? result.fetchedOnce : false);
     self.startTime = ko.observable(typeof result.startTime != "undefined" && result.startTime != null ? new Date(result.startTime) : new Date());
     self.endTime = ko.observable(typeof result.endTime != "undefined" && result.endTime != null ? new Date(result.endTime) : new Date());
