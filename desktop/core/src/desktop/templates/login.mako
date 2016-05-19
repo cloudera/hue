@@ -27,14 +27,14 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <style type="text/css">
   body {
-    background-color: #EEE;
+    background-color: #FAFAFA;
     padding-top: 150px;
   }
 </style>
 
 
-<div class="container">
-  <div class="row">
+<div class="container-fluid">
+  <div class="row-fluid">
     <div class="login-box">
       <form method="POST" action="${action}">
       ${ csrf_token(request) | n,unicode }
@@ -48,7 +48,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
         %endif
       </div>
 
-      <div class="logo"><img src="${ static('desktop/art/hue-login-white.png') }" width="50" height="50" /> </div>
+      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="50" height="50"></div>
 
       <div class="login-content">
 
