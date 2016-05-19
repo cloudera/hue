@@ -164,7 +164,8 @@ def dt_login(request, from_modal=False):
     ensure_home_directory(request.fs, user.username)
     return HttpResponseRedirect(redirect_to)
 
-  request.session.set_test_cookie()
+  if not from_modal:
+    request.session.set_test_cookie()
 
   renderable_path = 'login.mako'
   if from_modal:
