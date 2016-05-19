@@ -271,7 +271,7 @@ var Role = function (vm, role) {
 
   self.addPrivilege = function () {
     var privilege = new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true});
-    if (vm.assist.path()) {
+    if (vm.assist.path() && vm.getSectionHash() == 'edit') {
       privilege.path(vm.assist.path());
     }
     self.privileges.push(privilege);
