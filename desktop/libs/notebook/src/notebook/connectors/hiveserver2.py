@@ -295,6 +295,8 @@ class HS2Api(Api):
     try:
       db = self._get_db(snippet)
       handle = self._get_handle(snippet)
+      # Test handle to verify still valid
+      db.get_state(handle)
       return data_export.download(handle, format, db)
     except Exception, e:
       LOG.exception('error downloading notebook')
