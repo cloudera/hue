@@ -225,6 +225,7 @@
       }
     };
 
+    // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
 
     self.errorLoadingQueries = ko.observable(false);
@@ -233,7 +234,7 @@
     self.queriesHasErrors = ko.observable(false);
     self.queriesCurrentPage = ko.observable(1);
     self.queriesTotalPages = ko.observable(1);
-    self.queries = ko.observableArray();
+    self.queries = ko.observableArray([]);
 
     self.queriesFilter = ko.observable('');
     self.queriesFilterVisible = ko.observable(false);
@@ -289,9 +290,6 @@
         fetchQueries();
       }
     };
-
-    huePubSub.subscribe('fetch.queries.after.save', fetchQueries);
-
 
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
@@ -1106,12 +1104,17 @@
     self.unloaded = ko.observable(false);
     self.unload = function() {
       self.unloaded(true);
+      var currentQueries = null;
       self.snippets().forEach(function(snippet){
         if (snippet.checkStatusTimeout != null) {
           clearTimeout(snippet.checkStatusTimeout);
           snippet.checkStatusTimeout = null;
         }
+        if (currentQueries == null) {
+          currentQueries = snippet.queries();
+        }
       });
+      return currentQueries;
     }
 
     self.restartSession = function (session, callback) {
@@ -1685,13 +1688,18 @@
     };
 
     self.loadNotebook = function (notebook, queryTab) {
+      var currentQueries;
       if (self.selectedNotebook() != null) {
-        self.selectedNotebook().unload();
+        currentQueries = self.selectedNotebook().unload();
       }
 
       var notebook = new Notebook(self, notebook);
+
       if (notebook.snippets().length > 0) {
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
+        if (currentQueries != null) {
+          notebook.snippets()[0].queries(currentQueries);
+        }
         notebook.snippets().forEach(function (snippet) {
           snippet.statement_raw.valueHasMutated();
           if (snippet.result.handle().statements_count > 1 && snippet.result.handle().start != null && snippet.result.handle().end != null) {
@@ -1713,13 +1721,11 @@
             chartScatterSize: typeof snippet.chartScatterSize() !== "undefined" ? snippet.chartScatterSize() : snippet.previousChartOptions.chartScatterSize
           };
         });
+
         if (notebook.snippets()[0].result.data().length > 0) {
           $(document).trigger("redrawResults");
-        }
-        else {
-          if (queryTab){
-            notebook.snippets()[0].currentQueryTab(queryTab);
-          }
+        } else if (queryTab) {
+          notebook.snippets()[0].currentQueryTab(queryTab);
         }
       }
       self.selectedNotebook(notebook);
