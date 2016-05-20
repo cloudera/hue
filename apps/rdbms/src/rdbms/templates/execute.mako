@@ -853,7 +853,6 @@ ${ commonshare() | n,unicode }
     $("#executeQuery").button("loading");
   }
 
-
   function addResults(viewModel, dataTable, index, pageSize) {
     $.each(viewModel.rows.slice(index, index + pageSize), function (row_index, row) {
       var ordered_row = [];
