@@ -398,6 +398,9 @@ def import_documents(request):
   uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
 
   for doc in documents:
+    # Remove any deprecated fields
+    if 'tags' in doc['fields']:
+      doc['fields'].pop('tags')
 
     # If doc is not owned by current user, make a copy of the document with current user as owner
     if doc['fields']['owner'][0] != request.user.username:
@@ -466,15 +469,19 @@ def _copy_document_with_owner(doc, owner, uuids_map):
   doc['fields']['uuid'] = uuids_map[old_uuid]
 
   # Remap parent directory if needed
-  parent_uuid = doc['fields']['parent_directory'][0]
-  if parent_uuid not in uuids_map.keys():
-    LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
-             parent_uuid)
-    doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
-  else:
+  parent_uuid = None
+  if 'parent_directory' in doc['fields']:
+    parent_uuid = doc['fields']['parent_directory'][0]
+
+  if parent_uuid is not None and parent_uuid in uuids_map.keys():
     if uuids_map[parent_uuid] is None:
       uuids_map[parent_uuid] = uuid_default()
     doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
+  else:
+    if parent_uuid is not None:
+      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
+                parent_uuid)
+    doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
 
   # Remap dependencies if needed
   idx = 0
