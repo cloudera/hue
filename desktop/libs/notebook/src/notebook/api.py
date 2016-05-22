@@ -303,7 +303,7 @@ def save_notebook(request):
   notebook_doc1.save()
 
   response['status'] = 0
-  response['id'] = notebook_doc.id
+  response.update(notebook_doc.to_dict())
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
