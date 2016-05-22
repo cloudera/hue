@@ -1,7 +1,7 @@
-Welcome to Livy, the REST Spark Server
-======================================
+Welcome to Livy
+===============
 
-Livy is an open source REST interface for interacting with Spark from anywhere. It supports executing snippets of code or programs in a Spark context that runs locally or in YARN.
+Livy is an open source REST interface for interacting with Apache Spark from anywhere. It supports executing snippets of code or programs in a Spark context that runs locally or in YARN.
 
 * Interactive Scala, Python and R shells
 * Batch submissions in Scala, Java, Python
