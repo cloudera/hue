@@ -100,7 +100,7 @@ class HiveConfiguration(object):
       "key": "settings",
       "help_text": _("Hive and Hadoop configuration properties."),
       "type": "settings",
-      "options": [config.lower() for config in hive_settings.get()]
+      "options": [config.lower() for config in hive_settings.get()] if hasattr(hive_settings, 'get') else []
     }
   ]
 
@@ -118,7 +118,7 @@ class ImpalaConfiguration(object):
       "key": "settings",
       "help_text": _("Impala configuration properties."),
       "type": "settings",
-      "options": [config.lower() for config in impala_settings.get()] if impala_settings is not None else []
+      "options": [config.lower() for config in impala_settings.get()] if impala_settings else []
     }
   ]
 
