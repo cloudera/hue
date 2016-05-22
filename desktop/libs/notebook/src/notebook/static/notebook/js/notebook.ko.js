@@ -1300,7 +1300,13 @@
           self.isHistory(false);
           $(document).trigger("info", data.message);
           if (vm.editorMode) {
-            huePubSub.publish('fetch.queries.after.save');
+            self.snippets()[0].queries.unshift({
+                'uuid': data.uuid,
+                'name': data.name,
+                'description': data.description,
+                'owner': data.owner,
+                'last_modified': data.last_modified
+            });
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
           else {
