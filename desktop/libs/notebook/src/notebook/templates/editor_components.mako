@@ -1512,7 +1512,7 @@ ${ hueIcons.symbols() }
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': ($index() == 0 ? '1%' : ''), title: $data.type }"></th>
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: cssClass, attr: {'width': ($index() == 0 ? '1%' : ''), title: $data.type }"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -2221,18 +2221,6 @@ ${ hueIcons.symbols() }
         scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
       }, 300);
     }
-  }
-
-  function isNumericColumn(type) {
-    return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
-  }
-
-  function isDateTimeColumn(type) {
-    return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
-  }
-
-  function isStringColumn(type) {
-    return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
 
   function pieChartDataTransformer(rawDatum) {
