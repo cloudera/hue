@@ -79,10 +79,14 @@ class Submission(object):
 
     if local_tz and isinstance(self.job.data, dict):
       local_tz = self.job.data.get('properties')['timezone']
-    if 'start_date' in self.properties:
-      properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
-    if 'end_date' in self.properties:
-      properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
+
+    # Modify start_date & end_date only when it's a coordinator
+    from oozie.models2 import Coordinator
+    if type(self.job) is Coordinator:
+      if 'start_date' in self.properties:
+        properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
+      if 'end_date' in self.properties:
+        properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
 
     self.properties['security_enabled'] = self.api.security_enabled
 
