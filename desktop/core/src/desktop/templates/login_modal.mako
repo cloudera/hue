@@ -33,7 +33,7 @@
       <h2>${_('Sign in to continue to use Hue')}</h2>
     </div>
 
-    <div class="logo"><img src="${ static('desktop/art/hue-login-white.png') }" width="50" height="50" /> </div>
+    <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="50" height="50"></div>
 
     <div class="login-content">
 
