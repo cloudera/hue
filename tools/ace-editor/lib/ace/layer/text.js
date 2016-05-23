@@ -335,9 +335,12 @@ var Text = function(parentEl) {
                 // normally escaping this is not needed, but xml documents throw error when setting innerHTML to ]]>
                 return "&#62;";
             } else if (c == "\t") {
-                var tabSize = self.session.getScreenTabSize(screenColumn + tabIdx);
-                screenColumn += tabSize - 1;
-                return self.$tabStrings[tabSize];
+                if (typeof self.session !== 'undefined') {
+                    var tabSize = self.session.getScreenTabSize(screenColumn + tabIdx);
+                    screenColumn += tabSize - 1;
+                    return self.$tabStrings[tabSize];
+                }
+                return "<span class='ace_invisible ace_invisible_tab'>&#9;</span>";
             } else if (c == "\u3000") {
                 // U+3000 is both invisible AND full-width, so must be handled uniquely
                 var classToUse = self.showInvisibles ? "ace_cjk ace_invisible ace_invisible_space" : "ace_cjk";
