@@ -888,6 +888,7 @@ ${ tableStats.tableStats() }
   .left-panel {
     position: fixed !important;
     z-index: 1030;
+    outline: none !important;
   }
 
   .mega-popover .popover-content {
@@ -915,6 +916,7 @@ ${ tableStats.tableStats() }
 
   .right-panel {
     position: absolute;
+    outline: none !important;
   }
 
   #chooseFile, #chooseFolder, #choosePath {
