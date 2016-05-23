@@ -1912,6 +1912,7 @@ class ForkNode(Action):
 
 class HiveDocumentAction(Action):
   TYPE = 'hive-document'
+  DEFAULT_CREDENTIALS = 'hive2'
   FIELDS = {
      'uuid': {
           'name': 'uuid',
