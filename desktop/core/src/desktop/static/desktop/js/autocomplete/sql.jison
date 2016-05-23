@@ -14,19 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+%{
+  parser.yy.result = {};
+%}
+
 %lex
+%options case-insensitive
 %%
 
-\s+                       { /* skip whitespace */ }
-'|CURSOR|'                { return '|CURSOR|'; }
-[Ss][Ee][Ll][Ee][Cc][Tt]  { return 'SELECT'; }
-[Uu][Ss][Ee]              { return 'USE'; }
-[Ff][Rr][Oo][Mm]          { return 'FROM'; }
-[a-zA-Z0-9_]*\b           { return 'STRING_IDENTIFIER'; }
-','                       { return ','; }
-'*'                       { return '*'; }
-';'                       { return ';'; }
-<<EOF>>                   { return 'EOF'; }
+'|CURSOR|'                          { parser.yy.cursorFound = true; return 'CURSOR'; }
+'|PARTIAL_CURSOR|'                  { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+
+[A-Za-z][A-Za-z0-9_]*               { return 'REGULAR_IDENTIFIER'; }
+
+
+[-+&~|^/%*(),.;!]                   { return yytext; }
+
+[ \t\n]                             { /* skip whitespace */ }
+'--'.*                              { /* skip comments */ }
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/] { /* skip comments */ }
+
+<<EOF>>                             { return 'EOF'; }
 
 /lex
 
@@ -35,116 +43,288 @@
 %%
 
 Sql
- : SqlStatements EOF
+ : CleanResults SqlStatements ';' EOF
+   {
+     prioritizeSuggestions();
+     return parser.yy.result;
+   }
+ | CleanResults SqlStatements EOF
+   {
+     prioritizeSuggestions();
+     return parser.yy.result;
+   }
+ ;
+
+CleanResults
+ : /* empty */
+   {
+     parser.yy.result = {};
+     parser.yy.cursorFound = false;
+     delete parser.yy.latestTableReferences;
+   }
  ;
 
 SqlStatements
- : SqlStatement
+ :
  | SqlStatements ';' SqlStatement
  ;
 
-SqlStatement
- : SelectStatement
- | UseStatement
- | STRING_IDENTIFIER '|CURSOR|'
+DirectSqlStatement
+ : DirectSelectStatement ';'
+ ;
+
+CleanReferences
+ : /* empty */
    {
-     return filterStartsWith(adjustKeywordCase(isLowerCase($1), suggestions.statements), $1);
+     delete parser.yy.latestTableReferences;
    }
- | '|CURSOR|'
+ ;
+
+AnyCursor
+ : 'CURSOR'
+ | 'PARTIAL_CURSOR'
+ ;
+
+SqlStatement
+ : UseStatement
+ | QueryExpression
+ | CHARACTER_PRIMARY AnyCursor CHARACTER_PRIMARY
+ | CHARACTER_PRIMARY AnyCursor
    {
-     return adjustKeywordCase(false, suggestions.statements);
+     determineCase($1);
+     suggestKeywords(['SELECT', 'USE']);
+   }
+ | AnyCursor
+   {
+     suggestKeywords(['SELECT', 'USE']);
    }
  ;
 
 UseStatement
-  : 'USE' STRING_IDENTIFIER ';'
-  ;
-
-SelectStatement
- : 'SELECT' SelectExpression 'FROM' TableReference ';'
- | 'SELECT' '|CURSOR|'
+ : USE CHARACTER_PRIMARY AnyCursor
    {
-     var tables = parser.yy.callbacks.tableHandler({
-       prependQuestionMark: true,
-       prependFrom: true,
-       lowerCase: isLowerCase($1)
-     });
-
-     var databases = parser.yy.callbacks.databaseHandler({
-       prependQuestionMark: true,
-       prependFrom: true,
-       lowerCase: isLowerCase($1)
-     });
-
-     return tables.concat(databases);
+     determineCase($1);
+     suggestDatabases();
+   }
+ | 'USE' CHARACTER_PRIMARY
+   {
+     determineCase($1);
+     if (! parser.yy.cursorFound) {
+       parser.yy.result.useDatabase = $2;
+     }
+   }
+ | 'USE' AnyCursor
+   {
+     determineCase($1);
+     suggestDatabases();
    }
  ;
 
-SelectExpression
- : SelectExpressionList
- | '*' '|CURSOR|'
+QueryExpression
+ : 'SELECT' SelectList TableExpression
    {
-      var tables = parser.yy.callbacks.tableHandler({
-        prependFrom: true,
-        lowerCase: isLowerCase($1)
-      });
+     determineCase($1);
+     completeSuggestColumns();
+   }
+ | 'SELECT' SelectList
+   {
+     determineCase($1);
+   }
+ ;
 
-      var databases = parser.yy.callbacks.databaseHandler({
-        prependFrom: true,
-        lowerCase: isLowerCase($1)
-      });
+TableExpression
+ : FromClause
+ | FromClause 'PARTIAL_CURSOR'
+   {
+     determineCase($1);
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | FromClause SelectConditionList
+ ;
 
-      return tables.concat(databases);
+FromClause
+ : 'FROM' TableReferenceList
+ ;
+
+SelectConditionList
+ : SelectCondition
+ | SelectConditionList SelectCondition
+ ;
+
+SelectCondition
+ : WhereClause
+ | GroupByClause
+ | OrderByClause
+ | 'CURSOR'
+   {
+     suggestKeywords(['WHERE', 'GROUP BY', 'CLUSTER BY', 'LIMIT']);
+   }
+ ;
+
+WhereClause
+ : 'WHERE' SearchCondition
+ ;
+
+GroupByClause
+ : 'GROUP' 'BY' ColumnList
+ | 'GROUP' 'CURSOR'
+   {
+     suggestKeywords(['BY']);
+   }
+ ;
+
+OrderByClause
+ : 'ORDER' 'BY' ColumnList
+ | 'ORDER' 'CURSOR'
+   {
+     suggestKeywords(['BY']);
+   }
+ ;
+
+SelectList
+ : ColumnList
+   {
+     if ($1 == '|CURSOR|') {
+       parser.yy.result.suggestColumns.includeStar = true;
+     }
+   }
+ | '*' CHARACTER_PRIMARY 'PARTIAL_CURSOR'
+   {
+     suggestTables({ prependFrom: true });
+     suggestDatabases({ prependFrom: true, appendDot: true });
+   }
+ | '*' 'CURSOR'
+   {
+     suggestTables({ prependFrom: true });
+     suggestDatabases({ prependFrom: true, appendDot: true });
    }
  | '*'
  ;
 
-SelectExpressionList
+ColumnList
  : DerivedColumn
- | SelectExpressionList ',' DerivedColumn
+ | ColumnList ',' DerivedColumn
  ;
 
 DerivedColumn
- : STRING_IDENTIFIER
+ : CHARACTER_PRIMARY
+ | CHARACTER_PRIMARY '.' CHARACTER_PRIMARY
+ | CHARACTER_PRIMARY '.' AnyCursor
+ | CHARACTER_PRIMARY 'PARTIAL_CURSOR'
+   {
+     suggestColumns();
+     suggestTables({ prependQuestionMark: true, prependFrom: true });
+     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+   }
+ | 'CURSOR'
+   {
+     suggestColumns();
+     suggestTables({ prependQuestionMark: true, prependFrom: true });
+     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+   }
+ ;
+
+TableReferenceList
+ : TableReference
+ | TableReferenceList ',' TableReference
  ;
 
 TableReference
- : STRING_IDENTIFIER
+ : TablePrimaryOrJoinedTable
+ ;
+
+TablePrimaryOrJoinedTable
+ : TablePrimary
+ | JoinedTable
+ ;
+
+TablePrimary
+ : CHARACTER_PRIMARY
+   {
+     addTableReference({ table: $1 });
+   }
+ | CHARACTER_PRIMARY CHARACTER_PRIMARY
+   {
+     addTableReference({ table: $1, alias: $2 });
+   }
+ | CHARACTER_PRIMARY '.' CHARACTER_PRIMARY
+   {
+     addTableReference({ database: $1, table: $3 });
+   }
+ | CHARACTER_PRIMARY '.' CHARACTER_PRIMARY CHARACTER_PRIMARY
+   {
+     addTableReference({ database: $1, table: $3, alias: $4 });
+   }
+ | CHARACTER_PRIMARY '.' AnyCursor
+   {
+     suggestTables({ database: $1 });
+   }
+ | AnyCursor
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ ;
+
+JoinedTable
+ : TableReference JOIN TableReference JoinSpecification
+ ;
+
+JoinSpecification
+ : JoinCondition
+ ;
+
+JoinCondition
+ : 'ON' SearchCondition
  ;
 
 %%
 
-var suggestions = {
-  statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+var prioritizeSuggestions = function () {
+   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+     if (typeof parser.yy.result.suggestColumns.tables === 'undefined') {
+       delete parser.yy.result.suggestColumns;
+     } else {
+       delete parser.yy.result.suggestTables;
+       delete parser.yy.result.suggestDatabases;
+     }
+   }
 }
 
-var filterStartsWith = function (suggestions, start) {
-  var startLower = start.toLowerCase();
-  return suggestions.filter(function (suggestion) {
-    return suggestion.value.toLowerCase().indexOf(startLower) === 0;
-  });
+var completeSuggestColumns = function () {
+   if (parser.yy.cursorFound &&
+       typeof parser.yy.result.suggestColumns !== 'undefined') {
+     parser.yy.result.suggestColumns.tables = parser.yy.latestTableReferences;
+   }
 }
 
-var adjustKeywordCase = function (lowerCase, suggestions) {
-  if (lowerCase) {
-    suggestions.forEach(function (suggestion) {
-      if (suggestion.meta === 'keyword') {
-        suggestion.value = suggestion.value.toLowerCase();
-      }
-    });
-  } else {
-    suggestions.forEach(function (suggestion) {
-      if (suggestion.meta === 'keyword') {
-        suggestion.value = suggestion.value.toUpperCase();
-      }
-    });
+var addTableReference = function (ref) {
+  if (typeof parser.yy.latestTableReferences === 'undefined') {
+    parser.yy.latestTableReferences = [];
   }
-  return suggestions;
+  parser.yy.latestTableReferences.push(ref);
 }
 
-var isLowerCase = function (text) {
-  return text.toLowerCase() === text;
+var suggestKeywords = function (keywords) {
+  parser.yy.result.suggestKeywords = keywords;
 }
+
+var suggestColumns = function (details) {
+  parser.yy.result.suggestColumns = details || {};
+}
+
+var suggestTables = function (details) {
+  parser.yy.result.suggestTables = details || {};
+}
+
+var suggestDatabases = function (details) {
+  parser.yy.result.suggestDatabases = details || {};
+}
+
+var determineCase = function (text) {
+  parser.yy.result.lowerCase = text.toLowerCase() === text;
+};
 
 /*
  Hive Select syntax from https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select

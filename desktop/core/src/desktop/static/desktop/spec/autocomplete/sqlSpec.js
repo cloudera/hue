@@ -21,30 +21,47 @@ define([
 
   describe("sql.js", function() {
 
-    beforeAll(function() {
+    beforeAll(function () {
       sql.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(testUtils.autocompleteMatcher);
     });
-
-    beforeEach(function () {
-      sql.yy.callbacks = {
-        tableHandler: function () { return []; },
-        databaseHandler: function () { return []; }
-      }
-    });
-
+    
     var assertAutoComplete = function(testDefinition) {
-      var result = sql.parse(testDefinition.beforeCursor + ' |CURSOR| ' + testDefinition.afterCursor);
-      expect(result).toEqualAutocompleteValues(testDefinition.expectedSuggestions);
+      var result = sql.parse(testDefinition.beforeCursor + (testDefinition.beforeCursor.length == 0 || testDefinition.beforeCursor.indexOf(' ', testDefinition.beforeCursor.length - 1) !== -1 ? ' |CURSOR| ' : '|PARTIAL_CURSOR|') + testDefinition.afterCursor);
+      expect(result).toEqual(testDefinition.expectedResult);
     };
 
     it("should suggest keywords for empty statement", function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
-        expectedSuggestions: [ 'SELECT', 'USE' ]
+        expectedResult: {
+          suggestKeywords: [ 'SELECT', 'USE' ]
+        }
+      });
+    });
+
+    it("should suggest keywords after complete statement", function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM bar;',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [ 'SELECT', 'USE' ]
+        }
+      });
+    });
+
+    it("should suggest keywords after complete statements", function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM bar;SELECT * FROM bar;',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [ 'SELECT', 'USE' ]
+        }
       });
     });
 
@@ -52,202 +69,277 @@ define([
       assertAutoComplete({
         beforeCursor: 'se',
         afterCursor: '',
-        expectedSuggestions: [ 'select' ]
+        expectedResult: {
+          lowerCase: true,
+          suggestKeywords: [ 'SELECT', 'USE' ]
+        }
       });
     });
-
-    xit("should return empty suggestions for empty statement", function() {
+    
+    it("should return empty suggestions for bogus statement", function() {
       assertAutoComplete({
-        serverResponses: { },
-        beforeCursor: "",
-        afterCursor: "",
-        expectedSuggestions: []
-      });
-    });
-
-    xit("should return empty suggestions for bogus statement", function() {
-      assertAutoComplete({
-        serverResponses: { },
         beforeCursor: "foo",
         afterCursor: "bar",
-        expectedSuggestions: []
+        expectedResult: { }
       });
     });
 
     describe("database awareness", function() {
-      xit("should suggest databases after use", function () {
+      it("should suggest databases after use", function () {
         assertAutoComplete({
           serverResponses: {},
           beforeCursor: "USE ",
           afterCursor: "",
-          expectedSuggestions: ["database_one", "database_two"]
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: { }
+          }
         });
       });
 
-      xit("should use a use statement before the cursor if present", function () {
+      it("should suggest databases after use with started identifier", function () {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_two" : {
-              tables_meta: [{ name: "otherTable1" }, { name: "otherTable2" }]
-            }
-          },
-          beforeCursor: "USE database_two; \n\tSELECT ",
+          serverResponses: {},
+          beforeCursor: "USE bla",
           afterCursor: "",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: { }
+          }
         });
       });
 
-      xit("should use the last use statement before the cursor if multiple are present", function () {
+      it("should use a use statement before the cursor if present", function () {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/closest_db" : {
-              tables_meta: [{ name: "otherTable1" }, { name:  "otherTable2" }]
+          beforeCursor: "USE database_two; \n\select ",
+          afterCursor: "",
+          expectedResult: {
+            useDatabase: 'database_two',
+            lowerCase: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
             }
-          },
+          }
+        });
+      });
+
+      it("should use the last use statement before the cursor if multiple are present", function () {
+        assertAutoComplete({
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
           afterCursor: "",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
+          expectedResult: {
+            useDatabase: 'closest_db',
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
         });
       });
 
-      xit("should use the use statement before the cursor if multiple are present after the cursor", function () {
+      it("should use the use statement before the cursor if multiple are present after the cursor", function () {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/closest_db" : {
-              tables_meta: [{ name: "otherTable1" }, { name: "otherTable2" }]
-            }
-          },
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
-          afterCursor: "USE some_other_db;",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
+          afterCursor: "; USE some_other_db;",
+          expectedResult: {
+            useDatabase: 'closest_db',
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+    });
+
+    describe('text completer', function () {
+      it('should ignore line comments for local suggestions', function () {
+        assertAutoComplete({
+          beforeCursor: '-- line comment\nSELECT * from testTable1;\n',
+          afterCursor: '\n-- other line comment',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: [ 'SELECT', 'USE' ]
+          }
+        });
+      });
+
+      it('should ignore multi-line comments for local suggestions', function () {
+        assertAutoComplete({
+          beforeCursor: '/* line 1\nline 2\n*/\nSELECT * from testTable1;\n',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: [ 'SELECT', 'USE' ]
+          }
         });
       });
     });
 
     describe("table completion", function() {
       it("should suggest tables after SELECT", function () {
-        sql.yy.callbacks.tableHandler = function (options) {
-          if (options.prependQuestionMark && options.prependFrom) {
-            return [{value: '? FROM table_one', meta: 'table'}, {value: '? FROM table_two', meta: 'table'}];
-          }
-        };
-        sql.yy.callbacks.databaseHandler = function (options) {
-          if (options.prependQuestionMark && options.prependFrom) {
-            return [{value: '? FROM database_one.', meta: 'database'}, {value: '? FROM database_two.', meta: 'database'}];
-          }
-        };
-
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: '',
-          expectedSuggestions: ['? FROM table_one', '? FROM table_two', '? FROM database_one.', '? FROM database_two.']
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
         });
       });
 
       it("should follow keyword case for table name completion", function() {
-        sql.yy.callbacks.tableHandler = function (options) {
-          if (options.prependQuestionMark && options.prependFrom && options.lowerCase) {
-            return [{value: '? from table_one', meta: 'table'}, {value: '? from table_two', meta: 'table'}];
-          }
-        };
-
         assertAutoComplete({
           beforeCursor: 'select ',
           afterCursor: '',
-          expectedSuggestions: ['? from table_one', '? from table_two']
+          expectedResult: {
+            lowerCase: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
         });
       });
 
       it("should suggest table names with *", function() {
-        sql.yy.callbacks.tableHandler = function (options) {
-          if (options.prependFrom) {
-            return [{value: 'FROM table_one', meta: 'table'}, {value: 'FROM table_two', meta: 'table'}];
-          }
-        };
-        sql.yy.callbacks.databaseHandler = function (options) {
-          if (options.prependFrom) {
-            return [{value: 'FROM database_one.', meta: 'database'}, {value: 'FROM database_two.', meta: 'database'}];
-          }
-        };
-
         assertAutoComplete({
           beforeCursor: 'SELECT * ',
           afterCursor: '',
-          expectedSuggestions: ['FROM table_one', 'FROM table_two', 'FROM database_one.', 'FROM database_two.']
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependFrom: true,
+              appendDot: true
+            }
+          }
         });
       });
 
-      xit("should suggest table names with started FROM", function() {
+      it("should suggest table names with started FROM", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one" : {
-              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
-            }
-          },
           beforeCursor: "SELECT * fr",
           afterCursor: "",
-          expectedSuggestions: ["FROM testTable1", "FROM testTable2", "FROM database_one.", "FROM database_two."]
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependFrom: true,
+              appendDot: true
+            }
+          }
         });
       });
 
-      xit("should suggest table names after FROM", function() {
+      it("should suggest table names after FROM", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one" : {
-              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
-            }
-          },
           beforeCursor: "SELECT * FROM ",
           afterCursor: "",
-          expectedSuggestions: ["testTable1", "testTable2", "database_one.", "database_two."]
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
         });
       });
 
-      xit("should suggest table names after FROM with started name", function() {
+      it("should suggest database or table names after FROM with started name", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one" : {
-              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
-            }
-          },
           beforeCursor: "SELECT * FROM tes",
           afterCursor: "",
-          expectedSuggestions: ["testTable1", "testTable2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
         });
       });
-
-      xit("should suggest database names after FROM with started name", function() {
+      
+      it("should suggest table names after FROM with database reference", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one" : {
-              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
-            }
-          },
-          beforeCursor: "SELECT * FROM dat",
-          afterCursor: "",
-          expectedSuggestions: ["database_one.", "database_two."]
-        });
-      });
-
-      xit("should suggest table names after FROM with database reference", function() {
-        assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_two" : {
-              tables_meta: [{ name: "testTable3" }, { name: "testTable4" }]
-            }
-          },
           beforeCursor: "SELECT * FROM database_two.",
           afterCursor: "",
-          expectedSuggestions: ["testTable3", "testTable4"]
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'database_two'
+            }
+          }
         });
       });
 
-      xit("should suggest aliases", function() {
+      it("should suggest aliases", function() {
         assertAutoComplete({
           serverResponses: {},
           beforeCursor: "SELECT ",
           afterCursor: " FROM testTableA   tta, testTableB",
-          expectedSuggestions: ["tta.", "testTableB."]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              includeStar: true,
+              tables: [
+                {
+                  table: 'testTableA',
+                  alias: 'tta'
+                },
+                {
+                  table: 'testTableB'
+                }
+              ]
+            }
+          }
+        });
+      });
+      
+      it("should suggest keywords after table references", function() {
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: "SELECT * FROM testTableA tta, testTableB ",
+          afterCursor: "",
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['WHERE', 'GROUP BY', 'CLUSTER BY', 'LIMIT']
+          }
         });
       });
 
@@ -922,46 +1014,95 @@ define([
 
     describe("field completion", function() {
 
-      xit("should suggest columns for table", function() {
+      it("should suggest columns for table", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one/testTable" : {
-              columns: ["testTableColumn1", "testTableColumn2"]
-            }
-          },
           beforeCursor: "SELECT ",
           afterCursor: " FROM testTable",
-          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { includeStar: true, tables: [ { table: 'testTable' } ] }
+          }
         });
       });
 
-      xit("should suggest columns for table with database prefix", function() {
+      it("should suggest multiple columns for table", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_two/testTable" : {
-              columns: ["testTableColumn1", "testTableColumn2"]
-            }
-          },
-          beforeCursor: "SELECT ",
-          afterCursor: " FROM database_two.testTable",
-          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+          beforeCursor: "SELECT a, ",
+          afterCursor: " FROM testTable",
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [ { table: 'testTable' } ] }
+          }
         });
       });
 
-      xit("should suggest columns for table after WHERE", function() {
+      it('should suggest columns for tables with where keyword in name', function () {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one/testTable" : {
-              columns: ["testTableColumn1", "testTableColumn2"]
-            }
-          },
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM testwhere',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { includeStar: true, tables: [ { table: 'testwhere' } ] }
+          }
+        });
+      });
+
+      it('should suggest columns for tables with on keyword in name', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM teston',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { includeStar: true, tables: [ { table: 'teston' } ] }
+          }
+        });
+      });
+
+      it("should suggest columns for table with database prefix", function() {
+        assertAutoComplete({
+          beforeCursor: "select ",
+          afterCursor: " from database_two.testTable",
+          expectedResult: {
+            lowerCase: true,
+            suggestColumns: { includeStar: true, tables: [ { table: 'testTable', database: 'database_two' } ] }
+          }
+        });
+      });
+
+      it("should suggest columns for table after WHERE", function() {
+        assertAutoComplete({
           beforeCursor: "SELECT * FROM testTable WHERE ",
           afterCursor: "",
-          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [ { table: 'testTable' } ] }
+          }
         });
       });
 
-      xit("should suggest columns for table after ORDER BY ", function() {
+      it("should suggest BY after ORDER", function () {
+        assertAutoComplete({
+          beforeCursor: "SELECT * FROM testTable ORDER ",
+          afterCursor: "",
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BY']
+          }
+        });
+      });
+
+      it("should suggest BY after GROUP", function () {
+        assertAutoComplete({
+          beforeCursor: "SELECT * FROM testTable GROUP ",
+          afterCursor: "",
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BY']
+          }
+        });
+      });
+
+      it("should suggest columns for table after ORDER BY ", function() {
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one/testTable" : {
@@ -970,37 +1111,55 @@ define([
           },
           beforeCursor: "SELECT * FROM testTable ORDER BY ",
           afterCursor: "",
-          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              tables: [{ table: 'testTable'}]
+            }
+          }
         });
       });
 
-      xit("should suggest columns for table after ORDER BY with db reference", function() {
+      it("should suggest columns for table after ORDER BY with db reference", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_two/testTable" : {
-              columns: ["testTableColumn1", "testTableColumn2"]
-            }
-          },
           beforeCursor: "SELECT * FROM database_two.testTable ORDER BY ",
           afterCursor: "",
-          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              tables: [{ database: 'database_two', table: 'testTable' }]
+            }
+          }
         });
       });
 
-      xit("should suggest columns for table after GROUP BY ", function() {
+      it("should suggest columns for table after GROUP BY ", function() {
         assertAutoComplete({
-          serverResponses: {
-            "/notebook/api/autocomplete/database_one/testTable" : {
-              columns: ["testTableColumn1", "testTableColumn2"]
-            }
-          },
           beforeCursor: "SELECT * FROM testTable GROUP BY ",
           afterCursor: "",
-          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              tables: [{ table: 'testTable' }]
+            }
+          }
         });
       });
 
-      xit("should suggest columns for table after ON ", function() {
+      it("should suggest columns for table after GROUP BY with db reference ", function() {
+        assertAutoComplete({
+          beforeCursor: "SELECT * FROM database_two.testTable GROUP BY ",
+          afterCursor: "",
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              tables: [{ database: 'database_two', table: 'testTable' }]
+            }
+          }
+        });
+      });
+
+      it("should suggest columns for table after ON ", function() {
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one/testTable1" : {

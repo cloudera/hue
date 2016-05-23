@@ -15,63 +15,149 @@
 // limitations under the License.
 
 define(function(require){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,6],$V1=[1,7],$V2=[1,9],$V3=[1,8],$V4=[5,7],$V5=[1,18],$V6=[15,20];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,5],$V1=[6,7];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"Sql":3,"SqlStatements":4,"EOF":5,"SqlStatement":6,";":7,"SelectStatement":8,"UseStatement":9,"STRING_IDENTIFIER":10,"|CURSOR|":11,"USE":12,"SELECT":13,"SelectExpression":14,"FROM":15,"TableReference":16,"SelectExpressionList":17,"*":18,"DerivedColumn":19,",":20,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:";",10:"STRING_IDENTIFIER",11:"|CURSOR|",12:"USE",13:"SELECT",15:"FROM",18:"*",20:","},
-productions_: [0,[3,2],[4,1],[4,3],[6,1],[6,1],[6,2],[6,1],[9,3],[8,5],[8,2],[14,1],[14,2],[14,1],[17,1],[17,3],[19,1],[16,1]],
+symbols_: {"error":2,"Sql":3,"CleanResults":4,"SqlStatements":5,";":6,"EOF":7,"DirectSqlStatement":8,"CleanReferences":9,"DirectSelectStatement":10,"AnyCursor":11,"CURSOR":12,"PARTIAL_CURSOR":13,"SqlStatement":14,"UseStatement":15,"QueryExpression":16,"CHARACTER_PRIMARY":17,"USE":18,"SELECT":19,"SelectList":20,"TableExpression":21,"FromClause":22,"SelectConditionList":23,"FROM":24,"TableReferenceList":25,"SelectCondition":26,"WhereClause":27,"GroupByClause":28,"OrderByClause":29,"WHERE":30,"SearchCondition":31,"GROUP":32,"BY":33,"ColumnList":34,"ORDER":35,"*":36,"DerivedColumn":37,",":38,".":39,"TableReference":40,"TablePrimaryOrJoinedTable":41,"TablePrimary":42,"JoinedTable":43,"JOIN":44,"JoinSpecification":45,"JoinCondition":46,"ON":47,"$accept":0,"$end":1},
+terminals_: {2:"error",6:";",7:"EOF",10:"DirectSelectStatement",12:"CURSOR",13:"PARTIAL_CURSOR",17:"CHARACTER_PRIMARY",18:"USE",19:"SELECT",24:"FROM",30:"WHERE",31:"SearchCondition",32:"GROUP",33:"BY",35:"ORDER",36:"*",38:",",39:".",44:"JOIN",47:"ON"},
+productions_: [0,[3,4],[3,3],[4,0],[5,1],[5,3],[8,2],[9,0],[11,1],[11,1],[14,1],[14,1],[14,3],[14,2],[14,1],[15,3],[15,2],[15,2],[16,3],[16,2],[21,1],[21,2],[21,2],[22,2],[23,1],[23,2],[26,1],[26,1],[26,1],[26,1],[27,2],[28,3],[28,2],[29,3],[29,2],[20,1],[20,3],[20,2],[20,1],[34,1],[34,3],[37,1],[37,3],[37,3],[37,2],[37,1],[25,1],[25,3],[40,1],[41,1],[41,1],[42,1],[42,2],[42,3],[42,4],[42,3],[42,1],[43,4],[45,1],[46,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 6:
+case 1: case 2:
 
-     return filterStartsWith(adjustKeywordCase(isLowerCase($$[$0-1]), suggestions.statements), $$[$0-1]);
+     prioritizeSuggestions();
+     return parser.yy.result;
+   
+break;
+case 3:
+
+     parser.yy.result = {};
+     parser.yy.cursorFound = false;
+     delete parser.yy.latestTableReferences;
    
 break;
 case 7:
 
-     return adjustKeywordCase(false, suggestions.statements);
+     delete parser.yy.latestTableReferences;
    
 break;
-case 10:
+case 13:
 
-     var tables = parser.yy.callbacks.tableHandler({
-       prependQuestionMark: true,
-       prependFrom: true,
-       lowerCase: isLowerCase($$[$0-1])
-     });
-
-     var databases = parser.yy.callbacks.databaseHandler({
-       prependQuestionMark: true,
-       prependFrom: true,
-       lowerCase: isLowerCase($$[$0-1])
-     });
-
-     return tables.concat(databases);
+     determineCase($$[$0-1]);
+     suggestKeywords(['SELECT', 'USE']);
    
 break;
-case 12:
+case 14:
 
-      var tables = parser.yy.callbacks.tableHandler({
-        prependFrom: true,
-        lowerCase: isLowerCase($$[$0-1])
-      });
+     suggestKeywords(['SELECT', 'USE']);
+   
+break;
+case 15:
 
-      var databases = parser.yy.callbacks.databaseHandler({
-        prependFrom: true,
-        lowerCase: isLowerCase($$[$0-1])
-      });
+     determineCase($$[$0-2]);
+     suggestDatabases();
+   
+break;
+case 16:
 
-      return tables.concat(databases);
+     determineCase($$[$0-1]);
+     if (! parser.yy.cursorFound) {
+       parser.yy.result.useDatabase = $$[$0];
+     }
+   
+break;
+case 17:
+
+     determineCase($$[$0-1]);
+     suggestDatabases();
+   
+break;
+case 18:
+
+     determineCase($$[$0-2]);
+     completeSuggestColumns();
+   
+break;
+case 19:
+
+     determineCase($$[$0-1]);
+   
+break;
+case 21:
+
+     determineCase($$[$0-1]);
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   
+break;
+case 29:
+
+     suggestKeywords(['WHERE', 'GROUP BY', 'CLUSTER BY', 'LIMIT']);
+   
+break;
+case 32: case 34:
+
+     suggestKeywords(['BY']);
+   
+break;
+case 35:
+
+     if ($$[$0] == '|CURSOR|') {
+       parser.yy.result.suggestColumns.includeStar = true;
+     }
+   
+break;
+case 36: case 37:
+
+     suggestTables({ prependFrom: true });
+     suggestDatabases({ prependFrom: true, appendDot: true });
+   
+break;
+case 44: case 45:
+
+     suggestColumns();
+     suggestTables({ prependQuestionMark: true, prependFrom: true });
+     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+   
+break;
+case 51:
+
+     addTableReference({ table: $$[$0] });
+   
+break;
+case 52:
+
+     addTableReference({ table: $$[$0-1], alias: $$[$0] });
+   
+break;
+case 53:
+
+     addTableReference({ database: $$[$0-2], table: $$[$0] });
+   
+break;
+case 54:
+
+     addTableReference({ database: $$[$0-3], table: $$[$0-1], alias: $$[$0] });
+   
+break;
+case 55:
+
+     suggestTables({ database: $$[$0-2] });
+   
+break;
+case 56:
+
+     suggestTables();
+     suggestDatabases({ appendDot: true });
    
 break;
 }
 },
-table: [{3:1,4:2,6:3,8:4,9:5,10:$V0,11:$V1,12:$V2,13:$V3},{1:[3]},{5:[1,10],7:[1,11]},o($V4,[2,2]),o($V4,[2,4]),o($V4,[2,5]),{11:[1,12]},o($V4,[2,7]),{10:$V5,11:[1,14],14:13,17:15,18:[1,16],19:17},{10:[1,19]},{1:[2,1]},{6:20,8:4,9:5,10:$V0,11:$V1,12:$V2,13:$V3},o($V4,[2,6]),{15:[1,21]},o($V4,[2,10]),{15:[2,11],20:[1,22]},{11:[1,23],15:[2,13]},o($V6,[2,14]),o($V6,[2,16]),{7:[1,24]},o($V4,[2,3]),{10:[1,26],16:25},{10:$V5,19:27},{15:[2,12]},o($V4,[2,8]),{7:[1,28]},{7:[2,17]},o($V6,[2,15]),o($V4,[2,9])],
-defaultActions: {10:[2,1],23:[2,12],26:[2,17]},
+table: [{3:1,4:2,10:[2,3]},{1:[3]},{5:3,8:4,10:$V0},{6:[1,6],7:[1,7]},o($V1,[2,4],{9:8,10:[2,7]}),{6:[1,9]},{7:[1,10]},{1:[2,2]},{8:11,10:$V0},o([6,7,10],[2,6]),{1:[2,1]},o($V1,[2,5])],
+defaultActions: {7:[2,2],10:[2,1]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -223,38 +309,53 @@ parse: function parse(input) {
     return true;
 }};
 
+  parser.yy.result = {};
 
-var suggestions = {
-  statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+
+var prioritizeSuggestions = function () {
+   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+     if (typeof parser.yy.result.suggestColumns.tables === 'undefined') {
+       delete parser.yy.result.suggestColumns;
+     } else {
+       delete parser.yy.result.suggestTables;
+       delete parser.yy.result.suggestDatabases;
+     }
+   }
 }
 
-var filterStartsWith = function (suggestions, start) {
-  var startLower = start.toLowerCase();
-  return suggestions.filter(function (suggestion) {
-    return suggestion.value.toLowerCase().indexOf(startLower) === 0;
-  });
+var completeSuggestColumns = function () {
+   if (parser.yy.cursorFound &&
+       typeof parser.yy.result.suggestColumns !== 'undefined') {
+     parser.yy.result.suggestColumns.tables = parser.yy.latestTableReferences;
+   }
 }
 
-var adjustKeywordCase = function (lowerCase, suggestions) {
-  if (lowerCase) {
-    suggestions.forEach(function (suggestion) {
-      if (suggestion.meta === 'keyword') {
-        suggestion.value = suggestion.value.toLowerCase();
-      }
-    });
-  } else {
-    suggestions.forEach(function (suggestion) {
-      if (suggestion.meta === 'keyword') {
-        suggestion.value = suggestion.value.toUpperCase();
-      }
-    });
+var addTableReference = function (ref) {
+  if (typeof parser.yy.latestTableReferences === 'undefined') {
+    parser.yy.latestTableReferences = [];
   }
-  return suggestions;
+  parser.yy.latestTableReferences.push(ref);
 }
 
-var isLowerCase = function (text) {
-  return text.toLowerCase() === text;
+var suggestKeywords = function (keywords) {
+  parser.yy.result.suggestKeywords = keywords;
 }
+
+var suggestColumns = function (details) {
+  parser.yy.result.suggestColumns = details || {};
+}
+
+var suggestTables = function (details) {
+  parser.yy.result.suggestTables = details || {};
+}
+
+var suggestDatabases = function (details) {
+  parser.yy.result.suggestDatabases = details || {};
+}
+
+var determineCase = function (text) {
+  parser.yy.result.lowerCase = text.toLowerCase() === text;
+};
 
 /*
  Hive Select syntax from https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
@@ -593,34 +694,30 @@ pushState:function pushState(condition) {
 stateStackSize:function stateStackSize() {
         return this.conditionStack.length;
     },
-options: {},
+options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: /* skip whitespace */ 
+case 0: parser.yy.cursorFound = true; return 12; 
 break;
-case 1: return 11; 
+case 1: parser.yy.cursorFound = true; return 13; 
 break;
-case 2: return 13; 
+case 2: return 'REGULAR_IDENTIFIER'; 
 break;
-case 3: return 12; 
+case 3: return yy_.yytext; 
 break;
-case 4: return 15; 
+case 4: /* skip whitespace */ 
 break;
-case 5: return 10; 
+case 5: /* skip comments */ 
 break;
-case 6: return 20; 
+case 6: /* skip comments */ 
 break;
-case 7: return 18; 
-break;
-case 8: return 7; 
-break;
-case 9: return 5; 
+case 7: return 7; 
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:\|CURSOR\|)/,/^(?:[Ss][Ee][Ll][Ee][Cc][Tt])/,/^(?:[Uu][Ss][Ee])/,/^(?:[Ff][Rr][Oo][Mm])/,/^(?:[a-zA-Z0-9_]*\b)/,/^(?:,)/,/^(?:\*)/,/^(?:;)/,/^(?:$)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9],"inclusive":true}}
+rules: [/^(?:\|CURSOR\|)/i,/^(?:\|PARTIAL_CURSOR\|)/i,/^(?:[A-Za-z][A-Za-z0-9_]*)/i,/^(?:[-+&~|^\/%*(),.;!])/i,/^(?:[ \t\n])/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:$)/i],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7],"inclusive":true}}
 });
 return lexer;
 })();
