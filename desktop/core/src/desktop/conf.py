@@ -46,11 +46,13 @@ def coerce_database(database):
 
 
 def coerce_port(port):
-  port = int(port)
-  if port == 0:
-    return ''
-  else:
-    return port
+  try:
+    port = int(port)
+    if port == 0:
+      port = ''
+  except ValueError, e:
+    port = ''
+  return port
 
 
 def coerce_file(path):
@@ -505,7 +507,7 @@ DATABASE = ConfigSection(
       key='port',
       help=_('Database port.'),
       type=coerce_port,
-      default='0',
+      default='',
     ),
     OPTIONS=Config(
       key='options',
