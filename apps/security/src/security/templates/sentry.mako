@@ -105,6 +105,11 @@ ${ layout.menubar(section=component) }
     <!-- /ko -->
 
     <span class="muted" data-bind="text: privilegeType, attr: {title: moment(timestamp()).fromNow()}"></span>
+    <!-- ko if: $root.component() == 'solr' && authorizables().length > 0 && authorizables()[0].type() == 'COLLECTION'  && authorizables()[0].name_() != '*' -->
+      <a data-bind="attr: { href: indexerPath() }" target="_blank" title="${ _('Open in Indexer') }" class="muted">
+        <i class="fa fa-external-link"></i>
+      </a>
+    <!-- /ko -->
 
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
