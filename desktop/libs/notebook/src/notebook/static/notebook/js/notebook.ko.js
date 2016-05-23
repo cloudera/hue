@@ -64,7 +64,7 @@
         return item.name != ''
       });
     });
-    self.hasManyColumns = ko.computed(function () {
+    self.hasManyColumns = ko.pureComputed(function () {
       return self.meta() && self.meta().length > 300;
     });
     self.fetchedOnce = ko.observable(typeof result.fetchedOnce != "undefined" && result.fetchedOnce != null ? result.fetchedOnce : false);
@@ -826,6 +826,16 @@
         self.result.type(result.type);
         self.result.fetchedOnce(true);
       }
+
+      self.result.meta().forEach(function (meta) {
+        if ($.inArray(meta.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
+          meta.cssClass = 'sort-numeric';
+        } else if ($.inArray(meta.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
+          meta.cssClass = 'sort-date';
+        } else {
+          meta.cssClass = 'sort-string';
+        }
+      })
 
       self.result.hasMore(result.has_more);
 
