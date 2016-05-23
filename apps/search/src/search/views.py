@@ -367,7 +367,12 @@ def update_document(request):
     else:
       result['status'] = 0
       result['message'] = _('Document has no modifications to change.')
-
+  except RestException, e:
+    try:
+      result['message'] = json.loads(e.message)['error']['msg']
+    except:
+      LOG.exception('failed to parse json response')
+      result['message'] = force_unicode(e)
   except Exception, e:
     result['message'] = force_unicode(e)
 
