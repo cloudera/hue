@@ -217,6 +217,7 @@ ${ commonshare() | n,unicode }
 
   .left-panel {
     position: absolute;
+    outline: none !important;
   }
 
   .resizer {
@@ -234,6 +235,7 @@ ${ commonshare() | n,unicode }
 
   .right-panel {
     position: absolute;
+    outline: none !important;
   }
 
   #filechooser {

@@ -64,6 +64,7 @@ ${ fileBrowser.fileBrowser() }
     position: absolute;
     height: 100%;
     overflow: hidden;
+    outline: none !important;
   }
 
   .resizer {
@@ -84,6 +85,7 @@ ${ fileBrowser.fileBrowser() }
     position: absolute;
     height: 100%;
     overflow: hidden;
+    outline: none !important;
   }
 
   .show-assist {
