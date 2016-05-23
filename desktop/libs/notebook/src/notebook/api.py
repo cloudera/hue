@@ -278,6 +278,7 @@ def save_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
+  save_as = True
 
   if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
     notebook_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['parentSavedQueryUuid'])
@@ -286,6 +287,7 @@ def save_notebook(request):
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
+    save_as = False
 
     if notebook.get('directoryUuid'):
       notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=notebook.get('directoryUuid'), perm_type='write')
@@ -303,6 +305,7 @@ def save_notebook(request):
   notebook_doc1.save()
 
   response['status'] = 0
+  response['save_as'] = save_as
   response.update(notebook_doc.to_dict())
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
