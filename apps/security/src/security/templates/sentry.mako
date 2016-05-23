@@ -145,7 +145,7 @@ ${ layout.menubar(section=component) }
             <i class="fa fa-long-arrow-right"></i>
           <!-- /ko -->
           <!-- ko if: type() == 'COLLECTION' && name_() != '*' -->
-            <span data-bind="text: type"></span>=<a data-bind="attr: { href: $parent.indexerPath() }" target="_blank"><span data-bind="text: name_"></span></a></span>
+            <span data-bind="text: type"></span>=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse('collections.' + name_()) }" title="${ _('Browse privileges') }"><span data-bind="text: name_"></span></a></span>
           <!-- /ko -->
           <!-- ko ifnot: type() == 'COLLECTION' && name_() != '*' -->
             <span data-bind="text: type"></span>=<span data-bind="text: name_"></span></span>
