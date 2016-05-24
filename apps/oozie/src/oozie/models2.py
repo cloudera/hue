@@ -282,22 +282,23 @@ class Workflow(Job):
   def get_workflow_properties_for_user(cls, user, workflow=None):
     workflow = workflow if workflow is not None else {}
     properties = workflow.get('properties', None)
+
     if not properties:
       config = None
+      properties = cls.get_properties()
+
       if user is not None:
-        config = None
         if USE_DEFAULT_CONFIGURATION.get():
           config = DefaultConfiguration.objects.get_configuration_for_user(app=WorkflowConfiguration.APP_NAME, user=user)
 
       if config is not None:
-        properties = config.properties_dict
-      else:
-        properties = cls.get_properties()
+        properties.update(config.properties_dict)
 
       properties.update({
         'wf1_id': None,
         'description': ''
       })
+
     return properties
 
   @staticmethod
