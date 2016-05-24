@@ -382,6 +382,10 @@ def default_ssl_validate():
   return SSL_VALIDATE.get()
 
 
+def get_deprecated_login_lock_out_by_combination_browser_user_agent():
+  return AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP.get()
+
+
 SMTP = ConfigSection(
   key='smtp',
   help=_('Configuration options for connecting to an external SMTP server.'),
@@ -723,11 +727,19 @@ AUTH = ConfigSection(
       type=coerce_timedelta,
       default=None,
     ),
-    LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP = Config(
+    # Deprecated by LOGIN_LOCK_OUT_USE_USER_AGENT
+    LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP=Config(
       key="login_lock_out_by_combination_browser_user_agent_and_ip",
       help=_("If True, lock out based on IP and browser user agent"),
       type=coerce_bool,
       default=False,
+    ),
+    LOGIN_LOCK_OUT_USE_USER_AGENT = Config(
+      key="login_lock_out_use_user_agent",
+      help=_("If True, lock out based on an IP address AND a user agent."
+             "This means requests from different user agents but from the same IP are treated differently."),
+      type=coerce_bool,
+      dynamic_default=get_deprecated_login_lock_out_by_combination_browser_user_agent
     ),
     LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP = Config(
       key="login_lock_out_by_combination_user_and_ip",
@@ -736,6 +748,7 @@ AUTH = ConfigSection(
       default=False,
     ),
 ))
+
 
 LDAP = ConfigSection(
   key="ldap",

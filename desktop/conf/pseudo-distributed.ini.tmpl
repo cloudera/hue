@@ -303,8 +303,9 @@
     # If set, defines period of inactivity in seconds after which failed logins will be forgotten
     ## login_cooloff_time=60
 
-    # If True, lock out based on IP and browser user agent
-    ## login_lock_out_by_combination_browser_user_agent_and_ip=false
+    # If True, lock out based on an IP address AND a user agent.
+    # This means requests from different user agents but from the same IP are treated differently.
+    ## login_lock_out_use_user_agent=false
 
     # If True, lock out based on IP and user
     ## login_lock_out_by_combination_user_and_ip=false
