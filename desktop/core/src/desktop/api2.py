@@ -434,7 +434,7 @@ def import_documents(request):
 def _get_dependencies(documents, deps_mode=True):
   """
   Given a list of Document2 objects, perform a depth-first search and return a set of documents with all
-   dependencies included
+   dependencies (excluding history docs) included
   :param doc_set: set of Document2 objects to include
   :param deps_mode: traverse dependencies relationship, otherwise traverse children relationship
   """
@@ -444,7 +444,7 @@ def _get_dependencies(documents, deps_mode=True):
     stack = [doc]
     while stack:
       curr_doc = stack.pop()
-      if curr_doc not in doc_set:
+      if curr_doc not in doc_set and not curr_doc.is_history:
         doc_set.add(curr_doc)
         if deps_mode:
           deps_set = set(curr_doc.dependencies.all())
