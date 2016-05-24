@@ -164,7 +164,7 @@ class WorkflowConfiguration(object):
       "nice_name": _("Job XML"),
       "key": "job_xml",
       "help_text": _("Oozie Job XML file"),
-      "type": "hdfs-files"
+      "type": "hdfs-file"
     }, {
       "multiple": False,
       "defaultValue": False,
