@@ -45,11 +45,11 @@ try:
   from beeswax.server.dbms import get_query_server_config, QueryServerException
   from beeswax.views import _parse_out_hadoop_jobs
 except ImportError, e:
-  LOG.exception('Hive and HiveServer2 interfaces are not enabled')
+  LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 try:
   from impala.conf import CONFIG_WHITELIST as impala_settings
-  from impala import views   # Force checking if Impala is enabled
+  from impala import api   # Force checking if Impala is enabled
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
   impala_settings = None

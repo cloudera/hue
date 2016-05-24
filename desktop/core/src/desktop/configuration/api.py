@@ -206,18 +206,21 @@ def _update_default_and_group_configurations(configurations):
     for app, configs in configurations.items():
       if 'default' in configs:
         properties = configs['default']
-        _save_configuration(app, properties, is_default=True)
-        LOG.info('Saved default configuration for app: %s' % app)
+        if properties:
+          _save_configuration(app, properties, is_default=True)
+          LOG.info('Saved default configuration for app: %s' % app)
 
       if 'groups' in configs:
         for group_config in configs['groups']:
           group_ids = group_config.get('group_ids')
           properties = group_config.get('properties')
-          try:
-            groups = Group.objects.filter(id__in=group_ids)
-            _save_configuration(app, properties, is_default=False, groups=groups)
-          except Group.DoesNotExist, e:
-            raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
+
+          if properties:
+            try:
+              groups = Group.objects.filter(id__in=group_ids)
+              _save_configuration(app, properties, is_default=False, groups=groups)
+            except Group.DoesNotExist, e:
+              raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
 
   return _get_default_configurations()
 
