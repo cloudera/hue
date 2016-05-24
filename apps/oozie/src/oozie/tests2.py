@@ -465,9 +465,11 @@ LIMIT $limit"""))
           'type': 'settings'
         }
       ]
+
+      wf_props = Workflow.get_properties()
       config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME, properties=json.dumps(properties), is_default=True)
       config.save()
-      wf_props = config.properties_dict
+      wf_props.update(config.properties_dict)
       wf_props.update({'wf1_id': None, 'description': ''})
 
       # Test that a new workflow will be initialized with Default saved config if it exists
@@ -495,12 +497,14 @@ LIMIT $limit"""))
             'type': 'settings'
         }
       ]
+
+      wf_props = Workflow.get_properties()
       config = DefaultConfiguration.objects.create(app=WorkflowConfiguration.APP_NAME,
         properties=json.dumps(properties),
         is_default=False)
       config.groups.add(self.user.groups.first())
       config.save()
-      wf_props = config.properties_dict
+      wf_props.update(config.properties_dict)
       wf_props.update({'wf1_id': None, 'description': ''})
 
       # Test that a new workflow will be initialized with Default saved config if it exists
