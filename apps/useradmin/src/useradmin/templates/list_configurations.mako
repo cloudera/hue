@@ -38,19 +38,12 @@ ${layout.menubar(section='configurations')}
       <thead>
       <tr>
         <th>${ _('Application') }</th>
-        <th>${ _('Default') }</th>
         <th>${ _('Groups') }</th>
       </tr>
       </thead>
       <tbody data-bind="foreach: filteredApps">
       <tr class="tableRow pointer" data-bind="click: function () { $parent.edit($data); }">
         <td data-bind="text: name"></td>
-        <!-- ko if: actualDefaultOverrides().length > 0 -->
-        <td>${ _('defined') }</td>
-        <!-- /ko -->
-        <!-- ko if: actualDefaultOverrides().length == 0 -->
-        <td>&nbsp;</td>
-        <!-- /ko -->
         <!-- ko if: $data.groups -->
         <td data-bind="text: overriddenGroupNames"></td>
         <!-- /ko -->
@@ -76,14 +69,6 @@ ${layout.menubar(section='configurations')}
   <!-- ko with: selectedApp -->
   <div class="card card-small" style="padding-bottom: 68px;">
     <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
-    <div class="margin-top-20 form-horizontal">
-      <div class="control-group">
-        <label class="control-label">${ _('Global Properties') }</label>
-        <div class="controls">
-          <!-- ko component: { name: 'property-selector', params: { properties: $data.default } } --><!-- /ko -->
-        </div>
-      </div>
-    </div>
 
     <!-- ko foreach: groups -->
     <h4 class="margin-left-20" style="display: inline-block;">${ _('Group override') }</h4>
@@ -165,12 +150,6 @@ ${ configKoComponents.config() }
         }
       }, self);
 
-      self.actualDefaultOverrides = ko.pureComputed(function () {
-        return $.grep(self.default(), function (defaultOverride) {
-          return ko.mapping.toJSON(defaultOverride.defaultValue()) !== ko.mapping.toJSON(defaultOverride.value())
-        });
-      });
-
       self.overriddenGroupNames = ko.pureComputed(function () {
         var groups = {};
         var groupIndex = {};
@@ -227,7 +206,6 @@ ${ configKoComponents.config() }
       data[self.selectedApp().name()] = self.selectedApp();
 
       $.each(data, function (app, appConfig) {
-        appConfig.default(appConfig.actualDefaultOverrides());
         var actualGroups = [];
         appConfig.groups().forEach(function (groupConfig) {
           var actualGroupOverrides = $.grep(groupConfig.properties(), function (property) {
@@ -263,20 +241,7 @@ ${ configKoComponents.config() }
 
       $.each(data.configuration, function (appName, app) {
         app.name = appName;
-        var defaultIndex = {};
-        if (typeof app.default === 'undefined') {
-          app.default = [];
-        }
-
-        // Merge base properties with default properties into default
-        app.default.forEach(function (defaultProperty) {
-          defaultIndex[defaultProperty.name || defaultProperty.nice_name] = defaultProperty;
-        });
-        app.properties.forEach(function (property) {
-          if (!defaultIndex[property.name || property.nice_name]) {
-            app.default.push(property);
-          }
-        });
+        app.default = []; // Delete any existing default overrides
 
         if (typeof app.groups === 'undefined') {
           app.groups = [];
