@@ -250,11 +250,11 @@ ${ configKoComponents.config() }
           app.groups.forEach(function (group) {
             var groupPropertyIndex = {};
             group.properties.forEach(function (groupProperty) {
-              groupPropertyIndex[groupProperty.name] = groupProperty;
+              groupPropertyIndex[groupProperty.name || groupProperty.nice_name] = groupProperty;
             })
             // Merge the base properties into any existing group config
             app.properties.forEach(function (property) {
-              if (!groupPropertyIndex[property.name]){
+              if (!groupPropertyIndex[property.name || property.nice_name]){
                 group.properties.push(property);
               }
             });
