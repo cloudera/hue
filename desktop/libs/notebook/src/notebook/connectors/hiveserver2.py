@@ -23,6 +23,7 @@ import StringIO
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
@@ -145,7 +146,11 @@ class HS2Api(Api):
       session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
 
     if not properties:
-      config = DefaultConfiguration.objects.get_configuration_for_user(app=lang, user=self.user)
+
+      config = None
+      if USE_DEFAULT_CONFIGURATION.get():
+        config = DefaultConfiguration.objects.get_configuration_for_user(app=lang, user=self.user)
+
       if config is not None:
         properties = config.properties_list
       else:
