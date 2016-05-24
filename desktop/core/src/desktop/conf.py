@@ -1092,6 +1092,13 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   help=_('Choose whether to show the new SQL editor.')
 )
 
+USE_DEFAULT_CONFIGURATION = Config(
+  key='use_default_configuration',
+  default=False,
+  type=coerce_bool,
+  help=_('Enable saved default configurations for Hive, Impala, Spark, and Oozie.')
+)
+
 def validate_ldap(user, config):
   res = []
 

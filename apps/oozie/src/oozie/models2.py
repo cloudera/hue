@@ -29,6 +29,7 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -284,7 +285,9 @@ class Workflow(Job):
     if not properties:
       config = None
       if user is not None:
-        config = DefaultConfiguration.objects.get_configuration_for_user(app=WorkflowConfiguration.APP_NAME, user=user)
+        config = None
+        if USE_DEFAULT_CONFIGURATION.get():
+          config = DefaultConfiguration.objects.get_configuration_for_user(app=WorkflowConfiguration.APP_NAME, user=user)
 
       if config is not None:
         properties = config.properties_dict
