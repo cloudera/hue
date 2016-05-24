@@ -21,6 +21,7 @@ import time
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
@@ -144,7 +145,10 @@ class SparkApi(Api):
 
   def create_session(self, lang='scala', properties=None):
     if not properties:
-      config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
+      config = None
+      if USE_DEFAULT_CONFIGURATION.get():
+        config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
+
       if config is not None:
         properties = config.properties_list
       else:

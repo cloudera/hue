@@ -25,6 +25,7 @@ from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
+from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.models import DefaultConfiguration, Document, Document2
@@ -433,46 +434,49 @@ LIMIT $limit"""))
 
 
   def test_workflow_properties(self):
-    # Test that a new workflow will be initialized with default properties if no saved configs exist
-    wf = Workflow(user=self.user)
-    data = json.loads(wf.data)
-    assert_equal(data['workflow']['properties'], Workflow.get_workflow_properties_for_user(self.user))
+    reset = USE_DEFAULT_CONFIGURATION.set_for_testing(True)
 
-    # Setup a test Default configuration, NOTE: this is an invalid format for testing only
-    properties = [
-      {
-        'multiple': False,
-        'value': '/user/test/oozie',
-        'nice_name': 'Workspace',
-        'key': 'deployment_dir',
-        'help_text': 'Specify the deployment directory.',
-        'type': 'hdfs-file'
-      }, {
-        'multiple': True,
-        'value': [
+    try:
+      # Test that a new workflow will be initialized with default properties if no saved configs exist
+      wf = Workflow(user=self.user)
+      data = json.loads(wf.data)
+      assert_equal(data['workflow']['properties'], Workflow.get_workflow_properties_for_user(self.user))
+
+      # Setup a test Default configuration, NOTE: this is an invalid format for testing only
+      properties = [
+        {
+          'multiple': False,
+          'value': '/user/test/oozie',
+          'nice_name': 'Workspace',
+          'key': 'deployment_dir',
+          'help_text': 'Specify the deployment directory.',
+          'type': 'hdfs-file'
+        }, {
+          'multiple': True,
+          'value': [
             {
               'value': 'test',
               'key': 'mapred.queue.name'
             }
-        ],
-        'nice_name': 'Hadoop Properties',
-        'key': 'properties',
-        'help_text': 'Hadoop configuration properties.',
-        'type': 'settings'
-      }
-    ]
-    config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME, properties=json.dumps(properties), is_default=True)
-    config.save()
-    wf_props = config.properties_dict
-    wf_props.update({'wf1_id': None, 'description': ''})
+          ],
+          'nice_name': 'Hadoop Properties',
+          'key': 'properties',
+          'help_text': 'Hadoop configuration properties.',
+          'type': 'settings'
+        }
+      ]
+      config = DefaultConfiguration(app=WorkflowConfiguration.APP_NAME, properties=json.dumps(properties), is_default=True)
+      config.save()
+      wf_props = config.properties_dict
+      wf_props.update({'wf1_id': None, 'description': ''})
 
-    # Test that a new workflow will be initialized with Default saved config if it exists
-    wf = Workflow(user=self.user)
-    data = json.loads(wf.data)
-    assert_equal(data['workflow']['properties'], wf_props)
+      # Test that a new workflow will be initialized with Default saved config if it exists
+      wf = Workflow(user=self.user)
+      data = json.loads(wf.data)
+      assert_equal(data['workflow']['properties'], wf_props)
 
-    # Test that a new workflow will be initialized with Group saved config if it exists
-    properties = [
+      # Test that a new workflow will be initialized with Group saved config if it exists
+      properties = [
         {
             'multiple': True,
             'value': [
@@ -490,19 +494,22 @@ LIMIT $limit"""))
             'help_text': 'Hadoop configuration properties.',
             'type': 'settings'
         }
-    ]
-    config = DefaultConfiguration.objects.create(app=WorkflowConfiguration.APP_NAME,
-      properties=json.dumps(properties),
-      is_default=False)
-    config.groups.add(self.user.groups.first())
-    config.save()
-    wf_props = config.properties_dict
-    wf_props.update({'wf1_id': None, 'description': ''})
+      ]
+      config = DefaultConfiguration.objects.create(app=WorkflowConfiguration.APP_NAME,
+        properties=json.dumps(properties),
+        is_default=False)
+      config.groups.add(self.user.groups.first())
+      config.save()
+      wf_props = config.properties_dict
+      wf_props.update({'wf1_id': None, 'description': ''})
 
-    # Test that a new workflow will be initialized with Default saved config if it exists
-    wf = Workflow(user=self.user)
-    data = json.loads(wf.data)
-    assert_equal(data['workflow']['properties'], wf_props)
+      # Test that a new workflow will be initialized with Default saved config if it exists
+      wf = Workflow(user=self.user)
+      data = json.loads(wf.data)
+      assert_equal(data['workflow']['properties'], wf_props)
+    finally:
+      reset()
+
 
 class TestExternalWorkflowGraph(object):
 
