@@ -1508,7 +1508,7 @@ ${ hueIcons.symbols() }
             <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
           </div>
           <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-            <div data-bind="visible: showGrid; delayedOverflow, css: resultsKlass" style="display: none;">
+            <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
