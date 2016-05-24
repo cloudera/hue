@@ -126,36 +126,25 @@ ${ fb_components.menubar() }
     return "";
   }
 
-  function pageContent (page) {
-    var _html = "";
-    if ($("#page" + page).length == 0) {
-      if (pages[page] == null) {
-        _html += "<a id='page" + page + "'><div style='height: " + $("#fileArea").height() + "px'></div></a>";
-      } else {
-        _html += "<a id='page" + page + "'><div style='display: inline'>" + $("<span>").text(pages[page]).html() + "</div></a>";
-      }
-    } else {
-      if (pages[page] == null) {
-        $("#page" + page).html("<div style='height: " + $("#fileArea").height() + "px'></div>");
-      } else {
-        $("#page" + page).html("<div style='display: inline'>" + $("<span>").text(pages[page]).html() + "</div>");
-      }
-    }
-    return _html;
-  }
-
   function renderPages () {
     var _html = "";
+    var fileAreaHeight = $("#fileArea").height();
+
     if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING) { // enable scrolling
       for (var i = 1; i <= viewModel.totalPages(); i++) {
-        _html += pageContent(i);
+        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
       }
     } else {
-      _html += pageContent(viewModel.page());
+      for (i = viewModel.page(); i <= viewModel.upperPage(); i++) {
+        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
+      }
     }
-    if (_html != "") {
-      $("#fileArea pre").html(_html);
-    }
+    $("#fileArea pre").html(_html);
+  }
+
+  var getChunks = function (startPage, endPage, view) {
+    var chunkSize = view.length / (endPage - startPage + 1);
+    return view.contents.match(new RegExp('[\\s\\S]{1,' + chunkSize + '}', 'g'));
   }
 
   function getContent (callback) {
@@ -163,16 +152,37 @@ ${ fb_components.menubar() }
 
     viewModel.isLoading(true);
 
-    $.getJSON(_baseUrl, viewModel.jsonParams(), function (data) {
+    var startPage = viewModel.page();
+    var endPage = viewModel.upperPage();
+
+    var params = {
+      offset: (startPage - 1) * viewModel.length(),
+      length: viewModel.length() * (endPage - startPage + 1),
+      compression: viewModel.compression(),
+      mode: viewModel.mode()
+    };
+
+    $.getJSON(_baseUrl, params, function (data) {
       var _html = "";
 
       if (data.view.contents != null) {
-        pages[viewModel.page()] = data.view.contents;
-        renderPages();
+        var chunks = getChunks(startPage, endPage, data.view)
+        for (var i = startPage; i <= endPage; i++) {
+          pages[i] = chunks.shift();
+        }
+        if ($("#fileArea pre").children().length == 0) {
+          renderPages();
+        }
+        $.each(pages, function (page, content) {
+          var $page = $('#page' + page);
+          if ($page.children('.fill-file-area').length > 0) {
+            $page.html("<div style='display: inline'>" + $("<span>").text(content).html() + "</div>")
+          }
+        });
       }
 
       if (data.view.xxd != null) {
-        pages[viewModel.page()] = data.view.xxd;
+        pages[startPage] = data.view.xxd;
 
         $(data.view.xxd).each(function (cnt, item) {
           var i;
@@ -200,10 +210,14 @@ ${ fb_components.menubar() }
     var self = this;
 
     function changePage () {
+      if (viewModel.totalPages() >= viewModel.MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == "binary") {
+        renderPages();
+      }
       getContent(function () {
         if (viewModel.totalPages() >= viewModel.MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == "binary") {
           location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
           $("#fileArea").scrollTop(0);
+
         } else {
           location.hash = "#page" + viewModel.page();
         }
@@ -222,17 +236,13 @@ ${ fb_components.menubar() }
     self.length = ko.observable(params.length);
     self.size = ko.observable(params.size);
     self.page = ko.observable(1);
-    self.isLoading = ko.observable(true);
+    self.isLoading = ko.observable(false);
 
     self.totalPages = ko.computed(function () {
       return Math.max(Math.ceil(self.size() / self.length()), 1);
     });
 
     self.upperPage = ko.observable(Math.min(self.totalPages(), 50));
-
-    self.begin = ko.computed(function () {
-      return (self.page() - 1) * self.length();
-    });
 
     self.offset = ko.computed(function () {
       return ((self.page() - 1) * self.length()) - 1;
@@ -244,15 +254,6 @@ ${ fb_components.menubar() }
               + "&length=" + self.length()
               + "&compression=" + self.compression()
               + "&mode=" + self.mode();
-    });
-
-    self.jsonParams = ko.computed(function () {
-      return {
-        offset: self.begin(),
-        length: self.length() * (self.upperPage() - self.page() + 1),
-        compression: self.compression(),
-        mode: self.mode()
-      }
     });
 
     self.toggleDisables = function () {
@@ -347,8 +348,8 @@ ${ fb_components.menubar() }
 
     self.lastPage = function () {
       if (! ($(".last-page").hasClass("disabled"))) {
-        var _page = viewModel.totalPages();
-        viewModel.page(viewModel.totalPages());
+        var lastDiff = viewModel.upperPage() - viewModel.page() + 1;
+        viewModel.page(Math.max(1, viewModel.totalPages() - lastDiff));
         viewModel.upperPage(viewModel.totalPages());
         changePage();
       }
@@ -356,8 +357,13 @@ ${ fb_components.menubar() }
 
     self.firstPage = function () {
       if (! ($(".first-page").hasClass("disabled"))) {
+        var lastDiff = viewModel.upperPage() - viewModel.page() + 1;
         viewModel.page(1);
-        viewModel.upperPage(Math.min(self.totalPages(), 50));
+        if (lastDiff > 1) {
+          viewModel.upperPage(Math.min(self.totalPages(), lastDiff))
+        } else {
+          viewModel.upperPage(Math.min(self.totalPages(), 50));
+        }
         changePage();
       }
     };
@@ -385,7 +391,7 @@ ${ fb_components.menubar() }
       _hash = location.hash;
 
     _hashPage = 1;
-    _hashUpperPage = 1;
+    _hashUpperPage = 50;
 
     if (_hash != "") {
       if (_hash.indexOf("-") > -1) {
@@ -430,7 +436,7 @@ ${ fb_components.menubar() }
       clearTimeout(_resizeTimeout);
       _resizeTimeout = setTimeout(function () {
         resizeText();
-        renderPages();
+        $('.fill-file-area').css('height', $("#fileArea").height() + 'px');
       }, 300);
     });
 
@@ -463,7 +469,10 @@ ${ fb_components.menubar() }
         clearTimeout(_fileAreaScrollTimeout);
         _fileAreaScrollTimeout = setTimeout(function () {
           location.hash = "#p" + viewModel.page();
-          if (pages[viewModel.page()] == null) {
+          if (viewModel.page() > 1 && pages[viewModel.page() - 1] == null) {
+            viewModel.page(viewModel.page() - 1);
+            getContent();
+          } else if (pages[viewModel.page()] == null) {
             getContent();
           }
         }, 100);
