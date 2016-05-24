@@ -286,6 +286,19 @@ from desktop.views import _ko
         PropertySelectorViewModel.prototype.addProperty = function () {
           var self = this;
           if (self.propertyToAdd()) {
+            switch (self.propertyToAdd().type()) {
+              case 'csv-hdfs-files':
+                self.propertyToAdd().value('');
+                break;
+              case 'hdfs-files':
+                self.propertyToAdd().value([{ path: ko.observable(''), type: ko.observable('') }]);
+                break;
+              case 'functions':
+                self.propertyToAdd().value([{ name: ko.observable(''), class_name: ko.observable('') }]);
+                break;
+              case 'settings':
+                self.propertyToAdd().value([{ key: ko.observable(''), value: ko.observable('') }]);
+            }
             self.selectedProperties.push(self.propertyToAdd());
             self.availableProperties.remove(self.propertyToAdd());
             self.propertyToAdd(null);
