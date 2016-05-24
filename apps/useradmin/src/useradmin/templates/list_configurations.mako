@@ -68,10 +68,10 @@ ${layout.menubar(section='configurations')}
 <script id="edit-app" type="text/html">
   <!-- ko with: selectedApp -->
   <div class="card card-small" style="padding-bottom: 68px;">
-    <h1 class="card-heading simple">${ _('Configuration') } - <!-- ko text: name --><!-- /ko --></h1>
+    <h1 class="card-heading simple"><!-- ko text: name --><!-- /ko --> ${ _('configuration') }</h1>
 
     <!-- ko foreach: groups -->
-    <h4 class="margin-left-20" style="display: inline-block;">${ _('Group override') }</h4>
+    <h4 class="margin-left-20" style="display: inline-block;">${ _('Role') }</h4>
     <div class="config-actions">
       <a class="inactive-action pointer margin-left-10" title="${ _('Remove') }" rel="tooltip" data-bind="click: function() { $parent.groups.remove($data) }"><i class="fa fa-times"></i> ${ _('Remove') }</a>
     </div>
@@ -101,7 +101,7 @@ ${layout.menubar(section='configurations')}
     <!-- /ko -->
     <div class="margin-left-20 margin-top-20">
       <a class="inactive-action pointer" href="javascript:void(0)" data-bind="click: addGroupOverride">
-        <i class="fa fa-plus"></i> ${ _('Add group override') }
+        <i class="fa fa-plus"></i> ${ _('Add role') }
       </a>
     </div>
   </div>
