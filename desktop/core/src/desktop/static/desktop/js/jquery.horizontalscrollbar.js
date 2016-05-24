@@ -59,8 +59,8 @@
             e.stopPropagation();
             e.stopImmediatePropagation();
             scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
+            e.preventDefault();
           }
-          e.preventDefault();
         });
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
         scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
