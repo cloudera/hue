@@ -334,7 +334,7 @@ from desktop.views import _ko
       <select placeholder="${ _('Key') }" data-bind="selectize: $.map($parent.options(), function (option) { return { value: option } }), value: value, options: $.map($parent.options(), function (option) { return { value: option } }), optionsText: 'value', optionsValue: 'value'"></select>
     </div>
     <!-- /ko -->
-    <!-- ko if: typeof property === 'undefined' || typeof property.options() === 'undefined' || property.options().length === 0 -->
+    <!-- ko if: typeof property === 'undefined' || typeof property.options === 'undefined' || property.options().length === 0 -->
     <input class="input" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
     <!-- /ko -->
   </script>
