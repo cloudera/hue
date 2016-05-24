@@ -834,6 +834,11 @@ ${ commonshare() | n,unicode }
     $.jHueNotify.info("${_('Query saved successfully!')}")
   });
 
+  // Initial htmlEscape
+  String.prototype.htmlEscape = function() {
+    return $('<div/>').text(this.toString()).html();
+  };
+
   var dataTable = null;
   function cleanResultsTable() {
     if (dataTable) {
@@ -858,7 +863,7 @@ ${ commonshare() | n,unicode }
           ordered_row.push(index + row_index + 1);
         }
         else {
-          ordered_row.push(row[col]);
+          ordered_row.push(row[col]).toString().htmlEscape();
         }
       });
       dataTable.fnAddData(ordered_row);
