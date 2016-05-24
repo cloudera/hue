@@ -795,11 +795,13 @@ class TestDocument2ImportExport(object):
   def test_export_documents_with_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    query3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True)
     workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow.dependencies.add(query1)
     workflow.dependencies.add(query2)
+    workflow.dependencies.add(query3)
 
-    # Test that exporting workflow should export all dependencies
+    # Test that exporting workflow should export all dependencies except history
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id]), 'format': 'json'})
     documents = json.loads(response.content)
     documents = json.loads(documents)
@@ -808,6 +810,7 @@ class TestDocument2ImportExport(object):
     assert_true('test.wf' in [doc['fields']['name'] for doc in documents])
     assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
     assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+    assert_false('query3.sql' in [doc['fields']['name'] for doc in documents])
 
     # Test that exporting multiple workflows with overlapping dependencies works
     workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
