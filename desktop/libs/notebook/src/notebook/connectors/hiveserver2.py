@@ -137,13 +137,13 @@ class HS2Api(Api):
 
     session = Session.objects.get_session(self.user, application=application)
 
+    if session is None:
+      session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
+
     response = {
       'type': lang,
       'id': session.id
     }
-
-    if session is None:
-      session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
 
     if not properties:
 
