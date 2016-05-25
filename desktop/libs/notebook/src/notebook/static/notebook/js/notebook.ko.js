@@ -1393,7 +1393,7 @@
       });
     };
 
-    self.fetchHistory = function () {
+    self.fetchHistory = function (callback) {
       self.loadingHistory(true);
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
@@ -1418,38 +1418,40 @@
         self.history(parsedHistory);
       }).always(function(){
         self.loadingHistory(false);
+        if (callback) {
+          callback();
+        }
       });
     };
 
-    self.updateHistoryRunning = false;
-    self.updateHistory = function () {
-      if (!self.updateHistoryRunning) {
-        var items = $.grep(self.history(), function (item) {
-          return item.status() == 'available' || item.status() == 'running' || item.status() == 'starting';
+    self.updateHistory = function (statuses, interval) {
+      var items = $.grep(self.history(), function (item) {
+        return statuses.indexOf(item.status()) != -1;
+      });
+
+      function updateHistoryCall(item) {
+        $.post("/notebook/api/check_status", {
+          notebook: ko.mapping.toJSON({id: item.uuid()}),
+        }, function (data) {
+          var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : null);
+          if (status && item.status() != status) {
+            item.status(status);
+          }
+        }).always(function () {
+          if (items.length > 0) {
+            window.setTimeout(function () {
+              updateHistoryCall(items.pop());
+            }, 1000);
+          } else {
+            window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
+          }
         });
+      }
 
-        function updateHistoryCall(item) {
-          $.post("/notebook/api/check_status", {
-            notebook: ko.mapping.toJSON({id: item.uuid()}),
-          }, function (data) {
-            var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : null);
-            if (status && item.status() != status) {
-              item.status(status);
-            }
-          }).always(function () {
-            if (items.length > 0) {
-              window.setTimeout(function () {
-                updateHistoryCall(items.pop());
-              }, 1000);
-            }
-            self.updateHistoryRunning = (items.length > 0);
-          });
-        }
-
-        if (items.length > 0) {
-          self.updateHistoryRunning = true;
-          updateHistoryCall(items.pop());
-        }
+     if (items.length > 0) {
+        updateHistoryCall(items.pop());
+      } else {
+        window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
       }
     };
 
@@ -1545,9 +1547,10 @@
         self.addSnippet(snippet);
       });
       if (vm.editorMode && self.history().length == 0) {
-        self.fetchHistory();
-        window.clearInterval(vm.updateHistoryInterval);
-        vm.updateHistoryInterval = window.setInterval(self.updateHistory, 20000);
+        self.fetchHistory(function() {
+          self.updateHistory(['starting', 'running'], 20000);
+          self.updateHistory(['available'], 60000 * 5);
+        });
       }
     }
   };
@@ -1650,7 +1653,6 @@
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
     self.editorMode = options.mode == 'editor';
-    self.updateHistoryInterval = null;
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
