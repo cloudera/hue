@@ -95,6 +95,8 @@ def api_error_handler(func):
       response['message'] = force_unicode(str(e))
       if e.handle:
         response['handle'] = e.handle
+      if e.extra:
+        response.update(e.extra)
     except Exception, e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
