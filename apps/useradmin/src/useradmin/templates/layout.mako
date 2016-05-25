@@ -15,6 +15,7 @@
 ## limitations under the License.
 
 <%!
+from desktop import conf
 from django.utils.translation import ugettext as _
 
 def is_selected(section, matcher):
@@ -58,9 +59,11 @@ def is_selected(section, matcher):
               </li>
               %if user.is_superuser:
               <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
-				      <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
-				      <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
-##               <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
+              <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
+              <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
+              %if conf.USE_DEFAULT_CONFIGURATION.get():
+              <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
+              %endif
               %endif
             </ul>
           </div>
