@@ -272,14 +272,19 @@ var SmartViewModel = function (options) {
   });
 
   self._reloadcfs = function (callback) {
-    return API.queryTable("getColumnDescriptors").done(function (data) {
+    var descriptorCallback = function (data) {
       self.columnFamilies.removeAll();
       var keys = Object.keys(data);
       for (var i = 0; i < keys.length; i++) {
         self.columnFamilies.push(new ColumnFamily({name: keys[i], enabled: false}));
       }
-      if (callback != null)
+      if (typeof callback !== 'undefined' && callback !== null) {
         callback();
+      }
+    }
+
+    return API.queryTable("getColumnDescriptors").done(descriptorCallback).error(function () {
+      descriptorCallback({});
     });
   };
 

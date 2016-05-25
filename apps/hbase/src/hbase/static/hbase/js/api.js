@@ -34,8 +34,11 @@ var API = {
       url += '/' + encodeURIComponent(arguments[i]);
     }
     var queryObject = {url: url, method: 'POST', startTime: new Date().getTime(), status: 'running...'};
+    var functionName = arguments.length > 0 ? arguments[0] : '';
     var handler = $.post(url, $_POST).error(function (response) {
-      $(document).trigger("error", JSON.parse(response.responseText).message);
+      if (functionName !== 'getColumnDescriptors') {
+        $(document).trigger("error", JSON.parse(response.responseText).message);
+      }
     });
     var doneHandle = handler.done;
     handler.done = function () {
