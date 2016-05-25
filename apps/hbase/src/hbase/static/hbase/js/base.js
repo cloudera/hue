@@ -141,7 +141,7 @@ var ListViewModel = function (options) {
         callback();
       self.sortDropDown.sort();
       self.isLoading(false);
-      if (self.searchQuery()) {
+      if (self._table && self.searchQuery()) {
         self._table.fnFilter(self.searchQuery());
       }
     }]);
