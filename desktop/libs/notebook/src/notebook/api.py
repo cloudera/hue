@@ -28,7 +28,7 @@ from django.views.decorators.http import require_GET, require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired
+from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
@@ -107,26 +107,37 @@ def execute(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+    try:
+      response['handle'] = get_api(request, snippet).execute(notebook, snippet)
 
-    # Retrieve and remove the result from the handle
-    if response['handle'].get('sync'):
-      result = response['handle'].pop('result')
-  finally:
-    if notebook['type'].startswith('query-'):
-      _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
-      if 'handle' in response: # No failure
-        _snippet['result']['handle'] = response['handle']
-        _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
-        _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
-        _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']) # For non HS2, as non multi query yet
-      else:
-        _snippet['status'] = 'failed'
-      history = _historify(notebook, request.user)
-      response['history_id'] = history.id
-      response['history_uuid'] = history.uuid
-      if notebook['isSaved']: # Keep track of history of saved queries
-        response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
+      # Retrieve and remove the result from the handle
+      if response['handle'].get('sync'):
+        result = response['handle'].pop('result')
+    finally:
+      if notebook['type'].startswith('query-'):
+        _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
+        if 'handle' in response: # No failure
+          _snippet['result']['handle'] = response['handle']
+          _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
+          _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
+          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']) # For non HS2, as non multi query yet
+        else:
+          _snippet['status'] = 'failed'
+
+        history = _historify(notebook, request.user)
+
+        response['history_id'] = history.id
+        response['history_uuid'] = history.uuid
+        if notebook['isSaved']: # Keep track of history of saved queries
+          response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
+  except QueryError, ex: # We inject the history information from _historify() to the failed queries
+    if response.get('history_id'):
+      ex.extra['history_id'] = response['history_id']
+    if response.get('history_uuid'):
+      ex.extra['history_uuid'] = response['history_uuid']
+    if response.get('history_parent_uuid'):
+      ex.extra['history_parent_uuid'] = response['history_parent_uuid']
+    raise ex
 
   # Inject and HTML escape results
   if result is not None:
