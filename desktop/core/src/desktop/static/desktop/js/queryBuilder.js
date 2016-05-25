@@ -163,13 +163,13 @@
             }
 
             // Used to store new rule
-            var row = "<tr class='queryBuilderRow' database='${database}' table='${table}' column='${column}' rule='${rule}' category='${category}' template='${template}'>
-                       <td class='databaseAndTable' ${visibility}>${database}.${table}</td>
-                       <td class='column' ${visibility}>${column}</td>
-                       <td class='rule'>${rule}</td>
-                       <td class='input'>${inputField}</td>
-                       <td class='deleteRule' onclick='QueryBuilder.deleteRule($(this).closest("tr"))'><i class='fa fa-times'></i></td>
-                       </tr>";
+            var row = "<tr class='queryBuilderRow' database='${database}' table='${table}' column='${column}' rule='${rule}' category='${category}' template='${template}'>" +
+                       "<td class='databaseAndTable' ${visibility}>${database}.${table}</td>" +
+                       "<td class='column' ${visibility}>${column}</td>" +
+                       "<td class='rule'>${rule}</td>" +
+                       "<td class='input'>${inputField}</td>" +
+                       "<td class='deleteRule' onclick='QueryBuilder.deleteRule($(this).closest('tr'))'><i class='fa fa-times'></i></td>" +
+                       "</tr>";
 
             // Check if the column is already in the rules
             if (numOfMatchingRows) {
