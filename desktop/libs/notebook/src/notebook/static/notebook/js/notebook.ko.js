@@ -628,6 +628,7 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
+
         if (vm.editorMode && data.history_id) {
           var url = '/notebook/editor?editor=' + data.history_id;
           hueUtils.changeURL(url);
