@@ -61,6 +61,10 @@
 
     return this.each(function () {
       self.$table = $(this);
+      var parent = self.$table.parent();
+      if (parent.hasClass('dataTables_wrapper')) {
+        return;
+      }
       self.$table.wrap('<div class="dataTables_wrapper"></div>');
       self.$table.addClass('table-huedatatable');
     });
