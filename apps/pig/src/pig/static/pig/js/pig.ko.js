@@ -353,6 +353,7 @@ var PigViewModel = function (props) {
   };
 
   self.runScript = function () {
+    $("#withLogs").empty();
     callRun(self.currentScript());
   };
 
