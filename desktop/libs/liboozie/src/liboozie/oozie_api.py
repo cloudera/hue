@@ -73,8 +73,6 @@ class OozieApi(object):
     return self._security_enabled
 
   def _get_params(self):
-    if self.security_enabled:
-      return { 'doAs': self.user, 'timezone': TIME_ZONE.get() }
     return { 'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get() }
 
   def _get_oozie_properties(self, properties=None):
