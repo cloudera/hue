@@ -533,8 +533,11 @@ class Collection2(object):
   def get_default(self, user, name):
     fields = self.fields_data(user, name)
     id_field = [field['name'] for field in fields if field.get('isId')]
+
     if id_field:
       id_field = id_field[0]
+    else:
+      id_field = '' # Schemaless might not have an id
 
     TEMPLATE = {
       "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
@@ -860,6 +863,7 @@ def augment_solr_response(response, collection, query):
   # HTML escaping
   if not query.get('download'):
     id_field = collection.get('idField', '')
+
     for doc in response['response']['docs']:
       for field, value in doc.iteritems():
         if isinstance(value, numbers.Number):
