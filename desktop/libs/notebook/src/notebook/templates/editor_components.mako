@@ -40,6 +40,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 
 <script src="${ static('desktop/js/hue.json.js') }"></script>
+<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
@@ -73,8 +74,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
       $('.button-panel').show();
       $('#queryBuilder').show();
       $('#queryBuilderAlert').hide();
-    }
-    else {
+    } else {
       $('.button-panel').hide();
       $('#queryBuilder').hide();
       $('#queryBuilderAlert').show();
@@ -1974,8 +1974,7 @@ ${ hueIcons.symbols() }
           $("#importGithubBtn").removeAttr("disabled");
           $("#importGithubModal").modal("hide");
           importGithub();
-        }
-        else {
+        } else {
           location.href = data.auth_url;
         }
       });
@@ -1989,13 +1988,11 @@ ${ hueIcons.symbols() }
       if (data && data.content){
         if ($.isArray(data.content)) { // it's a Hue Notebook
           window.importExternalNotebook(JSON.parse(data.content[0].fields.data));
-        }
-        else { // iPython / Zeppelin
+        } else { // iPython / Zeppelin
           window.parseExternalJSON(data.content);
         }
         $("#importGithubUrl").val("");
-      }
-      else {
+      } else {
         $.jHueNotify.error("${ _("Failed to load") } " + $("#importGithubUrl").val());
       }
     });
@@ -2008,8 +2005,7 @@ ${ hueIcons.symbols() }
   var hideHoverMsg = function (vm) {
     if (vm.editorMode){
       $(".hoverText").html("${_('Drop a SQL file here')}");
-    }
-    else {
+    } else {
       $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
     }
     $(".hoverMsg").addClass("hide");
@@ -2058,8 +2054,25 @@ ${ hueIcons.symbols() }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
-  function createDatatable(el, snippet, vm) {
-    $(el).addClass("dt");
+  function createHueDatatable(el, snippet, vm) {
+    var _dt = $(el).hueDataTable({
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}"
+      },
+      "fnDrawCallback": function (oSettings) {
+        DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
+        $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+        $(el).jHueHorizontalScrollbar();
+      }
+    });
+    $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+    $(el).jHueHorizontalScrollbar();
+
+    return _dt;
+  }
+
+  function createRegularDatatable(el, snippet, vm) {
     var DATATABLES_MAX_HEIGHT = 330;
     var _dt = $(el).dataTable({
       "bPaginate": false,
@@ -2077,34 +2090,29 @@ ${ hueIcons.symbols() }
         }
         if (vm.editorMode) {
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-          if (!snippet.result.hasManyColumns()) {
-            $(el).jHueTableExtender({
-              fixedHeader: true,
-              fixedFirstColumn: true,
-              includeNavigator: false,
-              parentId: 'snippet_' + snippet.id(),
-              mainScrollable: '.right-panel',
-              stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
-              clonedContainerPosition: "fixed"
-            });
-          }
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            parentId: 'snippet_' + snippet.id(),
+            mainScrollable: '.right-panel',
+            stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
+            clonedContainerPosition: "fixed"
+          });
           $(el).jHueHorizontalScrollbar();
-        }
-        else {
+        } else {
           $(el).parents(".dataTables_wrapper").jHueTableScroller({
             maxHeight: DATATABLES_MAX_HEIGHT,
             heightAfterCorrection: 0
           });
-          if (!snippet.result.hasManyColumns()) {
-            $(el).jHueTableExtender({
-              fixedHeader: true,
-              fixedFirstColumn: true,
-              includeNavigator: false,
-              mainScrollable: '.right-panel',
-              parentId: 'snippet_' + snippet.id(),
-              clonedContainerPosition: "absolute"
-            });
-          }
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            mainScrollable: '.right-panel',
+            parentId: 'snippet_' + snippet.id(),
+            clonedContainerPosition: "absolute"
+          });
         }
       },
       "aoColumnDefs": [
@@ -2125,37 +2133,47 @@ ${ hueIcons.symbols() }
 
     if (vm.editorMode) {
       $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-      if (!snippet.result.hasManyColumns()) {
-        $(el).jHueTableExtender({
-          fixedHeader: true,
-          fixedFirstColumn: true,
-          includeNavigator: false,
-          parentId: 'snippet_' + snippet.id(),
-          mainScrollable: '.right-panel',
-          stickToTopPosition: vm.isPlayerMode() ? (vm.isFullscreenMode() ? 48 : 0) : 73,
-          clonedContainerPosition: "fixed"
-        });
-      }
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        includeNavigator: false,
+        parentId: 'snippet_' + snippet.id(),
+        mainScrollable: '.right-panel',
+        stickToTopPosition: vm.isPlayerMode() ? (vm.isFullscreenMode() ? 48 : 0) : 73,
+        clonedContainerPosition: "fixed"
+      });
       $(el).jHueHorizontalScrollbar();
-    }
-    else {
+    } else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
         maxHeight: DATATABLES_MAX_HEIGHT,
         heightAfterCorrection: 0,
         enableNiceScroll: true
       });
-      if (!snippet.result.hasManyColumns()) {
-        $(el).jHueTableExtender({
-          fixedHeader: true,
-          fixedFirstColumn: true,
-          includeNavigator: false,
-          mainScrollable: '.right-panel',
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "absolute"
-        });
-      }
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        includeNavigator: false,
+        mainScrollable: '.right-panel',
+        parentId: 'snippet_' + snippet.id(),
+        clonedContainerPosition: "absolute"
+      });
     }
     $(".dataTables_filter").hide();
+    return _dt;
+  }
+
+  function createDatatable(el, snippet, vm) {
+    var parent = $(el).parent();
+    // When executing few columns -> many columns -> few columns we have to clear the style
+    $(el).removeAttr('style');
+    $(el).removeClass('table-huedatatable');
+    if (parent.hasClass('dataTables_wrapper')) {
+      $(el).unwrap();
+    }
+    $(el).addClass("dt");
+
+    var _dt = snippet.result.hasManyColumns() ? createHueDatatable(el, snippet, vm) : createRegularDatatable(el, snippet, vm)
+
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
     if (!vm.editorMode) {
@@ -2318,8 +2336,7 @@ ${ hueIcons.symbols() }
             obj: item
           });
         });
-      }
-      else {
+      } else {
         $(rawDatum.counts()).each(function (cnt, item) {
           _data.push({
             lat: item[_idxLat],
@@ -2438,8 +2455,7 @@ ${ hueIcons.symbols() }
             addToDatum(item[_idxGroup]);
           });
         }
-      }
-      else {
+      } else {
         addToDatum('${ _('Distribution') }');
       }
 
@@ -2612,7 +2628,7 @@ ${ hueIcons.symbols() }
           return;
         }
         viewModel.selectedNotebook().snippets().forEach(function (snippet) {
-          if (!snippet.result.hasManyColumns()) {
+          if (snippet.result.meta().length > 0 && ! snippet.result.hasManyColumns()) {
             var _el = $("#snippet_" + snippet.id()).find(".resultTable");
             if (viewModel.editorMode) {
               _el.jHueTableExtender({
@@ -2625,8 +2641,7 @@ ${ hueIcons.symbols() }
                 clonedContainerPosition: "fixed"
               });
               _el.jHueHorizontalScrollbar();
-            }
-            else {
+            } else {
               _el.jHueTableExtender({
                 fixedHeader: true,
                 fixedFirstColumn: true,
@@ -2641,8 +2656,7 @@ ${ hueIcons.symbols() }
       }
       if (timeout){
         window.setTimeout(renderer, timeout);
-      }
-      else {
+      } else {
         renderer();
       }
       $('.right-panel').jHueScrollUp();
@@ -2711,15 +2725,13 @@ ${ hueIcons.symbols() }
       try {
         if (viewModel.editorMode){
           replaceAce(raw);
-        }
-        else {
+        } else {
           var loaded = typeof raw == "string" ? JSON.parse(raw) : raw;
           if (loaded.nbformat) { //ipython
             var cells = [];
             if (loaded.nbformat == 3) {
               cells = loaded.worksheets[0].cells;
-            }
-            else if (loaded.nbformat == 4) {
+            } else if (loaded.nbformat == 4) {
               cells = loaded.cells;
             }
             cells.forEach(function (cell, cellCnt) {
@@ -2727,8 +2739,7 @@ ${ hueIcons.symbols() }
                 if (cell.cell_type == "code") {
                   if (loaded.nbformat == 3) {
                     addPySpark($.isArray(cell.input) ? cell.input.join("") : cell.input);
-                  }
-                  else {
+                  } else {
                     addPySpark($.isArray(cell.source) ? cell.source.join("") : cell.source);
                   }
                 }
@@ -2736,11 +2747,9 @@ ${ hueIcons.symbols() }
                   var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
                   if (cell.level == 1) {
                     heading += "\n====================";
-                  }
-                  else if (cell.level == 2) {
+                  } else if (cell.level == 2) {
                     heading += "\n--------------------";
-                  }
-                  else {
+                  } else {
                     heading = "### " + heading;
                   }
                   addMarkdown(heading);
@@ -2765,16 +2774,13 @@ ${ hueIcons.symbols() }
                 if (content[0].indexOf("%md") > -1) {
                   content.shift();
                   addMarkdown(content.join("\n"));
-                }
-                else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
+                } else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
                   content.shift();
                   addSql(content.join("\n"));
-                }
-                else if (content[0].indexOf("%pyspark") > -1) {
+                } else if (content[0].indexOf("%pyspark") > -1) {
                   content.shift();
                   addPySpark(content.join("\n"));
-                }
-                else {
+                } else {
                   if (content[0].indexOf("%spark") > -1) {
                     content.shift();
                   }
@@ -2805,8 +2811,7 @@ ${ hueIcons.symbols() }
         var files = dt.files;
         if (files.length > 0){
           showHoverMsg();
-        }
-        else {
+        } else {
           hideHoverMsg(viewModel);
         }
 
@@ -2871,8 +2876,7 @@ ${ hueIcons.symbols() }
           $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
           $("#importGithubUrl").val(location.getParameter("github_fetch"));
           importGithub();
-        }
-        else {
+        } else {
           $.jHueNotify.error("${ _('Could not decode Github file content to JSON.') }");
         }
       }
@@ -2894,13 +2898,11 @@ ${ hueIcons.symbols() }
           $(".add-snippet").hide();
           if (viewModel.isFullscreenMode()){
             $(".main-content").css("top", "50px");
-          }
-          else {
+          } else {
             $(".main-content").css("top", "1px");
           }
           $(window).bind("keydown", "esc", exitPlayerMode);
-        }
-        else {
+        } else {
           viewModel.isLeftPanelVisible(wasAssistVisible);
           viewModel.assistAvailable(isAssistAvailable);
           $(".navigator").show();
@@ -3043,8 +3045,7 @@ ${ hueIcons.symbols() }
         $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr.selected').removeClass('selected');
         if ($(this).hasClass('selected')) {
           $(this).removeClass('selected');
-        }
-        else {
+        } else {
           $('.dataTables_wrapper > table tbody tr.selected').removeClass('selected');
           $(this).addClass('selected');
           $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr:eq('+($(this).index())+')').addClass('selected');
@@ -3055,8 +3056,7 @@ ${ hueIcons.symbols() }
         var _dtElement;
         if (snippet.showGrid()) {
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
-        }
-        else {
+        } else {
           _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
         }
         if (_dtElement.length == 0) {
@@ -3077,8 +3077,9 @@ ${ hueIcons.symbols() }
               options.snippet.result.meta.notifySubscribers();
               $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
               _dt = createDatatable(_el, options.snippet, viewModel);
-            }
-            else {
+            } else if (options.snippet.result.hasManyColumns()) {
+              _dt = _el.hueDataTable();
+            } else {
               _dt = _el.dataTable();
             }
             try {
@@ -3091,8 +3092,7 @@ ${ hueIcons.symbols() }
             redrawFixedHeaders();
             resizeToggleResultSettings(options.snippet);
           }, 300);
-        }
-        else {
+        } else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
           _dtElement.animate({opacity: '1'}, 50);
         }
