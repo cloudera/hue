@@ -1203,17 +1203,28 @@ ${ commonshare() | n,unicode }
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
-          if (data.logs.pig) {
+          var logs = data.logs.pig || '';
+          if (data.workflow && data.workflow.actions) {
+            data.workflow.actions.forEach(function (action) {
+              if (data.logs[action.name]) {
+                if (logs !== '') {
+                  logs += '\n';
+                }
+                logs += data.logs[action.name];
+              }
+            });
+          }
+          if (logs !== '') {
             if ($("#withLogs").is(":hidden")) {
               $("#withoutLogs").addClass("hide");
               $("#withLogs").removeClass("hide");
               resizeLogs();
             }
             var _logsEl = $("#withLogs");
-            var newLines = data.logs.pig.split("\n").slice(_logsEl.html().split("<br>").length);
-            if (newLines.length > 0){
-              _logsEl.html(_logsEl.html() + newLines.join("<br>") + "<br>");
-              checkForErrors(newLines);
+            var lines = logs.split("\n");
+            if (lines.length > 0){
+              _logsEl.html(lines.join("<br>") + "<br>");
+              checkForErrors(lines);
             }
             window.setTimeout(function () {
               resizeLogs();
