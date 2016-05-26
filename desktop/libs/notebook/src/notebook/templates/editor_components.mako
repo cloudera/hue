@@ -2166,9 +2166,11 @@ ${ hueIcons.symbols() }
     var parent = $(el).parent();
     // When executing few columns -> many columns -> few columns we have to clear the style
     $(el).removeAttr('style');
-    $(el).removeClass('table-huedatatable');
-    if (parent.hasClass('dataTables_wrapper')) {
-      $(el).unwrap();
+    if ($(el).hasClass('table-huedatatable')) {
+      $(el).removeClass('table-huedatatable');
+      if (parent.hasClass('dataTables_wrapper')) {
+        $(el).unwrap();
+      }
     }
     $(el).addClass("dt");
 
