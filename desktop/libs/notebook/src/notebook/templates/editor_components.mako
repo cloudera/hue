@@ -1459,7 +1459,7 @@ ${ hueIcons.symbols() }
     </ul>
     <ul class="unstyled" data-bind="foreach: result.meta">
       <li data-bind="visible: name != ''">
-        <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
+        <input type="checkbox" checked="checked" data-bind="event: { change: function(){ toggleColumn($element, $index(), $parent);} }" />
         <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
       </li>
     </ul>
@@ -2222,9 +2222,14 @@ ${ hueIcons.symbols() }
     return _dt;
   }
 
-  function toggleColumn(linkElement, index) {
-    var _dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
-    _dt.fnSetColumnVis(index, !_dt.fnSettings().aoColumns[index].bVisible);
+  function toggleColumn(linkElement, index, snippet) {
+    var dt;
+    if (snippet.result.hasManyColumns()) {
+      dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").hueDataTable();
+    } else {
+      dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
+    }
+    dt.fnSetColumnVis(index, !dt.fnSettings().aoColumns[index].bVisible);
   }
 
   function scrollToColumn(linkElement) {
