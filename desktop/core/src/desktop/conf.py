@@ -383,6 +383,7 @@ def default_ssl_validate():
 
 
 def get_deprecated_login_lock_out_by_combination_browser_user_agent():
+  """Return value of deprecated LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP config"""
   return AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP.get()
 
 
