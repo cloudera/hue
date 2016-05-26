@@ -31,8 +31,7 @@
     this.init();
   }
 
-  Plugin.prototype.init = function () {
-    var el = this.element;
+  function initWhenReady(el) {
     if ($(el).parents('.dataTables_wrapper').length > 0) {
       var scrollingRatio = function () {
         return $(el).parents('.dataTables_wrapper').width() - $(el).parents('.dataTables_wrapper').find('hue-scrollbar-x').width()
@@ -52,8 +51,8 @@
         });
         $(el).parents('.dataTables_wrapper').bind('mousewheel DOMMouseScroll wheel', function (e) {
           var _e = e.originalEvent,
-            _deltaX = _e.wheelDeltaX || -_e.deltaX,
-            _deltaY = _e.wheelDeltaY || -_e.deltaY;
+              _deltaX = _e.wheelDeltaX || -_e.deltaX,
+              _deltaY = _e.wheelDeltaY || -_e.deltaY;
           if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
             this.scrollLeft += -_deltaX / 2;
             e.stopPropagation();
@@ -65,8 +64,7 @@
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
         scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
         scrollbarRail.css("marginLeft", (colWidth) + "px");
-      }
-      else {
+      } else {
         var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 5;
         $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
         var scrollbarRail = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail');
@@ -75,6 +73,20 @@
         scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
       }
     }
+  }
+
+  Plugin.prototype.init = function () {
+    var el = this.element;
+
+    var checkWidth = function () {
+      if ($(el).parents('.dataTables_wrapper').width() > 0) {
+        initWhenReady(el);
+      } else {
+        window.setTimeout(checkWidth, 100);
+      }
+    }
+
+    checkWidth();
   };
 
   $.fn[pluginName] = function (options) {
