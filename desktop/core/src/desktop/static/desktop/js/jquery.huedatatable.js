@@ -22,19 +22,51 @@
   $.fn.hueDataTable = function (oInit) {
 
     var self = this;
-    this.$table = null;
+    self.$table = null;
 
-    this.fnAddData = function (mData, bRedraw) {
+    self.fnSetColumnVis = function(index, visible) {
+      var aoColumns = this.$table.data('aoColumns');
+      var change = aoColumns[index].bVisible !== visible;
+      aoColumns[index].bVisible = visible;
+      if (!change) {
+        return;
+      }
+      if (!visible) {
+        self.$table.find('tr').find('td:eq(' + index + '),th:eq(' + index + ')').hide();
+      } else {
+        self.$table.find('tr').find('td:eq(' + index + '),th:eq(' + index + ')').show();
+      }
+    }
+
+    self.fnAddData = function (mData, bRedraw) {
+      var aoColumns = this.$table.data('aoColumns');
+
       var $t = self.$table;
       if (mData.length === 0) {
         return;
       }
+
+      if (aoColumns.length === 0) {
+        mData[0].forEach(function () {
+          aoColumns.push({
+            bVisible: true
+          })
+        })
+      }
+
+
       var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
       var html = '';
       mData.forEach(function (row) {
         html += '<tr>';
+        var index = 0;
         row.forEach(function (cell) {
-          html += '<td>' + cell + '</td>';
+          if (aoColumns[index].bVisible) {
+            html += '<td>' + cell + '</td>';
+          } else {
+            html += '<td style="display: none;">' + cell + '</td>';
+          }
+          index++;
         });
         html += '</tr>';
       });
@@ -44,7 +76,14 @@
       }
     };
 
-    this.fnClearTable = function (bRedraw) {
+    self.fnSettings = function () {
+      var aoColumns = self.$table.data('aoColumns');
+      return {
+        aoColumns: aoColumns
+      }
+    }
+
+    self.fnClearTable = function (bRedraw) {
       var $t = self.$table;
       if ($t.children('tbody').length > 0) {
         $t.children('tbody').empty();
@@ -54,17 +93,19 @@
       }
     };
 
-    this.fnDestroy = function () {
+    self.fnDestroy = function () {
       self.$table.unwrap();
       self.$table.removeClass('table-huedatatable');
     };
 
-    return this.each(function () {
+    return self.each(function () {
       self.$table = $(this);
       var parent = self.$table.parent();
       if (parent.hasClass('dataTables_wrapper')) {
         return;
       }
+      self.$table.data('aoRows', []);
+      self.$table.data('aoColumns', []);
       self.$table.wrap('<div class="dataTables_wrapper"></div>');
       self.$table.addClass('table-huedatatable');
     });
