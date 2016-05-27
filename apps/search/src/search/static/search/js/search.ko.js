@@ -1692,14 +1692,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       document: ko.mapping.toJSON(doc),
       id: doc.id
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         doc.showEdit(false);
+
+        var versionField = $.grep(doc.details(), function(field) { return field.key() == '_version_'; });
+        if (versionField.length > 0) {
+          versionField[0].value( data.update.adds[1]);
+          versionField[0].hasChanged(false);
+        };
+
         doc.originalDetails(ko.toJSON(doc.details()));
       }
       else {
         $(document).trigger("error", data.message);
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };

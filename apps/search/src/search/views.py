@@ -356,14 +356,14 @@ def update_document(request):
       version = None # If there is a version, use it to avoid potential concurrent update conflicts
 
       for field in document['details']:
-        if field['hasChanged']:
+        if field['hasChanged'] and field['key'] != '_version_':
           edits[field['key']] = {"set": field['value']}
         if field['key'] == '_version_':
           version = field['value']
 
-      if SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version):
-        result['status'] = 0
-        result['message'] = _('Document successfully updated.')
+      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version)
+      result['message'] = _('Document successfully updated.')
+      result['status'] = 0
     else:
       result['status'] = 0
       result['message'] = _('Document has no modifications to change.')
@@ -371,7 +371,7 @@ def update_document(request):
     try:
       result['message'] = json.loads(e.message)['error']['msg']
     except:
-      LOG.exception('failed to parse json response')
+      LOG.exception('Failed to parse json response')
       result['message'] = force_unicode(e)
   except Exception, e:
     result['message'] = force_unicode(e)
