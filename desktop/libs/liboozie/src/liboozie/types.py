@@ -22,6 +22,7 @@ This is mostly just codifying the datastructure of the Oozie REST API.
 http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
 
+import logging
 import re
 
 from cStringIO import StringIO
@@ -37,6 +38,7 @@ from liboozie.utils import parse_timestamp, format_time
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
+LOG = logging.getLogger(__name__)
 
 class Action(object):
 
@@ -148,7 +150,11 @@ class WorkflowAction(Action):
 
     if self.conf:
       xml = StringIO(i18n.smart_str(self.conf))
-      self.conf_dict = hadoop.confparse.ConfParse(xml)
+      try:
+        self.conf_dict = hadoop.confparse.ConfParse(xml)
+      except Exception, e:
+        LOG.error('Failed to parse XML configuration for Workflow action %s: %s' % (self.name, e))
+        self.conf_dict = {}
     else:
       self.conf_dict = {}
 
