@@ -784,8 +784,7 @@ class SolrApi(object):
     elif content_type == 'json':
       content_type = 'application/json'
     else:
-      LOG.error("Could not update index for %s. Unsupported content type %s. Allowed content types: csv" % (collection_or_core_name, content_type))
-      return False
+      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
 
     params = self._get_params() + (
         ('wt', 'json'),
@@ -796,5 +795,5 @@ class SolrApi(object):
         ('_version_', version),
         ('versions', 'true')
       )
-    self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
-    return True
+    response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
+    return self._get_json(response)
