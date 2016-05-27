@@ -263,7 +263,7 @@ class SparkApi(Api):
     elif content['status'] == 'error':
       tb = content.get('traceback', None)
 
-      if tb is None:
+      if tb is None or not tb:
         msg = content.get('ename', 'unknown error')
 
         evalue = content.get('evalue')
