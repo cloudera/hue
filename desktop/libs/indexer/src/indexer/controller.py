@@ -28,10 +28,10 @@ from libsolr.api import SolrApi
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
+from search.models import Collection2
 
 from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
-from search.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
@@ -160,6 +160,7 @@ class CollectionManagerController(object):
         config_root_path = '%s/%s' % (solr_config_path, 'conf')
         try:
           zc.copy_path(root_node, config_root_path)
+
         except Exception, e:
           zc.delete_path(root_node)
           raise PopupException(_('Error in copying Solr configurations.'), detail=e)

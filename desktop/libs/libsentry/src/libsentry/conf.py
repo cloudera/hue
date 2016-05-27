@@ -15,10 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 
 from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config
+
+LOG = logging.getLogger(__name__)
 
 
 HOSTNAME=Config(
@@ -40,3 +43,11 @@ SENTRY_CONF_DIR = Config(
   help=_t('Sentry configuration directory, where sentry-site.xml is located.'),
   default=os.environ.get("SENTRY_CONF_DIR", '/etc/sentry/conf')
 )
+
+
+def is_enabled():
+  try:
+    from search.conf import SECURITY_ENABLED
+    return SECURITY_ENABLED.get()
+  except ImportError, e:
+    LOG.warn("Search app is not enabled")

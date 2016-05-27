@@ -86,6 +86,10 @@ class ZookeeperClient(object):
     return self.zk.exists(namespace) is not None
 
 
+  def set(self, path, value, version=-1):
+    return self.zk.set(path, value, version)
+
+
   def copy_path(self, namespace, filepath):
     if self.read_only:
       raise ReadOnlyClientException('Cannot execute copy_path when read_only is set to True.')
