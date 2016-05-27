@@ -45,10 +45,12 @@ def create_index(request):
     searcher = IndexController(request.user)
 
     try:
-      collection = searcher.create_index(name,
-                                         request.POST.get('fields', get_default_fields()),
-                                         request.POST.get('uniqueKeyField', 'id'),
-                                         request.POST.get('df', 'text'))
+      collection = searcher.create_index(
+          name,
+          request.POST.get('fields', get_default_fields()),
+          request.POST.get('uniqueKeyField', 'id'),
+          request.POST.get('df', 'text')
+      )
 
       response['status'] = 0
       response['collection'] = collection
