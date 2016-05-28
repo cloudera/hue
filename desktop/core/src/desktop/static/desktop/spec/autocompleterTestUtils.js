@@ -34,6 +34,23 @@ define([
           }
         }
       }
+    },
+    testDefinitionMatcher: {
+      toEqualDefinition : function() {
+        return {
+          compare: function(actualResponse, testDefinition) {
+            if (testDefinition.ignoreErrors) {
+              delete actualResponse.error;
+            }
+            return {
+              pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
+              message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                       'Expected response: ' + JSON.stringify(testDefinition.expectedResult) + '\n' +
+                       '  Parser response: ' + JSON.stringify(actualResponse) +   '\n'
+            };
+          }
+        }
+      }
     }
   }
 });
