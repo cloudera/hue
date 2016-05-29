@@ -15,12 +15,12 @@
 // limitations under the License.
 
 define(function(require){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,11],$V1=[1,12],$V2=[1,7],$V3=[1,9],$V4=[1,10],$V5=[9,10],$V6=[1,23],$V7=[1,22],$V8=[4,5,9,10,14,21,28,32,34,39,43,44,45,46,47,48,50,58,61,62,66,71,74],$V9=[9,10,21],$Va=[1,31],$Vb=[4,9,10,21,28,58,61,62,66],$Vc=[1,43],$Vd=[1,44],$Ve=[1,45],$Vf=[1,46],$Vg=[1,47],$Vh=[1,54],$Vi=[4,9,10,28,58,61,62],$Vj=[14,57],$Vk=[2,57],$Vl=[1,66],$Vm=[1,71],$Vn=[4,5,9,10,28,58,61,62],$Vo=[4,5,9,10,28,58,61,62,66],$Vp=[1,82],$Vq=[4,5,9,10,28,58,61,62,66,71,74],$Vr=[1,85],$Vs=[4,5,9,10,28,32,50,58,61,62,66,71,74],$Vt=[4,5,9,10,28,32,34,50,58,61,62,66,71,74],$Vu=[4,5,9,10,28,32,34,39,43,44,45,46,47,48,50,58,61,62,66,71,74],$Vv=[1,100],$Vw=[1,101],$Vx=[14,49,57],$Vy=[4,5,9,10,28,32,34,39,43,44,45,46,47,48,50,56,58,61,62,66,71,74];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,15],$V1=[1,16],$V2=[1,9],$V3=[1,11],$V4=[1,17],$V5=[1,18],$V6=[1,13],$V7=[1,14],$V8=[9,10],$V9=[1,36],$Va=[1,35],$Vb=[4,5,9,10,16,38,40,68,75,79,81,86,90,91,92,93,94,95,103,106,107,115,118],$Vc=[26,27],$Vd=[28,29],$Ve=[9,10,68],$Vf=[1,48],$Vg=[4,9,10,40,68,75,103,106,107],$Vh=[1,54],$Vi=[1,63],$Vj=[1,64],$Vk=[1,65],$Vl=[1,66],$Vm=[1,67],$Vn=[1,74],$Vo=[4,9,10,75,103,106,107],$Vp=[16,102],$Vq=[2,99],$Vr=[1,96],$Vs=[1,91],$Vt=[4,5,9,10,75,103,106,107],$Vu=[4,5,9,10,40,75,103,106,107],$Vv=[1,107],$Vw=[4,5,9,10,40,75,103,106,107,115,118],$Vx=[9,10,22],$Vy=[1,121],$Vz=[1,122],$VA=[4,5,9,10,38,40,75,79,103,106,107,115,118],$VB=[4,5,9,10,38,40,75,79,81,103,106,107,115,118],$VC=[4,5,9,10,38,40,75,79,81,86,90,91,92,93,94,95,103,106,107,115,118],$VD=[1,137],$VE=[1,138],$VF=[38,40],$VG=[16,36,102],$VH=[4,5,9,10,38,40,75,79,81,86,90,91,92,93,94,95,101,103,106,107,115,118];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"AnyCursor":3,"CURSOR":4,"PARTIAL_CURSOR":5,"InitResults":6,"Sql":7,"SqlStatements":8,";":9,"EOF":10,"SqlStatement":11,"UseStatement":12,"QueryExpression":13,"REGULAR_IDENTIFIER":14,"USE":15,"SELECT":16,"SelectList":17,"TableExpression":18,"FromClause":19,"SelectConditionList":20,"FROM":21,"TableReferenceList":22,"SelectCondition":23,"WhereClause":24,"GroupByClause":25,"OrderByClause":26,"LimitClause":27,"WHERE":28,"SearchCondition":29,"BooleanValueExpression":30,"BooleanTerm":31,"OR":32,"BooleanFactor":33,"AND":34,"NOT":35,"BooleanTest":36,"Predicate":37,"CompOp":38,"IS":39,"TruthValue":40,"ParenthesizedBooleanValueExpression":41,"NonParenthesizedValueExpressionPrimary":42,"=":43,"<>":44,"<":45,">":46,"<=":47,">=":48,"(":49,")":50,"ColumnReference":51,"BasicIdentifierChain":52,"InitIdentifierChain":53,"IdentifierChain":54,"Identifier":55,".":56,"\"":57,"GROUP":58,"BY":59,"ColumnList":60,"ORDER":61,"LIMIT":62,"UNSIGNED_INTEGER":63,"*":64,"DerivedColumn":65,",":66,"TableReference":67,"TablePrimaryOrJoinedTable":68,"TablePrimary":69,"JoinedTable":70,"JOIN":71,"JoinSpecification":72,"JoinCondition":73,"ON":74,"$accept":0,"$end":1},
-terminals_: {2:"error",4:"CURSOR",5:"PARTIAL_CURSOR",9:";",10:"EOF",14:"REGULAR_IDENTIFIER",15:"USE",16:"SELECT",21:"FROM",28:"WHERE",32:"OR",34:"AND",35:"NOT",39:"IS",40:"TruthValue",43:"=",44:"<>",45:"<",46:">",47:"<=",48:">=",49:"(",50:")",56:".",57:"\"",58:"GROUP",59:"BY",61:"ORDER",62:"LIMIT",63:"UNSIGNED_INTEGER",64:"*",66:",",71:"JOIN",74:"ON"},
-productions_: [0,[3,1],[3,1],[6,0],[7,4],[7,3],[8,1],[8,3],[11,1],[11,1],[11,3],[11,2],[11,1],[12,3],[12,2],[12,2],[13,3],[13,2],[18,1],[18,2],[18,2],[19,2],[19,2],[20,1],[20,2],[23,1],[23,1],[23,1],[23,1],[23,1],[24,2],[24,2],[29,1],[30,1],[30,3],[31,1],[31,3],[31,3],[33,2],[33,1],[36,1],[36,3],[36,3],[36,4],[37,1],[37,1],[38,1],[38,1],[38,1],[38,1],[38,1],[38,1],[41,3],[41,2],[42,1],[51,1],[52,2],[53,0],[54,1],[54,3],[54,3],[55,1],[55,3],[25,3],[25,2],[26,3],[26,2],[27,2],[27,2],[17,1],[17,3],[17,2],[17,1],[60,1],[60,3],[65,3],[65,3],[65,3],[65,2],[65,1],[65,1],[22,1],[22,3],[67,1],[68,1],[68,1],[69,1],[69,2],[69,3],[69,4],[69,3],[70,4],[70,3],[72,1],[73,2]],
+symbols_: {"error":2,"AnyCursor":3,"CURSOR":4,"PARTIAL_CURSOR":5,"InitResults":6,"Sql":7,"SqlStatements":8,";":9,"EOF":10,"SqlStatement":11,"UseStatement":12,"DataManipulation":13,"TableDefinition":14,"QueryExpression":15,"REGULAR_IDENTIFIER":16,"USE":17,"HiveOrImpalaLoad":18,"HiveOrImpalaData":19,"HiveOrImpalaInpath":20,"HdfsPath":21,"INTO":22,"TABLE":23,"<hive>LOAD":24,"<impala>LOAD":25,"<hive>DATA":26,"<impala>DATA":27,"<hive>INPATH":28,"<impala>INPATH":29,"CREATE":30,"TableScope":31,"TableElementList":32,"TableLocation":33,"<hive>EXTERNAL":34,"<impala>EXTERNAL":35,"(":36,"TableElements":37,")":38,"TableElement":39,",":40,"ColumnDefinition":41,"PrimitiveType":42,"HiveOrImpalaLocation":43,"<hive>LOCATION":44,"<impala>LOCATION":45,"HDFS_START_QUOTE":46,"HDFS_PATH":47,"HDFS_END_QUOTE":48,"TINYINT":49,"SMALLINT":50,"INT":51,"BIGINT":52,"BOOLEAN":53,"FLOAT":54,"DOUBLE":55,"STRING":56,"DECIMAL":57,"CHAR":58,"VARCHAR":59,"TIMESTAMP":60,"<hive>BINARY":61,"<hive>DATE":62,"SELECT":63,"SelectList":64,"TableExpression":65,"FromClause":66,"SelectConditionList":67,"FROM":68,"TableReferenceList":69,"SelectCondition":70,"WhereClause":71,"GroupByClause":72,"OrderByClause":73,"LimitClause":74,"WHERE":75,"SearchCondition":76,"BooleanValueExpression":77,"BooleanTerm":78,"OR":79,"BooleanFactor":80,"AND":81,"NOT":82,"BooleanTest":83,"Predicate":84,"CompOp":85,"IS":86,"TruthValue":87,"ParenthesizedBooleanValueExpression":88,"NonParenthesizedValueExpressionPrimary":89,"=":90,"<>":91,"<":92,">":93,"<=":94,">=":95,"ColumnReference":96,"BasicIdentifierChain":97,"InitIdentifierChain":98,"IdentifierChain":99,"Identifier":100,".":101,"\"":102,"GROUP":103,"BY":104,"ColumnList":105,"ORDER":106,"LIMIT":107,"UNSIGNED_INTEGER":108,"*":109,"DerivedColumn":110,"TableReference":111,"TablePrimaryOrJoinedTable":112,"TablePrimary":113,"JoinedTable":114,"JOIN":115,"JoinSpecification":116,"JoinCondition":117,"ON":118,"$accept":0,"$end":1},
+terminals_: {2:"error",4:"CURSOR",5:"PARTIAL_CURSOR",9:";",10:"EOF",16:"REGULAR_IDENTIFIER",17:"USE",22:"INTO",23:"TABLE",24:"<hive>LOAD",25:"<impala>LOAD",26:"<hive>DATA",27:"<impala>DATA",28:"<hive>INPATH",29:"<impala>INPATH",30:"CREATE",34:"<hive>EXTERNAL",35:"<impala>EXTERNAL",36:"(",38:")",40:",",44:"<hive>LOCATION",45:"<impala>LOCATION",46:"HDFS_START_QUOTE",47:"HDFS_PATH",48:"HDFS_END_QUOTE",49:"TINYINT",50:"SMALLINT",51:"INT",52:"BIGINT",53:"BOOLEAN",54:"FLOAT",55:"DOUBLE",56:"STRING",57:"DECIMAL",58:"CHAR",59:"VARCHAR",60:"TIMESTAMP",61:"<hive>BINARY",62:"<hive>DATE",63:"SELECT",68:"FROM",75:"WHERE",79:"OR",81:"AND",82:"NOT",86:"IS",87:"TruthValue",90:"=",91:"<>",92:"<",93:">",94:"<=",95:">=",101:".",102:"\"",103:"GROUP",104:"BY",106:"ORDER",107:"LIMIT",108:"UNSIGNED_INTEGER",109:"*",115:"JOIN",118:"ON"},
+productions_: [0,[3,1],[3,1],[6,0],[7,4],[7,3],[8,1],[8,3],[11,1],[11,1],[11,1],[11,1],[11,3],[11,2],[11,1],[12,3],[12,2],[12,2],[13,7],[13,4],[18,1],[18,1],[19,1],[19,1],[20,1],[20,1],[14,6],[14,2],[31,1],[31,1],[32,3],[37,1],[37,3],[39,1],[41,2],[33,2],[43,1],[43,1],[21,3],[21,5],[21,4],[21,3],[21,3],[21,2],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[42,1],[15,3],[15,2],[65,1],[65,2],[65,2],[66,2],[66,2],[67,1],[67,2],[70,1],[70,1],[70,1],[70,1],[70,1],[71,2],[71,2],[76,1],[77,1],[77,3],[78,1],[78,3],[78,3],[80,2],[80,1],[83,1],[83,3],[83,3],[83,4],[84,1],[84,1],[85,1],[85,1],[85,1],[85,1],[85,1],[85,1],[88,3],[88,2],[89,1],[96,1],[97,2],[98,0],[99,1],[99,3],[99,3],[100,1],[100,3],[72,3],[72,2],[73,3],[73,2],[74,2],[74,2],[64,1],[64,3],[64,2],[64,1],[105,1],[105,3],[110,3],[110,3],[110,3],[110,2],[110,1],[110,1],[69,1],[69,3],[111,1],[112,1],[112,1],[113,1],[113,2],[113,3],[113,4],[113,3],[114,4],[114,3],[116,1],[117,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -47,105 +47,130 @@ case 4: case 5:
      return parser.yy.result;
    
 break;
-case 11: case 12:
+case 13: case 14:
 
      suggestKeywords(['SELECT', 'USE']);
    
 break;
-case 13: case 15:
+case 15: case 17:
 
      suggestDatabases();
    
 break;
-case 14:
+case 16:
 
      if (! parser.yy.cursorFound) {
        parser.yy.result.useDatabase = $$[$0];
      }
    
 break;
-case 16:
+case 39:
+
+      suggestHdfs({ path: $$[$0-3] });
+    
+break;
+case 40:
+
+     suggestHdfs({ path: $$[$0-2] });
+   
+break;
+case 41:
+
+      suggestHdfs({ path: $$[$0-1] });
+    
+break;
+case 42:
+
+     suggestHdfs({ path: '/' });
+   
+break;
+case 43:
+
+      suggestHdfs({ path: '/' });
+    
+break;
+case 58:
 
      completeSuggestColumns();
    
 break;
-case 19: case 22:
+case 61: case 64:
 
      suggestTables();
      suggestDatabases({ appendDot: true });
    
 break;
-case 26: case 27: case 28:
+case 68: case 69: case 70:
 
      delete parser.yy.result.suggestStar;
    
 break;
-case 29:
+case 71:
 
      suggestKeywords(['WHERE', 'GROUP BY', 'LIMIT']);
    
 break;
-case 31:
+case 73:
 
      suggestColumns();
    
 break;
-case 36:
+case 78:
 
      // TODO: Fix issue when EOF after 'CURSOR' in started parenthesized expression it now throws a parser error
      suggestColumns();
    
 break;
-case 53:
+case 95:
 
      // For '...FROM tableA JOIN tableB ON (|', might need an ON flag
      suggestColumns();
    
 break;
-case 56:
+case 98:
 
      delete parser.yy.identifierChain;
    
 break;
-case 57:
+case 99:
 
      parser.yy.identifierChain = [];
    
 break;
-case 59:
+case 101:
 
      suggestColumns({
        identifierChain: parser.yy.identifierChain
      });
    
 break;
-case 61:
+case 103:
 
      parser.yy.identifierChain.push($$[$0]);
    
 break;
-case 62:
+case 104:
 
      parser.yy.identifierChain.push($$[$0-1]);
    
 break;
-case 64: case 66:
+case 106: case 108:
 
      suggestKeywords(['BY']);
    
 break;
-case 68:
+case 110:
 
      suggestNumbers([5, 10, 15]);
    
 break;
-case 70: case 71:
+case 112: case 113:
 
      suggestTables({ prependFrom: true });
      suggestDatabases({ prependFrom: true, appendDot: true });
    
 break;
-case 77:
+case 119:
 
      parser.yy.result.suggestStar = true;
      suggestColumns({
@@ -153,14 +178,14 @@ case 77:
      });
    
 break;
-case 78:
+case 120:
 
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
-case 80:
+case 122:
 
      parser.yy.result.suggestStar = true;
      suggestColumns();
@@ -168,32 +193,32 @@ case 80:
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
-case 86:
+case 128:
 
      addTableReference({ table: $$[$0] });
    
 break;
-case 87:
+case 129:
 
      addTableReference({ table: $$[$0-1], alias: $$[$0] });
    
 break;
-case 88:
+case 130:
 
      addTableReference({ database: $$[$0-2], table: $$[$0] });
    
 break;
-case 89:
+case 131:
 
      addTableReference({ database: $$[$0-3], table: $$[$0-1], alias: $$[$0] });
    
 break;
-case 90:
+case 132:
 
      suggestTables({ database: $$[$0-2] });
    
 break;
-case 92:
+case 134:
 
      suggestTables({});
      suggestDatabases({ appendDot: true });
@@ -201,8 +226,8 @@ case 92:
 break;
 }
 },
-table: [o([4,5,14,15,16],[2,3],{7:1,6:2}),{1:[3]},{3:8,4:$V0,5:$V1,8:3,11:4,12:5,13:6,14:$V2,15:$V3,16:$V4},{9:[1,13],10:[1,14]},o($V5,[2,6]),o($V5,[2,8]),o($V5,[2,9]),{3:15,4:$V0,5:$V1},o($V5,[2,12]),{3:17,4:$V0,5:$V1,14:[1,16]},{4:$V6,14:$V7,17:18,60:19,64:[1,20],65:21},o($V8,[2,1]),o($V8,[2,2]),{3:8,4:$V0,5:$V1,10:[1,24],11:25,12:5,13:6,14:$V2,15:$V3,16:$V4},{1:[2,5]},o($V5,[2,11],{14:[1,26]}),o($V5,[2,14],{3:27,4:$V0,5:$V1}),o($V5,[2,15]),o($V5,[2,17],{18:28,19:29,21:[1,30]}),o($V9,[2,69],{66:$Va}),o($V9,[2,72],{4:[1,33],14:[1,32]}),o($Vb,[2,73]),o($Vb,[2,79],{5:[1,35],56:[1,34]}),o($Vb,[2,80]),{1:[2,4]},o($V5,[2,7]),o($V5,[2,10]),o($V5,[2,13]),o($V5,[2,16]),o($V5,[2,18],{20:37,23:38,24:39,25:40,26:41,27:42,4:$Vc,5:[1,36],28:$Vd,58:$Ve,61:$Vf,62:$Vg}),{3:49,4:$V0,5:$V1,14:$Vh,22:48,67:50,68:51,69:52,70:53},{4:$V6,14:$V7,65:55},{5:[1,56]},o($V9,[2,71]),{3:59,4:$V0,5:$V1,14:[1,57],64:[1,58]},o($Vb,[2,78]),o($V5,[2,19]),o($V5,[2,20],{24:39,25:40,26:41,27:42,23:60,4:$Vc,28:$Vd,58:$Ve,61:$Vf,62:$Vg}),o($Vi,[2,23]),o($Vi,[2,25]),o($Vi,[2,26]),o($Vi,[2,27]),o($Vi,[2,28]),o($Vi,[2,29]),o($Vj,$Vk,{29:61,30:63,31:64,33:65,36:67,37:68,41:69,42:70,51:72,52:73,53:74,4:[1,62],35:$Vl,49:$Vm}),{4:[1,76],59:[1,75]},{4:[1,78],59:[1,77]},{4:[1,80],63:[1,79]},o($Vn,[2,21],{66:[1,81]}),o($Vn,[2,22]),o($Vo,[2,81],{71:$Vp}),o($Vq,[2,83]),o($Vq,[2,84]),o($Vq,[2,85]),o($Vq,[2,86],{14:[1,83],56:[1,84]}),o($Vb,[2,74]),o($V9,[2,70]),o($Vb,[2,75]),o($Vb,[2,76]),o($Vb,[2,77]),o($Vi,[2,24]),o($Vi,[2,30]),o($Vi,[2,31]),o($Vq,[2,32],{32:$Vr}),o($Vs,[2,33]),o($Vs,[2,35],{34:[1,86]}),o($Vj,$Vk,{37:68,41:69,42:70,51:72,52:73,53:74,36:87,49:$Vm}),o($Vt,[2,39]),o($Vt,[2,40],{38:88,39:[1,89],43:[1,90],44:[1,91],45:[1,92],46:[1,93],47:[1,94],48:[1,95]}),o($Vu,[2,44]),o($Vu,[2,45]),o($Vj,$Vk,{31:64,33:65,36:67,37:68,41:69,42:70,51:72,52:73,53:74,30:96,3:97,4:$V0,5:$V1,35:$Vl,49:$Vm}),o($Vu,[2,54]),o($Vu,[2,55]),{14:$Vv,54:98,55:99,57:$Vw},{4:$V6,14:$V7,60:102,65:21},o($Vi,[2,64]),{4:$V6,14:$V7,60:103,65:21},o($Vi,[2,66]),o($Vi,[2,67]),o($Vi,[2,68]),{14:$Vh,67:104,68:51,69:52,70:53},{3:106,4:$V0,5:$V1,14:$Vh,67:105,68:51,69:52,70:53},o($Vq,[2,87]),{3:108,4:$V0,5:$V1,14:[1,107]},o($Vj,$Vk,{33:65,36:67,37:68,41:69,42:70,51:72,52:73,53:74,31:109,35:$Vl,49:$Vm}),o($Vj,$Vk,{33:65,36:67,37:68,41:69,42:70,51:72,52:73,53:74,31:111,4:[1,110],35:$Vl,49:$Vm}),o($Vt,[2,38]),o($Vj,$Vk,{41:69,42:70,51:72,52:73,53:74,37:112,49:$Vm}),{35:[1,114],40:[1,113]},o($Vx,[2,46]),o($Vx,[2,47]),o($Vx,[2,48]),o($Vx,[2,49]),o($Vx,[2,50]),o($Vx,[2,51]),{32:$Vr,50:[1,115]},o($Vu,[2,53]),o($Vu,[2,56],{56:[1,116]}),o($Vy,[2,58]),o($Vy,[2,61]),{14:[1,117]},o($Vi,[2,63],{66:$Va}),o($Vi,[2,65],{66:$Va}),o($Vo,[2,82],{71:$Vp}),{71:$Vp,72:118,73:119,74:[1,120]},o($Vq,[2,92]),o($Vq,[2,88],{14:[1,121]}),o($Vq,[2,90]),o($Vs,[2,34]),o($Vs,[2,36]),o($Vs,[2,37]),o($Vt,[2,41]),o($Vt,[2,42]),{40:[1,122]},o($Vu,[2,52]),{5:[1,123],14:$Vv,55:124,57:$Vw},{57:[1,125]},o($Vq,[2,91]),o($Vq,[2,93]),o($Vj,$Vk,{30:63,31:64,33:65,36:67,37:68,41:69,42:70,51:72,52:73,53:74,29:126,35:$Vl,49:$Vm}),o($Vq,[2,89]),o($Vt,[2,43]),o($Vy,[2,59]),o($Vy,[2,60]),o($Vy,[2,62]),o($Vq,[2,94])],
-defaultActions: {14:[2,5],24:[2,4]},
+table: [o([4,5,16,17,24,25,30,63],[2,3],{7:1,6:2}),{1:[3]},{3:10,4:$V0,5:$V1,8:3,11:4,12:5,13:6,14:7,15:8,16:$V2,17:$V3,18:12,24:$V4,25:$V5,30:$V6,63:$V7},{9:[1,19],10:[1,20]},o($V8,[2,6]),o($V8,[2,8]),o($V8,[2,9]),o($V8,[2,10]),o($V8,[2,11]),{3:21,4:$V0,5:$V1},o($V8,[2,14]),{3:23,4:$V0,5:$V1,16:[1,22]},{19:24,26:[1,25],27:[1,26]},{23:[1,28],31:27,34:[1,29],35:[1,30]},{4:$V9,16:$Va,64:31,105:32,109:[1,33],110:34},o($Vb,[2,1]),o($Vb,[2,2]),o($Vc,[2,20]),o($Vc,[2,21]),{3:10,4:$V0,5:$V1,10:[1,37],11:38,12:5,13:6,14:7,15:8,16:$V2,17:$V3,18:12,24:$V4,25:$V5,30:$V6,63:$V7},{1:[2,5]},o($V8,[2,13],{16:[1,39]}),o($V8,[2,16],{3:40,4:$V0,5:$V1}),o($V8,[2,17]),{20:41,28:[1,42],29:[1,43]},o($Vd,[2,22]),o($Vd,[2,23]),{23:[1,44]},o($V8,[2,27]),{23:[2,28]},{23:[2,29]},o($V8,[2,59],{65:45,66:46,68:[1,47]}),o($Ve,[2,111],{40:$Vf}),o($Ve,[2,114],{4:[1,50],16:[1,49]}),o($Vg,[2,115]),o($Vg,[2,121],{5:[1,52],101:[1,51]}),o($Vg,[2,122]),{1:[2,4]},o($V8,[2,7]),o($V8,[2,12]),o($V8,[2,15]),{21:53,46:$Vh},{46:[2,24]},{46:[2,25]},{16:[1,55]},o($V8,[2,58]),o($V8,[2,60],{67:57,70:58,71:59,72:60,73:61,74:62,4:$Vi,5:[1,56],75:$Vj,103:$Vk,106:$Vl,107:$Vm}),{3:69,4:$V0,5:$V1,16:$Vn,69:68,111:70,112:71,113:72,114:73},{4:$V9,16:$Va,110:75},{5:[1,76]},o($Ve,[2,113]),{3:79,4:$V0,5:$V1,16:[1,77],109:[1,78]},o($Vg,[2,120]),o($V8,[2,19],{22:[1,80]}),{5:[1,82],47:[1,81]},{32:83,36:[1,84]},o($V8,[2,61]),o($V8,[2,62],{71:59,72:60,73:61,74:62,70:85,4:$Vi,75:$Vj,103:$Vk,106:$Vl,107:$Vm}),o($Vo,[2,65]),o($Vo,[2,67]),o($Vo,[2,68]),o($Vo,[2,69]),o($Vo,[2,70]),o($Vo,[2,71]),o($Vp,$Vq,{76:86,77:88,78:89,80:90,83:92,84:93,88:94,89:95,96:97,97:98,98:99,4:[1,87],36:$Vr,82:$Vs}),{4:[1,101],104:[1,100]},{4:[1,103],104:[1,102]},{4:[1,105],108:[1,104]},o($Vt,[2,63],{40:[1,106]}),o($Vt,[2,64]),o($Vu,[2,123],{115:$Vv}),o($Vw,[2,125]),o($Vw,[2,126]),o($Vw,[2,127]),o($Vw,[2,128],{16:[1,108],101:[1,109]}),o($Vg,[2,116]),o($Ve,[2,112]),o($Vg,[2,117]),o($Vg,[2,118]),o($Vg,[2,119]),{23:[1,110]},{5:[1,112],48:[1,111]},o($Vx,[2,43],{48:[1,113]}),{33:114,43:115,44:[1,116],45:[1,117]},{16:$Vy,37:118,39:119,41:120},o($Vo,[2,66]),o($Vo,[2,72]),o($Vo,[2,73]),o($Vw,[2,74],{79:$Vz}),o($VA,[2,75]),o($VA,[2,77],{81:[1,123]}),o($Vp,$Vq,{84:93,88:94,89:95,96:97,97:98,98:99,83:124,36:$Vr}),o($VB,[2,81]),o($VB,[2,82],{85:125,86:[1,126],90:[1,127],91:[1,128],92:[1,129],93:[1,130],94:[1,131],95:[1,132]}),o($VC,[2,86]),o($VC,[2,87]),o($Vp,$Vq,{78:89,80:90,83:92,84:93,88:94,89:95,96:97,97:98,98:99,77:133,3:134,4:$V0,5:$V1,36:$Vr,82:$Vs}),o($VC,[2,96]),o($VC,[2,97]),{16:$VD,99:135,100:136,102:$VE},{4:$V9,16:$Va,105:139,110:34},o($Vo,[2,106]),{4:$V9,16:$Va,105:140,110:34},o($Vo,[2,108]),o($Vo,[2,109]),o($Vo,[2,110]),{16:$Vn,111:141,112:71,113:72,114:73},{3:143,4:$V0,5:$V1,16:$Vn,111:142,112:71,113:72,114:73},o($Vw,[2,129]),{3:145,4:$V0,5:$V1,16:[1,144]},{16:[1,146]},o($Vx,[2,38]),o($Vx,[2,41],{47:[1,147],48:[1,148]}),o($Vx,[2,42]),o($V8,[2,26]),{21:149,46:$Vh},{46:[2,36]},{46:[2,37]},{38:[1,150],40:[1,151]},o($VF,[2,31]),o($VF,[2,33]),{42:152,49:[1,153],50:[1,154],51:[1,155],52:[1,156],53:[1,157],54:[1,158],55:[1,159],56:[1,160],57:[1,161],58:[1,162],59:[1,163],60:[1,164],61:[1,165],62:[1,166]},o($Vp,$Vq,{80:90,83:92,84:93,88:94,89:95,96:97,97:98,98:99,78:167,36:$Vr,82:$Vs}),o($Vp,$Vq,{80:90,83:92,84:93,88:94,89:95,96:97,97:98,98:99,78:169,4:[1,168],36:$Vr,82:$Vs}),o($VB,[2,80]),o($Vp,$Vq,{88:94,89:95,96:97,97:98,98:99,84:170,36:$Vr}),{82:[1,172],87:[1,171]},o($VG,[2,88]),o($VG,[2,89]),o($VG,[2,90]),o($VG,[2,91]),o($VG,[2,92]),o($VG,[2,93]),{38:[1,173],79:$Vz},o($VC,[2,95]),o($VC,[2,98],{101:[1,174]}),o($VH,[2,100]),o($VH,[2,103]),{16:[1,175]},o($Vo,[2,105],{40:$Vf}),o($Vo,[2,107],{40:$Vf}),o($Vu,[2,124],{115:$Vv}),{115:$Vv,116:176,117:177,118:[1,178]},o($Vw,[2,134]),o($Vw,[2,130],{16:[1,179]}),o($Vw,[2,132]),o($V8,[2,18]),{48:[1,180]},o($Vx,[2,40]),o($V8,[2,35]),o([44,45],[2,30]),{16:$Vy,39:181,41:120},o($VF,[2,34]),o($VF,[2,44]),o($VF,[2,45]),o($VF,[2,46]),o($VF,[2,47]),o($VF,[2,48]),o($VF,[2,49]),o($VF,[2,50]),o($VF,[2,51]),o($VF,[2,52]),o($VF,[2,53]),o($VF,[2,54]),o($VF,[2,55]),o($VF,[2,56]),o($VF,[2,57]),o($VA,[2,76]),o($VA,[2,78]),o($VA,[2,79]),o($VB,[2,83]),o($VB,[2,84]),{87:[1,182]},o($VC,[2,94]),{5:[1,183],16:$VD,100:184,102:$VE},{102:[1,185]},o($Vw,[2,133]),o($Vw,[2,135]),o($Vp,$Vq,{77:88,78:89,80:90,83:92,84:93,88:94,89:95,96:97,97:98,98:99,76:186,36:$Vr,82:$Vs}),o($Vw,[2,131]),o($Vx,[2,39]),o($VF,[2,32]),o($VB,[2,85]),o($VH,[2,101]),o($VH,[2,102]),o($VH,[2,104]),o($Vw,[2,136])],
+defaultActions: {20:[2,5],29:[2,28],30:[2,29],37:[2,4],42:[2,24],43:[2,25],116:[2,36],117:[2,37]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -434,14 +459,32 @@ var suggestDatabases = function (details) {
   parser.yy.result.suggestDatabases = details || {};
 }
 
+var suggestHdfs = function (details) {
+  parser.yy.result.suggestHdfs = details || {}
+}
+
 var determineCase = function (text) {
   parser.yy.lowerCase = text.toLowerCase() === text;
 };
+
+var lexerModified = false;
 
 /**
  * Main parser function
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect) {
+
+  // Hack to set the inital state of the lexer without first having to hit a token
+  // has to be done as the first token found can be dependant on dialect
+  if (!lexerModified && typeof dialect !== 'undefined') {
+    var originalSetInput = parser.lexer.setInput;
+    parser.lexer.setInput = function (input) {
+      var lexer = originalSetInput.bind(parser.lexer)(input);
+      lexer.begin(dialect)
+    }
+    lexerModified = true;
+  }
+
   var result;
   parser.yy.dialect = dialect;
   try {
@@ -453,6 +496,22 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
       throw err;
     }
     result = parser.yy.result;
+  }
+
+  if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
+    // Remove any expected tokens from other dialects, jison doesn't remove tokens from other lexer states.
+    var actualExpected = [];
+    result.error.expected.forEach(function (expected) {
+      var match = expected.match(/\<([a-z]+)\>(.*)/);
+      if (match !== null) {
+        if (typeof parser.yy.dialect !== 'undefined' && parser.yy.dialect === match[1]) {
+          actualExpected.push(match[2]);
+        }
+      } else {
+        actualExpected.push(expected);
+      }
+    });
+    result.error.expected = actualExpected;
   }
 
   return result;
@@ -809,46 +868,112 @@ case 3: parser.yy.cursorFound = true; return 4;
 break;
 case 4: parser.yy.cursorFound = true; return 5; 
 break;
-case 5: return 34; 
+case 5: return 81; 
 break;
-case 6: return 59; 
+case 6: return 52; 
 break;
-case 7: return 21; 
+case 7: return 53; 
 break;
-case 8: return 58; 
+case 8: return 104; 
 break;
-case 9: return 39; 
+case 9: return 58; 
 break;
-case 10: return 71; 
+case 10: return 30; 
 break;
-case 11: return 35; 
+case 11: return 57; 
 break;
-case 12: return 74; 
+case 12: return 55; 
 break;
-case 13: return 32; 
+case 13: return 54; 
 break;
-case 14: return 61; 
+case 14: return 68; 
 break;
-case 15: determineCase(yy_.yytext); return 16; 
+case 15: return 103; 
 break;
-case 16: determineCase(yy_.yytext); return 15; 
+case 16: return 51; 
 break;
-case 17: return 28; 
+case 17: return 22; 
 break;
-case 18: return 63; 
+case 18: return 86; 
 break;
-case 19: return 14; 
+case 19: return 115; 
 break;
-case 20: return yy_.yytext; 
+case 20: return 82; 
 break;
-case 21: return yy_.yytext; 
+case 21: return 118; 
 break;
-case 22: return 10; 
+case 22: return 79; 
+break;
+case 23: return 106; 
+break;
+case 24: determineCase(yy_.yytext); return 63; 
+break;
+case 25: return 50; 
+break;
+case 26: return 56; 
+break;
+case 27: return 23; 
+break;
+case 28: return 60; 
+break;
+case 29: return 49; 
+break;
+case 30: determineCase(yy_.yytext); return 17; 
+break;
+case 31: return 59; 
+break;
+case 32: return 75; 
+break;
+case 33: return 61; 
+break;
+case 34: return 26; 
+break;
+case 35: return 62; 
+break;
+case 36: return 34; 
+break;
+case 37: this.begin('hdfs'); return 28; 
+break;
+case 38: return 24; 
+break;
+case 39: this.begin('hdfs'); return 44; 
+break;
+case 40: return 27; 
+break;
+case 41: return 35; 
+break;
+case 42: this.begin('hdfs'); return 29; 
+break;
+case 43: return 25; 
+break;
+case 44: this.begin('hdfs'); return 45; 
+break;
+case 45: return 108; 
+break;
+case 46: return 16; 
+break;
+case 47: parser.yy.cursorFound = true; return 4; 
+break;
+case 48: parser.yy.cursorFound = true; return 5; 
+break;
+case 49: return 46; 
+break;
+case 50: return 47; 
+break;
+case 51: this.popState(); return 48; 
+break;
+case 52: return 10; 
+break;
+case 53: return yy_.yytext; 
+break;
+case 54: return yy_.yytext; 
+break;
+case 55: return 10; 
 break;
 }
 },
-rules: [/^(?:[ \t\n])/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:\|CURSOR\|)/i,/^(?:\|PARTIAL_CURSOR\|)/i,/^(?:AND\b)/i,/^(?:BY\b)/i,/^(?:FROM\b)/i,/^(?:GROUP\b)/i,/^(?:IS\b)/i,/^(?:JOIN\b)/i,/^(?:NOT\b)/i,/^(?:ON\b)/i,/^(?:OR\b)/i,/^(?:ORDER\b)/i,/^(?:SELECT\b)/i,/^(?:USE\b)/i,/^(?:WHERE\b)/i,/^(?:[0-9]+)/i,/^(?:[A-Za-z][A-Za-z0-9_]*)/i,/^(?:[-+&~|^\/%*(),.;!])/i,/^(?:[=<>])/i,/^(?:$)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],"inclusive":true}}
+rules: [/^(?:[ \t\n])/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:\|CURSOR\|)/i,/^(?:\|PARTIAL_CURSOR\|)/i,/^(?:AND\b)/i,/^(?:BIGINT\b)/i,/^(?:BOOLEAN\b)/i,/^(?:BY\b)/i,/^(?:CHAR\b)/i,/^(?:CREATE\b)/i,/^(?:DECIMAL\b)/i,/^(?:DOUBLE\b)/i,/^(?:FLOAT\b)/i,/^(?:FROM\b)/i,/^(?:GROUP\b)/i,/^(?:INT\b)/i,/^(?:INTO\b)/i,/^(?:IS\b)/i,/^(?:JOIN\b)/i,/^(?:NOT\b)/i,/^(?:ON\b)/i,/^(?:OR\b)/i,/^(?:ORDER\b)/i,/^(?:SELECT\b)/i,/^(?:SMALLINT\b)/i,/^(?:STRING\b)/i,/^(?:TABLE\b)/i,/^(?:TIMESTAMP\b)/i,/^(?:TINYINT\b)/i,/^(?:USE\b)/i,/^(?:VARCHAR\b)/i,/^(?:WHERE\b)/i,/^(?:BINARY\b)/i,/^(?:DATA\b)/i,/^(?:DATE\b)/i,/^(?:EXTERNAL\b)/i,/^(?:INPATH\b)/i,/^(?:LOAD\b)/i,/^(?:LOCATION\b)/i,/^(?:DATA\b)/i,/^(?:EXTERNAL\b)/i,/^(?:INPATH\b)/i,/^(?:LOAD\b)/i,/^(?:LOCATION\b)/i,/^(?:[0-9]+)/i,/^(?:[A-Za-z][A-Za-z0-9_]*)/i,/^(?:\|CURSOR\|)/i,/^(?:\|PARTIAL_CURSOR\|)/i,/^(?:\s+['])/i,/^(?:[^'|]+)/i,/^(?:['])/i,/^(?:$)/i,/^(?:[-+&~|^\/%*(),.;!])/i,/^(?:[=<>])/i,/^(?:$)/i],
+conditions: {"hdfs":{"rules":[47,48,49,50,51,52],"inclusive":false},"hive":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46,53,54,55],"inclusive":true},"impala":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,40,41,42,43,44,45,46,53,54,55],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,45,46,53,54,55],"inclusive":true}}
 });
 return lexer;
 })();
