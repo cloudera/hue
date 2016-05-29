@@ -16,6 +16,8 @@
 
 %lex
 %options case-insensitive
+%s hive impala
+%x hdfs
 %%
 
 [ \t\n]                             { /* skip whitespace */ }
@@ -26,9 +28,18 @@
 '|PARTIAL_CURSOR|'                  { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
 
 'AND'                               { return 'AND'; }
+'BIGINT'                            { return 'BIGINT'; }
+'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
+'CHAR'                              { return 'CHAR'; }
+'CREATE'                            { return 'CREATE'; }
+'DECIMAL'                           { return 'DECIMAL'; }
+'DOUBLE'                            { return 'DOUBLE'; }
+'FLOAT'                             { return 'FLOAT'; }
 'FROM'                              { return 'FROM'; }
 'GROUP'                             { return 'GROUP'; }
+'INT'                               { return 'INT'; }
+'INTO'                              { return 'INTO'; }
 'IS'                                { return 'IS'; }
 'JOIN'                              { return 'JOIN'; }
 'NOT'                               { return 'NOT'; }
@@ -36,11 +47,38 @@
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
+'SMALLINT'                          { return 'SMALLINT'; }
+'STRING'                            { return 'STRING'; }
+'TABLE'                             { return 'TABLE'; }
+'TIMESTAMP'                         { return 'TIMESTAMP'; }
+'TINYINT'                           { return 'TINYINT'; }
 'USE'                               { determineCase(yytext); return 'USE'; }
+'VARCHAR'                           { return 'VARCHAR'; }
 'WHERE'                             { return 'WHERE'; }
+
+<hive>'BINARY'                      { return '<hive>BINARY'; }
+<hive>'DATA'                        { return '<hive>DATA'; }
+<hive>'DATE'                        { return '<hive>DATE'; }
+<hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
+<hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
+<hive>'LOAD'                        { return '<hive>LOAD'; }
+<hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
+
+<impala>'DATA'                      { return '<impala>DATA'; }
+<impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
+<impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
+<impala>'LOAD'                      { return '<impala>LOAD'; }
+<impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [A-Za-z][A-Za-z0-9_]*               { return 'REGULAR_IDENTIFIER'; }
+
+<hdfs>'|CURSOR|'                    { parser.yy.cursorFound = true; return 'CURSOR'; }
+<hdfs>'|PARTIAL_CURSOR|'            { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+<hdfs>\s+[']                        { return 'HDFS_START_QUOTE'; }
+<hdfs>[^'|]+                        { return 'HDFS_PATH'; }
+<hdfs>[']                           { this.popState(); return 'HDFS_END_QUOTE'; }
+<hdfs><<EOF>>                       { return 'EOF'; }
 
 [-+&~|^/%*(),.;!]                   { return yytext; }
 [=<>]                               { return yytext; }
@@ -95,6 +133,8 @@ SqlStatements
 
 SqlStatement
  : UseStatement
+ | DataManipulation
+ | TableDefinition
  | QueryExpression
  | 'REGULAR_IDENTIFIER' AnyCursor 'REGULAR_IDENTIFIER'
  | 'REGULAR_IDENTIFIER' AnyCursor
@@ -122,6 +162,104 @@ UseStatement
    {
      suggestDatabases();
    }
+ ;
+
+DataManipulation
+ : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'TABLE' 'REGULAR_IDENTIFIER'
+ | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath
+ ;
+
+HiveOrImpalaLoad
+ : '<hive>LOAD'
+ | '<impala>LOAD'
+ ;
+
+HiveOrImpalaData
+ : '<hive>DATA'
+ | '<impala>DATA'
+ ;
+
+HiveOrImpalaInpath
+ : '<hive>INPATH'
+ | '<impala>INPATH'
+ ;
+
+TableDefinition
+ : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList TableLocation
+ | 'CREATE' 'TABLE'
+ ;
+
+TableScope
+ : '<hive>EXTERNAL'
+ | '<impala>EXTERNAL'
+ ;
+
+TableElementList
+ : '(' TableElements ')'
+ ;
+
+TableElements
+ : TableElement
+ | TableElements ',' TableElement
+ ;
+
+TableElement
+ : ColumnDefinition
+ ;
+
+ColumnDefinition
+ : 'REGULAR_IDENTIFIER' PrimitiveType
+ ;
+
+TableLocation
+ : HiveOrImpalaLocation HdfsPath
+ ;
+
+HiveOrImpalaLocation
+ : '<hive>LOCATION'
+ | '<impala>LOCATION'
+ ;
+
+HdfsPath
+ : 'HDFS_START_QUOTE' 'HDFS_PATH' 'HDFS_END_QUOTE'
+ | 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR' 'HDFS_PATH' 'HDFS_END_QUOTE'
+    {
+      suggestHdfs({ path: $2 });
+    }
+ | 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR' 'HDFS_END_QUOTE'
+   {
+     suggestHdfs({ path: $2 });
+   }
+ | 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR'
+    {
+      suggestHdfs({ path: $2 });
+    }
+ | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR' 'HDFS_END_QUOTE'
+   {
+     suggestHdfs({ path: '/' });
+   }
+ | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR'
+    {
+      suggestHdfs({ path: '/' });
+    }
+ ;
+
+// TODO: Support | DECIMAL(precision, scale)  -- (Note: Available in Hive 0.13.0 and later)
+PrimitiveType
+ : 'TINYINT'
+ | 'SMALLINT'
+ | 'INT'
+ | 'BIGINT'
+ | 'BOOLEAN'
+ | 'FLOAT'
+ | 'DOUBLE'
+ | 'STRING'
+ | 'DECIMAL'
+ | 'CHAR'
+ | 'VARCHAR'
+ | 'TIMESTAMP'
+ | '<hive>BINARY'
+ | '<hive>DATE'
  ;
 
 QueryExpression
@@ -488,14 +626,32 @@ var suggestDatabases = function (details) {
   parser.yy.result.suggestDatabases = details || {};
 }
 
+var suggestHdfs = function (details) {
+  parser.yy.result.suggestHdfs = details || {}
+}
+
 var determineCase = function (text) {
   parser.yy.lowerCase = text.toLowerCase() === text;
 };
+
+var lexerModified = false;
 
 /**
  * Main parser function
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect) {
+
+  // Hack to set the inital state of the lexer without first having to hit a token
+  // has to be done as the first token found can be dependant on dialect
+  if (!lexerModified && typeof dialect !== 'undefined') {
+    var originalSetInput = parser.lexer.setInput;
+    parser.lexer.setInput = function (input) {
+      var lexer = originalSetInput.bind(parser.lexer)(input);
+      lexer.begin(dialect)
+    }
+    lexerModified = true;
+  }
+
   var result;
   parser.yy.dialect = dialect;
   try {
@@ -507,6 +663,22 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
       throw err;
     }
     result = parser.yy.result;
+  }
+
+  if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
+    // Remove any expected tokens from other dialects, jison doesn't remove tokens from other lexer states.
+    var actualExpected = [];
+    result.error.expected.forEach(function (expected) {
+      var match = expected.match(/\<([a-z]+)\>(.*)/);
+      if (match !== null) {
+        if (typeof parser.yy.dialect !== 'undefined' && parser.yy.dialect === match[1]) {
+          actualExpected.push(match[2]);
+        }
+      } else {
+        actualExpected.push(expected);
+      }
+    });
+    result.error.expected = actualExpected;
   }
 
   return result;

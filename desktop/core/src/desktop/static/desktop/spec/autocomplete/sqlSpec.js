@@ -374,47 +374,107 @@ define([
       });
     });
 
-    describe('hive-specific stuff', function() {
-      describe('HDFS autocompletion', function () {
-
-        xit("should autocomplete hdfs paths in location references without initial /", function () {
-          assertAutoComplete({
-            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'',
-            afterCursor: '\'',
-            dialect: 'hive',
-            expectedResult: {
-              suggestHdfsFiles : { location: '' }
-            }
-          });
-        });
-
-        xit('should autocomplete hdfs paths in location references from root', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
-            afterCursor: '\'',
-            expectedSuggestions: ['file_one', 'folder_one/']
-          });
-        });
-
-        xit('should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
-            afterCursor: '',
-            expectedSuggestions: ['file_one\'', 'folder_one/']
-          });
-        });
-
-        xit('should autocomplete hdfs paths in location references from inside a path', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
-            afterCursor: '/bar\'',
-            expectedSuggestions: ['file_one', 'folder_one']
-          });
+    describe('HDFS autocompletion', function () {
+      it('should autocomplete hdfs paths in location references without initial /', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'',
+          afterCursor: '\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '/' }
+          }
         });
       });
+
+      it('should autocomplete hdfs paths in location references from root', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
+          afterCursor: '\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '/' }
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '/' }
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths in location references from inside a path', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'/',
+          afterCursor: '/bar\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '/' }
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths in location references without initial /', function () {
+        assertAutoComplete({
+          beforeCursor: 'LOAD DATA INPATH \'',
+          afterCursor: '\'',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/'}
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths in location references from root', function () {
+        assertAutoComplete({
+          beforeCursor: 'LOAD DATA INPATH \'/',
+          afterCursor: '\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/'}
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor', function () {
+        assertAutoComplete({
+          beforeCursor: 'LOAD DATA INPATH \'/',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/'}
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths in location references from inside a path', function () {
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: 'LOAD DATA INPATH \'/',
+          afterCursor: '/bar\' INTO TABLE foo',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/'}
+          }
+        });
+      });
+    });
+
+    describe('hive-specific stuff', function() {
+
 
       xit('should suggest struct from map values', function() {
         assertAutoComplete({
@@ -691,70 +751,6 @@ define([
     });
 
     describe('impala-specific stuff', function() {
-      beforeEach(function (done) {
-        changeType('impala', done);
-        ajaxHelper.responseForUrls = {};
-      });
-
-      describe('HDFS autocompletion', function () {
-        beforeEach(function() {
-          subject = new SqlAutocompleter({
-            hdfsAutocompleter: {
-              autocomplete: function(before, after, callback) {
-                callback([
-                  {
-                    meta: 'file',
-                    score: 1000,
-                    value: 'file_one'
-                  },
-                  {
-                    meta: 'dir',
-                    score: 999,
-                    value: 'folder_one'
-                  }
-                ])
-              }
-            },
-            snippet: snippet
-          });
-        });
-
-        xit('should autocomplete hdfs paths in location references without initial /', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'LOAD DATA INPATH \'',
-            afterCursor: '\'',
-            expectedSuggestions: ['/file_one', '/folder_one/']
-          });
-        });
-
-        xit('should autocomplete hdfs paths in location references from root', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'LOAD DATA INPATH \'/',
-            afterCursor: '\'',
-            expectedSuggestions: ['file_one', 'folder_one/']
-          });
-        });
-
-        xit('should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'LOAD DATA INPATH \'/',
-            afterCursor: '',
-            expectedSuggestions: ['file_one\'', 'folder_one/']
-          });
-        });
-
-        xit('should autocomplete hdfs paths in location references from inside a path', function () {
-          assertAutoComplete({
-            serverResponses: {},
-            beforeCursor: 'LOAD DATA INPATH \'/',
-            afterCursor: '/bar\' INTO TABLE foo',
-            expectedSuggestions: ['file_one', 'folder_one']
-          });
-        });
-      });
 
       xit('should not suggest struct from map values with hive style syntax', function() {
         assertAutoComplete({
