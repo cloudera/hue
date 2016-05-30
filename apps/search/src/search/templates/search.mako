@@ -658,7 +658,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 184px; background-color: #FFF"></i>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
@@ -2634,9 +2634,24 @@ function resizeFieldsList() {
       $(".fields-list").css("max-height", _fillHeight);
     }
   }, 100);
-  function positionInfo() {
-    $('.fields-list i').css('left', (184 + $('.fields-list').scrollLeft()) + 'px');
+
+  var positionInfo = function () {
+    var leftPos = 184;
+    if ($('.fields-list').get(0).scrollHeight > $('.fields-list').height()) {
+      leftPos -= hueUtils.scrollbarWidth();
+    }
+    $('.fields-list i').css('left', (leftPos + $('.fields-list').scrollLeft()) + 'px');
   }
+
+  var checkHeight = function () {
+    if ($('.fields-list').height() > 0) {
+      positionInfo();
+    } else {
+      window.setTimeout(checkHeight, 100);
+    }
+  }
+
+  checkHeight();
 
   $('.fields-list').off('scroll');
   $('.fields-list').on('scroll', positionInfo);
