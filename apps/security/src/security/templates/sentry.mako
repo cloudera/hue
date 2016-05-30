@@ -410,6 +410,7 @@ ${ layout.menubar(section=component) }
       </div>
 
     </div> <!-- /span10 -->
+  </div>
 </div>
 
 
