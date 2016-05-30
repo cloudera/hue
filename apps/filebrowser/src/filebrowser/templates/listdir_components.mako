@@ -322,7 +322,7 @@ from django.utils.translation import ugettext as _
   </form>
 
   <!-- upload file modal -->
-  <div id="uploadFileModal" class="modal hide fade" data-backdrop="static">
+  <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0">&times;</a>
       <h3>${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
@@ -835,6 +835,18 @@ from django.utils.translation import ugettext as _
       self.searchQuery = ko.observable("");
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.pendingUploads = ko.observable(0);
+      self.pendingUploads.subscribe(function (val) {
+        if (val > 0) {
+          if ($('#uploadFileModal').data('modal')) {
+            $('#uploadFileModal').data('modal').$element.off('keyup.dismiss.modal');
+            $('#uploadFileModal').data('modal').$backdrop.off('click');
+          }
+          if ($('#uploadArchiveModal').data('modal')) {
+            $('#uploadArchiveModal').data('modal').$element.off('keyup.dismiss.modal');
+            $('#uploadArchiveModal').data('modal').$backdrop.off('click');
+          }
+        }
+      });
       self.lastUploadBatch = ko.observableArray([]);
 
       self.fileNameSorting = function (l, r) {
@@ -1432,8 +1444,6 @@ from django.utils.translation import ugettext as _
 
         return function () {
           $("#uploadFileModal").modal({
-            keyboard: false,
-            backdrop: 'static',
             show: true
           });
         };
@@ -1504,8 +1514,6 @@ from django.utils.translation import ugettext as _
 
         return function () {
           $("#uploadArchiveModal").modal({
-            keyboard: false,
-            backdrop: 'static',
             show: true
           });
         };
