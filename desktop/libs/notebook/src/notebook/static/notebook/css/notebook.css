@@ -1058,3 +1058,15 @@ pre {
   right: 20px;
   top: 20px;
 }
+
+.meta-title {
+  line-height: 22px;
+}
+
+.meta-filter {
+  width: 140px;
+}
+
+.meta-noresults {
+  font-style: italic;
+}

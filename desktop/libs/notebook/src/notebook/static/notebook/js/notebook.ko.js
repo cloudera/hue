@@ -64,6 +64,19 @@
         return item.name != ''
       });
     });
+    self.metaFilter = ko.observable('');
+    self.isMetaFilterVisible = ko.observable(false);
+    self.filteredMeta = ko.pureComputed(function () {
+      return ko.utils.arrayFilter(self.meta(), function (item, i) {
+        if (typeof item.checked === 'undefined') {
+          item.checked = true;
+        }
+        if (typeof item.originalIndex === 'undefined') {
+          item.originalIndex = i;
+        }
+        return item.name.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1;
+      });
+    });
     self.hasManyColumns = ko.pureComputed(function () {
       return self.meta() && self.meta().length > 300;
     });
