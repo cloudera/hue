@@ -117,6 +117,9 @@ class Submission(object):
     self._update_properties(jt_address, deployment_dir)
     self.properties.update({'oozie.wf.application.path': deployment_dir})
 
+    if 'oozie.coord.application.path' in self.properties:
+      self.properties.pop('oozie.coord.application.path')
+
     if fail_nodes:
       self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
     elif not skip_nodes:
