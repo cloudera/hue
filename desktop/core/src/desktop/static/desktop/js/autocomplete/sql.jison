@@ -54,21 +54,31 @@
 'TINYINT'                           { return 'TINYINT'; }
 'USE'                               { determineCase(yytext); return 'USE'; }
 'VARCHAR'                           { return 'VARCHAR'; }
+'VIEW'                              { return 'VIEW'; }
 'WHERE'                             { return 'WHERE'; }
 
+<hive>'AS'                          { return '<hive>AS'; }
 <hive>'BINARY'                      { return '<hive>BINARY'; }
 <hive>'DATA'                        { return '<hive>DATA'; }
 <hive>'DATE'                        { return '<hive>DATE'; }
 <hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
 <hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
+<hive>'LATERAL'                     { return '<hive>LATERAL'; }
 <hive>'LOAD'                        { return '<hive>LOAD'; }
 <hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
+
+<hive>'explode'                     { return '<hive>explode'; }
+<hive>'posexplode'                     { return '<hive>posexplode'; }
+
+<hive>[.]                           { return '<hive>.'; }
 
 <impala>'DATA'                      { return '<impala>DATA'; }
 <impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
 <impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LOAD'                      { return '<impala>LOAD'; }
 <impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
+
+<impala>[.]                         { return '<impala>.'; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [A-Za-z][A-Za-z0-9_]*               { return 'REGULAR_IDENTIFIER'; }
@@ -82,6 +92,12 @@
 
 [-+&~|^/%*(),.;!]                   { return yytext; }
 [=<>]                               { return yytext; }
+
+\[                                  { return '['; }
+\]                                  { return ']'; }
+
+\'                                   { return 'SINGLE_QUOTE'; }
+\"                                   { return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
 
@@ -101,10 +117,17 @@ InitResults
    {
      parser.yy.result = {};
      parser.yy.cursorFound = false;
-     delete parser.yy.latestTableReferences;
+
+     // TODO: Move these below before token or use $$ instead
+     delete parser.yy.latestTablePrimaries;
+     delete parser.yy.identifierChain;
+     delete parser.yy.derivedColumnChain;
+     delete parser.yy.currentViews;
+     delete parser.yy.keepColumns;
+
      parser.parseError = function (message, error) {
        if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-         completeSuggestColumns();
+         linkTablesPrimaries();
        }
        prioritizeSuggestions();
        parser.yy.result.error = error;
@@ -136,19 +159,19 @@ SqlStatement
  | DataManipulation
  | TableDefinition
  | QueryExpression
- | 'REGULAR_IDENTIFIER' AnyCursor 'REGULAR_IDENTIFIER'
- | 'REGULAR_IDENTIFIER' AnyCursor
+ | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
+ | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
    {
      suggestKeywords(['SELECT', 'USE']);
    }
- | AnyCursor
+ | AnyCursor // Could be either ;| or ; |
    {
      suggestKeywords(['SELECT', 'USE']);
    }
  ;
 
 UseStatement
- : 'USE' 'REGULAR_IDENTIFIER' AnyCursor
+ : 'USE' 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
    {
      suggestDatabases();
    }
@@ -158,7 +181,7 @@ UseStatement
        parser.yy.result.useDatabase = $2;
      }
    }
- | 'USE' AnyCursor
+ | 'USE' 'CURSOR'
    {
      suggestDatabases();
    }
@@ -244,6 +267,12 @@ HdfsPath
     }
  ;
 
+AnyDot
+ : '.'
+ | '<impala>.'
+ | '<hive>.'
+ ;
+
 // TODO: Support | DECIMAL(precision, scale)  -- (Note: Available in Hive 0.13.0 and later)
 PrimitiveType
  : 'TINYINT'
@@ -265,24 +294,24 @@ PrimitiveType
 QueryExpression
  : 'SELECT' SelectList TableExpression
    {
-     completeSuggestColumns();
+     linkTablesPrimaries();
    }
  | 'SELECT' SelectList
  ;
 
 TableExpression
  : FromClause
- | FromClause 'PARTIAL_CURSOR'
-   {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
-   }
  | FromClause SelectConditionList
  ;
 
 FromClause
  : 'FROM' TableReferenceList
- | 'FROM' AnyCursor
+ | 'FROM' 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+    {
+      suggestTables();
+      suggestDatabases({ appendDot: true });
+    }
+ | 'FROM' 'CURSOR'
    {
      suggestTables();
      suggestDatabases({ appendDot: true });
@@ -349,6 +378,12 @@ BooleanFactor
 BooleanTest
  : Predicate
  | Predicate CompOp Predicate
+ | Predicate CompOp AnyCursor
+   {
+     if (typeof $1 !== 'undefined') {
+       suggestValues({ identifierChain: $1});
+     }
+   }
  | Predicate 'IS' TruthValue
  | Predicate 'IS' 'NOT' TruthValue
  ;
@@ -356,6 +391,9 @@ BooleanTest
 Predicate
  : ParenthesizedBooleanValueExpression
  | NonParenthesizedValueExpressionPrimary
+   {
+     $$ = $1;
+   }
  ;
 
 CompOp
@@ -369,7 +407,7 @@ CompOp
 
 ParenthesizedBooleanValueExpression
  : '(' BooleanValueExpression ')'
- | '(' AnyCursor
+ | '(' AnyCursor // Could be either (| or ( |
    {
      // For '...FROM tableA JOIN tableB ON (|', might need an ON flag
      suggestColumns();
@@ -378,15 +416,22 @@ ParenthesizedBooleanValueExpression
 
 NonParenthesizedValueExpressionPrimary
  : ColumnReference // TODO: Expand with more choices
+   {
+     $$ = $1;
+   }
  ;
 
 ColumnReference
  : BasicIdentifierChain
+   {
+     $$ = $1;
+   }
  ;
 
 BasicIdentifierChain
  : InitIdentifierChain IdentifierChain
    {
+     $$ = parser.yy.identifierChain
      delete parser.yy.identifierChain;
    }
  ;
@@ -400,23 +445,23 @@ InitIdentifierChain
 
 IdentifierChain
  : Identifier
- | IdentifierChain '.' 'PARTIAL_CURSOR'
+ | IdentifierChain AnyDot 'PARTIAL_CURSOR'
    {
      suggestColumns({
        identifierChain: parser.yy.identifierChain
      });
    }
- | IdentifierChain '.' Identifier
+ | IdentifierChain AnyDot Identifier
  ;
 
 Identifier
  : 'REGULAR_IDENTIFIER'
    {
-     parser.yy.identifierChain.push($1);
+     parser.yy.identifierChain.push({ name: $1 });
    }
  | '"' 'REGULAR_IDENTIFIER' '"'
    {
-     parser.yy.identifierChain.push($2);
+     parser.yy.identifierChain.push({ name: $2 });
    }
  ;
 
@@ -464,30 +509,86 @@ ColumnList
  | ColumnList ',' DerivedColumn
  ;
 
-// Needs revising REGULAR_IDENTIFIER should be CHARACTER_PRIMARY
-DerivedColumn
- : 'REGULAR_IDENTIFIER' '.' 'REGULAR_IDENTIFIER'
- | 'REGULAR_IDENTIFIER' '.' '*'
- | 'REGULAR_IDENTIFIER' '.' AnyCursor
+ColumnIdentifier
+ : 'REGULAR_IDENTIFIER'
    {
-     parser.yy.result.suggestStar = true;
+     $$ = { name: $1 }
+   }
+ | 'REGULAR_IDENTIFIER' '[' 'DOUBLE_QUOTE' 'REGULAR_IDENTIFIER' 'DOUBLE_QUOTE' ']'
+   {
+     $$ = { name: $1, key: '"' + $4 + '"' }
+   }
+ | 'REGULAR_IDENTIFIER' '[' 'UNSIGNED_INTEGER' ']'
+   {
+     $$ = { name: $1, key: parseInt($3) }
+   }
+ | 'REGULAR_IDENTIFIER' '[' ']'
+   {
+     $$ = { name: $1, key: null }
+   }
+ ;
+
+DerivedColumn
+ : ColumnIdentifier
+ | ColumnIdentifier AnyDot 'PARTIAL_CURSOR'
+   {
+     // TODO: Check if valid: SELECT testMap["key"].* FROM foo
+     if (typeof $1.key === 'undefined') {
+       parser.yy.result.suggestStar = true;
+     }
      suggestColumns({
        identifierChain: [ $1 ]
      });
    }
- | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+ | ColumnIdentifier 'PARTIAL_CURSOR'
    {
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'REGULAR_IDENTIFIER'
+ | ColumnIdentifier AnyDot '*'
+ | ColumnIdentifier AnyDot DerivedColumnChain
+   {
+      delete parser.yy.derivedColumnChain;
+   }
+ | ColumnIdentifier AnyDot DerivedColumnChain '<impala>.' 'PARTIAL_CURSOR'
+   {
+      parser.yy.derivedColumnChain.unshift($1);
+      suggestColumns({
+        identifierChain: parser.yy.derivedColumnChain
+      });
+      delete parser.yy.derivedColumnChain;
+    }
+ | ColumnIdentifier AnyDot DerivedColumnChain '<hive>.' 'PARTIAL_CURSOR'
+   {
+      parser.yy.derivedColumnChain.unshift($1);
+      suggestColumns({
+        identifierChain: parser.yy.derivedColumnChain
+      });
+      delete parser.yy.derivedColumnChain;
+    }
  | 'CURSOR'
    {
      parser.yy.result.suggestStar = true;
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+   }
+ ;
+
+DerivedColumnChain
+ : ColumnIdentifier
+   {
+     if (typeof parser.yy.derivedColumnChain === 'undefined') {
+       parser.yy.derivedColumnChain = [];
+     }
+     parser.yy.derivedColumnChain.push($1);
+     $$ = parser.yy.derivedColumnChain;
+   }
+ | DerivedColumnChain AnyDot ColumnIdentifier
+   {
+     parser.yy.derivedColumnChain.push($3);
+     $$ = parser.yy.derivedColumnChain;
    }
  ;
 
@@ -508,29 +609,88 @@ TablePrimaryOrJoinedTable
 TablePrimary
  : 'REGULAR_IDENTIFIER'
    {
-     addTableReference({ table: $1 });
+     addTablePrimary({ identifierChain: [ { name: $1 } ] });
+   }
+ | 'REGULAR_IDENTIFIER' LateralViews
+   {
+     addTablePrimary({ identifierChain: [ { name: $1 } ], lateralViews: $2 } );
    }
  | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
    {
-     addTableReference({ table: $1, alias: $2 });
+     addTablePrimary({ identifierChain: [ { name: $1 } ], alias: $2 });
    }
- | 'REGULAR_IDENTIFIER' '.' 'REGULAR_IDENTIFIER'
+ | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER' LateralViews
    {
-     addTableReference({ database: $1, table: $3 });
+     addTablePrimary({ identifierChain: [ { name: $1 } ], alias: $2, lateralViews: $3 } );
    }
- | 'REGULAR_IDENTIFIER' '.' 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
+ | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
    {
-     addTableReference({ database: $1, table: $3, alias: $4 });
+     addTablePrimary({ identifierChain: [ { name: $1 }, { name: $3 } ] });
    }
- | 'REGULAR_IDENTIFIER' '.' AnyCursor
+ | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
    {
-     suggestTables({ database: $1 });
+     addTablePrimary({ identifierChain: [ { name: $1 }, { name: $3 } ], alias: $4 });
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot 'PARTIAL_CURSOR'
+   {
+     suggestTablesOrColumns($1);
+   }
+ ;
+
+userDefinedTableGeneratingFunction
+ : '<hive>explode' '(' DerivedColumnChain ')'
+   {
+     delete parser.yy.derivedColumnChain;
+     $$ = { function: $1, expression: $3 }
+   }
+ | '<hive>posexplode' '(' DerivedColumnChain ')'
+    {
+      delete parser.yy.derivedColumnChain;
+      $$ = { function: $1, expression: $3 }
+    }
+ ;
+
+LateralViews
+ : LateralView
+   {
+     if (typeof parser.yy.currentViews === 'undefined') {
+       parser.yy.currentViews = [];
+     }
+     parser.yy.currentViews.push($1);
+     $$ = parser.yy.currentViews;
+   }
+ | LateralViews LateralView
+   {
+     parser.yy.currentViews.push($2);
+     $$ = parser.yy.currentViews;
+   }
+ ;
+
+LateralView
+ : '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' LateralViewColumnAliases
+   {
+     $$ = { udtf: $3, tableAlias: $4, columnAliases: $5 }
+   }
+ | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction LateralViewColumnAliases
+    {
+      $$ = { udtf: $3, columnAliases: $4 }
+    }
+ ;
+
+LateralViewColumnAliases
+ : '<hive>AS' 'REGULAR_IDENTIFIER'
+   {
+     $$ = [ $2 ]
+   }
+ | '<hive>AS' '(' 'REGULAR_IDENTIFIER' ',' 'REGULAR_IDENTIFIER' ')'
+   {
+     $$ = [ $3, $5 ]
    }
  ;
 
 JoinedTable
  : TableReference 'JOIN' TableReference JoinSpecification
- | TableReference 'JOIN' AnyCursor
+ | TableReference 'JOIN' 'CURSOR'
    {
      suggestTables({});
      suggestDatabases({ appendDot: true });
@@ -550,7 +710,9 @@ JoinCondition
 var prioritizeSuggestions = function () {
    parser.yy.result.lowerCase = parser.yy.lowerCase || false;
    if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
-     delete parser.yy.result.suggestColumns;
+     if (!parser.yy.keepColumns) {
+      delete parser.yy.result.suggestColumns;
+     }
      delete parser.yy.result.suggestTables;
      delete parser.yy.result.suggestDatabases;
      return;
@@ -566,44 +728,178 @@ var prioritizeSuggestions = function () {
    }
 }
 
-var completeSuggestColumns = function () {
-   if (parser.yy.cursorFound &&
-       typeof parser.yy.result.suggestColumns !== 'undefined') {
-     var identifierChain = parser.yy.result.suggestColumns.identifierChain;
-     delete parser.yy.result.suggestColumns.identifierChain;
-     var tableReferences = parser.yy.latestTableReferences;
 
-     // IdentifierChain contains a possibly started identifier or empty, example: a.b.c = ['a', 'b', 'c']
-     if (identifierChain.length > 0) {
-       var foundTable = tableReferences.filter(function (tableRef) {
-         return identifierChain[0] === tableRef.alias || identifierChain[0] === tableRef.table;
-       })
-       if (foundTable.length === 1) {
-         tableReferences = foundTable;
-       }
-     }
+/**
+ * Impala supports referencing maps and arrays in the the table reference list i.e.
+ *
+ *  SELECT m['foo'].bar.| FROM someDb.someTable t, t.someMap m;
+ *
+ * From this the tablePrimaries would look like:
+ *
+ * [ { alias: 't', identifierChain: [ { name: 'someDb' }, { name: 'someTable' } ] },
+ *   { alias: 'm', identifierChain: [ { name: 't' }, { name: 'someMap' } ] } ]
+ *
+ * with an identifierChain from the select list:
+ *
+ * [ { name: 'm', key: 'foo' }, { name: 'bar' } ]
+ *
+ * Calling this would return an expanded identifierChain, given the above it would be:
+ *
+ * [ { name: 't' }, { name: 'someMap', key: 'foo' }, { name: 'bar' } ]
+ */
+parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) {
+  if (typeof identifierChain === 'undefined' || identifierChain.length === 0) {
+    return identifierChain;
+  }
+  var firstIdentifier = identifierChain[0].name;
 
-     if (tableReferences.length === 1) {
-       parser.yy.result.suggestColumns.table = tableReferences[0].table;
-       if (typeof tableReferences[0].database !== 'undefined') {
-         parser.yy.result.suggestColumns.database = tableReferences[0].database;
-       }
-     } else if (tableReferences.length > 1) {
-       // Table identifier is required for column completion
-       delete parser.yy.result.suggestColumns;
-       parser.yy.result.suggestIdentifiers = [];
-       tableReferences.forEach(function (tableRef) {
-         parser.yy.result.suggestIdentifiers.push((tableRef.alias || tableRef.table) + '.');
-       });
+  foundPrimary = tablePrimaries.filter(function (tablePrimary) {
+    return tablePrimary.alias === firstIdentifier;
+  });
+
+  if (foundPrimary.length === 1) {
+    var firstPart = foundPrimary[0].identifierChain.concat();
+    var secondPart = identifierChain.slice(1);
+    if (typeof identifierChain[0].key !== 'undefined') {
+      var lastFromFirst = firstPart.pop();
+      firstPart.push({
+        name: lastFromFirst.name,
+        key: identifierChain[0].key
+      })
+    }
+    return firstPart.concat(secondPart);
+  }
+
+  return identifierChain;
+};
+
+parser.expandLateralViews = function (tablePrimaries, identifierChain) {
+  var firstIdentifier = identifierChain[0];
+  var identifierChainParts = [];
+  tablePrimaries.forEach(function (tablePrimary) {
+    if (typeof tablePrimary.lateralViews !== 'undefined') {
+      tablePrimary.lateralViews.reverse().forEach(function (lateralView) {
+        if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
+          identifierChain.shift();
+          firstIdentifier = identifierChain[0];
+        } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
+          parser.yy.result.suggestIdentifiers = lateralView.columnAliases;
+          delete parser.yy.result.suggestColumns;
+          return identifierChain;
+        }
+        if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
+          if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[0]) {
+            identifierChain[0] = { name: 'key' };
+          } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[1]) {
+            identifierChain[0] = { name: 'value' };
+          } else {
+            identifierChain[0] = { name: 'item' };
+          }
+          identifierChain = lateralView.udtf.expression.concat(identifierChain);
+          firstIdentifier = identifierChain[0];
+        }
+      });
+    }
+  });
+  return identifierChain;
+};
+
+var linkSuggestion = function (suggestion, isColumnSuggestion) {
+  var identifierChain = suggestion.identifierChain;
+  var tablePrimaries = parser.yy.latestTablePrimaries;
+
+  // Impala can have references to maps or array, i.e. FROM table t, t.map m
+  // We need to replace those in the identifierChain
+  if (parser.yy.dialect === 'impala') {
+    identifierChain = parser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+    suggestion.identifierChain = identifierChain;
+  }
+
+  // Expand exploded views in the identifier chain
+  if (parser.yy.dialect === 'hive') {
+    if (identifierChain.length === 0) {
+      var identifiers = [];
+      tablePrimaries.forEach(function (tablePrimary) {
+        if (typeof tablePrimary.lateralViews !== 'undefined') {
+          tablePrimary.lateralViews.forEach(function (lateralView) {
+            Array.prototype.push.apply(identifiers, lateralView.columnAliases);
+          });
+        }
+      });
+      if (identifiers.length > 0) {
+        parser.yy.keepColumns = true;
+        parser.yy.result.suggestIdentifiers = identifiers;
+      }
+    } else {
+      identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
+      suggestion.identifierChain = identifierChain;
+    }
+  }
+
+  // IdentifierChain contains a possibly started identifier or empty, example: a.b.c = ['a', 'b', 'c']
+  // Reduce the tablePrimaries to the one that matches the first identifier if found
+  if (identifierChain.length > 0) {
+    var foundTable = tablePrimaries.filter(function (tablePrimary) {
+      return identifierChain[0].name === tablePrimary.alias;
+    });
+
+    if (foundTable.length === 0) {
+      foundTable = tablePrimaries.filter(function (tablePrimary) {
+        return identifierChain[0].name === tablePrimary.identifierChain[0].name;
+      })
+    }
+
+    if (foundTable.length === 1) {
+      tablePrimaries = foundTable;
+      identifierChain.shift();
+    }
+  }
+
+  if (identifierChain.length == 0) {
+    delete suggestion.identifierChain;
+  }
+
+  if (tablePrimaries.length === 1) {
+    if (tablePrimaries[0].identifierChain.length == 2) {
+      suggestion.database = tablePrimaries[0].identifierChain[0].name;
+      suggestion.table = tablePrimaries[0].identifierChain[1].name;
+    } else {
+      suggestion.table = tablePrimaries[0].identifierChain[0].name;
+    }
+  } else if (tablePrimaries.length > 1 && isColumnSuggestion) {
+    // Table identifier is required for column completion
+    delete parser.yy.result.suggestColumns;
+    suggestTablePrimariesAsIdentifiers();
+  }
+}
+
+var suggestTablePrimariesAsIdentifiers = function () {
+  parser.yy.result.suggestIdentifiers = [];
+  parser.yy.latestTablePrimaries.forEach(function (tablePrimary) {
+    parser.yy.result.suggestIdentifiers.push((tablePrimary.alias || tablePrimary.identifierChain[0].name) + '.');
+  });
+}
+
+var linkTablesPrimaries = function () {
+   if (!parser.yy.cursorFound) {
+     return;
+   }
+   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+     linkSuggestion(parser.yy.result.suggestColumns, true);
+   }
+   if (typeof parser.yy.result.suggestValues !== 'undefined') {
+     linkSuggestion(parser.yy.result.suggestValues, false);
+     if (parser.yy.latestTablePrimaries.length > 1) {
+       suggestTablePrimariesAsIdentifiers();
      }
    }
 }
 
-var addTableReference = function (ref) {
-  if (typeof parser.yy.latestTableReferences === 'undefined') {
-    parser.yy.latestTableReferences = [];
+var addTablePrimary = function (ref) {
+  if (typeof parser.yy.latestTablePrimaries === 'undefined') {
+    parser.yy.latestTablePrimaries = [];
   }
-  parser.yy.latestTableReferences.push(ref);
+  parser.yy.latestTablePrimaries.push(ref);
 }
 
 var suggestNumbers = function (numbers) {
@@ -612,6 +908,21 @@ var suggestNumbers = function (numbers) {
 
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords;
+}
+
+var suggestTablesOrColumns = function (identifier) {
+  if (typeof parser.yy.latestTablePrimaries == 'undefined') {
+    suggestTables({ database: identifier });
+    return;
+  }
+  var tableRef = parser.yy.latestTablePrimaries.filter(function (tablePrimary) {
+    return tablePrimary.alias === identifier;
+  });
+  if (tableRef.length > 0) {
+    suggestColumns({ identifierChain: [ { name: identifier } ] });
+  } else {
+    suggestTables({ database: identifier });
+  }
 }
 
 var suggestColumns = function (details) {
@@ -630,6 +941,10 @@ var suggestHdfs = function (details) {
   parser.yy.result.suggestHdfs = details || {}
 }
 
+var suggestValues = function (details) {
+  parser.yy.result.suggestValues = details || { identifierChain: [] }
+}
+
 var determineCase = function (text) {
   parser.yy.lowerCase = text.toLowerCase() === text;
 };
@@ -640,6 +955,7 @@ var lexerModified = false;
  * Main parser function
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect) {
+  parser.yy.activeDialect = dialect;
 
   // Hack to set the inital state of the lexer without first having to hit a token
   // has to be done as the first token found can be dependant on dialect
@@ -647,7 +963,9 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     var originalSetInput = parser.lexer.setInput;
     parser.lexer.setInput = function (input) {
       var lexer = originalSetInput.bind(parser.lexer)(input);
-      lexer.begin(dialect)
+      if (typeof parser.yy.activeDialect !== 'undefined') {
+        lexer.begin(parser.yy.activeDialect)
+      }
     }
     lexerModified = true;
   }
