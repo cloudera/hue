@@ -1455,12 +1455,19 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="snippet-grid-settings">
   <div style="overflow:auto">
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
-      <li class="nav-header pointer" data-bind="click: toggleResultSettings" title="${_('Hide columns')}">${_('columns')}</li>
+      <li class="nav-header" title="${_('Hide columns')}">
+        <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(!result.isMetaFilterVisible()); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
+        <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
+      </li>
     </ul>
-    <ul class="unstyled" data-bind="foreach: result.meta">
+    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" />
+    <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
+      ${ _('No results found') }
+    </div>
+    <ul class="unstyled" data-bind="foreach: result.filteredMeta">
       <li data-bind="visible: name != ''">
-        <input type="checkbox" checked="checked" data-bind="event: { change: function(){ toggleColumn($element, $index(), $parent);} }" />
-        <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
+        <input type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" />
+        <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
       </li>
     </ul>
   </div>
