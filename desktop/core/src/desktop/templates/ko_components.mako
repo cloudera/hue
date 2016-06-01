@@ -176,7 +176,7 @@ from desktop.views import _ko
           </div>
         </li>
 
-        <li data-bind="visible: ! loadingDatabases()" >
+        <li data-bind="visible: ! errorFetchingDatabases() && ! loadingDatabases()" >
           <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
         </li>
 
@@ -185,21 +185,20 @@ from desktop.views import _ko
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </li>
 
-        <li data-bind="visible: hasErrors && availableDatabaseNames.length != 0">
+        <li data-bind="visible: errorFetchingDatabases">
           <span>${ _('The database list cannot be loaded.') }</span>
         </li>
 
-        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases() && ! hasErrors()">
+        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases()">
           ${_('tables')}
           <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           </div>
         </li>
-
-        <!-- ko if: selectedDatabase() != null -->
-          <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
-            <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
-          </li>
+        <!-- ko if: selectedDatabase() != null && !selectedDatabase().hasErrors() -->
+        <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
+          <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
+        </li>
 
         <div class="table-container">
           <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
@@ -208,6 +207,11 @@ from desktop.views import _ko
           </div>
           <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
           </div>
+        <!-- /ko -->
+        <!-- ko if: selectedDatabase() != null && selectedDatabase().hasErrors() -->
+        <li>
+          <span>${ _('The table list cannot be loaded.') }</span>
+        </li>
         <!-- /ko -->
       </ul>
     </div>
@@ -269,6 +273,7 @@ from desktop.views import _ko
 
         self.expandable = typeof definition.type === "undefined" || definition.type === "struct" || definition.type === "array" || definition.type === "map";
 
+        self.hasErrors = ko.observable(false);
         self.loaded = false;
         self.loading = ko.observable(false);
         self.open = ko.observable(false);
@@ -305,6 +310,7 @@ from desktop.views import _ko
           return;
         }
         self.loading(true);
+        self.hasErrors(false);
         self.entries([]);
 
         // Defer this part to allow ko to react on empty entries and loading
@@ -390,7 +396,7 @@ from desktop.views import _ko
             }
             self.loading(false);
           }, function() {
-            self.assistPanel.hasErrors(true);
+            self.hasErrors(true);
             self.loading(false);
           });
         }, 10);
@@ -660,6 +666,7 @@ from desktop.views import _ko
 
         // We need the names because select2 does not support objects
         self.availableDatabaseNames = ko.observableArray();
+        self.errorFetchingDatabases = ko.observable(false);
 
         self.fetchDatabases(function() {
           self.assistHelper.activeDatabase.subscribe(function(newValue) {
@@ -749,6 +756,7 @@ from desktop.views import _ko
 
       AssistPanel.prototype.fetchDatabases = function(callback) {
         var self = this;
+        self.errorFetchingDatabases(false);
 
         self.assistHelper.fetchDatabases(function(data) {
           self.databases($.map(data.databases, function(databaseName) {
@@ -775,7 +783,7 @@ from desktop.views import _ko
 
           self.loadingDatabases(false);
           self.reloading(false);
-          self.hasErrors(true);
+          self.errorFetchingDatabases(true);
         });
       };
 
