@@ -85,6 +85,25 @@ class Job(object):
   def __str__(self):
     return '%s' % force_unicode(self.name)
 
+  def deployment_dir(self):
+    return None
+
+  def check_workspace(self, fs, user):
+    # Create optional default root workspace for the first submission
+    if REMOTE_SAMPLE_DIR.get() == REMOTE_SAMPLE_DIR.config.default_value:
+      create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
+
+    Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
+    Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
+
+  def import_workspace(self, fs, source_deployment_dir, owner):
+    try:
+      fs.copy_remote_dir(source_deployment_dir, self.deployment_dir, owner=owner)
+    except WebHdfsException, e:
+      msg = _('The copy of the deployment directory failed: %s.') % e
+      LOG.error(msg)
+      raise PopupException(msg)
+
 
 class WorkflowConfiguration(object):
 
@@ -446,22 +465,6 @@ class Workflow(Job):
     _data['workflow']['properties']['deployment_dir'] = Job.get_workspace(user)
 
     self.data = json.dumps(_data)
-
-  def check_workspace(self, fs, user):
-    # Create optional default root workspace for the first submission
-    if REMOTE_SAMPLE_DIR.get() == REMOTE_SAMPLE_DIR.config.default_value:
-      create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
-
-    Submission(user, self, fs, None, {})._create_dir(self.deployment_dir)
-    Submission(user, self, fs, None, {})._create_dir(Hdfs.join(self.deployment_dir, 'lib'))
-
-  def import_workspace(self, fs, source_deployment_dir, owner):
-    try:
-      fs.copy_remote_dir(source_deployment_dir, self.deployment_dir, owner=owner)
-    except WebHdfsException, e:
-      msg = _('The copy of the deployment directory failed: %s.') % e
-      LOG.error(msg)
-      raise PopupException(msg)
 
   def create_single_action_workflow_data(self, node_id):
     _data = json.loads(self.data)
