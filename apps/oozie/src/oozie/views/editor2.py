@@ -172,12 +172,12 @@ def copy_workflow(request):
   return JsonResponse(response)
 
 
-def _import_workspace(fs, user, workflow):
-  source_workspace_dir = workflow.deployment_dir
+def _import_workspace(fs, user, job):
+  source_workspace_dir = job.deployment_dir
 
-  workflow.set_workspace(user)
-  workflow.check_workspace(fs, user)
-  workflow.import_workspace(fs, source_workspace_dir, user)
+  job.set_workspace(user)
+  job.check_workspace(fs, user)
+  job.import_workspace(fs, source_workspace_dir, user)
 
 
 @check_document_modify_permission()
@@ -465,8 +465,11 @@ def copy_coordinator(request):
 
     doc.copy(content_object=doc2, name=name, owner=request.user)
 
-    coordinator_data = Coordinator(document=doc2).get_data_for_json()
+    coord = Coordinator(document=doc2)
+    coordinator_data = coord.get_data_for_json()
     coordinator_data['name'] = name
+
+    _import_workspace(request.fs, request.user, coord)
     doc2.update_data(coordinator_data)
     doc2.save()
 
@@ -680,8 +683,11 @@ def copy_bundle(request):
 
     doc.copy(content_object=doc2, name=name, owner=request.user)
 
-    bundle_data = Bundle(document=doc2).get_data_for_json()
+    bundle = Bundle(document=doc2)
+    bundle_data = bundle.get_data_for_json()
     bundle_data['name'] = name
+
+    _import_workspace(request.fs, request.user, bundle)
     doc2.update_data(bundle_data)
     doc2.save()
 
