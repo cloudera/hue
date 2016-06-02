@@ -58,12 +58,15 @@ class AuthenticationForm(AuthAuthenticationForm):
 
         expires_delta = datetime.timedelta(seconds=conf.AUTH.EXPIRES_AFTER.get())
         if user.is_active and user.last_login + expires_delta < datetime.datetime.now():
+          INACTIVE_EXPIRATION_DELTA = datetime.timedelta(days=365)
           if user.is_superuser:
             if conf.AUTH.EXPIRE_SUPERUSERS.get():
               user.is_active = False
+              user.last_login = datetime.datetime.now() + INACTIVE_EXPIRATION_DELTA
               user.save()
           else:
             user.is_active = False
+            user.last_login = datetime.datetime.now() + INACTIVE_EXPIRATION_DELTA
             user.save()
 
         if not user.is_active:
