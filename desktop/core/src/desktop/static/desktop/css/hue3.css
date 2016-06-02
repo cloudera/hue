@@ -1028,13 +1028,32 @@ div.box {
   width: 400px;
   text-align: left;
   z-index: 11000;
-  word-break: break-all;
-  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.jHueNotify .message {
   max-height: 140px;
+  overflow-y: auto;
+  word-break: break-all;
+  width: 380px;
+}
+
+.jHueNotify.expanded {
+  z-index: 11001;
+  top: 20px!important;
+  left: 10px;
+  bottom: 10px;
+  width: auto;
+}
+
+.jHueNotify.expanded .message {
+  max-height: 100%;
+  width: auto;
+  word-break: normal;
 }
 
 .jHueNotify .close {
-  right: -27px;
+  right: 2px;
   opacity: 1;
 }
 

@@ -63,17 +63,39 @@
       el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN);
     }
 
+    var scrollColor = '#f0c36d';
+
     if (_this.options.level == TYPES.ERROR) {
       el.addClass("alert-error");
+      scrollColor = '#b94a48';
     }
     else if (_this.options.level == TYPES.INFO) {
       el.addClass("alert-info");
+      scrollColor = '#338bb8';
     }
     el.find(".message").html("<strong>" + _this.options.message + "</strong>");
+
+    el.find(".message").niceScroll({
+      cursorcolor: scrollColor,
+      cursorborder: '1px solid ' + scrollColor,
+      cursoropacitymin: 0,
+      cursoropacitymax: 0.7,
+      scrollspeed: 100,
+      mousescrollstep: 60,
+      cursorminheight: 20,
+      horizrailenabled: false,
+      zindex: 14000,
+      railoffset: { left: 5 }
+    });
 
     if (_this.options.css != null) {
       el.attr("style", _this.options.css);
     }
+
+    el.on('dblclick', function(){
+      el.toggleClass('expanded');
+      el.find('.message').getNiceScroll().resize();
+    });
 
     if (_this.options.sticky) {
       el.find(".close").click(function () {

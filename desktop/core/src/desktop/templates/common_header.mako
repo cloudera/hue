@@ -684,5 +684,5 @@ if USE_NEW_EDITOR.get():
 
 <div id="jHueNotify" class="alert hide">
     <button class="close">&times;</button>
-    <span class="message"></span>
+    <div class="message"></div>
 </div>
