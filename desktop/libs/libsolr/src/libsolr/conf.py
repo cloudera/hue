@@ -27,3 +27,10 @@ SSL_CERT_CA_VERIFY = Config(
   dynamic_default=default_ssl_validate,
   type=coerce_bool
 )
+
+SOLR_ZK_PATH = Config(
+  key="solr_zk_path",
+  help=_t("Default path to Solr in ZooKeeper"),
+  default='/solr',
+  type=str
+)
