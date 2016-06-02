@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 from nose.tools import assert_true, assert_false, assert_equal
 
 from django.conf import settings
@@ -100,6 +101,33 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     assert_true('/beeswax' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
+
+  def test_login_expiration(self):
+    response = self.c.post('/accounts/login/', {
+        'username': self.test_username,
+        'password': "test-hue-foo2",
+      }, follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+
+    self.reset.append(conf.AUTH.EXPIRES_AFTER.set_for_testing(10000))
+    user = User.objects.get(username=self.test_username)
+    user.last_login = datetime.datetime.now() + datetime.timedelta(days=-365)
+    user.save()
+
+    # Deactivate user
+    response = self.c.post('/accounts/login/', {
+        'username': self.test_username,
+        'password': "test-hue-foo2",
+      }, follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true("Account deactivated. Please contact an administrator." in response.content, response.content)
+
+    # Activate user
+    user = User.objects.get(username=self.test_username)
+    user.is_active = True
+    user.save()
+    response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"))
+    assert_equal(200, response.status_code, "Expected ok status.")
 
 
 class TestLdapLogin(PseudoHdfsTestBase):
