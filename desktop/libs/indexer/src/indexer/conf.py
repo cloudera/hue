@@ -85,7 +85,7 @@ SOLRCTL_PATH = Config(
   type=str,
   dynamic_default=solrctl)
 
-# Deprecated
+# Deprecated and not used anymore
 SOLR_ZK_ENSEMBLE = Config(
   key="solr_zk_ensemble",
   help=_t("Zookeeper ensemble."),
