@@ -274,7 +274,7 @@ def get_logs(request):
   # Retrieve full log for job progress parsing
   full_log = request.POST.get('full_log', logs)
 
-  response['logs'] = logs
+  response['logs'] = logs.strip()
   response['progress'] = db.progress(snippet, full_log) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['status'] = 0
