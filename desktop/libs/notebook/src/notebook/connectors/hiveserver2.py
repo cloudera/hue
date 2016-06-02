@@ -231,7 +231,7 @@ class HS2Api(Api):
     status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
 
     if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index):
-      if 'transition from CANCELED to ERROR' in operation.errorMessage: # Hive case on canceled query
+      if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage: # Hive case on canceled query
         raise QueryExpired()
       else:
         raise QueryError(operation.errorMessage)
