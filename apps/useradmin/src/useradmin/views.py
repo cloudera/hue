@@ -22,6 +22,10 @@ import threading
 import subprocess
 import json
 
+from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
+from axes.models import AccessAttempt
+from axes.utils import reset
+
 import ldap
 import ldap_access
 from ldap_access import LdapBindException, LdapSearchException
@@ -127,6 +131,11 @@ def massage_groups_for_json(groups):
       'name': group.name
     })
   return simple_groups
+
+
+def is_user_locked_out(username):
+  attempts = AccessAttempt.objects.filter(username=username)
+  return any(attempt.failures_since_start >= FAILURE_LIMIT and LOCK_OUT_AT_FAILURE for attempt in attempts)
 
 
 def delete_user(request):
@@ -263,6 +272,17 @@ def edit_user(request, username=None):
           # All ok
           form.save()
           request.info(_('User information updated'))
+
+          # Unlock account if selected
+          if form.cleaned_data.get('unlock_account'):
+            if not request.user.is_superuser:
+              raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
+
+            try:
+              reset(username=username)
+              request.info(_('Successfully unlocked account for user: %s') % username)
+            except Exception, e:
+              raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
         finally:
           __users_lock.release()
 

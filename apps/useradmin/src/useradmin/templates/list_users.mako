@@ -163,7 +163,7 @@ ${layout.menubar(section='users')}
         null,
         null,
         null,
-        { "sType": "date" }
+        { "sType": "date" },
       ],
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",

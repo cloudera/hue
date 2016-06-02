@@ -17,6 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from useradmin.password_policy import is_password_policy_enabled, get_password_hint
+from useradmin.views import is_user_locked_out
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -86,8 +87,11 @@ ${ layout.menubar(section='users') }
         </div>
       % if user.is_superuser:
         <div id="step3" class="stepDetails hide">
-        ${layout.render_field(form["is_active"])}
-                ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
+          ${layout.render_field(form["is_active"])}
+          ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
+          % if is_user_locked_out(username):
+            ${layout.render_field(form["unlock_account"])}
+          % endif
         </div>
       % endif
       </div>

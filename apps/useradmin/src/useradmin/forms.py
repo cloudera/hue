@@ -109,6 +109,10 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   language = forms.ChoiceField(label=_t("Language Preference"),
                                choices=LANGUAGES,
                                required=False)
+  unlock_account = forms.BooleanField(label=_t("Unlock Account"),
+                                      help_text=_t("Unlock user's account for login."),
+                                      initial=False,
+                                      required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
@@ -132,6 +136,8 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
         self.fields['is_active'].widget.attrs['readonly'] = True
       if 'is_superuser' in self.fields:
         self.fields['is_superuser'].widget.attrs['readonly'] = True
+      if 'unlock_account' in self.fields:
+        self.fields['unlock_account'].widget.attrs['readonly'] = True
       if 'groups' in self.fields:
         self.fields['groups'].widget.attrs['readonly'] = True
 
@@ -198,7 +204,7 @@ class PasswordChangeForm(UserChangeForm):
 
 class SuperUserChangeForm(UserChangeForm):
   class Meta(UserChangeForm.Meta):
-    fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "groups"]
+    fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
 
   def __init__(self, *args, **kwargs):
     super(SuperUserChangeForm, self).__init__(*args, **kwargs)
