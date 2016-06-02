@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
+from libsolr.conf import SOLR_ZK_PATH
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
@@ -42,7 +43,7 @@ ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 
 
 def get_solr_ensemble():
-  return '%s/solr' % ENSEMBLE.get()
+  return '%s%s' % (ENSEMBLE.get(), SOLR_ZK_PATH.get())
 
 
 class CollectionManagerController(object):

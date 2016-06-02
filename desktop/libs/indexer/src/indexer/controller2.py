@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from indexer.conf import CORE_INSTANCE_DIR
+from indexer.controller import get_solr_ensemble
 from indexer.utils import copy_configs
 from libsolr.api import SolrApi
 from libsentry.conf import is_enabled
@@ -38,10 +39,6 @@ MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored'), ('M', 'multivalued')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
-
-
-def get_solr_ensemble():
-  return '%s/solr' % ENSEMBLE.get()
 
 
 class IndexControllerException(Exception):
