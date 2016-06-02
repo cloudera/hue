@@ -60,8 +60,14 @@ $ build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 ```
 
 
+Docker
+------
+Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker) or the
+[video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
+
+
 Development Prerequisites
------------
+-------------------------
 You'll need these library development packages and tools installed on
 your system:
 
