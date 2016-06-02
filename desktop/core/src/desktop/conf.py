@@ -1101,6 +1101,13 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+USE_NEW_AUTOCOMPLETER = Config( # To remove when it's working properly
+  key='use_new_autocompleter',
+  default=False,
+  type=coerce_bool,
+  help=_('Enable the new editor SQL autocompleter')
+)
+
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='use_new_editor',
   default=True,
