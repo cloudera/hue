@@ -1021,7 +1021,8 @@
     self.autocompleter = new Autocompleter({
       snippet: self,
       user: vm.user,
-      optEnabled: false
+      optEnabled: false,
+      useNewAutocompleter: vm.useNewAutocompleter
     });
 
     self.init = function () {
@@ -1574,6 +1575,7 @@
     self.i18n = i18n;
     self.user = options.user;
     self.userId = options.userId;
+    self.useNewAutocompleter = options.useNewAutocompleter || false;
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);

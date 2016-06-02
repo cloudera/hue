@@ -1340,6 +1340,7 @@ ${ hueIcons.symbols() }
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
+        useNewAutocompleter: $root.useNewAutocompleter,
         aceOptions: {
           showLineNumbers: $root.editorMode,
           showGutter: $root.editorMode,
@@ -2506,6 +2507,9 @@ ${ hueIcons.symbols() }
       user: '${ user.username }',
       userId: ${ user.id },
       assistAvailable: true,
+      %if conf.USE_NEW_AUTOCOMPLETER.get():
+      useNewAutocompleter: true,
+      %endif
       snippetViewSettings: {
         default: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',

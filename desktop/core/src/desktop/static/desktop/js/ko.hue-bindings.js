@@ -2609,16 +2609,21 @@
       }
       editor.completer.exactMatch = ! snippet.isSqlDialect();
 
+      var initAutocompleters = function () {
+        editor.completers.length = 0;
+        if(! options.useNewAutocompleter) {
+          editor.completers.push(langTools.snippetCompleter);
+          editor.completers.push(langTools.textCompleter);
+          editor.completers.push(langTools.keyWordCompleter);
+        }
+        editor.completers.push(snippet.autocompleter);
+      }
+
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
 
-      editor.on("focus", function () {
-        editor.completers.length = 0;
-        editor.completers.push(langTools.snippetCompleter);
-        editor.completers.push(langTools.textCompleter);
-        editor.completers.push(langTools.keyWordCompleter);
-        editor.completers.push(snippet.autocompleter);
-      });
+      editor.on("focus", initAutocompleters);
+      initAutocompleters();
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
