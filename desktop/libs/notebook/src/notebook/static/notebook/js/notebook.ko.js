@@ -870,36 +870,39 @@
       }, function (data) {
         if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
-        } else if (data.status == 0) {
-          self.status(data.query_status.status);
+        } else {
           self.getLogs();
 
-          if (self.status() == 'running' || self.status() == 'starting') {
-            self.result.endTime(new Date());
-            if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
-          }
-          else if (self.status() == 'available') {
-            self.fetchResult(100);
-            self.progress(100);
-            if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
-              self.ddlNotification(Math.random());
-              if (self.result.handle().has_more_statements) {
-                setTimeout(function () {
-                  self.execute(); // Execute next, need to wait as we disabled fast click
-                }, 1000);
+          if (data.status == 0) {
+            self.status(data.query_status.status);
+
+            if (self.status() == 'running' || self.status() == 'starting') {
+              self.result.endTime(new Date());
+              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
+            }
+            else if (self.status() == 'available') {
+              self.fetchResult(100);
+              self.progress(100);
+             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
+                self.ddlNotification(Math.random());
+                if (self.result.handle().has_more_statements) {
+                  setTimeout(function () {
+                    self.execute(); // Execute next, need to wait as we disabled fast click
+                  }, 1000);
+                }
+              }
+              if (vm.successUrl()) {
+                window.location.href = vm.successUrl();
               }
             }
-            if (vm.successUrl()) {
-              window.location.href = vm.successUrl();
+            else if (self.status() == 'success') {
+              self.progress(99);
             }
+          } else if (data.status == -3) {
+            self.status('expired');
+          } else {
+            self._ajaxError(data);
           }
-          else if (self.status() == 'success') {
-            self.progress(99);
-          }
-        } else if (data.status == -3) {
-          self.status('expired');
-        } else {
-          self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText || textStatus);
@@ -1433,7 +1436,7 @@
         $.post("/notebook/api/check_status", {
           notebook: ko.mapping.toJSON({id: item.uuid()}),
         }, function (data) {
-          var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : null);
+          var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
           if (status && item.status() != status) {
             item.status(status);
           }
