@@ -32,47 +32,323 @@ define([
       expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
     };
 
-    it('should suggest keywords for empty statement', function() {
-      assertAutoComplete({
-        beforeCursor: '',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [ 'SELECT', 'USE' ]
-        }
+    describe('keyword completion', function () {
+      it('should suggest keywords for empty statement', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
+          }
+        });
       });
-    });
 
-    it('should suggest keywords after complete statement', function() {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM bar;',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [ 'SELECT', 'USE' ]
-        }
+      it('should suggest keywords after complete statement', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM bar;',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
+          }
+        });
       });
-    });
 
-    it('should suggest keywords after complete statements', function() {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM bar;SELECT * FROM bar;',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [ 'SELECT', 'USE' ]
-        }
+      it('should suggest keywords after complete statements', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM bar;SELECT * FROM bar;',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
+          }
+        });
       });
-    });
 
-    it('should suggest keywords for partial statement', function() {
-      assertAutoComplete({
-        beforeCursor: 'se',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [ 'SELECT', 'USE' ]
-        }
+      it('should suggest keywords for partial statement', function() {
+        assertAutoComplete({
+          beforeCursor: 'se',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE TABLE identifier (identifier ', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE foo (id ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE TABLE identifier (identifier INT, identifier FLOAT, identifier ', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT * ', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables:{
+              prependFrom:true
+            },
+            suggestDatabases:{
+              prependFrom:true,
+              appendDot:true
+            }
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList ', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT foo, bar ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables:{
+              prependFrom:true
+            },
+            suggestDatabases:{
+              prependFrom:true,
+              appendDot:true
+            }
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function() {
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY', 'WHERE']
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList FROM TablePrimary WHERE SearchCondition ', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY']
+          }
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest keywords for empty statement', function() {
+          assertAutoComplete({
+            beforeCursor: '',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
+                'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
+                'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+            }
+          });
+        });
+
+        it ('should suggest keywords after LOAD', function () {
+          assertAutoComplete({
+            beforeCursor: 'LOAD ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DATA']
+            }
+          });
+        });
+
+        it ('should suggest keywords after LOAD DATA', function () {
+          assertAutoComplete({
+            beforeCursor: 'LOAD DATA ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['INPATH']
+            }
+          });
+        });
+
+        it ('should suggest keywords after LOAD DATA hdfsPath', function () {
+          assertAutoComplete({
+            beforeCursor: 'LOAD DATA INPATH \'/some/path\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['INTO']
+            }
+          });
+        });
+
+        it ('should suggest keywords after LOAD DATA hdfsPath INTO', function () {
+          assertAutoComplete({
+            beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TABLE']
+            }
+          });
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should suggest keywords for empty statement', function() {
+          assertAutoComplete({
+            beforeCursor: '',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
+                'DROP', 'EXPLAIN', 'EXPORT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+                'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+            }
+          });
+        });
+
+        it ('should suggest keywords after CREATE', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXTERNAL', 'TABLE']
+            }
+          });
+        });
+
+        it ('should suggest keywords after CREATE EXTERNAL TABLE identifier tableElementList', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LOCATION']
+            }
+          });
+        });
+
+        it('should suggest keywords in after CREATE TABLE identifier (identifier ', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['GROUP BY', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary WHERE SearchCondition ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo LATERAL ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VIEW']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL VIEW ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo LATERAL VIEW ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['explode', 'posexplode']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL VIEW udtf ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
       });
     });
 
@@ -182,7 +458,9 @@ define([
           afterCursor: '\n-- other line comment',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: [ 'SELECT', 'USE' ]
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
           }
         });
       });
@@ -193,7 +471,9 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: [ 'SELECT', 'USE' ]
+            suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
+              'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
+              'UPDATE', 'USE']
           }
         });
       });
@@ -324,18 +604,6 @@ define([
             lowerCase: false,
             suggestStar: true,
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
-          }
-        });
-      });
-
-      it('should suggest keywords after table references', function() {
-        assertAutoComplete({
-          serverResponses: {},
-          beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
-          afterCursor: '',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'LIMIT']
           }
         });
       });

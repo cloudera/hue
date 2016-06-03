@@ -39,10 +39,6 @@
     var self = this;
     var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type());
 
-    if (parseResult.error) {
-      console.log(parseResult.error)
-    }
-
     var completions = [];
 
     if (parseResult.suggestKeywords) {
@@ -146,7 +142,10 @@
       currentScore--;
     });
 
-    editor.hideSpinner();
+    // TODO Figure out why SELECT | FROM customers LATERAL VIEW explode(a) AS (b, c)
+    if (typeof editor !== 'undefined') {
+      editor.hideSpinner();
+    }
     callback(completions);
   };
 
