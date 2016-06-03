@@ -28,6 +28,7 @@ from string import Template
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
@@ -67,7 +68,9 @@ class Job(object):
 
   @classmethod
   def get_workspace(cls, user):
-    return (REMOTE_SAMPLE_DIR.get() + '/hue-oozie-$TIME').replace('$USER', user.username).replace('$TIME', str(time.time()))
+    if type(user) is User:
+      user = user.username
+    return (REMOTE_SAMPLE_DIR.get() + '/hue-oozie-$TIME').replace('$USER', user).replace('$TIME', str(time.time()))
 
   @property
   def validated_name(self):

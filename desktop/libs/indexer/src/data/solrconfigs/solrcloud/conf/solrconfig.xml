@@ -146,14 +146,6 @@
        before upgrading to a newer version to avoid unnecessary reindexing.
   -->
   <codecFactory class="solr.SchemaCodecFactory"/>
-
-  <!-- To enable dynamic schema REST APIs, use the following for <schemaFactory>: -->
-
-       <schemaFactory class="ManagedIndexSchemaFactory">
-         <bool name="mutable">true</bool>
-         <str name="managedSchemaResourceName">managed-schema</str>
-       </schemaFactory>
-
 <!--
        When ManagedIndexSchemaFactory is specified, Solr will load the schema from
        he resource named in 'managedSchemaResourceName', rather than from schema.xml.
