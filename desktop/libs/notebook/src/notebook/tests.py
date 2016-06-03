@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+## -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -27,6 +28,8 @@ from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2
 
 from notebook.api import _historify
+from notebook.connectors.base import QueryError
+from notebook.decorators import api_error_handler
 
 
 class TestNotebookApi(object):
@@ -173,3 +176,33 @@ class TestNotebookApi(object):
     assert_false(Document2.objects.filter(type='query-hive', is_history=True).exists())
     assert_true(Document2.objects.filter(type='query-hive', is_history=False).exists())
     assert_true(Document2.objects.filter(type='query-impala', is_history=True).exists())
+
+
+  def test_query_error_encoding(self):
+    @api_error_handler
+    def send_exception(message):
+      raise QueryError(message=message)
+
+    message = """SELECT
+a.key,
+a.*
+FROM customers c, c.addresses a"""
+    response =send_exception(message)
+    data = json.loads(response.content)
+    assert_equal(1, data['status'])
+
+    message = """SELECT
+\u2002\u2002a.key,
+\u2002\u2002a.*
+FROM customers c, c.addresses a"""
+    response =send_exception(message)
+    data = json.loads(response.content)
+    assert_equal(1, data['status'])
+
+    message = u"""SELECT
+a.key,
+a.*
+FROM déclenché c, c.addresses a"""
+    response =send_exception(message)
+    data = json.loads(response.content)
+    assert_equal(1, data['status'])
