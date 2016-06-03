@@ -323,7 +323,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestStar: true,
-            suggestIdentifiers: ['tta.', 'testTableB.']
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -346,7 +346,7 @@ define([
           afterCursor: '',
           expectedResult : {
             lowerCase: false,
-            suggestIdentifiers: ['tta.', 'testTableB.']
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -360,7 +360,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestStar: true,
-            suggestIdentifiers: ['tta.', 'ttb.', 'ttaSum.']
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum', type: 'alias' }, { name: 'ttb.', type: 'alias' }]
           }
         });
       });
@@ -722,6 +722,38 @@ define([
           });
         });
 
+        it('should suggest lateral view aliases', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT ',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestStar: true, // TODO: Verify that this is true
+              suggestColumns: {
+                table: 'testTable'
+              },
+              suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest lateral view aliases with multiple column aliases', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT ',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS (testKey, testValue)',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestStar: true, // TODO: Verify that this is true
+              suggestColumns: {
+                table: 'testTable'
+              },
+              suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testKey', type: 'alias' }, { name: 'testValue', type: 'alias' }]
+            }
+          });
+        });
+
         it('should suggest structs from exploded item references to arrays', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT testItem.',
@@ -873,7 +905,7 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestStar: true, // TODO: Check if really true
-              suggestIdentifiers: ['testMapKey', 'testMapValue']
+              suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }]
             }
           });
         });
@@ -891,7 +923,7 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestStar: true, // TODO: Check if really true
-              suggestIdentifiers: ['testMapKey', 'testMapValue'],
+              suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
               suggestColumns: {
                 table: 'testTable',
               }
@@ -1021,7 +1053,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestStar: true, // TODO: Check if really so
-            suggestIdentifiers: ['t.', 'tm.']
+            suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
         });
       });
@@ -1068,7 +1100,7 @@ define([
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'key' }]
             },
-            suggestIdentifiers : ['t.', 'tm.']
+            suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
         });
       });
@@ -1084,7 +1116,7 @@ define([
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'field' }]
             },
-            suggestIdentifiers : ['t.', 'm.']
+            suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }]
           }
         });
       })
@@ -1398,7 +1430,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestIdentifiers: ['testTable1.', 'testTable2.']
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -1410,7 +1442,7 @@ define([
           ignoreErrors: true, // Here the right parenthesis is missing
           expectedResult: {
             lowerCase: false,
-            suggestIdentifiers: ['testTable1.', 'testTable2.']
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -1421,7 +1453,7 @@ define([
           afterCursor: ' AND testTable1.testColumn1 = testTable2.testColumn3',
           expectedResult: {
             lowerCase: false,
-            suggestIdentifiers: ['testTable1.', 'testTable2.']
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
