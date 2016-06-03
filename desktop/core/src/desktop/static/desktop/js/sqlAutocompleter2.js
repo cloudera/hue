@@ -33,23 +33,30 @@
   function SqlAutocompleter2(options) {
     var self = this;
     self.snippet = options.snippet;
-  };
+  }
 
   SqlAutocompleter2.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
     var self = this;
     var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type());
-    var completions = [];
 
-    var onFailure = function () {
-      editor.hideSpinner();
-      self.finalizeCompletions(completions);
-    };
+    if (parseResult.error) {
+      console.log(parseResult.error)
+    }
+
+    var completions = [];
 
     if (parseResult.suggestKeywords) {
       parseResult.suggestKeywords.forEach(function (keyword) {
         completions.push({ value: keyword, meta: 'keyword' });
       });
     }
+
+    if (parseResult.suggestIdentifiers) {
+      parseResult.suggestIdentifiers.forEach(function (identifier) {
+        completions.push({ value: identifier.name, meta: identifier.type });
+      });
+    }
+
     if (parseResult.suggestStar) {
       completions.push({ value: '*', meta: 'keyword' });
     }
@@ -57,12 +64,16 @@
     if (parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
       var database = parseResult.useDatabase || self.snippet.database();
 
+      var deferrals = [];
+
       if (parseResult.suggestTables) {
         var prefix = parseResult.suggestTables.prependQuestionMark ? '? ' : '';
         if (parseResult.suggestTables.prependFrom) {
           prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
         }
-        
+
+        var tableDeferred = $.Deferred();
+        deferrals.push(tableDeferred);
         self.snippet.getApiHelper().fetchTables({
           sourceType: self.snippet.type(),
           databaseName: database,
@@ -70,14 +81,18 @@
             data.tables_meta.forEach(function (tablesMeta) {
               completions.push({ value: prefix + tablesMeta.name, meta: tablesMeta.type.toLowerCase() })
             });
-            self.finalizeCompletions(completions, callback);
+            tableDeferred.resolve();
           },
           silenceErrors: true,
-          errorCallback: onFailure,
+          errorCallback: tableDeferred.resolve,
           editor: editor
         });
       }
+
       if (parseResult.suggestColumns) {
+        var columnsDeferred = $.Deferred();
+        deferrals.push(columnsDeferred);
+
         var fields = [];
         if (parseResult.suggestColumns.identifierChain) {
           parseResult.suggestColumns.identifierChain.forEach(function (identifier) {
@@ -96,7 +111,6 @@
           fields: fields,
           editor: editor,
           successCallback: function (data) {
-            console.log(data);
             if (data.columns) {
               data.columns.forEach(function (column) {
                 completions.push({ value: column, meta: 'column' })
@@ -107,18 +121,22 @@
                 completions.push({ value: field.name  , meta: 'struct' })
               });
             }
-            self.finalizeCompletions(completions, callback);
+            columnsDeferred.resolve();
           },
           silenceErrors: true,
-          errorCallback: onFailure
+          errorCallback: columnsDeferred.resolve
         });
       }
+
+      $.when.apply($, deferrals).done(function () {
+        self.finalizeCompletions(completions, callback, editor);
+      });
     } else {
-      self.finalizeCompletions(completions, callback);
+      self.finalizeCompletions(completions, callback, editor);
     }
   };
 
-  SqlAutocompleter2.prototype.finalizeCompletions = function (completions, callback) {
+  SqlAutocompleter2.prototype.finalizeCompletions = function (completions, callback, editor) {
     var self = this;
     self.sortCompletions(completions);
 
@@ -128,10 +146,11 @@
       currentScore--;
     });
 
+    editor.hideSpinner();
     callback(completions);
   };
 
-  var typeOrder = { 'star': 1, 'table': 2, 'keyword': 3,  };
+  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'identifier': 4, 'keyword': 5 };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {
     completions.sort(function (a, b) {

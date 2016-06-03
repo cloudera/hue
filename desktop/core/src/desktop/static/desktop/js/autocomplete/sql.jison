@@ -783,7 +783,12 @@ parser.expandLateralViews = function (tablePrimaries, identifierChain) {
           identifierChain.shift();
           firstIdentifier = identifierChain[0];
         } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
-          parser.yy.result.suggestIdentifiers = lateralView.columnAliases;
+          if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+            parser.yy.result.suggestIdentifiers = [];
+          }
+          lateralView.columnAliases.forEach(function (columnAlias) {
+            parser.yy.result.suggestIdentifiers.push({ name: columnAlias, type: 'alias' });
+          });
           delete parser.yy.result.suggestColumns;
           return identifierChain;
         }
@@ -818,18 +823,23 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
   // Expand exploded views in the identifier chain
   if (parser.yy.dialect === 'hive') {
     if (identifierChain.length === 0) {
-      var identifiers = [];
+      if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+        parser.yy.result.suggestIdentifiers = [];
+      }
       tablePrimaries.forEach(function (tablePrimary) {
         if (typeof tablePrimary.lateralViews !== 'undefined') {
           tablePrimary.lateralViews.forEach(function (lateralView) {
-            Array.prototype.push.apply(identifiers, lateralView.columnAliases);
+            if (typeof lateralView.tableAlias !== 'undefined') {
+              parser.yy.result.suggestIdentifiers.push({ name: lateralView.tableAlias + '.', type: 'alias' });
+              parser.yy.keepColumns = true;
+            }
+            lateralView.columnAliases.forEach(function (columnAlias) {
+              parser.yy.result.suggestIdentifiers.push({ name: columnAlias, type: 'alias' });
+              parser.yy.keepColumns = true;
+            });
           });
         }
       });
-      if (identifiers.length > 0) {
-        parser.yy.keepColumns = true;
-        parser.yy.result.suggestIdentifiers = identifiers;
-      }
     } else {
       identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
       suggestion.identifierChain = identifierChain;
@@ -874,9 +884,15 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
 }
 
 var suggestTablePrimariesAsIdentifiers = function () {
-  parser.yy.result.suggestIdentifiers = [];
+  if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+    parser.yy.result.suggestIdentifiers = [];
+  }
   parser.yy.latestTablePrimaries.forEach(function (tablePrimary) {
-    parser.yy.result.suggestIdentifiers.push((tablePrimary.alias || tablePrimary.identifierChain[0].name) + '.');
+    if (typeof tablePrimary.alias !== 'undefined') {
+      parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.alias + '.', type: 'alias' });
+    } else {
+      parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.identifierChain[0].name + '.', type: 'table' });
+    }
   });
 }
 
