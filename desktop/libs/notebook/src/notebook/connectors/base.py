@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import smart_unicode
 
 from notebook.conf import get_interpreters
 
@@ -44,8 +44,8 @@ class QueryError(Exception):
     self.handle = handle
     self.extra = {}
 
-  def __str__(self):
-    return force_unicode(str(self.message))
+  def __unicode__(self):
+    return smart_unicode(self.message)
 
 
 class Notebook(object):

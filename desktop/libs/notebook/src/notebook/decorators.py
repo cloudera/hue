@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired
@@ -92,7 +92,7 @@ def api_error_handler(func):
     except QueryError, e:
       LOG.exception('Error running %s' % func)
       response['status'] = 1
-      response['message'] = force_unicode(str(e))
+      response['message'] = smart_unicode(e)
       if e.handle:
         response['handle'] = e.handle
       if e.extra:
@@ -100,7 +100,7 @@ def api_error_handler(func):
     except Exception, e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
-      response['message'] = force_unicode(str(e))
+      response['message'] = smart_unicode(e)
     finally:
       if response:
         return JsonResponse(response)
