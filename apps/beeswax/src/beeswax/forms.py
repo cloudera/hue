@@ -284,6 +284,8 @@ class CreateTableForm(DependencyAwareForm):
 
 
 def _clean_tablename(db, name, database='default'):
+  if ' ' in name:
+    raise forms.ValidationError(_('Spaces are not allowed in table names.'))
   try:
     table = db.get_table(database, name)
     if table.name:
