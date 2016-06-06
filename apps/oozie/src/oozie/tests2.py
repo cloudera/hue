@@ -25,7 +25,7 @@ from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
-from desktop.conf import USE_DEFAULT_CONFIGURATION
+from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.models import DefaultConfiguration, Document, Document2
@@ -45,6 +45,10 @@ class TestEditor(OozieMockBase):
   def setUp(self):
     super(TestEditor, self).setUp()
     self.wf = Workflow()
+
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True,
+                                               is_superuser=False)
+    self.user_not_me = User.objects.get(username="not_perm_user")
 
 
   def test_parsing(self):
@@ -383,6 +387,7 @@ LIMIT $limit"""))
     subworkflow_doc.delete()
     query_doc.delete()
 
+
   def test_editor_access_permissions(self):
     group = 'no_editor'
 
@@ -409,6 +414,27 @@ LIMIT $limit"""))
       assert_equal(response.status_code, 200)
     finally:
       remove_from_group("test", group)
+
+
+  def test_share_workflow(self):
+    try:
+      wf_doc = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[5], self.user)
+
+      # other user cannot view document
+      response = self.client_not_me.get(reverse('oozie:edit_workflow'), {'uuid': wf_doc.uuid})
+      assert_equal(response.status_code, 500)
+
+      # Share write perm by user
+      if USE_NEW_EDITOR.get():
+        wf_doc.share(wf_doc.owner, name='write', users=[self.user_not_me])
+      else:
+        wf_doc.doc.get().sync_permissions({'write': {'user_ids': [self.user_not_me.id], 'group_ids': []}})
+
+      # other user can access document
+      response = self.client_not_me.get(reverse('oozie:edit_workflow'), {'workflow': wf_doc.uuid})
+      assert_equal(response.status_code, 200)
+    finally:
+      wf_doc.delete()
 
 
   def test_list_editor_workflows(self):
