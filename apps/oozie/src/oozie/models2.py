@@ -34,7 +34,7 @@ from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import DefaultConfiguration, Document2
+from desktop.models import DefaultConfiguration, Document2, Document
 
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
@@ -45,6 +45,7 @@ from liboozie.submission2 import create_directories
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
+from liboozie.oozie_api import get_oozie
 
 
 LOG = logging.getLogger(__name__)
@@ -272,7 +273,7 @@ class Workflow(Job):
     wf_nodes = []
     _dig_nodes(node_hierarchy, adj_list, user, wf_nodes)
     data['workflow']['nodes'] = wf_nodes
-    data['workflow']['id'] = "123"
+    data['workflow']['id'] = '123'
     data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None)
     data['workflow']['properties'].update({
       'deployment_dir': '/user/hue/oozie/workspaces/hue-oozie-1452553957.19'
@@ -2790,3 +2791,344 @@ class History(object):
       return Bundle(document=doc)
     except Document2.DoesNotExist:
       pass
+
+
+class WorkflowBuilder():
+  """
+  Focus on building nodes, not the UI layout.
+  """
+  def create_hive_document_workflow(self, name, parameters, user):
+    api = get_oozie(user)
+
+    credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
+    params = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
+
+    data = json.dumps({'workflow': {
+      u'name': name,
+      u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5'
+                    , u'uri:oozie:workflow:0.5'],
+      u'isDirty': False,
+      u'movedNode': None,
+      u'linkMapping': {
+          u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': [],
+          u'3f107997-04cc-8733-60a9-a4bb62cebffc': [u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
+                  ],
+          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': [u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
+                  ],
+          u'17c9c895-5a16-7443-bb81-f34b30b21548': [],
+          },
+      u'nodeIds': [u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+                   u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
+                   u'17c9c895-5a16-7443-bb81-f34b30b21548',
+                   u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'],
+      u'id': 47,
+      u'nodes': [{
+          u'name': u'Start',
+          u'properties': {},
+          u'actionParametersFetched': False,
+          u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+          u'type': u'start-widget',
+          u'children': [{u'to': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
+                        }],
+          u'actionParameters': [],
+          }, {
+          u'name': u'End',
+          u'properties': {},
+          u'actionParametersFetched': False,
+          u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
+          u'type': u'end-widget',
+          u'children': [],
+          u'actionParameters': [],
+          }, {
+          u'name': u'Kill',
+          u'properties': {
+              u'body': u'',
+              u'cc': u'',
+              u'to': u'',
+              u'enableMail': False,
+              u'message': u'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'
+                  ,
+              u'subject': u'',
+              },
+          u'actionParametersFetched': False,
+          u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
+          u'type': u'kill-widget',
+          u'children': [],
+          u'actionParameters': [],
+          }, {
+          u'name': u'hive-0aec',
+          u'actionParametersUI': [],
+          u'properties': {
+              u'files': [],
+              u'job_xml': u'',
+              u'uuid': uuid,
+              u'parameters': params,
+              u'retry_interval': [],
+              u'retry_max': [],
+              u'job_properties': [],
+              u'sla': [
+                  {u'key': u'enabled', u'value': False},
+                  {u'key': u'nominal-time', u'value': u'${nominal_time}'},
+                  {u'key': u'should-start', u'value': u''},
+                  {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
+                  {u'key': u'max-duration', u'value': u''},
+                  {u'key': u'alert-events', u'value': u''},
+                  {u'key': u'alert-contact', u'value': u''},
+                  {u'key': u'notification-msg', u'value': u''},
+                  {u'key': u'upstream-apps', u'value': u''},
+                  ],
+              u'archives': [],
+              u'prepares': [],
+              u'credentials': credentials,
+              u'password': u'',
+              u'jdbc_url': u'',
+              },
+          u'actionParametersFetched': False,
+          u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
+          u'type': u'hive-document-widget',
+          u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
+                        {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
+                        }],
+          u'actionParameters': [],
+          }],
+      u'properties': {
+          u'job_xml': u'',
+          u'description': u'',
+          u'wf1_id': None,
+          u'sla_enabled': False,
+          u'deployment_dir': u'/user/hue/oozie/workspaces/hue-oozie-1459474214.27',
+          u'schema_version': u'uri:oozie:workflow:0.5',
+          u'sla': [
+              {u'key': u'enabled', u'value': False},
+              {u'key': u'nominal-time', u'value': u'${nominal_time}'},
+              {u'key': u'should-start', u'value': u''},
+              {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
+              {u'key': u'max-duration', u'value': u''},
+              {u'key': u'alert-events', u'value': u''},
+              {u'key': u'alert-contact', u'value': u''},
+              {u'key': u'notification-msg', u'value': u''},
+              {u'key': u'upstream-apps', u'value': u''},
+              ],
+          u'show_arrows': True,
+          u'parameters': [{u'name': u'oozie.use.system.libpath',
+                          u'value': True}],
+          u'properties': [],
+          },
+      u'nodeNamesMapping': {
+          u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': u'End',
+          u'3f107997-04cc-8733-60a9-a4bb62cebffc': u'Start',
+          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'hive-0aec',
+          u'17c9c895-5a16-7443-bb81-f34b30b21548': u'Kill',
+          },
+      u'uuid': u'433922e5-e616-dfe0-1cba-7fe744c9305c',
+      }, 'layout': [{
+      u'oozieRows': [{
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Hive',
+              u'widgetType': u'hive-document-widget',
+              u'oozieMovable': True,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
+              u'size': 12,
+              }],
+          u'id': u'32e1ea1a-812b-6878-9719-ff7b8407bf46',
+          u'columns': [],
+          }],
+      u'rows': [{
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Start',
+              u'widgetType': u'start-widget',
+              u'oozieMovable': False,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+              u'size': 12,
+              }],
+          u'id': u'798dc16a-d366-6305-d2b3-2d5a6f6c4f4b',
+          u'columns': [],
+          }, {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Hive',
+              u'widgetType': u'hive-document-widget',
+              u'oozieMovable': True,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
+              u'size': 12,
+              }],
+          u'id': u'32e1ea1a-812b-6878-9719-ff7b8407bf46',
+          u'columns': [],
+          }, {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'End',
+              u'widgetType': u'end-widget',
+              u'oozieMovable': False,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
+              u'size': 12,
+              }],
+          u'id': u'f2cf152d-8c82-2f4f-5d67-2e18c99e59c4',
+          u'columns': [],
+          }, {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Kill',
+              u'widgetType': u'kill-widget',
+              u'oozieMovable': True,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
+              u'size': 12,
+              }],
+          u'id': u'01afcf1b-fa7a-e093-b613-ce52c5531a04',
+          u'columns': [],
+          }],
+      u'oozieEndRow': {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'End',
+              u'widgetType': u'end-widget',
+              u'oozieMovable': False,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
+              u'size': 12,
+              }],
+          u'id': u'f2cf152d-8c82-2f4f-5d67-2e18c99e59c4',
+          u'columns': [],
+          },
+      u'oozieKillRow': {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Kill',
+              u'widgetType': u'kill-widget',
+              u'oozieMovable': True,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
+              u'size': 12,
+              }],
+          u'id': u'01afcf1b-fa7a-e093-b613-ce52c5531a04',
+          u'columns': [],
+          },
+      u'enableOozieDropOnAfter': True,
+      u'oozieStartRow': {
+          u'enableOozieDropOnBefore': True,
+          u'enableOozieDropOnSide': True,
+          u'enableOozieDrop': False,
+          u'widgets': [{
+              u'status': u'',
+              u'logsURL': u'',
+              u'name': u'Start',
+              u'widgetType': u'start-widget',
+              u'oozieMovable': False,
+              u'ooziePropertiesExpanded': False,
+              u'externalIdUrl': u'',
+              u'properties': {},
+              u'isLoading': True,
+              u'offset': 0,
+              u'actionURL': u'',
+              u'progress': 0,
+              u'klass': u'card card-widget span12',
+              u'oozieExpanded': False,
+              u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+              u'size': 12,
+              }],
+          u'id': u'798dc16a-d366-6305-d2b3-2d5a6f6c4f4b',
+          u'columns': [],
+          },
+      u'klass': u'card card-home card-column span12',
+      u'enableOozieDropOnBefore': True,
+      u'drops': [u'temp'],
+      u'id': u'672ff75a-d841-72c3-c616-c9d45ec97649',
+      u'size': 12,
+      }]}
+    )
+  
+    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
+    return workflow_doc
