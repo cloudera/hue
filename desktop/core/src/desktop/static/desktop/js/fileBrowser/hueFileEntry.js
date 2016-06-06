@@ -365,16 +365,27 @@
     }
   };
 
-  HueFileEntry.prototype.open = function () {
+  HueFileEntry.prototype.open = function (entry, e) {
+    var isLeftButton = (e.which || e.button) === 1;
+    var hasModifierKey = e.ctrlKey || e.shiftKey || e.metaKey;
     var self = this;
-    if (self.definition().type === 'directory') {
-      self.makeActive();
-      huePubSub.publish('file.browser.directory.opened');
-      if (! self.loaded()) {
-        self.load();
+    if (isLeftButton && !hasModifierKey) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (self.definition().type === 'directory') {
+        self.makeActive();
+        huePubSub.publish('file.browser.directory.opened');
+        if (! self.loaded()) {
+          self.load();
+        }
+      } else {
+        window.location.href = self.definition().absoluteUrl;
       }
-    } else {
-      window.location.href = self.definition().absoluteUrl;
+    }
+    else {
+      if (self.definition().type !== 'directory') {
+        window.open(self.definition().absoluteUrl);
+      }
     }
   };
 
