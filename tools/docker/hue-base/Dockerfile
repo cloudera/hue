@@ -2,6 +2,8 @@
 FROM ubuntu:trusty
 MAINTAINER The Hue Team "https://github.com/cloudera/hue"
 
+RUN apt-get update -y
+
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository -y ppa:webupd8team/java
 RUN apt-get update -y
@@ -30,7 +32,8 @@ RUN apt-get install --fix-missing -q -y \
   libldap2-dev \
   python-dev \
   python-setuptools \
-  libgmp3-dev
+  libgmp3-dev \
+  libz-dev
 
 RUN git clone https://github.com/cloudera/hue.git
 WORKDIR hue
