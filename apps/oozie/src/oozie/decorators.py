@@ -21,6 +21,7 @@ import logging
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 
@@ -54,10 +55,15 @@ def check_document_access_permission():
         if doc_id is not None:
           doc2 = Document2.objects.get(id=doc_id)
         elif uuid is not None:
-          doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+          # TODO: The commented line should be used once we fully transition to doc2
+          # doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=uuid, perm_type=None)
+          doc2 = Document2.objects.filter(uuid=uuid).order_by('-last_modified').first()
 
         if doc2:
-          doc2.doc.get().can_read_or_exception(request.user)
+          if USE_NEW_EDITOR.get():
+            doc2.can_read_or_exception(request.user)
+          else:
+            doc2.doc.get().can_read_or_exception(request.user)
       except Document2.DoesNotExist:
         raise PopupException(_('Job with %(key)s=%(value)s does not exist') %
                              {'key': 'id' if doc_id else 'uuid', 'value': doc_id or uuid})
