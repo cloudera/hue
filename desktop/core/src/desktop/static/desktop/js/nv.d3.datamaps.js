@@ -974,14 +974,19 @@
     element.on('mousemove', null);
     element.on('mousemove', function () {
       var position = d3.mouse(this);
+      var svgHeight = d3.select(self.svg[0][0].parentNode)[0][0].offsetHeight || -1;
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
-          .style('top', ( (position[1] + 30)) + "px")
-          .html(function () {
-            var data = JSON.parse(element.attr('data-info'));
-            //if ( !data ) return '';
-            return options.popupTemplate(d, data);
-          })
-          .style('left', ( position[0]) + "px");
+        .style('top', ( (position[1] + 30)) + "px")
+        .html(function () {
+          var data = JSON.parse(element.attr('data-info'));
+          //if ( !data ) return '';
+          return options.popupTemplate(d, data);
+        })
+        .style('left', ( position[0]) + "px");
+      var popupHeight = d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')[0][0].offsetHeight;
+      if (position[1] + 30 + popupHeight > svgHeight) {
+        d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('top', ( (position[1] - 10 - popupHeight)) + "px")
+      }
     });
 
     d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
