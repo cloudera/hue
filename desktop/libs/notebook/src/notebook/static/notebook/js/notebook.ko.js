@@ -450,12 +450,37 @@
         $(document).trigger("gridShown", self);
       }
     });
+
+    function prepopulateChart() {
+      var type = self.chartType();
+      if (self.result.cleanedMeta().length > 0) {
+        if (self.chartX() == null && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP)) {
+          self.chartX(self.result.cleanedMeta()[0].name);
+        }
+        if (self.chartMapLabel() == null && type == ko.HUE_CHARTS.TYPES.MAP) {
+          self.chartMapLabel(self.result.cleanedMeta()[0].name);
+        }
+      }
+      if (self.result.cleanedNumericMeta().length > 0) {
+        if (self.chartX() == null && type != ko.HUE_CHARTS.TYPES.BARCHART && type != ko.HUE_CHARTS.TYPES.PIECHART && type != ko.HUE_CHARTS.TYPES.GRADIENTMAP) {
+          self.chartX(self.result.cleanedNumericMeta()[0].name);
+        }
+        if (self.chartYMulti().length == 0 && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.LINECHART)) {
+          self.chartYMulti.push(self.result.cleanedNumericMeta()[0].name);
+        }
+        if (self.chartYSingle() == null && (type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.MAP || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP || type == ko.HUE_CHARTS.TYPES.SCATTERCHART)) {
+          self.chartYSingle(type == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? self.result.cleanedMeta()[0].name : self.result.cleanedNumericMeta()[0].name);
+        }
+      }
+    }
+
     self.showChart.subscribe(function (val) {
       if (val) {
         self.showGrid(false);
         self.isResultSettingsVisible(true);
         $(document).trigger("forceChartDraw", self);
         $(document).trigger("chartShown", self);
+        prepopulateChart();
       }
     });
     self.showLogs.subscribe(function (val) {
@@ -492,6 +517,7 @@
     self.hasSuggestion = ko.observable(false);
 
     self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
+    self.chartType.subscribe(prepopulateChart);
     self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
     self.chartScatterGroup = ko.observable(typeof snippet.chartScatterGroup != "undefined" && snippet.chartScatterGroup != null ? snippet.chartScatterGroup : null);
     self.chartScatterSize = ko.observable(typeof snippet.chartScatterSize != "undefined" && snippet.chartScatterSize != null ? snippet.chartScatterSize : null);
