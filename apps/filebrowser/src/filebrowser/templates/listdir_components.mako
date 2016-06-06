@@ -801,7 +801,7 @@ from django.utils.translation import ugettext as _
         url: breadcrumb.url,
         label: breadcrumb.label,
         show: function (breadcrumb, e) {
-          var isLeftButton = (e.which || evt.button) === 1;
+          var isLeftButton = (e.which || e.button) === 1;
           if (isLeftButton) {
             e.stopPropagation();
             e.preventDefault();

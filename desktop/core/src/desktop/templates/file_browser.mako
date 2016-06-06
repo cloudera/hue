@@ -652,7 +652,7 @@ from desktop.views import _ko
                   <use xlink:href="#hi-share-addon"></use>
                   <!-- /ko -->
                 </svg>
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }" class="margin-left-5"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
               </div>
               <div class="fb-attr-group">
                 <!-- ko with: definition -->
