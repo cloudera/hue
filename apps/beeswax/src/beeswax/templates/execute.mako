@@ -793,6 +793,10 @@ ${ layout.menubar(section='query') }
 
 ${ commonshare() | n,unicode }
 
+<script>
+  var SqlAutocompleter2 = {};
+</script>
+
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1219,7 +1223,8 @@ var autocompleter = new Autocompleter({
   snippet: snippet,
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
-  optEnabled: false
+  optEnabled: false,
+  useNewAutocompleter: false
 });
 
 var totalStorageUserPrefix = apiHelper.getTotalStorageUserPrefix(snippetType);

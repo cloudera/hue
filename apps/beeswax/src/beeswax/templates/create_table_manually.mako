@@ -797,7 +797,7 @@ ${ assist.assistPanel() }
       function validateForm() {
         // step 1
         var tableNameFld = $("input[name='table-name']");
-        if (!isValid($.trim(tableNameFld.val()))) {
+        if (!isValid($.trim(tableNameFld.val())) || !withoutSpaces($.trim(tableNameFld.val()))) {
           showFieldError(tableNameFld);
           return false;
         }
@@ -880,6 +880,10 @@ ${ assist.assistPanel() }
       function isValid(str) {
         // validates against empty string
         return (str != "");
+      }
+
+      function withoutSpaces(str) {
+        return (str.indexOf(" ") == -1);
       }
 
       function showFieldError(field) {
