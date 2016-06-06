@@ -2192,7 +2192,8 @@
           skipColumns: options.skipColumns,
           startingPath: options.database + '.',
           rewriteVal: true,
-          onPathChange: options.onChange
+          onPathChange: options.onChange,
+          searchEverywhere : options.searchEverywhere || false
         });
       }
       else {

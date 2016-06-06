@@ -34,7 +34,8 @@
         smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
         showOnFocus: false,
         startingPath: '',
-        rewriteVal: false
+        rewriteVal: false,
+        searchEverywhere: false
       };
 
   function Plugin(element, options) {
@@ -136,8 +137,15 @@
           $("#jHueGenericAutocomplete ul li").show();
           if (path != ""){
             $("#jHueGenericAutocomplete ul li").each(function () {
-              if ($(this).text().trim().indexOf(path) != 0) {
-                $(this).hide();
+              if (_this.options.searchEverywhere){
+                if ($(this).text().trim().toLowerCase().indexOf(path.toLowerCase()) == -1) {
+                  $(this).hide();
+                }
+              }
+              else {
+                if ($(this).text().trim().indexOf(path) != 0) {
+                  $(this).hide();
+                }
               }
             });
           }
