@@ -2626,6 +2626,11 @@
       editor.on("focus", initAutocompleters);
       initAutocompleters();
 
+      var removeUnicodes = function (value) {
+        var UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/ig;  //taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
+        return value.replace(UNICODES_TO_REMOVE, ' ');
+      }
+
       var placeHolderElement = null;
       var placeHolderVisible = false;
       var placeHolderText = snippet.getPlaceHolder();
@@ -2649,7 +2654,8 @@
           placeHolderVisible = false;
         }
         if (options.updateOnInput){
-          snippet.statement_raw(editor.getValue());
+
+          snippet.statement_raw(removeUnicodes(editor.getValue()));
         }
         if (editor.session.$backMarkers) {
           for (var marker in editor.session.$backMarkers) {
@@ -2672,9 +2678,9 @@
 
       editor.on("blur", function () {
         snippet.inFocus(false);
-        snippet.statement_raw(editor.getValue());
+        snippet.statement_raw(removeUnicodes(editor.getValue()));
         if (options.onBlur) {
-          options.onBlur($el, editor.getValue());
+          options.onBlur($el, removeUnicodes(editor.getValue()));
         }
       });
 
@@ -2900,7 +2906,7 @@
       });
 
       editor.on("change", function (e) {
-        snippet.statement_raw(editor.getValue());
+        snippet.statement_raw(removeUnicodes(editor.getValue()));
         editor.clearErrors();
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
@@ -2930,7 +2936,7 @@
         name: "execute",
         bindKey: {win: "Ctrl-Enter", mac: "Command-Enter|Ctrl-Enter"},
         exec: function () {
-          snippet.statement_raw(editor.getValue());
+          snippet.statement_raw(removeUnicodes(editor.getValue()));
           snippet.execute();
         }
       });
@@ -2946,7 +2952,7 @@
               }
               else {
                 editor.setValue(vkbeautify.sql(editor.getValue(), 2), 1);
-                snippet.statement_raw(editor.getValue());
+                snippet.statement_raw(removeUnicodes(editor.getValue()));
               }
             }
           }
