@@ -84,7 +84,7 @@ ${ assist.assistPanel() }
     <!-- ko if: editingTable -->
       <!-- ko with: table -->
       <li class="editable-breadcrumb-input">
-        <input type="text" data-bind="hivechooser: {data: name, database: $parent.name, skipColumns: true, onChange: function(val){ $parent.setTableByName(val); $parent.editingTable(false); }}" autocomplete="off" />
+        <input type="text" data-bind="hivechooser: {data: name, database: $parent.name, skipColumns: true, searchEverywhere: true, onChange: function(val){ $parent.setTableByName(val); $parent.editingTable(false); }}" autocomplete="off" />
       </li>
       <!-- /ko -->
     <!-- /ko -->
