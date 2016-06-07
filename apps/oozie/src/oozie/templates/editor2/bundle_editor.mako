@@ -123,8 +123,11 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
                 <em data-bind="text: value"></em>
               </li>
               <li data-bind="visible: $root.isEditing">              
-                <input data-bind="value: name"/>
-                <input data-bind="value: value"/>
+                <input data-bind="value: name" type="text" class="no-margin-bottom"/>
+                <div class="controls inline-block">
+                  <input data-bind="value: value, filechooser: value" type="text" class="input-xlarge filechooser-input"/>
+                  <!-- ko template: { name: 'calendar-dropdown' } --><!-- /ko -->
+                </div>
                 <a href="#" data-bind="click: function(){ $parent.properties.remove(this); }">
                   <i class="fa fa-minus"></i>
                 </a>
@@ -176,14 +179,21 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
   </div>
   <div class="modal-body">
       <h4>${ _('Kick off time') }</h4>
-      <input data-bind="value: bundle.properties.kickoff"/>
-        
+      <div class="controls">
+        <input data-bind="value: bundle.properties.kickoff" type="text" class="no-margin-bottom"/>
+        <!-- ko template: { name: 'calendar-dropdown' } --><!-- /ko -->
+      </div>
+
       <h4>${ _('Submission Parameters') }</h4>
       <ul data-bind="foreach: bundle.properties.parameters" class="unstyled">
         <!-- ko if: ['oozie.use.system.libpath', 'start_date', 'end_date'].indexOf(typeof name == 'function' ? name() : name) == -1 -->
         <li>
-          <input data-bind="value: name"/>
-          <input data-bind="value: value"/>
+
+          <input data-bind="value: name" type="text" class="no-margin-bottom"/>
+          <div class="controls inline-block">
+            <input data-bind="value: value, filechooser: value" type="text" class="filechooser-input"/>
+            <!-- ko template: { name: 'calendar-dropdown' } --><!-- /ko -->
+          </div>
           <a href="#" data-bind="click: function(){ $root.bundle.properties.parameters.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
@@ -201,6 +211,39 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 
 </div>
+
+<div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+      <div id="filechooser">
+      </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
+
+<script type="text/html" id="calendar-dropdown">
+<div class="btn-group">
+  <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-calendar"></i>
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu pull-right" role="menu">
+    <li>
+      <a class="pointer now-link">
+        ${ _('Now') }
+      </a>
+      <a class="pointer calendar-link">
+        ${ _('Calendar') }
+      </a>
+    </li>
+  </ul>
+</div>
+</script>
 
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
@@ -264,6 +307,36 @@ ${ dashboard.import_bindings() }
         $(".demi-modal.fade.in .demi-modal-chevron").click();
       }
     });
+
+    $(document).on("click", ".now-link", function(){
+      $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm[Z]"));
+    });
+
+    $(document).on("click", ".calendar-link", function(){
+      var DATE_FORMAT = "YYYY-MM-DD";
+      var _el = $(this).parents(".controls").find("input[type='text']");
+      _el.off("keyup");
+      _el.on("keyup", function(){
+        _el.data("lastValue", _el.val());
+      });
+      _el.data("lastValue", _el.val());
+      _el.datepicker({
+        format: DATE_FORMAT.toLowerCase()
+       }).on("changeDate", function () {
+        _el.datepicker("hide");
+      }).on("hide", function () {
+        var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
+        if (_val.indexOf("T") == -1){
+          _el.val(_el.val() + "T00:00Z");
+        }
+        else if (_el.val().indexOf("T") == "-1") {
+          _el.val(_el.val() + "T" +  _val.split("T")[1]);
+        }
+      });
+     _el.datepicker('show');
+    });
+
+
   });
 </script>
 
