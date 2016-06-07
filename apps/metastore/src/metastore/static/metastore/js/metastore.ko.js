@@ -723,7 +723,6 @@
         if (self.database().table() && self.database().table().name == tableDef.name) {
           return;
         }
-
         var setTableAfterLoad = function () {
           var foundTables = $.grep(self.database().tables(), function (table) {
             return table.name === tableDef.name;
@@ -731,13 +730,21 @@
           if (foundTables.length === 1) {
             self.database().setTable(foundTables[0], callback);
           }
+          else {
+            huePubSub.publish('assist.clear.db.cache', {
+              sourceType: 'hive',
+              clearAll: false,
+              databaseName: self.database().name
+            });
+            self.database().load(setTableAfterLoad, self.optimizerEnabled());
+          }
         };
 
         if (!self.database().loaded()) {
           var doOnce = self.database().loaded.subscribe(function () {
             setTableAfterLoad();
             doOnce.dispose();
-          })
+          });
         } else {
           setTableAfterLoad();
         }
