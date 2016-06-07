@@ -680,7 +680,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-columns-tab">
-  <!-- ko with: columns -->
+  <!-- ko with: filteredColumns -->
   <!-- ko template: "metastore-columns-table" --><!-- /ko -->
   <!-- /ko -->
 </script>
@@ -803,6 +803,11 @@ ${ assist.assistPanel() }
         <li class="pull-right"><a class="pointer" data-bind="click: function () { location.href = '/notebook/browse/' + $root.database().name + '/' + $root.database().table().name; }"><i class="fa fa-external-link"></i> ${ _('Open in editor') }</a>
       <!-- /ko -->
     <!-- /ko -->
+    <!-- ko if: $root.currentTab() == 'table-columns' -->
+    <li class="pull-right">
+      <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: columnQuery, value: columnQuery, valueUpdate: 'afterkeydown'"/>
+    </li>
+    <!-- /ko -->
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -816,7 +821,6 @@ ${ assist.assistPanel() }
       <!-- ko if: $root.currentTab() == 'table-columns' -->
       <!-- ko template: 'metastore-columns-tab' --><!-- /ko -->
       <!-- /ko -->
-
     </div>
 
     <div class="tab-pane" id="partitions">

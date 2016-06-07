@@ -357,7 +357,21 @@
 
     self.loadingDetails = ko.observable(false);
     self.loadingColumns = ko.observable(false);
+    self.columnQuery = ko.observable('').extend({rateLimit: 150});
     self.columns = ko.observableArray();
+    self.filteredColumns = ko.computed(function () {
+      var returned = self.columns();
+      if (self.columnQuery() !== '') {
+        returned = $.grep(self.columns(), function (column) {
+          return column.name().toLowerCase().indexOf(self.columnQuery()) > -1
+            || (column.comment() && column.comment().toLowerCase().indexOf(self.columnQuery()) > -1);
+        });
+      }
+      return returned.sort(function (a, b) {
+        return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+      });
+    });
+
     self.favouriteColumns = ko.observableArray();
     self.samples = new MetastoreTableSamples({
       apiHelper: self.apiHelper,
