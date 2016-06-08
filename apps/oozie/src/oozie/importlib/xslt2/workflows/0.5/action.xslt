@@ -21,6 +21,7 @@
 <xsl:import href="extensions/ssh.0.1.xslt"/>
 <xsl:import href="extensions/ssh.0.2.xslt"/>
 <xsl:import href="extensions/spark.0.1.xslt"/>
+<xsl:import href="extensions/spark.0.2.xslt"/>
 <xsl:import href="nodes/fs.xslt"/>
 <xsl:import href="nodes/java.xslt"/>
 <xsl:import href="nodes/mapreduce.xslt"/>

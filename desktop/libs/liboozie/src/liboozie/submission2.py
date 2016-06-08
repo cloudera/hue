@@ -89,6 +89,8 @@ class Submission(object):
         properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
 
     self.properties['security_enabled'] = self.api.security_enabled
+    if 'oozie.use.system.libpath' not in properties:
+        properties['oozie.use.system.libpath'] = 'true'
 
   def __str__(self):
     if self.oozie_id:
