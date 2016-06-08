@@ -17,6 +17,8 @@
 
 import logging
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paginator import Paginator
 
@@ -250,6 +252,21 @@ class YarnApi(JobBrowserApi):
         raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
 
     return job
+
+  def get_application(self, jobid):
+    app = None
+    app_id = jobid.replace('job', 'application')
+
+    try:
+      app = self.resource_manager_api.app(app_id)['app']
+    except RestException, e:
+      raise PopupException(_('Job %s could not be found in Resource Manager: %s') % (jobid, e), detail=e)
+    except ApplicationNotRunning, e:
+      raise PopupException(_('Application is not running: %s') % e, detail=e)
+    except Exception, e:
+      raise PopupException(_('Job %s could not be found: %s') % (jobid, e), detail=e)
+
+    return app
 
   def get_tasks(self, jobid, **filters):
     filters.pop('pagenum')

@@ -280,35 +280,53 @@ def job_attempt_logs(request, job, attempt_index=0):
 def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0):
   """For async log retrieval as Yarn servers are very slow"""
 
+  log_link = None
+  response = {'status': -1}
+
   try:
-    attempt_index = int(attempt_index)
-    attempt = job.job_attempts['jobAttempt'][attempt_index]
-    log_link = attempt['logsLink']
-    # Reformat log link to use YARN RM, replace node addr with node ID addr
-    log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
+    jt = get_api(request.user, request.jt)
+    app = jt.get_application(job.jobId)
+
+    if app['applicationType'] == 'MAPREDUCE':
+      if app['finalStatus'] in ('SUCCEEDED', 'FAILED', 'KILLED'):
+        attempt_index = int(attempt_index)
+        attempt = job.job_attempts['jobAttempt'][attempt_index]
+
+        log_link = attempt['logsLink']
+        # Reformat log link to use YARN RM, replace node addr with node ID addr
+        log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
+      elif app['state'] == 'RUNNING':
+        log_link = app['amContainerLogs']
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
-
-  link = '/%s/' % name
-  params = {}
-  if offset and int(offset) >= 0:
-    params['start'] = offset
-
-  root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
-  debug_info = ''
-  try:
-    response = root.get(link, params=params)
-    log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
   except Exception, e:
-    log = _('Failed to retrieve log: %s' % e)
-    try:
-      debug_info = '\nLog Link: %s' % log_link
-      debug_info += '\nHTML Response: %s' % response
-      LOG.error(debug_info)
-    except:
-      LOG.exception('failed to create debug info')
+    raise Exception(_("Failed to get application for job %s: %s") % (job.jobId, e))
 
-  response = {'log': LinkJobLogs._make_hdfs_links(log), 'debug': debug_info}
+  if log_link:
+    link = '/%s/' % name
+    params = {}
+    if offset and int(offset) >= 0:
+      params['start'] = offset
+
+    root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+    api_resp = None
+
+    try:
+      api_resp = root.get(link, params=params)
+      log = html.fromstring(api_resp, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+
+      response['status'] = 0
+      response['log'] = LinkJobLogs._make_hdfs_links(log)
+    except Exception, e:
+      response['log'] = _('Failed to retrieve log: %s' % e)
+      try:
+        debug_info = '\nLog Link: %s' % log_link
+        if api_resp:
+          debug_info += '\nHTML Response: %s' % response
+        response['debug'] = debug_info
+        LOG.error(debug_info)
+      except:
+        LOG.exception('failed to create debug info')
 
   return JsonResponse(response)
 
