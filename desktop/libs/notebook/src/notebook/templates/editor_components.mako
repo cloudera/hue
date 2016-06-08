@@ -1456,18 +1456,19 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="snippet-grid-settings">
   <div style="overflow:auto">
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
-      <li class="nav-header" title="${_('Hide columns')}">
+      <li class="nav-header" title="${_('Hide columns')}" style="margin-left: -2px">
         <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(!result.isMetaFilterVisible()); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
+        <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllColumns($element, $data); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
         <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
       </li>
     </ul>
-    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" />
+    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
     <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
       ${ _('No results found') }
     </div>
-    <ul class="unstyled" data-bind="foreach: result.filteredMeta">
+    <ul class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
       <li data-bind="visible: name != ''">
-        <input type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" />
+        <input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" />
         <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
       </li>
     </ul>
@@ -2232,6 +2233,18 @@ ${ hueIcons.symbols() }
     return _dt;
   }
 
+  function toggleAllColumns(linkElement, snippet) {
+    var dt;
+    if (snippet.result.hasManyColumns()) {
+      dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").hueDataTable();
+    } else {
+      dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
+    }
+    $(linkElement).parents(".snippet").find('.filtered-meta li input').each(function (idx, item) {
+      dt.fnSetColumnVis(idx, linkElement.checked);
+    });
+  }
+
   function toggleColumn(linkElement, index, snippet) {
     var dt;
     if (snippet.result.hasManyColumns()) {
@@ -2239,7 +2252,7 @@ ${ hueIcons.symbols() }
     } else {
       dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
     }
-    dt.fnSetColumnVis(index, !dt.fnSettings().aoColumns[index].bVisible);
+    dt.fnSetColumnVis(index, linkElement.checked);
   }
 
   function scrollToColumn(linkElement) {

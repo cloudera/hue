@@ -66,10 +66,16 @@
     });
     self.metaFilter = ko.observable('');
     self.isMetaFilterVisible = ko.observable(false);
+    self.filteredMetaChecked = ko.observable(true);
     self.filteredMeta = ko.pureComputed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item, i) {
         if (typeof item.checked === 'undefined') {
-          item.checked = true;
+          item.checked = ko.observable(true);
+          item.checked.subscribe(function () {
+            self.filteredMetaChecked(ko.utils.arrayFilter(self.filteredMeta(), function (item) {
+                return !item.checked();
+              }).length == 0);
+          });
         }
         if (typeof item.originalIndex === 'undefined') {
           item.originalIndex = i;
@@ -77,6 +83,13 @@
         return item.name.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1;
       });
     });
+
+    self.clickFilteredMetaCheck = function () {
+      self.filteredMeta().forEach(function (item) {
+        item.checked(self.filteredMetaChecked());
+      });
+    };
+
     self.hasManyColumns = ko.pureComputed(function () {
       return self.meta() && self.meta().length > 300;
     });
