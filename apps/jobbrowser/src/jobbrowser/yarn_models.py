@@ -442,6 +442,7 @@ class Attempt:
       if int(offset) >= 0:
         params['start'] = offset
 
+      response = None
       try:
         log_link = re.sub('job_[^/]+', self.id, log_link)
         root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
@@ -451,7 +452,8 @@ class Attempt:
         log = _('Failed to retrieve log: %s' % e)
         try:
           debug_info = '\nLog Link: %s' % log_link
-          debug_info += '\nHTML Response: %s' % response
+          if response:
+            debug_info += '\nHTML Response: %s' % response
           LOG.error(debug_info)
         except:
           LOG.exception('failed to build debug info')
