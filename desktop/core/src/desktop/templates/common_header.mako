@@ -201,6 +201,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
+  <script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
   <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -208,10 +209,14 @@ if USE_NEW_EDITOR.get():
 
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
+      var mTime = time;
       if (typeof ko !== 'undefined' && ko.isObservable(time)) {
-        return moment(time()).format("L LT");
+        mTime = time();
       }
-      return moment(time).format("L LT");
+      if (moment(mTime).isValid()) {
+        return moment(mTime).format("L LT");
+      }
+      return mTime;
     }
 
     //Add CSRF Token to all XHR Requests

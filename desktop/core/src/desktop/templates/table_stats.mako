@@ -43,7 +43,7 @@ from desktop.views import _ko
       <!-- ko if: statRows().length -->
       <table class="table table-striped">
         <tbody data-bind="foreach: statRows">
-          <tr><th data-bind="text: data_type, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th><td data-bind="text: comment, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td></tr>
+          <tr><th data-bind="text: data_type, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th><td data-bind="text: $root.formatAnalysisValue(data_type, comment), style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td></tr>
         </tbody>
       </table>
       <!-- /ko -->
@@ -173,6 +173,7 @@ from desktop.views import _ko
       }
     }(function (ko, TableStats) {
 
+
       function TableStatsViewModel(params, element) {
         var self = this;
         self.params = params;
@@ -191,6 +192,15 @@ from desktop.views import _ko
         self.enabled = params.tableName || params.columnName;
         self.alwaysActive = params.alwaysActive || false;
         self.analysisStats = ko.observable(null);
+        self.formatAnalysisValue = function (type, val) {
+          if (type === 'last_modified_time' || type === 'transient_lastDdlTime') {
+            return localeFormat(val * 1000);
+          }
+          if (type.toLowerCase().indexOf('size') > -1) {
+            return filesize(val);
+          }
+          return val;
+        }
 
         if (ko.isObservable(self.params.statsVisible)) {
           self.analysisStats.subscribe(function (newValue) {
