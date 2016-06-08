@@ -924,3 +924,34 @@ class TestExternalWorkflowGraph(object):
     assert_equal(workflow_data['layout'][0]['rows'][6]['widgets'][0]['widgetType'], 'decision-widget')
     assert_equal(workflow_data['workflow']['nodes'][7]['type'], 'decision-widget')
     assert_true(len(workflow_data['workflow']['nodes'][7]['children']) == 2)
+
+
+  def test_gen_workflow_data_from_xml_for_spark_schema02(self):
+    self.wf.definition = """<workflow-app name="My_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <start to="spark-fa35"/>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="spark-fa35">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>local[*]</master>
+            <mode>client</mode>
+            <name>MySpark</name>
+            <jar>wordcount.py</jar>
+            <file>/user/admin/wordcount.py#wordcount.py</file>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+    </workflow-app>
+    """
+
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 4)
+    assert_true(len(workflow_data['workflow']['nodes']) == 4)
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'spark-widget')
+    assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)

@@ -805,6 +805,8 @@ def _upgrade_older_node(node):
     node['properties']['content_type'] = 'text/plain'
     node['properties']['attachment'] = ''
 
+  if node['type'] == 'spark-widget' and 'files' not in node['properties']:
+    node['properties']['files'] = []
 
 class Action(object):
 
@@ -1797,6 +1799,13 @@ class SparkAction(Action):
           'help_text': _('The name of the spark application'),
           'type': ''
      },
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Files put in the running directory.'),
+          'type': ''
+     },
     'class': {
           'name': 'class',
           'label': _('Main class'),
@@ -1862,7 +1871,7 @@ class SparkAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['jars'], cls.FIELDS['class']]
+    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['jars']]
 
 
 class KillAction(Action):

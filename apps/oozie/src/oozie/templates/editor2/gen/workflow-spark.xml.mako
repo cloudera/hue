@@ -18,7 +18,7 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
     <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }${ common.retry_max(node['properties']['retry_max']) }${ common.retry_interval(node['properties']['retry_interval']) }>
-        <spark xmlns="uri:oozie:spark-action:0.1">
+        <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
@@ -45,6 +45,8 @@
             % for argument in node['properties']['spark_arguments']:
               <arg>${ argument['value'] }</arg>
             % endfor
+
+            ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </spark>
         <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
         <error to="${ node_mapping[node['children'][1]['error']].name }"/>
