@@ -312,6 +312,7 @@ def save_notebook(request):
     )
 
   notebook_doc.update_data(notebook)
+  notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
   notebook_doc.description = notebook_doc1.description = notebook['description']
   notebook_doc.save()
@@ -352,9 +353,17 @@ def _historify(notebook, user):
 
   notebook['uuid'] = history_doc.uuid
   history_doc.update_data(notebook)
+  history_doc.search = _get_statement(notebook)
   history_doc.save()
 
   return history_doc
+
+
+def _set_search_field(notebook_doc):
+  notebook = Notebook(document=notebook_doc).get_data()
+  statement = _get_statement(notebook)
+  notebook_doc.search = statement
+  return notebook_doc
 
 
 def _get_statement(notebook):
@@ -388,12 +397,7 @@ def get_history(request):
   for doc in docs.order_by('-last_modified')[:limit]:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
-      try:
-        statement = notebook['snippets'][0]['result']['handle']['statement']
-        if type(statement) == dict: # Old format
-          statement = notebook['snippets'][0]['statement_raw']
-      except KeyError: # Old format
-        statement = notebook['snippets'][0]['statement_raw']
+      statement = _get_statement(notebook)
       history.append({
         'name': doc.name,
         'id': doc.id,
