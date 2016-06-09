@@ -110,7 +110,7 @@ ${ assist.assistPanel() }
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
-      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5}">
+      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
         <tr>
           ## start at 1
           <td data-bind="text: $index()+$indexOffset()+1"></td>
@@ -337,7 +337,7 @@ ${ assist.assistPanel() }
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 145}">
+    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 145, scrollUp: true}">
     <tr>
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
@@ -466,7 +466,7 @@ ${ assist.assistPanel() }
             <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 277}">
+          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 277, scrollUp: true}">
             <tr>
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
