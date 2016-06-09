@@ -2267,7 +2267,9 @@ ${ hueIcons.symbols() }
       _colSel.addClass("columnSelected");
       _t.parent().animate({
         scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
-      }, 300);
+      }, 300, function(){
+        _t.parent().trigger('scroll_update');
+      });
     }
   }
 
