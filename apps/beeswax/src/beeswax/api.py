@@ -638,9 +638,14 @@ def _get_sample_data(db, database, table, column):
   response = {'status': -1}
 
   if sample_data:
+    sample = escape_rows(sample_data.rows(), nulls_only=True)
+    if column:
+      sample = set([row[0] for row in sample])
+      sample = [[item] for item in sorted(list(sample))]
+
     response['status'] = 0
     response['headers'] = sample_data.cols()
-    response['rows'] = escape_rows(sample_data.rows(), nulls_only=True)
+    response['rows'] = sample
   else:
     response['message'] = _('Failed to get sample data.')
 
