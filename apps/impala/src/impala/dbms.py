@@ -77,7 +77,7 @@ class ImpalaDbms(HiveServer2Dbms):
             select_tokens = [token]
 
     select_clause = '.'.join(select_tokens)
-    from_clause = '.'.join('`%s`' % token for token in from_tokens)
+    from_clause = '.'.join('`%s`' % token.strip('`') for token in from_tokens)
     return select_clause, from_clause
 
 
