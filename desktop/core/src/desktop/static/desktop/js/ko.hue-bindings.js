@@ -3629,6 +3629,7 @@
         considerStretching = valueAccessor().considerStretching || false,
         itemHeight = valueAccessor().itemHeight || 22,
         scrollable = valueAccessor().scrollable || 'body',
+        scrollUp = valueAccessor().scrollUp || false,
         scrollableOffset = valueAccessor().scrollableOffset || 0,
         disableHueEachRowCount = valueAccessor().disableHueEachRowCount || 0,
         forceRenderSub = valueAccessor().forceRenderSub || null,
@@ -3722,6 +3723,9 @@
       huePubSub.publish('scrollable.scroll.off', scrollable);
 
       $parent.parents(scrollable).on('scroll', render);
+      if (scrollUp){
+        $parent.parents(scrollable).jHueScrollUp();
+      }
 
       if ($parent.parents('.hueach').length > 0) {
         window.setTimeout(render, 100);
