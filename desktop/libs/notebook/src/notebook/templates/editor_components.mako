@@ -2404,7 +2404,7 @@ ${ hueIcons.symbols() }
             _data.push({
               series: _plottedSerie,
               x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-              y: item[_idxValue],
+              y: item[_idxValue]*1,
               obj: item
             });
           });
