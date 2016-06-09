@@ -237,6 +237,8 @@ class YarnApi(JobBrowserApi):
 
         if job['state'] in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING'):
           json = self.mapreduce_api.job(self.user, jobid)
+          if not isinstance(json, dict):
+            raise PopupException(_('Mapreduce Proxy API did not return JSON response, check if the job is running.'))
           job = YarnJob(self.mapreduce_api, json['job'])
         else:
           json = self.history_server_api.job(self.user, jobid)
