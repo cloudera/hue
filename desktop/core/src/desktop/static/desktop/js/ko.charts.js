@@ -170,7 +170,22 @@
           _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
         }
 
-        window.setTimeout(function () {
+        var _isDiscrete = false;
+        for (var j = 0; j < _datum.length; j++) {
+          for (var i = 0; i < _datum[j].values.length; i++) {
+            if (isNaN(_datum[j].values[i].x * 1)) {
+              _isDiscrete = true;
+              break;
+            }
+          }
+        }
+
+        if ((_isDiscrete && $(element).data('chart_type') !== 'discrete_bar') || (!_isDiscrete && $(element).data('chart_type') === 'discrete_bar')){
+          ko.bindingHandlers.barChart.init(element, valueAccessor);
+        }
+        else {
+
+          window.setTimeout(function () {
           var _d3 = d3.select($(element).find("svg")[0]);
           _d3.datum(_datum)
             .transition().duration(150)
@@ -214,6 +229,8 @@
           }
           chartsNormalState();
         }, 0);
+
+        }
       }
       else if (_datum.length > 0) {
         ko.bindingHandlers.barChart.init(element, valueAccessor);
@@ -952,6 +969,7 @@
             $(element).find("svg").empty();
           }
           _chart = nv.models.multiBarWithBrushChart();
+          $(element).data('chart_type', 'multibar_brush');
           if (_datum.length > 0 && _datum[0].values.length > 10) {
             _chart.enableSelection();
           }
@@ -983,6 +1001,7 @@
             if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
               $(element).find("svg").empty();
             }
+            $(element).data('chart_type', 'discrete_bar');
             _chart = nv.models.growingDiscreteBarChart()
                 .x(function (d) {
                   return d.x
@@ -999,6 +1018,7 @@
             if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
               $(element).find("svg").empty();
             }
+            $(element).data('chart_type', 'multibar_brush');
             _chart = nv.models.multiBarWithBrushChart();
             _chart.tooltipContent(function (key, x, y) {
               return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
