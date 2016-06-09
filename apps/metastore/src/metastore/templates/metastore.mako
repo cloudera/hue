@@ -426,22 +426,6 @@ ${ assist.assistPanel() }
           </button>
           % if has_write_access:
             <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
-            <div id="dropTable" class="modal hide fade">
-              <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
-                ${ csrf_token(request) | n,unicode }
-                <div class="modal-header">
-                  <a href="#" class="close" data-dismiss="modal">&times;</a>
-                  <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
-                </div>
-                <div class="modal-footer">
-                  <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
-                  <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-                </div>
-                <!-- ko foreach: selectedTables -->
-                <input type="hidden" name="table_selection" data-bind="value: name" />
-                <!-- /ko -->
-              </form>
-            </div>
           % endif
           <!-- ko if: $root.optimizerEnabled  -->
           &nbsp;
@@ -524,6 +508,25 @@ ${ assist.assistPanel() }
         <span data-bind="visible: filteredTables().length === 0, css: {'margin-left-10': tables().length > 0}" style="font-style: italic; display: none;">${_('No tables found.')}</span>
       </div>
     </div>
+
+  % if has_write_access:
+    <div id="dropTable" class="modal hide fade">
+      <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+        ${ csrf_token(request) | n,unicode }
+        <div class="modal-header">
+          <a href="#" class="close" data-dismiss="modal">&times;</a>
+          <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
+        </div>
+        <div class="modal-footer">
+          <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
+          <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+        </div>
+        <!-- ko foreach: selectedTables -->
+        <input type="hidden" name="table_selection" data-bind="value: name" />
+        <!-- /ko -->
+      </form>
+    </div>
+  % endif
 </script>
 
 <script type="text/html" id="metastore-databases-parameters">
