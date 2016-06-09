@@ -258,15 +258,18 @@ def kill_job(request, job):
   api = get_api(request.user, request.jt)
 
   while time.time() - cur_time < 15:
-    job = api.get_job(jobid=job.jobId)
-
-    if job.status not in ["RUNNING", "QUEUED"]:
-      if request.REQUEST.get("next"):
-        return HttpResponseRedirect(request.REQUEST.get("next"))
-      elif request.REQUEST.get("format") == "json":
-        return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
-      else:
-        raise MessageException("Job Killed")
+    try:
+      job = api.get_job(jobid=job.jobId)
+    except Exception, e:
+      LOG.warn('Failed to get job with ID %s: %s' % (job.jobId, e))
+    else:
+      if job.status not in ["RUNNING", "QUEUED"]:
+        if request.REQUEST.get("next"):
+          return HttpResponseRedirect(request.REQUEST.get("next"))
+        elif request.REQUEST.get("format") == "json":
+          return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
+        else:
+          raise MessageException("Job Killed")
     time.sleep(1)
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))

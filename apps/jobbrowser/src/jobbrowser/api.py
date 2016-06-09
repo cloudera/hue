@@ -244,6 +244,8 @@ class YarnApi(JobBrowserApi):
         # The MapReduce API only returns JSON when the application is in a RUNNING state
         elif app['state'] in ('NEW', 'SUBMITTED', 'RUNNING') and app['applicationType'] == 'MAPREDUCE':
           resp = self.mapreduce_api.job(self.user, job_id)
+          if not isinstance(resp, dict):
+            raise PopupException(_('Mapreduce Proxy API did not return JSON response, check if the job is running.'))
           job = YarnJob(self.mapreduce_api, resp['job'])
         else:
           job = Application(app, self.resource_manager_api)
