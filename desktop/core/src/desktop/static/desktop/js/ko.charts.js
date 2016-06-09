@@ -1048,7 +1048,7 @@
         _chart.transitionDuration(0);
 
         _chart.yAxis
-            .tickFormat(d3.format(",0f"));
+            .tickFormat(d3.format("s"));
 
         $(element).data("chart", _chart);
 
