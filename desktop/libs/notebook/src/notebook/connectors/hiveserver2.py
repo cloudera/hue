@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
+from desktop.lib.conf import BoundConfig, Config
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
@@ -49,8 +50,8 @@ except ImportError, e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 try:
-  from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala import api   # Force checking if Impala is enabled
+  from impala.conf import CONFIG_WHITELIST as impala_settings
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
   impala_settings = None
@@ -70,6 +71,10 @@ def query_error_handler(func):
       else:
         raise QueryError(message)
   return decorator
+
+
+def is_impala_enabled():
+  return impala_settings is not None or type(impala_settings) == BoundConfig
 
 
 class HiveConfiguration(object):
@@ -119,7 +124,7 @@ class ImpalaConfiguration(object):
       "key": "settings",
       "help_text": _("Impala configuration properties."),
       "type": "settings",
-      "options": [config.lower() for config in impala_settings.get()] if impala_settings else []
+      "options": [config.lower() for config in impala_settings.get()] if is_impala_enabled() else []
     }
   ]
 
