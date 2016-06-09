@@ -176,8 +176,8 @@ class TestDocument2(object):
     # Creates 2 directories and 2 queries and saves to home directory
     dir1 = Directory.objects.create(name='test_dir1', owner=self.user)
     dir2 = Directory.objects.create(name='test_dir2', owner=self.user)
-    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={})
-    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={})
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, search='foobar')
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, search='barfoo')
     children = [dir1, dir2, query1, query2]
 
     self.home_dir.children.add(*children)
@@ -196,11 +196,14 @@ class TestDocument2(object):
     assert_true(all(doc['type'] == 'directory' for doc in data['children']))
 
     # Test search text
-    response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'query'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'foo'})
     data = json.loads(response.content)
-    assert_equal('query', data['text'])
+    assert_equal('foo', data['text'])
     assert_equal(2, data['count'])
-    assert_true(all('query' in doc['name'] for doc in data['children']))
+
+    response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'foobar'})
+    data = json.loads(response.content)
+    assert_equal(1, data['count'])
 
     # Test pagination with limit
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'page': 2, 'limit': 2})

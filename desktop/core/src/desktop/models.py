@@ -864,7 +864,7 @@ class Document2QueryMixin(object):
       trashed_ids = [doc.id for doc in docs if Document2.TRASH_DIR in doc.path]
       docs = docs.exclude(id__in=trashed_ids)
 
-    return docs.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
+    return docs.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
 
   def search_documents(self, types=None, search_text=None, order_by=None):
@@ -880,7 +880,8 @@ class Document2QueryMixin(object):
       documents = documents.filter(type__in=types)
 
     if search_text:
-      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text))
+      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text) |
+                                   Q(search__icontains=search_text))
 
     if order_by:  # TODO: Validate that order_by is a valid sort parameter
       documents = documents.order_by(order_by)
@@ -1001,6 +1002,7 @@ class Document2(models.Model):
 
   data = models.TextField(default='{}')
   extra = models.TextField(default='')
+  search = models.TextField(blank=True, null=True, help_text=_t('Searchable text for the document.'))
   # settings = models.TextField(default='{}') # Owner settings like, can other reshare, can change access
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
@@ -1272,7 +1274,7 @@ class Document2(models.Model):
     information like personally identifiable information, that information could be leaked into the Hue database and
     logfiles.
     """
-    if global_redaction_engine.is_enabled() and self.type == 'notebook':
+    if global_redaction_engine.is_enabled() and (self.type == 'notebook' or self.type.startswith('query')):
       data_dict = self.data_dict
       snippets = data_dict.get('snippets', [])
       for snippet in snippets:
@@ -1283,6 +1285,7 @@ class Document2(models.Model):
             snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
             snippet['is_redacted'] = True
       self.data = json.dumps(data_dict)
+      self.search = global_redaction_engine.redact(self.search)
 
   def _contains_cycle(self):
     """
@@ -1345,7 +1348,7 @@ class Directory(Document2):
 
     documents = documents.exclude(is_history=True)
 
-    return documents.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
+    return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
 
   def save(self, *args, **kwargs):
