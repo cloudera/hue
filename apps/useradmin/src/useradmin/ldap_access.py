@@ -296,7 +296,11 @@ class LdapConnection(object):
     sanitized_name = sanitized_name.replace(r'\5c,', r'\2c')
 
     search_dn, user_name_filter = self._get_search_params(sanitized_name, search_attr, find_by_dn)
-    ldap_filter = '(&' + user_filter + user_name_filter + ')'
+    ldap_filter = user_filter
+    if user_name_filter:
+      if ldap_filter.lower() in ('(objectclass=*)', 'objectclass=*'):
+        ldap_filter = ''
+      ldap_filter = '(&' + ldap_filter + user_name_filter + ')'
     attrlist = ['objectClass', 'isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', user_name_attr]
 
     ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
