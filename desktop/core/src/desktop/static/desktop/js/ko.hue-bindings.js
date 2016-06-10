@@ -2942,6 +2942,22 @@
       });
 
       editor.commands.addCommand({
+        name: "new",
+        bindKey: {win: "Ctrl-e", mac: "Command-e|Ctrl-e"},
+        exec: function () {
+          huePubSub.publish('editor.create.new');
+        }
+      });
+
+      editor.commands.addCommand({
+        name: "save",
+        bindKey: {win: "Ctrl-s", mac: "Command-s|Ctrl-s"},
+        exec: function () {
+          huePubSub.publish('editor.save');
+        }
+      });
+
+      editor.commands.addCommand({
         name: "format",
         bindKey: {win: "Ctrl-i", mac: "Command-i|Ctrl-i"},
         exec: function () {
