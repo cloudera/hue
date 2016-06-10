@@ -1034,7 +1034,9 @@
           if (data.jobs.length > 0) {
             self.jobs(data.jobs);
           }
-          self.progress(data.progress);
+          if (self.status() == 'running') { // Maybe the query finished or failed in the meantime
+            self.progress(data.progress)
+          };
         } else {
           self._ajaxError(data);
         }
