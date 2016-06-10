@@ -2984,11 +2984,22 @@ ${ hueIcons.symbols() }
 
       $(".preview-sample").css("right", (10 + hueUtils.scrollbarWidth()) + "px");
 
+      function saveKeyHandler() {
+        if (viewModel.canSave()) {
+          viewModel.saveNotebook();
+        }
+        else {
+          $('#saveAsModal').modal('show');
+        }
+      }
+
       $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
         e.preventDefault();
-        viewModel.saveNotebook();
+        saveKeyHandler();
         return false;
       });
+
+      huePubSub.subscribe('editor.save', saveKeyHandler);
 
       $(document).bind('keyup', function (e) {
         if (e.keyCode == 191 && !$(e.target).is('input') && !$(e.target).is('textarea')) {
@@ -2996,13 +3007,22 @@ ${ hueIcons.symbols() }
         }
       });
 
-      if (!viewModel.editorMode) {
-        $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
-          e.preventDefault();
+      function newKeyHandler() {
+        if (!viewModel.editorMode) {
           viewModel.selectedNotebook().newSnippet();
-          return false;
-        });
+        }
+        else {
+          viewModel.newNotebook(true);
+        }
       }
+
+      $(window).bind("keydown", "ctrl+e alt+e meta+e", function (e) {
+        e.preventDefault();
+        newKeyHandler();
+        return false;
+      });
+
+      huePubSub.subscribe('editor.create.new', newKeyHandler);
 
       var initialResizePosition = 100;
 
