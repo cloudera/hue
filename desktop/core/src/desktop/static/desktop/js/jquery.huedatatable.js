@@ -38,6 +38,8 @@
       }
     }
 
+    self.fnDraw = function () {};
+
     self.fnAddData = function (mData, bRedraw) {
       var aoColumns = this.$table.data('aoColumns');
 
