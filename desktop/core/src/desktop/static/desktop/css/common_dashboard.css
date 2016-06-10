@@ -34,6 +34,10 @@
   min-height: 100px;
 }
 
+.ui-sortable.white {
+  background-color: #FFF!important;
+}
+
 .ui-sortable h2 {
   padding-left: 10px !important;
 }
@@ -46,6 +50,15 @@
 
 .ui-sortable-disabled {
   background-color: #FFF;
+}
+
+.sortable-arguments {
+  margin-left: -10px!important;
+  width: 99%;
+}
+
+.sortable-arguments li {
+  margin-left: 10px;
 }
 
 .card-column, .card-additional {
