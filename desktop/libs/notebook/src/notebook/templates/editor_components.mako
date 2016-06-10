@@ -2241,8 +2241,9 @@ ${ hueIcons.symbols() }
       dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
     }
     $(linkElement).parents(".snippet").find('.filtered-meta li input').each(function (idx, item) {
-      dt.fnSetColumnVis(idx, linkElement.checked);
+      dt.fnSetColumnVis(idx, linkElement.checked, false);
     });
+    dt.fnDraw();
   }
 
   function toggleColumn(linkElement, index, snippet) {
