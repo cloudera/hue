@@ -89,8 +89,6 @@ class Submission(object):
         properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
 
     self.properties['security_enabled'] = self.api.security_enabled
-    if 'oozie.use.system.libpath' not in properties:
-        properties['oozie.use.system.libpath'] = 'true'
 
   def __str__(self):
     if self.oozie_id:
@@ -107,6 +105,9 @@ class Submission(object):
     Take care of all the actions of submitting a Oozie workflow.
     Returns the oozie job id if all goes well.
     """
+
+    if self.properties and 'oozie.use.system.libpath' not in self.properties:
+      self.properties['oozie.use.system.libpath'] = 'true'
 
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))
