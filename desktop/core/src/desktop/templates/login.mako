@@ -32,91 +32,90 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
   }
 </style>
 
+<div class="navigator">
+  <div class="pull-right">
+
+  <ul class="nav nav-pills">
+    <li><a href="http://gethue.com" target="_blank" title="${_('Go to gethue.com')}" rel="navigator-tooltip" data-placement="left"><i class="fa fa-globe"></i></a></li>
+  </ul>
+
+  </div>
+  <a class="brand pull-left" href="/"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /></a>
+</div>
+
+
+<div class="login-container">
+
+  <form method="POST" action="${action}" autocomplete="off">
+    ${ csrf_token(request) | n,unicode }
+
+    <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70"></div>
+
+    %if first_login_ever:
+      <div class="alert alert-info center">
+        ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
+        <strong>${_('they will become your Hue superuser credentials.')}</strong>
+        %if is_password_policy_enabled():
+        <p>${get_password_hint()}</p>
+        %endif
+      </div>
+    %endif
+
+    <div class="text-input
+      %if backend_names == ['OAuthBackend']:
+        hide
+      %endif
+      %if form['username'].errors or login_errors:
+        error
+      %endif
+    ">
+      ${ form['username'] | n,unicode }
+    </div>
+
+    <div class="text-input
+      %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
+        hide
+      %endif
+      %if form['password'].errors or login_errors:
+        error
+      %endif
+    ">
+      ${ form['password'] | n,unicode }
+    </div>
+
+    %if active_directory:
+    <div>
+      ${ form['server'] | n,unicode }
+    </div>
+    %endif
+
+    %if login_errors and not form['username'].errors and not form['password'].errors:
+      %if form.errors:
+        % for error in form.errors:
+         ${ form.errors[error]|unicode,n }
+        % endfor
+      %endif
+    %endif
+
+    %if first_login_ever:
+      <input type="submit" class="btn btn-primary" value="${_('Create Account')}"/>
+    %else:
+      <input type="submit" class="btn btn-primary" value="${_('Sign In')}"/>
+    %endif
+    <input type="hidden" name="next" value="${next}"/>
+
+  </form>
+
+  %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
+  <div class="alert alert-info" id="login-splash">
+    ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+  </div>
+  %endif
+</div>
+
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="login-box">
-      <form method="POST" action="${action}">
-      ${ csrf_token(request) | n,unicode }
-
-      <div class="login-header">
-        <h1>${ _('Welcome to Hue') }</h1>
-        %if first_login_ever:
-          <h2>${_('Create your Hue account')}</h2>
-        %else:
-          <h2>${_('Please sign in to continue')}</h2>
-        %endif
-      </div>
-
-      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="50" height="50"></div>
-
-      <div class="login-content">
-
-        %if first_login_ever:
-          <div class="alert alert-block">
-            ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
-            <strong>${_('they will become your Hue superuser credentials.')}</strong>
-            %if is_password_policy_enabled():
-	          <p>${get_password_hint()}</p>
-            %endif
-          </div>
-        %endif
-
-        <div class="
-          %if backend_names == ['OAuthBackend']:
-            hide
-          %endif
-        ">
-          ${ form['username'] | n,unicode }
-        </div>
-
-        ${ form['username'].errors | n,unicode }
-
-        <div class="
-          %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
-            hide
-          %endif
-        ">
-          ${ form['password'] | n,unicode }
-        </div>
-
-        ${ form['password'].errors | n,unicode }
-
-        %if active_directory:
-        <div>
-          ${ form['server'] | n,unicode }
-        </div>
-        %endif
-
-        %if login_errors and not form['username'].errors and not form['password'].errors:
-          <div class="alert alert-error" style="text-align: center">
-            <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
-            %if form.errors:
-              % for error in form.errors:
-               ${ form.errors[error]|unicode,n }
-              % endfor
-            %endif
-          </div>
-        %endif
-
-        %if first_login_ever:
-          <input type="submit" class="btn btn-large btn-primary" value="${_('Create account')}"/>
-        %else:
-          <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
-        %endif
-        <input type="hidden" name="next" value="${next}"/>
-        </div>
-
-      </form>
-
-      %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
-      <div class="alert alert-info" id="login-splash">
-        ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
-      </div>
-      %endif
-    </div>
-  </div>
-  <div class="row">
     <div class="center muted">
       ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
     </div>

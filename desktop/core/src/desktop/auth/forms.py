@@ -41,7 +41,7 @@ class AuthenticationForm(AuthAuthenticationForm):
   Adds appropriate classes to authentication form
   """
   error_messages = {
-    'invalid_login': _t("Invalid username or password."),
+    'invalid_login': _t("Invalid username or password"),
     'inactive': _t("Account deactivated. Please contact an administrator."),
   }
 

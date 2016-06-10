@@ -22,40 +22,37 @@
 
 
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 
 <div id="login-modal" class="modal fade hide" data-backdrop="static" data-keyboard="false" style="padding: 0px!important;box-shadow: none;background: transparent;">
-  <div class="login-box">
-    <form method="POST" action="${action}">
-    <input type="hidden" name="csrfmiddlewaretoken" value="">
-    <div class="login-header">
-      <h1>${ _('You have been logged out') }</h1>
-      <h2>${_('Sign in to continue to use Hue')}</h2>
-    </div>
+  <div class="login-container">
+    <form method="POST" action="${action}" autocomplete="off">
+      <input type="hidden" name="csrfmiddlewaretoken" value="">
 
-    <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="50" height="50"></div>
+      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70"></div>
 
-    <div class="login-content">
+      <h4 class="muted">${ _('You have been logged out, please sign in again') }</h4>
 
-      <div class="
+      <div class="text-input
         %if backend_names == ['OAuthBackend']:
           hide
+        %endif
+        %if form['username'].errors or login_errors:
+          error
         %endif
       ">
         ${ form['username'] | n,unicode }
       </div>
 
-      ${ form['username'].errors | n,unicode }
-
-      <div class="
+      <div class="text-input
         %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
           hide
+        %endif
+        %if form['password'].errors or login_errors:
+          error
         %endif
       ">
         ${ form['password'] | n,unicode }
       </div>
-
-      ${ form['password'].errors | n,unicode }
 
       %if active_directory:
       <div>
@@ -63,14 +60,21 @@
       </div>
       %endif
 
+      %if login_errors and not form['username'].errors and not form['password'].errors:
+        %if form.errors:
+          % for error in form.errors:
+           ${ form.errors[error]|unicode,n }
+          % endfor
+        %endif
+      %endif
+
       <div class="login-error alert alert-error hide" style="text-align: center">
         <strong><i class="fa fa-exclamation-triangle"></i> ${_('Sign in failed. Please try again.')}</strong>
       </div>
 
-      <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
+      <input type="submit" class="btn btn-primary" value="${_('Sign In')}"/>
       <input type="hidden" name="next" value="${next}"/>
       <input type="hidden" name="fromModal" value="true"/>
-      </div>
 
     </form>
 
@@ -82,14 +86,8 @@
   </div>
 </div>
 
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script>
   $(document).ready(function () {
-    $('#id_server').chosen({
-      disable_search_threshold: 5,
-      width: "90%",
-      no_results_text: "${_('Oops, no database found!')}"
-    });
 
     $('#login-modal form').on('submit', function () {
       $('input[name="csrfmiddlewaretoken"]').val($.cookie('csrftoken'));
