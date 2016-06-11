@@ -59,6 +59,7 @@ def entry():
       execute_from_command_line(sys.argv)
   except ImproperlyConfigured, e:
     if len(sys.argv) > 1 and sys.argv[1] == 'is_db_alive' and 'oracle' in str(e).lower():
+      print >> sys.stderr, e # Oracle connector is improperly configured
       sys.exit(10)
     else:
       raise e
