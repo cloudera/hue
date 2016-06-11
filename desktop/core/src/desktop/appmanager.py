@@ -242,9 +242,13 @@ def load_apps(app_blacklist):
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
     if sdk_app.name not in app_blacklist:
-      m = sdk_app.load()
-      dmi = DesktopModuleInfo(m)
-      DESKTOP_APPS.append(dmi)
+      # TODO: Remove once pig and jobsub have been migrated to editor
+      if 'oozie' in app_blacklist and sdk_app.name in ('pig', 'jobsub'):
+        LOG.warn('%s depends on oozie which is blacklisted, will skip loading %s app.' % (sdk_app.name, sdk_app.name))
+      else:
+        m = sdk_app.load()
+        dmi = DesktopModuleInfo(m)
+        DESKTOP_APPS.append(dmi)
 
   LOG.debug("Loaded Desktop Applications: " + ", ".join(a.name for a in DESKTOP_APPS))
   DESKTOP_MODULES += DESKTOP_APPS
