@@ -71,7 +71,8 @@ class Command(NoArgsCommand):
     try:
       db_conn = connections['default']
       db_conn.cursor()
-    except ImproperlyConfigured: # Connector not found
+    except ImproperlyConfigured, e:
+      self.stderr.write('DB improperly configured: %s' % e)
       sys.exit(10)
     except OperationalError, e:
       self.stderr.write('Error accessing DB: %s' % e)
