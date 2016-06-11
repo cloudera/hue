@@ -1272,7 +1272,7 @@ class Document2(models.Model):
     information like personally identifiable information, that information could be leaked into the Hue database and
     logfiles.
     """
-    if global_redaction_engine.is_enabled() and self.type == 'notebook':
+    if global_redaction_engine.is_enabled() and (self.type == 'notebook' or self.type.startswith('query')):
       data_dict = self.data_dict
       snippets = data_dict.get('snippets', [])
       for snippet in snippets:
