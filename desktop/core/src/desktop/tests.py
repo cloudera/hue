@@ -967,6 +967,7 @@ class TestDocument(object):
     try:
       self.document2.type = 'notebook'
       self.document2.update_data({'snippets': snippets})
+      self.document2.search = sensitive_query
       self.document2.save()
       saved_snippets = self.document2.data_dict['snippets']
 
@@ -978,6 +979,9 @@ class TestDocument(object):
       assert_equal(redacted_query, saved_snippets[1]['statement'])
       assert_equal(redacted_query, saved_snippets[1]['statement_raw'])
       assert_equal(True, saved_snippets[1]['is_redacted'])
+
+      document = Document2.objects.get(pk=self.document2.pk)
+      assert_equal(redacted_query, document.search)
 
       # Make sure unredacted queries are not redacted.
       assert_equal(nonsensitive_query, saved_snippets[2]['statement'])
