@@ -391,7 +391,7 @@ def get_history(request):
   docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
 
   if doc_text:
-    docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text))
+    docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text) | Q(search__icontains=doc_text))
 
   history = []
   for doc in docs.order_by('-last_modified')[:limit]:
