@@ -2795,7 +2795,7 @@ class History(object):
 
 class WorkflowBuilder():
   """
-  Focus on building nodes, not the UI layout.
+  Focus on building nodes, not the UI layout (should be graph automatically).
   """
   def create_hive_document_workflow(self, name, parameters, user):
     api = get_oozie(user)
@@ -3127,8 +3127,8 @@ class WorkflowBuilder():
       u'size': 12,
       }]}
     )
-  
-    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data)
+
+    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, managed=True)
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
     return workflow_doc
