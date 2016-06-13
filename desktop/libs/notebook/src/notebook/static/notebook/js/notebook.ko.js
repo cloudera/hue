@@ -1524,17 +1524,6 @@
       });
     };
 
-    self.schedule = function() {
-      logGA('schedule');
-      $.post("/oozie/editor/document/schedule/", {
-        uuid: self.uuid()
-      }, function (data) {
-        window.location.href = data.url;
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
-
     self.clearHistory = function (type) {
       logGA('clearHistory');
       $.post("/notebook/api/clear_history", {
@@ -1845,6 +1834,24 @@
       self.selectedNotebook().uuid(UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.saveNotebook();
+    };
+
+    self.loadScheduler = function() {
+      logGA('schedule');
+      $.get("/oozie/editor/coordinator/new/", {
+        format: 'json'
+      }, function (data) {
+        $("#schedulerEditor").html(data.layout);
+        var viewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+
+        ko.cleanNode($("#schedulerEditor")[0]);
+        ko.applyBindings(viewModel, $("#schedulerEditor")[0]);
+
+        viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+        viewModel.coordinator.tracker().markCurrentStateAsClean();
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
     };
   }
 
