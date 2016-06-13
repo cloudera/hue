@@ -65,23 +65,27 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
       %if backend_names == ['OAuthBackend']:
         hide
       %endif
-      %if form['username'].errors or login_errors:
+      %if form['username'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
         error
       %endif
     ">
       ${ form['username'] | n,unicode }
     </div>
 
+    ${ form['username'].errors | n,unicode }
+
     <div class="text-input
       %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
         hide
       %endif
-      %if form['password'].errors or login_errors:
+      %if form['password'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
         error
       %endif
     ">
       ${ form['password'] | n,unicode }
     </div>
+
+    ${ form['password'].errors | n,unicode }
 
     %if active_directory:
     <div>
@@ -114,12 +118,8 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
 </div>
 
 
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="center muted">
-      ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
-    </div>
-  </div>
+<div class="trademark center muted">
+  ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
 </div>
 
 <script>
