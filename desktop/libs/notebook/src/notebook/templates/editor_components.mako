@@ -270,7 +270,7 @@ ${ hueIcons.symbols() }
 
         &nbsp;&nbsp;&nbsp;
 
-        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+        <a class="btn pointer" title="${ _('Context') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
           <i class="fa fa-cogs"></i>
         </a>
       </div>
@@ -1063,6 +1063,10 @@ ${ hueIcons.symbols() }
 
     ## To move to 'notification' panel
     <div class="tab-pane" id="scheduleActionsTab">
+      <input type="text" data-bind="value: viewSchedulerId, click: viewScheduler"></input>
+
+      <div id="schedulerViewer">
+      </div>
     </div>
     % endif
 
