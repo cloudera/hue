@@ -152,6 +152,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
+## Scheduler
+## ChangeTracker
+<%namespace name="dashboard" file="/common_dashboard.mako" />
+${ dashboard.import_layout() }
+## Duplicating these two for some reason
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+
+<link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
+<script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
+<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
 ${ require.config() }
 
 </%def>
@@ -972,6 +987,7 @@ ${ hueIcons.symbols() }
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
       <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
+      <li><a href="#scheduleActionsTab" data-toggle="tab">${_('Executions')}</a></li>
       % endif
     </ul>
 
@@ -1032,12 +1048,21 @@ ${ hueIcons.symbols() }
       <legend><i class="fa fa-calendar"></i> ${ _('Schedule') }</legend>
 
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
-        Coord UI
+        <a data-bind="click: $root.loadScheduler">Load scheduler</a>
+
+        [Start / Monitor - Stop - Sync]
+
+        <div id="schedulerEditor">
+        </div>
       <!-- /ko -->
 
       <!-- ko ifnot: $root.selectedNotebook() && $root.selectedNotebook().id() -->
         ${ _('Document needs to be saved first.') }
       <!-- /ko -->
+    </div>
+
+    ## To move to 'notification' panel
+    <div class="tab-pane" id="scheduleActionsTab">
     </div>
     % endif
 

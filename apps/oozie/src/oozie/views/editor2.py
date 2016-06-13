@@ -43,10 +43,10 @@ from oozie.decorators import check_document_access_permission, check_document_mo
 from oozie.forms import ParameterForm
 from oozie.models import Workflow as OldWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
-    find_dollar_variables, find_dollar_braced_variables, HiveDocumentAction,\
-  WorkflowBuilder
+    find_dollar_variables, find_dollar_braced_variables, WorkflowBuilder
 from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
+from desktop.lib import django_mako
 
 
 LOG = logging.getLogger(__name__)
@@ -512,7 +512,17 @@ def edit_coordinator(request):
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
-  return render('editor2/coordinator_editor.mako', request, {
+  if request.GET.get('format') == 'json':
+    return JsonResponse({
+      'coordinator': coordinator.get_data_for_json(),
+      'credentials': credentials.credentials.keys(),
+      'workflows': workflows,
+      'doc_uuid': doc.uuid if doc else '',
+      'can_edit': doc is None or doc.doc.get().is_editable(request.user),
+      'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {})
+    })
+  else:
+    return render('editor2/coordinator_editor.mako', request, {
       'coordinator_json': coordinator.to_json_for_html(),
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),

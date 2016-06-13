@@ -109,7 +109,7 @@ var Coordinator = function (vm, coordinator) {
     if (value || !vm.isEditing()) {
       coordCron.disable();
     } else {
-      coordCron.enable();
+      //coordCron.enable(); // TODO REVERT
     }
   });
 
