@@ -835,7 +835,7 @@ class FilesystemException(Exception):
 
 class Document2QueryMixin(object):
 
-  def documents(self, user, perms='both', include_history=False, include_trashed=False):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
@@ -858,6 +858,8 @@ class Document2QueryMixin(object):
 
     if not include_history:
       docs = docs.exclude(is_history=True)
+
+    docs = docs.filter(is_managed=include_managed)
 
     if not include_trashed:
       # Since the Trash folder can have multiple directory levels, we need to check full path and exclude those IDs
@@ -1008,6 +1010,7 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
+  is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
