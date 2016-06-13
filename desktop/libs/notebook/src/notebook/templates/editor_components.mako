@@ -197,31 +197,6 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-        &nbsp;&nbsp;&nbsp;
-
-        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-cogs"></i>
-        </a>
-
-        % if mode == 'editor' and ENABLE_QUERY_SCHEDULING.get():
-        <div class="btn-group">
-          <a class="btn" title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { $root.selectedNotebook().schedule() } }, css: {'disabled': ! $root.selectedNotebook() || ! $root.selectedNotebook().id() }">
-            <i class="fa fa-fw fa-calendar"></i>
-          </a>
-
-           <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().dependentsWorkflows().length > 0 -->
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            <ul class="dropdown-menu pull-right" data-bind="foreach: $root.selectedNotebook().dependentsWorkflows">
-              <li>
-                <a class="pointer" data-bind="attr: { 'href': absoluteUrl }">
-                  <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> <span data-bind="text: name"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- /ko -->
-          </div>
-        % endif
-
         % if mode != 'editor':
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
@@ -276,6 +251,12 @@ ${ hueIcons.symbols() }
 
         <a class="btn" href="${ url('notebook:notebooks') }?type=${ editor_type }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
+        </a>
+
+        &nbsp;&nbsp;&nbsp;
+
+        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <i class="fa fa-cogs"></i>
         </a>
       </div>
 
@@ -985,56 +966,82 @@ ${ hueIcons.symbols() }
     </div>
   </div>
 
-  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
-    <div class="row-fluid">
-      <div class="span12">
-        <!-- ko with: $root.selectedNotebook() -->
-        <form class="form-horizontal">
-          <fieldset>
-            <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
-            <!-- ko ifnot: sessions().length -->
-            <p>${ _('There are currently no active sessions.') }</p>
-            <!-- /ko -->
-            <!-- ko foreach: sessions -->
-            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
-            <div class="session-actions">
-              <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
-              <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
-              %if conf.USE_DEFAULT_CONFIGURATION.get():
-              <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
-              %endif
-              <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
-              <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
-              <!-- /ko -->
-            </div>
-            <div style="width:100%;">
-              <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
-            </div>
-            <div style="clear:both; padding-left: 120px;">
-              <!-- ko if: availableNewProperties().length -->
-              <select data-bind="options: availableNewProperties,
-                       optionsText: 'nice_name',
-                       optionsValue: 'name',
-                       value: selectedSessionProperty,
-                       optionsCaption: '${ _ko('Choose a property...') }'"></select>
-              <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
-                  properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
-                  selectedSessionProperty('');
-                }" style="margin-left:10px;vertical-align: text-top;">
-                <i class="fa fa-plus"></i>
-              </a>
-              <!-- /ko -->
-            </div>
-            <!-- /ko -->
-            <!-- /ko -->
-            <br/>
-          </fieldset>
-        </form>
-        <!-- /ko -->
-      </div>
-    </div>
-  </div>
 
+  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
+      % if ENABLE_QUERY_SCHEDULING.get():
+      <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
+      % endif
+    </ul>
+
+    <div class="tab-content" style="border: none">
+      <div class="tab-pane active" id="sessionsTab">
+        <div class="row-fluid">
+          <div class="span12">
+            <!-- ko with: $root.selectedNotebook() -->
+            <form class="form-horizontal">
+              <fieldset>
+                <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
+                <!-- ko ifnot: sessions().length -->
+               <p>${ _('There are currently no active sessions.') }</p>
+               <!-- /ko -->
+               <!-- ko foreach: sessions -->
+               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
+               <div class="session-actions">
+                 <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
+                 <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
+                 % if conf.USE_DEFAULT_CONFIGURATION.get():
+                 <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+                 % endif
+                 <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
+                 <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
+                 <!-- /ko -->
+               </div>
+               <div style="width:100%;">
+                 <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+               </div>
+               <div style="clear:both; padding-left: 120px;">
+                 <!-- ko if: availableNewProperties().length -->
+                 <select data-bind="options: availableNewProperties,
+                          optionsText: 'nice_name',
+                          optionsValue: 'name',
+                          value: selectedSessionProperty,
+                          optionsCaption: '${ _ko('Choose a property...') }'"></select>
+                 <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+                    properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
+                    selectedSessionProperty('');
+                   }" style="margin-left:10px;vertical-align: text-top;">
+                   <i class="fa fa-plus"></i>
+                 </a>
+                 <!-- /ko -->
+               </div>
+               <!-- /ko -->
+               <!-- /ko -->
+               <br/>
+             </fieldset>
+           </form>
+           <!-- /ko -->
+         </div>
+       </div>
+    </div>
+
+    ## mode == 'editor', mode not defined yet
+    % if ENABLE_QUERY_SCHEDULING.get():
+    <div class="tab-pane" id="scheduleTab">
+      <legend><i class="fa fa-calendar"></i> ${ _('Schedule') }</legend>
+
+      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
+        Coord UI
+      <!-- /ko -->
+
+      <!-- ko ifnot: $root.selectedNotebook() && $root.selectedNotebook().id() -->
+        ${ _('Document needs to be saved first.') }
+      <!-- /ko -->
+    </div>
+    % endif
+
+  </div>
 </script>
 
 <script type="text/html" id="snippetIcon">
@@ -1203,6 +1210,7 @@ ${ hueIcons.symbols() }
             </ul>
           </div>
         </div>
+
         %if ENABLE_QUERY_BUILDER.get():
         <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: {'active': currentQueryTab() == 'queryBuilderTab'}">
           <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
@@ -1221,6 +1229,7 @@ ${ hueIcons.symbols() }
           </div>
         </div>
         %endif
+
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
         </div>
