@@ -199,7 +199,7 @@ ${ hueIcons.symbols() }
 
         &nbsp;&nbsp;&nbsp;
 
-        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
+        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
           <i class="fa fa-cogs"></i>
         </a>
 
@@ -984,6 +984,57 @@ ${ hueIcons.symbols() }
       %endif
     </div>
   </div>
+
+  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
+    <div class="row-fluid">
+      <div class="span12">
+        <!-- ko with: $root.selectedNotebook() -->
+        <form class="form-horizontal">
+          <fieldset>
+            <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
+            <!-- ko ifnot: sessions().length -->
+            <p>${ _('There are currently no active sessions.') }</p>
+            <!-- /ko -->
+            <!-- ko foreach: sessions -->
+            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
+            <div class="session-actions">
+              <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
+              <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
+              %if conf.USE_DEFAULT_CONFIGURATION.get():
+              <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+              %endif
+              <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
+              <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
+              <!-- /ko -->
+            </div>
+            <div style="width:100%;">
+              <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+            </div>
+            <div style="clear:both; padding-left: 120px;">
+              <!-- ko if: availableNewProperties().length -->
+              <select data-bind="options: availableNewProperties,
+                       optionsText: 'nice_name',
+                       optionsValue: 'name',
+                       value: selectedSessionProperty,
+                       optionsCaption: '${ _ko('Choose a property...') }'"></select>
+              <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+                  properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
+                  selectedSessionProperty('');
+                }" style="margin-left:10px;vertical-align: text-top;">
+                <i class="fa fa-plus"></i>
+              </a>
+              <!-- /ko -->
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <br/>
+          </fieldset>
+        </form>
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>
+
 </script>
 
 <script type="text/html" id="snippetIcon">
@@ -1819,62 +1870,6 @@ ${ hueIcons.symbols() }
     <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }">${_('No')}</a>
     <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); redrawFixedHeaders(100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }" />
   </div>
-</div>
-
-
-<div id="sessionsDemiModal" class="demi-modal fade" data-backdrop="false">
-  <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
-  <div class="modal-body">
-    <div class="row-fluid">
-      <div class="span12">
-        <!-- ko with: $root.selectedNotebook() -->
-        <form class="form-horizontal">
-          <fieldset>
-            <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
-            <!-- ko ifnot: sessions().length -->
-            <p>${ _('There are currently no active sessions.') }</p>
-            <!-- /ko -->
-            <!-- ko foreach: sessions -->
-            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
-            <div class="session-actions">
-              <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
-              <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
-              %if conf.USE_DEFAULT_CONFIGURATION.get():
-              <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
-              %endif
-              <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
-              <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
-              <!-- /ko -->
-            </div>
-            <div style="width:100%;">
-              <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
-            </div>
-            <div style="clear:both; padding-left: 120px;">
-              <!-- ko if: availableNewProperties().length -->
-              <select data-bind="options: availableNewProperties,
-                       optionsText: 'nice_name',
-                       optionsValue: 'name',
-                       value: selectedSessionProperty,
-                       optionsCaption: '${ _ko('Choose a property...') }'"></select>
-              <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
-                  properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
-                  selectedSessionProperty('');
-                }" style="margin-left:10px;vertical-align: text-top;">
-                <i class="fa fa-plus"></i>
-              </a>
-              <!-- /ko -->
-            </div>
-            <!-- /ko -->
-            <!-- /ko -->
-            <br/>
-          </fieldset>
-        </form>
-        <!-- /ko -->
-      </div>
-    </div>
-
-  </div>
-  <div style="position:absolute; width:100%; bottom: 0;"><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
 

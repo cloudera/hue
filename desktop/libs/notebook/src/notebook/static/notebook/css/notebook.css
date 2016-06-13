@@ -64,6 +64,27 @@ body {
   outline: none !important;
 }
 
+.context-panel {
+  position: fixed;
+  background: #fff;
+  height: calc(100% - 70px);
+  top: 70px;
+  transition: all;
+  -webkit-transition-duration: .3s;
+  transition-duration: .3s;
+  z-index: 10;
+  overflow-y: auto;
+  padding: 10px;
+  width: 380px;
+  right: -440px;
+  box-shadow: 0 0 20px rgba(14, 18, 21, .38);
+  outline: none !important;
+}
+
+.context-panel.visible {
+  right: 0;
+}
+
 .resizer {
   position: absolute;
   height: 100%;
@@ -1069,4 +1090,36 @@ pre {
 
 .meta-noresults {
   font-style: italic;
+}
+
+.config-property {
+  display: inline!important;
+}
+
+.config-property-available {
+  margin-left: 0!important;
+  margin-top: 10px;
+}
+
+.config-property-add-value {
+  margin-top: -8px!important;
+  margin-bottom: 20px;
+}
+
+.config-property-input-small {
+  width: 120px!important;
+}
+
+.config-property-input-mini {
+  width: 90px!important;
+}
+
+.config-label {
+  text-align: left!important;
+  margin-left: 0!important;
+}
+
+.config-property-remove {
+  float: right;
+  margin-top: 2px!important;
 }
