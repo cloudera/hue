@@ -85,6 +85,11 @@ from desktop.views import _ko
   <script type="text/html" id="property-selector-template">
     <!-- ko foreach: selectedProperties -->
     <div>
+      <div class="config-property-remove">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
       <!-- ko template: {
         name: 'property',
         data: {
@@ -96,17 +101,12 @@ from desktop.views import _ko
           visibleObservable: $parent.visibleObservable
         }
       } --><!-- /ko -->
-      <div class="config-property-remove">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
-          <i class="fa fa-times"></i>
-        </a>
-      </div>
     </div>
     <!-- /ko -->
-    <div class="margin-left-10" data-bind="visible: availableProperties().length > 0">
+    <div class="config-property-available margin-left-10" data-bind="visible: availableProperties().length > 0">
       <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: '${_ko('Add a property...')}', value: propertyToAdd"></select>
       <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
-        <a class="inactive-action pointer" data-bind="click: addProperty">
+        <a class="inactive-action pointer" data-bind="click: addProperty, visible: propertyToAdd() != null">
           <i class="fa fa-plus"></i>
         </a>
       </div>
@@ -248,7 +248,7 @@ from desktop.views import _ko
 
           self.selectedProperties = ko.observableArray();
           self.availableProperties = ko.observableArray();
-          self.propertyToAdd = ko.observable();
+          self.propertyToAdd = ko.observable(null);
 
           var setInitialProperties = function () {
             self.selectedProperties([]);
@@ -457,15 +457,15 @@ from desktop.views import _ko
         <!-- /ko -->
         <div class="input-append" style="margin-bottom: 4px">
           <!-- ko if: $parent.options.length === 0 -->
-          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
-          <input type="text" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <input type="text" class="config-property-input-mini" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -537,15 +537,15 @@ from desktop.views import _ko
         <!-- /ko -->
         <div class="input-append" style="margin-bottom: 4px">
           <!-- ko if: $parent.options.length === 0 -->
-          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
-          <input type="text" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <input type="text" class="config-property-input-small" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -611,14 +611,14 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
-          <input type="text" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
-          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -674,12 +674,12 @@ from desktop.views import _ko
       <li>
         <div class="input-append" style="margin-bottom: 4px">
           <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
-          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
@@ -761,12 +761,12 @@ from desktop.views import _ko
           <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
           <!-- /ko -->
           <!-- ko template: { if: $parent.inputTemplate, name: $parent.inputTemplate } --><!-- /ko -->
-          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px;">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>

@@ -1707,6 +1707,8 @@
     self.isLeftPanelVisible = ko.observable();
     ApiHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
+    self.isContextPanelVisible = ko.observable(false);
+
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
     self.editorMode = options.mode == 'editor';
