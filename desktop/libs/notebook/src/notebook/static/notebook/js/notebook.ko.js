@@ -1837,7 +1837,7 @@
     };
 
     self.loadScheduler = function() {
-      logGA('schedule');
+      logGA('schedule/edit');
       $.get("/oozie/editor/coordinator/new/", {
         format: 'json'
       }, function (data) {
@@ -1853,8 +1853,23 @@
         $(document).trigger("error", xhr.responseText);
       });
     };
-  }
 
+    self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
+    self.viewScheduler = function() {
+      logGA('schedule/view');
+      $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
+        format: 'json'
+      }, function (data) {
+        $("#schedulerViewer").text(ko.mapping.toJSON(data));
+
+        //var viewModel = new RunningCoordinatorModel(data.actions);
+        //ko.cleanNode($("#schedulerViewer")[0]);
+        //ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+  }
 
   function logGA(page) {
     if (typeof trackOnGA == 'function') {
