@@ -136,10 +136,12 @@
     });
   }
 
-  AssistDbEntry.prototype.toggleSearch = function() {
+  AssistDbEntry.prototype.toggleSearch = function () {
     var self = this;
-    self.isSearchVisible(!self.isSearchVisible());
-    self.editingSearch(self.isSearchVisible());
+    if (!self.isSearchVisible()) {
+      self.isSearchVisible(true);
+      self.editingSearch(self.isSearchVisible());
+    }
   };
 
   AssistDbEntry.prototype.triggerRefresh = function () {

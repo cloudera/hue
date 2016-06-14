@@ -1694,6 +1694,20 @@
     }
   }
 
+  ko.bindingHandlers.blurHide = {
+    init: function (element, valueAccessor) {
+      var $el = $(element);
+      var prop = valueAccessor();
+      $el.on('blur', function () {
+        if ($.trim($el.val()) === '') {
+          if (ko.isObservable(prop)) {
+            prop(false);
+          }
+        }
+      });
+    }
+  }
+
   ko.bindingHandlers.spinedit = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var options = $.extend({
