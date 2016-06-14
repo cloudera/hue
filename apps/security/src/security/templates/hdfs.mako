@@ -315,6 +315,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     $("#path").jHueHdfsAutocomplete({
       home: viewModel.assist.path(),
+      skipKeydownEvents: true,
       onPathChange: function (path) {
         viewModel.assist.path(path);
       },
