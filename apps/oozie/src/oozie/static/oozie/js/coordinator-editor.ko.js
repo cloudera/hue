@@ -203,7 +203,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
   }
 
 
-  self.save = function () {
+  self.save = function (cb) {
     if (!self.isSaving()) {
       self.isSaving(true);
       $(".jHueNotify").hide();
@@ -214,6 +214,9 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
           self.coordinator.id(data.id);
           self.coordinator.tracker().markCurrentStateAsClean();
           $(document).trigger("info", data.message);
+          if (cb) {
+            cb(data);
+          }
           if (window.location.search.indexOf("coordinator") == -1) {
             window.location.hash = '#coordinator=' + data.id;
           }

@@ -1046,29 +1046,36 @@ ${ hueIcons.symbols() }
     % if ENABLE_QUERY_SCHEDULING.get():
     <div class="tab-pane" id="scheduleTab">
       <legend><i class="fa fa-calendar"></i> ${ _('Schedule') }</legend>
+      
+      <!-- ko if: $root.selectedNotebook() -->
+      <!-- ko with: $root.selectedNotebook() -->
+        <!-- ko if: $root.selectedNotebook().id() -->
+          <a data-bind="click: loadScheduler">Load</a></br>
+          <a data-bind="click: saveScheduler">Save</a></br></br>
+           Start</br>
+          <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
-      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
-        <a data-bind="click: $root.loadScheduler">Load scheduler</a></br>
-        <a data-bind="click: $root.saveScheduler">Save coord</a></br></br>
+          <div id="schedulerEditor">
+          </div>
+        <!-- /ko -->
 
-        Start</br>
-        <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
-
-        <div id="schedulerEditor">
-        </div>
+        <!-- ko ifnot: $root.selectedNotebook().id() -->
+          ${ _('Document needs to be saved first.') }
+        <!-- /ko -->
       <!-- /ko -->
-
-      <!-- ko ifnot: $root.selectedNotebook() && $root.selectedNotebook().id() -->
-        ${ _('Document needs to be saved first.') }
       <!-- /ko -->
     </div>
 
     ## To move to 'notification' panel
     <div class="tab-pane" id="scheduledJobsTab">
-      <input type="text" data-bind="value: viewSchedulerId, click: viewScheduler"></input>
+      <!-- ko if: $root.selectedNotebook() -->
+      <!-- ko with: $root.selectedNotebook() -->    
+        <input type="text" data-bind="value: viewSchedulerId, click: viewScheduler"></input>
 
-      <div id="schedulerViewer">
-      </div>
+        <div id="schedulerViewer">
+        </div>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
     % endif
 
