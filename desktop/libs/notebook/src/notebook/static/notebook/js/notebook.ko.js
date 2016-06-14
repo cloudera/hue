@@ -1836,6 +1836,8 @@
       self.saveNotebook();
     };
 
+    var schedulerViewModel;
+
     self.loadScheduler = function() {
       logGA('schedule/edit');
       // Create or load existing schedule
@@ -1844,16 +1846,21 @@
         document: self.selectedNotebook().uuid()
       }, function (data) {
         $("#schedulerEditor").html(data.layout);
-        var viewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+        schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
 
         ko.cleanNode($("#schedulerEditor")[0]);
-        ko.applyBindings(viewModel, $("#schedulerEditor")[0]);
+        ko.applyBindings(schedulerViewModel, $("#schedulerEditor")[0]);
 
-        viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-        viewModel.coordinator.tracker().markCurrentStateAsClean();
+        schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+        schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
       });
+    };
+
+    self.saveScheduler = function() {
+      schedulerViewModel.coordinator.name('My daily run');
+      schedulerViewModel.save();  // {"status": 0, "message": "Saved !", "id": 52677}
     };
 
     self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
