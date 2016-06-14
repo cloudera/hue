@@ -495,10 +495,8 @@ def edit_coordinator(request):
     # Has already a workflow managing the query for this user?
     workflows = Document2.objects.filter(type='oozie-workflow2', owner=request.user, is_managed=True, dependencies__uuid__in=[document_uuid])
     if workflows.exists():
-      print workflows
       workflow_doc = workflows.get()
     else:
-      print 'create'
       workflow_doc = WorkflowBuilder().create_workflow(doc_uuid=document_uuid, user=request.user, managed=True)
     workflow_uuid = workflow_doc.uuid
     coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
@@ -603,10 +601,12 @@ def save_coordinator(request):
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
   if coordinator_data['properties']['workflow']:
-    dependencies = Document2.objects.filter(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
-    for doc in dependencies:
-      doc.doc.get().can_read_or_exception(request.user)
-    coordinator_doc.dependencies = dependencies
+    workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
+    workflow_doc.doc.get().can_read_or_exception(request.user)
+    coordinator_doc.dependencies = [workflow_doc]
+    scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=True)
+    if scheduled_doc.exists():
+      print scheduled_doc
 
   coordinator_doc1 = coordinator_doc.doc.get()
   coordinator_doc.update_data(coordinator_data)
@@ -617,6 +617,7 @@ def save_coordinator(request):
 
   response['status'] = 0
   response['id'] = coordinator_doc.id
+  response['uuid'] = coordinator_doc.uuid
   response['message'] = _('Saved !')
 
   return JsonResponse(response)

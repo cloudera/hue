@@ -1116,6 +1116,7 @@
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
+    self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
@@ -1542,6 +1543,58 @@
       $(document).trigger("hideHistoryModal");
     };
 
+    self.schedulerViewModel;
+
+    self.loadScheduler = function() {      
+      var _action;
+      if (self.coordinatorUuid()) {
+    	_action = 'edit';
+      } else {
+    	_action = 'new';
+      }
+      logGA('schedule/' + _action);
+
+      $.get('/oozie/editor/coordinator/' + _action + '/', {
+        format: 'json',
+        document: self.uuid(),
+        uuid: self.coordinatorUuid()
+      }, function (data) {
+        $("#schedulerEditor").html(data.layout);
+        self.schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+
+        ko.cleanNode($("#schedulerEditor")[0]);
+        ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+
+        schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+        schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
+    self.saveScheduler = function() {
+      self.schedulerViewModel.coordinator.name('My daily run');  // TODO Temp fix until js errors are gone
+      self.schedulerViewModel.save(function(data) {
+    	self.coordinatorUuid(data.uuid);
+      });
+    };
+
+    self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
+    self.viewScheduler = function() {
+      logGA('schedule/view');
+      $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
+        format: 'json'
+      }, function (data) {
+        $("#schedulerViewer").text(ko.mapping.toJSON(data));
+
+        //var viewModel = new RunningCoordinatorModel(data.actions);
+        //ko.cleanNode($("#schedulerViewer")[0]);
+        //ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+    
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
         var cell = {
@@ -1834,49 +1887,6 @@
       self.selectedNotebook().uuid(UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.saveNotebook();
-    };
-
-    var schedulerViewModel;
-
-    self.loadScheduler = function() {
-      logGA('schedule/edit');
-      // Create or load existing schedule
-      $.get("/oozie/editor/coordinator/new/", {
-        format: 'json',
-        document: self.selectedNotebook().uuid()
-      }, function (data) {
-        $("#schedulerEditor").html(data.layout);
-        schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
-
-        ko.cleanNode($("#schedulerEditor")[0]);
-        ko.applyBindings(schedulerViewModel, $("#schedulerEditor")[0]);
-
-        schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-        schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
-
-    self.saveScheduler = function() {
-      schedulerViewModel.coordinator.name('My daily run');
-      schedulerViewModel.save();  // {"status": 0, "message": "Saved !", "id": 52677}
-    };
-
-    self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
-    self.viewScheduler = function() {
-      logGA('schedule/view');
-      $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
-        format: 'json'
-      }, function (data) {
-        $("#schedulerViewer").text(ko.mapping.toJSON(data));
-
-        //var viewModel = new RunningCoordinatorModel(data.actions);
-        //ko.cleanNode($("#schedulerViewer")[0]);
-        //ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
     };
   }
 
