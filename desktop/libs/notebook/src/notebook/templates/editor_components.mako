@@ -987,7 +987,7 @@ ${ hueIcons.symbols() }
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
       <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-      <li><a href="#scheduleActionsTab" data-toggle="tab">${_('Executions')}</a></li>
+      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
       % endif
     </ul>
 
@@ -1048,9 +1048,10 @@ ${ hueIcons.symbols() }
       <legend><i class="fa fa-calendar"></i> ${ _('Schedule') }</legend>
 
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
-        <a data-bind="click: $root.loadScheduler">Load scheduler</a>
+        <a data-bind="click: $root.loadScheduler">Load scheduler</a></br>
+        Save coord</br>
 
-        [Start / Monitor - Stop - Sync]
+        [Start / Monitor - Stop - Sync]</br>
 
         <div id="schedulerEditor">
         </div>
@@ -1062,7 +1063,7 @@ ${ hueIcons.symbols() }
     </div>
 
     ## To move to 'notification' panel
-    <div class="tab-pane" id="scheduleActionsTab">
+    <div class="tab-pane" id="scheduledJobsTab">
       <input type="text" data-bind="value: viewSchedulerId, click: viewScheduler"></input>
 
       <div id="schedulerViewer">

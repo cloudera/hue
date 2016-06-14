@@ -1838,8 +1838,10 @@
 
     self.loadScheduler = function() {
       logGA('schedule/edit');
+      // Create or load existing schedule
       $.get("/oozie/editor/coordinator/new/", {
-        format: 'json'
+        format: 'json',
+        document: self.selectedNotebook().uuid()
       }, function (data) {
         $("#schedulerEditor").html(data.layout);
         var viewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
