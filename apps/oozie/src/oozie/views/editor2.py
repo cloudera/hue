@@ -36,8 +36,6 @@ from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 
-from notebook.models import Notebook
-
 from oozie.decorators import check_document_access_permission, check_document_modify_permission,\
   check_editor_access_permission
 from oozie.forms import ParameterForm
@@ -490,7 +488,21 @@ def edit_coordinator(request):
     coordinator = Coordinator()
     coordinator.set_workspace(request.user)
 
-  workflow_uuid = request.GET.get('workflow')
+  # Automatically create the workflow of a scheduled document
+  document_uuid = request.GET.get('document')
+  if document_uuid:
+    # Has already a workflow managing the query for this user?
+    workflows = Document2.objects.filter(type='oozie-workflow2', owner=request.user, is_managed=True, dependencies__uuid__in=[document_uuid])
+    if workflows.exists():
+      print workflows
+      workflow_doc = workflows.get()
+    else:
+      print 'create'
+      workflow_doc = WorkflowBuilder().create_workflow(doc_uuid=document_uuid, user=request.user, managed=True)
+    workflow_uuid = workflow_doc.uuid
+  elif request.GET.get('workflow'):
+    workflow_uuid = request.GET.get('workflow')
+
   if workflow_uuid:
     coordinator.data['properties']['workflow'] = workflow_uuid
 
@@ -870,27 +882,3 @@ def _submit_bundle(request, bundle, properties):
   except RestException, ex:
     LOG.exception('Error submitting bundle')
     raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
-
-
-@check_editor_access_permission
-def schedule_document(request):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-
-  uuid = request.POST.get('uuid')
-
-  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
-  notebook = Notebook(document=document)
-  parameters = find_dollar_braced_variables(notebook.get_str())
-
-  name = _('Schedule of ') + document.name
-
-  workflow_doc = WorkflowBuilder.create_hive_document_workflow(name, parameters, request.user)
-  workflow_doc.dependencies.add(document)
-
-  response = {
-    'status': 0,
-    'url': reverse('oozie:new_coordinator') + '?workflow=' + workflow_doc.uuid
-  }
-
-  return JsonResponse(response)

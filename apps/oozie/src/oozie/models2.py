@@ -39,13 +39,14 @@ from desktop.models import DefaultConfiguration, Document2, Document
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
+from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
+from notebook.models import Notebook
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
-from liboozie.oozie_api import get_oozie
 
 
 LOG = logging.getLogger(__name__)
@@ -2795,9 +2796,24 @@ class History(object):
 
 class WorkflowBuilder():
   """
-  Focus on building nodes, not the UI layout (should be graph automatically).
+  Focus on building nodes, not the UI layout (should be graphed automatically in dashboard).
+  Only support Hive document currently, but then will have Pig, PySpark, MapReduce...
   """
-  def create_hive_document_workflow(self, name, parameters, user):
+
+  def create_workflow(self, doc_uuid, user, name=None, managed=False):
+    document = Document2.objects.get_by_uuid(user=user, uuid=doc_uuid)
+    notebook = Notebook(document=document)
+    parameters = find_dollar_braced_variables(notebook.get_str())
+
+    if name is None:
+      name = _('Schedule of ') + document.name
+  
+    workflow_doc = self.create_hive_document_workflow(name, doc_uuid, parameters, user, managed=managed)
+    workflow_doc.dependencies.add(document)
+
+    return workflow_doc
+
+  def create_hive_document_workflow(self, name, doc_uuid, parameters, user, managed=False):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
@@ -2861,7 +2877,7 @@ class WorkflowBuilder():
           u'properties': {
               u'files': [],
               u'job_xml': u'',
-              u'uuid': uuid,
+              u'uuid': doc_uuid,
               u'parameters': params,
               u'retry_interval': [],
               u'retry_max': [],
@@ -3128,7 +3144,7 @@ class WorkflowBuilder():
       }]}
     )
 
-    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, managed=True)
+    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
     return workflow_doc

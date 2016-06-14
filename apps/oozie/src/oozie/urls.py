@@ -103,8 +103,6 @@ urlpatterns += patterns(
   url(r'^editor/bundle/save/$', 'save_bundle', name='save_bundle'),
   url(r'^editor/bundle/submit/(?P<doc_id>\d+)$', 'submit_bundle', name='editor_submit_bundle'),
   url(r'^editor/bundle/open_v1/$', 'open_old_bundle', name='open_old_bundle'),
-
-  url(r'^editor/document/schedule/$', 'schedule_document', name='schedule_document'),
 )
 
 
