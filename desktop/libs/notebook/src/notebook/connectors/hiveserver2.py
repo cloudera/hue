@@ -74,7 +74,7 @@ def query_error_handler(func):
 
 
 def is_impala_enabled():
-  return impala_settings is not None or type(impala_settings) == BoundConfig
+  return impala_settings is not None and type(impala_settings) == BoundConfig
 
 
 class HiveConfiguration(object):
