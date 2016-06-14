@@ -475,6 +475,7 @@ def list_editor_coordinators(request):
 def edit_coordinator(request):
   coordinator_id = request.GET.get('coordinator', request.GET.get('uuid'))
   doc = None
+  workflow_uuid = None
 
   if coordinator_id:
     cid = {}
@@ -500,6 +501,7 @@ def edit_coordinator(request):
       print 'create'
       workflow_doc = WorkflowBuilder().create_workflow(doc_uuid=document_uuid, user=request.user, managed=True)
     workflow_uuid = workflow_doc.uuid
+    coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
   elif request.GET.get('workflow'):
     workflow_uuid = request.GET.get('workflow')
 
@@ -516,7 +518,7 @@ def edit_coordinator(request):
 
   if USE_NEW_EDITOR.get():
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
-                      for d in Document2.objects.documents(request.user).search_documents(types=['oozie-workflow2'])]
+                      for d in Document2.objects.documents(request.user, include_managed=True).search_documents(types=['oozie-workflow2'])]
   else:
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]

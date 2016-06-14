@@ -1049,9 +1049,10 @@ ${ hueIcons.symbols() }
 
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
         <a data-bind="click: $root.loadScheduler">Load scheduler</a></br>
-        Save coord</br>
+        <a data-bind="click: $root.saveScheduler">Save coord</a></br></br>
 
-        [Start / Monitor - Stop - Sync]</br>
+        Start</br>
+        <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
         <div id="schedulerEditor">
         </div>
