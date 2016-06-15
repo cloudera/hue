@@ -74,8 +74,7 @@ body {
   transition-duration: .3s;
   z-index: 10;
   overflow-y: auto;
-  padding: 10px;
-  padding-top: 20px;
+  padding: 10px 0;
   width: 380px;
   right: -440px;
   box-shadow: 0 0 20px rgba(14, 18, 21, .38);
@@ -84,6 +83,13 @@ body {
 
 .context-panel.visible {
   right: 0;
+}
+
+.context-panel .nav-tabs {
+  padding-left: 10px;
+}
+.context-panel .tab-content {
+  padding: 12px;
 }
 
 .resizer {
