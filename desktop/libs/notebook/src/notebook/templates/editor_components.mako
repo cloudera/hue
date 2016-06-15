@@ -155,13 +155,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 ## Scheduler
 ## ChangeTracker
 <%namespace name="dashboard" file="/common_dashboard.mako" />
-${ dashboard.import_layout() }
-<link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
-<script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
+## ${ dashboard.import_layout() }
+## <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
+## <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+## <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
+## <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ require.config() }
 
@@ -2543,13 +2543,14 @@ ${ hueIcons.symbols() }
     "knockout",
     "ko.charts",
     "notebook/js/notebook.ko",
+    "oozie/js/coordinator-editor.ko",
     "assistPanel",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
     "ko.hue-bindings",
     "ko.switch-case"
-  ], function (ko, charts, EditorViewModel) {
+  ], function (ko, charts, EditorViewModel, CoordinatorEditorViewModel) {
 
     ko.options.deferUpdates = true;
 
