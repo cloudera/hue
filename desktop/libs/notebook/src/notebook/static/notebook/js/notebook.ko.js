@@ -1132,8 +1132,8 @@
     });
     self.directoryUuid = ko.observable(typeof notebook.directoryUuid != "undefined" && notebook.directoryUuid != null ? notebook.directoryUuid : null);
     self.dependents = ko.mapping.fromJS(typeof notebook.dependents != "undefined" && notebook.dependents != null ? notebook.dependents : []);
-    self.dependentsWorkflows = ko.computed(function() {
-      return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-workflow2' ;})
+    self.dependentsCoordinator = ko.computed(function() {
+      return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-coordinator2' ;})
     });
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
     self.historyFilter = ko.observable('');
@@ -1562,7 +1562,7 @@
       $.get('/oozie/editor/coordinator/' + _action + '/', {
         format: 'json',
         document: self.uuid(),
-        uuid: self.coordinatorUuid()
+        coordinator: self.coordinatorUuid()
       }, function (data) {
         $("#schedulerEditor").html(data.layout);
         self.schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
@@ -1577,8 +1577,8 @@
       });
     };
 
-    self.saveScheduler = function() {
-      if (self.schedulerViewModel.coordinator.isDirty()) {
+    self.saveScheduler = function() { console.log(self.coordinatorUuid());
+      if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
         self.schedulerViewModel.coordinator.name('My daily run');  // TODO Temp fix until js errors are gone
         self.schedulerViewModel.save(function(data) {
     	  self.coordinatorUuid(data.uuid);
@@ -1586,6 +1586,16 @@
       }
     };
 
+    self.showSubmitPopup = function () {
+      $.get('/oozie/editor/coordinator/submit/' + 52687, {
+      }, function (data) {
+        $(document).trigger("showSubmitPopup", data);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
+    
     self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
     self.viewScheduler = function() {
       logGA('schedule/view');
@@ -1659,9 +1669,6 @@
           self.updateHistory(['available'], 60000 * 5);
         });
       }
-    }
-    if (self.isSaved()) {
-      self.loadScheduler();
     }
   };
 
@@ -1852,6 +1859,11 @@
           notebook.snippets()[0].currentQueryTab(queryTab);
         }
       }
+
+      if (notebook.isSaved()) {
+        notebook.loadScheduler();
+      }
+
       self.selectedNotebook(notebook);
     };
 
