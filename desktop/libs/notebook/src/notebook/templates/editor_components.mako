@@ -156,10 +156,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 ## ChangeTracker
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 ${ dashboard.import_layout() }
-## Duplicating these two for some reason
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
 <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
