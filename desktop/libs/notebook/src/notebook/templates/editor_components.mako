@@ -1050,8 +1050,6 @@ ${ hueIcons.symbols() }
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
-          <a data-bind="click: loadScheduler">Load</a></br>
-
            Start</br>
           <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
