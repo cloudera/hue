@@ -156,7 +156,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
 
   if (! coordinator_json['properties']['timezone']) {
     coordinator_json['properties']['timezone'] = tzdetect.matches()[0];
-   }
+  }
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(coordinator_json.id == null);
   self.isEditing.subscribe(function (newVal) {
@@ -213,9 +213,10 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
         if (data.status == 0) {
           self.coordinator.id(data.id);
           self.coordinator.tracker().markCurrentStateAsClean();
-          $(document).trigger("info", data.message);
           if (cb) {
             cb(data);
+          } else {
+        	$(document).trigger("info", data.message);
           }
           if (window.location.search.indexOf("coordinator") == -1) {
             window.location.hash = '#coordinator=' + data.id;
