@@ -14,6 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+(function (root, factory) {
+  if(typeof define === "function" && define.amd) {
+    define([
+      'knockout',
+      'knockout-mapping',
+      'ko.charts'
+    ], factory);
+  } else {
+    root.CoordinatorEditorViewModel = factory(ko);
+  }
+}(this, function (ko) {
+
 var Coordinator = function (vm, coordinator) {
 
   var self = this;
@@ -29,10 +41,14 @@ var Coordinator = function (vm, coordinator) {
   self.showAdvancedFrequencyUI = ko.observable(typeof coordinator.showAdvancedFrequencyUI != "undefined" && coordinator.showAdvancedFrequencyUI != null ? coordinator.showAdvancedFrequencyUI : false);
   self.workflowParameters = ko.mapping.fromJS(typeof coordinator.workflowParameters != "undefined" && coordinator.workflowParameters != null ? coordinator.workflowParameters : []);
 
-  self.tracker = new ChangeTracker(self);  // from ko.common-dashboard.js
+  self.tracker = null;
+
+  if (typeof ChangeTracker !== 'undefined'){
+    self.tracker = new ChangeTracker(self);
+  }
 
   self.isDirty = ko.computed(function () {
-    return self.tracker().somethingHasChanged();
+    return self.tracker != null ? self.tracker().somethingHasChanged() : false;
   });
 
   self._get_parameter = function (name) {
@@ -212,7 +228,9 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
       }, function (data) {
         if (data.status == 0) {
           self.coordinator.id(data.id);
-          self.coordinator.tracker().markCurrentStateAsClean();
+          if (self.coordinator.tracker != null){
+            self.coordinator.tracker().markCurrentStateAsClean();
+          }
           if (cb) {
             cb(data);
           } else {
@@ -272,3 +290,6 @@ function logGA(page) {
     trackOnGA('oozie/editor/coordinator/' + page);
   }
 }
+
+  return CoordinatorEditorViewModel;
+}));
