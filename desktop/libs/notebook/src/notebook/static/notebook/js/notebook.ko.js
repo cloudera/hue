@@ -1566,8 +1566,6 @@
         $("#schedulerEditor").html(data.layout);
         self.schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
 
-        window.sched = self.schedulerViewModel;
-
         ko.cleanNode($("#schedulerEditor")[0]);
         ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
