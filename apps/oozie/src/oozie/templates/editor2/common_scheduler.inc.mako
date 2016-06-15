@@ -430,7 +430,7 @@ from django.utils.translation import ugettext as _
 </%def>
 
 
-<%def name="import_js()">
+<%def name="import_js(coordinator_json)">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
@@ -447,10 +447,36 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript">
+  function showChooseWorkflow() {
+  }
+  </script>
+</%def>
+
+<%def name="import_sla_cron(coordinator_json)">
+  <script type="text/javascript">
   ${ utils.slaGlobal() }
   ${ utils.cron_js() }
 
-  function showChooseWorkflow() {
-  }
+  var coordCron =
+  $('#coord-frequency')
+    .jqCron({
+      texts: {
+        i18n: cron_i18n
+      },
+      enabled_minute: false,
+      multiple_dom: true,
+      multiple_month: true,
+      multiple_mins: true,
+      multiple_dow: true,
+      multiple_time_hours: true,
+      multiple_time_minutes: false,
+      default_period: 'day',
+      default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
+      no_reset_button: true,
+      lang: 'i18n',
+      jquery_container: $('#jqCron-container'),
+      jquery_element: $('#jqCron-instance')
+    })
+    .jqCronGetInstance();
   </script>
 </%def>

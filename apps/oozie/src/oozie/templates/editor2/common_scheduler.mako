@@ -22,3 +22,4 @@ from django.utils.translation import ugettext as _
 
 ${ scheduler.import_layout(embedded=True) }
 ${ scheduler.import_js() }
+${ scheduler.import_sla_cron(coordinator_json) }

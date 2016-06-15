@@ -531,7 +531,7 @@ def edit_coordinator(request):
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
       'can_edit': doc is None or doc.doc.get().is_editable(request.user),
-      'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {})
+      'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {'coordinator_json': coordinator.to_json_for_html()})
     })
   else:
     return render('editor2/coordinator_editor.mako', request, {

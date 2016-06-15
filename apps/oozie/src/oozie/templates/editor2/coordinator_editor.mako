@@ -141,33 +141,9 @@ ${ dashboard.import_bindings() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
+${ scheduler.import_sla_cron(coordinator_json) }
 
 <script type="text/javascript">
-  ${ utils.slaGlobal() }
-
-  ${ utils.cron_js() }
-
-  var coordCron =
-    $('#coord-frequency')
-      .jqCron({
-        texts: {
-          i18n: cron_i18n
-        },
-        enabled_minute: false,
-        multiple_dom: true,
-        multiple_month: true,
-        multiple_mins: true,
-        multiple_dow: true,
-        multiple_time_hours: true,
-        multiple_time_minutes: false,
-        default_period: 'day',
-        default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
-        no_reset_button: true,
-        lang: 'i18n',
-        jquery_container: $('#jqCron-container'),
-        jquery_element: $('#jqCron-instance')
-      })
-      .jqCronGetInstance();
 
   $('#jqCron-container').on('cron:change', function(e, cron){
     viewModel.coordinator.properties.cron_frequency(cron);
