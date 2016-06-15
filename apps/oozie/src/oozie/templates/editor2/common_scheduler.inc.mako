@@ -18,12 +18,15 @@ from desktop.views import _ko
 from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_layout()">
+<%namespace name="utils" file="../utils.inc.mako" />
+
+<%def name="import_layout(embedded=False)">
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12 coordinator">
 
+      %if not embedded:
       <div class="card card-home">
         <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
         <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.coordinator.properties.description)">
@@ -53,6 +56,7 @@ from django.utils.translation import ugettext as _
           <!-- /ko -->
         </div>
       </div>
+      %endif
 
       <div class="card card-home" data-bind="visible: coordinator.properties.workflow" style="margin-top: 20px">
         <h1 class="card-heading simple">${ _('How often?') }
@@ -334,6 +338,7 @@ from django.utils.translation import ugettext as _
 
       </div>
 
+      %if not embedded:
       <div class="card card-home" data-bind="visible: coordinator.id() == null && coordinator.properties.workflow()">
         <div class="card-body">
           <a href type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
@@ -342,10 +347,15 @@ from django.utils.translation import ugettext as _
           </a>
         </div>
       </div>
+      %endif
 
     </div>
   </div>
 </div>
+
+</%def>
+
+<%def name="import_modals()">\
 
 <div id="chooseWorkflowDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
@@ -417,5 +427,30 @@ from django.utils.translation import ugettext as _
       </div>
   </div>
 </div>
+</%def>
 
+
+<%def name="import_js()">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+  <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
+  <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
+  <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
+
+  <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript">
+  ${ utils.slaGlobal() }
+  ${ utils.cron_js() }
+
+  function showChooseWorkflow() {
+  }
+  </script>
 </%def>

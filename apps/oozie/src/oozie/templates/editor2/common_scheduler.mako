@@ -20,4 +20,5 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="scheduler" file="common_scheduler.inc.mako" />
 
-${ scheduler.import_layout() }
+${ scheduler.import_layout(embedded=True) }
+${ scheduler.import_js() }

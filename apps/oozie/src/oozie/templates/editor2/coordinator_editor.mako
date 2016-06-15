@@ -88,6 +88,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
 
 
 ${ scheduler.import_layout() }
+${ scheduler.import_modals() }
 
 
 <div class="submit-modal modal hide"></div>
