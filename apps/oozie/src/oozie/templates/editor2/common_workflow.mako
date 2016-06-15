@@ -1806,8 +1806,11 @@
             <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
-        <ul data-bind="foreach: properties.distcp_parameters" class="unstyled">
+        <ul class="unstyled white sortable-arguments" data-bind="sortable: { data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
           <li>
+            <span class="muted move-widget">
+              <i class="fa fa-arrows"></i>
+            </span>
             <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }" validate="nonempty"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this);  }">
