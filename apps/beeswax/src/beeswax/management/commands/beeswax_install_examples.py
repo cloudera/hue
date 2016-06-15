@@ -314,7 +314,9 @@ class SampleQuery(object):
       except Document2.DoesNotExist:
         # Create document from saved query
         notebook = import_saved_beeswax_query(query)
-        data = notebook.get_json()
+        data = notebook.get_data()
+        data['isSaved'] = True
+        data = json.dumps(data)
 
         # Get or create sample user directories
         home_dir = Directory.objects.get_home_directory(django_user)
