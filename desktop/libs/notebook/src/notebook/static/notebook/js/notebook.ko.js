@@ -1142,6 +1142,8 @@
       self.fetchHistory();
     });
 
+    self.schedulerViewModel;
+
     self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
     self.getSession = function (session_type) {
@@ -1547,9 +1549,7 @@
       $(document).trigger("hideHistoryModal");
     };
 
-    self.schedulerViewModel;
-
-    self.loadScheduler = function() {      
+    self.loadScheduler = function() {
       var _action;
       if (self.coordinatorUuid()) {
     	_action = 'edit';
@@ -1602,7 +1602,7 @@
         $(document).trigger("error", xhr.responseText);
       });
     };
-    
+
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
         var cell = {
@@ -1660,6 +1660,9 @@
           self.updateHistory(['available'], 60000 * 5);
         });
       }
+    }
+    if (self.isSaved()) {
+      self.loadScheduler();
     }
   };
 
