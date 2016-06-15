@@ -947,8 +947,10 @@ def _list_query_history(user, querydict, page_size, prefix=""):
 
   # Design id
   design_id = querydict.get(prefix + 'design_id')
-  if design_id:
+  if design_id and design_id.isdigit():
     db_queryset = db_queryset.filter(design__id=int(design_id))
+  else:
+    raise PopupException(_('list_query_history requires design_id parameter to be an integer: %s') % design_id)
 
   # Search
   search_filter = querydict.get(prefix + 'search')

@@ -112,6 +112,7 @@ def massaged_tags_for_json(docs, user):
 
   return ts
 
+
 def massaged_tags(tag, tag_doc_mapping):
   return {
     'id': tag.id,
@@ -142,6 +143,7 @@ def massage_permissions(document):
         }
       }
     }
+
 
 def massaged_documents_for_json(documents, user):
   """
@@ -189,10 +191,17 @@ def massaged_documents_for_json(documents, user):
 
 @require_GET
 def get_document(request):
-  doc_id = request.GET['id']
-  doc = Document.objects.get(id=doc_id)
-  response = massage_doc_for_json(doc, request.user)
+  response = {'status': -1, 'message': ''}
+  doc_id = request.GET.get('id', '')
+
+  if doc_id.isdigit():
+    doc = Document.objects.get(id=doc_id)
+    response = massage_doc_for_json(doc, request.user)
+  else:
+    response['message'] = _('get_document requires an id integer parameter: %s') % doc_id
+
   return JsonResponse(response)
+
 
 def massage_doc_for_json(document, user, url=''):
   read_perms = document.list_permissions(perm='read')
