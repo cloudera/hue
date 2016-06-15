@@ -294,15 +294,20 @@ if USE_NEW_EDITOR.get():
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
       function checkJobBrowserStatus(){
-        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function(data){
-          if (data != null && data.jobs != null){
-            if (data.jobs.length > 0){
-              $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
+        $.post("/jobbrowser/jobs/", {
+            "format": "json",
+            "state": "running",
+            "user": "${user.username}"
+          },
+          function(data) {
+            if (data != null && data.jobs != null) {
+              if (data.jobs.length > 0){
+                $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
+              }
+              else {
+                $("#jobBrowserCount").addClass("hide");
+              }
             }
-            else {
-              $("#jobBrowserCount").addClass("hide");
-            }
-          }
           checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
         }).fail(function () {
           window.clearTimeout(checkJobBrowserStatusIdx);
