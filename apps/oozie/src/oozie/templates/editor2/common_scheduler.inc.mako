@@ -430,7 +430,7 @@ from django.utils.translation import ugettext as _
 </%def>
 
 
-<%def name="import_js(coordinator_json)">
+<%def name="import_js()">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
