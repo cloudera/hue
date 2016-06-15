@@ -164,6 +164,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 ## <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 ## <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+## submit popup
+<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ require.config() }
 
@@ -1046,7 +1048,8 @@ ${ hueIcons.symbols() }
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
-           Start</br>
+           Refresh</br>
+          <a data-bind="click: showSubmitPopup">Start</a></br>
           <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
           <div id="schedulerEditor">
@@ -2001,6 +2004,9 @@ ${ hueIcons.symbols() }
     <a class="btn btn-danger disable-feedback" data-bind="click: function() { $root.selectedNotebook().clearHistory(); }">${_('Yes')}</a>
   </div>
 </div>
+
+
+<div class="submit-modal modal hide"></div>
 
 </%def>
 

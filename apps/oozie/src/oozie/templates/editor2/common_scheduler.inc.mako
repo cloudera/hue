@@ -477,10 +477,11 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript">
-  function showChooseWorkflow() {
-  }
+    function showChooseWorkflow() {
+    }
   </script>
 </%def>
+
 
 <%def name="import_sla_cron(coordinator_json)">
   <script type="text/javascript">
