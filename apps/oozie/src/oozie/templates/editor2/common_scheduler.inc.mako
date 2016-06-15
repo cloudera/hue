@@ -66,7 +66,11 @@ from django.utils.translation import ugettext as _
 
           <div class="row-fluid">
             <div class="span6">
-              <form class="form-horizontal">
+              <form class="
+              %if not embedded:
+              form-horizontal
+              %endif
+              ">
                 <div class="control-group" data-bind="visible: ! coordinator.properties.cron_advanced()">
                   <div class="controls" id="jqCron-container">
                     <div id="jqCron-instance" style="margin-top: 5px; display: inline-block"></div>
@@ -97,7 +101,11 @@ from django.utils.translation import ugettext as _
           </div>
 
           <div data-bind="visible: coordinator.showAdvancedFrequencyUI">
-            <form class="form-horizontal">
+            <form class="
+            %if not embedded:
+            form-horizontal
+            %endif
+            ">
 
               <div class="control-group">
                 <div class="controls">
@@ -239,7 +247,11 @@ from django.utils.translation import ugettext as _
                 </span>
 
                 <div data-bind="visible: show_advanced" style="padding: 20px">
-                  <form class="form-horizontal">
+                  <form class="
+                  %if not embedded:
+                  form-horizontal
+                  %endif
+                  ">
                     <div class="control-group">
                       <label class="control-label">${ _('Done flag') }</label>
                       <div class="controls">

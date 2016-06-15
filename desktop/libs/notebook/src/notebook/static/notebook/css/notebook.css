@@ -75,6 +75,7 @@ body {
   z-index: 10;
   overflow-y: auto;
   padding: 10px;
+  padding-top: 20px;
   width: 380px;
   right: -440px;
   box-shadow: 0 0 20px rgba(14, 18, 21, .38);
@@ -1122,4 +1123,8 @@ pre {
 .config-property-remove {
   float: right;
   margin-top: 2px!important;
+}
+
+#schedulerEditor .container-fluid, #schedulerEditor .card-heading, #schedulerEditor .card-body {
+  padding: 0;
 }
