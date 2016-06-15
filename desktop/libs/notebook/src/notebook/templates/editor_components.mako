@@ -980,10 +980,10 @@ ${ hueIcons.symbols() }
 
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
+      <li class="active"><a href="#sessionsTab" data-toggle="tab"><i class="fa fa-cloud"></i> ${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
-      <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
+      <li><a href="#scheduleTab" data-toggle="tab"><i class="fa fa-calendar"></i> ${_('Schedule')}</a></li>
+      <li><a href="#scheduledJobsTab" data-toggle="tab"><i class="fa fa-wrench"></i> ${_('Jobs')}</a></li>
       % endif
     </ul>
 
@@ -994,7 +994,6 @@ ${ hueIcons.symbols() }
             <!-- ko with: $root.selectedNotebook() -->
             <form class="form-horizontal">
               <fieldset>
-                <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
                 <!-- ko ifnot: sessions().length -->
                <p>${ _('There are currently no active sessions.') }</p>
                <!-- /ko -->
@@ -1041,8 +1040,7 @@ ${ hueIcons.symbols() }
     ## mode == 'editor', mode not defined yet
     % if ENABLE_QUERY_SCHEDULING.get():
     <div class="tab-pane" id="scheduleTab">
-      <legend><i class="fa fa-calendar"></i> ${ _('Schedule') }</legend>
-      
+
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
