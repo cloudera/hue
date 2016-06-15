@@ -208,7 +208,7 @@ def config_validator(user):
     try:
       if not 'test' in sys.argv: # Avoid tests hanging
         server = dbms.get(user)
-        server.get_databases()
+        server.execute_statement("SELECT 'Hello World!';")
     except StructuredThriftTransportException, e:
       if 'Error validating the login' in str(e):
         msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'

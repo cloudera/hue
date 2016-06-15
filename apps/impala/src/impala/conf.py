@@ -183,7 +183,7 @@ def config_validator(user):
       if not 'test' in sys.argv: # Avoid tests hanging
         query_server = get_query_server_config(name='impala')
         server = dbms.get(user, query_server)
-        server.get_databases()
+        server.execute_statement("SELECT 'Hello World!';")
     except StructuredThriftTransportException, ex:
       if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
         msg = "Failed to authenticate to Impalad, check authentication configurations."
