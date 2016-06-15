@@ -1049,9 +1049,9 @@ ${ hueIcons.symbols() }
       
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
-        <!-- ko if: $root.selectedNotebook().id() -->
+        <!-- ko if: $root.selectedNotebook().isSaved() -->
           <a data-bind="click: loadScheduler">Load</a></br>
-          <a data-bind="click: saveScheduler">Save</a></br></br>
+
            Start</br>
           <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
@@ -1059,7 +1059,7 @@ ${ hueIcons.symbols() }
           </div>
         <!-- /ko -->
 
-        <!-- ko ifnot: $root.selectedNotebook().id() -->
+        <!-- ko ifnot: $root.selectedNotebook().isSaved() -->
           ${ _('Document needs to be saved first.') }
         <!-- /ko -->
       <!-- /ko -->

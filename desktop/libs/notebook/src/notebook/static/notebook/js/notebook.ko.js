@@ -1350,6 +1350,10 @@
         snippet.jobs.length = 0;
       });
 
+      if (self.schedulerViewModel) {
+    	self.saveScheduler();
+      }
+
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode
@@ -1573,10 +1577,12 @@
     };
 
     self.saveScheduler = function() {
-      self.schedulerViewModel.coordinator.name('My daily run');  // TODO Temp fix until js errors are gone
-      self.schedulerViewModel.save(function(data) {
-    	self.coordinatorUuid(data.uuid);
-      });
+      if (self.schedulerViewModel.coordinator.isDirty()) {
+        self.schedulerViewModel.coordinator.name('My daily run');  // TODO Temp fix until js errors are gone
+        self.schedulerViewModel.save(function(data) {
+    	  self.coordinatorUuid(data.uuid);
+        });
+      }
     };
 
     self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
