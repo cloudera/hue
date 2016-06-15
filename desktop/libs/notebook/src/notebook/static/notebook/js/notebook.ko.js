@@ -1566,11 +1566,13 @@
         $("#schedulerEditor").html(data.layout);
         self.schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
 
+        window.sched = self.schedulerViewModel;
+
         ko.cleanNode($("#schedulerEditor")[0]);
         ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
-        schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-        schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+        self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+        self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
       });
