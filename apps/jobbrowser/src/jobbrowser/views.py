@@ -107,12 +107,12 @@ def job_not_assigned(request, jobid, path):
 
 
 def jobs(request):
-  user = request.GET.get('user', request.user.username)
-  state = request.GET.get('state')
-  text = request.GET.get('text')
-  retired = request.GET.get('retired')
+  user = request.POST.get('user', request.user.username)
+  state = request.POST.get('state')
+  text = request.POST.get('text')
+  retired = request.POST.get('retired')
 
-  if request.GET.get('format') == 'json':
+  if request.POST.get('format') == 'json':
     try:
       # Limit number of jobs to be 10,000
       jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=10000)

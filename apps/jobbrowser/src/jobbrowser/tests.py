@@ -224,12 +224,12 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # Select only killed jobs (should be absent)
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=killed')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'killed'})
     assert_false(hadoop_job_id_short in response.content)
 
     # Select only failed jobs (should be present)
     # Map job should succeed. Reduce job should fail.
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=failed')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'failed'})
     assert_true(hadoop_job_id_short in response.content)
 
     raise SkipTest # Not compatible with MR2
@@ -259,17 +259,17 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
   def test_jobs_page(self):
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json'})
     assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content, response.content)
 
     # Make sure job succeeded
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=completed')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'completed'})
     assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=failed')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'failed'})
     assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=running')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'running'})
     assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
-    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=killed')
+    response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'killed'})
     assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
 
   def test_tasks_page(self):
@@ -287,14 +287,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Login as ourself
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&user=')
+      response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
       assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&user=')
+      response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
       assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
@@ -305,14 +305,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
+      response = client_not_me.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
       assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
+      response = client_not_me.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
       assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
@@ -424,16 +424,16 @@ class TestMapReduce2NoHadoop:
       f()
 
   def test_jobs(self):
-    response = self.c.get('/jobbrowser/?format=json')
+    response = self.c.post('/jobbrowser/', {'format': 'json'})
     response_content = json.loads(response.content)
     assert_equal(len(response_content['jobs']), 4)
 
-    response = self.c.get('/jobbrowser/jobs/?format=json&text=W=MapReduce-copy2')
+    response = self.c.post('/jobbrowser/jobs/', {'format': 'json', 'text': 'W=MapReduce-copy2'})
     response_content = json.loads(response.content)
     assert_equal(len(response_content['jobs']), 1)
 
   def test_applications_no_start_time(self):
-    response = self.c.get('/jobbrowser/?format=json')
+    response = self.c.post('/jobbrowser/', {'format': 'json'})
     data = json.loads(response.content)
     job = [j for j in data['jobs'] if j['id'] == 'application_1428442704693_0007']
     assert_true(job, job)

@@ -287,37 +287,37 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     }
 
     function callJsonData(callback, justRunning) {
-      var _url = "?format=json";
+      var _url_params = {"format": "json"};
 
       if (justRunning == undefined) {
         if ($(".btn-status.active").length > 0) {
-          _url += "&state=" + $(".btn-status.active").data("value");
+          _url_params["state"] = $('.btn-status.active').data('value');
         }
         else {
-          _url += "&state=all";
+          _url_params["state"] = "all";
         }
       }
       else {
         isUpdating = true;
         if ($(".btn-status.active").length > 0) {
-          _url += "&state=" + $(".btn-status.active").data("value");
+          _url_params["state"] = $('.btn-status.active').data('value');
         }
         else {
-          _url += "&state=running";
+          _url_params["state"] = "running";
         }
       }
 
-      _url += "&user=" + $("#userFilter").val().trim();
+      _url_params["user"] = $('#userFilter').val().trim();
 
       if ($("#textFilter").val().trim() != "") {
-        _url += "&text=" + $("#textFilter").val().trim();
+        _url_params["text"] = $('#textFilter').val().trim();
       }
 
       if ($("#showRetired").is(":checked")) {
-        _url += "&retired=on";
+        _url_params["retired"] = "on";
       }
 
-      $.getJSON(_url, callback);
+      $.post("/jobbrowser/jobs/", _url_params, callback);
     }
 
     $(".search-query").jHueDelayedInput(function(){
