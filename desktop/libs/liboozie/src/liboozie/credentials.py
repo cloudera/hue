@@ -81,8 +81,6 @@ class Credentials(object):
       'properties': []
     }
 
-    LOG.info('Using credentials: %s' % credentials)
-
     return credentials
 
   @property
