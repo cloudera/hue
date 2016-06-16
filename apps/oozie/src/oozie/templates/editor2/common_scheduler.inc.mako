@@ -552,45 +552,47 @@ from django.utils.translation import ugettext as _
   };
 
   function renderJqCron() {
-    coordCron = $('#coord-frequency').jqCron({
-        texts: {
-          i18n: cron_i18n
-        },
-        enabled_minute: false,
-        multiple_dom: true,
-        multiple_month: true,
-        multiple_mins: true,
-        multiple_dow: true,
-        multiple_time_hours: true,
-        multiple_time_minutes: false,
-        default_period: 'day',
-        default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
-        no_reset_button: true,
-        lang: 'i18n',
-        jquery_container: $('#jqCron-container'),
-        jquery_element: $('#jqCron-instance')
-      }).jqCronGetInstance();
+    if (typeof coordCron.getSettings === 'undefined') {
+      coordCron = $('#coord-frequency').jqCron({
+          texts: {
+            i18n: cron_i18n
+          },
+          enabled_minute: false,
+          multiple_dom: true,
+          multiple_month: true,
+          multiple_mins: true,
+          multiple_dow: true,
+          multiple_time_hours: true,
+          multiple_time_minutes: false,
+          default_period: 'day',
+          default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
+          no_reset_button: true,
+          lang: 'i18n',
+          jquery_container: $('#jqCron-container'),
+          jquery_element: $('#jqCron-instance')
+        }).jqCronGetInstance();
 
-    function waitForVm() {
-      var _vm = $('#coord-frequency').data('__ko_vm');
-      if (typeof _vm.coordinator !== 'undefined' && typeof _vm.coordinator.properties !== 'undefined') {
-        if (_vm.coordinator.properties.cron_advanced() || !_vm.isEditing()) {
-          coordCron.disable();
+      function waitForVm() {
+        var _vm = $('#coord-frequency').data('__ko_vm');
+        if (typeof _vm.coordinator !== 'undefined' && typeof _vm.coordinator.properties !== 'undefined') {
+          if (_vm.coordinator.properties.cron_advanced() || !_vm.isEditing()) {
+            coordCron.disable();
+          }
+          else {
+            coordCron.enable();
+          }
         }
         else {
-          coordCron.enable();
+          window.setTimeout(waitForVm, 100)
         }
       }
-      else {
-        window.setTimeout(waitForVm, 100)
-      }
+
+      waitForVm();
+
+      $('#jqCron-container').on('cron:change', function(e, cron){
+        $('#coord-frequency').data('__ko_vm').coordinator.properties.cron_frequency(cron);
+      });
     }
-
-    waitForVm();
-
-    $('#jqCron-container').on('cron:change', function(e, cron){
-      $('#coord-frequency').data('__ko_vm').coordinator.properties.cron_frequency(cron);
-    });
   }
 
   </script>
