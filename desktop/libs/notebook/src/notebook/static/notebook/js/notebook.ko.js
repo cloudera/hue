@@ -1376,6 +1376,9 @@
                 'last_modified': data.last_modified
               });
             }
+            if (! self.schedulerViewModel) {
+              self.loadScheduler();
+            }
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
           else {
