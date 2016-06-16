@@ -88,35 +88,35 @@ var Coordinator = function (vm, coordinator) {
   }
 
   self.refreshParameters = function() {
-    self.properties.workflow.valueHasMutated();
+    $.get("/oozie/editor/workflow/parameters/", {
+      "uuid": self.properties.workflow(),
+    }, function (data) {
+      self.workflowParameters(data.parameters);
+
+      // Remove Uncommon params
+      prev_variables = self.variables.slice();
+      $.each(prev_variables, function (index, variable) {
+        if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable() }).length == 0) {
+          self.variables.remove(variable);
+        }
+      });
+
+      // Append the new variables
+      prev_variables = self.variables.slice();
+      $.each(data.parameters, function (index, param) {
+        if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable() }).length == 0) {
+          self.addVariable();
+          self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+        }
+      });
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
   }
 
   self.properties.workflow.subscribe(function (newVal) {
     if (newVal) {
-      $.get("/oozie/editor/workflow/parameters/", {
-        "uuid": self.properties.workflow(),
-      }, function (data) {
-        self.workflowParameters(data.parameters);
-
-        // Remove Uncommon params
-        prev_variables = self.variables.slice();
-        $.each(prev_variables, function (index, variable) {
-          if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable() }).length == 0) {
-            self.variables.remove(variable);
-          }
-        });
-
-        // Append the new variables
-        prev_variables = self.variables.slice();
-        $.each(data.parameters, function (index, param) {
-          if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable() }).length == 0) {
-            self.addVariable();
-            self.variables()[self.variables().length - 1].workflow_variable(param['name']);
-          }
-        });
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
+      self.refreshParameters();
     }
   });
 
