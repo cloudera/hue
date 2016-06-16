@@ -176,7 +176,7 @@ var Workflow = function (vm, workflow) {
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
-  self.tracker = new ChangeTracker(self); // from ko.common-dashboard.js
+  self.tracker = new ChangeTracker(self, ko); // from ko.common-dashboard.js
 
   self.isDirty = ko.computed(function () {
     return self.tracker().somethingHasChanged();
