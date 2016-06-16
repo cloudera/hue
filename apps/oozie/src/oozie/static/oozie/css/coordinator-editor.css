@@ -35,3 +35,7 @@
 .coordinator .card-home {
   padding-bottom: 10px;
 }
+
+.dataset-input {
+  width: 380px;
+}

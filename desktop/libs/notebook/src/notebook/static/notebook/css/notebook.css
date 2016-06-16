@@ -1141,3 +1141,25 @@ pre {
   padding: 0;
 }
 
+#schedulerEditor .dataset-input {
+  width: 270px;
+}
+
+#schedulerEditor .form-horizontal .control-label {
+  width: 100px;
+  text-align: left;
+}
+
+#schedulerEditor .form-horizontal .controls {
+  margin-left: 110px;
+}
+
+#schedulerEditor .workflow-parameter {
+  padding: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+#schedulerEditor .workflow-parameter:hover {
+  background-color: #FAFAFA;
+}
