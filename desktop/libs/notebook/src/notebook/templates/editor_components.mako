@@ -982,10 +982,10 @@ ${ hueIcons.symbols() }
 
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#sessionsTab" data-toggle="tab"><i class="fa fa-cloud"></i> ${_('Sessions')}</a></li>
+      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
-      <li><a href="#scheduleTab" data-toggle="tab"><i class="fa fa-calendar"></i> ${_('Schedule')}</a></li>
-      <li><a href="#scheduledJobsTab" data-toggle="tab"><i class="fa fa-wrench"></i> ${_('Jobs')}</a></li>
+      <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
+      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
       % endif
     </ul>
 
