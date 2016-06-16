@@ -1571,7 +1571,7 @@
         ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
         self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-        //self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+        self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
       });

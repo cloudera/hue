@@ -26,7 +26,7 @@ var Bundle = function (vm, bundle) {
   self.coordinators = ko.mapping.fromJS(typeof bundle.coordinators != "undefined" && bundle.coordinators != null ? bundle.coordinators : []);
   self.properties = ko.mapping.fromJS(typeof bundle.properties != "undefined" && bundle.properties != null ? bundle.properties : {});
 
-  self.tracker = new ChangeTracker(self);  // from ko.common-dashboard.js
+  self.tracker = new ChangeTracker(self, ko);  // from ko.common-dashboard.js
 
   self.isDirty = ko.computed(function () {
     return self.tracker().somethingHasChanged();

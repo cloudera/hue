@@ -285,15 +285,15 @@ function setLayout(colSizes, vm) {
   $(document).trigger("setLayout");
 }
 
-function ChangeTracker(objectToTrack, hashFunction) {
-  hashFunction = hashFunction || ko.toJSON;
+function ChangeTracker(objectToTrack, ko) {
+  var hashFunction = ko.toJSON;
   var lastCleanState = ko.observable(hashFunction(objectToTrack));
 
   var result = {
-    somethingHasChanged: ko.dependentObservable(function () {
+    somethingHasChanged: ko.computed(function () {
       $(document).trigger("viewmodelHasChanged");
       return hashFunction(objectToTrack) != lastCleanState()
-    }),
+    }).extend({ rateLimit: 500 }),
     markCurrentStateAsClean: function () {
       lastCleanState(hashFunction(objectToTrack));
     }
