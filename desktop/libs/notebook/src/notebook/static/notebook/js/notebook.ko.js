@@ -1858,10 +1858,11 @@
         } else if (queryTab) {
           notebook.snippets()[0].currentQueryTab(queryTab);
         }
-      }
 
-      if (notebook.isSaved()) {
-        notebook.loadScheduler();
+        if (notebook.isSaved()) {
+          notebook.loadScheduler();
+          notebook.snippets()[0].currentQueryTab('savedQueries');
+        }
       }
 
       self.selectedNotebook(notebook);
