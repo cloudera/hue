@@ -4054,5 +4054,10 @@
   };
 
 
+  ko.bindingHandlers.attachViewModelToElementData = {
+    init: function (el, valueAccessor, allBindingsAccessor, viewModel) {
+      $(el).data('__ko_vm', viewModel);
+    }
+  }
 
 }));

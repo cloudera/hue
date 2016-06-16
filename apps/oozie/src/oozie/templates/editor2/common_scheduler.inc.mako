@@ -65,7 +65,7 @@ from django.utils.translation import ugettext as _
         <div class="card-body">
 
           <div class="row-fluid">
-            <div class="span6">
+            <div class="span12">
               <form class="
               %if not embedded:
               form-horizontal
@@ -79,7 +79,7 @@ from django.utils.translation import ugettext as _
                 <div class="control-group" data-bind="visible: coordinator.properties.cron_advanced">
                   <label class="control-label">${ _('Crontab') }</label>
                   <div class="controls">
-                    <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency, enable: $root.isEditing" name="cron_frequency"/>
+                    <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency, enable: $root.isEditing, attachViewModelToElementData" name="cron_frequency"/>
                     <span class="help-inline">
                       <a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
                       <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
@@ -241,7 +241,7 @@ from django.utils.translation import ugettext as _
                   </span>
                   <span data-bind="visible: dataset_variable().length > 0 && instance_choice() != 'range'">
                     ${ _('Will convert to') }
-                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice()), attr: {'href': '/filebrowser/view=' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice())}"></a>
+                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root), attr: {'href': '/filebrowser/view=' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root)}"></a>
                   </span>
                   </a>
                 </span>
@@ -466,29 +466,114 @@ from django.utils.translation import ugettext as _
 
 <%def name="import_sla_cron(coordinator_json)">
   <script type="text/javascript">
+  var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
+
+  function zeroPadding(value) {
+    return (value < 10 ? '0':'') + value;
+  }
+
+  function convertDatasetVariables(path, hasSameStart, customStart, hasSameFrequency, customFrequencyUnit, startInstance, instanceChoice, vm) {
+    var _startDate = moment(vm.coordinator.start_date.value()).utc();
+    if (!hasSameStart) {
+      _startDate = moment(customStart).utc();
+    }
+
+    var _startDiffObj = {
+      qty: 0,
+      freq: "minutes"
+    };
+    if (startInstance != 0 && instanceChoice == "single") {
+      _startDiffObj.qty = startInstance;
+      if (hasSameFrequency) {
+        var _freqs = $.trim(viewModel.coordinator.properties.cron_frequency()).split(" ");
+        if (_freqs.length >= 5) {
+          if (_freqs[_freqs.length - 1] == "*") {
+            _startDiffObj.freq = "years";
+          }
+          if (_freqs[_freqs.length - 2] == "*") {
+            _startDiffObj.freq = "months";
+          }
+          if (_freqs[_freqs.length - 3] == "*") {
+            _startDiffObj.freq = "days";
+          }
+          if (_freqs[_freqs.length - 4] == "*") {
+            _startDiffObj.freq = "hours";
+          }
+          if (_freqs[_freqs.length - 5] == "*") {
+            _startDiffObj.freq = "minutes";
+          }
+        }
+        else {
+          _startDiffObj.qty = 0;
+        }
+      }
+      else {
+        _startDiffObj.freq = customFrequencyUnit;
+      }
+    }
+
+    if (_startDate.isValid()) {
+      _startDate = _startDate.add(_startDiffObj.qty, _startDiffObj.freq);
+      path = path.replace(/\${'$'}{YEAR}/gi, _startDate.year());
+      path = path.replace(/\${'$'}{MONTH}/gi, zeroPadding((_startDate.month() + 1)));
+      path = path.replace(/\${'$'}{DAY}/gi, zeroPadding(_startDate.date()));
+      path = path.replace(/\${'$'}{HOUR}/gi, zeroPadding(_startDate.hours()));
+      path = path.replace(/\${'$'}{MINUTE}/gi, zeroPadding(_startDate.minutes()));
+    }
+    return path;
+  }
+
   ${ utils.slaGlobal() }
   ${ utils.cron_js() }
 
-  var coordCron =
-  $('#coord-frequency')
-    .jqCron({
-      texts: {
-        i18n: cron_i18n
-      },
-      enabled_minute: false,
-      multiple_dom: true,
-      multiple_month: true,
-      multiple_mins: true,
-      multiple_dow: true,
-      multiple_time_hours: true,
-      multiple_time_minutes: false,
-      default_period: 'day',
-      default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
-      no_reset_button: true,
-      lang: 'i18n',
-      jquery_container: $('#jqCron-container'),
-      jquery_element: $('#jqCron-instance')
-    })
-    .jqCronGetInstance();
+  var coordCron = {
+    enable: function () {
+    },
+    disable: function () {
+    }
+  };
+
+  function renderJqCron() {
+    coordCron = $('#coord-frequency').jqCron({
+        texts: {
+          i18n: cron_i18n
+        },
+        enabled_minute: false,
+        multiple_dom: true,
+        multiple_month: true,
+        multiple_mins: true,
+        multiple_dow: true,
+        multiple_time_hours: true,
+        multiple_time_minutes: false,
+        default_period: 'day',
+        default_value: ${ coordinator_json | n,unicode }.properties.cron_frequency,
+        no_reset_button: true,
+        lang: 'i18n',
+        jquery_container: $('#jqCron-container'),
+        jquery_element: $('#jqCron-instance')
+      }).jqCronGetInstance();
+
+    function waitForVm() {
+      var _vm = $('#coord-frequency').data('__ko_vm');
+      if (typeof _vm.coordinator !== 'undefined' && typeof _vm.coordinator.properties !== 'undefined') {
+        if (_vm.coordinator.properties.cron_advanced() || !_vm.isEditing()) {
+          coordCron.disable();
+        }
+        else {
+          coordCron.enable();
+        }
+      }
+      else {
+        window.setTimeout(waitForVm, 100)
+      }
+    }
+
+    waitForVm();
+
+    $('#jqCron-container').on('cron:change', function(e, cron){
+      $('#coord-frequency').data('__ko_vm').coordinator.properties.cron_frequency(cron);
+    });
+  }
+
   </script>
 </%def>

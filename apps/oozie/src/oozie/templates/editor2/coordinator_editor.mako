@@ -82,10 +82,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
-  var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
-
 </script>
-
 
 ${ scheduler.import_layout() }
 ${ scheduler.import_modals() }
@@ -145,65 +142,6 @@ ${ scheduler.import_sla_cron(coordinator_json) }
 
 <script type="text/javascript">
 
-  $('#jqCron-container').on('cron:change', function(e, cron){
-    viewModel.coordinator.properties.cron_frequency(cron);
-  });
-
-  function zeroPadding(value) {
-    return (value < 10 ? '0':'') + value;
-  }
-
-  function convertDatasetVariables(path, hasSameStart, customStart, hasSameFrequency, customFrequencyUnit, startInstance, instanceChoice) {
-    var _startDate = moment(viewModel.coordinator.start_date.value()).utc();
-    if (!hasSameStart) {
-      _startDate = moment(customStart).utc();
-    }
-
-    var _startDiffObj = {
-      qty: 0,
-      freq: "minutes"
-    };
-    if (startInstance != 0 && instanceChoice == "single") {
-      _startDiffObj.qty = startInstance;
-      if (hasSameFrequency) {
-        var _freqs = $.trim(viewModel.coordinator.properties.cron_frequency()).split(" ");
-        if (_freqs.length >= 5) {
-          if (_freqs[_freqs.length - 1] == "*") {
-            _startDiffObj.freq = "years";
-          }
-          if (_freqs[_freqs.length - 2] == "*") {
-            _startDiffObj.freq = "months";
-          }
-          if (_freqs[_freqs.length - 3] == "*") {
-            _startDiffObj.freq = "days";
-          }
-          if (_freqs[_freqs.length - 4] == "*") {
-            _startDiffObj.freq = "hours";
-          }
-          if (_freqs[_freqs.length - 5] == "*") {
-            _startDiffObj.freq = "minutes";
-          }
-        }
-        else {
-          _startDiffObj.qty = 0;
-        }
-      }
-      else {
-        _startDiffObj.freq = customFrequencyUnit;
-      }
-    }
-
-    if (_startDate.isValid()) {
-      _startDate = _startDate.add(_startDiffObj.qty, _startDiffObj.freq);
-      path = path.replace(/\${'$'}{YEAR}/gi, _startDate.year());
-      path = path.replace(/\${'$'}{MONTH}/gi, zeroPadding((_startDate.month() + 1)));
-      path = path.replace(/\${'$'}{DAY}/gi, zeroPadding(_startDate.date()));
-      path = path.replace(/\${'$'}{HOUR}/gi, zeroPadding(_startDate.hours()));
-      path = path.replace(/\${'$'}{MINUTE}/gi, zeroPadding(_startDate.minutes()));
-    }
-    return path;
-  }
-
   var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode }, ${ can_edit_json | n,unicode });
 
   ko.applyBindings(viewModel, $("#editor")[0]);
@@ -233,6 +171,7 @@ ${ scheduler.import_sla_cron(coordinator_json) }
   });
 
   $(document).ready(function() {
+    renderJqCron();
     $("#chooseWorkflowDemiModal").modal({
       show: false
     });
