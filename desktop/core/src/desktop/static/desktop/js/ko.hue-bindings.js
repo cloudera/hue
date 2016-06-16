@@ -2071,7 +2071,11 @@
         if (options.type == "parameter" && options.update != "") {
           var _found = false;
           allBindingsAccessor().options().forEach(function(opt){
-            if (opt[allBindingsAccessor().optionsValue]() == options.update){
+            var _option = opt[allBindingsAccessor().optionsValue];
+            if (ko.isObservable(_option)){
+              _option = _option();
+            }
+            if (_option == options.update){
               _found = true;
             }
           });
