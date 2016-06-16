@@ -453,7 +453,7 @@ from django.utils.translation import ugettext as _
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.coordinator.properties">
-        ## ${ utils.slaForm() } ## TODO re-add
+        ${ utils.slaForm() }
       </div>
   </div>
 </div>
