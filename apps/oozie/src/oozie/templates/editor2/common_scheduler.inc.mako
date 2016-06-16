@@ -176,10 +176,21 @@ from django.utils.translation import ugettext as _
           <span class="muted" data-bind="visible: coordinator.variables().length == 0 && ! isEditing()">${ _('This coordinator has no defined parameters.') }</span>
 
           <ul data-bind="foreach: coordinator.variables, visible: coordinator.variables().length > 0" class="unstyled">
-            <li style="margin-bottom: 10px">
+            <li class="workflow-parameter" style="margin-bottom: 10px">
+
+              %if embedded:
+              <a href="#" class="pull-right inactive-action" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
+                <i class="fa fa-times"></i>
+              </a>
+              %endif
+
               <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _ko("Select a parameter") }', update: workflow_variable, type: 'parameter', readonly: !$root.isEditing()}" style="width: 250px"></select>
 
-              &nbsp;&nbsp;
+              %if embedded:
+                <div style="height: 20px"></div>
+              %else:
+                &nbsp;&nbsp;
+              %endif
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -213,21 +224,27 @@ from django.utils.translation import ugettext as _
                 </ul>
               </div>
 
-              &nbsp;&nbsp;
+              %if embedded:
+                <div style="height: 20px"></div>
+              %else:
+                &nbsp;&nbsp;
+              %endif
 
               <span data-bind="visible: $root.isEditing">
                 <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
                   dataset_type() == 'input_path' ? '${ _ko("Required data path dependency to start the worklow") }' :
                   dataset_type() == 'output_path' ? '${ _ko("Data path created by the workflow") }' :
                   'e.g. 1, 2, 3, /data/logs, ${"$"}{coord:nominalTime()}' },
-                  typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '', multipleValuesExtractors: [' ', '/'] }" style="margin-bottom:0; width: 380px" />
+                  typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '', multipleValuesExtractors: [' ', '/'] }" style="margin-bottom:0;" />
               </span>
 
               <span data-bind="text: dataset_variable, visible: ! $root.isEditing()"></span>
 
+              %if not embedded:
               <a href="#" data-bind="click: function(){ $root.coordinator.variables.remove(this); }, visible: $root.isEditing">
                 <i class="fa fa-minus"></i>
               </a>
+              %endif
 
               <!-- ko if: dataset_type() == 'input_path' || dataset_type() == 'output_path' -->
 
@@ -235,7 +252,12 @@ from django.utils.translation import ugettext as _
                   <i class="fa fa-sliders"></i>
                 </a>
 
+                %if embedded:
+                <div style="height: 4px"></div>
+                <span class="muted">
+                %else:
                 <span style="padding-left:100px">
+                %endif
                   <span data-bind="visible: dataset_variable().length == 0">
                     e.g. /data/${'$'}{YEAR}/${'$'}{MONTH}/${'$'}{DAY}
                   </span>
@@ -247,11 +269,7 @@ from django.utils.translation import ugettext as _
                 </span>
 
                 <div data-bind="visible: show_advanced" style="padding: 20px">
-                  <form class="
-                  %if not embedded:
-                  form-horizontal
-                  %endif
-                  ">
+                  <form class="form-horizontal">
                     <div class="control-group">
                       <label class="control-label">${ _('Done flag') }</label>
                       <div class="controls">
