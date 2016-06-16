@@ -3215,7 +3215,9 @@ ${ hueIcons.symbols() }
       });
 
       $(document).on('shown', 'a[href="#scheduleTab"]', function(){
-        renderJqCron();
+        if (typeof renderJqCron !== 'undefined'){
+          renderJqCron();
+        }
       });
 
       $(document).on("gridShown", function (e, snippet) {
