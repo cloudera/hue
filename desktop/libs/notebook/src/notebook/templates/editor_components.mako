@@ -3208,6 +3208,10 @@ ${ hueIcons.symbols() }
         }
       });
 
+      $(document).on('shown', 'a[href="#scheduleTab"]', function(){
+        renderJqCron();
+      });
+
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet);

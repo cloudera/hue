@@ -88,8 +88,14 @@ body {
 .context-panel .nav-tabs {
   padding-left: 10px;
 }
+
 .context-panel .tab-content {
   padding: 12px;
+  min-height: calc(100% - 90px);
+}
+
+.context-panel .tab-pane {
+  height: 100%;
 }
 
 .resizer {
@@ -1134,3 +1140,4 @@ pre {
 #schedulerEditor .container-fluid, #schedulerEditor .card-heading, #schedulerEditor .card-body {
   padding: 0;
 }
+
