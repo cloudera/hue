@@ -1133,7 +1133,7 @@
     self.directoryUuid = ko.observable(typeof notebook.directoryUuid != "undefined" && notebook.directoryUuid != null ? notebook.directoryUuid : null);
     self.dependents = ko.mapping.fromJS(typeof notebook.dependents != "undefined" && notebook.dependents != null ? notebook.dependents : []);
     self.dependentsCoordinator = ko.computed(function() {
-      return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-coordinator2' ;})
+      return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-coordinator2' && doc.is_managed() == true ;})
     });
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
     self.historyFilter = ko.observable('');
@@ -1611,7 +1611,7 @@
     };
 
     self.showSubmitPopup = function () {
-      $.get('/oozie/editor/coordinator/submit/' + 52687, {
+      $.get('/oozie/editor/coordinator/submit/' + self.dependentsCoordinator()[0].id(), {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
