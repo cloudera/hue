@@ -1118,6 +1118,7 @@ class Document2(models.Model):
       'perms': self._massage_permissions(),
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
+      'is_managed': self.is_managed,
       'isSelected': False,
       'absoluteUrl': self.get_absolute_url(),
     }
