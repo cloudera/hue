@@ -2800,14 +2800,13 @@ class WorkflowBuilder():
   Only support Hive document currently, but then will have Pig, PySpark, MapReduce...
   """
 
-  def create_workflow(self, doc_uuid, user, name=None, managed=False):
-    document = Document2.objects.get_by_uuid(user=user, uuid=doc_uuid)
+  def create_workflow(self, document, user, name=None, managed=False):
     parameters = self.get_document_parameters(document)
 
     if name is None:
       name = _('Schedule of ') + document.name
 
-    workflow_doc = self.create_hive_document_workflow(name, doc_uuid, parameters, user, managed=managed)
+    workflow_doc = self.create_hive_document_workflow(name, document.uuid, parameters, user, managed=managed)
     workflow_doc.dependencies.add(document)
 
     return workflow_doc
