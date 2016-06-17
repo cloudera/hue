@@ -21,6 +21,7 @@ import sys
 import logging
 
 import aws
+from aws.conf import AWS_ACCOUNTS
 
 from desktop.lib.fs import ProxyFS
 from hadoop import cluster
@@ -31,7 +32,7 @@ DEFAULT_SCHEMA = 'hdfs'
 
 FS_GETTERS = {
   "hdfs": cluster.get_hdfs,
-  "s3": aws.get_s3fs
+  "s3": aws.get_s3fs if 'default' in AWS_ACCOUNTS.keys() else None,
 }
 
 
@@ -49,8 +50,11 @@ def _make_fs(name):
   fs_dict = {}
   for schema, getter in FS_GETTERS.iteritems():
     try:
-      fs = getter(name)
-      fs_dict[schema] = fs
+      if getter is not None:
+        fs = getter(name)
+        fs_dict[schema] = fs
+      else:
+        raise Exception('Filesystem not configured for %s' % schema)
     except KeyError:
       if DEFAULT_SCHEMA == schema:
         logging.error('Can not get filesystem called "%s" for default schema "%s"' % (name, schema))
@@ -58,6 +62,8 @@ def _make_fs(name):
         raise exc_class, exc, tb
       else:
         logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
+    except Exception, e:
+      logging.warn(e)
   return ProxyFS(fs_dict, DEFAULT_SCHEMA)
 
 
