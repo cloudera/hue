@@ -526,6 +526,7 @@ def edit_coordinator(request):
     coordinator.set_workspace(request.user)
 
   # Automatically create the workflow of a scheduled document
+  # To move to save coordinator
   document_uuid = request.GET.get('document')
   if document_uuid:
     # Has already a workflow managing the query for this user?
@@ -533,7 +534,8 @@ def edit_coordinator(request):
     if workflows.exists():
       workflow_doc = workflows.get()
     else:
-      workflow_doc = WorkflowBuilder().create_workflow(doc_uuid=document_uuid, user=request.user, managed=True)
+      document = Document2.objects.get_by_uuid(user=request.user, uuid=document_uuid)
+      workflow_doc = WorkflowBuilder().create_workflow(document=document, user=request.user, managed=True)
       if doc:
         doc.dependencies.add(workflow_doc)
     workflow_uuid = workflow_doc.uuid
@@ -644,7 +646,7 @@ def save_coordinator(request):
     coordinator_doc.dependencies = [workflow_doc]
     scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=True)
     if scheduled_doc.exists():
-      print scheduled_doc
+      coordinator_doc.dependencies.add(scheduled_doc)
 
   coordinator_doc1 = coordinator_doc.doc.get()
   coordinator_doc.update_data(coordinator_data)
