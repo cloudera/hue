@@ -637,16 +637,16 @@ def save_coordinator(request):
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:
-    coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user)
+    coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user, is_managed=coordinator_data.get('isManaged'))
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
   if coordinator_data['properties']['workflow']:
     workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
     workflow_doc.doc.get().can_read_or_exception(request.user)
     coordinator_doc.dependencies = [workflow_doc]
-    scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=True)
-    if scheduled_doc.exists():
-      coordinator_doc.dependencies.add(scheduled_doc)
+    scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=False)
+    for action in scheduled_doc.all():
+      coordinator_doc.dependencies.add(action)
 
   coordinator_doc1 = coordinator_doc.doc.get()
   coordinator_doc.update_data(coordinator_data)

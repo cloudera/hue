@@ -1603,7 +1603,8 @@
 
     self.saveScheduler = function() {
       if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
-        self.schedulerViewModel.save(function(data) {
+        self.schedulerViewModel.coordinator.isManaged(true);        
+    	self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
         });
       }
