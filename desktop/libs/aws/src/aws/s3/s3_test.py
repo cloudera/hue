@@ -45,11 +45,9 @@ def test_join():
 
 
 def test_abspath():
-  raise SkipTest()
-
   a = s3.abspath
-  eq_('s3://a/b/d', a('s3://a/b/c', 'd'))
-  eq_('s3://d', a('s3://a/b/c', 's3://d'))
+  eq_('s3://a/b/c/d', a('s3://a/b/c', 'd'))
+  eq_('s3://a/b/c/d', a('/a/b/c', 'd'))
 
 
 def test_is_root():
