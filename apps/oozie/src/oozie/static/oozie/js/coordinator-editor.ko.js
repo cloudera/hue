@@ -26,6 +26,12 @@
   }
 }(this, function (ko) {
 
+var COORDINATOR_MAPPING = {
+  ignore: [
+    "availableTimezones", "availableSettings", "filteredModalWorkflows"
+  ]
+};
+
 var Coordinator = function (vm, coordinator) {
 
   var self = this;
@@ -222,7 +228,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
       self.isSaving(true);
       $(".jHueNotify").hide();
       $.post("/oozie/editor/coordinator/save/", {
-        "coordinator": ko.mapping.toJSON(self.coordinator)
+        "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
       }, function (data) {
         if (data.status == 0) {
           self.coordinator.id(data.id);
@@ -252,7 +258,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
     logGA('gen_xml');
 
     $.post("/oozie/editor/coordinator/gen_xml/", {
-      "coordinator": ko.mapping.toJSON(self.coordinator)
+      "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
     }, function (data) {
       if (data.status == 0) {
         console.log(data.xml);
