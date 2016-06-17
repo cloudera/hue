@@ -3214,6 +3214,10 @@ ${ hueIcons.symbols() }
       });
 
       $(document).on('shown', 'a[href="#scheduleTab"]', function(){
+        huePubSub.publish('render.jqcron');
+      });
+
+      huePubSub.subscribe('render.jqcron', function(){
         if (typeof renderJqCron !== 'undefined'){
           renderJqCron();
         }

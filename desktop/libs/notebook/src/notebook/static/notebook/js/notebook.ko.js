@@ -1555,12 +1555,12 @@
       $(document).trigger("hideHistoryModal");
     };
 
-    self.loadScheduler = function() {
+    self.loadScheduler = function () {
       var _action;
       if (self.coordinatorUuid()) {
-    	_action = 'edit';
+        _action = 'edit';
       } else {
-    	_action = 'new';
+        _action = 'new';
       }
       logGA('schedule/' + _action);
 
@@ -1574,6 +1574,8 @@
 
         ko.cleanNode($("#schedulerEditor")[0]);
         ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+
+        huePubSub.publish('render.jqcron');
 
         self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
         self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
