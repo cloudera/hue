@@ -25,6 +25,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
+from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -35,6 +36,7 @@ from desktop.models import Document, Document2
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
+from notebook.connectors.base import Notebook
 
 from oozie.decorators import check_document_access_permission, check_document_modify_permission,\
   check_editor_access_permission
@@ -44,7 +46,6 @@ from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_N
     find_dollar_variables, find_dollar_braced_variables, WorkflowBuilder
 from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
-from desktop.lib import django_mako
 
 
 LOG = logging.getLogger(__name__)
@@ -348,11 +349,46 @@ def workflow_parameters(request):
   response = {'status': -1}
 
   try:
-    workflow = Workflow(document=Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid')),
-                        user=request.user)
+    workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid'))
+    workflow = Workflow(document=workflow_doc, user=request.user)
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
+  except Exception, e:
+    response['message'] = str(e)
+
+  return JsonResponse(response)
+
+
+@check_editor_access_permission
+@check_document_access_permission()
+def refresh_action_parameters(request):
+  response = {'status': -1}
+
+  try:
+    coord_uuid = request.POST.get('uuid')
+    workflow_doc = Document2.objects.get(type='oozie-workflow2', owner=request.user, is_managed=True, dependents__uuid__in=[coord_uuid])
+
+    # Refresh the action parameters of a document action in case the document changed
+    workflow = Workflow(document=workflow_doc, user=request.user)
+
+    _data = workflow.get_data()
+    hive_node = _data['workflow']['nodes'][3]
+    query_document = Document2.objects.get_by_uuid(user=request.user, uuid=hive_node['properties']['uuid'])
+    parameters = WorkflowBuilder().get_document_parameters(query_document)
+
+    changed = set([p['value'] for p in parameters]) != set([p['value'] for p in hive_node['properties']['parameters']])
+
+    if changed:
+      hive_node['properties']['parameters'] = parameters
+      workflow.data = json.dumps(_data)
+
+      workflow_doc.update_data({'workflow': _data['workflow']})
+      workflow_doc.save()
+
+    response['status'] = 0
+    response['parameters'] = parameters
+    response['changed'] = changed
   except Exception, e:
     response['message'] = str(e)
 
@@ -498,6 +534,8 @@ def edit_coordinator(request):
       workflow_doc = workflows.get()
     else:
       workflow_doc = WorkflowBuilder().create_workflow(doc_uuid=document_uuid, user=request.user, managed=True)
+      if doc:
+        doc.dependencies.add(workflow_doc)
     workflow_uuid = workflow_doc.uuid
     coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
   elif request.GET.get('workflow'):
@@ -524,7 +562,7 @@ def edit_coordinator(request):
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
-  if request.GET.get('format') == 'json':
+  if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
       'credentials': credentials.credentials.keys(),

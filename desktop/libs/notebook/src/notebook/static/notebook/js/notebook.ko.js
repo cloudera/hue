@@ -267,10 +267,10 @@
     self.queriesFilterVisible = ko.observable(false);
     self.queriesFilter.extend({ rateLimit: 300 });
     self.queriesFilter.subscribe(function(val){
-      fetchQueries();
+      self.fetchQueries();
     });
 
-    var fetchQueries = function () {
+    self.fetchQueries = function () {
       var QUERIES_PER_PAGE = 50;
       if (self.loadingQueries()) {
         return;
@@ -300,21 +300,21 @@
     self.currentQueryTab.subscribe(function (newValue) {
       huePubSub.publish('redraw.fixed.headers');
       if (newValue === 'savedQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
-        fetchQueries();
+        self.fetchQueries();
       }
     });
 
     self.prevQueriesPage = function () {
       if (self.queriesCurrentPage() !== 1) {
         self.queriesCurrentPage(self.queriesCurrentPage() - 1);
-        fetchQueries();
+        self.fetchQueries();
       }
     };
 
     self.nextQueriesPage = function () {
       if (self.queriesCurrentPage() !== self.queriesTotalPages()) {
         self.queriesCurrentPage(self.queriesCurrentPage() + 1);
-        fetchQueries();
+        self.fetchQueries();
       }
     };
 
@@ -1378,6 +1378,8 @@
             }
             if (! self.schedulerViewModel) {
               self.loadScheduler();
+            } else {
+              self.refreshSchedulerParameters();
             }
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
@@ -1575,14 +1577,26 @@
 
         self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
         self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+        self.schedulerViewModel.isEditing(true);
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
       });
     };
 
-    self.saveScheduler = function() { console.log(self.coordinatorUuid());
+    self.refreshSchedulerParameters = function() {
+      $.post("/oozie/editor/workflow/action/refresh_parameters/", {
+        uuid: self.coordinatorUuid()
+      }, function(data) {
+    	if (data.status == 0 && data.changed) {
+    	  self.schedulerViewModel.coordinator.refreshParameters()
+    	} else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    }
+    
+    self.saveScheduler = function() {
       if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
-        self.schedulerViewModel.coordinator.name('My daily run');  // TODO Temp fix until js errors are gone
         self.schedulerViewModel.save(function(data) {
     	  self.coordinatorUuid(data.uuid);
         });
@@ -1864,6 +1878,7 @@
 
         if (notebook.isSaved()) {
           notebook.loadScheduler();
+          notebook.snippets()[0].fetchQueries();
           notebook.snippets()[0].currentQueryTab('savedQueries');
         }
       }

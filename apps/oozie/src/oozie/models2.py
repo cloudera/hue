@@ -2802,22 +2802,26 @@ class WorkflowBuilder():
 
   def create_workflow(self, doc_uuid, user, name=None, managed=False):
     document = Document2.objects.get_by_uuid(user=user, uuid=doc_uuid)
-    notebook = Notebook(document=document)
-    parameters = find_dollar_braced_variables(notebook.get_str())
+    parameters = self.get_document_parameters(document)
 
     if name is None:
       name = _('Schedule of ') + document.name
-  
+
     workflow_doc = self.create_hive_document_workflow(name, doc_uuid, parameters, user, managed=managed)
     workflow_doc.dependencies.add(document)
 
     return workflow_doc
 
+  def get_document_parameters(self, document):
+    notebook = Notebook(document=document)
+    parameters = find_dollar_braced_variables(notebook.get_str())
+
+    return [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
+
   def create_hive_document_workflow(self, name, doc_uuid, parameters, user, managed=False):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
-    params = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
 
     data = json.dumps({'workflow': {
       u'name': name,
@@ -2878,7 +2882,7 @@ class WorkflowBuilder():
               u'files': [],
               u'job_xml': u'',
               u'uuid': doc_uuid,
-              u'parameters': params,
+              u'parameters': parameters,
               u'retry_interval': [],
               u'retry_max': [],
               u'job_properties': [],
