@@ -1048,7 +1048,6 @@ ${ hueIcons.symbols() }
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
-          <a data-bind="click: function() { schedulerViewModel.coordinator.refreshParameters(); }">Refresh</a></br>
           <a data-bind="click: showSubmitPopup">Start</a></br>
           <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 

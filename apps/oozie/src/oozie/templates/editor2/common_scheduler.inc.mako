@@ -170,7 +170,7 @@ from django.utils.translation import ugettext as _
 
 
       <div class="card card-home" data-bind="visible: coordinator.properties.workflow()" style="margin-top: 20px; margin-bottom: 20px">
-        <h1 class="card-heading simple">${ _('Workflow Parameters') }</h1>
+        <h1 class="card-heading simple">${ _('Parameters') }</h1>
 
         <div class="card-body">
           <span class="muted" data-bind="visible: coordinator.variables().length == 0 && ! isEditing()">${ _('This coordinator has no defined parameters.') }</span>

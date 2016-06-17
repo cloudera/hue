@@ -52,6 +52,10 @@ def check_document_access_permission():
         elif 'doc_id' in kwargs:
           doc_id = kwargs['doc_id']
 
+        if doc_id and not doc_id.isdigit():
+          uuid = doc_id
+          doc_id = None
+
         if doc_id is not None:
           doc2 = Document2.objects.get(id=doc_id)
         elif uuid is not None:
