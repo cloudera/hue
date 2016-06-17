@@ -29,10 +29,8 @@ from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
 from aws import s3
-from aws.s3 import translate_s3_error, s3file
+from aws.s3 import normpath, s3file, translate_s3_error, S3_ROOT
 from aws.s3.s3stat import S3Stat
-
-from hadoop.fs import normpath
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
@@ -116,6 +114,19 @@ class S3FileSystem(object):
   @staticmethod
   def normpath(path):
     return normpath(path)
+
+  @staticmethod
+  def parent_path(path):
+    parent_dir = S3FileSystem._append_separator(path)
+    if not s3.is_root(parent_dir):
+      bucket_name, key_name, basename = s3.parse_uri(path)
+      if not basename:  # bucket is top-level so return root
+        parent_dir = S3_ROOT
+      else:
+        bucket_path = '%s%s' % (S3_ROOT, bucket_name)
+        key_path = '/'.join(key_name.split('/')[:-1])
+        parent_dir = s3.abspath(bucket_path, key_path)
+    return parent_dir
 
   @translate_s3_error
   def open(self, path, mode='r'):

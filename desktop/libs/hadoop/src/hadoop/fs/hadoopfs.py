@@ -199,6 +199,10 @@ class Hdfs(object):
     return res
 
   @staticmethod
+  def parent_path(path):
+    return Hdfs.join(path, "..")
+
+  @staticmethod
   def urlsplit(url):
     """
     Take an HDFS path (hdfs://nn:port/foo) or just (/foo) and split it into

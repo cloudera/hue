@@ -331,7 +331,7 @@ def listdir(request, path, chooser):
 
     # Include parent dir, unless at filesystem root.
     if not request.fs.isroot(path):
-        parent_path = request.fs.join(path, "..")
+        parent_path = request.fs.parent_path(path)
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
         # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
@@ -415,7 +415,7 @@ def listdir_paged(request, path):
 
     # Include parent dir always as second option, unless at filesystem root.
     if not request.fs.isroot(path):
-        parent_path = request.fs.join(path, "..")
+        parent_path = request.fs.parent_path(path)
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
         # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.

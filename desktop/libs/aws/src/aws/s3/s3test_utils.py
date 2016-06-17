@@ -41,8 +41,6 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
 class S3TestBase(unittest.TestCase):
   @classmethod
   def setUpClass(cls):
-    raise SkipTest()
-
     cls.bucket_name = get_test_bucket()
 
     cls._should_skip = False

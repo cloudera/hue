@@ -26,7 +26,7 @@ import time
 from functools import wraps
 
 from boto.exception import S3ResponseError
-from hadoop.fs import normpath
+from hadoop.fs import normpath as fs_normpath
 
 
 ERRNO_MAP = {
@@ -84,8 +84,10 @@ def abspath(cd, uri):
   abspath('s3://bucket/key', key2') == 's3://bucket/key/key2'
   abspath('s3://bucket/key', 's3://bucket2/key2') == 's3://bucket2/key2'
   """
-  if not uri.lower().startswith(S3_ROOT):
-    uri = normpath(join(cd, '..', uri))
+  if cd.lower().startswith(S3_ROOT):
+    uri = join(cd, uri)
+  else:
+    uri = normpath(join(cd, uri))
   return uri
 
 
@@ -99,6 +101,20 @@ def join(*comp_list):
   if joined and joined[0] == '/':
     joined = 's3:/%s' % joined
   return joined
+
+
+def normpath(path):
+  """
+  Return normalized path but ignore leading S3_ROOT prefix if it exists
+  """
+  if path.lower().startswith(S3_ROOT):
+    if is_root(path):
+      normalized = path
+    else:
+      normalized = '%s%s' % (S3_ROOT, fs_normpath(path[len(S3_ROOT):]))
+  else:
+    normalized = fs_normpath(path)
+  return normalized
 
 
 def s3datetime_to_timestamp(datetime):

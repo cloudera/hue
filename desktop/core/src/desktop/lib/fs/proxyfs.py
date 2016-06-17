@@ -119,6 +119,9 @@ class ProxyFS(object):
   def isroot(self, path):
     return self._get_fs(path).isroot(path)
 
+  def parent_path(self, path):
+    return self._get_fs(path).parent_path(path)
+
   def join(self, first, *comp_list):
     return self._get_fs(first).join(first, *comp_list)
 

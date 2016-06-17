@@ -31,7 +31,7 @@ DEFAULT_SCHEMA = 'hdfs'
 
 FS_GETTERS = {
   "hdfs": cluster.get_hdfs,
-#   "s3": aws.get_s3fs
+  "s3": aws.get_s3fs
 }
 
 
