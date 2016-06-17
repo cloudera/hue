@@ -1578,7 +1578,7 @@
         self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
         self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
         self.schedulerViewModel.isEditing(true);
-        
+
         if (_action == 'new') {
           self.saveScheduler();
         }
@@ -1603,7 +1603,7 @@
 
     self.saveScheduler = function() {
       if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
-        self.schedulerViewModel.coordinator.isManaged(true);        
+        self.schedulerViewModel.coordinator.isManaged(true);
     	self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
         });
@@ -1885,8 +1885,10 @@
 
         if (notebook.isSaved()) {
           notebook.loadScheduler();
-          notebook.snippets()[0].fetchQueries();
           notebook.snippets()[0].currentQueryTab('savedQueries');
+          if (notebook.snippets()[0].queries().length === 0) {
+            notebook.snippets()[0].fetchQueries(); // Subscribe not updating yet
+          }
         }
       }
 
