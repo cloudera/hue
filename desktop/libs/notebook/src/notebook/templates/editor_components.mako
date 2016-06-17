@@ -1048,7 +1048,7 @@ ${ hueIcons.symbols() }
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
-          <a data-bind="click: showSubmitPopup">Start</a></br>
+          <a data-bind="click: showSubmitPopup">Submit</a></br>
           <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
 
           <div id="schedulerEditor">
