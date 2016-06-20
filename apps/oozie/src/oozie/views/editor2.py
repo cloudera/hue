@@ -561,8 +561,12 @@ def edit_coordinator(request):
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
-  if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
+  if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows): # In Hue 4, use dependencies instead
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
+
+  if USE_NEW_EDITOR.get(): # In Hue 4, merge with above
+    workflows = [dict([('uuid', d.uuid), ('name', d.name)])
+                      for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
   if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
