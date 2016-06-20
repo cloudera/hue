@@ -367,9 +367,7 @@
             || (column.comment() && column.comment().toLowerCase().indexOf(self.columnQuery()) > -1);
         });
       }
-      return returned.sort(function (a, b) {
-        return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
-      });
+      return returned;
     });
 
     self.favouriteColumns = ko.observableArray();
