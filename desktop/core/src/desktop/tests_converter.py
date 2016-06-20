@@ -57,7 +57,7 @@ class TestDocumentConverter(object):
     ]
     file_resources = [{'type': 'jar', 'path': '/tmp/doc2/test.jar'}]
     functions = [{'name': 'myUpper', 'class_name': 'org.hue.udf.MyUpper'}]
-    design = hql_query(sql, settings=settings, file_resources=file_resources, functions=functions)
+    design = hql_query(sql, database='etl', settings=settings, file_resources=file_resources, functions=functions)
 
     query = SavedQuery.objects.create(
         type=SavedQuery.TYPES_MAPPING['hql'],
@@ -104,6 +104,7 @@ class TestDocumentConverter(object):
       assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
       assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
       assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
+      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
 
       # Verify snippet properties
       assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
@@ -155,7 +156,7 @@ class TestDocumentConverter(object):
         {'key': 'EXPLAIN_LEVEL', 'value': '2'},
         {'key': 'ABORT_ON_ERROR', 'value': '1'}
     ]
-    design = hql_query(sql, settings=settings)
+    design = hql_query(sql, database='etl', settings=settings)
 
     query = SavedQuery.objects.create(
         type=SavedQuery.TYPES_MAPPING['impala'],
@@ -186,9 +187,13 @@ class TestDocumentConverter(object):
       assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
       assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
       assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
+      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
 
       # Verify snippet properties
       assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
+
+      # Verify default properties
+      assert_true(doc2.data_dict['isSaved'])
     finally:
       query.delete()
 
