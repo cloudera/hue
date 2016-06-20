@@ -1364,7 +1364,7 @@
           self.isHistory(false);
           $(document).trigger("info", data.message);
           if (vm.editorMode) {
-            if (! data.save_as) {
+            if (! data.save_as && self.queries().length != 0) {
               self.snippets()[0].queries.unshift({
                 'uuid': data.uuid,
                 'name': data.name,
