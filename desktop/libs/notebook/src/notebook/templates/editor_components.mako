@@ -996,7 +996,7 @@ ${ hueIcons.symbols() }
         <div class="row-fluid">
           <div class="span12">
             <!-- ko with: $root.selectedNotebook() -->
-            <form class="form-horizontal">
+            <form class="form-horizontal session-config">
               <fieldset>
                 <!-- ko ifnot: sessions().length -->
                <p>${ _('There are currently no active sessions.') }</p>
