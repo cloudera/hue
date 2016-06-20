@@ -21,7 +21,7 @@ import sys
 import logging
 
 import aws
-from aws.conf import AWS_ACCOUNTS
+from aws.conf import is_enabled as is_s3_enabled
 
 from desktop.lib.fs import ProxyFS
 from hadoop import cluster
@@ -32,7 +32,7 @@ DEFAULT_SCHEMA = 'hdfs'
 
 FS_GETTERS = {
   "hdfs": cluster.get_hdfs,
-  "s3": aws.get_s3fs if 'default' in AWS_ACCOUNTS.keys() else None,
+  "s3": aws.get_s3fs if is_s3_enabled() else None,
 }
 
 

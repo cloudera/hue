@@ -37,7 +37,6 @@ from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
-from django.template.defaultfilters import urlencode
 from django.utils.functional import curry
 from django.utils.http import http_date
 from django.utils.html import escape
@@ -46,6 +45,7 @@ from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
 
+from aws.conf import is_enabled as is_s3_enabled
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
@@ -436,7 +436,9 @@ def listdir_paged(request, path):
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
         'path': path,
+        's3_path': 's3://',
         'breadcrumbs': breadcrumbs,
+        'is_s3_enabled': is_s3_enabled(),
         'current_request_path': request.path,
         'files': page.object_list,
         'page': _massage_page(page),
