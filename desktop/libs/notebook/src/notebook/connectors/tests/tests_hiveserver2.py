@@ -218,6 +218,118 @@ class TestHiveserver2Api(object):
     assert_equal(upgraded_props, properties)
 
 
+  def test_progress(self):
+    snippet = json.loads("""
+        {
+            "status": "running",
+            "database": "default",
+            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+            "result": {
+                "type": "table",
+                "handle": {
+                  "statement_id": 0,
+                  "statements_count": 2,
+                  "has_more_statements": true
+                },
+                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+            },
+            "statement": "%(statement)s",
+            "type": "hive",
+            "properties": {
+                "files": [],
+                "functions": [],
+                "settings": []
+            }
+        }
+      """ % {'statement': "SELECT * FROM sample_07;"}
+    )
+
+    logs = """INFO  : Compiling command(queryId=hive_20160620133030_7e69739c-a00b-4170-8717-9eee331130eb): SELECT app,
+                 AVG(bytes) AS avg_bytes
+        FROM web_logs
+        GROUP BY  app
+        HAVING app IS NOT NULL
+        ORDER BY avg_bytes DESC
+        INFO  : Semantic Analysis Completed
+        INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:app, type:string, comment:null), FieldSchema(name:avg_bytes, type:double, comment:null)], properties:null)
+        INFO  : Completed compiling command(queryId=hive_20160620133030_7e69739c-a00b-4170-8717-9eee331130eb); Time taken: 0.116 seconds
+        INFO  : Executing command(queryId=hive_20160620133030_7e69739c-a00b-4170-8717-9eee331130eb): SELECT app,
+                 AVG(bytes) AS avg_bytes
+        FROM web_logs
+        GROUP BY  app
+        HAVING app IS NOT NULL
+        ORDER BY avg_bytes DESC
+        INFO  : Query ID = hive_20160620133030_7e69739c-a00b-4170-8717-9eee331130eb
+        INFO  : Total jobs = 2
+        INFO  : Launching Job 1 out of 2
+        INFO  : Starting task [Stage-1:MAPRED] in serial mode
+        INFO  : Number of reduce tasks not specified. Estimated from input data size: 1
+        INFO  : In order to change the average load for a reducer (in bytes):
+        INFO  :   set hive.exec.reducers.bytes.per.reducer=<number>
+        INFO  : In order to limit the maximum number of reducers:
+        INFO  :   set hive.exec.reducers.max=<number>
+        INFO  : In order to set a constant number of reducers:
+        INFO  :   set mapreduce.job.reduces=<number>
+        INFO  : number of splits:1
+        INFO  : Submitting tokens for job: job_1466104358744_0003
+        INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
+    """
+
+    assert_equal(self.api.progress(snippet, logs), 5)
+
+    logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
+        INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466104358744_0003
+        INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+        INFO  : 2016-06-20 13:30:34,494 Stage-1 map = 0%,  reduce = 0%
+        INFO  : 2016-06-20 13:30:47,081 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.13 sec
+        INFO  : 2016-06-20 13:30:58,606 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 5.59 sec
+        INFO  : MapReduce Total cumulative CPU time: 5 seconds 590 msec
+        INFO  : Ended Job = job_1466104358744_0003
+    """
+
+    assert_equal(self.api.progress(snippet, logs), 50)
+
+    snippet = json.loads("""
+        {
+            "status": "running",
+            "database": "default",
+            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+            "result": {
+                "type": "table",
+                "handle": {
+                  "statement_id": 0,
+                  "statements_count": 2,
+                  "has_more_statements": true
+                },
+                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+            },
+            "statement": "%(statement)s",
+            "type": "impala",
+            "properties": {
+                "files": [],
+                "functions": [],
+                "settings": []
+            }
+        }
+      """ % {'statement': "SELECT * FROM sample_07;"}
+    )
+
+    logs = "Query 734a81444c85be66:d05f3bb1a6c2d0a5: 0% Complete (1 out of 4693)"
+
+    assert_equal(self.api.progress(snippet, logs), 0)
+
+    logs += """Query 734a81444c85be66:d05f3bb1a6c2d0a5: 20% Complete (4 out of 4693)
+
+    Query 734a81444c85be66:d05f3bb1a6c2d0a5: 30% Complete (7 out of 4693)
+
+    Query 734a81444c85be66:d05f3bb1a6c2d0a5: 40% Complete (7 out of 4693)
+
+    Query 734a81444c85be66:d05f3bb1a6c2d0a5: 50% Complete (234 out of 4693)
+    """
+
+    assert_equal(self.api.progress(snippet, logs), 50)
+
+
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
   @classmethod
