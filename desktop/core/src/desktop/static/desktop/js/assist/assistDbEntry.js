@@ -87,7 +87,7 @@
         if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
           return;
         }
-        if (entry.definition.name.toLowerCase().indexOf(self.filter.query()) > -1) {
+        if (entry.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
           result.push(entry);
         }
       });

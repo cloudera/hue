@@ -74,7 +74,7 @@
       }
       var result = [];
       $.each(self.databases(), function (index, database) {
-        if (database.definition.name.toLowerCase().indexOf(self.filter.query()) > -1) {
+        if (database.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
           result.push(database);
         }
       });
