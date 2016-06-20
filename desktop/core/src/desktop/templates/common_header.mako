@@ -215,7 +215,7 @@ if USE_NEW_EDITOR.get():
         mTime = time();
       }
       if (moment(mTime).isValid()) {
-        return moment(mTime).format("L LT");
+        return moment.utc(mTime).format("L LT");
       }
       return mTime;
     }
