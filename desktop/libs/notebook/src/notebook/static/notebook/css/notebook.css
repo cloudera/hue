@@ -1105,36 +1105,36 @@ pre {
   font-style: italic;
 }
 
-.config-property {
-  display: inline!important;
+.session-config .config-property {
+  display: inline !important;
 }
 
-.config-property-available {
-  margin-left: 0!important;
+.session-config .config-property-available {
+  margin-left: 0 !important;
   margin-top: 10px;
 }
 
-.config-property-add-value {
-  margin-top: -8px!important;
+.session-config  .config-property-add-value {
+  margin-top: -8px !important;
   margin-bottom: 20px;
 }
 
-.config-property-input-small {
-  width: 120px!important;
+.session-config .config-property-input-small {
+  width: 120px !important;
 }
 
-.config-property-input-mini {
-  width: 90px!important;
+.session-config .config-property-input-mini {
+  width: 90px !important;
 }
 
-.config-label {
-  text-align: left!important;
+.session-config .config-label {
+  text-align: left !important;
   margin-left: 0!important;
 }
 
-.config-property-remove {
+.session-config .config-property-remove {
   float: right;
-  margin-top: 2px!important;
+  margin-top: 2px !important;
 }
 
 #schedulerEditor .container-fluid, #schedulerEditor .card-heading, #schedulerEditor .card-body {

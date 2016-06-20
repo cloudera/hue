@@ -85,11 +85,6 @@ from desktop.views import _ko
   <script type="text/html" id="property-selector-template">
     <!-- ko foreach: selectedProperties -->
     <div>
-      <div class="config-property-remove">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
-          <i class="fa fa-times"></i>
-        </a>
-      </div>
       <!-- ko template: {
         name: 'property',
         data: {
@@ -101,6 +96,11 @@ from desktop.views import _ko
           visibleObservable: $parent.visibleObservable
         }
       } --><!-- /ko -->
+      <div class="config-property-remove">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
     </div>
     <!-- /ko -->
     <div class="config-property-available margin-left-10" data-bind="visible: availableProperties().length > 0">
