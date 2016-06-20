@@ -308,7 +308,18 @@ def save_notebook(request):
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
-  notebook_doc1 = notebook_doc.doc.get()
+
+  if notebook_doc.doc is not None:
+    notebook_doc1 = notebook_doc.doc.get()
+  else:
+    notebook_doc1 = Document.objects.link(
+      notebook_doc,
+      owner=notebook_doc.owner,
+      name=notebook_doc.name,
+      description=notebook_doc.description,
+      extra=notebook_type
+    )
+
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']

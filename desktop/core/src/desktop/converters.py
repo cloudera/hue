@@ -159,6 +159,16 @@ class DocumentConverter(object):
         data=data
       )
       self._sync_permissions(document, document2)
+
+      # Create a doc1 copy and link it for backwards compatibility
+      Document.objects.link(
+        document2,
+        owner=document2.owner,
+        name=document2.name,
+        description=document2.description,
+        extra=document.extra
+      )
+
       document.add_tag(self.imported_tag)
       document.save()
       return document2
