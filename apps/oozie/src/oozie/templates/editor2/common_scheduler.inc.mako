@@ -231,7 +231,7 @@ from django.utils.translation import ugettext as _
               %endif
 
               <span data-bind="visible: $root.isEditing">
-                <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
+                <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, valueUpdate:'afterkeydown', filechooser: dataset_variable, attr: { placeholder:
                   dataset_type() == 'input_path' ? '${ _ko("Required data path dependency to start the worklow") }' :
                   dataset_type() == 'output_path' ? '${ _ko("Data path created by the workflow") }' :
                   'e.g. 1, 2, 3, /data/logs, ${"$"}{coord:nominalTime()}' },
@@ -385,7 +385,7 @@ from django.utils.translation import ugettext as _
 
 </%def>
 
-<%def name="import_modals()">\
+<%def name="import_modals()">
 
 <div id="chooseWorkflowDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
