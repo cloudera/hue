@@ -521,12 +521,14 @@ class Workflow(Job):
 def _to_lowercase(node_list):
   for node in node_list:
     for key in node.keys():
-      if type(node[key]) is str:
+      if hasattr(node[key], 'lower'):
         node[key] = node[key].lower()
 
 def _update_adj_list(adj_list):
   uuids = {}
   id = 1
+  first_kill_node_seen = False
+
   for node in adj_list.keys():
     adj_list[node]['id'] = id
 
@@ -540,7 +542,12 @@ def _update_adj_list(adj_list):
       adj_list[node]['node_type'] = 'subworkflow'
 
     if adj_list[node]['node_type'] == 'kill':
-      adj_list[node]['uuid'] = '17c9c895-5a16-7443-bb81-f34b30b21548'
+      # JS requires at least one of the kill nodes to have this Id
+      if not first_kill_node_seen:
+        adj_list[node]['uuid'] = '17c9c895-5a16-7443-bb81-f34b30b21548'
+        first_kill_node_seen = True
+      else:
+        adj_list[node]['uuid'] = str(uuid.uuid4())
     elif adj_list[node]['node_type'] == 'start':
       adj_list[node]['uuid'] = '3f107997-04cc-8733-60a9-a4bb62cebffc'
     elif adj_list[node]['node_type'] == 'end':
@@ -662,7 +669,9 @@ def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
   _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy)
 
   # Add End and Kill nodes to node_hierarchy
-  node_hierarchy.append([adj_list[key]['name'] for key in adj_list.keys() if adj_list[key]['node_type'] == 'kill'])
+  for key in adj_list.keys():
+    if adj_list[key]['node_type'] == 'kill':
+      node_hierarchy.append([adj_list[key]['name']])
   node_hierarchy.append([adj_list[key]['name'] for key in adj_list.keys() if adj_list[key]['node_type'] == 'end'])
 
 
