@@ -498,188 +498,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script>
 
   var setupjHueRowSelector = function () {
     $("a[data-row-selector='true']").jHueRowSelector();
   }
-
-  var Action = function (action) {
-    return {
-      id: action.id,
-      url: action.url,
-      number: action.number,
-      type: action.type,
-      status: action.status,
-      statusClass: "label " + getStatusClass(action.status),
-      externalId: action.externalId,
-      externalIdUrl: action.externalIdUrl,
-      title: action.title,
-      nominalTime: action.nominalTime,
-      createdTime: action.createdTime,
-      lastModifiedTime: action.lastModifiedTime,
-      errorMessage: action.errorMessage,
-      errorCode: action.errorCode,
-      missingDependencies: action.missingDependencies,
-      selected: ko.observable(false),
-      handleSelect: function (row, e) {
-        e.stopPropagation();
-        this.selected(! this.selected());
-        viewModel.allSelected(false);
-      }
-    };
-  };
-
-  var RunningCoordinatorModel = function (actions) {
-    var self = this;
-
-    self.isLoading = ko.observable(true);
-
-    self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
-      return new Action(action);
-    });
-
-    self.allSelected = ko.observable(false);
-
-    self.filter = ko.observableArray([]);
-
-    self.searchFilter = ko.observable("");
-
-    self.isRefreshingLogs = ko.observable(false);
-    self.logFilterRecentHours = ko.observable("");
-    self.logFilterRecentMinutes = ko.observable("");
-    self.logFilterRecent = ko.computed(function () {
-      var _h = self.logFilterRecentHours();
-      var _m = self.logFilterRecentMinutes();
-      return (_h != "" ? _h + "h" : "") + (_h != "" && _m != "" ? ":" : "") +  (_m != "" ? _m + "m" : "");
-    }).extend({ throttle: 500 });
-
-    self.logFilterLimit = ko.observable("5000").extend({ throttle: 500 });
-
-    self.logFilterText = ko.observable("").extend({ throttle: 500 });
-
-    self.logFilterRecent.subscribe(function(){
-      refreshLogs();
-    });
-
-    self.logFilterLimit.subscribe(function(){
-      refreshLogs();
-    });
-
-    self.logFilterText.subscribe(function(){
-      refreshLogs();
-    });
-
-    self.isLogFilterVisible = ko.observable(false);
-
-    self.toggleLogFilterVisible = function () {
-      self.isLogFilterVisible(!self.isLogFilterVisible());
-    };
-
-    self.select = function (filter) {
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        if (action.status.toLowerCase() === filter) {
-          action.selected(true);
-        }
-      });
-    };
-
-    self.clearAllSelections = function () {
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        action.selected(false);
-      });
-      self.allSelected(false);
-    };
-
-    self.clearSelections = function (filter) {
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        if (action.status.toLowerCase() === filter) {
-          action.selected(false);
-        }
-      });
-      self.allSelected(false);
-    };
-
-    self.selectAll = function () {
-      var regexp;
-
-      if (!Array.isArray(self.filter())) {
-        ko.utils.arrayForEach(self.actions(), function (action) {
-          regexp = new RegExp(self.filter());
-
-          self.allSelected(!self.allSelected());
-
-          if (regexp.test(action.title.toLowerCase())) {
-            action.selected(!action.selected());
-          }
-        });
-        return true;
-      }
-
-      self.allSelected(!self.allSelected());
-
-      ko.utils.arrayForEach(self.actions(), function (action) {
-        if (action.id) {
-          action.selected(self.allSelected());
-        }
-      });
-      return true;
-    };
-
-    self.selectedActions = ko.computed(function () {
-      var actionlist = [];
-
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        if (action.selected()) {
-          actionlist.push(action.number.toString());
-        }
-      });
-      return actionlist;
-    });
-
-    self.searchFilter.subscribe(function () {
-      if (self.searchFilter().length === 0) {
-        self.filter([]);
-      } else {
-        self.filter(self.searchFilter().toLowerCase());
-      }
-
-      if (self.selectedActions().length === self.actions().length) {
-        self.allSelected(true);
-      } else {
-        self.allSelected(false);
-      }
-    });
-
-    self.filteredActions = ko.computed(function () {
-      var filter = self.filter(),
-          actions = [],
-          regexp,
-          data;
-
-      if (self.filter().length === 0) {
-        return self.actions();
-      }
-
-      ko.utils.arrayFilter(self.actions(), function (action) {
-        if ($.inArray(filter.toString(), ['succeeded', 'running', 'failed']) === -1) {
-          regexp = new RegExp(filter);
-          if (regexp.test(action.title.toLowerCase())) {
-            actions.push(action);
-          }
-        }
-      });
-
-      if (Array.isArray(self.filter())) {
-        data = self.actions()
-      } else {
-        data = actions;
-      }
-
-      return data;
-    });
-  };
 
   var viewModel = new RunningCoordinatorModel([]);
   ko.applyBindings(viewModel);
@@ -987,7 +812,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         if (data != null && data.actions){
           var prevActions = viewModel.actions();
           $(data.actions).each(function (iAction, action) {
-            var actionItem = new Action(action);
+            var actionItem = new viewModel.Action(action);
             $(prevActions).each(function (iPrev, prev) {
               if (prev.id == actionItem.id) {
                 actionItem.selected(prev.selected());
