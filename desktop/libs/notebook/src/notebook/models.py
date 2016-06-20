@@ -52,7 +52,7 @@ def escape_rows(rows, nulls_only=False):
 
 
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
-                  files=None, functions=None, settings=None, is_saved=False):
+                  files=None, functions=None, settings=None, is_saved=False, database='default'):
 
   from notebook.connectors.hiveserver2 import HS2Api
 
@@ -100,7 +100,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
             'settings': [] if settings is None else settings
          },
          'name': name,
-         'database': 'default',
+         'database': database,
          'result': {}
       }
     ]
@@ -121,7 +121,8 @@ def import_saved_beeswax_query(bquery):
       files=design.file_resources,
       functions=design.functions,
       settings=design.settings,
-      is_saved=True
+      is_saved=True,
+      database=design.database
   )
 
 
