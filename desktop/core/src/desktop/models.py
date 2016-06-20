@@ -859,7 +859,8 @@ class Document2QueryMixin(object):
     if not include_history:
       docs = docs.exclude(is_history=True)
 
-    docs = docs.filter(is_managed=include_managed)
+    if not include_managed:
+      docs = docs.exclude(is_managed=True)
 
     if not include_trashed:
       # Since the Trash folder can have multiple directory levels, we need to check full path and exclude those IDs
