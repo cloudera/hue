@@ -333,8 +333,9 @@ class HS2Api(Api):
       progress = int((started + ended) * 100 / (total * 2))
       return max(progress, 5)  # Return 5% progress as a minimum
     elif snippet['type'] == 'impala':
-      match = re.search('(\d+)% Complete', logs, re.MULTILINE)
-      return int(match.group(1)) if match else 0
+      match = re.findall('(\d+)% Complete', logs, re.MULTILINE)
+      # Retrieve the last reported progress percentage if it exists
+      return int(match[-1]) if match and isinstance(match, list) else 0
     else:
       return 50
 
