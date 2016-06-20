@@ -1106,8 +1106,7 @@ def check_job_access_permission(request, job_id, **kwargs):
     except RestException, ex:
       msg = _("Error accessing Oozie job %s.") % (job_id,)
       LOG.exception(msg)
-
-      raise PopupException(msg, detail=ex._headers['oozie-error-message', ''])
+      raise PopupException(msg, detail=ex._headers.get('oozie-error-message'))
 
   if request.user.is_superuser \
       or oozie_job.user == request.user.username \
