@@ -21,13 +21,14 @@
       'desktop/js/apiHelper',
       'desktop/js/autocompleter',
       'oozie/js/coordinator-editor.ko',
+      'oozie/js/list-oozie-coordinator.ko',
       'knockout-mapping',
       'ko.charts'
     ], factory);
   } else {
     root.EditorViewModel = factory(ko, ApiHelper, Autocompleter);
   }
-}(this, function (ko, ApiHelper, Autocompleter, CoordinatorEditorViewModel) {
+}(this, function (ko, ApiHelper, Autocompleter, CoordinatorEditorViewModel, RunningCoordinatorModel) {
 
   var NOTEBOOK_MAPPING = {
     ignore: [
@@ -1620,19 +1621,23 @@
     };
 
 
-    self.viewSchedulerId = ko.observable('0000000-160519110441280-oozie-oozi-C');
+    self.viewSchedulerId = ko.observable('0000025-160525025600562-oozie-oozi-C');
+    self.loadingScheduler = ko.observable(false);
     self.viewScheduler = function() {
       logGA('schedule/view');
+      self.loadingScheduler(true);
       $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
         format: 'json'
       }, function (data) {
         $("#schedulerViewer").text(ko.mapping.toJSON(data));
 
-        //var viewModel = new RunningCoordinatorModel(data.actions);
-        //ko.cleanNode($("#schedulerViewer")[0]);
-        //ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
+        // var viewModel = new RunningCoordinatorModel(data.actions);
+        // ko.cleanNode($("#schedulerViewer")[0]);
+        // ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function(){
+        self.loadingScheduler(false);
       });
     };
 

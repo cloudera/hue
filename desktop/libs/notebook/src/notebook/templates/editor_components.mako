@@ -1049,7 +1049,7 @@ ${ hueIcons.symbols() }
       <!-- ko with: $root.selectedNotebook() -->
         <!-- ko if: $root.selectedNotebook().isSaved() -->
           <a data-bind="click: showSubmitPopup">Submit</a></br>
-          <a href="#scheduledJobsTab" data-toggle="tab">${_('View')}</a>
+          <a class="pointer" data-bind="click: function(){ $('a[href=\'#scheduledJobsTab\']').click(); }">${_('View')}</a>
 
           <div id="schedulerEditor">
           </div>
@@ -1066,8 +1066,13 @@ ${ hueIcons.symbols() }
     <div class="tab-pane" id="scheduledJobsTab">
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->    
-        <input type="text" data-bind="value: viewSchedulerId, click: viewScheduler"></input>
+        <input type="text" data-bind="value: viewSchedulerId" /> <a class="pointer" data-bind="click: viewScheduler">load</a>
 
+        <!-- ko if: loadingScheduler -->
+        <div style="padding: 20px">
+          <i class="fa fa-spinner fa-spin muted"></i>
+        </div>
+        <!-- /ko -->
         <div id="schedulerViewer">
         </div>
       <!-- /ko -->
