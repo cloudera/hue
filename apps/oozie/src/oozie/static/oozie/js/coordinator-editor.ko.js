@@ -234,10 +234,11 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
         if (data.status == 0) {
           self.coordinator.id(data.id);
           self.coordinator.tracker().markCurrentStateAsClean();
-          if (cb) {
+          if (typeof cb === 'function') {
             cb(data);
-          } else {
-        	$(document).trigger("info", data.message);
+          }
+          else {
+        	  $(document).trigger("info", data.message);
           }
           if (window.location.search.indexOf("coordinator") == -1) {
             window.location.hash = '#coordinator=' + data.id;
