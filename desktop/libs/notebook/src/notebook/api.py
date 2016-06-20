@@ -467,7 +467,10 @@ def close_notebook(request):
 
   for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
     try:
-      response['result'] = get_api(request, snippet).close_statement(snippet)
+      if snippet['status'] != 'running':
+        response['result'].append(get_api(request, snippet).close_statement(snippet))
+      else:
+        LOG.info('Not closing SQL snippet as still running.')
     except QueryExpired:
       pass
     except Exception, e:
