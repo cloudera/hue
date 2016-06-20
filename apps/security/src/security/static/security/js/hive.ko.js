@@ -1321,6 +1321,7 @@ var HiveViewModel = function (initial) {
 
   self.linkToBrowse = function (path) {
     self.assist.path(path);
+    self.updatePathHash(path);
     $(document).trigger("changed.path");
     self.assist.loadParents();
     self.updateSectionHash("edit");
