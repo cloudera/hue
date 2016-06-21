@@ -726,7 +726,6 @@ from desktop.views import _ko
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
           var options = valueAccessor();
           var allEntries = options.entries;
-          var disableSelect = options.disableSelect || false;
           var $element = $(element);
           var dragToSelect = false;
           var alreadySelected = false;
@@ -748,9 +747,7 @@ from desktop.views import _ko
               $element.removeClass('fb-drop-hover');
             },
             over: function () {
-              if (dragToSelect && ! disableSelect) {
-                boundEntry.selected(true);
-              } else if (! dragToSelect && boundEntry.isDirectory()) {
+              if (! dragToSelect && boundEntry.isDirectory()) {
                 var movableCount = allEntries().filter(function (entry) {
                   return entry.selected() && ! entry.isSharedWithMe();
                 }).length;
@@ -760,14 +757,7 @@ from desktop.views import _ko
               }
             },
             out: function (event, ui) {
-              if (!(alreadySelected && (event.metaKey || event.ctrlKey)) && dragToSelect && ! disableSelect) {
-                var originTop = ui.draggable[0].getBoundingClientRect().top;
-                var elementMiddle = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2)
-                if ((originTop > elementMiddle && ui.position.top > elementMiddle) ||
-                    (originTop < elementMiddle && ui.position.top < elementMiddle)) {
-                  boundEntry.selected(false);
-                }
-              } else if (! dragToSelect && boundEntry.isDirectory()) {
+              if (! dragToSelect && boundEntry.isDirectory()) {
                 $element.removeClass('fb-drop-hover');
               }
             }
@@ -784,8 +774,10 @@ from desktop.views import _ko
           var dragStartY = -1;
           var dragStartX = -1;
           var dragToSelect = false;
+          var allRows;
           $element.draggable({
             start: function (event, ui) {
+              allRows = $('.fb-row');
               var $container = $('.fb-drag-container');
 
               var selectedEntries = $.grep(allEntries(), function (entry) {
@@ -815,6 +807,11 @@ from desktop.views import _ko
               }
 
               boundEntry.selected(true);
+              if (dragToSelect) {
+                allEntries().forEach(function (entry) {
+                  entry.alreadySelected = entry.selected();
+                })
+              }
 
               if (! dragToSelect) {
                 var $helper = $('.fb-drag-helper').clone().show();
@@ -843,6 +840,16 @@ from desktop.views import _ko
               var startX = Math.min(event.clientX, dragStartX);
               var startY = Math.min(event.clientY, dragStartY);
               if (dragToSelect) {
+                allRows.each(function (idx, row) {
+                  var boundingRect = row.getBoundingClientRect();
+                  var boundObject = ko.dataFor(row);
+                  if ((dragStartY <= boundingRect.top && event.clientY >= boundingRect.top) ||
+                      (event.clientY <= boundingRect.bottom && dragStartY >= boundingRect.bottom)) {
+                    boundObject.selected(true);
+                  } else if (!boundObject.alreadySelected) {
+                    boundObject.selected(false);
+                  }
+                });
                 $('.fb-drag-select').css({
                   top: startY + 'px',
                   left: startX + 'px',
