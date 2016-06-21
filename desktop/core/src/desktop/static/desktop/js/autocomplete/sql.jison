@@ -47,11 +47,13 @@
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
+'SET'                               { return 'SET'; }
 'SMALLINT'                          { return 'SMALLINT'; }
 'STRING'                            { return 'STRING'; }
 'TABLE'                             { return 'TABLE'; }
 'TIMESTAMP'                         { return 'TIMESTAMP'; }
 'TINYINT'                           { return 'TINYINT'; }
+'UPDATE'                            { determineCase(yytext); return 'UPDATE'; }
 'USE'                               { determineCase(yytext); return 'USE'; }
 'VARCHAR'                           { return 'VARCHAR'; }
 'VIEW'                              { return 'VIEW'; }
@@ -115,7 +117,7 @@ AnyCursor
  | 'PARTIAL_CURSOR'
  ;
 
-NoOrPartialToken
+NoOrPartialRegularIdentifier
  : 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
  | 'CURSOR'
  ;
@@ -135,7 +137,7 @@ InitResults
 
      parser.parseError = function (message, error) {
        if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-         linkTablesPrimaries();
+         linkTablePrimaries();
        }
        prioritizeSuggestions();
        parser.yy.result.error = error;
@@ -196,21 +198,26 @@ UseStatement
  ;
 
 DataManipulation
+ : LoadStatement
+ | UpdateStatement
+ ;
+
+LoadStatement
  : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'TABLE' 'REGULAR_IDENTIFIER'
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' NoOrPartialToken
+ | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' NoOrPartialRegularIdentifier
    {
      suggestKeywords([ 'TABLE' ]);
    }
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath NoOrPartialToken
+ | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath NoOrPartialRegularIdentifier
    {
      suggestKeywords([ 'INTO' ]);
    }
  | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath
- | HiveOrImpalaLoad HiveOrImpalaData NoOrPartialToken
+ | HiveOrImpalaLoad HiveOrImpalaData NoOrPartialRegularIdentifier
    {
      suggestKeywords([ 'INPATH' ]);
    }
- | HiveOrImpalaLoad NoOrPartialToken
+ | HiveOrImpalaLoad NoOrPartialRegularIdentifier
    {
      suggestKeywords([ 'DATA' ]);
    }
@@ -231,34 +238,119 @@ HiveOrImpalaInpath
  | '<impala>INPATH'
  ;
 
+UpdateStatement
+ : 'UPDATE' TargetTable 'SET' SetClauseList WhereClause
+   {
+     linkTablePrimaries();
+   }
+ | 'UPDATE' TargetTable 'SET' SetClauseList 'CURSOR'
+   {
+     suggestKeywords([ 'WHERE' ]);
+   }
+ | 'UPDATE' TargetTable 'SET' SetClauseList
+   {
+     linkTablePrimaries();
+   }
+ | 'UPDATE' TargetTable 'CURSOR'
+   {
+     suggestKeywords([ 'SET' ]);
+   }
+ | 'UPDATE' TargetTable
+ | 'UPDATE' NoOrPartialRegularIdentifier
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ ;
+
+TargetTable
+ : TableName
+ ;
+
+TableName
+ : LocalOrSchemaQualifiedName
+ ;
+
+LocalOrSchemaQualifiedName
+ : 'REGULAR_IDENTIFIER' AnyDot 'PARTIAL_CURSOR'
+   {
+     suggestTables({ database: $1 });
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+   {
+     suggestTables({ database: $1 });
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
+   {
+     addTablePrimary({ identifierChain: [{ name: $1 }, { name: $3 }] });
+   }
+ | 'REGULAR_IDENTIFIER'
+   {
+     addTablePrimary({ identifierChain: [{ name: $1 }] });
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot
+   {
+     addTablePrimary({ identifierChain: [{ name: $1 }] });
+   }
+ ;
+
+SetClauseList
+ : SetClause
+ | SetClauseList ',' SetClause
+ ;
+
+SetClause
+ : SetTarget '=' UpdateSource
+ | SetTarget 'CURSOR'
+   {
+     suggestKeywords([ '=' ]);
+   }
+ | NoOrPartialRegularIdentifier
+   {
+     suggestColumns();
+   }
+ ;
+
+SetTarget
+ : 'REGULAR_IDENTIFIER'
+ ;
+
+UpdateSource
+ : ValueExpression
+ ;
+
+ValueExpression
+ : BooleanValueExpression
+ ;
+
 TableDefinition
  : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList TableLocation
- | 'CREATE' NoOrPartialToken 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
+ | 'CREATE' NoOrPartialRegularIdentifier 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' NoOrPartialToken 'TABLE' 'REGULAR_IDENTIFIER'
+ | 'CREATE' NoOrPartialRegularIdentifier 'TABLE' 'REGULAR_IDENTIFIER'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' NoOrPartialToken 'TABLE'
+ | 'CREATE' NoOrPartialRegularIdentifier 'TABLE'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList NoOrPartialToken
+ | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList NoOrPartialRegularIdentifier
    {
      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
        suggestKeywords(['LOCATION'])
      }
    }
  | 'CREATE' 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
- | 'CREATE' NoOrPartialToken
+ | 'CREATE' NoOrPartialRegularIdentifier
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL', 'TABLE'])
@@ -288,7 +380,7 @@ TableElement
 
 ColumnDefinition
  : 'REGULAR_IDENTIFIER' PrimitiveType
- | 'REGULAR_IDENTIFIER' NoOrPartialToken
+ | 'REGULAR_IDENTIFIER' NoOrPartialRegularIdentifier
    {
      if (parser.yy.dialect == 'hive') {
        suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
@@ -296,7 +388,7 @@ ColumnDefinition
        suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
      }
    }
- | 'REGULAR_IDENTIFIER' NoOrPartialToken ColumnDefinitionError error
+ | 'REGULAR_IDENTIFIER' NoOrPartialRegularIdentifier ColumnDefinitionError error
    // error here is because it expects closing ')'
  ;
 
@@ -371,7 +463,7 @@ PrimitiveType
 QueryExpression
  : 'SELECT' CleanUpSelectConditions SelectList TableExpression
    {
-     linkTablesPrimaries();
+     linkTablePrimaries();
    }
  | 'SELECT' CleanUpSelectConditions SelectList
  ;
@@ -393,7 +485,7 @@ CleanUpSelectConditions
 
 FromClause
  : 'FROM' TableReferenceList
- | 'FROM' NoOrPartialToken
+ | 'FROM' NoOrPartialRegularIdentifier
    {
      suggestTables();
      suggestDatabases({ appendDot: true });
@@ -584,7 +676,7 @@ Identifier
 
 GroupByClause
  : 'GROUP' 'BY' ColumnList
- | 'GROUP' NoOrPartialToken
+ | 'GROUP' NoOrPartialRegularIdentifier
    {
      suggestKeywords(['BY']);
    }
@@ -592,7 +684,7 @@ GroupByClause
 
 OrderByClause
  : 'ORDER' 'BY' ColumnList
- | 'ORDER' NoOrPartialToken
+ | 'ORDER' NoOrPartialRegularIdentifier
    {
      suggestKeywords(['BY']);
    }
@@ -600,7 +692,7 @@ OrderByClause
 
 LimitClause
  : 'LIMIT' 'UNSIGNED_INTEGER'
- | 'LIMIT' NoOrPartialToken
+ | 'LIMIT' NoOrPartialRegularIdentifier
    {
      suggestNumbers([1, 5, 10]);
    }
@@ -608,12 +700,12 @@ LimitClause
 
 SelectList
  : ColumnList
- | ColumnList NoOrPartialToken
+ | ColumnList NoOrPartialRegularIdentifier
    {
       suggestTables({ prependFrom: true });
       suggestDatabases({ prependFrom: true, appendDot: true });
     }
- | '*' NoOrPartialToken
+ | '*' NoOrPartialRegularIdentifier
    {
      suggestTables({ prependFrom: true });
      suggestDatabases({ prependFrom: true, appendDot: true });
@@ -792,15 +884,15 @@ LateralView
     {
       $$ = { udtf: $3, columnAliases: $4 }
     }
- | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction NoOrPartialToken
+ | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction NoOrPartialRegularIdentifier
    {
      suggestKeywords(['AS']);
    }
- | '<hive>LATERAL' 'VIEW' NoOrPartialToken
+ | '<hive>LATERAL' 'VIEW' NoOrPartialRegularIdentifier
    {
      suggestKeywords(['explode', 'posexplode']);
    }
- | '<hive>LATERAL' NoOrPartialToken
+ | '<hive>LATERAL' NoOrPartialRegularIdentifier
    {
      suggestKeywords(['VIEW']);
    }
@@ -941,7 +1033,6 @@ parser.expandLateralViews = function (tablePrimaries, identifierChain) {
 var linkSuggestion = function (suggestion, isColumnSuggestion) {
   var identifierChain = suggestion.identifierChain;
   var tablePrimaries = parser.yy.latestTablePrimaries;
-
   // Impala can have references to maps or array, i.e. FROM table t, t.map m
   // We need to replace those in the identifierChain
   if (parser.yy.dialect === 'impala') {
@@ -1025,7 +1116,7 @@ var suggestTablePrimariesAsIdentifiers = function () {
   });
 }
 
-var linkTablesPrimaries = function () {
+var linkTablePrimaries = function () {
    if (!parser.yy.cursorFound) {
      return;
    }

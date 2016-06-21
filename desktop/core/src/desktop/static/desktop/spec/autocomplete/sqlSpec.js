@@ -175,6 +175,39 @@ define([
         });
       });
 
+      it('should suggest keywords after UPDATE TableReference ', function () {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar  ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SET']
+          }
+        });
+      });
+
+      it('should suggest keywords after UPDATE TableReference SET SetClauseList ', function () {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar SET id=1, foo=2 ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['WHERE']
+          }
+        });
+      });
+
+      it('should suggest keywords after UPDATE TableReference SET identifier ', function () {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar SET id ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['=']
+          }
+        });
+      });
+
       describe('Impala specific', function () {
         it('should suggest keywords for empty statement', function() {
           assertAutoComplete({
@@ -629,6 +662,133 @@ define([
             lowerCase: false,
             suggestStar: true,
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum', type: 'alias' }, { name: 'ttb.', type: 'alias' }]
+          }
+        });
+      });
+    });
+
+    describe('update statements', function () {
+      it('should suggest tables after UPDATE', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest tables after UPDATE with partial table or schema ref', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bla',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest tables after UPDATE with database', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'bar'
+            }
+          }
+        });
+      });
+
+      it('should suggest tables after UPDATE with database and partial table', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'bar'
+            }
+          }
+        });
+      });
+
+      it('should suggest columns after SET', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              database: 'bar',
+              table: 'foo'
+            }
+          }
+        });
+      });
+
+      it('should suggest columns after SET id = 1, bar = \'foo\', ', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET id = 1, bar = \'foo\', ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              database: 'bar',
+              table: 'foo'
+            }
+          }
+        });
+      });
+
+      it('should suggest columns after SET bar = \'foo\' WHERE ', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              database: 'bar',
+              table: 'foo'
+            }
+          }
+        });
+      });
+
+      it('should suggest values after SET bar = \'foo\' WHERE id = ', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: {
+              database: 'bar',
+              table: 'foo',
+              identifierChain: [{ name: 'id' }]
+            }
+          }
+        });
+      });
+
+      it('should suggest columns after SET bar = \'foo\' WHERE id = 1 AND ', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = 1 AND ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              database: 'bar',
+              table: 'foo'
+            }
           }
         });
       });
@@ -1193,7 +1353,7 @@ define([
               suggestStar: true, // TODO: Check if really true
               suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
               suggestColumns: {
-                table: 'testTable',
+                table: 'testTable'
               }
             }
           });
