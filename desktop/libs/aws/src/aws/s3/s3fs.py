@@ -55,6 +55,17 @@ class S3FileSystem(object):
       self._bucket_cache[name] = self._s3_connection.get_bucket(name)
     return self._bucket_cache[name]
 
+  def _get_or_create_bucket(self, name):
+    try:
+      bucket = self._get_bucket(name)
+    except S3ResponseError, e:
+      if e.status == 404:
+        bucket = self._s3_connection.create_bucket(name)
+        self._bucket_cache[name] = bucket
+      else:
+        raise e
+    return bucket
+
   def _get_key(self, path, validate=True):
     bucket_name, key_name = s3.parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
@@ -233,6 +244,8 @@ class S3FileSystem(object):
 
     Actually it creates an empty object: s3://[bucket]/[path]/
     """
+    bucket_name, key_name = s3.parse_uri(path)[:2]
+    self._get_or_create_bucket(bucket_name)
     stats = self._stats(path)
     if stats:
       if stats.isDir:

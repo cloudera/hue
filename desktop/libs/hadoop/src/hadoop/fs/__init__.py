@@ -176,6 +176,7 @@ class LocalSubFileSystem(object):
   isfile = _wrap(os.path.isfile)
   isdir = _wrap(os.path.isdir)
   chmod = _wrap(os.chmod)
+  join = _wrap(os.path.join)
   # This could be provided with an error_handler
   rmtree = _wrap(shutil.rmtree)
   chown = _wrap(os.chown, paths=[0], users=[1], groups=[2])

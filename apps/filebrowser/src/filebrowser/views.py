@@ -56,6 +56,7 @@ from desktop.lib.fs import splitpath
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
+from hadoop.fs.webhdfs import WebHdfs
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
@@ -977,6 +978,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 op(*args)
             except (IOError, WebHdfsException), e:
                 msg = _("Cannot perform operation.")
+                # TODO: Only apply this message for HDFS
                 if request.user.is_superuser and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
@@ -1014,7 +1016,7 @@ def rename(request):
           raise PopupException(_("Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames." % (src_path, dest_path)))
         if "/" not in dest_path:
             src_dir = os.path.dirname(src_path)
-            dest_path = os.path.join(src_dir, dest_path)
+            dest_path = request.fs.join(src_dir, dest_path)
         request.fs.rename(src_path, dest_path)
 
     return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
@@ -1026,7 +1028,7 @@ def mkdir(request):
         # No absolute directory specification allowed.
         if posixpath.sep in name or "#" in name:
             raise PopupException(_("Could not name folder \"%s\": Slashes or hashes are not allowed in filenames." % name))
-        request.fs.mkdir(os.path.join(path, name))
+        request.fs.mkdir(request.fs.join(path, name))
 
     return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
@@ -1036,7 +1038,7 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(os.path.join(path, name))
+        request.fs.create(request.fs.join(path, name))
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
