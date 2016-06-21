@@ -222,8 +222,9 @@ class S3FSTest(S3TestBase):
     buckets = self.fs.listdir('s3://')
     assert_true(len(buckets) > 0)
 
-
-
-
-
-
+  def test_mkdir(self):
+    dir_path = self.get_test_path('test_mkdir')
+    assert_false(self.fs.exists(dir_path))
+    
+    self.fs.mkdir(dir_path)
+    assert_true(self.fs.exists(dir_path))
