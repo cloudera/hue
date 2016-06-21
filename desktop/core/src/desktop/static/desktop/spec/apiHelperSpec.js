@@ -38,6 +38,10 @@ define([
         expect(subject.successResponseIsError({ status: -1 })).toBeTruthy();
       });
 
+      it("should determine that a success response is an error response if status is -3", function () {
+        expect(subject.successResponseIsError({ status: -3 })).toBeTruthy();
+      });
+
       it("should determine that a success response is an error response if status is 500", function () {
         expect(subject.successResponseIsError({ status: 500 })).toBeTruthy();
       });
