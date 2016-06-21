@@ -59,16 +59,15 @@ def is_enabled():
 def config_validator(user):
   res = []
 
-  if AWS_ACCOUNTS.keys():
-    if is_enabled():
-      res.append(('aws.aws_accounts', 'Default AWS account is not configured'))
+  if not is_enabled():
+    res.append(('aws.aws_accounts', 'Default AWS account is not configured'))
 
-    regions = get_regions('s3')  # S3 is only supported service so far
-    region_names = [r.name for r in regions]
+  regions = get_regions('s3')  # S3 is only supported service so far
+  region_names = [r.name for r in regions]
 
-    for name in AWS_ACCOUNTS.keys():
-      region_name = AWS_ACCOUNTS[name].REGION.get()
-      if region_name not in region_names:
-        res.append(('aws.aws_accounts.%s.region' % name, 'Unknown region %s' % region_name))
+  for name in AWS_ACCOUNTS.keys():
+    region_name = AWS_ACCOUNTS[name].REGION.get()
+    if region_name not in region_names:
+      res.append(('aws.aws_accounts.%s.region' % name, 'Unknown region %s' % region_name))
 
   return res
