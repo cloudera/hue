@@ -312,6 +312,7 @@ def list_oozie_workflow(request, job_id):
   credentials = None
   doc = None
   hue_workflow = None
+  hue_coord = None
   workflow_graph = 'MISSING'  # default to prevent loading the graph tab for deleted workflows
   full_node_list = None
 
