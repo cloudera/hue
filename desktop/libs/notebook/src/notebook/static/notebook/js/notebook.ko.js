@@ -388,31 +388,37 @@
       var toDelete = [];
       var toAdd = [];
 
-      $.each(newVal, function (key, name) {
-        var match = ko.utils.arrayFirst(self.variables(), function (_var) {
-          return _var.name() == name;
+      if (newVal.length == self.variables().length) { // Just rename one of the variable
+        $.each(newVal, function(i, item) {
+          self.variables()[i].name(newVal[i]);
         });
-        if (!match) {
-          toAdd.push(name);
-        }
-      });
-      $.each(self.variables(), function (key, _var) {
-        var match = ko.utils.arrayFirst(newVal, function (name) {
-          return _var.name() == name;
+      } else {
+        $.each(newVal, function (key, name) {
+          var match = ko.utils.arrayFirst(self.variables(), function (_var) {
+            return _var.name() == name;
+          });
+          if (! match) {
+            toAdd.push(name);
+          }
         });
-        if (!match) {
-          toDelete.push(_var);
-        }
-      });
+        $.each(self.variables(), function (key, _var) {
+          var match = ko.utils.arrayFirst(newVal, function (name) {
+            return _var.name() == name;
+          });
+          if (! match) {
+            toDelete.push(_var);
+          }
+        });
 
-      $.each(toDelete, function (index, item) {
-        self.variables.remove(item);
-      });
-      $.each(toAdd, function (index, item) {
-        self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
-      });
+        $.each(toDelete, function (index, item) {
+          self.variables.remove(item);
+        });
+        $.each(toAdd, function (index, item) {
+          self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
+        });
+      }
 
-      if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
+     if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
         self.variables.sort(function (left, right) {
           var leftIndex = newVal.indexOf(left.name());
           var rightIndex = newVal.indexOf(right.name());
