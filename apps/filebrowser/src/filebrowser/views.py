@@ -45,7 +45,6 @@ from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
 
-from aws.conf import is_enabled as is_s3_enabled
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
@@ -56,7 +55,6 @@ from desktop.lib.fs import splitpath
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
-from hadoop.fs.webhdfs import WebHdfs
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
@@ -434,11 +432,14 @@ def listdir_paged(request, path):
 
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs'
+
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
         'path': path,
         'breadcrumbs': breadcrumbs,
         'current_request_path': request.path,
+        'is_trash_enabled': is_trash_enabled,
         'files': page.object_list,
         'page': _massage_page(page),
         'pagesize': pagesize,
@@ -981,6 +982,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
+            except NotImplementedError, e:
+                msg = _("Cannot perform operation.")
+                raise PopupException(msg, detail=e)
+
             if next:
                 logging.debug("Next: %s" % next)
                 # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.

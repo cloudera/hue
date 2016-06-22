@@ -30,11 +30,13 @@ from django.utils.translation import ugettext as _
             </ul>
             <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" />
         </li>
+        % if is_trash_enabled:
         <li class="pull-right">
           <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" class="trashLink" title="${_('View trash')}">
             <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
+        % endif
         <li class="pull-right">
           <div class="dropdown history">
             <a href="javascript:void(0)" class="historyLink dropdown-toggle" title="${_('View History')}" data-toggle="dropdown" id="historyDropdown">
