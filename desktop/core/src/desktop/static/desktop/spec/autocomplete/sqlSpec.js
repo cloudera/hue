@@ -615,9 +615,49 @@ define([
         });
       });
 
+      it('should suggest database or table names after FROM with started backticked name', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM `tes',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
       it('should suggest table names after FROM with database reference', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM database_two.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'database_two'
+            }
+          }
+        });
+      });
+
+      it('should suggest table names after FROM with backticked database reference', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM `database_two`.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'database_two'
+            }
+          }
+        });
+      });
+
+      it('should suggest table names after FROM with partial backticked table reference', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM `database_two`.`bla ',
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
@@ -1672,6 +1712,18 @@ define([
             lowerCase: true,
             suggestStar: true,
             suggestColumns: { table: 'testTable', database: 'database_two' }
+          }
+        });
+      });
+
+      it('should suggest columns for table with grave accents', function () {
+        assertAutoComplete({
+          beforeCursor: 'select ',
+          afterCursor: ' from `database one`.`test table`',
+          expectedResult: {
+            lowerCase: true,
+            suggestStar: true,
+            suggestColumns: { table: 'test table', database: 'database one' }
           }
         });
       });
