@@ -17,7 +17,7 @@
 %lex
 %options case-insensitive
 %s hive impala
-%x hdfs stringValue
+%x hdfs singleQuotedValue backtickedValue
 %%
 
 [ \t\n]                             { /* skip whitespace */ }
@@ -92,16 +92,26 @@
 <hdfs>[']                           { this.popState(); return 'HDFS_END_QUOTE'; }
 <hdfs><<EOF>>                       { return 'EOF'; }
 
-<stringValue>[^']+                  { return 'VALUE'; }
-<stringValue>\'                     { this.popState(); return 'SINGLE_QUOTE'; }
-
 [-+&~|^/%*(),.;!]                   { return yytext; }
 [=<>]                               { return yytext; }
+
 
 \[                                  { return '['; }
 \]                                  { return ']'; }
 
-\'                                  { this.begin('stringValue'); return 'SINGLE_QUOTE'; }
+\`                                  { this.begin('backtickedValue'); return 'BACKTICK'; }
+<backtickedValue>[^`]+              { if (yytext.indexOf('CURSOR|') !== -1) {
+                                        this.popState();
+                                        return 'PARTIAL_VALUE';
+                                      }
+                                      return 'VALUE';
+                                    }
+<backtickedValue>\`                 { this.popState(); return 'BACKTICK'; }
+
+\'                                  { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
+<singleQuotedValue>[^']+            { return 'VALUE'; }
+<singleQuotedValue>\'               { this.popState(); return 'SINGLE_QUOTE'; }
+
 \"                                  { return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
@@ -269,28 +279,15 @@ TargetTable
 
 TableName
  : LocalOrSchemaQualifiedName
- ;
-
-LocalOrSchemaQualifiedName
- : 'REGULAR_IDENTIFIER' AnyDot 'PARTIAL_CURSOR'
    {
-     suggestTables({ database: $1 });
-   }
- | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
-   {
-     suggestTables({ database: $1 });
-   }
- | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
-   {
-     addTablePrimary({ identifierChain: [{ name: $1 }, { name: $3 }] });
-   }
- | 'REGULAR_IDENTIFIER'
-   {
-     addTablePrimary({ identifierChain: [{ name: $1 }] });
-   }
- | 'REGULAR_IDENTIFIER' AnyDot
-   {
-     addTablePrimary({ identifierChain: [{ name: $1 }] });
+     // TODO: Replace with TablePrimary?
+     if ($1.partial) {
+       if ($1.identifierChain.length === 1) {
+         suggestTablesOrColumns($1.identifierChain[0].name);
+       }
+     } else if (typeof $1.identifierChain !== 'undefined') {
+       addTablePrimary($1);
+     }
    }
  ;
 
@@ -812,37 +809,104 @@ TableReference
 
 TablePrimaryOrJoinedTable
  : TablePrimary
+   {
+     if ($1.partial) {
+       if ($1.identifierChain.length === 1) {
+         suggestTablesOrColumns($1.identifierChain[0].name);
+       } else if ($1.identifierChain.length === 0) {
+         suggestTables();
+         suggestDatabases({ appendDot: true });
+       }
+     } else if (typeof $1.identifierChain !== 'undefined') {
+       addTablePrimary($1);
+     }
+   }
+ | LateralViewDefinition
+   {
+     addTablePrimary($1);
+   }
  | JoinedTable
  ;
 
-TablePrimary
- : 'REGULAR_IDENTIFIER'
+LateralViewDefinition
+ :'REGULAR_IDENTIFIER' LateralViews
    {
-     addTablePrimary({ identifierChain: [ { name: $1 } ] });
-   }
- | 'REGULAR_IDENTIFIER' LateralViews
-   {
-     addTablePrimary({ identifierChain: [ { name: $1 } ], lateralViews: $2 } );
-   }
- | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
-   {
-     addTablePrimary({ identifierChain: [ { name: $1 } ], alias: $2 });
+     $$ = { identifierChain: [ { name: $1 } ], lateralViews: $2 }
    }
  | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER' LateralViews
    {
-     addTablePrimary({ identifierChain: [ { name: $1 } ], alias: $2, lateralViews: $3 } );
+     $$ = { identifierChain: [ { name: $1 } ], alias: $2, lateralViews: $3 };
    }
- | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
+ ;
+
+TablePrimary
+ : LocalOrSchemaQualifiedName
+ ;
+
+RegularOrBacktickedIdentifier
+ : 'REGULAR_IDENTIFIER'
+ | 'BACKTICK' 'VALUE' 'BACKTICK'
    {
-     addTablePrimary({ identifierChain: [ { name: $1 }, { name: $3 } ] });
+     $$ = $1;
    }
- | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
+ ;
+
+RegularOrBackTickedSchemaQualifiedName
+ : 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
    {
-     addTablePrimary({ identifierChain: [ { name: $1 }, { name: $3 } ], alias: $4 });
+     $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] }
+   }
+ | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot 'REGULAR_IDENTIFIER'
+   {
+     $$ = { identifierChain: [ { name: $2 }, { name: $5 } ] }
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot 'BACKTICK' 'VALUE' 'BACKTICK'
+   {
+     $$ = { identifierChain: [ { name: $1 }, { name: $4 } ] }
+   }
+ | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot 'BACKTICK' 'VALUE' 'BACKTICK'
+   {
+     $$ = { identifierChain: [ { name: $2 }, { name: $6 } ] }
+   }
+ | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot 'BACKTICK' 'PARTIAL_VALUE'
+   {
+     $$ = { partial: true, identifierChain: [ { name: $2 } ] };
+   }
+ | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+   {
+     $$ = { partial: true, identifierChain: [ { name: $1 } ] };
+   }
+ | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot 'PARTIAL_CURSOR'
+   {
+     $$ = { partial: true, identifierChain: [ { name: $2 } ] };
+   }
+ | 'BACKTICK' 'PARTIAL_VALUE'
+   {
+     $$ = { partial: true, identifierChain: [ ] };
    }
  | 'REGULAR_IDENTIFIER' AnyDot 'PARTIAL_CURSOR'
    {
-     suggestTablesOrColumns($1);
+     $$ = { partial: true, identifierChain: [ { name: $1 } ] };
+   }
+ | 'BACKTICK' 'VALUE' 'BACKTICK'
+   {
+     $$ = { identifierChain: [ { name: $2 } ] }
+   }
+ ;
+
+LocalOrSchemaQualifiedName
+ : 'REGULAR_IDENTIFIER'
+   {
+     $$ = { identifierChain: [ { name: $1 } ] }
+   }
+ | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
+   {
+     $$ = { identifierChain: [ { name: $1 } ], alias: $2 };
+   }
+ | RegularOrBackTickedSchemaQualifiedName
+ | RegularOrBackTickedSchemaQualifiedName 'REGULAR_IDENTIFIER'
+   {
+     $$ = { identifierChain: $1.identifierChain, alias: $2 }
    }
  ;
 
