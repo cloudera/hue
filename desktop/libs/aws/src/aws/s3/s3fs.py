@@ -28,6 +28,8 @@ from boto.exception import S3ResponseError
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
+from django.utils.translation import ugettext as _
+
 from aws import s3
 from aws.s3 import normpath, s3file, translate_s3_error, S3_ROOT
 from aws.s3.s3stat import S3Stat
@@ -181,7 +183,7 @@ class S3FileSystem(object):
   @translate_s3_error
   def listdir_stats(self, path, glob=None):
     if glob is not None:
-      raise NotImplementedError("Option `glob` is not implemented")
+      raise NotImplementedError(_("Option `glob` is not implemented"))
 
     if s3.is_root(path):
       self._init_bucket_cache()
@@ -206,7 +208,12 @@ class S3FileSystem(object):
   @translate_s3_error
   def rmtree(self, path, skipTrash=False):
     if not skipTrash:
-      raise NotImplementedError('Moving to trash is not implemented for S3')
+      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+
+    bucket_name, key_name = s3.parse_uri(path)[:2]
+    if bucket_name and not key_name:
+      raise NotImplementedError(_('Deleting a bucket is not implemented for S3'))
+
     key = self._get_key(path, validate=False)
 
     if key.exists():
@@ -230,12 +237,12 @@ class S3FileSystem(object):
   @translate_s3_error
   def remove(self, path, skip_trash=False):
     if not skip_trash:
-      raise NotImplementedError('Moving to trash is not implemented for S3')
+      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
     key = self._get_key(path, validate=False)
     key.bucket.delete_key(key.name)
 
   def restore(self, *args, **kwargs):
-    raise NotImplementedError('Moving to trash is not implemented for S3')
+    raise NotImplementedError(_('Moving to trash is not implemented for S3'))
 
   @translate_s3_error
   def mkdir(self, path, *args, **kwargs):
@@ -297,7 +304,7 @@ class S3FileSystem(object):
 
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
-        raise RuntimeError("Invalid key to transform: %s" % key.name)
+        raise RuntimeError(_("Invalid key to transform: %s") % key.name)
       dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
       key.copy(dst_bucket, dst_name)
 
