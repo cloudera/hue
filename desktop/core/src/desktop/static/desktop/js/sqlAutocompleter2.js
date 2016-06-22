@@ -107,14 +107,46 @@
           fields: fields,
           editor: editor,
           successCallback: function (data) {
-            if (data.columns) {
+            if (data.extended_columns) {
+              data.extended_columns.forEach(function (column) {
+                if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
+                  completions.push({value: column.name + '[]', meta: 'map'})
+                } else if (column.type.indexOf('map') === 0) {
+                  completions.push({value: column.name, meta: 'map'})
+                } else if (column.type.indexOf('struct') === 0) {
+                  completions.push({ value: column.name, meta: 'struct' })
+                } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
+                  completions.push({ value: column.name + '[]', meta: 'array' })
+                } else if (column.type.indexOf('array') === 0) {
+                  completions.push({ value: column.name, meta: 'array' })
+                } else {
+                  completions.push({ value: column.name, meta: column.type })
+                }
+              });
+            } else if (data.columns) {
               data.columns.forEach(function (column) {
                 completions.push({ value: column, meta: 'column' })
               });
             }
+            if (data.type === 'map' && self.snippet.type() === 'impala') {
+              completions.push({ value: 'key', meta: 'key' });
+              completions.push({ value: 'value', meta: 'value' });
+            }
             if (data.type === 'struct') {
               data.fields.forEach(function (field) {
-                completions.push({ value: field.name  , meta: 'struct' })
+                completions.push({ value: field.name, meta: 'struct' })
+              });
+            } else if (data.type === 'map' && (data.value && data.value.fields)) {
+              data.value.fields.forEach(function (field) {
+                completions.push({ value: field.name, meta: field.type });
+              });
+            } else if (data.type === 'array' && (data.item && data.item.fields)) {
+              data.item.fields.forEach(function (field) {
+                if ((field.type === 'array' || field.type === 'map') && self.snippet.type() === 'hive') {
+                  completions.push({ value: field.name + '[]', meta: field.type });
+                } else {
+                  completions.push({ value: field.name, meta: field.type });
+                }
               });
             }
             columnsDeferred.resolve();
@@ -122,6 +154,58 @@
           silenceErrors: true,
           errorCallback: columnsDeferred.resolve
         });
+      }
+
+      if (parseResult.suggestValues) {
+        var valuesDeferred = $.Deferred();
+        var impalaValuesDeferred = $.Deferred();
+        deferrals.push(valuesDeferred);
+        deferrals.push(impalaValuesDeferred);
+
+        self.snippet.getApiHelper().fetchTableSample({
+          sourceType: self.snippet.type(),
+          databaseName: parseResult.suggestValues.database || database,
+          tableName: parseResult.suggestValues.table,
+          columnName: parseResult.suggestValues.identifierChain[0].name,
+          editor: editor,
+          successCallback: function (data) {
+            if (data.status === 0 && data.headers.length === 1) {
+              data.rows.forEach(function (row) {
+                completions.push({ value: typeof row[0] === 'string' ? "'" + row[0] + "'" :  '' + row[0], meta: 'value' });
+              });
+            }
+            valuesDeferred.resolve();
+          },
+          silenceErrors: true,
+          errorCallback: valuesDeferred.resolve
+        });
+
+        if (self.snippet.type() === 'impala') {
+          // TODO: Fetch for each identifier in the chain, we need to add key or value for impala
+          //       select a.key from customers c, c.addresses a WHERE a.zip_code = |
+          // Same goes for Hive
+          //       SELECT orders[].items[].| FROM customers
+          self.snippet.getApiHelper().fetchFields({
+            sourceType: self.snippet.type(),
+            databaseName: parseResult.suggestValues.database || database,
+            tableName: parseResult.suggestValues.table,
+            fields: $.map(parseResult.suggestValues.identifierChain, function (value) { return value.name }),
+            editor: editor,
+            successCallback: function (data) {
+              if (data.sample) {
+                var isString = data.type === "string";
+                data.sample.forEach(function (sample) {
+                  completions.push({ meta: 'value', value: isString ? "'" + sample + "'" : new String(sample) })
+                });
+              }
+              impalaValuesDeferred.resolve();
+            },
+            silenceErrors: true,
+            errorCallback: impalaValuesDeferred.resolve
+          });
+        } else {
+          impalaValuesDeferred.resolve();
+        }
       }
 
       $.when.apply($, deferrals).done(function () {
@@ -149,7 +233,7 @@
     callback(completions);
   };
 
-  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'identifier': 4, 'keyword': 5 };
+  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'identifier': 4, 'key' : 5, 'value' : 6, 'keyword': 7 };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {
     completions.sort(function (a, b) {

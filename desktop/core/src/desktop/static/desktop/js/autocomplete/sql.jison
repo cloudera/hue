@@ -93,7 +93,7 @@
 <hdfs><<EOF>>                       { return 'EOF'; }
 
 [-+&~|^/%*(),.;!]                   { return yytext; }
-[=<>]                               { return yytext; }
+[=<>]+                              { return yytext; }
 
 
 \[                                  { return '['; }
@@ -127,9 +127,14 @@ AnyCursor
  | 'PARTIAL_CURSOR'
  ;
 
-NoOrPartialRegularIdentifier
+PartialIdentifierOrCursor
  : 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
  | 'CURSOR'
+ ;
+
+PartialIdentifierOrPartialCursor
+ : 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+ | 'PARTIAL_CURSOR'
  ;
 
 InitResults
@@ -214,20 +219,20 @@ DataManipulation
 
 LoadStatement
  : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'TABLE' 'REGULAR_IDENTIFIER'
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' NoOrPartialRegularIdentifier
+ | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' PartialIdentifierOrCursor
    {
      suggestKeywords([ 'TABLE' ]);
    }
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath NoOrPartialRegularIdentifier
+ | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath PartialIdentifierOrCursor
    {
      suggestKeywords([ 'INTO' ]);
    }
  | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath
- | HiveOrImpalaLoad HiveOrImpalaData NoOrPartialRegularIdentifier
+ | HiveOrImpalaLoad HiveOrImpalaData PartialIdentifierOrCursor
    {
      suggestKeywords([ 'INPATH' ]);
    }
- | HiveOrImpalaLoad NoOrPartialRegularIdentifier
+ | HiveOrImpalaLoad PartialIdentifierOrCursor
    {
      suggestKeywords([ 'DATA' ]);
    }
@@ -266,7 +271,7 @@ UpdateStatement
      suggestKeywords([ 'SET' ]);
    }
  | 'UPDATE' TargetTable
- | 'UPDATE' NoOrPartialRegularIdentifier
+ | 'UPDATE' PartialIdentifierOrCursor
    {
      suggestTables();
      suggestDatabases({ appendDot: true });
@@ -302,7 +307,7 @@ SetClause
    {
      suggestKeywords([ '=' ]);
    }
- | NoOrPartialRegularIdentifier
+ | PartialIdentifierOrCursor
    {
      suggestColumns();
    }
@@ -322,32 +327,32 @@ ValueExpression
 
 TableDefinition
  : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList TableLocation
- | 'CREATE' NoOrPartialRegularIdentifier 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
+ | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' NoOrPartialRegularIdentifier 'TABLE' 'REGULAR_IDENTIFIER'
+ | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' NoOrPartialRegularIdentifier 'TABLE'
+ | 'CREATE' PartialIdentifierOrCursor 'TABLE'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL'])
       }
     }
- | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList NoOrPartialRegularIdentifier
+ | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList PartialIdentifierOrCursor
    {
      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
        suggestKeywords(['LOCATION'])
      }
    }
  | 'CREATE' 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
- | 'CREATE' NoOrPartialRegularIdentifier
+ | 'CREATE' PartialIdentifierOrCursor
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
         suggestKeywords(['EXTERNAL', 'TABLE'])
@@ -377,7 +382,7 @@ TableElement
 
 ColumnDefinition
  : 'REGULAR_IDENTIFIER' PrimitiveType
- | 'REGULAR_IDENTIFIER' NoOrPartialRegularIdentifier
+ | 'REGULAR_IDENTIFIER' PartialIdentifierOrCursor
    {
      if (parser.yy.dialect == 'hive') {
        suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
@@ -385,7 +390,7 @@ ColumnDefinition
        suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
      }
    }
- | 'REGULAR_IDENTIFIER' NoOrPartialRegularIdentifier ColumnDefinitionError error
+ | 'REGULAR_IDENTIFIER' PartialIdentifierOrCursor ColumnDefinitionError error
    // error here is because it expects closing ')'
  ;
 
@@ -482,7 +487,7 @@ CleanUpSelectConditions
 
 FromClause
  : 'FROM' TableReferenceList
- | 'FROM' NoOrPartialRegularIdentifier
+ | 'FROM' PartialIdentifierOrCursor
    {
      suggestTables();
      suggestDatabases({ appendDot: true });
@@ -520,8 +525,11 @@ SelectCondition
      if (!parser.yy.afterGroupBy) {
        keywords.push('GROUP BY');
      }
-     if (parser.yy.dialect === 'hive' && !parser.yy.afterGroupBy && !parser.yy.afterWhere && !parser.yy.afterOrderBy && !parser.yy.afterLimit) {
-       keywords.push('LATERAL');
+     if (!parser.yy.afterGroupBy && !parser.yy.afterWhere && !parser.yy.afterOrderBy && !parser.yy.afterLimit) {
+       keywords.push('JOIN');
+       if (parser.yy.dialect === 'hive') {
+         keywords.push('LATERAL');
+       }
      }
      if (!parser.yy.afterLimit) {
        keywords.push('LIMIT');
@@ -594,10 +602,10 @@ Predicate
 CompOp
  : '='
  | '<>'
- | '<'
- | '>'
  | '<='
  | '>='
+ | '<'
+ | '>'
  ;
 
 ParenthesizedBooleanValueExpression
@@ -661,9 +669,13 @@ IdentifierChain
  ;
 
 Identifier
- : 'REGULAR_IDENTIFIER'
+ : ColumnIdentifier
    {
-     parser.yy.identifierChain.push({ name: $1 });
+     parser.yy.identifierChain.push($1);
+   }
+ | ColumnIdentifier 'PARTIAL_CURSOR'
+   {
+     suggestColumns();
    }
  | '"' 'REGULAR_IDENTIFIER' '"'
    {
@@ -673,7 +685,7 @@ Identifier
 
 GroupByClause
  : 'GROUP' 'BY' ColumnList
- | 'GROUP' NoOrPartialRegularIdentifier
+ | 'GROUP' PartialIdentifierOrCursor
    {
      suggestKeywords(['BY']);
    }
@@ -681,7 +693,7 @@ GroupByClause
 
 OrderByClause
  : 'ORDER' 'BY' ColumnList
- | 'ORDER' NoOrPartialRegularIdentifier
+ | 'ORDER' PartialIdentifierOrCursor
    {
      suggestKeywords(['BY']);
    }
@@ -689,7 +701,7 @@ OrderByClause
 
 LimitClause
  : 'LIMIT' 'UNSIGNED_INTEGER'
- | 'LIMIT' NoOrPartialRegularIdentifier
+ | 'LIMIT' PartialIdentifierOrCursor
    {
      suggestNumbers([1, 5, 10]);
    }
@@ -697,12 +709,12 @@ LimitClause
 
 SelectList
  : ColumnList
- | ColumnList NoOrPartialRegularIdentifier
+ | ColumnList PartialIdentifierOrCursor
    {
-      suggestTables({ prependFrom: true });
-      suggestDatabases({ prependFrom: true, appendDot: true });
-    }
- | '*' NoOrPartialRegularIdentifier
+     suggestTables({ prependFrom: true });
+     suggestDatabases({ prependFrom: true, appendDot: true });
+   }
+ | '*' PartialIdentifierOrCursor
    {
      suggestTables({ prependFrom: true });
      suggestDatabases({ prependFrom: true, appendDot: true });
@@ -736,7 +748,7 @@ ColumnIdentifier
 
 DerivedColumn
  : ColumnIdentifier
- | ColumnIdentifier AnyDot 'PARTIAL_CURSOR'
+ | ColumnIdentifier AnyDot PartialIdentifierOrPartialCursor
    {
      // TODO: Check if valid: SELECT testMap["key"].* FROM foo
      if (typeof $1.key === 'undefined') {
@@ -773,7 +785,7 @@ DerivedColumn
       });
       delete parser.yy.derivedColumnChain;
     }
- | 'CURSOR'
+ | AnyCursor
    {
      parser.yy.result.suggestStar = true;
      suggestColumns();
@@ -872,7 +884,7 @@ RegularOrBackTickedSchemaQualifiedName
    {
      $$ = { partial: true, identifierChain: [ { name: $2 } ] };
    }
- | 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+ | 'REGULAR_IDENTIFIER' AnyDot PartialIdentifierOrPartialCursor
    {
      $$ = { partial: true, identifierChain: [ { name: $1 } ] };
    }
@@ -883,10 +895,6 @@ RegularOrBackTickedSchemaQualifiedName
  | 'BACKTICK' 'PARTIAL_VALUE'
    {
      $$ = { partial: true, identifierChain: [ ] };
-   }
- | 'REGULAR_IDENTIFIER' AnyDot 'PARTIAL_CURSOR'
-   {
-     $$ = { partial: true, identifierChain: [ { name: $1 } ] };
    }
  | 'BACKTICK' 'VALUE' 'BACKTICK'
    {
@@ -910,17 +918,20 @@ LocalOrSchemaQualifiedName
    }
  ;
 
+// TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
 userDefinedTableGeneratingFunction
  : '<hive>explode' '(' DerivedColumnChain ')'
    {
      delete parser.yy.derivedColumnChain;
      $$ = { function: $1, expression: $3 }
    }
+ | '<hive>explode' '(' PartialIdentifierOrPartialCursor error
  | '<hive>posexplode' '(' DerivedColumnChain ')'
     {
       delete parser.yy.derivedColumnChain;
       $$ = { function: $1, expression: $3 }
     }
+ | '<hive>posexplode' '(' PartialIdentifierOrPartialCursor error
  ;
 
 LateralViews
@@ -948,15 +959,19 @@ LateralView
     {
       $$ = { udtf: $3, columnAliases: $4 }
     }
- | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction NoOrPartialRegularIdentifier
+ | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' PartialIdentifierOrCursor
    {
      suggestKeywords(['AS']);
    }
- | '<hive>LATERAL' 'VIEW' NoOrPartialRegularIdentifier
+ | '<hive>LATERAL' 'VIEW' userDefinedTableGeneratingFunction PartialIdentifierOrCursor
+   {
+     suggestKeywords(['AS']);
+   }
+ | '<hive>LATERAL' 'VIEW' PartialIdentifierOrCursor
    {
      suggestKeywords(['explode', 'posexplode']);
    }
- | '<hive>LATERAL' NoOrPartialRegularIdentifier
+ | '<hive>LATERAL' PartialIdentifierOrCursor
    {
      suggestKeywords(['VIEW']);
    }
@@ -975,6 +990,10 @@ LateralViewColumnAliases
 
 JoinedTable
  : TableReference 'JOIN' TableReference JoinSpecification
+ | TableReference 'JOIN' TableReference 'CURSOR'
+   {
+     suggestKeywords(['ON']);
+   }
  | TableReference 'JOIN' 'CURSOR'
    {
      suggestTables({});
@@ -1290,7 +1309,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
   parser.yy.dialect = dialect;
   try {
     // Add |CURSOR| or |PARTIAL_CURSOR| to represent the different cursor states in the lexer
-    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || beforeCursor.indexOf(' ', beforeCursor.length - 1) !== -1 ? ' |CURSOR| ' : '|PARTIAL_CURSOR|') + afterCursor);
+    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /.*\s+$/.test(beforeCursor) ? ' |CURSOR| ' : '|PARTIAL_CURSOR|') + afterCursor);
   } catch (err) {
     // On any error try to at least return any existing result
     if (typeof parser.yy.result === 'undefined') {

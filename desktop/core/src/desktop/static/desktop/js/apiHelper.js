@@ -690,7 +690,7 @@
       })
       .done(function (data) {
         if (! self.successResponseIsError(data)) {
-          if (data.rows.length > 0) {
+          if ((typeof data.rows !== 'undefined' && data.rows.length > 0) || typeof data.sample !== 'undefined') {
             storeInCache(data);
           }
           options.successCallback(data);

@@ -159,7 +159,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY', 'WHERE']
+            suggestKeywords: ['GROUP BY', 'JOIN', 'LIMIT', 'ORDER BY', 'WHERE']
           }
         });
       });
@@ -330,7 +330,31 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['GROUP BY', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
+              suggestKeywords: ['GROUP BY', 'JOIN', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary JOIN TablePrimary ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo JOIN baz ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ON']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary with linebreaks', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar\nFROM foo\n',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['GROUP BY', 'JOIN', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
             }
           });
         });
@@ -374,6 +398,18 @@ define([
         it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL VIEW udtf ', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL VIEW udtf ', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) b ',
             afterCursor: '',
             dialect: 'hive',
             expectedResult: {
@@ -707,6 +743,36 @@ define([
       });
     });
 
+    describe('functions', function () {
+      xit('should suggest fields in functions', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT id, SUM(',
+          afterCursor: ' FROM testTable',
+          ignoreErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              table: 'testTable'
+            }
+          }
+        });
+      });
+
+      xit('should suggest fields in functions after operators', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT id, SUM(a * ',
+          afterCursor: ' FROM testTable',
+          ignoreErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              table: 'testTable'
+            }
+          }
+        });
+      })
+    });
+
     describe('update statements', function () {
       it('should suggest tables after UPDATE', function() {
         assertAutoComplete({
@@ -1009,6 +1075,21 @@ define([
         });
       });
 
+      it('should suggest struct from map values without a given key after where', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE testMap[].',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns : {
+              table: 'testTable',
+              identifierChain: [{ name: 'testMap', key: null }]
+            }
+          }
+        });
+      });
+
       // Lateral view === only hive?
       describe('lateral views', function() {
 
@@ -1202,6 +1283,46 @@ define([
                 table: 'testTable'
               },
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }]
+            }
+          });
+        });
+
+        xit('should suggest columns in explode', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              suggestColumns: {
+                table: 'testTable'
+              }
+            }
+          });
+        });
+
+        xit('should suggest columns in explode for structs', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(a.b.',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              suggestColumns: {
+                table: 'testTable',
+                identifierChain: [ { name: 'a' }, { name: 'b' }]
+              }
+            }
+          });
+        });
+
+        xit('should suggest columns in posexplode', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable LATERAL VIEW posexplode(',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              suggestColumns: {
+                table: 'testTable'
+              }
             }
           });
         });
@@ -1462,6 +1583,22 @@ define([
         });
       });
 
+      it('should suggest fields from nested structs with table alias', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT tt.columnA.fieldC.',
+          afterCursor: ' FROM testTable tt',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: {
+              table: 'testTable',
+              identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
+            }
+          }
+        });
+      });
+
+
       // TODO: Result should have 'key', 'key' is only possible after call to see column type but as it's
       //       after FROM perhaps only maps are allowed there?
       //       If the map has a scalar value type (int etc.) it should also suggest 'value'
@@ -1469,6 +1606,22 @@ define([
       it('should suggest fields from map values of type structs', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT tm.',
+          afterCursor: ' FROM testTable t, t.testMap tm;',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestColumns : {
+              table: 'testTable',
+              identifierChain: [{ name: 'testMap' }]
+            }
+          }
+        });
+      });
+
+      it('should suggest fields from map values of type structs with partial identifier', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT tm.a',
           afterCursor: ' FROM testTable t, t.testMap tm;',
           dialect: 'impala',
           expectedResult: {
@@ -1653,6 +1806,20 @@ define([
           }
         });
       });
+
+      it('should suggest values for columns in conditions', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a, b, c FROM testTable WHERE d >= ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: {
+              table: 'testTable',
+              identifierChain: [{ name: 'd' }]
+            }
+          }
+        });
+      });
     });
 
     describe('field completion', function() {
@@ -1671,6 +1838,18 @@ define([
       it('should suggest multiple columns for table', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT a, ',
+          afterCursor: ' FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true, // TODO: Correct?
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest multiple columns for table without space', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a,',
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
@@ -1731,6 +1910,17 @@ define([
       it('should suggest columns for table after WHERE', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for table after WHERE with partial column', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a',
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
@@ -1946,6 +2136,22 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable2'}
+          }
+        });
+      });
+
+      xit('should suggest identifiers or values in join condition if table reference is present from multiple tables', function() {
+        assertAutoComplete({
+          beforeCursor: 'select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ',
+          afterCursor: '',
+          ignoreErrors: true,
+          expectedResult: {
+            lowerCase: true,
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
+            suggestValues: {
+              table: 'testTable1',
+              identifierChain: [{ name: 'testColumn1' }]
+            }
           }
         });
       });
