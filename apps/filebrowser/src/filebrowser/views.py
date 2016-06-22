@@ -437,9 +437,7 @@ def listdir_paged(request, path):
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
         'path': path,
-        's3_path': 's3://',
         'breadcrumbs': breadcrumbs,
-        'is_s3_enabled': is_s3_enabled(),
         'current_request_path': request.path,
         'files': page.object_list,
         'page': _massage_page(page),
