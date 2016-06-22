@@ -15,6 +15,7 @@
 ## limitations under the License.
 
 <%!
+from aws.conf import is_enabled as is_s3_enabled
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
@@ -417,8 +418,39 @@ if USE_NEW_EDITOR.get():
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li class="hide1380"><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
-    <li class="hideMoreThan1380"><a title="${_('File Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i></a></li>
+      % if not is_s3_enabled():
+      <li class="hide1380">
+        <a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
+          <i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;
+        </a>
+      </li>
+      % else:
+        <li class="dropdown hide1380">
+          <a title="${_('File Browsers')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+            <i class="fa fa-file"></i>&nbsp;${_('File Browsers')} <b class="caret"></b>
+          </a>
+          <ul role="menu" class="dropdown-menu">
+            <li><a href="/${apps['filebrowser'].display_name}">
+              <i class="fa fa-fw fa-file" style="vertical-align: middle"></i>${_('HDFS Browser')}</a>
+            </li>
+            <li><a href="/${apps['filebrowser'].display_name}/view=S3://">
+              <i class="fa fa-fw fa-cloud" style="vertical-align: middle"></i>${_('S3 Browser')}</a>
+            </li>
+          </ul>
+        </li>
+      % endif
+      <li class="hideMoreThan1380">
+        <a title="${_('HDFS Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
+          <i class="fa fa-file"></i>
+        </a>
+      </li>
+      <li class="hideMoreThan1380">
+        % if is_s3_enabled():
+          <a title="${_('S3 Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3://">
+            <i class="fa fa-cloud"></i>
+          </a>
+        % endif
+      </li>
     % endif
     % if 'jobbrowser' in apps:
     <li class="hide1380"><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
