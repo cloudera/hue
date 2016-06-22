@@ -53,7 +53,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get().strip() != ''
+  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None
 
 
 def config_validator(user):
