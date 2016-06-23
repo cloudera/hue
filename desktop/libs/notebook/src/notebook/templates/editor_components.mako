@@ -171,7 +171,7 @@ ${ require.config() }
 
 </%def>
 
-<%def name="topBar(mode='notebook')">
+<%def name="topBar()">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -212,7 +212,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-        % if mode != 'editor':
+        <!-- ko if: editorMode() == 'editor' -->
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-bars"></i>
@@ -250,21 +250,22 @@ ${ hueIcons.symbols() }
             </li>
           </ul>
         </div>
-        % endif
+        <!-- /ko -->
 
         &nbsp;&nbsp;&nbsp;
 
-        % if mode == 'editor':
+        <!-- ko if: editorMode() == 'editor' -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook(true); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _('Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
-        % else:
+        <!-- /ko -->
+        <!-- ko if: editorMode() != 'editor' -->
         <a class="btn" href="javascript:void(0)" data-bind="click: newNotebook" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
-        % endif
+        <!-- /ko -->
 
-        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType() }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType(), 'title':  editorMode() == 'editor' ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
 
@@ -278,8 +279,7 @@ ${ hueIcons.symbols() }
       <div class="nav-collapse">
         <ul class="nav editor-nav">
           <li class="currentApp">
-
-            % if mode == 'editor':
+            <!-- ko if: editorMode() == 'editor' -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
@@ -302,11 +302,13 @@ ${ hueIcons.symbols() }
                 SQL
               <!-- /ko -->
               </a>
-            % else:
+            <!-- /ko -->
+            <!-- ko if: editorMode() != 'editor' -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
-            % endif
+            <!-- /ko -->            
           </li>
+
           <!-- ko with: selectedNotebook -->
           <li class="no-horiz-padding">
             <a>&nbsp;</a>
@@ -900,7 +902,7 @@ ${ hueIcons.symbols() }
 </a>
 
 
-<div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
+<div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPlayerMode() ? '0' : '20px' }" >
     <div class="vertical-full">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook'}">
@@ -927,7 +929,7 @@ ${ hueIcons.symbols() }
               showStats: true
             },
           },
-          visibleAssistPanels: editorMode ? ['sql'] : []
+          visibleAssistPanels: editorMode() ? ['sql'] : []
         }
       }"></div>
   </div>
@@ -1045,8 +1047,8 @@ ${ hueIcons.symbols() }
        </div>
     </div>
 
-    ## mode == 'editor', mode not defined yet
     % if ENABLE_QUERY_SCHEDULING.get():
+    <!-- ko if: editorMode() == 'editor' -->
     <div class="tab-pane" id="scheduleTab">
 
       <!-- ko if: $root.selectedNotebook() -->
@@ -1082,6 +1084,7 @@ ${ hueIcons.symbols() }
       <!-- /ko -->
       <!-- /ko -->
     </div>
+    <!-- /ko -->
     % endif
 
   </div>
@@ -1308,25 +1311,25 @@ ${ hueIcons.symbols() }
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></a>
   </div>
-  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="visible: $root.editorMode && !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times fa-fw"></i></a>
+  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="visible: $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times fa-fw"></i></a>
 </script>
 
 <script type="text/html" id="snippet">
-  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode, selector: '.hover-actions' }">
-    <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode || inFocus, selector: '.snippet-actions' }">
-      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode(), selector: '.hover-actions' }">
+    <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus, selector: '.snippet-actions' }">
+      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
-              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
+              <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-type-controls' } --><!-- /ko -->
               <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
             </div>
             <div class="snippet-body" data-bind="clickForAceFocus: ace">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
-                <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
-                <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
+              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+                <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
+                <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
               </h2>
               <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
@@ -1338,12 +1341,12 @@ ${ hueIcons.symbols() }
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
-          <!-- ko if: $root.editorMode -->
+          <!-- ko template: { if: $root.editorMode(), name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko if: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: 'query-tabs' --><!-- /ko -->
           <!-- /ko -->
-          <!-- ko ifnot: $root.editorMode -->
+          <!-- ko ifnot: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
           <!-- /ko -->
@@ -1431,8 +1434,8 @@ ${ hueIcons.symbols() }
     </div>
   </div>
   <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
+      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         openIt: '${ _ko("Shift + Click to open it") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
@@ -1440,10 +1443,10 @@ ${ hueIcons.symbols() }
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
         aceOptions: {
-          showLineNumbers: $root.editorMode,
-          showGutter: $root.editorMode,
-          maxLines: $root.editorMode ? null : 25,
-          minLines: $root.editorMode ? null : 3
+          showLineNumbers: $root.editorMode(),
+          showGutter: $root.editorMode(),
+          maxLines: $root.editorMode() ? null : 25,
+          minLines: $root.editorMode() ? null : 3
         }
       }"></div>
       <ul class="table-drop-menu hue-context-menu">
@@ -1766,16 +1769,16 @@ ${ hueIcons.symbols() }
     <a class="snippet-side-btn blue" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
+    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
       <i class="fa fa-fw fa-repeat snippet-side-single"></i>
     </a>
-    <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode && result.statements_count() > 1">
+    <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
     <a class="snippet-side-btn blue" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Stop the currently running statement') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="attr: {'title': $root.editorMode && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }">
+    <a class="snippet-side-btn" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }">
       <i class="fa fa-fw fa-play snippet-side-single"></i>
     </a>
     <!-- ko if: isSqlDialect -->
@@ -1921,10 +1924,10 @@ ${ hueIcons.symbols() }
 
 
 <div class="hoverMsg hide">
-  <!-- ko if: $root.editorMode -->
+  <!-- ko if: $root.editorMode() -->
   <p class="hoverText">${_('Drop a SQL file here')}</p>
   <!-- /ko -->
-  <!-- ko ifnot: $root.editorMode -->
+  <!-- ko ifnot: $root.editorMode() -->
   <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
   <!-- /ko -->
 </div>
@@ -1933,10 +1936,10 @@ ${ hueIcons.symbols() }
 <div id="saveAsModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <!-- ko if: $root.editorMode -->
+    <!-- ko if: $root.editorMode() -->
       <h3>${_('Save query as...')}</h3>
     <!-- /ko -->
-    <!-- ko ifnot: $root.editorMode -->
+    <!-- ko ifnot: $root.editorMode() -->
       <h3>${_('Save notebook as...')}</h3>
     <!-- /ko -->
   </div>
@@ -2057,7 +2060,7 @@ ${ hueIcons.symbols() }
   };
 
   var hideHoverMsg = function (vm) {
-    if (vm.editorMode){
+    if (vm.editorMode()){
       $(".hoverText").html("${_('Drop a SQL file here')}");
     } else {
       $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
@@ -2139,10 +2142,10 @@ ${ hueIcons.symbols() }
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        if (vm.editorMode){
+        if (vm.editorMode()){
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
         }
-        if (vm.editorMode) {
+        if (vm.editorMode()) {
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
           $(el).jHueTableExtender({
             fixedHeader: true,
@@ -2185,7 +2188,7 @@ ${ hueIcons.symbols() }
       ]
     });
 
-    if (vm.editorMode) {
+    if (vm.editorMode()) {
       $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
       $(el).jHueTableExtender({
         fixedHeader: true,
@@ -2232,7 +2235,7 @@ ${ hueIcons.symbols() }
 
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    if (!vm.editorMode) {
+    if (!vm.editorMode()) {
       dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
         if ($(el).closest(".results").css("overflow") == "hidden") {
           return;
@@ -2254,17 +2257,17 @@ ${ hueIcons.symbols() }
     var _scrollTimeout = -1;
 
     var scrollElement = dataTableEl;
-    if (vm.editorMode) {
+    if (vm.editorMode()) {
       scrollElement = $('.right-panel');
     }
 
     scrollElement.on('scroll', function () {
-      if (!vm.editorMode || (vm.editorMode && snippet.currentQueryTab() === 'queryResults')) {
+      if (!vm.editorMode() || (vm.editorMode() && snippet.currentQueryTab() === 'queryResults')) {
         var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
         window.clearTimeout(_scrollTimeout);
         scrollElement.data("scrollPosition", scrollElement.scrollTop());
         _scrollTimeout = window.setTimeout(function () {
-          if (vm.editorMode) {
+          if (vm.editorMode()) {
             _lastScrollPosition--; //hack for forcing fetching
           }
           if (_lastScrollPosition != scrollElement.scrollTop() && scrollElement.scrollTop() + scrollElement.outerHeight() + 20 >= scrollElement[0].scrollHeight && _dt && snippet.result.hasMore()) {
@@ -2710,7 +2713,7 @@ ${ hueIcons.symbols() }
         viewModel.selectedNotebook().snippets().forEach(function (snippet) {
           if (snippet.result.meta().length > 0 && ! snippet.result.hasManyColumns()) {
             var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-            if (viewModel.editorMode) {
+            if (viewModel.editorMode()) {
               _el.jHueTableExtender({
                 fixedHeader: true,
                 fixedFirstColumn: true,
@@ -2803,7 +2806,7 @@ ${ hueIcons.symbols() }
 
     function parseExternalJSON(raw) {
       try {
-        if (viewModel.editorMode){
+        if (viewModel.editorMode()){
           replaceAce(raw);
         } else {
           var loaded = typeof raw == "string" ? JSON.parse(raw) : raw;
@@ -3054,7 +3057,7 @@ ${ hueIcons.symbols() }
       });
 
       function newKeyHandler() {
-        if (!viewModel.editorMode) {
+        if (!viewModel.editorMode()) {
           viewModel.selectedNotebook().newSnippet();
         }
         else {
