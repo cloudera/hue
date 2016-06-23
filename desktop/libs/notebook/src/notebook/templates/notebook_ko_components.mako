@@ -15,10 +15,17 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
+
+try:
+  from beeswax.conf import DOWNLOAD_CELL_LIMIT
+except ImportError, e:
+  LOG.warn("Hive app is not enabled")
+  DOWNLOAD_CELL_LIMIT = None
 %>
 
 <%def name="snippetDbSelection()">
@@ -318,12 +325,12 @@ from desktop.views import _ko
       </a>
       <ul class="dropdown-menu less-padding">
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s cells as CSV') % DOWNLOAD_CELL_LIMIT.get() }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as XLS') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s cells as XLS') % DOWNLOAD_CELL_LIMIT.get() }">
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
@@ -354,7 +361,7 @@ from desktop.views import _ko
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('In HDFS (small csv)') }
+                  &nbsp;${ _('In HDFS (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
                   <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
