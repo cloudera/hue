@@ -57,10 +57,38 @@
       completions.push({ value: '*', meta: 'keyword' });
     }
 
-    if (parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
+    if (parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
       var database = parseResult.useDatabase || self.snippet.database();
 
       var deferrals = [];
+
+      if (parseResult.suggestHdfs) {
+        var parts = parseResult.suggestHdfs.path.split('/');
+        // Drop the first " or '
+        parts.shift();
+        // Last one is either partial name or empty
+        parts.pop();
+
+        var hdfsDeferred = $.Deferred();
+        deferrals.push(hdfsDeferred);
+
+        self.snippet.getApiHelper().fetchHdfsPath({
+          pathParts: parts,
+          successCallback: function (data) {
+            if (!data.error) {
+              data.files.forEach(function (file) {
+                if (file.name !== '..' && file.name !== '.') {
+                  completions.push({ value: parseResult.suggestHdfs.path === '' ? '/' + file.name : file.name, meta: file.type });
+                }
+              });
+            }
+            hdfsDeferred.resolve();
+          },
+          silenceErrors: true,
+          errorCallback: hdfsDeferred.resolve,
+          editor: editor
+        });
+      }
 
       if (parseResult.suggestTables) {
         var prefix = parseResult.suggestTables.prependQuestionMark ? '? ' : '';
