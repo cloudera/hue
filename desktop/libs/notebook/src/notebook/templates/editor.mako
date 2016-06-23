@@ -35,7 +35,7 @@ ${ editorComponents.includes() }
   }
 </style>
 
-${ editorComponents.topBar('editor') }
+${ editorComponents.topBar() }
 ${ editorComponents.commonHTML() }
 
 ${ tableStats.tableStats() }

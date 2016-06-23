@@ -448,7 +448,7 @@
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
     self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
     var defaultShowLogs = false;
-    if (vm.editorMode && $.totalStorage('hue.editor.showLogs')) {
+    if (vm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
     self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : defaultShowLogs);
@@ -509,7 +509,7 @@
       if (val) {
         self.getLogs();
       }
-      if (vm.editorMode) {
+      if (vm.editorMode()) {
         $.totalStorage('hue.editor.showLogs', val);
       }
     });
@@ -684,12 +684,12 @@
       self.currentQueryTab('queryHistory');
 
       $.post("/notebook/api/execute", {
-        notebook: vm.editorMode ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
+        notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
 
-        if (vm.editorMode && data.history_id) {
+        if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor?editor=' + data.history_id;
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
@@ -1365,14 +1365,14 @@
 
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
-        "editorMode": vm.editorMode
+        "editorMode": vm.editorMode()
       }, function (data) {
         if (data.status == 0) {
           self.id(data.id);
           self.isSaved(true);
           self.isHistory(false);
           $(document).trigger("info", data.message);
-          if (vm.editorMode) {
+          if (vm.editorMode()) {
             if (! data.save_as && self.snippets()[0].queries().length != 0) {
               self.snippets()[0].queries.unshift({
                 'uuid': data.uuid,
@@ -1407,7 +1407,7 @@
       logGA('close');
       $.post("/notebook/api/notebook/close", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
-        "editorMode": vm.editorMode
+        "editorMode": vm.editorMode()
       });
     };
 
@@ -1702,7 +1702,7 @@
       $.each(notebook.snippets, function (index, snippet) {
         self.addSnippet(snippet);
       });
-      if (vm.editorMode && self.history().length == 0) {
+      if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
           self.updateHistory(['starting', 'running'], 20000);
           self.updateHistory(['available'], 60000 * 5);
@@ -1719,7 +1719,7 @@
     self.userId = options.userId;
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
-      console.log('reload session if in editor mode');
+      console.log('Should happen on new query, or Hive --> Impala only: reload session, saved queries, history if in editor mode');
     });
     self.editorTypeTitle = ko.observable(options.editor_type);
     self.useNewAutocompleter = options.useNewAutocompleter || false;
@@ -1816,7 +1816,10 @@
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
-    self.editorMode = options.mode == 'editor';
+    self.editorMode = ko.observable(options.mode == 'editor');
+    self.editorMode.subscribe(function(newVal) {
+      console.log('should be switchable when max 1 snippet');
+    });
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
@@ -1941,7 +1944,7 @@
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
-        if (self.editorMode) {
+        if (self.editorMode()) {
           self.selectedNotebook().newSnippet();
           if (window.location.getParameter('new') == '') {
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
