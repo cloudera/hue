@@ -33,11 +33,14 @@
 'BY'                                { return 'BY'; }
 'CHAR'                              { return 'CHAR'; }
 'CREATE'                            { return 'CREATE'; }
+'DATABASE'                          { return 'DATABASE'; }
 'DECIMAL'                           { return 'DECIMAL'; }
 'DOUBLE'                            { return 'DOUBLE'; }
+'EXISTS'                            { return 'EXISTS'; }
 'FLOAT'                             { return 'FLOAT'; }
 'FROM'                              { return 'FROM'; }
 'GROUP'                             { return 'GROUP'; }
+'IF'                                { return 'IF'; }
 'INT'                               { return 'INT'; }
 'INTO'                              { return 'INTO'; }
 'IS'                                { return 'IS'; }
@@ -46,6 +49,7 @@
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
+'SCHEMA'                            { return 'SCHEMA'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
 'SET'                               { return 'SET'; }
 'SMALLINT'                          { return 'SMALLINT'; }
@@ -61,6 +65,7 @@
 
 <hive>'AS'                          { return '<hive>AS'; }
 <hive>'BINARY'                      { return '<hive>BINARY'; }
+<hive>'COMMENT'                     { return '<hive>COMMENT'; }
 <hive>'DATA'                        { return '<hive>DATA'; }
 <hive>'DATE'                        { return '<hive>DATE'; }
 <hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
@@ -74,6 +79,7 @@
 
 <hive>[.]                           { return '<hive>.'; }
 
+<impala>'COMMENT'                   { return '<impala>COMMENT'; }
 <impala>'DATA'                      { return '<impala>DATA'; }
 <impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
 <impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
@@ -182,7 +188,7 @@ SqlStatements
 SqlStatement
  : UseStatement
  | DataManipulation
- | TableDefinition
+ | DataDefinition
  | QueryExpression
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
@@ -325,41 +331,154 @@ ValueExpression
  : BooleanValueExpression
  ;
 
+DataDefinition
+ : TableDefinition
+ | DatabaseDefinition
+ | 'CREATE' PartialIdentifierOrCursor
+   {
+     if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+       suggestKeywords(['DATABASE', 'EXTERNAL', 'SCHEMA', 'TABLE']);
+     } else {
+       suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE']);
+     }
+   }
+ ;
+
+DatabaseOrSchema
+ : 'DATABASE'
+ | 'SCHEMA'
+ ;
+
+OptionalIfNotExists
+ :
+ | 'IF' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['NOT EXISTS']);
+   }
+ | 'IF' 'NOT' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['EXISTS']);
+   }
+ | 'IF' 'NOT' 'EXISTS'
+ | 'CURSOR'
+   {
+     suggestKeywords(['IF NOT EXISTS']);
+   }
+ ;
+
+Comment
+ : HiveOrImpalaComment SINGLE_QUOTE
+ | HiveOrImpalaComment SINGLE_QUOTE VALUE
+ | HiveOrImpalaComment SINGLE_QUOTE VALUE SINGLE_QUOTE
+ ;
+
+HivePropertyAssignmentList
+ : HivePropertyAssignment
+ | HivePropertyAssignmentList ',' HivePropertyAssignment
+ ;
+
+HivePropertyAssignment
+ : 'REGULAR_IDENTIFIER' '=' 'REGULAR_IDENTIFIER'
+ | SINGLE_QUOTE VALUE SINGLE_QUOTE '=' SINGLE_QUOTE VALUE SINGLE_QUOTE
+ ;
+
+HiveDbProperties
+ : '<hive>WITH' 'DBPROPERTIES' '(' HivePropertyAssignmentList ')'
+ | '<hive>WITH' 'DBPROPERTIES'
+ | '<hive>WITH' 'CURSOR'
+   {
+     suggestKeywords(['DBPROPERTIES']);
+   }
+ ;
+
+DatabaseDefinitionOptionals
+ : DatabaseDefinitionOptional
+ | DatabaseDefinitionOptional DatabaseDefinitionOptional
+ | DatabaseDefinitionOptional DatabaseDefinitionOptional DatabaseDefinitionOptional
+ ;
+
+DatabaseDefinitionOptional
+ : Comment
+   {
+     parser.yy.afterComment = true;
+   }
+ | HdfsLocation
+   {
+     parser.yy.afterHdfsLocation = true;
+   }
+ | HiveDbProperties
+   {
+     parser.yy.afterHiveDbProperties = true;
+   }
+ ;
+
+CleanUpDatabaseConditions
+ : /* empty */
+   {
+     delete parser.yy.afterComment;
+     delete parser.yy.afterHdfsLocation;
+     delete parser.yy.afterHiveDbProperties;
+   }
+ ;
+
+DatabaseDefinition
+ : 'CREATE' DatabaseOrSchema OptionalIfNotExists
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER'
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' 'CURSOR'
+   {
+     if (parser.yy.dialect === 'hive') {
+       suggestKeywords(['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']);
+     } else if (parser.yy.dialect === 'impala') {
+       suggestKeywords(['COMMENT', 'LOCATION']);
+     }
+   }
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals error
+   // For the HDFS open single quote completion
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals 'CURSOR'
+   {
+     var keywords = [];
+     if (! parser.yy.afterComment) {
+       keywords.push('COMMENT');
+     }
+     if (! parser.yy.afterHdfsLocation) {
+       keywords.push('LOCATION');
+     }
+     if (! parser.yy.afterHiveDbProperties && parser.yy.dialect === 'hive') {
+       keywords.push('WITH DBPROPERTIES');
+     }
+     if (keywords.length > 0) {
+       suggestKeywords(keywords);
+     }
+   }
+ ;
+
 TableDefinition
- : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList TableLocation
+ : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList HdfsLocation
  | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
-        suggestKeywords(['EXTERNAL'])
+        suggestKeywords(['EXTERNAL']);
       }
     }
  | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
-        suggestKeywords(['EXTERNAL'])
+        suggestKeywords(['EXTERNAL']);
       }
     }
  | 'CREATE' PartialIdentifierOrCursor 'TABLE'
     {
       if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
-        suggestKeywords(['EXTERNAL'])
+        suggestKeywords(['EXTERNAL']);
       }
     }
  | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList PartialIdentifierOrCursor
    {
      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
-       suggestKeywords(['LOCATION'])
+       suggestKeywords(['LOCATION']);
      }
    }
  | 'CREATE' 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
- | 'CREATE' PartialIdentifierOrCursor
-    {
-      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
-        suggestKeywords(['EXTERNAL', 'TABLE'])
-      } else {
-        suggestKeywords(['TABLE'])
-      }
-    }
  ;
 
 TableScope
@@ -405,13 +524,18 @@ ColumnDefinitionError
    }
  ;
 
-TableLocation
+HdfsLocation
  : HiveOrImpalaLocation HdfsPath
  ;
 
 HiveOrImpalaLocation
  : '<hive>LOCATION'
  | '<impala>LOCATION'
+ ;
+
+HiveOrImpalaComment
+ : '<hive>COMMENT'
+ | '<impala>COMMENT'
  ;
 
 HdfsPath
@@ -430,11 +554,11 @@ HdfsPath
     }
  | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR' 'HDFS_END_QUOTE'
    {
-     suggestHdfs({ path: '/' });
+     suggestHdfs({ path: '' });
    }
  | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR'
     {
-      suggestHdfs({ path: '/' });
+      suggestHdfs({ path: '' });
     }
  ;
 
@@ -645,7 +769,7 @@ ColumnReference
 BasicIdentifierChain
  : InitIdentifierChain IdentifierChain
    {
-     $$ = parser.yy.identifierChain
+     $$ = parser.yy.identifierChain;
      delete parser.yy.identifierChain;
    }
  ;

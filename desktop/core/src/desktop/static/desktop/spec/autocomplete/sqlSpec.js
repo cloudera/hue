@@ -91,7 +91,51 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['TABLE']
+            suggestKeywords: ['DATABASE', 'SCHEMA', 'TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE DATABASE ', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE DATABASE IF ', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE IF ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE SCHEMA ', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE SCHEMA ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords after CREATE DATABASE and before Identifier', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE ',
+          afterCursor: ' bla;',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
           }
         });
       });
@@ -270,6 +314,18 @@ define([
             }
           });
         });
+
+        it('should suggest keywords after CREATE DATABASE foo ', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'LOCATION']
+            }
+          });
+        });
       });
 
       describe('Hive specific', function () {
@@ -294,7 +350,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['EXTERNAL', 'TABLE']
+              suggestKeywords: ['DATABASE', 'EXTERNAL', 'SCHEMA', 'TABLE']
             }
           });
         });
@@ -319,6 +375,42 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+            }
+          });
+        });
+
+        it('should suggest keywords after CREATE DATABASE foo ', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords after CREATE DATABASE foo COMMENT ', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LOCATION', 'WITH DBPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords after CREATE DATABASE foo COMMENT and LOCATION', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH DBPROPERTIES']
             }
           });
         });
@@ -901,6 +993,30 @@ define([
     });
 
     describe('HDFS autocompletion', function () {
+      it('should autocomplete hdfs paths in database location references without initial /', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE foo LOCATION \'',
+          afterCursor: '\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '' }
+          }
+        });
+      });
+
+      it('should autocomplete hdfs paths in database location references after comment without initial /', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE foo COMMENT \'blabla\' LOCATION \'',
+          afterCursor: '\'',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs : { path: '' }
+          }
+        });
+      });
+
       it('should autocomplete hdfs paths in location references without initial /', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) LOCATION \'',
@@ -908,7 +1024,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestHdfs : { path: '/' }
+            suggestHdfs : { path: '' }
           }
         });
       });
@@ -956,7 +1072,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestHdfs: { path: '/'}
+            suggestHdfs: { path: ''}
           }
         });
       });
