@@ -709,10 +709,13 @@ def submit_coordinator(request, doc_id):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
+      jsonify = request.POST.get('format') == 'json'
       job_id = _submit_coordinator(request, coordinator, mapping)
-
-      request.info(_('Coordinator submitted.'))
-      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+      else:
+        request.info(_('Coordinator submitted.'))
+        return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -724,7 +727,8 @@ def submit_coordinator(request, doc_id):
                  'params_form': params_form,
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
-                 'show_dryrun': True
+                 'show_dryrun': True,
+                 'return_json': request.GET.get('format') == 'json'
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
 

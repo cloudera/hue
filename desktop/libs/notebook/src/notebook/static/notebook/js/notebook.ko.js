@@ -1622,6 +1622,7 @@
 
     self.showSubmitPopup = function () {
       $.get('/oozie/editor/coordinator/submit/' + self.dependentsCoordinator()[0].id(), {
+        format: 'json'
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
