@@ -3228,6 +3228,12 @@ ${ hueIcons.symbols() }
         }
       });
 
+      huePubSub.subscribe('submit.popup.return', function(data){
+        console.log('Job id', data.job_id);
+        $.jHueNotify.info('${_('Coordinator submitted.')}');
+        $('.submit-modal').modal('hide');
+      });
+
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet);
