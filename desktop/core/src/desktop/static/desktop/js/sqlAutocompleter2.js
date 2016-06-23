@@ -43,7 +43,7 @@
 
     if (parseResult.suggestKeywords) {
       parseResult.suggestKeywords.forEach(function (keyword) {
-        completions.push({ value: keyword, meta: 'keyword' });
+        completions.push({ value: parseResult.lowerCase ? keyword.toLowerCase() : keyword, meta: 'keyword' });
       });
     }
 
@@ -57,10 +57,29 @@
       completions.push({ value: '*', meta: 'keyword' });
     }
 
-    if (parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
+    if (parseResult.suggestDatabases || parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
       var database = parseResult.useDatabase || self.snippet.database();
 
       var deferrals = [];
+
+      if (parseResult.suggestDatabases) {
+        var databaseDeferred = $.Deferred();
+        deferrals.push(databaseDeferred);
+
+        self.snippet.getApiHelper().loadDatabases({
+          sourceType: self.snippet.type(),
+          successCallback: function (data) {
+            data.forEach(function (db) {
+              completions.push({ value: db + (parseResult.suggestDatabases.appendDot ? '.' : ''), meta: 'database' });
+            });
+            databaseDeferred.resolve();
+
+          },
+          silenceErrors: true,
+          errorCallback: databaseDeferred.resolve
+        })
+
+      }
 
       if (parseResult.suggestHdfs) {
         var parts = parseResult.suggestHdfs.path.split('/');
@@ -261,7 +280,7 @@
     callback(completions);
   };
 
-  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'identifier': 4, 'key' : 5, 'value' : 6, 'keyword': 7 };
+  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'database': 4, 'identifier': 5, 'key' : 6, 'value' : 7, 'keyword': 8 };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {
     completions.sort(function (a, b) {
