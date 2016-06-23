@@ -43,8 +43,8 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 from hadoop.yarn.clients import get_log_client
 import hadoop.yarn.resource_manager_api as resource_manager_api
 
-from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.conf import DISABLE_KILLING_JOBS
+
+from jobbrowser.conf import DISABLE_KILLING_JOBS, LOG_OFFSET, SHARE_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs, can_kill_job
 from jobbrowser.yarn_models import Application
@@ -53,6 +53,9 @@ import urllib2
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+LOG_OFFSET_BYTES = LOG_OFFSET.get()
 
 
 def check_job_permission(view_func):
@@ -273,11 +276,12 @@ def job_attempt_logs(request, job, attempt_index=0):
   return render("job_attempt_logs.mako", request, {
     "attempt_index": attempt_index,
     "job": job,
+    "log_offset": LOG_OFFSET_BYTES
   })
 
 
 @check_job_permission
-def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0):
+def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
   """For async log retrieval as Yarn servers are very slow"""
 
   try:
@@ -289,7 +293,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
 
   link = '/%s/' % name
   params = {}
-  if offset and int(offset) >= 0:
+  if offset != 0:
     params['start'] = offset
 
   root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
@@ -313,7 +317,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
 
 
 @check_job_permission
-def job_single_logs(request, job):
+def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   """
   Try to smartly detect the most useful task attempt (e.g. Oozie launcher, failed task) and get its MR logs.
   """
@@ -340,7 +344,9 @@ def job_single_logs(request, job):
   if task is None or not task.taskAttemptIds:
     raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
-  return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
+  params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
+
+  return single_task_attempt_logs(request, **params)
 
 @check_job_permission
 def tasks(request, job):
@@ -415,7 +421,7 @@ def single_task_attempt(request, job, taskid, attemptid):
     })
 
 @check_job_permission
-def single_task_attempt_logs(request, job, taskid, attemptid):
+def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_BYTES):
   jt = get_api(request.user, request.jt)
 
   job_link = jt.get_job_link(job.jobId)
@@ -436,7 +442,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
       diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
     logs = [diagnostic_log]
     # Add remaining logs
-    logs += [section.strip() for section in attempt.get_task_log()]
+    logs += [section.strip() for section in attempt.get_task_log(offset=offset)]
     log_tab = [i for i, log in enumerate(logs) if log]
     if log_tab:
       first_log_tab = log_tab[0]

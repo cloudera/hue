@@ -21,7 +21,6 @@ import logging
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -215,7 +214,7 @@ def delete(request):
 @show_oozie_error
 def watch(request, job_id):
   oozie_workflow = check_job_access_permission(request, job_id)
-  logs, workflow_actions, is_really_done = api.get(request.jt, request.jt, request.user).get_log(request, oozie_workflow)
+  logs, workflow_actions, is_really_done = api.get(request.fs, request.jt, request.user).get_log(request, oozie_workflow)
   output = get_workflow_output(oozie_workflow, request.fs)
 
   workflow = {

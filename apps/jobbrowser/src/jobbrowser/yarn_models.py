@@ -33,7 +33,7 @@ from hadoop.yarn.clients import get_log_client
 from jobbrowser.models import format_unixtime_ms
 
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class Application(object):
@@ -139,7 +139,7 @@ class Job(object):
     for attr in attrs.keys():
       if attr == 'acls':
         # 'acls' are actually not available in the API
-        LOGGER.warn('Not using attribute: %s' % attrs[attr])
+        LOG.warn('Not using attribute: %s' % attrs[attr])
       else:
         setattr(self, attr, attrs[attr])
 
@@ -359,9 +359,10 @@ class Attempt:
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
       params = {}
-      if int(offset) >= 0:
+      if int(offset) != 0:
         params['start'] = offset
 
+      response = None
       try:
         log_link = re.sub('job_[^/]+', self.id, log_link)
         root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
@@ -371,8 +372,9 @@ class Attempt:
         log = _('Failed to retrieve log: %s' % e)
         try:
           debug_info = '\nLog Link: %s' % log_link
-          debug_info += '\nHTML Response: %s' % response
-          LOGGER.error(debug_info)
+          if response:
+            debug_info += '\nHTML Response: %s' % response
+          LOG.error(debug_info)
         except:
           LOG.exception('failed to build debug info')
 
