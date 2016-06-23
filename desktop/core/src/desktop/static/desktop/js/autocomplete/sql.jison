@@ -32,10 +32,11 @@
 'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
 'CHAR'                              { return 'CHAR'; }
-'CREATE'                            { return 'CREATE'; }
+'CREATE'                            { determineCase(yytext); return 'CREATE'; }
 'DATABASE'                          { return 'DATABASE'; }
 'DECIMAL'                           { return 'DECIMAL'; }
 'DOUBLE'                            { return 'DOUBLE'; }
+'DROP'                              { determineCase(yytext); return 'DROP'; }
 'EXISTS'                            { return 'EXISTS'; }
 'FLOAT'                             { return 'FLOAT'; }
 'FROM'                              { return 'FROM'; }
@@ -49,6 +50,7 @@
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
+'ROLE'                              { return 'ROLE'; }
 'SCHEMA'                            { return 'SCHEMA'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
 'SET'                               { return 'SET'; }
@@ -69,22 +71,30 @@
 <hive>'DATA'                        { return '<hive>DATA'; }
 <hive>'DATE'                        { return '<hive>DATE'; }
 <hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
+<hive>'FUNCTION'                    { return '<hive>FUNCTION'; }
+<hive>'INDEX'                       { return '<hive>INDEX'; }
 <hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
 <hive>'LATERAL'                     { return '<hive>LATERAL'; }
 <hive>'LOAD'                        { return '<hive>LOAD'; }
 <hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
+<hive>'MACRO'                       { return '<hive>MACRO'; }
+<hive>'TEMPORARY'                   { return '<hive>TEMPORARY'; }
 
 <hive>'explode'                     { return '<hive>explode'; }
 <hive>'posexplode'                     { return '<hive>posexplode'; }
 
 <hive>[.]                           { return '<hive>.'; }
 
+<impala>'AGGREGATE'                 { return '<impala>AGGREGATE'; }
 <impala>'COMMENT'                   { return '<impala>COMMENT'; }
 <impala>'DATA'                      { return '<impala>DATA'; }
+<impala>'FUNCTION'                  { return '<impala>FUNCTION'; }
 <impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
+<impala>'INCREMENTAL'               { return '<impala>INCREMENTAL'; }
 <impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LOAD'                      { return '<impala>LOAD'; }
 <impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
+<impala>'STATS'                     { return '<impala>STATS'; }
 
 <impala>[.]                         { return '<impala>.'; }
 
@@ -186,8 +196,7 @@ SqlStatements
  ;
 
 SqlStatement
- : UseStatement
- | DataManipulation
+ : DataManipulation
  | DataDefinition
  | QueryExpression
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
@@ -332,6 +341,12 @@ ValueExpression
  ;
 
 DataDefinition
+ : CreateStatement
+ | DropStatement
+ | UseStatement
+ ;
+
+CreateStatement
  : TableDefinition
  | DatabaseDefinition
  | 'CREATE' PartialIdentifierOrCursor
@@ -344,9 +359,91 @@ DataDefinition
    }
  ;
 
+DropStatement
+ : 'DROP' PartialIdentifierOrCursor
+   {
+     if (parser.yy.dialect === 'hive') {
+       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+     } else if (parser.yy.dialect === 'impala') {
+       suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
+     } else {
+       suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
+     }
+   }
+ | DropDatabaseStatement
+ | DropTableStatement
+ ;
+
+OptionalHiveCascadeOrRestrict
+ :
+ | '<hive>CASCADE'
+ | '<hive>RESTRICT'
+ ;
+
+DropDatabaseStatement
+ : 'DROP' DatabaseOrSchema OptionalIfExists
+ | 'DROP' DatabaseOrSchema OptionalIfExists PartialIdentifierOrCursor
+   {
+     if (!$3) {
+       suggestKeywords(['IF EXISTS']);
+     }
+     suggestDatabases();
+   }
+ | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier PartialIdentifierOrCursor
+   {
+     if (parser.yy.dialect === 'hive') {
+       suggestKeywords(['CASCADE', 'RESTRICT']);
+     }
+   }
+ | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
+ ;
+
+DropTableStatement
+ : 'DROP' 'TABLE' OptionalIfExists
+ | 'DROP' 'TABLE' OptionalIfExists PartialIdentifierOrCursor
+   {
+     if (!$3) {
+       suggestKeywords(['IF EXISTS']);
+     }
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'DROP' 'TABLE' OptionalIfExists TablePrimary
+   {
+     if (!$3 && !$4.partial) {
+       suggestKeywords(['IF EXISTS']);
+     }
+     if ($4.partial) {
+       if ($4.identifierChain.length === 1) {
+         suggestTablesOrColumns($4.identifierChain[0].name);
+       } else if ($1.identifierChain.length === 0) {
+         suggestTables();
+         suggestDatabases({ appendDot: true });
+       }
+     }
+   }
+ | 'DROP' 'TABLE' OptionalIfExists TablePrimary 'CURSOR'
+   {
+     if (parser.yy.dialect === 'hive') {
+       suggestKeywords(['PURGE']);
+     }
+   }
+ ;
+
 DatabaseOrSchema
  : 'DATABASE'
  | 'SCHEMA'
+ ;
+
+OptionalIfExists
+ : { $$ = false }
+ | 'IF' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['EXISTS']);
+   }
+ | 'IF' 'EXISTS'
  ;
 
 OptionalIfNotExists
@@ -1415,6 +1512,8 @@ var lexerModified = false;
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect) {
   parser.yy.activeDialect = dialect;
+  parser.yy.result = {};
+  parser.yy.lowerCase = false;
 
   // Hack to set the inital state of the lexer without first having to hit a token
   // has to be done as the first token found can be dependant on dialect
