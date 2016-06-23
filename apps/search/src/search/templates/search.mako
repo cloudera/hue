@@ -2869,6 +2869,7 @@ $(document).ready(function () {
 
 
   function toggleGridFieldsSelection() {
+    viewModel.resultsHash = '';
     if (viewModel.collection.template.fields().length > 0) {
       viewModel.collection.template.fieldsSelected([])
     }
