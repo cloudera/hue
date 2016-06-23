@@ -36,7 +36,7 @@ urlpatterns = patterns('jobbrowser.views',
 
   # MR2 specific
   url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', 'job_attempt_logs', name='job_attempt_logs'),
-  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)/(?P<name>\w+)?/(?P<offset>\d+)?$', 'job_attempt_logs_json', name='job_attempt_logs_json'),
+  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)/(?P<name>\w+)?/(?P<offset>[\d-]+)?$', 'job_attempt_logs_json', name='job_attempt_logs_json'),
   url(r'^jobs/(?P<jobid>\w+)/job_not_assigned/(?P<path>.+)$','job_not_assigned', name='job_not_assigned'),
 
   # Unused

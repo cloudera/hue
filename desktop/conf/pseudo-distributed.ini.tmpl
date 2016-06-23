@@ -960,6 +960,8 @@
   # Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.
   ## enable_cron_scheduling=true
 
+  # Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).
+  ## log_offset=-1000000
 
 ###########################################################################
 # Settings to configure the Filebrowser app
@@ -1106,6 +1108,8 @@
   # Whether to disalbe the job kill button for all users in the jobbrowser
   ## disable_killing_jobs=false
 
+  # Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).
+  ## log_offset=-1000000
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

@@ -44,8 +44,7 @@ class OozieApi(object):
   """
   WORKFLOW_NAME = 'pig-app-hue-script'
   RE_LOG_END = re.compile('(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed <<<)')
-  RE_LOG_START_RUNNING = re.compile('>>> Invoking Pig command line now >>>(.+?)(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed)', re.M | re.DOTALL)
-  RE_LOG_START_FINISHED = re.compile('(>>> Invoking Pig command line now >>>)', re.M | re.DOTALL)
+  RE_LOG_START_RUNNING = re.compile('(Pig script \[(?:[\w.-]+)\] content:.+)', re.M | re.DOTALL)
   MAX_DASHBOARD_JOBS = 100
 
   def __init__(self, fs, jt, user):
@@ -178,9 +177,13 @@ class OozieApi(object):
 
           if data and 'logs' in data:
             matched_logs = self._match_logs(data)
-            logs[action.name] = LinkJobLogs._make_links(matched_logs)
-            is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
 
+            if matched_logs:
+              logs[action.name] = LinkJobLogs._make_links(matched_logs)
+
+            is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
+            if is_really_done and not matched_logs:
+              LOG.warn('Unable to scrape full pig logs, try increasing the jobbrowser log_offset configuration value.')
       except Exception, e:
         LOG.error('An error occurred while watching the job running: %(error)s' % {'error': e})
         is_really_done = True
@@ -207,13 +210,10 @@ class OozieApi(object):
     """Difficult to match multi lines of text"""
     logs = data['logs'][1]
 
-    if OozieApi.RE_LOG_END.search(logs):
+    if OozieApi.RE_LOG_START_RUNNING.search(logs):
       return re.search(OozieApi.RE_LOG_START_RUNNING, logs).group(1).strip()
     else:
-      group = re.search(OozieApi.RE_LOG_START_FINISHED, logs)
-      i = logs.index(group.group(1)) + len(group.group(1))
-      return logs[i:].strip()
-
+      return None
 
   def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []

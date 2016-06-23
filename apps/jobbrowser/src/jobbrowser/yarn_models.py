@@ -439,7 +439,7 @@ class Attempt:
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
       params = {}
-      if int(offset) >= 0:
+      if int(offset) != 0:
         params['start'] = offset
 
       response = None
