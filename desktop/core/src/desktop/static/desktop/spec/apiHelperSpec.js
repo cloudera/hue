@@ -34,6 +34,10 @@ define([
         expect(subject.successResponseIsError({ status: 0 })).toBeFalsy();
       });
 
+      it("should determine that a success response is an error response if status is 1", function () {
+        expect(subject.successResponseIsError({ status: 1 })).toBeTruthy();
+      });
+
       it("should determine that a success response is an error response if status is -1", function () {
         expect(subject.successResponseIsError({ status: -1 })).toBeTruthy();
       });

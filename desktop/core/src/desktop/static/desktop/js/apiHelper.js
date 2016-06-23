@@ -134,8 +134,7 @@
   ApiHelper.prototype.successResponseIsError = function (response) {
     return typeof response !== 'undefined' && (
         typeof response.traceback !== 'undefined' ||
-        (typeof response.status !== 'undefined' && response.status < 0) ||
-        response.status === 500 ||
+        (typeof response.status !== 'undefined' && response.status !== 0) ||
         response.code === 503 ||
         response.code === 500);
   };
