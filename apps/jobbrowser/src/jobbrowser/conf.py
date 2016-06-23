@@ -32,3 +32,9 @@ DISABLE_KILLING_JOBS = Config(
   type=coerce_bool,
   help=_('Disable the job kill button for all users in the job browser.'))
 
+LOG_OFFSET = Config(
+  key='log_offset',
+  default=-1000000,
+  type=int,
+  help=_('Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).')
+)
