@@ -78,6 +78,7 @@ def notebook(request):
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
+          'editor_type': 'notebook'
       }),
       'is_yarn_mode': is_yarn_mode,
   })
@@ -100,8 +101,7 @@ def editor(request):
           'mode': 'editor',
           'is_optimizer_enabled': has_optimizer(),
           'editor_type': editor_type
-      }),
-      'editor_type': editor_type,
+      })
   })
 
 

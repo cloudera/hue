@@ -171,7 +171,7 @@ ${ require.config() }
 
 </%def>
 
-<%def name="topBar(mode='notebook', editor_type='notebook')">
+<%def name="topBar(mode='notebook')">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -255,7 +255,7 @@ ${ hueIcons.symbols() }
         &nbsp;&nbsp;&nbsp;
 
         % if mode == 'editor':
-        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook(true); }" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook(true); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _('Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % else:
@@ -264,7 +264,7 @@ ${ hueIcons.symbols() }
         </a>
         % endif
 
-        <a class="btn" href="${ url('notebook:notebooks') }?type=${ editor_type }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType() }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
 
@@ -280,23 +280,27 @@ ${ hueIcons.symbols() }
           <li class="currentApp">
 
             % if mode == 'editor':
-              <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
-              % if editor_type == 'impala':
+              <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
+              <!-- ko if: editorType() == 'impala' -->
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
                 Impala
-              % elif editor_type == 'rdbms':
+              <!-- /ko -->
+              <!-- ko if: editorType() == 'rdbms' -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 DB Query
-              % elif editor_type == 'pig':
+              <!-- /ko -->
+              <!-- ko if: editorType() == 'pig' -->
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
-              % elif editor_type in ('beeswax', 'hive'):
+              <!-- /ko -->
+              <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
-              % else:
+              <!-- /ko -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
-              % endif
+              <!-- /ko -->
               </a>
             % else:
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
@@ -2538,9 +2542,9 @@ ${ hueIcons.symbols() }
   function saveTemporarySnippet($element, value) {
     if ($element.data('last-active-editor')) {
       try {
-        %if editor_type:
-        $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.${editor_type}', value);
-        %endif
+        if (viewModel.editorType() != 'notebook') {
+          $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + viewModel.editorType(), value);
+        }
       }
       catch (e){} // storage quota exceeded with enormous editor content
     }

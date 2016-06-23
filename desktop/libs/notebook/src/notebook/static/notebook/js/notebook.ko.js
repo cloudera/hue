@@ -1717,6 +1717,11 @@
     self.i18n = i18n;
     self.user = options.user;
     self.userId = options.userId;
+    self.editorType = ko.observable(options.editor_type);
+    self.editorType.subscribe(function(newVal) {
+      console.log('reload session if in editor mode');
+    });
+    self.editorTypeTitle = ko.observable(options.editor_type);
     self.useNewAutocompleter = options.useNewAutocompleter || false;
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();

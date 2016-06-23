@@ -28,7 +28,7 @@
 ${ commonheader(_('Notebook'), app_name, user, "68px") | n,unicode }
 
 ${ editorComponents.includes() }
-${ editorComponents.topBar(editor_type) }
+${ editorComponents.topBar() }
 <%editorComponents:commonHTML>
   <%def name="addSnippetHTML()">
     <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
