@@ -148,7 +148,8 @@ def get_document(request):
     'children': [],
     'dependencies': [],
     'dependents': [],
-    'data': ''
+    'data': '',
+    'status': 0
   }
 
   response['user_perms'] = {
