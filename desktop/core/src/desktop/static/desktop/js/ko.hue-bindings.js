@@ -1458,6 +1458,7 @@
             }
             ace().resize();
             editorHeight = ace().session.getLength();
+            huePubSub.publish('redraw.fixed.headers');
           }
         }
       });
