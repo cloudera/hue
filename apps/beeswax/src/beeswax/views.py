@@ -885,23 +885,38 @@ def parse_query_context(context):
   return pair
 
 
-def _parse_out_hadoop_jobs(log, engine='mr'):
+def _parse_out_hadoop_jobs(log, engine='mr', with_state=False):
   """
   Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
+
+  with_state: If True, will return a list of dict items with 'job_id', 'started', 'finished'
   """
   ret = []
 
   if engine.lower() == 'mr':
-    pattern = HADOOP_JOBS_RE
+    start_pattern = HADOOP_JOBS_RE
   elif engine.lower() == 'spark':
-    pattern = SPARK_APPLICATION_RE
+    start_pattern = SPARK_APPLICATION_RE
   else:
     raise ValueError(_('Cannot parse job IDs for execution engine %(engine)s') % {'engine': engine})
 
-  for match in pattern.finditer(log):
+  for match in start_pattern.finditer(log):
     job_id = match.group(1)
-    if job_id not in ret:
-      ret.append(job_id)
+
+    if with_state:
+      if job_id not in list(job['job_id'] for job in ret):
+        ret.append({'job_id': job_id, 'started': True, 'finished': False})
+      end_pattern = 'Ended Job = %s' % job_id
+
+      if end_pattern in log:
+        job = next((job for job in ret if job['job_id'] == job_id), None)
+        if job is not None:
+           job['finished'] = True
+        else:
+          ret.append({'job_id': job_id, 'started': True, 'finished': True})
+    else:
+      if job_id not in ret:
+        ret.append(job_id)
 
   return ret
 

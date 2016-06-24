@@ -330,6 +330,103 @@ class TestHiveserver2Api(object):
     assert_equal(self.api.progress(snippet, logs), 50)
 
 
+  def test_get_jobs(self):
+
+    notebook = json.loads("""
+      {
+        "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
+        "id": 1234,
+        "sessions": [{"type": "hive", "properties": [], "id": "1234"}],
+        "type": "query-hive",
+        "name": "Test Hiveserver2 Editor",
+        "isSaved": false,
+        "parentUuid": null
+      }
+    """)
+
+    snippet = json.loads("""
+        {
+            "status": "running",
+            "database": "default",
+            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+            "result": {
+                "type": "table",
+                "handle": {
+                  "statement_id": 0,
+                  "statements_count": 2,
+                  "has_more_statements": true
+                },
+                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+            },
+            "statement": "%(statement)s",
+            "type": "hive",
+            "properties": {
+                "files": [],
+                "functions": [],
+                "settings": []
+            }
+        }
+      """ % {'statement': "SELECT * FROM sample_07;"}
+                         )
+
+    logs = """INFO  : Compiling command(queryId=hive_20160624155555_c81f8b95-af22-45fd-8e2c-fb012f530f13): SELECT app,
+                     AVG(bytes) AS avg_bytes
+            FROM web_logs
+            GROUP BY  app
+            HAVING app IS NOT NULL
+            ORDER BY avg_bytes DESC
+            INFO  : Semantic Analysis Completed
+            INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:app, type:string, comment:null), FieldSchema(name:avg_bytes, type:double, comment:null)], properties:null)
+            INFO  : Completed compiling command(queryId=hive_20160624155555_c81f8b95-af22-45fd-8e2c-fb012f530f13); Time taken: 0.073 seconds
+            INFO  : Executing command(queryId=hive_20160624155555_c81f8b95-af22-45fd-8e2c-fb012f530f13): SELECT app,
+                     AVG(bytes) AS avg_bytes
+            FROM web_logs
+            GROUP BY  app
+            HAVING app IS NOT NULL
+            ORDER BY avg_bytes DESC
+            INFO  : Query ID = hive_20160624155555_c81f8b95-af22-45fd-8e2c-fb012f530f13
+            INFO  : Total jobs = 2
+            INFO  : Launching Job 1 out of 2
+            INFO  : Starting task [Stage-1:MAPRED] in serial mode
+            INFO  : Number of reduce tasks not specified. Estimated from input data size: 1
+            INFO  : In order to change the average load for a reducer (in bytes):
+            INFO  :   set hive.exec.reducers.bytes.per.reducer=<number>
+            INFO  : In order to limit the maximum number of reducers:
+            INFO  :   set hive.exec.reducers.max=<number>
+            INFO  : In order to set a constant number of reducers:
+            INFO  :   set mapreduce.job.reduces=<number>
+            INFO  : number of splits:1
+            INFO  : Submitting tokens for job: job_1466630204796_0059
+            INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466630204796_0059/
+            INFO  : Starting Job = job_1466630204796_0059, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466630204796_0059/
+            INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466630204796_0059
+    """
+
+    jobs = self.api.get_jobs(notebook, snippet, logs)
+    assert_true(isinstance(jobs, list))
+    assert_true(len(jobs), 1)
+    assert_equal(jobs[0]['name'], 'job_1466630204796_0059')
+    assert_equal(jobs[0]['started'], True)
+    assert_equal(jobs[0]['finished'], False)
+    assert_true('url' in jobs[0])
+
+    logs += """INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+        INFO  : 2016-06-24 15:55:51,125 Stage-1 map = 0%,  reduce = 0%
+        INFO  : 2016-06-24 15:56:00,410 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.12 sec
+        INFO  : 2016-06-24 15:56:09,709 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 4.04 sec
+        INFO  : MapReduce Total cumulative CPU time: 4 seconds 40 msec
+        INFO  : Ended Job = job_1466630204796_0059
+        INFO  : Launching Job 2 out of 2
+    """
+
+
+    jobs = self.api.get_jobs(notebook, snippet, logs)
+    assert_true(len(jobs), 1)
+    assert_equal(jobs[0]['name'], 'job_1466630204796_0059')
+    assert_equal(jobs[0]['started'], True)
+    assert_equal(jobs[0]['finished'], True)
+
+
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
   @classmethod
