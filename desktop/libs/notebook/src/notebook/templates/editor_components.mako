@@ -1297,13 +1297,8 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="editor-snippet-header">
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;">
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
-    <!-- ko if: availableDatabases().length > 0 -->
-    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"  title="${ _('Selected database') }"></span> <i class="fa fa-caret-down"></i></a>
-    <div class="dropdown-menu" style="overflow-y: scroll; min-width: 170px; min-height: 34px; max-height: 200px;">
-      <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: availableDatabases, minHeight: 34, container: '.dropdown-menu' }">
-        <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a></li>
-      </ul>
-    </div>
+    <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
+    <div data-bind="component: { name: 'snippet-db-selection', params: { selectedDatabase: database, availableDatabases: availableDatabases } }" style="display: inline-block"></div>
     <!-- /ko -->
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>

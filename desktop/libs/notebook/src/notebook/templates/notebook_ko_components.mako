@@ -21,6 +21,154 @@ from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
+<%def name="snippetDbSelection()">
+  <style>
+    .db-selection-input {
+      width: 175px !important;
+      height: 12px !important;
+      font-size: 12px !important;
+      border: 1px solid rgba(0,0,0,0.2) !important;
+      border-radius: 2px !important;
+      box-shadow: none !important;
+      margin-left: -1px;
+    }
+  </style>
+
+  <script type="text/html" id="snippet-db-selection-template">
+    <!-- ko ifnot: dbSelectionVisible -->
+    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }">
+      <span data-bind="text: selectedDatabase, visible: ! dbSelectionVisible()"  title="${ _('Selected database') }"></span>
+      <i class="fa fa-caret-down"></i>
+    </a>
+    <!-- /ko -->
+    <!-- ko if: dbSelectionVisible -->
+    <input class="db-selection-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': selectedDatabase }, visible: dbSelectionVisible, style: { color: filterEdited() ? '#000' : '#AAA' }"/>
+    <i class="fa fa-caret-down"></i>
+    <!-- /ko -->
+    <div data-bind="css: { 'open' : dbSelectionVisible }" style="display: inline-block;">
+      <div class="dropdown-menu" data-bind="visible: filteredDatabases().length > 0" style="overflow-y: scroll; width: 190px; min-height: 34px; max-height: 200px;">
+        <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredDatabases, minHeight: 34, container: '.dropdown-menu' }">
+          <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.selectedDatabase($data); }"></a></li>
+        </ul>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+
+      var SnippetDbSelection = function (params, element) {
+        var self = this;
+        self.dbSelectionVisible = ko.observable(false);
+        self.selectedDatabase = params.selectedDatabase;
+        self.availableDatabases = params.availableDatabases;
+
+        var closeOnOutsideClick = function (e) {
+          var $input = $(element).find('.db-selection-input');
+          if (!$input.is($(e.target))) {
+            self.dbSelectionVisible(false);
+          }
+        };
+
+        var inputKeyup = function (e) {
+          var $currentActive = $(element).find('.hue-inner-drop-down > .active');
+          var activeTop = $currentActive.length !== 0 ? $currentActive.position().top : 0;
+          var activeHeight = $currentActive.length !== 0 ? $currentActive.outerHeight(true) : $(element).find('.hue-inner-drop-down li:first-child').outerHeight(true);
+          var containerHeight = $(element).find('.dropdown-menu').innerHeight();
+          var containerScrollTop = $(element).find('.dropdown-menu').scrollTop();
+
+          $currentActive.removeClass('active');
+          if (e.keyCode === 27) {
+            // esc
+            self.dbSelectionVisible(false);
+          } else if (e.keyCode === 38) {
+            // up
+            if ($currentActive.length !== 0 && $currentActive.prev().length !== 0) {
+              if (activeTop < containerScrollTop + activeHeight) {
+                $(element).find('.dropdown-menu').scrollTop(activeTop - containerHeight/2);
+              }
+              $currentActive.prev().addClass('active');
+            }
+          } else if (e.keyCode === 40) {
+            // down
+            if ($currentActive.length === 0) {
+              $(element).find('.hue-inner-drop-down li:first-child').addClass('active');
+            } else if ($currentActive.next().length !== 0) {
+              if ((activeTop + activeHeight *3) > containerHeight - containerScrollTop) {
+                $(element).find('.dropdown-menu').scrollTop(activeTop - containerHeight/2);
+              }
+              $currentActive.next().addClass('active');
+            } else {
+              $currentActive.addClass('active');
+            }
+          } else if (e.keyCode === 13) {
+            // enter
+            if ($currentActive.length > 0) {
+              self.selectedDatabase(ko.dataFor($currentActive[0]));
+              self.dbSelectionVisible(false);
+              $(element).find('.dropdown-menu').scrollTop(0)
+            }
+          } else {
+            $(element).find('.dropdown-menu').scrollTop(0)
+          }
+        };
+        self.filter = ko.observable('');
+
+        self.selectedDatabase.subscribe(function () {
+          self.dbSelectionVisible(false);
+        });
+
+        self.filterEdited = ko.observable(false);
+
+        self.filter.subscribe(function () {
+          self.filterEdited(true);
+          $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
+        });
+        self.dbSelectionVisible.subscribe(function (newValue) {
+          self.filterEdited(false);
+          if (newValue) {
+            window.setTimeout(function () {
+              self.filter('');
+              $(window).on('click', closeOnOutsideClick);
+              $(element).find('.db-selection-input').on('keyup', inputKeyup);
+              $(element).find('.db-selection-input').focus();
+            }, 0);
+          } else {
+            $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
+            $(window).off('click', closeOnOutsideClick);
+            $(element).find('.db-selection-input').off('keyup', inputKeyup);
+          }
+        });
+        self.filteredDatabases = ko.pureComputed(function () {
+          if (self.filter() === '' || ! self.filterEdited()) {
+            return self.availableDatabases();
+          } else {
+            var lowerFilter = self.filter().toLowerCase();
+            return self.availableDatabases().filter(function (database) {
+              return database.toLowerCase().indexOf(lowerFilter) !== -1;
+            });
+          }
+        });
+      };
+
+      ko.components.register('snippet-db-selection', {
+        viewModel: {
+          createViewModel: function(params, componentInfo) {
+            return new SnippetDbSelection(params, componentInfo.element);
+          }
+        },
+        template: { element: 'snippet-db-selection-template' }
+      });
+    }));
+  </script>
+</%def>
+
 <%def name="addSnippetMenu()">
   <script type="text/html" id="add-snippet-menu-template">
     <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
