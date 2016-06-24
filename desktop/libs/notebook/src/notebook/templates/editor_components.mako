@@ -279,7 +279,7 @@ ${ hueIcons.symbols() }
       <div class="nav-collapse">
         <ul class="nav editor-nav">
           <li class="currentApp">
-            <!-- ko if: editorMode() == 'editor' -->
+            <!-- ko if: editorMode() -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
@@ -303,7 +303,7 @@ ${ hueIcons.symbols() }
               <!-- /ko -->
               </a>
             <!-- /ko -->
-            <!-- ko if: editorMode() != 'editor' -->
+            <!-- ko ifnot: editorMode() -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
             <!-- /ko -->            
@@ -1048,7 +1048,7 @@ ${ hueIcons.symbols() }
     </div>
 
     % if ENABLE_QUERY_SCHEDULING.get():
-    <!-- ko if: editorMode() == 'editor' -->
+    <!-- ko if: editorMode() -->
     <div class="tab-pane" id="scheduleTab">
 
       <!-- ko if: $root.selectedNotebook() -->
