@@ -409,6 +409,11 @@ def import_documents(request):
     else:  # Update existing doc or create new
       doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
 
+    # If the doc contains any history dependencies, ignore them
+    # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
+    deps_minus_history = [dep for dep in doc.get('dependencies', []) if len(dep) >= 3 and not dep[2]]
+    doc['dependencies'] = deps_minus_history
+
     # Set last modified date to now
     doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
     docs.append(doc)
