@@ -302,6 +302,7 @@ if USE_NEW_EDITOR.get():
           },
           function(data) {
             if (data != null && data.jobs != null) {
+              huePubSub.publish('jobbrowser.data', data.jobs);
               if (data.jobs.length > 0){
                 $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
               }
@@ -314,6 +315,7 @@ if USE_NEW_EDITOR.get():
           window.clearTimeout(checkJobBrowserStatusIdx);
         });
       }
+      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
       % endif
 
       function openDropdown(which, timeout){

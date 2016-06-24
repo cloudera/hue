@@ -617,6 +617,24 @@ h1.empty {
   background-color: #fdae6b;
 }
 
+.progress-job {
+  height: 2px;
+}
+
+.jobs-overlay {
+  background-color: transparent;
+}
+
+.jobs-overlay li {
+  background-color: #FFF;
+  margin-bottom: 5px;
+  padding: 0;
+}
+
+.jobs-overlay li a {
+  margin: 6px;
+}
+
 @-webkit-keyframes pulsate {
   0% {
     margin-left: 0;
