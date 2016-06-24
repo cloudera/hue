@@ -257,7 +257,7 @@ ${ assist.assistPanel() }
     <div title="${ _('Owner') }">
       <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
     </div>
-    <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
+    <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time)"></span></div>
     <div title="${ _('Format') }">
       <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
       <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span>
@@ -291,17 +291,17 @@ ${ assist.assistPanel() }
         <!-- ko if: typeof last_modified_by !== 'undefined' -->
           <div title="${ _('Last modified by') }"><i class="fa fa-fw fa-user muted"></i> <span data-bind="text: last_modified_by"></span> </div>
         <!-- /ko -->
-        <!-- ko if: typeof last_modified_time  !== 'undefined' -->
-          <div title="${ _('Last modified time') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: last_modified_time"></span></div>
+        <!-- ko if: typeof last_modified_time !== 'undefined' -->
+          <div title="${ _('Last modified time') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(last_modified_time*1000)"></span></div>
         <!-- /ko -->
-        <!-- ko if: typeof numFiles !== 'undefined' && last_modified_by == 'undefined' -->
+        <!-- ko if: typeof numFiles !== 'undefined' && typeof last_modified_by === 'undefined' -->
           <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span> ${ _('files') }</div>
         <!-- /ko -->
         <!-- ko if: typeof numRows !== 'undefined' -->
           <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span> ${ _('rows') }</div>
         <!-- /ko -->
-        <!-- ko if: typeof totalSize !== 'undefined' && last_modified_by == 'undefined' -->
-          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span> ${ _('bytes') }</div>
+        <!-- ko if: typeof totalSize !== 'undefined' && typeof last_modified_by === 'undefined' -->
+          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: filesize(totalSize)"></span></div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
