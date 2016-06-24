@@ -2414,6 +2414,7 @@ body {
 }
 
 .hue-inner-drop-down > li > a:hover,
+.hue-inner-drop-down > li.active,
 .hue-context-menu > li > a:not(.disabled):hover {
   background-color: #DBE8F1;
 }

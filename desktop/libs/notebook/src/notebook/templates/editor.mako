@@ -42,6 +42,7 @@ ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }
+${ notebookKoComponents.snippetDbSelection() }
 
 ${ editorComponents.commonJS() }
 
