@@ -1561,7 +1561,7 @@ ${ hueIcons.symbols() }
         <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
       </li>
     </ul>
-    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, hasFocus: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
+    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
     <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
       ${ _('No results found') }
     </div>

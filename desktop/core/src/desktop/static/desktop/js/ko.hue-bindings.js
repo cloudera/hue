@@ -1706,6 +1706,13 @@
           }
         }
       });
+    },
+    update: function (element, valueAccessor) {
+      var $el = $(element);
+      var prop = valueAccessor();
+      if (ko.isObservable(prop) && prop()) {
+        $el.focus();
+      }
     }
   }
 
