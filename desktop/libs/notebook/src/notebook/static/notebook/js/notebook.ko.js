@@ -1942,7 +1942,11 @@
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
           }
-          hueUtils.changeURL('/notebook/editor');
+          if (window.location.getParameter('type')) {
+            hueUtils.changeURL('/notebook/editor?type=' + window.location.getParameter('type'));
+          } else {
+            hueUtils.changeURL('/notebook/editor');
+          }
         } else {
           hueUtils.changeURL('/notebook/notebook');
         }
