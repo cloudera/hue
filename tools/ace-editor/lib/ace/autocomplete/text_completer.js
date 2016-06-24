@@ -37,7 +37,7 @@ define(function(require, exports, module) {
 
     function stripSqlComments(txt) {
         if (ignoreSqlCommentLines) {
-            return txt.replace(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/, '').replace(/--.*/g, '');
+            return txt.replace(/(--.*$|\/\*[\s\S]*?\*\/)/gm, ' ');
         }
         return txt;
     }
