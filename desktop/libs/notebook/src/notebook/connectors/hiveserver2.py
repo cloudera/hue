@@ -346,12 +346,14 @@ class HS2Api(Api):
 
     if snippet['type'] == 'hive':
       engine = self._get_hive_execution_engine(notebook, snippet)
-      job_ids = _parse_out_hadoop_jobs(logs, engine=engine)
+      jobs_with_state = _parse_out_hadoop_jobs(logs, engine=engine, with_state=True)
 
       jobs = [{
-        'name': job_id,
-        'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
-      } for job_id in job_ids]
+        'name': job.get('job_id', ''),
+        'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}),
+        'started': job.get('started', False),
+        'finished': job.get('finished', False)
+      } for job in jobs_with_state]
 
     return jobs
 
