@@ -712,16 +712,18 @@
           self._ajaxError(data, self.execute);
         }
 
-        notebook.history.unshift(
-          notebook._makeHistoryRecord(
-            url,
-            data.handle.statement,
-            self.lastExecuted(),
-            self.status(),
-            notebook.name(),
-            notebook.uuid()
-          )
-        );
+        if (vm.editorMode()) {
+          notebook.history.unshift(
+            notebook._makeHistoryRecord(
+              url,
+              data.handle.statement,
+              self.lastExecuted(),
+              self.status(),
+              notebook.name(),
+              notebook.uuid()
+            )
+          );
+        }
 
         if (data.handle.statements_count != null) {
           self.result.statements_count(data.handle.statements_count);
@@ -931,7 +933,9 @@
         if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else {
-          self.getLogs();
+          if (vm.editorMode()) {
+            self.getLogs();
+          }
 
           if (data.status == 0) {
             self.status(data.query_status.status);
@@ -1107,7 +1111,7 @@
     self.availableNewProperties = ko.computed(function() {
       var addedIndex = {};
       $.each(self.properties(), function(index, property) {
-        addedIndex[property.key()] = true;
+        addedIndex[property.key] = true;
       });
       var result = $.grep(vm.availableSessionProperties(), function(property) {
         return ! addedIndex[property.name];

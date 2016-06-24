@@ -192,7 +192,7 @@ class SparkApi(Api):
       }
     except Exception, e:
       message = force_unicode(str(e)).lower()
-      if 'session not found' in message or 'connection refused' in message or 'session is in state busy' in message:
+      if re.search("session ('\d+' )?not found", message) or 'connection refused' in message or 'session is in state busy' in message:
         raise SessionExpired(e)
       else:
         raise e
@@ -209,7 +209,7 @@ class SparkApi(Api):
       }
     except Exception, e:
       message = force_unicode(str(e)).lower()
-      if 'session not found' in message:
+      if re.search("session ('\d+' )?not found", message):
         raise SessionExpired(e)
       else:
         raise e
@@ -223,7 +223,7 @@ class SparkApi(Api):
       response = api.fetch_data(session['id'], cell)
     except Exception, e:
       message = force_unicode(str(e)).lower()
-      if 'session not found' in message:
+      if re.search("session ('\d+' )?not found", message):
         raise SessionExpired(e)
       else:
         raise e
