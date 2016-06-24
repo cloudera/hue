@@ -1052,7 +1052,7 @@
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         from: self.result.logLines,
-        jobs: ko.mapping.toJSON(self.jobs),
+        jobs: ko.mapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
         full_log: self.result.logs
       }, function (data) {
         if (data.status == 1) { // Append errors to the logs
@@ -1070,8 +1070,33 @@
               self.result.logs(oldLogs + "\n" + data.logs);
             }
           }
+
+          self.jobs().forEach(function(job){
+            if (typeof job.percentJob === 'undefined'){
+              job.percentJob = ko.observable(-1);
+            }
+          });
+
           if (data.jobs.length > 0) {
-            self.jobs(data.jobs);
+            data.jobs.forEach(function (job) {
+              var _found = ko.utils.arrayFilter(self.jobs(), function (item) {
+                return item.name === job.name;
+              });
+              if (_found.length === 0) {
+                if (typeof job.percentJob === 'undefined') {
+                  job.percentJob = ko.observable(-1);
+                }
+                self.jobs.push(job);
+              }
+            });
+            self.jobs().forEach(function (job) {
+              var _found = ko.utils.arrayFilter(self.jobs(), function (item) {
+                return item.name === job.name;
+              });
+              if (_found.length === 0) {
+                self.jobs.remove(job);
+              }
+            });
           }
           if (self.status() == 'running') { // Maybe the query finished or failed in the meantime
             self.progress(data.progress)
@@ -1947,6 +1972,7 @@
       }
 
       self.selectedNotebook(notebook);
+      huePubSub.publish('check.job.browser');
     };
 
     self.openNotebook = function (uuid, queryTab) {
