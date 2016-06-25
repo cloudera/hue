@@ -37,8 +37,7 @@
   </licenses>
 
   <properties>
-    <hadoop-mr1.version>2.6.0-mr1-cdh5.5.0</hadoop-mr1.version>
-    <hadoop.version>2.6.0-cdh5.5.0</hadoop.version>
+    <hadoop.version>${cdh.hadoop.version}</hadoop.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
@@ -123,13 +122,8 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-core</artifactId>
-        <version>${hadoop-mr1.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-client</artifactId>
-        <version>${hadoop-mr1.version}</version>
+        <version>${hadoop.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -145,11 +139,6 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.8.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-test</artifactId>
-        <version>${hadoop-mr1.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
