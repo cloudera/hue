@@ -45,7 +45,7 @@ def get_mapreduce_api(username):
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        API_CACHE = MapreduceApi(username, yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = MapreduceApi(yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       API_CACHE_LOCK.release()
 
@@ -56,8 +56,7 @@ def get_mapreduce_api(username):
 
 class MapreduceApi(object):
 
-  def __init__(self, username, mr_url, security_enabled=False, ssl_cert_ca_verify=False):
-    self._user = username
+  def __init__(self, mr_url, security_enabled=False, ssl_cert_ca_verify=False):
     self._url = posixpath.join(mr_url, 'proxy')
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
@@ -94,7 +93,7 @@ class MapreduceApi(object):
       return DEFAULT_USER.get()
 
   def setuser(self, user):
-    curr = self._user
+    curr = self.username
     self._thread_local.user = user
     return curr
 
@@ -144,4 +143,4 @@ class MapreduceApi(object):
 
   def kill(self, job_id):
     app_id = job_id.replace('job', 'application')
-    get_resource_manager(self._user).kill(app_id) # We need to call the RM
+    get_resource_manager(self.username).kill(app_id) # We need to call the RM
