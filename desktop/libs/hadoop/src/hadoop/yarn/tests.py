@@ -20,6 +20,9 @@ import logging
 from nose.tools import assert_true, assert_equal, assert_not_equal
 
 from hadoop.yarn import clients
+from hadoop.yarn import mapreduce_api
+from hadoop.yarn.mapreduce_api import MapreduceApi, get_mapreduce_api
+
 
 
 LOG = logging.getLogger(__name__)
@@ -47,3 +50,28 @@ def test_get_log_client():
     assert_true('http://test3:8041' in base_urls)
   finally:
     clients.MAX_HEAP_SIZE = old_max_heap_size
+
+
+class MapreduceAPIMock(MapreduceApi):
+  EXPECTED_USERNAME = None
+
+  def kill(self, job_id):
+    assert_equal(MapreduceAPIMock.EXPECTED_USERNAME, self._user)
+
+
+class TestMapReduceAPI():
+
+  def setUp(self):
+    if not hasattr(self, 'originalMapReduceApi'):
+      self.originalMapReduceApi = mapreduce_api.MapreduceApi
+    mapreduce_api.MapreduceApi = MapreduceAPIMock
+
+  def tearDown(self):
+    mapreduce_api.MapreduceApi = self.originalMapReduceApi
+
+  def test_MR_Api_Cache(self):
+    MapreduceAPIMock.EXPECTED_USERNAME = 'admin'
+    get_mapreduce_api('admin').kill(job_id='123')
+
+    MapreduceAPIMock.EXPECTED_USERNAME = 'bob'
+    get_mapreduce_api('bob').kill(job_id='123')
