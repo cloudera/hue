@@ -270,7 +270,16 @@ ${ workflow.render() }
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           <!-- ko if: type() == 'hive' -->
-         <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
+          <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
+          <!-- ko if: $root.getHiveQueryById(value()) -->
+            <!-- ko with: $root.getHiveQueryById(value()) -->
+              <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
+                <i class="fa fa-external-link-square"></i>
+              </a>
+              </br>
+              <span data-bind='text: $data.description' class="muted"></span>
+            <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko if: type() == 'distcp' -->

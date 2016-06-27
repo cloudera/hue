@@ -951,7 +951,7 @@
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
       <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
-        <a data-bind="attr: {href: absoluteUrl()}" target="_blank"><span data-bind='text: name'></span></a>
+        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -963,6 +963,9 @@
         <!-- ko if: $root.getHiveQueryById(properties.uuid()) -->
         <!-- ko with: $root.getHiveQueryById(properties.uuid()) -->
           <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
+          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
           <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
         <!-- /ko -->
         <!-- /ko -->
