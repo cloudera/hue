@@ -17,15 +17,87 @@
 %lex
 %options case-insensitive
 %s hive impala
-%x hdfs singleQuotedValue backtickedValue
+%x hdfs doubleQuotedValue singleQuotedValue backtickedValue
 %%
 
 [ \t\n]                             { /* skip whitespace */ }
 '--'.*                              { /* skip comments */ }
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/] { /* skip comments */ }
 
-'|CURSOR|'                          { parser.yy.cursorFound = true; return 'CURSOR'; }
-'|PARTIAL_CURSOR|'                  { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+'\u2020'                            { parser.yy.cursorFound = true; return 'CURSOR'; }
+'\u2021'                            { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+
+<hive>'AS'                          { return '<hive>AS'; }
+<hive>'ALL'                         { return '<hive>ALL'; }
+<hive>'BINARY'                      { return '<hive>BINARY'; }
+<hive>'COLUMNS'                     { return '<hive>COLUMNS'; }
+<hive>'COMMENT'                     { return '<hive>COMMENT'; }
+<hive>'COMPACTIONS'                 { return '<hive>COMPACTIONS'; }
+<hive>'CONF'                        { return '<hive>CONF'; }
+<hive>'CREATE'                      { determineCase(yytext); return '<hive>CREATE'; }
+<hive>'CURRENT'                     { return '<hive>CURRENT'; }
+<hive>'DATA'                        { return '<hive>DATA'; }
+<hive>'DATABASES'                   { return '<hive>DATABASES'; }
+<hive>'DATE'                        { return '<hive>DATE'; }
+<hive>'EXTENDED'                    { return '<hive>EXTENDED'; }
+<hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
+<hive>'FORMATTED'                   { return '<hive>FORMATTED'; }
+<hive>'FUNCTION'                    { return '<hive>FUNCTION'; }
+<hive>'FUNCTIONS'                   { return '<hive>FUNCTIONS'; }
+<hive>'GRANT'                       { return '<hive>GRANT'; }
+<hive>'IN'                          { return '<hive>IN'; }
+<hive>'INDEX'                       { return '<hive>INDEX'; }
+<hive>'INDEXES'                     { return '<hive>INDEXES'; }
+<hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
+<hive>'LATERAL'                     { return '<hive>LATERAL'; }
+<hive>'LOAD'                        { return '<hive>LOAD'; }
+<hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
+<hive>'LOCKS'                       { return '<hive>LOCKS'; }
+<hive>'MACRO'                       { return '<hive>MACRO'; }
+<hive>'PARTITION'                   { return '<hive>PARTITION'; }
+<hive>'PARTITIONS'                  { return '<hive>PARTITIONS'; }
+<hive>'ROLE'                        { return '<hive>ROLE'; }
+<hive>'ROLES'                       { return '<hive>ROLES'; }
+<hive>'SCHEMAS'                     { return '<hive>SCHEMAS'; }
+<hive>'TABLE'                       { return '<hive>TABLE'; }
+<hive>'TABLES'                      { return '<hive>TABLES'; }
+<hive>'TBLPROPERTIES'               { return '<hive>TBLPROPERTIES'; }
+<hive>'TEMPORARY'                   { return '<hive>TEMPORARY'; }
+<hive>'TRANSACTIONS'                { return '<hive>TRANSACTIONS'; }
+<hive>'USER'                        { return '<hive>USER'; }
+
+<hive>'explode'                     { return '<hive>explode'; }
+<hive>'posexplode'                  { return '<hive>posexplode'; }
+
+<hive>[.]                           { return '<hive>.'; }
+
+<impala>'AGGREGATE'                 { return '<impala>AGGREGATE'; }
+<impala>'ANALYTIC'                  { return '<impala>ANALYTIC'; }
+<impala>'COLUMN'                    { return '<impala>COLUMN'; }
+<impala>'COMMENT'                   { return '<impala>COMMENT'; }
+<impala>'CREATE'                    { determineCase(yytext); return '<impala>CREATE'; }
+<impala>'CURRENT'                   { return '<impala>CURRENT'; }
+<impala>'DATA'                      { return '<impala>DATA'; }
+<impala>'DATABASES'                 { return '<impala>DATABASES'; }
+<impala>'FUNCTION'                  { return '<impala>FUNCTION'; }
+<impala>'FUNCTIONS'                 { return '<impala>FUNCTIONS'; }
+<impala>'GRANT'                     { return '<impala>GRANT'; }
+<impala>'GROUP'                     { return '<impala>GROUP'; }
+<impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
+<impala>'INCREMENTAL'               { return '<impala>INCREMENTAL'; }
+<impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
+<impala>'IN'                        { return '<impala>IN'; }
+<impala>'LOAD'                      { return '<impala>LOAD'; }
+<impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
+<impala>'PARTITIONS'                { return '<impala>PARTITIONS'; }
+<impala>'ROLE'                      { return '<impala>ROLE'; }
+<impala>'ROLES'                     { return '<impala>ROLES'; }
+<impala>'SCHEMAS'                   { return '<impala>SCHEMAS'; }
+<impala>'STATS'                     { return '<impala>STATS'; }
+<impala>'TABLE'                     { return '<impala>TABLE'; }
+<impala>'TABLES'                    { return '<impala>TABLES'; }
+
+<impala>[.]                         { return '<impala>.'; }
 
 'AND'                               { return 'AND'; }
 'BIGINT'                            { return 'BIGINT'; }
@@ -46,6 +118,7 @@
 'INTO'                              { return 'INTO'; }
 'IS'                                { return 'IS'; }
 'JOIN'                              { return 'JOIN'; }
+'LIKE'                              { return 'LIKE'; }
 'NOT'                               { return 'NOT'; }
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
@@ -54,6 +127,7 @@
 'SCHEMA'                            { return 'SCHEMA'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
 'SET'                               { return 'SET'; }
+'SHOW'                              { determineCase(yytext); return 'SHOW'; }
 'SMALLINT'                          { return 'SMALLINT'; }
 'STRING'                            { return 'STRING'; }
 'TABLE'                             { return 'TABLE'; }
@@ -65,46 +139,13 @@
 'VIEW'                              { return 'VIEW'; }
 'WHERE'                             { return 'WHERE'; }
 
-<hive>'AS'                          { return '<hive>AS'; }
-<hive>'BINARY'                      { return '<hive>BINARY'; }
-<hive>'COMMENT'                     { return '<hive>COMMENT'; }
-<hive>'DATA'                        { return '<hive>DATA'; }
-<hive>'DATE'                        { return '<hive>DATE'; }
-<hive>'EXTERNAL'                    { return '<hive>EXTERNAL'; }
-<hive>'FUNCTION'                    { return '<hive>FUNCTION'; }
-<hive>'INDEX'                       { return '<hive>INDEX'; }
-<hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
-<hive>'LATERAL'                     { return '<hive>LATERAL'; }
-<hive>'LOAD'                        { return '<hive>LOAD'; }
-<hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
-<hive>'MACRO'                       { return '<hive>MACRO'; }
-<hive>'TEMPORARY'                   { return '<hive>TEMPORARY'; }
-
-<hive>'explode'                     { return '<hive>explode'; }
-<hive>'posexplode'                     { return '<hive>posexplode'; }
-
-<hive>[.]                           { return '<hive>.'; }
-
-<impala>'AGGREGATE'                 { return '<impala>AGGREGATE'; }
-<impala>'COMMENT'                   { return '<impala>COMMENT'; }
-<impala>'DATA'                      { return '<impala>DATA'; }
-<impala>'FUNCTION'                  { return '<impala>FUNCTION'; }
-<impala>'EXTERNAL'                  { return '<impala>EXTERNAL'; }
-<impala>'INCREMENTAL'               { return '<impala>INCREMENTAL'; }
-<impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
-<impala>'LOAD'                      { return '<impala>LOAD'; }
-<impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
-<impala>'STATS'                     { return '<impala>STATS'; }
-
-<impala>[.]                         { return '<impala>.'; }
-
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [A-Za-z][A-Za-z0-9_]*               { return 'REGULAR_IDENTIFIER'; }
 
-<hdfs>'|CURSOR|'                    { parser.yy.cursorFound = true; return 'CURSOR'; }
-<hdfs>'|PARTIAL_CURSOR|'            { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+<hdfs>'\u2020'                      { parser.yy.cursorFound = true; return 'CURSOR'; }
+<hdfs>'\u2021'                      { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
 <hdfs>\s+[']                        { return 'HDFS_START_QUOTE'; }
-<hdfs>[^'|]+                        { return 'HDFS_PATH'; }
+<hdfs>[^'\u2020\u2021]+             { return 'HDFS_PATH'; }
 <hdfs>[']                           { this.popState(); return 'HDFS_END_QUOTE'; }
 <hdfs><<EOF>>                       { return 'EOF'; }
 
@@ -116,7 +157,7 @@
 \]                                  { return ']'; }
 
 \`                                  { this.begin('backtickedValue'); return 'BACKTICK'; }
-<backtickedValue>[^`]+              { if (yytext.indexOf('CURSOR|') !== -1) {
+<backtickedValue>[^`]+              { if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
                                         this.popState();
                                         return 'PARTIAL_VALUE';
                                       }
@@ -128,7 +169,9 @@
 <singleQuotedValue>[^']+            { return 'VALUE'; }
 <singleQuotedValue>\'               { this.popState(); return 'SINGLE_QUOTE'; }
 
-\"                                  { return 'DOUBLE_QUOTE'; }
+\"                                  { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
+<doubleQuotedValue>[^"]+            { return 'VALUE'; }
+<doubleQuotedValue>\"               { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
 
@@ -210,30 +253,13 @@ SqlStatement
    }
  ;
 
-UseStatement
- : 'USE' 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
-   {
-     suggestDatabases();
-   }
- | 'USE' 'REGULAR_IDENTIFIER'
-   {
-     if (! parser.yy.cursorFound) {
-       parser.yy.result.useDatabase = $2;
-     }
-   }
- | 'USE' 'CURSOR'
-   {
-     suggestDatabases();
-   }
- ;
-
 DataManipulation
  : LoadStatement
  | UpdateStatement
  ;
 
 LoadStatement
- : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'TABLE' 'REGULAR_IDENTIFIER'
+ : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' AnyTable 'REGULAR_IDENTIFIER'
  | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' PartialIdentifierOrCursor
    {
      suggestKeywords([ 'TABLE' ]);
@@ -343,15 +369,28 @@ ValueExpression
 DataDefinition
  : CreateStatement
  | DropStatement
+ | ShowStatement
  | UseStatement
+ ;
+
+AnyCreate
+ : 'CREATE'
+ | '<hive>CREATE'
+ | '<impala>CREATE'
+ ;
+
+AnyTable
+ : 'TABLE'
+ | '<hive>TABLE'
+ | '<impala>TABLE'
  ;
 
 CreateStatement
  : TableDefinition
  | DatabaseDefinition
- | 'CREATE' PartialIdentifierOrCursor
+ | AnyCreate PartialIdentifierOrCursor
    {
-     if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+     if (isHive() || isImpala()) {
        suggestKeywords(['DATABASE', 'EXTERNAL', 'SCHEMA', 'TABLE']);
      } else {
        suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE']);
@@ -362,9 +401,9 @@ CreateStatement
 DropStatement
  : 'DROP' PartialIdentifierOrCursor
    {
-     if (parser.yy.dialect === 'hive') {
+     if (isHive()) {
        suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
-     } else if (parser.yy.dialect === 'impala') {
+     } else if (isImpala()) {
        suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
      } else {
        suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
@@ -391,7 +430,7 @@ DropDatabaseStatement
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier PartialIdentifierOrCursor
    {
-     if (parser.yy.dialect === 'hive') {
+     if (isHive()) {
        suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
@@ -399,8 +438,8 @@ DropDatabaseStatement
  ;
 
 DropTableStatement
- : 'DROP' 'TABLE' OptionalIfExists
- | 'DROP' 'TABLE' OptionalIfExists PartialIdentifierOrCursor
+ : 'DROP' AnyTable OptionalIfExists
+ | 'DROP' AnyTable OptionalIfExists PartialIdentifierOrCursor
    {
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
@@ -410,7 +449,7 @@ DropTableStatement
        appendDot: true
      });
    }
- | 'DROP' 'TABLE' OptionalIfExists TablePrimary
+ | 'DROP' AnyTable OptionalIfExists TablePrimary
    {
      if (!$3 && !$4.partial) {
        suggestKeywords(['IF EXISTS']);
@@ -424,9 +463,9 @@ DropTableStatement
        }
      }
    }
- | 'DROP' 'TABLE' OptionalIfExists TablePrimary 'CURSOR'
+ | 'DROP' AnyTable OptionalIfExists TablePrimary 'CURSOR'
    {
-     if (parser.yy.dialect === 'hive') {
+     if (isHive()) {
        suggestKeywords(['PURGE']);
      }
    }
@@ -444,6 +483,623 @@ OptionalIfExists
      suggestKeywords(['EXISTS']);
    }
  | 'IF' 'EXISTS'
+ ;
+
+UseStatement
+ : 'USE' 'REGULAR_IDENTIFIER'
+   {
+     if (! parser.yy.cursorFound) {
+       parser.yy.result.useDatabase = $2;
+     }
+   }
+ | 'USE' PartialIdentifierOrCursor
+   {
+     suggestDatabases();
+   }
+ ;
+
+ShowStatement
+ : 'SHOW' PartialIdentifierOrCursor
+   {
+     if (isHive()) {
+       suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
+     } else if (isImpala()) {
+       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
+     } else {
+       suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
+     }
+   }
+ | 'SHOW' PartialIdentifierOrCursor CleanRegularOrBackTickedSchemaQualifiedName
+   {
+     if (isImpala()) {
+       suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
+     }
+   }
+ | 'SHOW' PartialIdentifierOrCursor LIKE SingleQuotedValue
+   {
+     if (isImpala()) {
+       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
+     } else if (isHive()) {
+       suggestKeywords(['DATABASES', 'SCHEMAS', 'TABLE EXTENDED']);
+     }
+   }
+ | ShowColumnStatement
+ | ShowColumnsStatement
+ | ShowCompactionsStatement
+ | ShowConfStatement
+ | ShowCreateTableStatement
+ | ShowCurrentStatement
+ | ShowDatabasesStatement
+ | ShowFunctionsStatement
+ | ShowGrantStatement
+ | ShowIndexStatement
+ | ShowLocksStatement
+ | ShowPartitionsStatement
+ | ShowRoleStatement
+ | ShowRolesStatement
+ | ShowTableStatement
+ | ShowTablesStatement
+ | ShowTblPropertiesStatement
+ | ShowTransactionsStatement
+ ;
+
+ShowColumnStatement
+ : 'SHOW' '<impala>COLUMN' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['STATS']);
+   }
+ | 'SHOW' '<impala>COLUMN' '<impala>STATS' PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'SHOW' '<impala>COLUMN' '<impala>STATS' CleanRegularOrBackTickedSchemaQualifiedName
+   if ($3.partial && $3.identifierChain.length === 1) {
+     suggestTablesOrColumns($3.identifierChain[0].name)
+   }
+ ;
+
+ShowColumnsStatement
+ : 'SHOW' '<hive>COLUMNS' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' '<hive>COLUMNS' PartialIdentifierOrCursor RegularOrBacktickedIdentifier
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn PartialIdentifierOrCursor
+   {
+     suggestTables();
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn PartialIdentifierOrCursor AnyFromOrIn
+   {
+     suggestTables();
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn PartialIdentifierOrCursor AnyFromOrIn RegularOrBacktickedIdentifier
+   {
+     suggestTables();
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier PartialIdentifierOrCursor
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier PartialIdentifierOrCursor RegularOrBacktickedIdentifier
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn PartialIdentifierOrCursor
+   {
+     suggestDatabases();
+   }
+ | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ ;
+
+ShowCompactionsStatement
+ : 'SHOW' '<hive>COMPACTIONS'
+ ;
+
+ShowConfStatement
+ : 'SHOW' '<hive>CONF' ConfigurationName
+ ;
+
+ConfigurationName
+ : 'REGULAR_IDENTIFIER'
+ | PartialIdentifierOrCursor
+ | ConfigurationName '<hive>.' 'REGULAR_IDENTIFIER'
+ | ConfigurationName '<hive>.' PartialIdentifierOrCursor
+ | ConfigurationName '<hive>.' 'PARTIAL_CURSOR'
+ ;
+
+AnyFromOrIn
+ : 'FROM'
+ | '<hive>IN'
+ ;
+
+ShowCreateTableStatement
+ : 'SHOW' HiveOrImpalaCreate PartialIdentifierOrCursor
+   {
+     suggestKeywords(['TABLE']);
+   }
+ | 'SHOW' HiveOrImpalaCreate AnyTable PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'SHOW' HiveOrImpalaCreate AnyTable CleanRegularOrBackTickedSchemaQualifiedName
+   {
+     if ($4.partial && $4.identifierChain.length === 1) {
+       suggestTablesOrColumns($4.identifierChain[0].name);
+     }
+   }
+ | 'SHOW' HiveOrImpalaCreate PartialIdentifierOrCursor CleanRegularOrBackTickedSchemaQualifiedName
+   {
+     suggestKeywords(['TABLE']);
+   }
+ ;
+
+// TODO: Move into RegularOrBackTickedSchemaQualifiedName
+CleanRegularOrBackTickedSchemaQualifiedName
+ : 'REGULAR_IDENTIFIER'
+   {
+     $$ = { identifierChain: [ { name: $1 } ] }
+   }
+ | RegularOrBackTickedSchemaQualifiedName
+   {
+     $$ = $1;
+   }
+ ;
+
+HiveOrImpalaCreate
+ : '<hive>CREATE'
+ | '<impala>CREATE'
+ ;
+
+ShowCurrentStatement
+ : 'SHOW' HiveOrImpalaCurrent PartialIdentifierOrCursor
+   {
+     suggestKeywords([ 'ROLES' ]);
+   }
+ | 'SHOW' PartialIdentifierOrCursor HiveOrImpalaRoles
+   {
+     suggestKeywords([ 'CURRENT' ]);
+   }
+ | 'SHOW' HiveOrImpalaCurrent HiveOrImpalaRoles
+ ;
+
+HiveOrImpalaCurrent
+ : '<hive>CURRENT'
+ | '<impala>CURRENT'
+ ;
+
+HiveOrImpalaRoles
+ : '<hive>ROLES'
+ | '<impala>ROLES'
+ ;
+
+ShowDatabasesStatement
+ : 'SHOW' HiveOrImpalaDatabasesOrSchemas PartialIdentifierOrCursor
+   {
+     suggestKeywords(['LIKE']);
+   }
+ | 'SHOW' HiveOrImpalaDatabasesOrSchemas 'LIKE' SingleQuotedValue
+ | 'SHOW' '<impala>DATABASES' SingleQuotedValue
+ ;
+
+HiveOrImpalaDatabasesOrSchemas
+ : '<hive>DATABASES'
+ | '<hive>SCHEMAS'
+ | '<impala>DATABASES'
+ | '<impala>SCHEMAS'
+ ;
+
+ShowFunctionsStatement
+ : 'SHOW' '<hive>FUNCTIONS'
+ | 'SHOW' '<hive>FUNCTIONS' DoubleQuotedValue
+ | 'SHOW' AggregateOrAnalytic PartialIdentifierOrCursor
+   {
+     suggestKeywords(['FUNCTIONS']);
+   }
+ | 'SHOW' OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase
+ | 'SHOW' PartialIdentifierOrCursor '<impala>FUNCTIONS' OptionalInDatabase
+   {
+     suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
+   }
+ | 'SHOW' OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase PartialIdentifierOrCursor
+   {
+     if (!$4) {
+       suggestKeywords(['IN', 'LIKE']);
+     } else {
+       suggestKeywords(['LIKE']);
+     }
+   }
+ | 'SHOW' OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' SingleQuoteValue
+ | 'SHOW' AggregateOrAnalytic PartialIdentifierOrCursor OptionalInDatabase 'LIKE' SingleQuoteValue
+   {
+     suggestKeywords(['FUNCTIONS']);
+   }
+ | 'SHOW' PartialIdentifierOrCursor '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' SingleQuoteValue
+   {
+     suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
+   }
+ | 'SHOW' OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase PartialIdentifierOrCursor SingleQuoteValue
+   {
+     if (!$4) {
+       suggestKeywords(['IN', 'LIKE']);
+     } else {
+       suggestKeywords(['LIKE']);
+     }
+   }
+ ;
+
+OptionalAggregateOrAnalytic
+ :
+   {
+     $$ = false;
+   }
+ | AggregateOrAnalytic
+   {
+     $$ = true;
+   }
+ ;
+
+AggregateOrAnalytic
+ : '<impala>AGGREGATE'
+ | '<impala>ANALYTIC'
+ ;
+
+ShowGrantStatement
+ : 'SHOW' '<hive>GRANT' OptionalPrincipalName
+   {
+     if ($3) {
+       suggestKeywords(['ON']);
+     }
+   }
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' '<hive>ALL'
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['ALL', 'TABLE']);
+     suggestTables();
+   }
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' RegularOrBacktickedIdentifier
+ | 'SHOW'  '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable PartialIdentifierOrCursor
+   {
+     suggestTables();
+   }
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable RegularOrBacktickedIdentifier
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' PartialIdentifierOrCursor RegularOrBacktickedIdentifier
+   {
+     suggestKeywords(['TABLE']);
+   }
+ | 'SHOW' '<impala>GRANT' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['ROLE']);
+   }
+ ;
+
+OptionalPrincipalName
+ :
+ | 'REGULAR_IDENTIFIER'
+ | PartialIdentifierOrCursor
+   {
+     $$ = true;
+   }
+ | 'REGULAR_IDENTIFIER' 'CURSOR'
+   {
+     $$ = true;
+   }
+ ;
+
+
+ShowIndexStatement
+ : 'SHOW' '<hive>FORMATTED' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['INDEX', 'INDEXES']);
+   }
+ | 'SHOW' OptionallyFormattedIndex PartialIdentifierOrCursor
+   {
+     suggestKeywords(['ON']);
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' PartialIdentifierOrCursor
+   {
+     suggestTables();
+   }
+ | 'SHOW' OptionallyFormattedIndex PartialIdentifierOrCursor RegularOrBacktickedIdentifier
+   {
+     suggestKeywords(['ON']);
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier PartialIdentifierOrCursor
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier PartialIdentifierOrCursor RegularOrBacktickedIdentifier
+   {
+     suggestKeywords(['FROM', 'IN']);
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn PartialIdentifierOrCursor
+   {
+     suggestDatabases();
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' PartialIdentifierOrCursor AnyFromOrIn RegularOrBacktickedIdentifier
+   {
+     suggestTablesOrColumns($6);
+   }
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ ;
+
+OptionallyFormattedIndex
+ : '<hive>FORMATTED' IndexOrIndexes
+ | PartialIdentifierOrCursor IndexOrIndexes
+   {
+     suggestKeywords(['FORMATTED']);
+   }
+ | IndexOrIndexes
+ ;
+
+IndexOrIndexes
+ : '<hive>INDEX'
+ | '<hive>INDEXES'
+ ;
+
+// TODO: Merge the first two i.e. PartialIdentifierOrCursor | RegularOrBackTickedSchemaQualifiedName
+ShowLocksStatement
+ : 'SHOW' '<hive>LOCKS' PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+     suggestKeywords(['DATABASE', 'SCHEMA']);
+   }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName
+   {
+     if ($3.partial && $3.identifierChain.length === 1) {
+       suggestTablesOrColumns($3.identifierChain[0].name)
+     }
+   }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName PartialIdentifierOrCursor
+    {
+      suggestKeywords(['EXTENDED', 'PARTITION']);
+    }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName '<hive>EXTENDED'
+   {
+     if ($3.partial && $3.identifierChain.length === 1) {
+       suggestTablesOrColumns($3.identifierChain[0].name)
+     }
+   }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')'
+   {
+     if ($3.partial && $3.identifierChain.length === 1) {
+       suggestTablesOrColumns($3.identifierChain[0].name)
+     }
+   }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['EXTENDED']);
+   }
+ | 'SHOW' '<hive>LOCKS' CleanRegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')' '<hive>EXTENDED'
+   {
+     // TODO: Move into CleanRegularOrBackTickedSchemaQualifiedName
+     if ($3.partial && $3.identifierChain.length === 1) {
+       suggestTablesOrColumns($3.identifierChain[0].name)
+     }
+   }
+ | 'SHOW' '<hive>LOCKS' DatabaseOrSchema PartialIdentifierOrCursor
+   {
+     suggestDatabases();
+   }
+ | 'SHOW' '<hive>LOCKS' DatabaseOrSchema RegularOrBacktickedIdentifier
+ ;
+
+PartitionSpecList
+ : PartitionSpec
+ | PartitionSpecList ',' PartitionSpec
+ ;
+
+PartitionSpec
+ : 'REGULAR_IDENTIFIER' '=' SingleQuotedValue
+ ;
+
+ShowPartitionsStatement
+ : 'SHOW' '<hive>PARTITIONS' PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'SHOW' '<hive>PARTITIONS' CleanRegularOrBackTickedSchemaQualifiedName
+   if ($3.partial && $3.identifierChain.length === 1) {
+     suggestTablesOrColumns($3.identifierChain[0].name)
+   }
+ | 'SHOW' '<hive>PARTITIONS' CleanRegularOrBackTickedSchemaQualifiedName PartialIdentifierOrCursor
+   {
+     suggestKeywords(['PARTITION']);
+   }
+ | 'SHOW' '<hive>PARTITIONS' CleanRegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<impala>PARTITIONS' PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'SHOW' '<impala>PARTITIONS' CleanRegularOrBackTickedSchemaQualifiedName
+   if ($3.partial && $3.identifierChain.length === 1) {
+     suggestTablesOrColumns($3.identifierChain[0].name)
+   }
+ ;
+
+ShowRoleStatement
+ : 'SHOW' HiveOrImpalaRole PartialIdentifierOrCursor
+   {
+     suggestKeywords(['GRANT']);
+   }
+ | 'SHOW' HiveOrImpalaRole PartialIdentifierOrCursor HiveRoleOrUser 'REGULAR_IDENTIFIER'
+   {
+     suggestKeywords(['GRANT']);
+   }
+ | 'SHOW' HiveOrImpalaRole '<hive>GRANT' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['ROLE', 'USER']);
+   }
+ | 'SHOW' HiveOrImpalaRole '<hive>GRANT' PartialIdentifierOrCursor 'REGULAR_IDENTIFIER'
+   {
+     suggestKeywords(['ROLE', 'USER']);
+   }
+ | 'SHOW' HiveOrImpalaRole '<hive>GRANT' HiveRoleOrUser 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole '<impala>GRANT' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['GROUP']);
+   }
+ | 'SHOW' HiveOrImpalaRole '<impala>GRANT' PartialIdentifierOrCursor 'REGULAR_IDENTIFIER'
+   {
+     suggestKeywords(['GROUP']);
+   }
+ | 'SHOW' HiveOrImpalaRole '<impala>GRANT' '<impala>GROUP' 'REGULAR_IDENTIFIER'
+ ;
+
+HiveRoleOrUser
+ : '<hive>ROLE'
+ | '<hive>USER'
+ ;
+
+HiveOrImpalaRole
+ : '<hive>ROLE'
+ | '<impala>ROLE'
+ ;
+
+ShowRolesStatement
+ : 'SHOW' '<impala>ROLES'
+ ;
+
+ShowTableStatement
+ : 'SHOW' '<hive>TABLE' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['EXTENDED']);
+   }
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase PartialIdentifierOrCursor
+    {
+      if ($4) {
+        suggestKeywords(['LIKE']);
+      } else {
+        suggestKeywords(['FROM', 'IN', 'LIKE']);
+      }
+    }
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue
+ | 'SHOW' '<hive>TABLE' PartialIdentifierOrCursor OptionalFromDatabase 'LIKE' SingleQuotedValue
+ | 'SHOW' '<hive>TABLE' PartialIdentifierOrCursor OptionalFromDatabase PartialIdentifierOrCursor SingleQuotedValue
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue PartialIdentifierOrCursor
+    {
+      suggestKeywords(['PARTITION']);
+    }
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' PartialIdentifierOrCursor OptionalFromDatabase 'LIKE' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
+   {
+     suggestKeywords(['EXTENDED']);
+   }
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase PartialIdentifierOrCursor SingleQuotedValue '<hive>PARTITION' PartitionSpecList
+   {
+     suggestKeywords(['LIKE']);
+   }
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue PartialIdentifierOrCursor PartitionSpecList
+   {
+     suggestKeywords(['PARTITION']);
+   }
+ | 'SHOW' '<impala>TABLE' PartialIdentifierOrCursor
+   {
+     suggestKeywords(['STATS']);
+   }
+ | 'SHOW' '<impala>TABLE' '<impala>STATS' PartialIdentifierOrCursor
+   {
+     suggestTables();
+     suggestDatabases({
+       appendDot: true
+     });
+   }
+ | 'SHOW' '<impala>TABLE' '<impala>STATS' CleanRegularOrBackTickedSchemaQualifiedName
+   if ($3.partial && $3.identifierChain.length === 1) {
+     suggestTablesOrColumns($3.identifierChain[0].name)
+   }
+ ;
+
+OptionalFromDatabase
+ :
+   {
+     $$ = false;
+   }
+ | FromOrIn RegularOrBacktickedIdentifier
+   {
+     $$ = true;
+   }
+ | FromOrIn PartialIdentifierOrCursor
+   {
+     $$ = true;
+     suggestDatabases();
+   }
+ ;
+
+FromOrIn
+ : 'FROM'
+ | '<hive>IN'
+ ;
+
+ShowTablesStatement
+ : 'SHOW' HiveOrImpalaTables OptionalInDatabase
+ | 'SHOW' HiveOrImpalaTables OptionalInDatabase PartialIdentifierOrCursor
+   {
+     if (!$3) {
+       suggestKeywords(['IN', 'LIKE']);
+     } else {
+       suggestKeywords(['LIKE']);
+     }
+   }
+ | 'SHOW' HiveOrImpalaTables OptionalInDatabase SingleQuotedValue
+ | 'SHOW' HiveOrImpalaTables OptionalInDatabase 'LIKE' SingleQuotedValue
+ ;
+
+OptionalInDatabase
+ :
+   {
+     $$ = false;
+   }
+ | HiveOrImpalaIn PartialIdentifierOrCursor
+   {
+     $$ = true;
+     suggestDatabases();
+   }
+ | HiveOrImpalaIn RegularOrBacktickedIdentifier
+   {
+     $$ = true;
+   }
+ ;
+
+HiveOrImpalaTables
+ : '<hive>TABLES'
+ | '<impala>TABLES'
+ ;
+
+HiveOrImpalaIn
+ : '<hive>IN'
+ | '<impala>IN'
+ ;
+
+ShowTblPropertiesStatement
+ : 'SHOW' '<hive>TBLPROPERTIES' PartialIdentifierOrCursor
+   {
+     suggestTables();
+   }
+ ;
+
+ShowTransactionsStatement
+ : 'SHOW' '<hive>TRANSACTIONS'
  ;
 
 OptionalIfNotExists
@@ -519,19 +1175,19 @@ CleanUpDatabaseConditions
  ;
 
 DatabaseDefinition
- : 'CREATE' DatabaseOrSchema OptionalIfNotExists
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER'
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' 'CURSOR'
+ : AnyCreate DatabaseOrSchema OptionalIfNotExists
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' 'CURSOR'
    {
-     if (parser.yy.dialect === 'hive') {
+     if (isHive()) {
        suggestKeywords(['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']);
-     } else if (parser.yy.dialect === 'impala') {
+     } else if (isImpala()) {
        suggestKeywords(['COMMENT', 'LOCATION']);
      }
    }
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals error
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals error
    // For the HDFS open single quote completion
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals 'CURSOR'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' CleanUpDatabaseConditions DatabaseDefinitionOptionals 'CURSOR'
    {
      var keywords = [];
      if (! parser.yy.afterComment) {
@@ -540,7 +1196,7 @@ DatabaseDefinition
      if (! parser.yy.afterHdfsLocation) {
        keywords.push('LOCATION');
      }
-     if (! parser.yy.afterHiveDbProperties && parser.yy.dialect === 'hive') {
+     if (! parser.yy.afterHiveDbProperties && isHive()) {
        keywords.push('WITH DBPROPERTIES');
      }
      if (keywords.length > 0) {
@@ -550,32 +1206,32 @@ DatabaseDefinition
  ;
 
 TableDefinition
- : 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList HdfsLocation
- | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
+ : AnyCreate TableScope AnyTable 'REGULAR_IDENTIFIER' TableElementList HdfsLocation
+ | AnyCreate PartialIdentifierOrCursor AnyTable 'REGULAR_IDENTIFIER' TableElementList
     {
-      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+      if (isHive() || isImpala()) {
         suggestKeywords(['EXTERNAL']);
       }
     }
- | 'CREATE' PartialIdentifierOrCursor 'TABLE' 'REGULAR_IDENTIFIER'
+ | AnyCreate PartialIdentifierOrCursor AnyTable 'REGULAR_IDENTIFIER'
     {
-      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+      if (isHive() || isImpala()) {
         suggestKeywords(['EXTERNAL']);
       }
     }
- | 'CREATE' PartialIdentifierOrCursor 'TABLE'
+ | AnyCreate PartialIdentifierOrCursor AnyTable
     {
-      if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+      if (isHive() || isImpala()) {
         suggestKeywords(['EXTERNAL']);
       }
     }
- | 'CREATE' TableScope 'TABLE' 'REGULAR_IDENTIFIER' TableElementList PartialIdentifierOrCursor
+ | AnyCreate TableScope AnyTable 'REGULAR_IDENTIFIER' TableElementList PartialIdentifierOrCursor
    {
-     if (parser.yy.dialect === 'hive' || parser.yy.dialect === 'impala') {
+     if (isHive() || isImpala()) {
        suggestKeywords(['LOCATION']);
      }
    }
- | 'CREATE' 'TABLE' 'REGULAR_IDENTIFIER' TableElementList
+ | AnyCreate AnyTable 'REGULAR_IDENTIFIER' TableElementList
  ;
 
 TableScope
@@ -748,7 +1404,7 @@ SelectCondition
      }
      if (!parser.yy.afterGroupBy && !parser.yy.afterWhere && !parser.yy.afterOrderBy && !parser.yy.afterLimit) {
        keywords.push('JOIN');
-       if (parser.yy.dialect === 'hive') {
+       if (isHive()) {
          keywords.push('LATERAL');
        }
      }
@@ -843,8 +1499,15 @@ SignedInteger
  | '-' 'UNSIGNED_INTEGER'
  ;
 
-StringValue
+SingleQuotedValue
  : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE'
+ ;
+
+DoubleQuotedValue
+ : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'
+   {
+     $$ = $2;
+   }
  ;
 
 NonParenthesizedValueExpressionPrimary
@@ -853,7 +1516,7 @@ NonParenthesizedValueExpressionPrimary
      $$ = $1;
    }
  | SignedInteger
- | StringValue
+ | SingleQuotedValue
  ;
 
 ColumnReference
@@ -904,9 +1567,15 @@ Identifier
    }
  ;
 
+AnyGroup
+ : 'GROUP'
+ | '<hive>GROUP'
+ | '<impala>GROUP'
+ ;
+
 GroupByClause
- : 'GROUP' 'BY' ColumnList
- | 'GROUP' PartialIdentifierOrCursor
+ : AnyGroup 'BY' ColumnList
+ | AnyGroup PartialIdentifierOrCursor
    {
      suggestKeywords(['BY']);
    }
@@ -953,9 +1622,9 @@ ColumnIdentifier
    {
      $$ = { name: $1 }
    }
- | 'REGULAR_IDENTIFIER' '[' 'DOUBLE_QUOTE' 'REGULAR_IDENTIFIER' 'DOUBLE_QUOTE' ']'
+ | 'REGULAR_IDENTIFIER' '[' DoubleQuotedValue ']'
    {
-     $$ = { name: $1, key: '"' + $4 + '"' }
+     $$ = { name: $1, key: '"' + $3 + '"' }
    }
  | 'REGULAR_IDENTIFIER' '[' 'UNSIGNED_INTEGER' ']'
    {
@@ -1232,25 +1901,34 @@ JoinCondition
 
 %%
 
+var isHive = function () {
+  return parser.yy.dialect === 'hive';
+}
+
+var isImpala = function () {
+  return parser.yy.dialect === 'impala';
+}
+
+
 var prioritizeSuggestions = function () {
-   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
-   if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
-     if (!parser.yy.keepColumns) {
+  parser.yy.result.lowerCase = parser.yy.lowerCase || false;
+  if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
+    if (!parser.yy.keepColumns) {
+     delete parser.yy.result.suggestColumns;
+    }
+    delete parser.yy.result.suggestTables;
+    delete parser.yy.result.suggestDatabases;
+    return;
+  }
+  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+    if (typeof parser.yy.result.suggestColumns.table === 'undefined') {
       delete parser.yy.result.suggestColumns;
-     }
-     delete parser.yy.result.suggestTables;
-     delete parser.yy.result.suggestDatabases;
-     return;
-   }
-   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-     if (typeof parser.yy.result.suggestColumns.table === 'undefined') {
-       delete parser.yy.result.suggestColumns;
-     } else {
-       delete parser.yy.result.suggestTables;
-       delete parser.yy.result.suggestDatabases;
-     }
-     return;
-   }
+    } else {
+      delete parser.yy.result.suggestTables;
+      delete parser.yy.result.suggestDatabases;
+    }
+    return;
+  }
 }
 
 
@@ -1339,13 +2017,13 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
   var tablePrimaries = parser.yy.latestTablePrimaries;
   // Impala can have references to maps or array, i.e. FROM table t, t.map m
   // We need to replace those in the identifierChain
-  if (parser.yy.dialect === 'impala') {
+  if (isImpala()) {
     identifierChain = parser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
     suggestion.identifierChain = identifierChain;
   }
 
   // Expand exploded views in the identifier chain
-  if (parser.yy.dialect === 'hive') {
+  if (isHive()) {
     if (identifierChain.length === 0) {
       if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
         parser.yy.result.suggestIdentifiers = [];
@@ -1364,6 +2042,9 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
           });
         }
       });
+      if (parser.yy.result.suggestIdentifiers.length === 0) {
+        delete parser.yy.result.suggestIdentifiers;
+      }
     } else {
       identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
       suggestion.identifierChain = identifierChain;
@@ -1377,15 +2058,25 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
       return identifierChain[0].name === tablePrimary.alias;
     });
 
+    var dbAndTable = false;
     if (foundTable.length === 0) {
       foundTable = tablePrimaries.filter(function (tablePrimary) {
-        return identifierChain[0].name === tablePrimary.identifierChain[0].name;
+        if (identifierChain[0].name === tablePrimary.identifierChain[0].name) {
+          if (identifierChain.length > 1 && tablePrimary.identifierChain.length > 1) {
+            dbAndTable = identifierChain[1].name === tablePrimary.identifierChain[1].name;
+          }
+          return true;
+        }
+        return false;
       })
     }
 
     if (foundTable.length === 1) {
       tablePrimaries = foundTable;
       identifierChain.shift();
+      if (dbAndTable) {
+        identifierChain.shift();
+      }
     }
   }
 
@@ -1418,6 +2109,9 @@ var suggestTablePrimariesAsIdentifiers = function () {
       parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.identifierChain[0].name + '.', type: 'table' });
     }
   });
+  if (parser.yy.result.suggestIdentifiers.length === 0) {
+    delete parser.yy.result.suggestIdentifiers;
+  }
 }
 
 var linkTablePrimaries = function () {
@@ -1511,6 +2205,9 @@ var lexerModified = false;
  * Main parser function
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect) {
+  if (dialect === 'generic') {
+    dialect = undefined;
+  }
   parser.yy.activeDialect = dialect;
   parser.yy.result = {};
   parser.yy.lowerCase = false;
@@ -1532,7 +2229,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
   parser.yy.dialect = dialect;
   try {
     // Add |CURSOR| or |PARTIAL_CURSOR| to represent the different cursor states in the lexer
-    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /.*\s+$/.test(beforeCursor) ? ' |CURSOR| ' : '|PARTIAL_CURSOR|') + afterCursor);
+    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /.*\s+$/.test(beforeCursor) ? ' \u2020 ' : '\u2021') + afterCursor);
   } catch (err) {
     // On any error try to at least return any existing result
     if (typeof parser.yy.result === 'undefined') {
