@@ -56,7 +56,7 @@ class MapreduceAPIMock(MapreduceApi):
   EXPECTED_USERNAME = None
 
   def kill(self, job_id):
-    assert_equal(MapreduceAPIMock.EXPECTED_USERNAME, self._user)
+    assert_equal(MapreduceAPIMock.EXPECTED_USERNAME, self.username)
 
 
 class TestMapReduceAPI():
