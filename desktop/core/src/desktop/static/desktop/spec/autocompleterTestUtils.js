@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 define([
-], function() {
+  'desktop/js/autocomplete/sql'
+], function(sql) {
   return {
     autocompleteMatcher : {
       toEqualAutocompleteValues : function() {
@@ -42,14 +43,46 @@ define([
             if (testDefinition.ignoreErrors) {
               delete actualResponse.error;
             }
+            if (typeof testDefinition.containsKeywords !== 'undefined') {
+              var keywords = actualResponse.suggestKeywords;
+              var contains = true;
+              testDefinition.containsKeywords.forEach(function (keyword) {
+                if (typeof keywords === 'undefined' || keywords.indexOf(keyword) === -1) {
+                  contains = false;
+                  return false;
+                }
+              });
+              if (!contains) {
+                return {
+                  pass: false,
+                  message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                             '          Dialect: ' + testDefinition.dialect + '\n' +
+                             'Expected keywords: ' + JSON.stringify(testDefinition.containsKeywords) + '\n' +
+                             '  Parser keywords: ' + JSON.stringify(keywords) +   '\n'
+                }
+              }
+              delete actualResponse.suggestKeywords;
+            }
             return {
               pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
-                       'Expected response: ' + JSON.stringify(testDefinition.expectedResult) + '\n' +
-                       '  Parser response: ' + JSON.stringify(actualResponse) +   '\n'
+                         '          Dialect: ' + testDefinition.dialect + '\n' +
+                         'Expected response: ' + JSON.stringify(testDefinition.expectedResult) + '\n' +
+                         '  Parser response: ' + JSON.stringify(actualResponse) +   '\n'
             };
           }
         }
+      }
+    },
+    assertAutocomplete: function(testDefinition) {
+      if (typeof testDefinition.dialect === 'undefined') {
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
+        testDefinition.dialect = 'hive';
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
+        testDefinition.dialect = 'impala';
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'impala')).toEqualDefinition(testDefinition);
+      } else {
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
       }
     }
   }
