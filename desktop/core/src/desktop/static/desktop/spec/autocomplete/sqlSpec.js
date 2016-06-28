@@ -18,6 +18,7 @@ define([
   'desktop/js/autocomplete/sql',
   'desktop/spec/autocompleterTestUtils',
   'desktop/spec/autocomplete/sqlSpecCreate',
+  'desktop/spec/autocomplete/sqlSpecDescribe',
   'desktop/spec/autocomplete/sqlSpecDrop',
   'desktop/spec/autocomplete/sqlSpecLoad',
   'desktop/spec/autocomplete/sqlSpecSelect',
