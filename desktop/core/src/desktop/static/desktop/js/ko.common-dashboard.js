@@ -286,16 +286,22 @@ function setLayout(colSizes, vm) {
 }
 
 function ChangeTracker(objectToTrack, ko) {
-  var hashFunction = ko.toJSON;
+  var hashFunction = typeof ko.mapping !== 'undefined' ? ko.mapping.toJSON : ko.toJSON;
   var lastCleanState = ko.observable(hashFunction(objectToTrack));
 
+  var MAPPING = {
+    ignore: [
+      "isDirty"
+    ]
+  };
+
   var result = {
-    somethingHasChanged: ko.computed(function () {
+    somethingHasChanged: ko.dependentObservable(function () {
       $(document).trigger("viewmodelHasChanged");
-      return hashFunction(objectToTrack) != lastCleanState()
-    }).extend({ rateLimit: 500 }),
+      return hashFunction(objectToTrack, MAPPING) != lastCleanState()
+    }).extend({rateLimit: 500}),
     markCurrentStateAsClean: function () {
-      lastCleanState(hashFunction(objectToTrack));
+      lastCleanState(hashFunction(objectToTrack, MAPPING));
     }
   };
 
