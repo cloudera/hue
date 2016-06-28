@@ -18,13 +18,12 @@
 import json
 import logging
 
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
 from desktop.lib.django_util import JsonResponse, render, login_notrequired
 from desktop.log.access import access_log_level
-from desktop.models import Settings
+from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
 
 
@@ -40,7 +39,7 @@ def admin_wizard(request):
   tours_and_tutorials = Settings.get_settings().tours_and_tutorials
 
   return render('admin_wizard.mako', request, {
-      'version': settings.HUE_DESKTOP_VERSION,
+      'version': hue_version(),
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'tours_and_tutorials': tours_and_tutorials,
