@@ -137,7 +137,7 @@ var Node = function (node) {
   };
 
   self.fetch_parameters = function () {
-    if (typeof self.properties.parameters != "undefined" && !self.actionParametersFetched()) { // Fetch once the possible variable when they exist
+    if (typeof self.properties.parameters != "undefined" && ! self.actionParametersFetched()) { // Fetch once the possible variable when they exist
       $.post("/oozie/editor/workflow/action/parameters/", {
         "node": ko.mapping.toJSON(self),
       }, function (data) {
@@ -163,6 +163,13 @@ var Node = function (node) {
   if (typeof self.properties.script_path != "undefined") {
     self.properties.script_path.subscribe(function () {
       self.actionParametersFetched(false);
+    });
+  }
+
+  if (type == 'hive-document-widget' && typeof self.properties.uuid != "undefined") {
+    self.properties.uuid.subscribe(function () {
+      self.actionParametersFetched(false);
+      self.fetch_parameters();
     });
   }
 }
