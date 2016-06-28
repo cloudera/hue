@@ -641,7 +641,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="grid-results">
     <span data-bind="visible: $root.hasRetrievedResults() && $root.response().response">
-      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px; border-right:1px solid #EEE">
+      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
         <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width:180px; margin-bottom:10px" />
         <div style="margin-bottom: 8px">
           <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(true)}, style: {'font-weight': $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: $root.collection.template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: $root.collection.template.fields().length"></span>)</a>
@@ -666,8 +666,14 @@ ${ dashboard.layout_skeleton() }
         </div>
       </div>
 
-      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px; border-right: 1px solid #EEE">
+      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
         <span data-bind="template: {name: 'grid-chart-settings', data: $root.collection.template.chartSettings}"></span>
+      </div>
+
+      <div style="position: absolute; margin-left: 208px; top: 0px; margin-top: 130px;" data-bind="visible: $root.collection.template.showFieldList()">
+        <a class="inactive-action pointer" title="${_('Hide settings')}" data-bind="click: function() { $root.collection.template.showFieldList(false) }">
+          <i class="fa fa-chevron-left"></i>
+        </a>
       </div>
     </span>
 
@@ -757,7 +763,7 @@ ${ dashboard.layout_skeleton() }
     <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
   </ul>
 
-  <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+  <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
     <ul class="unstyled" data-bind="foreach: $root.collection.template.cleanedNumericMeta">
       <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
     </ul>
