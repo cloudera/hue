@@ -51,7 +51,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import UserPreferences, Settings
+from desktop.models import UserPreferences, Settings, hue_version
 from desktop import appmanager
 
 
@@ -440,7 +440,7 @@ def commonfooter(request, messages=None):
   return django_mako.render_to_string("common_footer.mako", {
     'request': request,
     'messages': messages,
-    'version': settings.HUE_DESKTOP_VERSION,
+    'version': hue_version(),
     'collect_usage': collect_usage(),
     'tours_and_tutorials': hue_settings.tours_and_tutorials
   })

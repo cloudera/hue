@@ -35,9 +35,12 @@ from django.db.models.query import QuerySet
 from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from settings import HUE_DESKTOP_VERSION
+
 from desktop import appmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.paths import get_run_root
 from desktop.redaction import global_redaction_engine
 
 
@@ -48,11 +51,25 @@ SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
-
+HUE_VERSION = None
 
 def uuid_default():
   return str(uuid.uuid4())
 
+def hue_version():
+  global HUE_VERSION
+
+  if HUE_VERSION is None:
+    p = get_run_root('cloudera', 'cdh_version.properties')
+    if os.path.exists(p):
+      HUE_VERSION = _version_from_properties(open(p))
+    else:
+      HUE_VERSION = HUE_DESKTOP_VERSION
+
+  return HUE_VERSION
+
+def _version_from_properties(f):
+  return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('version', HUE_DESKTOP_VERSION)
 
 ###################################################################################################
 # Custom Settings
