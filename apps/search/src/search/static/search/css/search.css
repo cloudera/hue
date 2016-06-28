@@ -614,6 +614,7 @@ em {
 .grid-results {
   margin-left: 35px;
   margin-right: 20px;
+  position: relative;
 }
 
 .grid-side-btn {
