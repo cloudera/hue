@@ -52,6 +52,20 @@ define([
           }
         });
       });
+
+      it('should suggest keywords for partial statement', function() {
+        assertAutoComplete({
+          beforeCursor: 'foo',
+          afterCursor: 'bar',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
+              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
+              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+          }
+        });
+      });
     });
 
     describe('Hive specific', function () {
@@ -68,15 +82,19 @@ define([
           }
         });
       });
-    });
 
-    it('should return empty suggestions for bogus statement', function() {
-      assertAutoComplete({
-        beforeCursor: 'foo',
-        afterCursor: 'bar',
-        expectedResult: {
-          lowerCase: false
-        }
+      it('should suggest keywords for partial statement', function() {
+        assertAutoComplete({
+          beforeCursor: 'foo',
+          afterCursor: 'bar',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
+              'DROP', 'EXPLAIN', 'EXPORT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+          }
+        });
       });
     });
 
@@ -105,6 +123,27 @@ define([
             'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
             'UPDATE', 'USE']
         }
+      });
+    });
+
+    describe('partial removal', function () {
+      it('should identify part lengths', function () {
+        var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', '(', ')', '[', ']', ';'];
+        expect(sql.identifyPartials('', '')).toEqual({left: 0, right: 0});
+        expect(sql.identifyPartials('foo', '')).toEqual({left: 3, right: 0});
+        expect(sql.identifyPartials(' foo', '')).toEqual({left: 3, right: 0});
+        expect(sql.identifyPartials('foo', 'bar')).toEqual({left: 3, right: 3});
+        expect(sql.identifyPartials('foo ', '')).toEqual({left: 0, right: 0});
+        expect(sql.identifyPartials('foo \'', '\'')).toEqual({left: 0, right: 0});
+        expect(sql.identifyPartials('foo "', '"')).toEqual({left: 0, right: 0});
+        limitChars.forEach(function (char) {
+          expect(sql.identifyPartials('bar foo' + char, '')).toEqual({left: 0, right: 0});
+          expect(sql.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({left: 6, right: 0});
+          expect(sql.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({left: 0, right: 0});
+          expect(sql.identifyPartials('', char + 'foo bar')).toEqual({left: 0, right: 0});
+          expect(sql.identifyPartials('', 'foofoo' + char)).toEqual({left: 0, right: 6});
+          expect(sql.identifyPartials('', ' foofoo' + char)).toEqual({left: 0, right: 0});
+        });
       });
     });
 

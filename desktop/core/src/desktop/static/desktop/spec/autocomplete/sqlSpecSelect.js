@@ -83,7 +83,20 @@ define([
         dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['GROUP BY', 'JOIN', 'LIMIT', 'ORDER BY', 'WHERE']
+          suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+        }
+      });
+    });
+
+    it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
+        afterCursor: '',
+        dialect: 'impala',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']
         }
       });
     });
@@ -107,7 +120,19 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['GROUP BY', 'JOIN', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bar FROM db.foo f ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
           }
         });
       });
@@ -131,7 +156,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['GROUP BY', 'JOIN', 'LATERAL', 'LIMIT', 'ORDER BY', 'WHERE']
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
           }
         });
       });
@@ -151,6 +176,30 @@ define([
       it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL ', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bar FROM foo LATERAL ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['VIEW']
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL ', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bar FROM db.foo f LATERAL ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['VIEW']
+          }
+        });
+      });
+
+      it('should suggest keywords after SELECT SelectList FROM TablePrimary LATERAL ', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bar FROM db.foo AS f LATERAL ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
@@ -1311,6 +1360,17 @@ define([
     });
 
     describe('joins', function() {
+      it('should handle complete JOIN statement', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable1 JOIN db1.table2; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest tables to join with', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable1 JOIN ',
@@ -1323,7 +1383,40 @@ define([
         });
       });
 
+      it('should suggest tables to join with from database', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable1 JOIN db1.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'db1' }
+          }
+        });
+      });
+
+      it('should suggest tables to join with from database before other join', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable1 JOIN db1.',
+          afterCursor: ' JOIN foo',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'db1' }
+          }
+        });
+      });
+
       it('should suggest table references in join condition if not already there', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest table references in join condition if not already there with parenthesis', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (',
           afterCursor: '',
@@ -1338,7 +1431,6 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ',
           afterCursor: '',
-          ignoreErrors: true, // Here the right parenthesis is missing
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
@@ -1361,7 +1453,6 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
           afterCursor: '',
-          ignoreErrors: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable2'}
@@ -1369,18 +1460,35 @@ define([
         });
       });
 
-      xit('should suggest identifiers or values in join condition if table reference is present from multiple tables', function() {
+      it('should suggest field references in join condition if table reference is present', function() {
+        assertAutoComplete({
+          beforeCursor: 'select * from testTable1 cross join testTable2 on testTable1.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: true,
+            suggestColumns: { table: 'testTable1'}
+          }
+        });
+      });
+
+      it('should suggest correct identifier in join condition if database reference is present', function() {
+        assertAutoComplete({
+          beforeCursor: 'select * from testTable1 join db.testTable2 on ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: true,
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'db.testTable2.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest identifiers or values in join condition if table reference is present from multiple tables', function() {
         assertAutoComplete({
           beforeCursor: 'select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ',
           afterCursor: '',
-          ignoreErrors: true,
           expectedResult: {
             lowerCase: true,
-            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
-            suggestValues: {
-              table: 'testTable1',
-              identifierChain: [{ name: 'testColumn1' }]
-            }
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -1408,6 +1516,228 @@ define([
           }
         });
       });
+
+      xit('should suggest join types before JOIN', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+          afterCursor: ' JOIN',
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
+          }
+        });
+      });
+
+      it('should suggest join types before JOIN and after FULL', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
+          afterCursor: ' JOIN',
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['OUTER']
+          }
+        });
+      });
+
+      it('should suggest join types before JOIN and after LEFT', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
+          afterCursor: ' JOIN',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ANTI', 'SEMI', 'OUTER']
+          }
+        });
+      });
+
+      it('should suggest join types before JOIN and after RIGHT', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
+          afterCursor: ' JOIN',
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['OUTER']
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should suggest join types', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        xit('should suggest join types before JOIN', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+            afterCursor: ' JOIN',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after FULL', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
+            afterCursor: ' JOIN',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OUTER']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after LEFT', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
+            afterCursor: ' JOIN',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SEMI', 'OUTER']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after RIGHT', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
+            afterCursor: ' JOIN',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OUTER']
+            }
+          });
+        });
+
+        it('should suggest table references in join conditions for multiple joins', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (',
+            afterCursor: ' AND t1.c1 = t2.c2',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest tables in partial join conditions for multiple joins', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
+            afterCursor: ' CROSS JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest join types', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['LEFT ANTI JOIN', 'RIGHT ANTI JOIN'], // Tested in full above
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        xit('should suggest join types before JOIN', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+            afterCursor: ' JOIN',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT ANTI', 'RIGHT OUTER', 'RIGHT SEMI']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after FULL', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
+            afterCursor: ' JOIN',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OUTER']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after LEFT', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
+            afterCursor: ' JOIN',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ANTI', 'SEMI', 'OUTER']
+            }
+          });
+        });
+
+        it('should suggest join types before JOIN and after RIGHT', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
+            afterCursor: ' JOIN',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ANTI', 'SEMI', 'OUTER']
+            }
+          });
+        });
+
+        it('should suggest table references in join conditions for multiple joins', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (',
+            afterCursor: ' AND t1.c1 = t2.c2',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest tables in partial join conditions for multiple joins', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
+            afterCursor: ' INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+      })
     })
   });
 });
