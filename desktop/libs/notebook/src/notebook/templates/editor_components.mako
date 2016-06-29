@@ -1297,9 +1297,16 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
+<script type="text/html" id="longer-operation">
+  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The operation in the server is taking longer than expected') }" class="inline-block">
+    <i  class="fa fa-exclamation-triangle warning"></i>
+  </div>
+</script>
+
 <script type="text/html" id="notebook-snippet-header">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
+    <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
@@ -1310,6 +1317,7 @@ ${ hueIcons.symbols() }
 
 <script type="text/html" id="editor-snippet-header">
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;">
+    <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div data-bind="component: { name: 'snippet-db-selection', params: { selectedDatabase: database, availableDatabases: availableDatabases } }" style="display: inline-block"></div>

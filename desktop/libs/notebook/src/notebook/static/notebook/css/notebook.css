@@ -1181,3 +1181,7 @@ pre {
 #schedulerEditor .workflow-parameter:hover {
   background-color: #FAFAFA;
 }
+
+.warning {
+  color: #fdae6b;
+}

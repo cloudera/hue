@@ -666,6 +666,21 @@
 
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
+    self.showLongOperationWarning = ko.observable(false);
+
+    var longOperationTimeout = -1;
+
+    function startLongOperationTimeout() {
+      longOperationTimeout = window.setTimeout(function () {
+        self.showLongOperationWarning(true);
+      }, 2000);
+    }
+
+    function stopLongOperationTimeout() {
+      window.clearTimeout(longOperationTimeout);
+      self.showLongOperationWarning(false);
+    }
+
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || self.statement() == '') {
@@ -710,6 +725,8 @@
         }
       });
 
+      startLongOperationTimeout();
+
       self.currentQueryTab('queryHistory');
 
       $.post("/notebook/api/execute", {
@@ -717,7 +734,7 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
-
+        stopLongOperationTimeout();
         if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor?editor=' + data.history_id;
           hueUtils.changeURL(url);
@@ -870,6 +887,7 @@
     self.isFetchingData = false;
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
+        startLongOperationTimeout();
         self.isFetchingData = true;
         logGA('fetchResult/' + rows + '/' + startOver);
         $.post("/notebook/api/fetch_result_data", {
@@ -878,6 +896,7 @@
           rows: rows,
           startOver: startOver
         }, function (data) {
+          stopLongOperationTimeout();
           data = JSON.bigdataParse(data);
           if (data.status == 0) {
             self.loadData(data.result, rows);
