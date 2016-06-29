@@ -371,7 +371,7 @@ class DocumentManager(models.Manager):
   def sync(self):
 
     def find_jobs_with_no_doc(model):
-      return model.objects.filter(doc__isnull=True).select_related('owner')
+      return model.objects.filter(doc__isnull=True).exclude(is_history=True).select_related('owner')
 
     def find_oozie_jobs_with_no_doc(model):
       return model.objects.filter(doc__isnull=True).exclude(name__exact='').select_related('owner')
