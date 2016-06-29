@@ -1199,7 +1199,7 @@
       return $.grep(self.dependents(), function(doc) { return doc.type() == 'oozie-coordinator2' && doc.is_managed() == true ;})
     });
     if (self.dependentsCoordinator().length > 0 && ! self.coordinatorUuid()) {
-      self.coordinatorUuid(self.dependentsCoordinator()[0]);
+      self.coordinatorUuid(self.dependentsCoordinator()[0].uuid());
     }
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
     self.historyFilter = ko.observable('');
