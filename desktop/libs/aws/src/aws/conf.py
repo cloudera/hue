@@ -53,21 +53,26 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None
+  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw()
+
+
+def is_default_configured():
+  return is_enabled() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None
 
 
 def config_validator(user):
   res = []
 
-  if not is_enabled():
-    res.append(('aws.aws_accounts', 'Default AWS account is not configured'))
+  if is_enabled():
+    if not is_default_configured():  # Make a redundant call to is_enabled so that we only check default if it's non-empty
+      res.append(('aws.aws_accounts', 'Default AWS account is not configured'))
 
-  regions = get_regions('s3')  # S3 is only supported service so far
-  region_names = [r.name for r in regions]
+    regions = get_regions('s3')  # S3 is only supported service so far
+    region_names = [r.name for r in regions]
 
-  for name in AWS_ACCOUNTS.keys():
-    region_name = AWS_ACCOUNTS[name].REGION.get()
-    if region_name not in region_names:
-      res.append(('aws.aws_accounts.%s.region' % name, 'Unknown region %s' % region_name))
+    for name in AWS_ACCOUNTS.keys():
+      region_name = AWS_ACCOUNTS[name].REGION.get()
+      if region_name not in region_names:
+        res.append(('aws.aws_accounts.%s.region' % name, 'Unknown region %s' % region_name))
 
   return res
