@@ -21,7 +21,7 @@ import sys
 import logging
 
 import aws
-from aws.conf import is_enabled as is_s3_enabled
+from aws.conf import is_default_configured as is_s3_enabled
 
 from desktop.lib.fs import ProxyFS
 from hadoop import cluster
