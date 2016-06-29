@@ -2336,6 +2336,7 @@ ${ hueIcons.symbols() }
           _idxValue = idx;
         }
       });
+      var colors = HueColors.cuiD3Scale();
       $(rawDatum.counts()).each(function (cnt, item) {
         var val = item[_idxValue] * 1;
         if (isNaN(val)) {
@@ -2344,6 +2345,7 @@ ${ hueIcons.symbols() }
         _data.push({
           label: hueUtils.html2text(item[_idxLabel]),
           value: val,
+          color: colors[cnt % colors.length],
           obj: item
         });
       });
@@ -2449,11 +2451,13 @@ ${ hueIcons.symbols() }
 
         if (_idxValue > -1) {
           var _data = [];
+          var colors = HueColors.cuiD3Scale();
           $(rawDatum.counts()).each(function (cnt, item) {
             _data.push({
               series: _plottedSerie,
               x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
               y: item[_idxValue]*1,
+              color: colors[cnt % colors.length],
               obj: item
             });
           });

@@ -920,7 +920,7 @@ nv.utils.getColor = function(color) {
 
 // Default color chooser uses the index of an object as before.
 nv.utils.defaultColor = function() {
-    var colors = d3.scale.ordinal().range(['#29A7DE', '#417575', '#00B9AA', '#0F9D56', '#69AC13', '#E99F01', '#D0021B', '#D8276F', '#7B46AD', '#1C749B', '#2D5252', '#008177', '#0A6E3C', '#49780D', '#A36F00', '#910112', '#971B4D', '#62388A', '#A9DBF1', '#A0BABA', '#80DCD5', '#87CEAB', '#B4D689', '#EDC582', '#FFE5E5', '#EC93B7', '#BDA3D6']).range();
+    var colors = d3.scale.ordinal().range(HueColors.cuiD3Scale()).range();
     return function(d, i) { return d.color || colors[i % colors.length] };
 }
 

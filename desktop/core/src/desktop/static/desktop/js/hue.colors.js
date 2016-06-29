@@ -52,6 +52,9 @@ var HueColors = {
   d3Scale: function () {
     return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
   },
+  cuiD3Scale: function () {
+    return ['#29A7DE', '#417575', '#00B9AA', '#0F9D56', '#69AC13', '#E99F01', '#D0021B', '#D8276F', '#7B46AD', '#1C749B', '#2D5252', '#008177', '#0A6E3C', '#49780D', '#A36F00', '#910112', '#971B4D', '#62388A', '#A9DBF1', '#A0BABA', '#80DCD5', '#87CEAB', '#B4D689', '#EDC582', '#FFE5E5', '#EC93B7', '#BDA3D6'];
+  },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
   DARK_BLUE: "#338BB8",
