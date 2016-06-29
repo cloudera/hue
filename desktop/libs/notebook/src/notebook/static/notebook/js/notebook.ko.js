@@ -571,11 +571,38 @@
 
     self.previousChartOptions = {};
 
-    self.result.meta.subscribe(function(newValue) {
-      self.chartX(self.previousChartOptions.chartX);
-      self.chartYSingle(self.previousChartOptions.chartYSingle);
-      self.chartMapLabel(self.previousChartOptions.chartMapLabel);
-      self.chartYMulti(self.previousChartOptions.chartYMulti || []);
+    function guessMetaField(field) {
+      var _fld = null;
+      if (field) {
+        if (self.result.cleanedMeta().length > 0) {
+          self.result.cleanedMeta().forEach(function (fld) {
+            if (fld.name.toLowerCase().indexOf(field.toLowerCase()) > -1 || field.toLowerCase().indexOf(fld.name.toLowerCase()) > -1) {
+              _fld = fld.name;
+            }
+          });
+        }
+      }
+      return _fld;
+    }
+
+    function guessMetaFields(fields) {
+      var _fields = [];
+      if (fields) {
+        fields.forEach(function (fld) {
+          var _field = guessMetaField(fld);
+          if (_field) {
+            _fields.push(_field);
+          }
+        });
+      }
+      return _fields;
+    }
+
+    self.result.meta.subscribe(function (newValue) {
+      self.chartX(guessMetaField(self.previousChartOptions.chartX));
+      self.chartYSingle(guessMetaField(self.previousChartOptions.chartYSingle));
+      self.chartMapLabel(guessMetaField(self.previousChartOptions.chartMapLabel));
+      self.chartYMulti(guessMetaFields(self.previousChartOptions.chartYMulti) || []);
       self.chartSorting(self.previousChartOptions.chartSorting);
       self.chartScatterGroup(self.previousChartOptions.chartScatterGroup);
       self.chartScatterSize(self.previousChartOptions.chartScatterSize);
