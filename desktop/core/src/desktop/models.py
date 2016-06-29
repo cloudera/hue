@@ -1043,7 +1043,7 @@ class Document2(models.Model):
     ordering = ["-last_modified", "name"]
 
   def __str__(self):
-    res = '%s - %s - %s' % (force_unicode(self.name), self.owner, self.uuid)
+    res = '%s - %s - %s - %s' % (force_unicode(self.name), self.owner, self.type, self.uuid)
     return force_unicode(res)
 
   @property
