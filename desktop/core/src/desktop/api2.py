@@ -88,6 +88,7 @@ def search_documents(request):
   perms = request.GET.get('perms', 'both').lower()
   include_history = json.loads(request.GET.get('include_history', 'false'))
   include_trashed = json.loads(request.GET.get('include_trashed', 'true'))
+  include_managed = json.loads(request.GET.get('include_managed', 'false'))
   flatten = json.loads(request.GET.get('flatten', 'true'))
 
   if perms not in ['owned', 'shared', 'both']:
@@ -97,7 +98,8 @@ def search_documents(request):
     user=request.user,
     perms=perms,
     include_history=include_history,
-    include_trashed=include_trashed
+    include_trashed=include_trashed,
+    include_managed=include_managed
   )
 
   # Refine results
