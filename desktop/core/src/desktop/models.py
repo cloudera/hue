@@ -1354,7 +1354,7 @@ class Directory(Document2):
     """
     Returns the children documents for a given directory, excluding history documents
     """
-    documents = self.children.filter(is_history=False)  # TODO: perms
+    documents = self.children.filter(is_history=False).filter(is_managed=False)  # TODO: perms
     return documents
 
   def get_children_and_shared_documents(self, user):
@@ -1368,7 +1368,7 @@ class Directory(Document2):
           ~Q(owner=user) )
       )
 
-    documents = documents.exclude(is_history=True)
+    documents = documents.exclude(is_history=True).exclude(is_managed=True)
 
     return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
