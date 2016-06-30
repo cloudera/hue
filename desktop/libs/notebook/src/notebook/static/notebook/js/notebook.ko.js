@@ -739,28 +739,30 @@
           self._ajaxError(data, self.execute);
         }
 
-        if (vm.editorMode()) {
-          notebook.history.unshift(
-            notebook._makeHistoryRecord(
-              url,
-              data.handle.statement,
-              self.lastExecuted(),
-              self.status(),
-              notebook.name(),
-              notebook.uuid()
-            )
-          );
-        }
+        if (data.handle) {
+          if (vm.editorMode()) {
+            notebook.history.unshift(
+              notebook._makeHistoryRecord(
+                url,
+                data.handle.statement,
+                self.lastExecuted(),
+                self.status(),
+                notebook.name(),
+                notebook.uuid()
+              )
+            );
+          }
 
-        if (data.handle.statements_count != null) {
-          self.result.statements_count(data.handle.statements_count);
-          self.result.statement_id(data.handle.statement_id);
+          if (data.handle.statements_count != null) {
+            self.result.statements_count(data.handle.statements_count);
+            self.result.statement_id(data.handle.statement_id);
 
-          if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
-            self.result.statement_range({
-              start: data.handle.start,
-              end: data.handle.end
-            });
+            if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
+              self.result.statement_range({
+                start: data.handle.start,
+                end: data.handle.end
+              });
+            }
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {

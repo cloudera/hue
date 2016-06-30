@@ -233,6 +233,8 @@ if USE_NEW_EDITOR.get():
     // sets global apiHelper TTL
     $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
+    var IDLE_SESSION_TIMEOUT = -1;
+
     $(document).ready(function () {
       // forces IE's ajax calls not to cache
       if ($.browser.msie) {
@@ -251,13 +253,14 @@ if USE_NEW_EDITOR.get():
       }
 
       %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
+      IDLE_SESSION_TIMEOUT = ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()};
       var idleTimer;
       function resetIdleTimer() {
         clearTimeout(idleTimer);
         idleTimer = setTimeout(function () {
           // Check if logged out
           $.get('/desktop/debug/is_idle');
-        }, (${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000) + 1000);
+        }, (IDLE_SESSION_TIMEOUT * 1000) + 1000);
       }
 
       $(document).on('mousemove', resetIdleTimer);
