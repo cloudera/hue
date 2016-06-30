@@ -112,6 +112,17 @@ define([
       });
     });
 
+    it('should suggest keywords after SELECT FROM TablePrimary WHERE SearchCondition ', function () {
+      assertAutoComplete({
+        beforeCursor: 'SELECT FROM foo WHERE id = 1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY']
+        }
+      });
+    });
+
     describe('Hive specific', function () {
       it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function () {
         assertAutoComplete({
@@ -1737,7 +1748,185 @@ define([
             }
           });
         });
-      })
-    })
+      });
+    });
+
+    describe('Subqueries in WHERE clause', function () {
+      it('should handle complete subquery in where clause', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords at the start of a subquery', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IN (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest keywords at the start of a subquery following case', function() {
+        assertAutoComplete({
+          beforeCursor: 'select * from foo where bar in (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest database or table names after SELECT in subquery', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+
+      it('should suggest database or table names after SELECT in subquery with end parenthesis', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM bar WHERE foo NOT IN (SELECT ',
+          afterCursor: ')',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+    });
+
+    describe('Subqueries in FROM clause', function () {
+      it('should suggest keywords at the start of a subquery', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest keywords at the start of a subquery following case', function() {
+        assertAutoComplete({
+          beforeCursor: 'select * from (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest database or table names after SELECT in subquery', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM (SELECT ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest identifiers after SELECT with subqueries defined', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM (SELECT bla FROM abc WHERE foo > 1) bar',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestIdentifiers: [{ name: 'bar.', type: 'subquery'}]
+          }
+        });
+      });
+
+      it('should suggest database or table names after SELECT in subquery with end parenthesis', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM (SELECT ',
+          afterCursor: ')',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest identifiers with a mix of subqueries and tables', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM (SELECT * FROM tableOne) AS subqueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) subqueryTwo;',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestIdentifiers: [{ name: 'subqueryOne.', type: 'subquery'}, { name: 'tAlias.', type: 'alias'}, { name: 'tableThree.', type: 'table'}, { name: 'subqueryTwo.', type: 'subquery'}]
+          }
+        });
+      });
+
+      it('should suggest columns in a subquery with other subqueries', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM (SELECT ',
+          afterCursor: ' FROM tableOne) subqueryOne, someDb.tableTwo talias, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) AS subqueryTwo;',
+          expectedResult: {
+            lowerCase: false,
+            suggestStar: true,
+            suggestColumns: {
+              table: 'tableOne'
+            }
+          }
+        });
+      });
+    });
   });
 });
