@@ -379,7 +379,9 @@
 
       var match, matches = [];
       while (match = re.exec(self.statement_raw())) {
-        matches.push(match[1]);
+        if (matches.indexOf(match[1]) == -1) {
+          matches.push(match[1]);
+        }
       }
       return matches;
     });
