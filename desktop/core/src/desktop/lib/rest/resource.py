@@ -109,7 +109,7 @@ class Resource(object):
     return self.invoke("DELETE", relpath, params, headers=headers)
 
 
-  def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None):
+  def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, allow_redirects=False):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -117,23 +117,25 @@ class Resource(object):
     @param data: Optional. Body of the request.
     @param contenttype: Optional.
     @param headers: Optional. Base set of headers.
+    @param allow_redirects: Optional. Allow request to automatically resolve redirects.
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("POST", relpath, params, data, self._make_headers(contenttype, headers))
+    return self.invoke("POST", relpath, params, data, self._make_headers(contenttype, headers), allow_redirects)
 
 
-  def put(self, relpath=None, params=None, data=None, contenttype=None):
+  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False):
     """
     Invoke the PUT method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
     @param contenttype: Optional.
+    @param allow_redirects: Optional. Allow request to automatically resolve redirects.
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("PUT", relpath, params, data, self._make_headers(contenttype))
+    return self.invoke("PUT", relpath, params, data, self._make_headers(contenttype), allow_redirects)
 
 
   def _make_headers(self, contenttype=None, headers=None):
