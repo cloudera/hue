@@ -104,7 +104,7 @@ define([
         dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
         }
       });
     });
@@ -116,7 +116,7 @@ define([
         dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
         }
       });
     });
@@ -167,7 +167,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']
+            suggestKeywords: ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
           }
         });
       });
