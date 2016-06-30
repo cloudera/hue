@@ -140,7 +140,7 @@ class ResourceManagerApi(object):
 
     try:
       params = self._get_params()
-      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), allow_redirects=True, contenttype=_JSON_CONTENT_TYPE)
     finally:
       if token:
         self.cancel_token(token)
