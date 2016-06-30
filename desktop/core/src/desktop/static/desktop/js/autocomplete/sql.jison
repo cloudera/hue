@@ -112,6 +112,7 @@
 <impala>\]                          { return '<impala>]'; }
 
 'AND'                               { return 'AND'; }
+'AS'                                { return 'AS'; }
 'BIGINT'                            { return 'BIGINT'; }
 'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
@@ -133,10 +134,12 @@
 'INT'                               { return 'INT'; }
 'INTO'                              { return 'INTO'; }
 'IS'                                { return 'IS'; }
+'IN'                                { return 'IN'; }
 'JOIN'                              { return 'JOIN'; }
 'LEFT'                              { return 'LEFT'; }
 'LIKE'                              { return 'LIKE'; }
 'NOT'                               { return 'NOT'; }
+'NOT IN'                            { return 'NOT_IN'; }
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
@@ -214,7 +217,6 @@ InitResults
        if (typeof parser.yy.result.suggestColumns !== 'undefined') {
          linkTablePrimaries();
        }
-       prioritizeSuggestions();
        parser.yy.result.error = error;
        return message;
      }
@@ -224,12 +226,10 @@ InitResults
 Sql
  : InitResults SqlStatements ';' EOF
    {
-     prioritizeSuggestions();
      return parser.yy.result;
    }
  | InitResults SqlStatements EOF
    {
-     prioritizeSuggestions();
      return parser.yy.result;
    }
  ;
@@ -242,7 +242,7 @@ SqlStatements
 SqlStatement
  : DataDefinition
  | DataManipulation
- | SelectStatement
+ | QuerySpecification
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
    {
@@ -1107,12 +1107,20 @@ LoadStatement
 
 // ===================================== SELECT statement =====================================
 
-SelectStatement
+QuerySpecification
  : 'SELECT' SelectList TableExpression
    {
      linkTablePrimaries();
    }
- | 'SELECT' SelectList
+ | 'SELECT' error TableExpression
+   {
+     linkTablePrimaries();
+   }
+ | 'SELECT' SelectList 'CURSOR'
+   {
+     suggestTables({ prependFrom: true });
+     suggestDatabases({ prependFrom: true, appendDot: true });
+   }
  ;
 
 TableExpression
@@ -1229,24 +1237,66 @@ BooleanFactor
  ;
 
 BooleanTest
+ : BooleanPrimary OptionalIsNotTruthValue
+ ;
+
+OptionalIsNotTruthValue
+ :
+ | 'IS' OptionalNot TruthValue
+ ;
+
+OptionalNot
+ :
+ | 'NOT'
+ ;
+
+BooleanPrimary
  : Predicate
- | Predicate ComparisonOperators Predicate
- | Predicate ComparisonOperators AnyCursor
+ | BooleanPredicand
+ ;
+
+Predicate
+ : ComparisonPredicate
+ | InPredicate
+ ;
+
+AnyIn
+ : 'IN'
+ | '<hive>IN'
+ | '<impala>IN'
+ ;
+
+ComparisonPredicate
+ : BooleanPredicand ComparisonOperators BooleanPredicand
+ | BooleanPredicand ComparisonOperators AnyCursor
    {
      if (typeof $1 !== 'undefined') {
        suggestValues({ identifierChain: $1});
      }
    }
- | Predicate 'IS' TruthValue
- | Predicate 'IS' 'NOT' TruthValue
  ;
 
-Predicate
+BooleanPredicand
  : ParenthesizedBooleanValueExpression
  | NonParenthesizedValueExpressionPrimary
-   {
-     $$ = $1;
-   }
+ | CommonValueExpression
+ ;
+
+CommonValueExpression
+ : SignedInteger
+ | SingleQuotedValue
+ ;
+
+InPredicate
+ : BooleanPredicand InPredicatePartTwo
+ ;
+
+InPredicatePartTwo
+ : OptionalNot AnyIn InPredicateValue
+ ;
+
+InPredicateValue
+ : TableSubquery
  ;
 
 ParenthesizedBooleanValueExpression
@@ -1263,8 +1313,6 @@ NonParenthesizedValueExpressionPrimary
    {
      $$ = $1;
    }
- | SignedInteger
- | SingleQuotedValue
  ;
 
 ColumnReference
@@ -1317,22 +1365,13 @@ Identifier
 
 SelectList
  : ColumnList
- | ColumnList 'CURSOR'
-   {
-     suggestTables({ prependFrom: true });
-     suggestDatabases({ prependFrom: true, appendDot: true });
-   }
- | '*' 'CURSOR'
-   {
-     suggestTables({ prependFrom: true });
-     suggestDatabases({ prependFrom: true, appendDot: true });
-   }
  | '*'
  ;
 
 ColumnList
  : DerivedColumn
  | ColumnList ',' DerivedColumn
+ | ColumnList ',' error
  ;
 
 DerivedColumn
@@ -1493,7 +1532,7 @@ JoinCondition
 
 ParenthesizedJoinEqualityExpression
  : '(' JoinEqualityExpression ')'
- | '(' JoinEqualityExpression
+ |  '(' JoinEqualityExpression error
  ;
 
 JoinEqualityExpression
@@ -1527,7 +1566,7 @@ TablePrimary
  ;
 
 ImprovedTablePrimary
- : SchemaQualifiedTableIdentifier OptionalCorrelationName OptionalLateralViews
+ : TableOrQueryName OptionalCorrelationName OptionalLateralViews
    {
      if ($1.identifierChain) {
        if ($2 && !$2.partial) {
@@ -1539,6 +1578,89 @@ ImprovedTablePrimary
        addTablePrimary($1);
      }
    }
+ | DerivedTable OptionalCorrelationName // TODO: OptionalLateralViews?
+   {
+     if ($2 && !$2.partial) {
+       // TODO: Potentially add columns for SELECT bla.| FROM (SELECT * FROM foo) AS bla;
+       addTablePrimary({ subqueryAlias: $2 });
+     }
+   }
+ ;
+
+TableOrQueryName
+ : SchemaQualifiedTableIdentifier
+ ;
+
+DerivedTable
+ : TableSubquery
+ ;
+
+PushQueryState
+ :
+   {
+     if (typeof parser.yy.primariesStack === 'undefined') {
+       parser.yy.primariesStack = [];
+     }
+     if (typeof parser.yy.resultStack === 'undefined') {
+       parser.yy.resultStack = [];
+     }
+     parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
+     parser.yy.resultStack.push(parser.yy.result);
+
+     parser.yy.result = {};
+     parser.yy.latestTablePrimaries = [];
+   }
+ ;
+
+PopQueryState
+ :
+   {
+     if (Object.keys(parser.yy.result).length === 0) {
+       parser.yy.result = parser.yy.resultStack.pop();
+       parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
+     }
+   }
+ ;
+
+TableSubquery
+ : '(' PushQueryState Subquery PopQueryState ')'
+ | '(' PushQueryState Subquery error
+ ;
+
+Subquery
+ :  QueryExpression
+ | 'CURSOR'
+   {
+     suggestKeywords(['SELECT']);
+   }
+ | 'PARTIAL_CURSOR'
+    {
+      suggestKeywords(['SELECT']);
+    }
+ ;
+
+QueryExpression
+ : QueryExpressionBody
+ ;
+
+QueryExpressionBody
+ : NonJoinQueryExpression
+ ;
+
+NonJoinQueryExpression
+ : NonJoinQueryTerm
+ ;
+
+NonJoinQueryTerm
+ : NonJoinQueryPrimary
+ ;
+
+NonJoinQueryPrimary
+ : SimpleTable
+ ;
+
+SimpleTable
+ : QuerySpecification
  ;
 
 OptionalCorrelationName
@@ -2389,11 +2511,15 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
   }
 
   if (tablePrimaries.length === 1) {
-    if (tablePrimaries[0].identifierChain.length == 2) {
-      suggestion.database = tablePrimaries[0].identifierChain[0].name;
-      suggestion.table = tablePrimaries[0].identifierChain[1].name;
-    } else {
-      suggestion.table = tablePrimaries[0].identifierChain[0].name;
+    if (typeof tablePrimaries[0].identifierChain !== 'undefined') {
+      if (tablePrimaries[0].identifierChain.length == 2) {
+        suggestion.database = tablePrimaries[0].identifierChain[0].name;
+        suggestion.table = tablePrimaries[0].identifierChain[1].name;
+      } else {
+        suggestion.table = tablePrimaries[0].identifierChain[0].name;
+      }
+    } else if (typeof tablePrimaries[0].subqueryAlias !== 'undefined') {
+      suggestTablePrimariesAsIdentifiers();
     }
   } else if (tablePrimaries.length > 1 && isColumnSuggestion) {
     // Table identifier is required for column completion
@@ -2409,10 +2535,12 @@ var suggestTablePrimariesAsIdentifiers = function () {
   parser.yy.latestTablePrimaries.forEach(function (tablePrimary) {
     if (typeof tablePrimary.alias !== 'undefined') {
       parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.alias + '.', type: 'alias' });
-    } else if (tablePrimary.identifierChain.length == 2) {
+    } else if (typeof tablePrimary.identifierChain !== 'undefined' && tablePrimary.identifierChain.length == 2) {
       parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.identifierChain[0].name + '.' + tablePrimary.identifierChain[1].name + '.', type: 'table' });
-    } else {
+    } else if (typeof tablePrimary.identifierChain !== 'undefined') {
       parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.identifierChain[0].name + '.', type: 'table' });
+    } else if (typeof tablePrimary.subqueryAlias !== 'undefined') {
+      parser.yy.result.suggestIdentifiers.push({ name: tablePrimary.subqueryAlias + '.', type: 'subquery' });
     }
   });
   if (parser.yy.result.suggestIdentifiers.length === 0) {
@@ -2460,7 +2588,6 @@ var suggestDdlAndDmlKeywords = function () {
 
   suggestKeywords(keywords);
 }
-
 
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords;
@@ -2553,6 +2680,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     }
     result = parser.yy.result;
   }
+  prioritizeSuggestions();
 
   if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
     // Remove any expected tokens from other dialects, jison doesn't remove tokens from other lexer states.
