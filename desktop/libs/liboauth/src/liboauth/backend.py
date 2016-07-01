@@ -62,10 +62,10 @@ class OAuthBackend(DesktopBackendBase):
         is_super = True
       else:
         is_super = False
-
+    
       # Could save oauth_token detail in the user profile here
       user = find_or_create_user(username, password)
-    
+
       profile = get_profile(user)
       profile.creation_method = UserProfile.CreationMethod.EXTERNAL
       profile.save()
@@ -116,7 +116,7 @@ class OAuthBackend(DesktopBackendBase):
         if 'error' in request.GET or 'code' not in request.GET:
             return ""
 
-        redirect_uri = 'http://' + request.get_host() + '/oauth/social_login/oauth_authenticated'
+        redirect_uri = get_redirect_uri()
         code = request.GET['code']
         grant_type = 'authorization_code'
 
@@ -188,11 +188,22 @@ class OAuthBackend(DesktopBackendBase):
 
     return access_token
 
+
+  def get_redirect_uri(self, request):
+    # Either use the proxy-specified protocol or the one from the request itself.
+    # This is useful if the server is behind some kind of proxy
+    protocol = request.META.get("HTTP_X_FORWARDED_PROTO", request.scheme)
+    host = request.get_host()
+    path = '/oauth/social_login/oauth_authenticated'
+
+    return protocol + "://" + host + path
+
+
   @classmethod
   def handleLoginRequest(self, request):
     assert oauth is not None
-    
-    redirect_uri = 'http://' + request.get_host() + '/oauth/social_login/oauth_authenticated'
+
+    redirect_uri = get_redirect_uri(request)
     response_type = "code"
  
     social = request.GET['social']
