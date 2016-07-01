@@ -34,21 +34,21 @@ _JSON_CONTENT_TYPE = 'application/json'
 _BINARY_CONTENT_TYPE = 'application/octet-stream'
 _TEXT_CONTENT_TYPE = 'text/plain'
 
-_api_cache = None
-_api_cache_lock = threading.Lock()
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
 
 def get_api(user):
-  global _api_cache
-  if _api_cache is None:
-    _api_cache_lock.acquire()
+  global API_CACHE
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
     try:
-      if _api_cache is None:
-        _api_cache = JobServerApi(get_livy_server_url())
+      if API_CACHE is None:
+        API_CACHE = JobServerApi(get_livy_server_url())
     finally:
-      _api_cache_lock.release()
-  _api_cache.setuser(user)
-  return _api_cache
+      API_CACHE_LOCK.release()
+  API_CACHE.setuser(user)
+  return API_CACHE
 
 
 class JobServerApi(object):

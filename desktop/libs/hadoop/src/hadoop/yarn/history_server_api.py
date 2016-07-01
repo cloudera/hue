@@ -31,9 +31,6 @@ LOG = logging.getLogger(__name__)
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
-_api_cache = None
-_api_cache_lock = threading.Lock()
-
 API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
 

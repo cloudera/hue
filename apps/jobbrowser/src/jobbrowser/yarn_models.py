@@ -120,15 +120,19 @@ class SparkJob(Application):
     # XXX: we have to scrape the tracking URL directly because
     # spark jobs don't have a JSON api via YARN or app server
     # see YARN-1530, SPARK-1537 for progress on these apis
+    res = None
     self.scrapedData = {}
     try:
-      res = urllib2.urlopen(self.trackingUrl)
+      res = urllib2.urlopen(self.trackingUrl, timeout=5.0)
       html_doc = res.read()
       if self.trackingUI == 'History':
         self.scrapedData['metrics'] = self._history_application_metrics(html_doc)
     except Exception, e:
       # Prevent a nosedive. Don't create metrics if api changes or url is unreachable.
       self.scrapedData['metrics'] = []
+    finally:
+      if res is not None:
+        res.close()
 
 
 class Job(object):
