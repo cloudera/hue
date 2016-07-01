@@ -653,7 +653,9 @@
           huePubSub.publish('hide.retry.modal');
         }
         notebook.retryModalConfirm = function () {
-          self.execute();
+          if (callback) {
+            callback();
+          };
           huePubSub.publish('hide.retry.modal');
         }
         huePubSub.publish('show.retry.modal');
