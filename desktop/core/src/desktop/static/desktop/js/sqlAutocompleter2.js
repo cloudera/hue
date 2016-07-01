@@ -28,11 +28,13 @@
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
+   * @param {Number} options.timeout
    * @constructor
    */
   function SqlAutocompleter2(options) {
     var self = this;
     self.snippet = options.snippet;
+    self.timeout = options.timeout;
   }
 
   SqlAutocompleter2.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
@@ -105,7 +107,8 @@
           },
           silenceErrors: true,
           errorCallback: hdfsDeferred.resolve,
-          editor: editor
+          editor: editor,
+          timeout: self.timeout
         });
       }
 
@@ -128,7 +131,8 @@
           },
           silenceErrors: true,
           errorCallback: tableDeferred.resolve,
-          editor: editor
+          editor: editor,
+          timeout: self.timeout
         });
       }
 
@@ -153,6 +157,7 @@
           tableName: parseResult.suggestColumns.table,
           fields: fields,
           editor: editor,
+          timeout: self.timeout,
           successCallback: function (data) {
             if (data.extended_columns) {
               data.extended_columns.forEach(function (column) {
@@ -215,6 +220,7 @@
           tableName: parseResult.suggestValues.table,
           columnName: parseResult.suggestValues.identifierChain[0].name,
           editor: editor,
+          timeout: self.timeout,
           successCallback: function (data) {
             if (data.status === 0 && data.headers.length === 1) {
               data.rows.forEach(function (row) {
@@ -238,6 +244,7 @@
             tableName: parseResult.suggestValues.table,
             fields: $.map(parseResult.suggestValues.identifierChain, function (value) { return value.name }),
             editor: editor,
+            timeout: self.timeout,
             successCallback: function (data) {
               if (data.sample) {
                 var isString = data.type === "string";

@@ -27,11 +27,13 @@
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
+   * @param {Number} options.timeout
    * @param {HdfsAutocompleter} options.hdfsAutocompleter
    * @constructor
    */
   function SqlAutocompleter(options) {
     var self = this;
+    self.timeout = options.timeout;
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
     self.oldEditor = options.oldEditor || false;
@@ -262,6 +264,7 @@
             tableName: tableName,
             fields: completeFields,
             editor: editor,
+            timeout: self.timeout,
             successCallback: function (data) {
               if (data.type === "map") {
                 completeFields.push("value");
@@ -298,6 +301,8 @@
           tableName: tableName,
           columnName: fields.length === 1 ? fields[0] : null,
           editor: editor,
+          timeout: self.timeout,
+          silenceErrors: true,
           successCallback: function (data) {
             if (data.status === 0 && data.headers.length === 1) {
               var values = $.map(data.rows, function (row, index) {
@@ -321,6 +326,8 @@
           errorCallback: function () {
             if (self.snippet.type() === 'impala') {
               fetchImpalaFields(fields, []);
+            } else {
+              callback([]);
             }
           }
         });
@@ -609,7 +616,8 @@
         },
         silenceErrors: true,
         errorCallback: onFailure,
-        editor: editor
+        editor: editor,
+        timeout: self.timeout
       });
       return;
     } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
@@ -711,6 +719,7 @@
             tableName: tableName,
             fields: fields,
             editor: editor,
+            timeout: self.timeout,
             successCallback: function (data) {
               var suggestions = [];
               if (fields.length == 0) {
@@ -788,6 +797,7 @@
                 tableName: tableName,
                 fields: fields,
                 editor: editor,
+                timeout: self.timeout,
                 successCallback: function(data) {
                   if (data.type === "map") {
                     fields.push("value");
@@ -849,6 +859,7 @@
               tableName: tableName,
               fields: fields,
               editor: editor,
+              timeout: self.timeout,
               successCallback: successCallback,
               silenceErrors: true,
               errorCallback: onFailure

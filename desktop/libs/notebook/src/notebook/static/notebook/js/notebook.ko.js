@@ -1134,6 +1134,7 @@
       snippet: self,
       user: vm.user,
       optEnabled: false,
+      timeout: vm.autocompleteTimeout,
       useNewAutocompleter: vm.useNewAutocompleter
     });
 
@@ -1783,6 +1784,7 @@
     });
     self.editorTypeTitle = ko.observable(options.editor_type);
     self.useNewAutocompleter = options.useNewAutocompleter || false;
+    self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);

@@ -235,6 +235,7 @@
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string[]} options.pathParts
@@ -244,9 +245,14 @@
     var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + HDFS_PARAMETERS;
 
     var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
       $.ajax({
         dataType: "json",
         url: url,
+        timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
             if (data.files.length > 2) {
@@ -673,6 +679,7 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
+   * @param {Number} [options.timeout]
    * @param {string} [options.columnName]
    * @param {Object} [options.editor] - Ace editor
    */
@@ -681,13 +688,21 @@
     var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
 
     var fetchFunction = function (storeInCache) {
-      $.post(url, {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: options.sourceType
-        })
-      })
-      .done(function (data) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+          notebook: {},
+          snippet: ko.mapping.toJSON({
+            type: options.sourceType
+          })
+        },
+        timeout: options.timeout
+      }).done(function (data) {
         if (! self.successResponseIsError(data)) {
           if ((typeof data.rows !== 'undefined' && data.rows.length > 0) || typeof data.sample !== 'undefined') {
             storeInCache(data);
@@ -821,6 +836,7 @@
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string} options.databaseName
@@ -854,6 +870,7 @@
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string} options.databaseName
@@ -895,6 +912,7 @@
    * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
+   * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    */
   var fetchAssistData = function (options) {
@@ -918,12 +936,32 @@
       return;
     }
 
-    $.post(options.url, {
-      notebook: {},
-      snippet: ko.mapping.toJSON({
-        type: options.sourceType
-      })
-    }, function (data) {
+    var failCallback = function (data) {
+      while (queue.length > 0) {
+        var next = queue.shift();
+        next.errorCallback(data);
+        if (typeof next.editor !== 'undefined' && next.editor !== null) {
+          next.editor.hideSpinner();
+        }
+      }
+    };
+
+    if (options.timeout === 0) {
+      failCallback({ status: -1 });
+      return;
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: options.url,
+      data: {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: options.sourceType
+        })
+      },
+      timeout: options.timeout
+    }).success(function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
       if (data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
         cachedData[options.url] = {
@@ -943,15 +981,7 @@
           next.editor.hideSpinner();
         }
       }
-    }).fail(function (data) {
-      while (queue.length > 0) {
-        var next = queue.shift();
-        next.errorCallback(data);
-        if (typeof next.editor !== 'undefined' && next.editor !== null) {
-          next.editor.hideSpinner();
-        }
-      }
-    });
+    }).fail(failCallback);
   };
 
   /**
