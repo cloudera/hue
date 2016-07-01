@@ -34,7 +34,7 @@ def config_settings_loader(request):
   base_url = libsaml.conf.BASE_URL.get()
   if base_url is None:
     base_url = "%(protocol)s%(host)s" % {
-      'protocol': 'https://' if request.is_secure() else 'http://',
+      'protocol': 'https://' if (request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https') else 'http://',
       'host':  request.get_host(),
     }
 
