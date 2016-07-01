@@ -2026,6 +2026,22 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+<!-- ko if: $root.selectedNotebook() -->
+  <!-- ko with: $root.selectedNotebook() -->
+  <div id="retryModal" class="modal hide fade" data-keyboard="false" data-backdrop="static">
+    <div class="modal-header">
+      <h3>${_('Operation timed out')}</h3>
+    </div>
+    <div class="modal-body">
+      <p>${_('The operation timed out. Do you want to retry?')}</p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-bind="click: retryModalCancel">${_('No')}</a>
+      <a class="btn btn-primary disable-feedback" data-bind="click: retryModalConfirm">${_('Yes, retry')}</a>
+    </div>
+  </div>
+  <!-- /ko -->
+<!-- /ko -->
 
 <div class="submit-modal modal hide"></div>
 
@@ -2965,7 +2981,6 @@ ${ hueIcons.symbols() }
     }
 
 
-
     $(document).ready(function () {
       var i18n = {
         errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
@@ -3043,6 +3058,14 @@ ${ hueIcons.symbols() }
 
       $(document).on("hideHistoryModal", function (e) {
         $("#clearHistoryModal").modal("hide");
+      });
+
+      huePubSub.subscribe('show.retry.modal', function (data) {
+        $('#retryModal').modal('show');
+      });
+
+      huePubSub.subscribe('hide.retry.modal', function (data) {
+        $('#retryModal').modal('hide');
       });
 
       // Close the notebook snippets when leaving the page

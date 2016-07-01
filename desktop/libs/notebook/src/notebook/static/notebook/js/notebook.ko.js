@@ -648,11 +648,15 @@
         self.status('expired');
       }
       else if (data.status == -4) { // Operation timed out
-        self.status('failed'); // to remove when below ready
-        ///
-        console.log('Operation timed out, do you want to retry or cancel?'); // cf. 401 modal below for popup or inline message same place as usual error message? (nicer than popup)
-        // if yes, if (callback) { callback(); };
-        // if no, self.status('failed');
+        notebook.retryModalCancel = function () {
+          self.status('failed');
+          huePubSub.publish('hide.retry.modal');
+        }
+        notebook.retryModalConfirm = function () {
+          self.execute();
+          huePubSub.publish('hide.retry.modal');
+        }
+        huePubSub.publish('show.retry.modal');
       }
       else if (data.status == 401) { // Auth required
         self.status('expired');
@@ -1241,6 +1245,9 @@
     });
 
     self.schedulerViewModel;
+
+    self.retryModalConfirm = null;
+    self.retryModalCancel = null;
 
     self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
