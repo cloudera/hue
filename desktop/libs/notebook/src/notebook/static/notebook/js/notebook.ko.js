@@ -647,6 +647,13 @@
       else if (data.status == -3) { // Statement expired
         self.status('expired');
       }
+      else if (data.status == -4) { // Operation timed out
+        self.status('failed'); // to remove when below ready
+        ///
+        console.log('Operation timed out, do you want to retry or cancel?'); // cf. 401 modal below for popup or inline message same place as usual error message? (nicer than popup)
+        // if yes, if (callback) { callback(); };
+        // if no, self.status('failed');
+      }
       else if (data.status == 401) { // Auth required
         self.status('expired');
         $(document).trigger("showAuthModal", {'type': self.type(), 'callback': self.execute});
@@ -901,7 +908,7 @@
           if (data.status == 0) {
             self.loadData(data.result, rows);
           } else {
-            self._ajaxError(data);
+            self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
             $(document).trigger("renderDataError", {snippet: self});
           }
         }, 'text').fail(function (xhr, textStatus, errorThrown) {
