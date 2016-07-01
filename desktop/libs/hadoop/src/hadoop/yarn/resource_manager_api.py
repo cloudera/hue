@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 
 from hadoop import cluster
@@ -140,7 +140,7 @@ class ResourceManagerApi(object):
 
     try:
       params = self._get_params()
-      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), allow_redirects=True, contenttype=_JSON_CONTENT_TYPE)
+      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     finally:
       if token:
         self.cancel_token(token)
@@ -157,11 +157,24 @@ class ResourceManagerApi(object):
     return self._execute(self._root.delete, 'cluster/delegation-token', params=params, headers=headers)
 
   def _execute(self, function, *args, **kwargs):
-    response = function(*args, **kwargs)
-
-    # YARN-2605: Yarn does not use proper HTTP redirects when the standby RM has
-    # failed back to the master RM.
-    if isinstance(response, str) and response.startswith('This is standby RM. Redirecting to the current active RM'):
-      raise YarnFailoverOccurred(response)
+    response = None
+    try:
+      response = function(*args, **kwargs)
+    except RestException, e:
+      # YARN-2605: Yarn does not use proper HTTP redirects when the standby RM has
+      # failed back to the master RM.
+      if e.code == 307 and e.message.startswith('This is standby RM'):
+        LOG.info('Received YARN failover redirect response, attempting to resolve redirect.')
+        try:
+          kwargs.update({'allow_redirects': True})
+          response = function(*args, **kwargs)
+        except Exception, e:
+          if response:
+            raise YarnFailoverOccurred(response)
+          else:
+            raise PopupException(_('Failed to resolve YARN RM: %s') % e)
+      else:
+        raise PopupException(_('YARN RM returned a failed response: %s') % e)
 
     return response
+
