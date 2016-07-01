@@ -19,32 +19,37 @@ import logging
 import posixpath
 import threading
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from hadoop import cluster
 
 
 LOG = logging.getLogger(__name__)
-DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
-_api_cache = None
-_api_cache_lock = threading.Lock()
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
 
 def get_history_server_api():
-  global _api_cache
-  if _api_cache is None:
-    _api_cache_lock.acquire()
+  # TODO: Spark History Server does not yet support setuser, implement when it does
+  global API_CACHE
+
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
     try:
-      if _api_cache is None:
+      if API_CACHE is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-        _api_cache = SparkHistoryServerApi(yarn_cluster.SPARK_HISTORY_SERVER_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        if yarn_cluster is None:
+          raise PopupException(_('No Spark History Server is available.'))
+        API_CACHE = SparkHistoryServerApi(yarn_cluster.SPARK_HISTORY_SERVER_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
-      _api_cache_lock.release()
-  return _api_cache
+      API_CACHE_LOCK.release()
+
+  return API_CACHE
 
 
 class SparkHistoryServerApi(object):
