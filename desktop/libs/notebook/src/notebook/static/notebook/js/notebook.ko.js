@@ -158,6 +158,7 @@
       self.data.removeAll();
       self.images.removeAll();
       self.logs('');
+      self.handle({});
       self.startTime(new Date());
       self.endTime(new Date());
       self.explanation('');
@@ -679,6 +680,7 @@
 
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
+    self.executingBlockingOperation = null; // A ExecuteStatement()
     self.showLongOperationWarning = ko.observable(false);
 
     var longOperationTimeout = -1;
@@ -738,16 +740,24 @@
         }
       });
 
+      // TODO: rename startLongOperationTimeout to startBlockingOperationTimeout
+      // TODO: stop blocking operation UI if there is one
+      // TODO: offer to stop blocking submit or fetch operation UI if there is one (add a new call to function for cancelBlockingOperation)
+      // TODO: stop current blocking operation if there is one
+      // TODO: handle jquery.dataTables.1.8.2.min.js:150 Uncaught TypeError: Cannot read property 'asSorting' of undefined on some cancels
+      // TODO: we should cancel blocking operation when leaving notebook (similar to unload())
+      // TODO: we should test when we go back to a query history of a blocking operation that we left
       startLongOperationTimeout();
 
       self.currentQueryTab('queryHistory');
 
-      $.post("/notebook/api/execute", {
+      self.executingBlockingOperation = $.post("/notebook/api/execute", {
         notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
         stopLongOperationTimeout();
+
         if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor?editor=' + data.history_id;
           hueUtils.changeURL(url);
@@ -798,12 +808,15 @@
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (self.statusForButtons() != 'canceled') { // No error when manually canceled
+          $(document).trigger("error", xhr.responseText);
+        }
         self.status('failed');
         self.statusForButtons('executed');
+      }).always(function () {
+        self.executingBlockingOperation = null;
       });
     };
-
 
     self.reexecute = function () {
       self.result.handle()['statement_id'] = 0;
@@ -1043,23 +1056,32 @@
         self.checkStatusTimeout = null;
       }
       logGA('cancel');
-      self.statusForButtons('canceling');
 
-      $.post("/notebook/api/cancel_statement", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
-        snippet: ko.mapping.toJSON(self.getContext())
-      }, function (data) {
-        self.statusForButtons('canceled');
-        if (data.status == 0) {
-          self.status('canceled');
-        } else {
-          self._ajaxError(data);
+      if ($.isEmptyObject(self.result.handle())) { // Query was not even submitted yet
+        if (self.executingBlockingOperation != null) {
+          self.executingBlockingOperation.abort();
+          self.executingBlockingOperation = null;
         }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
         self.statusForButtons('canceled');
         self.status('failed');
-      });
+      } else {
+        self.statusForButtons('canceling');
+        $.post("/notebook/api/cancel_statement", {
+          notebook: ko.mapping.toJSON(notebook.getContext()),
+          snippet: ko.mapping.toJSON(self.getContext())
+        }, function (data) {
+          self.statusForButtons('canceled');
+          if (data.status == 0) {
+            self.status('canceled');
+          } else {
+            self._ajaxError(data);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+          self.statusForButtons('canceled');
+          self.status('failed');
+        });
+      }
     };
 
     self.close = function () {
@@ -1710,7 +1732,7 @@
     self.saveScheduler = function() {
       if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
         self.schedulerViewModel.coordinator.isManaged(true);
-    	self.schedulerViewModel.save(function(data) {
+        self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
         });
       }
