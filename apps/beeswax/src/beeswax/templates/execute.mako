@@ -17,6 +17,7 @@
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
+  from desktop import conf
   from django.utils.translation import ugettext as _
   from notebook.conf import ENABLE_QUERY_BUILDER
 %>
@@ -1224,6 +1225,7 @@ var autocompleter = new Autocompleter({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
   optEnabled: false,
+  timeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
   useNewAutocompleter: false
 });
 

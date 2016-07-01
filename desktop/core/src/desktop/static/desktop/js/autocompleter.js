@@ -27,35 +27,40 @@
 }(this, function (SqlAutocompleter, SqlAutocompleter2, HdfsAutocompleter) {
 
   /**
-   * @param options {object}
+   * @param {Object} options {object}
    * @param options.snippet
    * @param options.user
    * @param options.optEnabled
+   * @param {Number} options.timeout
    * @param options.useNewSqlAutocompleter {boolean}
    * @constructor
    */
   function Autocompleter(options) {
     var self = this;
     self.snippet = options.snippet;
+    self.timeout = options.timeout;
     
     self.topTables = {};
 
     var initializeAutocompleter = function () {
       if (self.snippet.isSqlDialect() && options.useNewAutocompleter) {
         self.autocompleter = new SqlAutocompleter2({
-          snippet: self.snippet
+          snippet: self.snippet,
+          timeout: self.timeout
         });
       } else {
         var hdfsAutocompleter = new HdfsAutocompleter({
           user: options.user,
-          snippet: options.snippet
+          snippet: options.snippet,
+          timeout: options.timeout
         });
         if (self.snippet.isSqlDialect()) {
           self.autocompleter = new SqlAutocompleter({
             hdfsAutocompleter: hdfsAutocompleter,
             snippet: options.snippet,
             oldEditor: options.oldEditor,
-            optEnabled: options.optEnabled
+            optEnabled: options.optEnabled,
+            timeout: self.timeout
           })
         } else {
           self.autocompleter = hdfsAutocompleter;
