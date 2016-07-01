@@ -28,7 +28,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired
+from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout
 
 
 LOG = logging.getLogger(__name__)
@@ -89,6 +89,8 @@ def api_error_handler(func):
       LOG.exception('Error validation %s' % func)
       response['status'] = -1
       response['message'] = e.message
+    except OperationTimeout, e:
+      response['status'] = -4
     except QueryError, e:
       LOG.exception('Error running %s' % func)
       response['status'] = 1

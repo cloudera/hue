@@ -24,12 +24,13 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
-from desktop.lib.conf import BoundConfig, Config
+from desktop.lib.conf import BoundConfig
+from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
 
-from notebook.connectors.base import Api, QueryError, QueryExpired
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout
 
 
 LOG = logging.getLogger(__name__)
@@ -64,6 +65,12 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except StructuredException, e:
+      message = force_unicode(str(e))
+      if 'timed out' in message:
+        raise OperationTimeout(e)
+      else:
+        raise QueryError(message)
     except QueryServerException, e:
       message = force_unicode(str(e))
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:

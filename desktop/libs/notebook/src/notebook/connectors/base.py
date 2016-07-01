@@ -38,6 +38,10 @@ class QueryExpired(Exception):
 class AuthenticationRequired(Exception):
   pass
 
+class OperationTimeout(Exception):
+  pass
+
+
 class QueryError(Exception):
   def __init__(self, message, handle=None):
     self.message = message or _('No error message, please check the logs.')
