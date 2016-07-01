@@ -123,14 +123,18 @@ class SparkJob(Application):
     return self.trackingUrl.strip('/').split('/')[-1]
 
   def _resolve_tracking_url(self):
+    resp = None
     try:
-      resp = urllib2.urlopen(self.trackingUrl)
+      resp = urllib2.urlopen(self.trackingUrl, timeout=5.0)
       actual_url = resp.url
       if actual_url.strip('/').split('/')[-1] == 'jobs':
         actual_url = actual_url.strip('/').replace('jobs', '')
       self.trackingUrl = actual_url
     except Exception, e:
       LOG.warn("Failed to resolve Spark Job's actual tracking URL: %s" % e)
+    finally:
+      if resp is not None:
+        resp.close()
 
   def _get_metrics(self):
     self.metrics = {}
