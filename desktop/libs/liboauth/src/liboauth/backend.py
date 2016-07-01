@@ -120,22 +120,23 @@ class OAuthBackend(DesktopBackendBase):
         code = request.GET['code']
         grant_type = 'authorization_code'
 
-        if request.GET['state'] == 'google':
-            social = 'google'
+        state_split = request.GET['state'].split(',')
+        nexturl = state_split[1] if len(state_split) > 1 else '/'
+        social = state_split[0]
+
+        if social == 'google':
             consumer_key=liboauth.conf.CONSUMER_KEY_GOOGLE.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_GOOGLE.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_GOOGLE.get()
-            authentication_token_uri=liboauth.conf.AUTHORIZE_URL_GOOGLE.get()
-        
-        elif request.GET['state'] == 'facebook':
-            social = 'facebook'
+            authentication_token_uri=liboauth.conf.AUTHORIZE_URL_GOOGLE.get()        
+
+        elif social == 'facebook':
             consumer_key=liboauth.conf.CONSUMER_KEY_FACEBOOK.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_FACEBOOK.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_FACEBOOK.get()
             authentication_token_uri=liboauth.conf.AUTHORIZE_URL_FACEBOOK.get()
         
-        elif request.GET['state'] == 'linkedin':
-            social = 'linkedin'
+        elif social == 'linkedin':
             consumer_key=liboauth.conf.CONSUMER_KEY_LINKEDIN.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_LINKEDIN.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_LINKEDIN.get()
@@ -186,7 +187,7 @@ class OAuthBackend(DesktopBackendBase):
             access_token = dict(screen_name=map_username(username), oauth_token_secret=access_tok)
   
 
-    return access_token
+    return access_token, nexturl
 
 
   def get_redirect_uri(self, request):
@@ -207,6 +208,7 @@ class OAuthBackend(DesktopBackendBase):
     response_type = "code"
  
     social = request.GET['social']
+    state = social + "," + request.REQUEST.get('next', '/')
 
     if social == 'google':
       consumer_key=liboauth.conf.CONSUMER_KEY_GOOGLE.get()
@@ -214,7 +216,6 @@ class OAuthBackend(DesktopBackendBase):
       scope = "https://www.googleapis.com/auth/userinfo.email"
       access_type="offline"
       approval_prompt="force"
-      state="google"
 
       url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&state={state}&access_type={access_type}&approval_prompt={approval_prompt}".format(
          token_request_uri = token_request_uri,
@@ -232,7 +233,6 @@ class OAuthBackend(DesktopBackendBase):
        token_request_uri = liboauth.conf.REQUEST_TOKEN_URL_FACEBOOK.get()
        scope = "email"
        grant_type = "client_credentials"
-       state = "facebook"
 
        url = "{token_request_uri}?client_id={client_id}&redirect_uri={redirect_uri}&grant_type={grant_type}&scope={scope}&state={state}".format(
            token_request_uri=token_request_uri,
@@ -247,7 +247,6 @@ class OAuthBackend(DesktopBackendBase):
        consumer_key=liboauth.conf.CONSUMER_KEY_LINKEDIN.get()
        token_request_uri = liboauth.conf.REQUEST_TOKEN_URL_LINKEDIN.get()
        scope= "r_emailaddress"
-       state= "linkedin"
 
        url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&scope={scope}&state={state}&redirect_uri={redirect_uri}".format(
              token_request_uri=token_request_uri,
