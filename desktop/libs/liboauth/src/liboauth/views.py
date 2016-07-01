@@ -79,10 +79,9 @@ def oauth_login(request):
 @login_notrequired
 def oauth_authenticated(request):
    
-  access_token = OAuthBackend.handleAuthenticationRequest(request)
+  access_token, next = OAuthBackend.handleAuthenticationRequest(request)
   if access_token == "":
       return show_login_page(request, True)
   user = authenticate(access_token = access_token)
   login(request, user)
-  redirect_to = request.REQUEST.get('next', '/')
-  return HttpResponseRedirect(redirect_to)
+  return HttpResponseRedirect(next)
