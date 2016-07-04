@@ -3197,8 +3197,10 @@ ${ hueIcons.symbols() }
           $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
           $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerColumn").remove();
           $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerCell").remove();
-          _el.dataTable().fnClearTable();
-          _el.dataTable().fnDestroy();
+          if (_el.dataTable()) {
+            _el.dataTable().fnClearTable();
+            _el.dataTable().fnDestroy();
+          }
           _el.find("thead tr").empty();
         }
       });
