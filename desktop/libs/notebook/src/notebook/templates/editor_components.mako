@@ -2143,19 +2143,54 @@ ${ hueIcons.symbols() }
   ace.config.set("basePath", "/static/desktop/js/ace");
 
   function createHueDatatable(el, snippet, vm) {
+    var DATATABLES_MAX_HEIGHT = 330;
     var _dt = $(el).hueDataTable({
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
-        $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-        $(el).jHueHorizontalScrollbar();
+        if (vm.editorMode()) {
+          DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
+          $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            parentId: 'snippet_' + snippet.id(),
+            mainScrollable: '.right-panel',
+            stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
+            clonedContainerPosition: "fixed"
+          });
+          $(el).jHueHorizontalScrollbar();
+        }
+        else {
+          $(el).parents(".dataTables_wrapper").jHueTableScroller({
+            maxHeight: DATATABLES_MAX_HEIGHT,
+            heightAfterCorrection: 0
+          });
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            mainScrollable: '.right-panel',
+            parentId: 'snippet_' + snippet.id(),
+            clonedContainerPosition: "absolute"
+          });
+        }
       }
     });
-    $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-    $(el).jHueHorizontalScrollbar();
+
+    if (vm.editorMode()) {
+      $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+      $(el).jHueHorizontalScrollbar();
+    } else {
+      $(el).parents(".dataTables_wrapper").jHueTableScroller({
+        maxHeight: DATATABLES_MAX_HEIGHT,
+        heightAfterCorrection: 0,
+        enableNiceScroll: true
+      });
+    }
 
     return _dt;
   }
@@ -2175,8 +2210,6 @@ ${ hueIcons.symbols() }
       "fnDrawCallback": function (oSettings) {
         if (vm.editorMode()){
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
-        }
-        if (vm.editorMode()) {
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
           $(el).jHueTableExtender({
             fixedHeader: true,
@@ -2221,29 +2254,12 @@ ${ hueIcons.symbols() }
 
     if (vm.editorMode()) {
       $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-      $(el).jHueTableExtender({
-        fixedHeader: true,
-        fixedFirstColumn: true,
-        includeNavigator: false,
-        parentId: 'snippet_' + snippet.id(),
-        mainScrollable: '.right-panel',
-        stickToTopPosition: vm.isPlayerMode() ? (vm.isFullscreenMode() ? 48 : 0) : 73,
-        clonedContainerPosition: "fixed"
-      });
       $(el).jHueHorizontalScrollbar();
     } else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
         maxHeight: DATATABLES_MAX_HEIGHT,
         heightAfterCorrection: 0,
         enableNiceScroll: true
-      });
-      $(el).jHueTableExtender({
-        fixedHeader: true,
-        fixedFirstColumn: true,
-        includeNavigator: false,
-        mainScrollable: '.right-panel',
-        parentId: 'snippet_' + snippet.id(),
-        clonedContainerPosition: "absolute"
       });
     }
     $(".dataTables_filter").hide();
