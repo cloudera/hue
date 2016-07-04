@@ -299,8 +299,7 @@
     clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
     $pluginElement.find("thead>tr th").each(function (i) {
       var originalTh = $(this);
-      clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");
-      clonedTable.find("thead>tr th:eq(" + i + ")").click(function () {
+      clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
         originalTh.click();
         clonedTable.find("thead>tr th").attr("class", "sorting");
         $(this).attr("class", originalTh.attr("class"));
