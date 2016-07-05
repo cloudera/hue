@@ -24,7 +24,8 @@ from desktop.lib.django_util import JsonResponse, render
 
 from indexer.controller2 import IndexController
 from indexer.management.commands import indexer_setup
-from indexer.smart_indexer import Field
+from indexer.fields import FIELD_TYPES
+from indexer.operations import OPERATORS
 
 LOG = logging.getLogger(__name__)
 
@@ -53,8 +54,8 @@ def indexer(request):
 
   return render('indexer.mako', request, {
       'indexes_json': json.dumps(indexes),
-      'fields_json' : json.dumps([field.name for field in Field.TYPES]),
-      'operators_json' : json.dumps([operator.to_dict() for operator in Field.OPERATORS])
+      'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
+      'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS])
   })
 
 def install_examples(request, is_redirect=False):

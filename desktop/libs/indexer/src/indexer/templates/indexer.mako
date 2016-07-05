@@ -36,12 +36,13 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   <div class="snippet-settings" data-bind="visible: createWizard.show" style="
   text-align: center;">
 
-    <div class="control-group" data-bind="css: { error: createWizard.validName() === false, success: createWizard.validName()}">
+    <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
         <input type="text" class="form-control" id = "collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
-        <span class="help-block" data-bind="visible: createWizard.validName() === true">${ _('Collection name available') }</span>
-        <span class="help-block" data-bind="visible: createWizard.validName() === false">${_('This collection already exists') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === true">${ _('Collection name available') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('This collection already exists') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
       </div>
     </div>
 
@@ -82,21 +83,25 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
           </thead>
           <tbody data-bind="foreach: createWizard.sample">
             <tr data-bind="foreach: $data">
-              <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
-              </td>
+              <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
+                <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
+                </td>
 
                 <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
                   <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
                 <!-- /ko -->
+              <!-- /ko -->
             </tr>
           </tbody>
         </table>
 
         <br><hr><br>
 
-        <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.validName()}">${_('Index File!')}</a>
+        <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">${_('Index File!')}</a>
 
-        <h4 class="error" data-bind="visible: !createWizard.validName()">${_('Collection needs a unique name')}</h4>
+        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Collection needs a unique name')}</h4>
+        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('Collection needs a name')}</h4>
+
 
         <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {           href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
           ${_('View Indexing Status')}
@@ -123,7 +128,9 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 <script type="text/html" id="operation-template">
   <div><select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
   <!-- ko template: "operation-args-template" --><!-- /ko -->
-    <input type="number" data-bind="value: operation.numExpectedFields">
+    <!-- ko if: operation.settings().outputType() == "custom_fields" -->
+      <input type="number" data-bind="value: operation.numExpectedFields">
+    <!-- /ko -->
     <button class="btn" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}">${_('remove')}</button>
     <div style="padding-left:50px" data-bind="foreach: operation.fields">
       <div data-bind="template: { name:'field-template',data:$data}"></div>
@@ -153,11 +160,32 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="operation-args-template">
-  <!-- ko foreach: Object.keys(operation.settings()) -->
-  <input type="text" data-bind="value: $parent.operation.settings()[$data]">
+  <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
+    <!-- ko template: {name: 'operation-arg-'+argument.type, data:{operation: $parent.operation, argVal: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
+
 </script>
 
+<script type="text/html" id="operation-arg-text">
+  <input type="text" data-bind="attr: {placeholder: argument.name}, value: argVal">
+</script>
+
+<script type="text/html" id="operation-arg-checkbox">
+  <h4 data-bind="text: argument.name"></h4>
+  <input type="checkbox" data-bind="checked: argVal">
+</script>
+
+<script type="text/html" id="operation-arg-mapping">
+  <!-- ko foreach: argVal-->
+    <div>
+      <input type="text" data-bind="value: key, attr: {placeholder: 'key'}">
+      <input type="text" data-bind="value: value, attr: {placeholder: 'value'}">
+      <button class="btn" data-bind="click: function(){$parent.operation.settings().mapping.remove($data)}">${_('Remove Pair')}</button>
+    </div>
+  <!-- /ko -->
+  <button class="btn" data-bind="click: operation.addPair">${_('Add Pair')}</button>
+  <br>
+</script>
 
 <div class="hueOverlay" data-bind="visible: isLoading">
   <!--[if lte IE 9]>
@@ -175,9 +203,16 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
+var fieldNum = 0;
+
+var getNewFieldName = function(){
+  fieldNum++;
+  return "new_field_" + fieldNum
+}
+
   var createDefaultField = function(){
     return {
-      name: ko.observable("new_field"),
+      name: ko.observable(getNewFieldName()),
       type: ko.observable("string"),
       keep: ko.observable(true),
       required: ko.observable(true),
@@ -186,43 +221,89 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   };
 
   var Operation = function(type){
+    var self = this;
+
+    var createArgumentValue = function(arg){
+      if(arg.type == "mapping"){
+        return ko.observableArray([]);
+      }
+      else if(arg.type =="checkbox"){
+        return ko.observable(false);
+      }
+      else{
+        return ko.observable("");
+      }
+    }
+
     var constructSettings = function(type){
       var settings = {};
+
       var operation = viewModel.createWizard.operationTypes.find(function(currOperation){
         return currOperation.name == type;
       });
 
       for(var i = 0; i < operation.args.length; i++){
-        settings[operation.args[i]] = ko.observable(operation.args[i]);
+        argVal = createArgumentValue(operation.args[i]);
+
+        if(operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields"){
+          argVal.subscribe(function(newVal){
+            if(newVal){
+              self.fields.push(createDefaultField());
+            }
+            else{
+              self.fields.pop();
+            }
+          });
+        }
+
+        settings[operation.args[i].name] = argVal;
       }
+
+      settings.getArguments = function(){
+        return operation.args
+      };
+
+      settings.outputType= function(){
+        return operation.outputType;
+      }
+
       return settings;
     };
 
-    var self = this;
+    var init = function(){
+      self.fields([]);
+      self.numExpectedFields(0);
+
+      self.numExpectedFields.subscribe(function(numExpectedFields){
+        if(numExpectedFields < self.fields().length){
+          self.fields(self.fields().slice(0,numExpectedFields));
+        }
+        else if (numExpectedFields > self.fields().length){
+          difference = numExpectedFields - self.fields().length;
+
+          for(var i = 0; i < difference; i++){
+            self.fields.push(createDefaultField());
+          }
+        }
+      });
+
+      self.settings(constructSettings(self.type()));
+    }
 
     self.type = ko.observable(type);
     self.fields = ko.observableArray();
+    self.numExpectedFields = ko.observable();
+    self.settings = ko.observable();
 
-    self.numExpectedFields = ko.observable(0);
-
-    self.numExpectedFields.subscribe(function(numExpectedFields){
-      if(numExpectedFields < self.fields().length){
-        self.fields(self.fields().slice(0,numExpectedFields));
-      }
-      else if (numExpectedFields > self.fields().length){
-        difference = numExpectedFields - self.fields().length;
-
-        for(var i = 0; i < difference; i++){
-          self.fields.push(createDefaultField());
-        }
-      }
-    });
-
-    self.settings = ko.observable(constructSettings(type));
+    init();
 
     self.type.subscribe(function(newType){
-      self.settings(constructSettings(newType));
+      init();
     });
+
+    self.addPair = function(){
+      self.settings().mapping.push({key: ko.observable(""), value: ko.observable("")});
+    }
   }
 
   var File_Format = function (vm) {
@@ -230,7 +311,6 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 
     self.name = ko.observable('');
-    self.sample = ko.observableArray();
     self.show = ko.observable(false);
 
     self.path = ko.observable('/tmp/test.csv');
@@ -246,8 +326,6 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     self.fieldTypes = ko.observableArray(${fields_json | n});
 
-    self.validName = ko.observable(null);
-
     self.show = ko.observable(true);
     self.showCreate = ko.observable(false);
 
@@ -259,6 +337,17 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     self.indexingStarted = ko.observable(false);
 
+    self.isNameAvailable = ko.computed(function(){
+      var name = self.fileFormat().name();
+      return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
+    });
+
+    self.readyToIndex = ko.computed(function(){
+      var validFields = self.fileFormat().columns().length
+
+      return self.isNameAvailable() && validFields;
+    });
+
     self.fileFormat().format.subscribe(function(){
       self.fileFormat().format().quoteChar.subscribe(self.guessFieldTypes);
       self.fileFormat().format().recordSeparator.subscribe(self.guessFieldTypes);
@@ -268,10 +357,6 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
       self.guessFieldTypes();
     });
-
-    self.fileFormat().name.subscribe(function(newName){
-      self.validName(viewModel.collectionNameAvailable(newName));
-    })
 
     self.guessFormat = function() {
       viewModel.isLoading(true);
@@ -310,7 +395,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
     };
 
     self.indexFile = function() {
-      if(!self.validName()) return;
+      if(!self.readyToIndex()) return;
 
       self.indexingStarted(true);
 
