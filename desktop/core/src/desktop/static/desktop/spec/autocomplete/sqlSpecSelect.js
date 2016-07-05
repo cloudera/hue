@@ -107,6 +107,18 @@ define([
       });
     });
 
+    it('should handle asterisked complete SELECT statement ', function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: 'SELECT tta.* FROM testTableA tta, testTableB; ',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords after SELECT SelectList FROM TablePrimary ', function() {
       assertAutoComplete({
         serverResponses: {},
@@ -126,18 +138,18 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['AND', 'GROUP BY', 'LIMIT', 'ORDER BY']
+          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
         }
       });
     });
 
     it('should suggest keywords after SELECT FROM TablePrimary WHERE SearchCondition ', function () {
       assertAutoComplete({
-        beforeCursor: 'SELECT FROM foo WHERE id = 1 ',
+        beforeCursor: 'SELECT * FROM foo WHERE id = 1 ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['AND', 'GROUP BY', 'LIMIT', 'ORDER BY']
+          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
         }
       });
     });
@@ -210,7 +222,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['AND', 'GROUP BY', 'LIMIT', 'ORDER BY']
+            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
           }
         });
       });
@@ -295,7 +307,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -315,30 +327,13 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: true,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
             },
             suggestDatabases: {
               prependQuestionMark: true,
-              prependFrom: true,
-              appendDot: true
-            }
-          }
-        });
-      });
-
-      it('should suggest table names with *', function() {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * ',
-          afterCursor: '',
-          expectedResult: {
-            lowerCase: false,
-            suggestTables: {
-              prependFrom: true
-            },
-            suggestDatabases: {
               prependFrom: true,
               appendDot: true
             }
@@ -352,7 +347,7 @@ define([
           afterCursor: ' FROM tableA;',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: {table: 'tableA'}
           }
         });
@@ -364,7 +359,19 @@ define([
           afterCursor: ' FROM tableA;',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
+            suggestColumns: {table: 'tableA'}
+          }
+        });
+      });
+
+      it('should suggest table names if FROM is already there after *', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT *, ',
+          afterCursor: ' FROM tableA;',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*'],
             suggestColumns: {table: 'tableA'}
           }
         });
@@ -396,6 +403,17 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a ',
           afterCursor: ', b, c AS foo, d FROM tableA;',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AS']
+          }
+        });
+      });
+
+      it('should suggest keywords after a column reference before comma', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a ',
+          afterCursor: ', FROM tableA;',
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -508,7 +526,7 @@ define([
           afterCursor: ' FROM testTableA   tta, testTableB',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
@@ -520,29 +538,88 @@ define([
           afterCursor: ' FROM testTableA   tta, testTableB',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
 
-      // TODO: fix me, issue is SUM function
-      xit('should suggest table aliases and select aliases', function() {
+      it('should suggest table aliases and select aliases', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.array) ttaSum, testTableB ttb',
           ignoreErrors: true,
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
-            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum', type: 'alias' }, { name: 'ttb.', type: 'alias' }]
+            suggestKeywords: ['*'],
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum.', type: 'subquery' }, { name: 'ttb.', type: 'alias' }]
           }
         });
       });
     });
 
     describe('functions', function () {
-      xit('should suggest fields in functions', function () {
+      it('should handle count', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT COUNT(*) FROM testTable;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest table names with just a function', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT COUNT(*) ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependFrom: true,
+              appendDot: true
+            },
+            suggestKeywords: ['AS']
+          }
+        });
+      });
+
+      it('should suggest columns in aggregate functions', function () {
+        var aggregateFunctions = [
+          { name: 'COUNT', dialect: 'generic'}];
+        aggregateFunctions.forEach(function (aggregateFunction) {
+          if (aggregateFunction.name === 'COUNT') {
+            assertAutoComplete({
+              beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
+              afterCursor: ') FROM testTable',
+              expectedResult: {
+                lowerCase: false,
+                suggestColumns: {
+                  table: 'testTable'
+                },
+                suggestKeywords: ['*']
+              }
+            });
+          } else {
+            assertAutoComplete({
+              beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
+              afterCursor: ') FROM testTable',
+              expectedResult: {
+                lowerCase: false,
+                suggestColumns: {
+                  table: 'testTable'
+                }
+              }
+            });
+          }
+        })
+      });
+
+      it('should suggest fields in functions', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT id, SUM(',
           afterCursor: ' FROM testTable',
@@ -556,9 +633,9 @@ define([
         });
       });
 
-      xit('should suggest fields in functions after operators', function () {
+      it('should suggest fields in functions after operators', function () {
         assertAutoComplete({
-          beforeCursor: 'SELECT id, SUM(a * ',
+          beforeCursor: 'SELECT id, SUM(a *  ',
           afterCursor: ' FROM testTable',
           ignoreErrors: true,
           expectedResult: {
@@ -582,7 +659,8 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap', key: '\"anyKey\"' }]
-            }
+            },
+            suggestKeywords: ['*']
           }
         });
       });
@@ -597,7 +675,8 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap', key: null }]
-            }
+            },
+            suggestKeywords: ['*']
           }
         });
       });
@@ -612,7 +691,8 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap', key: '\"anyKey\"' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*']
           }
         });
       });
@@ -627,7 +707,8 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testArray', key: 1 }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*']
           }
         });
       });
@@ -642,7 +723,8 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testArray', key: 1 }, { name: 'testMap', key: '\"key\"' }]
-            }
+            },
+            suggestKeywords: ['*']
           }
         });
       });
@@ -671,7 +753,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable'
               },
@@ -680,12 +762,13 @@ define([
           });
         });
 
-        xit('should suggest columns in explode', function () {
+        it('should suggest columns in explode', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(',
             afterCursor: '',
             dialect: 'hive',
             expectedResult: {
+              lowerCase: false,
               suggestColumns: {
                 table: 'testTable'
               }
@@ -693,12 +776,13 @@ define([
           });
         });
 
-        xit('should suggest columns in explode for structs', function () {
+        it('should suggest columns in explode for structs', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(a.b.',
             afterCursor: '',
             dialect: 'hive',
             expectedResult: {
+              lowerCase: false,
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [ { name: 'a' }, { name: 'b' }]
@@ -707,12 +791,13 @@ define([
           });
         });
 
-        xit('should suggest columns in posexplode', function () {
+        it('should suggest columns in posexplode', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW posexplode(',
             afterCursor: '',
             dialect: 'hive',
             expectedResult: {
+              lowerCase: false,
               suggestColumns: {
                 table: 'testTable'
               }
@@ -727,7 +812,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable'
               },
@@ -743,7 +828,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testArray' }, { name: 'item' }]
@@ -761,7 +846,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testArrayA' }, { name: 'item' }]
@@ -779,7 +864,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable2',
                 identifierChain: [{ name: 'testArrayB' }, { name: 'item' }]
@@ -798,7 +883,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }]
@@ -817,7 +902,8 @@ define([
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testArray' }, { name: 'item' }]
-              }
+              },
+              suggestKeywords: ['*']
             }
           });
         });
@@ -838,7 +924,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
+              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testArray' }, { name: 'item' }]
@@ -854,11 +940,11 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Verify that this is true
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testMap' }, { name: 'value' }]
-              }
+              },
+              suggestKeywords: ['*'] // TODO: Verify that this is true
             }
           });
         });
@@ -873,7 +959,8 @@ define([
               suggestColumns: {
                 table: 'testTable',
                 identifierChain: [{ name: 'testMap' }, { name: 'value' }]
-              }
+              },
+              suggestKeywords: ['*'] // TODO: Verify that this is true
             }
           });
         });
@@ -886,8 +973,8 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Check if really true
-              suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }]
+              suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
+              suggestKeywords: ['*'] // TODO: Check if really true
             }
           });
         });
@@ -904,7 +991,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestStar: true, // TODO: Check if really true
+              suggestKeywords: ['*'], // TODO: Check if really true
               suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
               suggestColumns: {
                 table: 'testTable'
@@ -916,6 +1003,20 @@ define([
     });
 
     describe('Impala specific', function() {
+
+      // Fails on YEAR(, and ROUND but recoverable error
+      xit('should handle complex query 1', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT tmp.book_category, ROUND(tmp.revenue, 2) AS revenue FROM ( SELECT tst_a_db_0001.books_001.category AS book_category, SUM(tst_a_db_0001.books_001.price * transactions.quantity) AS revenue FROM tst_a_db_0001.books_001 JOIN [SHUFFLE] transactions ON ( transactions.book_id = tst_a_db_0001.books_001.id AND YEAR(transactions.transaction_date) BETWEEN 2008 AND 2010) GROUP BY tst_a_db_0001.books_001.category) tmp ORDER BY revenue DESC LIMIT 60;',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should not suggest struct from map values with hive style syntax', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testMap[\"anyKey\"].',
@@ -926,7 +1027,8 @@ define([
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'testMap',  key: '\"anyKey\"' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -941,7 +1043,8 @@ define([
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -956,7 +1059,8 @@ define([
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -971,7 +1075,8 @@ define([
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -988,7 +1093,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }]
@@ -1004,7 +1109,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }]
@@ -1051,7 +1156,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true, // TODO: Check if really so
+            suggestKeywords: ['*'], // TODO: Check if really so
             suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
         });
@@ -1129,7 +1234,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true, // TODO: Verify that this is true
+            suggestKeywords: ['*'], // TODO: Verify that this is true
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'columnA' }]
@@ -1148,7 +1253,8 @@ define([
             suggestColumns: {
               table: 'testTable',
               identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -1164,7 +1270,8 @@ define([
               table: 'testTable',
               database: 'database_two',
               identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }]
-            }
+            },
+            suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
       });
@@ -1180,10 +1287,27 @@ define([
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
-            }
+            },
+            suggestColumns: { table: 'testTable' }
           }
         });
       });
+
+      it('should suggest values for columns in conditions reversed', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE ',
+          afterCursor: ' = id',
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: {
+              table: 'testTable',
+              identifierChain: [{ name: 'id' }]
+            },
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
 
       it('should suggest values for columns in conditions', function() {
         assertAutoComplete({
@@ -1194,7 +1318,8 @@ define([
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
-            }
+            },
+            suggestColumns: { table: 'testTable' }
           }
         });
       });
@@ -1207,7 +1332,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1219,7 +1344,7 @@ define([
           afterCursor: ' a, b, c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1231,7 +1356,7 @@ define([
           afterCursor: ',c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1243,7 +1368,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true, // TODO: Correct?
+            suggestKeywords: ['*'], // TODO: Correct?
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1255,7 +1380,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true, // TODO: Correct?
+            suggestKeywords: ['*'], // TODO: Correct?
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1267,7 +1392,7 @@ define([
           afterCursor: ' FROM testwhere',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testwhere' }
           }
         });
@@ -1279,7 +1404,7 @@ define([
           afterCursor: ' FROM teston',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'teston' }
           }
         });
@@ -1291,7 +1416,7 @@ define([
           afterCursor: ' from database_two.testTable',
           expectedResult: {
             lowerCase: true,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable', database: 'database_two' }
           }
         });
@@ -1303,7 +1428,7 @@ define([
           afterCursor: ' from `database one`.`test table`',
           expectedResult: {
             lowerCase: true,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'test table', database: 'database one' }
           }
         });
@@ -1658,7 +1783,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1670,7 +1795,7 @@ define([
           afterCursor: ' FROM testTable tt',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1682,7 +1807,7 @@ define([
           afterCursor: ' FROM database_two.testTable tt',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTable', database: 'database_two' }
           }
         });
@@ -1694,7 +1819,7 @@ define([
           afterCursor: ' FROM testTableA tta, testTableB ttb',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTableA' }
           }
         });
@@ -1703,7 +1828,7 @@ define([
           afterCursor: ' FROM testTableA tta, testTableB ttb',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: { table: 'testTableB' }
           }
         });
@@ -1979,7 +2104,7 @@ define([
 
         it('should handle multiple joins', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT t1.* FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2); ',
+            beforeCursor: 'SELECT t1.foo FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2); ',
             afterCursor: '',
             dialect: 'hive',
             containsKeywords: ['SELECT'],
@@ -2110,7 +2235,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['<', '<=', '<>', '=', '=>', '>', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'ORDER BY']
+            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
           }
         });
       });
@@ -2165,7 +2290,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -2186,7 +2311,7 @@ define([
           afterCursor: ')',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -2230,7 +2355,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -2250,7 +2375,7 @@ define([
           afterCursor: ' FROM (SELECT bla FROM abc WHERE foo > 1) bar',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestIdentifiers: [{ name: 'bar.', type: 'subquery'}]
           }
         });
@@ -2262,7 +2387,7 @@ define([
           afterCursor: ')',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -2282,7 +2407,7 @@ define([
           afterCursor: ' FROM (SELECT * FROM tableOne) AS subqueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) subqueryTwo;',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestIdentifiers: [{ name: 'subqueryOne.', type: 'subquery'}, { name: 'tAlias.', type: 'alias'}, { name: 'tableThree.', type: 'table'}, { name: 'subqueryTwo.', type: 'subquery'}]
           }
         });
@@ -2294,7 +2419,7 @@ define([
           afterCursor: ' FROM tableOne) subqueryOne, someDb.tableTwo talias, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) AS subqueryTwo;',
           expectedResult: {
             lowerCase: false,
-            suggestStar: true,
+            suggestKeywords: ['*'],
             suggestColumns: {
               table: 'tableOne'
             }

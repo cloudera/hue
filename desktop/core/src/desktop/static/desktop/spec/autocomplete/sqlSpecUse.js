@@ -72,7 +72,7 @@ define([
         expectedResult: {
           useDatabase: 'database_two',
           lowerCase: true,
-          suggestStar: true,
+          suggestKeywords: ['*'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -93,7 +93,7 @@ define([
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestStar: true,
+          suggestKeywords: ['*'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -114,7 +114,7 @@ define([
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestStar: true,
+          suggestKeywords: ['*'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
