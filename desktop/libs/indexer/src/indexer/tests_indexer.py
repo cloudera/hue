@@ -40,7 +40,7 @@ class IndexerTest():
 
   def test_guess_format(self):
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
-    indexer = Indexer("hue", None)
+    indexer = Indexer("test", None)
 
     guessed_format = indexer.guess_format({'file': stream})
 
@@ -74,12 +74,36 @@ class IndexerTest():
       }
     ]
 
-    for i in range(len(expected_fields)):
-      expected = expected_fields[i]
-      actual = fields[i]
-
+    for expected, actual in zip(expected_fields, fields):
       for key in ("name", "type"):
         assert_equal(expected[key], actual[key])
+
+  def test_guess_format_invalid_csv_format(self):
+    indexer = Indexer("test", None)
+    stream = StringIO.StringIO(IndexerTest.simpleCSVString)
+
+    guessed_format = indexer.guess_format({'file': stream})
+
+    guessed_format["fieldSeparator"] = "invalid separator"
+
+    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    assert_equal(fields, [])
+
+    stream.seek(0)
+    guessed_format = indexer.guess_format({'file': stream})
+
+    guessed_format["recordSeparator"] = "invalid separator"
+
+    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    assert_equal(fields, [])
+
+    stream.seek(0)
+    guessed_format = indexer.guess_format({'file': stream})
+
+    guessed_format["quoteChar"] = "invalid quoteChar"
+
+    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    assert_equal(fields, [])
 
   def test_end_to_end(self):
     fs = cluster.get_hdfs()

@@ -14,10 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 import os
-import csv
-import operator
-import itertools
-import re
 import logging
 
 from mako.lookup import TemplateLookup
@@ -27,6 +23,9 @@ from liboozie.oozie_api import get_oozie
 from oozie.models2 import Job
 from liboozie.submission2 import Submission
 
+from indexer.fields import Field, FIELD_TYPES
+from indexer.operations import get_checked_args
+from indexer.file_format import get_file_format_instance
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.conf import zkensemble
@@ -108,12 +107,12 @@ class Indexer(object):
           ]
     }
     """
-    file_format = FileFormat.get_instance(data['file'])
+    file_format = get_file_format_instance(data['file'])
     return file_format.get_format()
 
   def guess_field_types(self, data):
-    file_format = FileFormat.get_instance(data['file'], data['format'])
-    return file_format.get_fields()
+    file_format = get_file_format_instance(data['file'], data['format'])
+    return file_format.get_fields() if file_format else {'columns':[]}
 
   # Breadth first ordering of fields
   def get_field_list(self, field_data):
@@ -155,7 +154,7 @@ class Indexer(object):
 
   @staticmethod
   def _get_regex_for_type(type_):
-    matches = filter(lambda field_type: field_type.name == type_, Field.TYPES)
+    matches = filter(lambda field_type: field_type.name == type_, FIELD_TYPES)
 
     return matches[0].regex.replace('\\', '\\\\')
 
@@ -173,6 +172,9 @@ class Indexer(object):
     Morphline content 'SOLR_LOCATOR : { ...}'
     """
 
+    geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
+    grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
+
     properties = {
       "collection_name":collection_name,
       "fields":self.get_field_list(data['columns']),
@@ -181,7 +183,9 @@ class Indexer(object):
       "uuid_name" : uuid_name,
       "get_regex":Indexer._get_regex_for_type,
       "format":data['format'],
-      "grok_dictionaries_location" : os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries"),
+      "get_kept_args": get_checked_args,
+      "grok_dictionaries_location" : grok_dicts_loc if self.fs.exists(geolite_loc) else None,
+      "geolite_db_location" : geolite_loc if self.fs.exists(geolite_loc) else None,
       "zk_host": zkensemble()
     }
 
@@ -192,282 +196,3 @@ class Indexer(object):
 
     return morphline
 
-class FieldType():
-  def __init__(self, name, regex):
-    self._name = name
-    self._regex = regex
-
-  @property
-  def name(self):
-    return self._name
-
-  @property
-  def regex(self):
-    return self._regex
-  
- 
-  def matches(self, field):
-    pattern = re.compile(self._regex)
-
-    return pattern.match(field)
-
-class Operator():
-  def __init__(self, name, args):
-    self._name = name
-    self._args = args
-
-  def to_dict(self):
-    return {
-      "name": self._name,
-      "args": self._args
-    }
-
-class Field(object):
-  TYPES = [
-    FieldType('text', "^.{100,}$"),
-    FieldType('string', "^.*$"),
-    FieldType('double', "^[+-]?[0-9]+\\.?[0-9]+$"),
-    FieldType('long', "^(?:[+-]?(?:[0-9]+))$"),
-    FieldType('date', "[0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+(\\.[0-9]*)?Z")
-  ]
-
-  OPERATORS = [
-    Operator(
-      name="split",
-      args=["splitChar"]
-      ),
-    Operator(
-      name="grok",
-      args=["regexp"]
-      ),
-    Operator(
-      name="convert_date",
-      args=["format"]
-      ),
-  ]
-
-  def __init__(self, name, field_type):
-    self._name = name
-    self._field_type = field_type
-    self._keep = True
-    self._operations = []
-    self._required = True
-
-  @staticmethod
-  def guess_type(samples):
-    guesses = [Field._guess_field_type(sample) for sample in samples]
-
-    return Field._pick_best(guesses)
-
-  @staticmethod
-  def _guess_field_type(field):
-    for field_type in Field.TYPES[::-1]:
-      if field_type.matches(field):
-        return field_type.name
-
-  @staticmethod
-  def _pick_best(types):
-    types = set(types)
-
-    for field in Field.TYPES:
-      if field.name in types:
-        return field.name
-    return "string"
-
-  @property
-  def required(self):
-    return self._required
-
-  @property
-  def name(self):
-    return self._name
-
-  @property
-  def field_type(self):
-    return self._field_type
-
-  @property
-  def keep(self):
-    return self._keep
-
-  @property
-  def operations(self):
-    return self._operations
-
-  def to_dict(self):
-    return {'name': self.name,
-    'type': self.field_type,
-    'keep': self.keep,
-    'operations': self.operations,
-    'required': self.required}
-
-class FileFormat(object):
-  @staticmethod
-  def get_instance(file_stream, format_=None):
-    return CSVFormat(file_stream, format_)
-
-  def __init__(self):
-    pass
-
-  @property
-  def format_(self):
-    pass
-
-  @property
-  def sample(self):
-    pass
-
-  @property
-  def fields(self):
-    return []
-
-  def get_format(self):
-    return self.format_
-
-  def get_fields(self):
-    obj = {}
-
-    obj['columns'] = [field.to_dict() for field in self.fields]
-    obj['sample'] = self.sample
-
-    return obj
-
-  def to_dict(self):
-    obj = {}
-
-    obj['format'] = self.format_
-    obj['columns'] = [field.to_dict() for field in self.fields]
-    obj['sample'] = self.sample
-
-    return obj
-
-class CSVFormat(FileFormat):
-  def __init__(self, file_stream, format_=None):
-    file_stream.seek(0)
-    sample = file_stream.read(1024*1024*5)
-    file_stream.seek(0)
-
-    if format_:
-      self._delimiter = format_["fieldSeparator"].encode('utf-8')
-      self._line_terminator = format_["recordSeparator"].encode('utf-8')
-      self._quote_char = format_["quoteChar"].encode('utf-8')
-      self._has_header = format_["hasHeader"]
-    else:
-      dialect, self._has_header = self._guess_dialect(sample)
-      self._delimiter = dialect.delimiter
-      self._line_terminator = dialect.lineterminator
-      self._quote_char = dialect.quotechar
-
-    # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
-    self._line_terminator = self._line_terminator.replace("\r\n", "\n")
-
-    self._sample_rows = self._get_sample_rows(sample)
-    self._num_columns = self._guess_num_columns(self._sample_rows)
-
-    self._fields = self._guess_fields(sample)
-
-    super(CSVFormat, self).__init__()
-
-  @property
-  def sample(self):
-    return self._sample_rows
-
-  @property
-  def fields(self):
-    return self._fields
-
-  @property
-  def delimiter(self):
-    return self._delimiter
-
-  @property
-  def line_terminator(self):
-    return self._line_terminator
-
-  @property
-  def quote_char(self):
-    return self._quote_char
-
-  @property
-  def format_(self):
-    return {
-      "type":"csv",
-      "fieldSeparator":self.delimiter,
-      "recordSeparator":self.line_terminator,
-      "quoteChar":self.quote_char,
-      "hasHeader":self._has_header
-    }
-
-  def _guess_dialect(self, sample):
-    sniffer = csv.Sniffer()
-    dialect = sniffer.sniff(sample)
-    has_header = sniffer.has_header(sample)
-    return dialect, has_header
-
-  def _guess_num_columns(self, sample_rows):
-    counts = {}
-
-    for row in sample_rows:
-      num_columns = len(row)
-
-      if num_columns not in counts:
-        counts[num_columns] = 0
-      counts[num_columns] += 1
-
-    if counts:
-      num_columns_guess = max(counts.iteritems(), key=operator.itemgetter(1))[0]
-    else:
-      num_columns_guess = 0
-    return num_columns_guess
-
-  def _guess_field_types(self, sample_rows):
-    field_type_guesses = []
-
-    num_columns = self._num_columns
-
-    for col in range(num_columns):
-      column_samples = [sample_row[col] for sample_row in sample_rows if len(sample_row) > col]
-
-      field_type_guess = Field.guess_type(column_samples)
-      field_type_guesses.append(field_type_guess)
-
-    return field_type_guesses
-
-  def _get_sample_reader(self, sample):
-    if self.line_terminator != '\n':
-      sample = sample.replace('\n', '\\n')
-    return csv.reader(sample.split(self.line_terminator), delimiter=self.delimiter, quotechar=self.quote_char)
-
-  def _guess_field_names(self, sample):
-    reader = self._get_sample_reader(sample)
-
-    first_row = reader.next()
-
-    if self._has_header:
-      header = first_row
-    else:
-      header = ["field_%d" % (i+1) for i in range(self._num_columns)]
-
-    return header
-
-  def _get_sample_rows(self, sample):
-    NUM_SAMPLES = 5
-
-    header_offset = 1 if self._has_header else 0
-    reader = itertools.islice(self._get_sample_reader(sample), header_offset, NUM_SAMPLES + 1)
-
-    sample_rows = list(reader)
-    return sample_rows
-
-  def _guess_fields(self, sample):
-    header = self._guess_field_names(sample)
-    types = self._guess_field_types(self._sample_rows)
-
-    if len(header) == len(types):
-      fields = [Field(header[i], types[i]) for i in range(len(header))]
-    else:
-      # likely failed to guess correctly
-      LOG.warn("Guess field types failed - number of headers didn't match number of predicted types.")
-      fields = []
-
-    return fields

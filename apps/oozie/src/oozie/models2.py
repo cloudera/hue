@@ -68,7 +68,7 @@ class Job(object):
 
   @classmethod
   def get_workspace(cls, user):
-    if type(user) is User:
+    if not isinstance(user, basestring):
       user = user.username
     return (REMOTE_SAMPLE_DIR.get() + '/hue-oozie-$TIME').replace('$USER', user).replace('$TIME', str(time.time()))
 
