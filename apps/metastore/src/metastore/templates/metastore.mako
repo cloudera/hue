@@ -1220,7 +1220,8 @@ ${ assist.assistPanel() }
     'knockout-mapping',
     'knockout-sortable',
     'ko.editable',
-    'ko.hue-bindings'
+    'ko.hue-bindings',
+    'desktop/ext/js/jquery/plugins/jquery.mousewheel.min'
   ], function (ko, MetastoreViewModel) {
 
     ko.options.deferUpdates = true;
