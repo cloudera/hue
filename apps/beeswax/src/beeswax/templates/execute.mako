@@ -56,6 +56,7 @@ ${ layout.menubar(section='query') }
                   activeSourceType: snippetType,
                   navigationSettings: {
                     openItem: false,
+                    showPreview: true,
                     showStats: true
                   }
                 },
@@ -1281,6 +1282,7 @@ var INITIAL_HORIZONTAL_RESIZE_POSITION = -1;
 
 // Navigator, recent queries
 $(document).ready(function () {
+  $(document).on('click', '.assist-table .fa-list', function(){ $('.modal-backdrop').before($('#assistQuickLook')) });
   $("#resizePanel a").draggable({
     axis: "y",
     start: function (e, ui) {
