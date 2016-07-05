@@ -46,7 +46,7 @@ define([
 
       it('should handle DESCRIBE tbl.col.field', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE tbl.col.field;',
+          beforeCursor: 'DESCRIBE tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['SELECT'],
@@ -68,9 +68,9 @@ define([
         });
       });
 
-      it('should handle EXTENDED tbl.col.field', function() {
+      it('should handle EXTENDED tbl col.field', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE EXTENDED tbl.col.field;',
+          beforeCursor: 'DESCRIBE EXTENDED tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['SELECT'],
@@ -94,7 +94,7 @@ define([
 
       it('should handle FORMATTED tbl.col.field', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE FORMATTED tbl.col.field;',
+          beforeCursor: 'DESCRIBE FORMATTED tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['SELECT'],
@@ -112,7 +112,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA'],
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
           }
         });
       });
@@ -125,35 +126,34 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA'],
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
           }
         });
       });
 
-      it('should suggest columns after DESCRIBE tbl.', function() {
+      it('should suggest tables after DESCRIBE db.', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE tbl.',
+          beforeCursor: 'DESCRIBE db.',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'db' }
+          }
+        });
+      });
+
+      it('should suggest columns after DESCRIBE db.tb ', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE db.tbl ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
-              table: 'tbl'
-            }
-          }
-        });
-      });
-
-      it('should suggest fields after DESCRIBE tbl.bla.', function() {
-        assertAutoComplete({
-          beforeCursor: 'DESCRIBE tbl.bla.',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              identifierChain: [{ name: 'bla' }],
-              table: 'tbl'
+              table: 'tbl',
+              database: 'db'
             }
           }
         });
@@ -290,34 +290,33 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
           }
         });
       });
 
-      it('should suggest columns after DESCRIBE EXTENDED tbl.', function() {
+      it('should suggest tables after DESCRIBE EXTENDED db.', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE EXTENDED tbl.',
+          beforeCursor: 'DESCRIBE EXTENDED db.',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'db' }
+          }
+        });
+      });
+
+      it('should suggest columns after DESCRIBE EXTENDED db.tbl', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE EXTENDED db.tbl ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
-              table: 'tbl'
-            }
-          }
-        });
-      });
-
-      it('should suggest fields after DESCRIBE EXTENDED tbl.bla.', function() {
-        assertAutoComplete({
-          beforeCursor: 'DESCRIBE EXTENDED tbl.bla.',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              identifierChain: [{ name: 'bla' }],
+              database: 'db',
               table: 'tbl'
             }
           }
@@ -331,34 +330,51 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
           }
         });
       });
 
-      it('should suggest columns after DESCRIBE FORMATTED tbl.', function() {
+      it('should suggest tables after DESCRIBE FORMATTED db.', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE FORMATTED tbl.',
+          beforeCursor: 'DESCRIBE FORMATTED db.',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              database: 'db'
+            }
+          }
+        });
+      });
+
+      it('should suggest columns after DESCRIBE FORMATTED db.tbl', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE FORMATTED db.tbl ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
+              database: 'db',
               table: 'tbl'
             }
           }
         });
       });
 
-      it('should suggest fields after DESCRIBE FORMATTED tbl.bla.', function() {
+      it('should suggest fields after DESCRIBE FORMATTED db.tbl col.', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE FORMATTED tbl.bla.',
+          beforeCursor: 'DESCRIBE FORMATTED db.tbl col.',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
-              identifierChain: [{ name: 'bla' }],
+              identifierChain: [{ name: 'col' }],
+              database: 'db',
               table: 'tbl'
             }
           }

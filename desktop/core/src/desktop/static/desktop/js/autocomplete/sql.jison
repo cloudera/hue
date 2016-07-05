@@ -17,7 +17,7 @@
 %lex
 %options case-insensitive
 %s hive impala
-%x hdfs DoubleQuotedValue_Complete SingleQuotedValue_Complete backtickedValue
+%x hdfs DoubleQuotedValue SingleQuotedValue backtickedValue
 %%
 
 [ \t\n]                             { /* skip whitespace */ }
@@ -33,7 +33,13 @@
 <hive>'COLUMNS'                     { return '<hive>COLUMNS'; }
 <hive>'COMMENT'                     { return '<hive>COMMENT'; }
 <hive>'COMPACTIONS'                 { return '<hive>COMPACTIONS'; }
+<hive>'COLLECT_LIST'                { return '<hive>COLLECT_LIST'; }
+<hive>'COLLECT_SET'                 { return '<hive>COLLECT_SET'; }
 <hive>'CONF'                        { return '<hive>CONF'; }
+<hive>'CORR'                        { return '<hive>CORR'; }
+<hive>'COVAR_POP'                   { return '<hive>COVAR_POP'; }
+<hive>'COVAR_SAMP'                  { return '<hive>COVAR_SAMP'; }
+<hive>'CUME_DIST'                   { return '<hive>CUME_DIST'; }
 <hive>'CREATE'                      { determineCase(yytext); return '<hive>CREATE'; }
 <hive>'CROSS'                       { return '<hive>CROSS'; }
 <hive>'CURRENT'                     { return '<hive>CURRENT'; }
@@ -47,7 +53,7 @@
 <hive>'FUNCTION'                    { return '<hive>FUNCTION'; }
 <hive>'FUNCTIONS'                   { return '<hive>FUNCTIONS'; }
 <hive>'GRANT'                       { return '<hive>GRANT'; }
-<hive>'IN'                          { return '<hive>IN'; }
+<hive>'HISTOGRAM_NUMERIC'           { return '<hive>HISTOGRAM_NUMERIC'; }
 <hive>'INDEX'                       { return '<hive>INDEX'; }
 <hive>'INDEXES'                     { return '<hive>INDEXES'; }
 <hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
@@ -56,8 +62,11 @@
 <hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCKS'                       { return '<hive>LOCKS'; }
 <hive>'MACRO'                       { return '<hive>MACRO'; }
+<hive>'NTILE'                       { return '<hive>NTILE'; }
 <hive>'PARTITION'                   { return '<hive>PARTITION'; }
 <hive>'PARTITIONS'                  { return '<hive>PARTITIONS'; }
+<hive>'PERCENTILE'                  { return '<hive>PERCENTILE'; }
+<hive>'PERCENTILE_APPROX'           { return '<hive>PERCENTILE_APPROX'; }
 <hive>'ROLE'                        { return '<hive>ROLE'; }
 <hive>'ROLES'                       { return '<hive>ROLES'; }
 <hive>'SCHEMAS'                     { return '<hive>SCHEMAS'; }
@@ -67,6 +76,7 @@
 <hive>'TEMPORARY'                   { return '<hive>TEMPORARY'; }
 <hive>'TRANSACTIONS'                { return '<hive>TRANSACTIONS'; }
 <hive>'USER'                        { return '<hive>USER'; }
+<hive>'VARIANCE'                    { return '<hive>VARIANCE'; }
 
 <hive>'explode'                     { return '<hive>explode'; }
 <hive>'posexplode'                  { return '<hive>posexplode'; }
@@ -82,6 +92,7 @@
 <impala>'COLUMN'                    { return '<impala>COLUMN'; }
 <impala>'COMMENT'                   { return '<impala>COMMENT'; }
 <impala>'CREATE'                    { determineCase(yytext); return '<impala>CREATE'; }
+<impala>'CUME_DIST'                 { return '<impala>CUME_DIST'; } // Not supported but in SQL 2003 and Hive
 <impala>'CURRENT'                   { return '<impala>CURRENT'; }
 <impala>'DATA'                      { return '<impala>DATA'; }
 <impala>'DATABASES'                 { return '<impala>DATABASES'; }
@@ -93,42 +104,55 @@
 <impala>'FUNCTIONS'                 { return '<impala>FUNCTIONS'; }
 <impala>'GRANT'                     { return '<impala>GRANT'; }
 <impala>'GROUP'                     { return '<impala>GROUP'; }
+<impala>'GROUP_CONCAT'              { return '<impala>GROUP_CONCAT'; }
 <impala>'INCREMENTAL'               { return '<impala>INCREMENTAL'; }
 <impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
-<impala>'IN'                        { return '<impala>IN'; }
 <impala>'INNER'                     { return '<impala>INNER'; }
 <impala>'LAST'                      { return '<impala>LAST'; }
 <impala>'LOAD'                      { return '<impala>LOAD'; }
 <impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
+<impala>'NDV'                       { return '<impala>NDV'; }
 <impala>'NULLS'                     { return '<impala>NULLS'; }
+<impala>'OVER'                      { return '<impala>OVER'; }
 <impala>'PARTITIONS'                { return '<impala>PARTITIONS'; }
 <impala>'RIGHT'                     { return '<impala>RIGHT'; }
 <impala>'ROLE'                      { return '<impala>ROLE'; }
 <impala>'ROLES'                     { return '<impala>ROLES'; }
 <impala>'SCHEMAS'                   { return '<impala>SCHEMAS'; }
 <impala>'STATS'                     { return '<impala>STATS'; }
+<impala>'STDDEV'                    { return '<impala>STDDEV'; }
 <impala>'TABLE'                     { return '<impala>TABLE'; }
 <impala>'TABLES'                    { return '<impala>TABLES'; }
-
+<impala>'VARIANCE'                  { return '<impala>VARIANCE'; }
+<impala>'VARIANCE_POP'              { return '<impala>VARIANCE_POP'; }
+<impala>'VARIANCE_SAMP'             { return '<impala>VARIANCE_SAMP'; }
+<impala>\[SHUFFLE\]                 { return '<impala>SHUFFLE'; }
+<impala>\[BROADCAST\]               { return '<impala>BROADCAST'; }
 <impala>[.]                         { return '<impala>.'; }
 <impala>\[                          { return '<impala>['; }
 <impala>\]                          { return '<impala>]'; }
 
+'ALL'                               { return 'ALL'; }
 'AND'                               { return 'AND'; }
+'ANY'                               { return 'ANY'; }
 'AS'                                { return 'AS'; }
 'ASC'                               { return 'ASC'; }
 'BIGINT'                            { return 'BIGINT'; }
 'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
 'CHAR'                              { return 'CHAR'; }
+'COUNT'                             { return 'COUNT'; }
 'CREATE'                            { determineCase(yytext); return 'CREATE'; }
+'CUME_DIST'                         { return 'CUME_DIST'; }
 'DATABASE'                          { return 'DATABASE'; }
 'DECIMAL'                           { return 'DECIMAL'; }
 'DESC'                              { return 'DESC'; }
+'DISTINCT'                          { return 'DISTINCT'; }
 'DOUBLE'                            { return 'DOUBLE'; }
 'DROP'                              { determineCase(yytext); return 'DROP'; }
 'EXISTS'                            { return 'EXISTS'; }
 'FALSE'                             { return 'FALSE'; }
+'FILTER' // CHECK                   { return 'FILTER'; }
 'FLOAT'                             { return 'FLOAT'; }
 'FROM'                              { return 'FROM'; }
 'OUTER'                             { return 'OUTER'; }
@@ -136,6 +160,7 @@
 'RIGHT'                             { return 'RIGHT'; }
 'FULL'                              { return 'FULL'; }
 'GROUP'                             { return 'GROUP'; }
+'GROUPING'                          { return 'GROUPING'; }
 'IF'                                { return 'IF'; }
 'INT'                               { return 'INT'; }
 'INTO'                              { return 'INTO'; }
@@ -144,11 +169,13 @@
 'JOIN'                              { return 'JOIN'; }
 'LEFT'                              { return 'LEFT'; }
 'LIKE'                              { return 'LIKE'; }
+'MAX'                               { return 'MAX'; }
+'MIN'                               { return 'MIN'; }
 'NOT'                               { return 'NOT'; }
-'NOT IN'                            { return 'NOT_IN'; }
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
+'RANK'                              { return 'RANK'; }
 'ROLE'                              { return 'ROLE'; }
 'SCHEMA'                            { return 'SCHEMA'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
@@ -156,7 +183,10 @@
 'SET'                               { return 'SET'; }
 'SHOW'                              { determineCase(yytext); return 'SHOW'; }
 'SMALLINT'                          { return 'SMALLINT'; }
+'STDDEV_POP'                        { return 'STDDEV_POP'; }
+'STDDEV_SAMP'                       { return 'STDDEV_SAMP'; }
 'STRING'                            { return 'STRING'; }
+'SUM'                               { return 'SUM'; }
 'TABLE'                             { return 'TABLE'; }
 'TIMESTAMP'                         { return 'TIMESTAMP'; }
 'TINYINT'                           { return 'TINYINT'; }
@@ -164,10 +194,14 @@
 'UPDATE'                            { determineCase(yytext); return 'UPDATE'; }
 'USE'                               { determineCase(yytext); return 'USE'; }
 'VARCHAR'                           { return 'VARCHAR'; }
+'VAR_POP'                           { return 'VAR_POP'; }
+'VAR_SAMP'                          { return 'VAR_SAMP'; }
 'VIEW'                              { return 'VIEW'; }
 'WHERE'                             { return 'WHERE'; }
+'WITHIN'                            { return 'WITHIN'; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
+[0-9]+E                             { return 'UNSIGNED_INTEGER_E'; }
 [A-Za-z][A-Za-z0-9_]*               { return 'REGULAR_IDENTIFIER'; }
 
 <hdfs>'\u2020'                      { parser.yy.cursorFound = true; return 'CURSOR'; }
@@ -192,17 +226,29 @@
                                     }
 <backtickedValue>\`                 { this.popState(); return 'BACKTICK'; }
 
-\'                                  { this.begin('SingleQuotedValue_Complete'); return 'SINGLE_QUOTE'; }
-<SingleQuotedValue_Complete>[^']+   { return 'VALUE'; }
-<SingleQuotedValue_Complete>\'      { this.popState(); return 'SINGLE_QUOTE'; }
+\'                                  { this.begin('SingleQuotedValue'); return 'SINGLE_QUOTE'; }
+<SingleQuotedValue>[^']+   { return 'VALUE'; }
+<SingleQuotedValue>\'      { this.popState(); return 'SINGLE_QUOTE'; }
 
-\"                                  { this.begin('DoubleQuotedValue_Complete'); return 'DOUBLE_QUOTE'; }
-<DoubleQuotedValue_Complete>[^"]+   { return 'VALUE'; }
-<DoubleQuotedValue_Complete>\"      { this.popState(); return 'DOUBLE_QUOTE'; }
+\"                                  { this.begin('DoubleQuotedValue'); return 'DOUBLE_QUOTE'; }
+<DoubleQuotedValue>[^"]+   { return 'VALUE'; }
+<DoubleQuotedValue>\"      { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
 
 /lex
+
+/* operators and precedence levels */
+
+%left 'OR'
+%left 'AND'
+%nonassoc 'IN' 'IS' 'LIKE'
+%left 'NOT' '!'
+%left  '=' '<>' '<' '>' '<=' '>=' '<=>'
+%left '|'
+%left '&'
+%left '+' '-'
+%left '*' '/' '%' 'MOD'
 
 %start Sql
 
@@ -247,8 +293,8 @@ SqlStatements
 SqlStatement
  : DataDefinition
  | DataManipulation
- | QuerySpecification_Complete
- | QuerySpecification_Cursored
+ | QuerySpecification
+ | QuerySpecification_EDIT
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
  | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
    {
@@ -301,22 +347,13 @@ AnyDot
 
 AnyFromOrIn
  : 'FROM'
- | '<hive>IN'
+ | 'IN'
  ;
 
 AnyTable
  : 'TABLE'
  | '<hive>TABLE'
  | '<impala>TABLE'
- ;
-
-ComparisonOperators
- : '='
- | '<>'
- | '<='
- | '>='
- | '<'
- | '>'
  ;
 
 DatabaseOrSchema
@@ -326,7 +363,7 @@ DatabaseOrSchema
 
 FromOrIn
  : 'FROM'
- | '<hive>IN'
+ | 'IN'
  ;
 
 HiveIndexOrIndexes
@@ -371,11 +408,6 @@ HiveOrImpalaLoad
  | '<impala>LOAD'
  ;
 
-HiveOrImpalaIn
- : '<hive>IN'
- | '<impala>IN'
- ;
-
 HiveOrImpalaInpath
  : '<hive>INPATH'
  | '<impala>INPATH'
@@ -416,19 +448,14 @@ HiveRoleOrUser
  | '<hive>USER'
  ;
 
-SignedInteger_Complete
- : 'UNSIGNED_INTEGER'
- | '-' 'UNSIGNED_INTEGER'
- ;
-
-SingleQuotedValue_Complete
+SingleQuotedValue
  : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE'
    {
      $$ = $2;
    }
  ;
 
-DoubleQuotedValue_Complete
+DoubleQuotedValue
  : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'
    {
      $$ = $2;
@@ -467,12 +494,12 @@ OptionalFormatted
  | '<impala>FORMATTED'
  ;
 
-OptionallyFormattedIndex_Complete
+OptionallyFormattedIndex
  : '<hive>FORMATTED' HiveIndexOrIndexes
  | HiveIndexOrIndexes
  ;
 
-OptionallyFormattedIndex_Cursored
+OptionallyFormattedIndex_EDIT
  : '<hive>FORMATTED' 'CURSOR'
    {
      suggestKeywords(['INDEX', 'INDEXES']);
@@ -483,41 +510,40 @@ OptionallyFormattedIndex_Cursored
    }
  ;
 
-OptionalFromDatabase_Complete
+OptionalFromDatabase
  :
- | FromOrIn DatabaseIdentifier_Complete
+ | FromOrIn DatabaseIdentifier
  ;
 
-OptionalFromDatabase_Cursored
- : FromOrIn DatabaseIdentifier_Cursored
+OptionalFromDatabase_EDIT
+ : FromOrIn DatabaseIdentifier_EDIT
  ;
 
-
-OptionalHiveCascadeOrRestrict_Complete
+OptionalHiveCascadeOrRestrict
  :
  | '<hive>CASCADE'
  | '<hive>RESTRICT'
  ;
 
-OptionalIfExists_Complete
+OptionalIfExists
  :
  | 'IF' 'EXISTS'
  ;
 
 
-OptionalIfExists_Cursored
+OptionalIfExists_EDIT
  : 'IF' 'CURSOR'
    {
      suggestKeywords(['EXISTS']);
    }
  ;
 
-OptionalIfNotExists_Complete
+OptionalIfNotExists
  :
  | 'IF' 'NOT' 'EXISTS'
  ;
 
-OptionalIfNotExists_Cursored
+OptionalIfNotExists_EDIT
  : 'CURSOR'
    {
      suggestKeywords(['IF NOT EXISTS']);
@@ -534,8 +560,8 @@ OptionalIfNotExists_Cursored
 
 OptionalInDatabase
  :
- | HiveOrImpalaIn DatabaseIdentifier_Complete
- | HiveOrImpalaIn DatabaseIdentifier_Cursored
+ | 'IN' DatabaseIdentifier
+ | 'IN' DatabaseIdentifier_EDIT
  ;
 
 ConfigurationName
@@ -559,7 +585,7 @@ PartialBacktickedIdentifier
  : 'BACKTICK' 'PARTIAL_VALUE'
  ;
 
-SchemaQualifiedTableIdentifier_Complete
+SchemaQualifiedTableIdentifier
  : RegularOrBacktickedIdentifier
    {
      $$ = { identifierChain: [{ name: $1 }] }
@@ -570,7 +596,7 @@ SchemaQualifiedTableIdentifier_Complete
    }
  ;
 
-SchemaQualifiedTableIdentifier_Cursored
+SchemaQualifiedTableIdentifier_EDIT
  : PartialBacktickedIdentifier
    {
      suggestTables();
@@ -588,11 +614,11 @@ SchemaQualifiedTableIdentifier_Cursored
    }
  ;
 
-DatabaseIdentifier_Complete
+DatabaseIdentifier
  : RegularOrBacktickedIdentifier
  ;
 
-DatabaseIdentifier_Cursored
+DatabaseIdentifier_EDIT
  : PartialBacktickedOrCursor
    {
      $$ = { cursorOrPartialIdentifier: true }
@@ -600,14 +626,13 @@ DatabaseIdentifier_Cursored
    }
  ;
 
-
 PartitionSpecList
  : PartitionSpec
  | PartitionSpecList ',' PartitionSpec
  ;
 
 PartitionSpec
- : 'REGULAR_IDENTIFIER' '=' SingleQuotedValue_Complete
+ : 'REGULAR_IDENTIFIER' '=' SingleQuotedValue
  ;
 
 // TODO: Move into RegularOrBackTickedSchemaQualifiedName
@@ -682,31 +707,31 @@ LocalOrSchemaQualifiedName
    }
  ;
 
-DerivedColumnChain_Complete
- : ColumnIdentifier_Complete
+DerivedColumnChain
+ : ColumnIdentifier
    {
      $$ = [ $1 ]
    }
- | DerivedColumnChain_Complete AnyDot ColumnIdentifier_Complete
+ | DerivedColumnChain AnyDot ColumnIdentifier
    {
      $$ = $1.concat($3)
    }
  ;
 
-DerivedColumnChain_Cursored
- : DerivedColumnChain_Complete AnyDot PartialBacktickedIdentifier
+DerivedColumnChain_EDIT
+ : DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor
    {
-     $$ = $1;
-   }
- | DerivedColumnChain_Complete AnyDot 'PARTIAL_CURSOR'
-   {
-     $$ = $1;
+     $$ = { identifierChain: $1 }
    }
  ;
 
+PartialBacktickedIdentifierOrPartialCursor
+ : PartialBacktickedIdentifier
+ | 'PARTIAL_CURSOR'
+ ;
 
-ColumnIdentifier_Complete
- : RegularOrBacktickedIdentifier OptionalMapOrArrayKey_Complete
+ColumnIdentifier
+ : RegularOrBacktickedIdentifier OptionalMapOrArrayKey
    {
      if (typeof $2.key !== 'undefined') {
        $$ = { name: $1, key: $2.key }
@@ -716,13 +741,13 @@ ColumnIdentifier_Complete
    }
  ;
 
-ColumnIdentifier_Cursored
- : PartialBacktickedOrCursor OptionalMapOrArrayKey_Complete
+ColumnIdentifier_EDIT
+ : PartialBacktickedOrCursor OptionalMapOrArrayKey
  ;
 
-OptionalMapOrArrayKey_Complete
+OptionalMapOrArrayKey
  :  { $$ = {} }
- | HiveOrImpalaLeftSquareBracket DoubleQuotedValue_Complete HiveOrImpalaRightSquareBracket
+ | HiveOrImpalaLeftSquareBracket DoubleQuotedValue HiveOrImpalaRightSquareBracket
    {
      $$ = { key: '"' + $2 + '"' }
    }
@@ -809,13 +834,13 @@ OptionalHiveDbProperties
  ;
 
 DatabaseDefinition
- : AnyCreate DatabaseOrSchema OptionalIfNotExists_Complete
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_Cursored
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_Complete 'REGULAR_IDENTIFIER'
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_Cursored 'REGULAR_IDENTIFIER'
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_Complete 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals error
+ : AnyCreate DatabaseOrSchema OptionalIfNotExists
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT 'REGULAR_IDENTIFIER'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals error
    // For the HDFS open single quote completion
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_Complete 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals 'CURSOR'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals 'CURSOR'
    {
      if ($5 && $5.suggestKeywords.length > 0) {
        suggestKeywords($5.suggestKeywords);
@@ -946,35 +971,39 @@ HdfsPath
 
 DescribeStatement
  : HiveDescribeStatement
+ | HiveDescribeStatement_EDIT
  | ImpalaDescribeStatement
  ;
 
 HiveDescribeStatement
- : '<hive>DESCRIBE' OptionalExtendedOrFormatted DerivedColumnChain_Complete
- | '<hive>DESCRIBE' OptionalExtendedOrFormatted DerivedColumnChain_Cursored
-    {
-      if ($3.length > 0) {
-        var table =  $3.shift().name;
-        suggestColumns({
-          table: table,
-          identifierChain: $3
-        });
-      } else {
-        if (!$2) {
-          suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA']);
-        }
-        suggestTables();
-      }
-    }
+ : '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain
+ | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier
+ | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier
+ ;
+
+HiveDescribeStatement_EDIT
+ : '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier_EDIT
+ | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT
+   {
+     addTablePrimary($3);
+     suggestColumns($4);
+     linkTablePrimaries();
+   }
+ | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR'
+   {
+     addTablePrimary($3);
+     suggestColumns();
+     linkTablePrimaries();
+   }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
    {
      if (!$2) {
        suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA']);
      }
      suggestTables();
+     suggestDatabases({ appendDot: true });
     }
- | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier_Complete
- | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier_Cursored
+ | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier_EDIT
    {
      if (!$3) {
        suggestKeywords(['EXTENDED']);
@@ -983,9 +1012,9 @@ HiveDescribeStatement
  ;
 
 ImpalaDescribeStatement
- : '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier_Complete
- | '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier_Cursored
- | '<impala>DESCRIBE' OptionalFormatted 'CURSOR' SchemaQualifiedTableIdentifier_Complete
+ : '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier
+ | '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier_EDIT
+ | '<impala>DESCRIBE' OptionalFormatted 'CURSOR' SchemaQualifiedTableIdentifier
     {
       if (!$2) {
         suggestKeywords(['FORMATTED']);
@@ -1021,29 +1050,29 @@ DropStatement
  ;
 
 DropDatabaseStatement
- : 'DROP' DatabaseOrSchema OptionalIfExists_Complete
- | 'DROP' DatabaseOrSchema OptionalIfExists_Cursored
- | 'DROP' DatabaseOrSchema OptionalIfExists_Complete 'CURSOR'
+ : 'DROP' DatabaseOrSchema OptionalIfExists
+ | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT
+ | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR'
    {
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
      }
      suggestDatabases();
    }
- | 'DROP' DatabaseOrSchema OptionalIfExists_Complete RegularOrBacktickedIdentifier 'CURSOR'
+ | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
    {
      if (isHive()) {
        suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
- | 'DROP' DatabaseOrSchema OptionalIfExists_Complete RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict_Complete
- | 'DROP' DatabaseOrSchema OptionalIfExists_Cursored RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict_Complete
+ | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
+ | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
  ;
 
 DropTableStatement
- : 'DROP' AnyTable OptionalIfExists_Complete
- | 'DROP' AnyTable OptionalIfExists_Cursored
- | 'DROP' AnyTable OptionalIfExists_Complete 'CURSOR'
+ : 'DROP' AnyTable OptionalIfExists
+ | 'DROP' AnyTable OptionalIfExists_EDIT
+ | 'DROP' AnyTable OptionalIfExists 'CURSOR'
    {
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
@@ -1053,8 +1082,8 @@ DropTableStatement
        appendDot: true
      });
    }
- | 'DROP' AnyTable OptionalIfExists_Complete TablePrimary_Complete
- | 'DROP' AnyTable OptionalIfExists_Complete TablePrimary_Cursored
+ | 'DROP' AnyTable OptionalIfExists TablePrimary
+ | 'DROP' AnyTable OptionalIfExists TablePrimary_EDIT
    {
      if ($4.identifierChain && $4.identifierChain.length === 1) {
        suggestTablesOrColumns($4.identifierChain[0].name);
@@ -1063,8 +1092,8 @@ DropTableStatement
        suggestDatabases({ appendDot: true });
      }
    }
- | 'DROP' AnyTable OptionalIfExists_Cursored TablePrimary_Complete
- | 'DROP' AnyTable OptionalIfExists_Complete TablePrimary_Complete 'CURSOR'
+ | 'DROP' AnyTable OptionalIfExists_EDIT TablePrimary
+ | 'DROP' AnyTable OptionalIfExists TablePrimary 'CURSOR'
    {
      if (isHive()) {
        suggestKeywords(['PURGE']);
@@ -1101,61 +1130,66 @@ LoadStatement
 
 // ===================================== SELECT statement =====================================
 
-QuerySpecification_Complete
- : 'SELECT' SelectList_Complete // TODO: Needed?
- | 'SELECT' SelectList_Complete TableExpression_Complete
+QuerySpecification
+ : 'SELECT' SelectList // TODO: Needed?
+ | 'SELECT' SelectList TableExpression
    {
      linkTablePrimaries();
    }
  ;
 
-QuerySpecification_Cursored
- : 'SELECT' SelectList_Cursored
+QuerySpecification_EDIT
+ : 'SELECT' SelectList_EDIT
  | 'SELECT' 'CURSOR'
    {
-     parser.yy.result.suggestStar = true;
+     suggestKeywords(['*']);
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' SelectList_Complete TableExpression_Cursored
+ | 'SELECT' SelectList TableExpression_EDIT
    {
      linkTablePrimaries();
    }
- | 'SELECT' SelectList_Cursored TableExpression_Complete
+ | 'SELECT' SelectList_EDIT TableExpression
    {
      linkTablePrimaries();
    }
- | 'SELECT' 'CURSOR' TableExpression_Complete
+ | 'SELECT' 'CURSOR' TableExpression
    {
-     parser.yy.result.suggestStar = true;
+     suggestKeywords(['*']);
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      linkTablePrimaries();
    }
- | 'SELECT' error TableExpression_Complete
+ | 'SELECT' error TableExpression
    {
      linkTablePrimaries();
    }
- | 'SELECT' error TableExpression_Cursored
+ | 'SELECT' error TableExpression_EDIT
    {
      linkTablePrimaries();
    }
- | 'SELECT' SelectList_Complete 'CURSOR' TableExpression_Complete
+ | 'SELECT' SelectList 'CURSOR' TableExpression
    {
      if ($2.suggestKeywords) {
        suggestKeywords($2.suggestKeywords);
      }
    }
- | 'SELECT' SelectList_Complete 'CURSOR' ',' TableExpression_Complete
- | 'SELECT' SelectList_Complete 'CURSOR' ',' error TableExpression_Complete
+ | 'SELECT' SelectList 'CURSOR' ',' TableExpression
+   {
+     if ($2.suggestKeywords) {
+       suggestKeywords($2.suggestKeywords);
+     }
+   }
+  | 'SELECT' SelectList 'CURSOR' ',' error TableExpression
     {
       if ($2.suggestKeywords) {
         suggestKeywords($2.suggestKeywords);
       }
     }
- | 'SELECT' SelectList_Complete 'CURSOR'
+ | 'SELECT' SelectList 'CURSOR'
    {
      if ($2.suggestKeywords) {
        suggestKeywords($2.suggestKeywords);
@@ -1165,14 +1199,14 @@ QuerySpecification_Cursored
    }
  ;
 
-TableExpression_Complete
- : FromClause_Complete SelectConditions_Complete
+TableExpression
+ : FromClause SelectConditions
  ;
 
-TableExpression_Cursored
- : FromClause_Complete SelectConditions_Cursored
- | FromClause_Cursored SelectConditions_Complete
- | FromClause_Complete SelectConditions_Complete 'CURSOR'
+TableExpression_EDIT
+ : FromClause SelectConditions_EDIT
+ | FromClause_EDIT SelectConditions
+ | FromClause SelectConditions 'CURSOR'
    {
      if ($2.suggestKeywords.length == 0) {
        var keywords = [];
@@ -1193,15 +1227,15 @@ TableExpression_Cursored
    }
  ;
 
-FromClause_Complete
- : 'FROM' TableReferenceList_Complete
+FromClause
+ : 'FROM' TableReferenceList
    {
      $$ = $2;
    }
  ;
 
-FromClause_Cursored
- : 'FROM' TableReferenceList_Cursored
+FromClause_EDIT
+ : 'FROM' TableReferenceList_EDIT
  | 'FROM' 'CURSOR'
    {
        suggestTables();
@@ -1209,8 +1243,8 @@ FromClause_Cursored
    }
  ;
 
-SelectConditions_Complete
- : OptionalWhereClause_Complete OptionalGroupByClause_Complete OptionalOrderByClause_Complete OptionalLimitClause_Complete
+SelectConditions
+ : OptionalWhereClause OptionalGroupByClause OptionalOrderByClause OptionalLimitClause
    {
      if (!$1 && !$2 && !$3 && !$4) {
        $$ = { suggestKeywords: [] }
@@ -1228,39 +1262,36 @@ SelectConditions_Complete
    }
  ;
 
-SelectConditions_Cursored
- : OptionalWhereClause_Cursored OptionalGroupByClause_Complete OptionalOrderByClause_Complete OptionalLimitClause_Complete
- | OptionalWhereClause_Complete OptionalGroupByClause_Cursored OptionalOrderByClause_Complete OptionalLimitClause_Complete
- | OptionalWhereClause_Complete OptionalGroupByClause_Complete OptionalOrderByClause_Cursored OptionalLimitClause_Complete
- | OptionalWhereClause_Complete OptionalGroupByClause_Complete OptionalOrderByClause_Complete OptionalLimitClause_Cursored
+SelectConditions_EDIT
+ : OptionalWhereClause_EDIT OptionalGroupByClause OptionalOrderByClause OptionalLimitClause
+ | OptionalWhereClause OptionalGroupByClause_EDIT OptionalOrderByClause OptionalLimitClause
+ | OptionalWhereClause OptionalGroupByClause OptionalOrderByClause_EDIT OptionalLimitClause
+ | OptionalWhereClause OptionalGroupByClause OptionalOrderByClause OptionalLimitClause_EDIT
  ;
 
-OptionalWhereClause_Complete
+OptionalWhereClause
  :
- | 'WHERE' SearchCondition_Complete
+ | 'WHERE' SearchCondition
    {
      $$ = $2;
    }
  ;
 
-OptionalWhereClause_Cursored
- : 'WHERE' SearchCondition_Cursored
+OptionalWhereClause_EDIT
+ : 'WHERE' SearchCondition_EDIT
  | 'WHERE' 'CURSOR'
    {
      suggestColumns();
    }
  ;
 
-OptionalGroupByClause_Complete
+OptionalGroupByClause
  :
- | AnyGroup 'BY' GroupByColumnList_Complete
+ | AnyGroup 'BY' GroupByColumnList
  ;
 
-OptionalGroupByClause_Cursored
- : AnyGroup 'BY' GroupByColumnList_Cursored
-   {
-     delete parser.yy.result.suggestStar;
-   }
+OptionalGroupByClause_EDIT
+ : AnyGroup 'BY' GroupByColumnList_EDIT
  | AnyGroup 'BY' 'CURSOR'
    {
      suggestColumns();
@@ -1273,94 +1304,91 @@ OptionalGroupByClause_Cursored
    }
  ;
 
-GroupByColumnList_Complete
- : DerivedColumnOrUnsignedInteger_Complete
- | GroupByColumnList_Complete, DerivedColumnOrUnsignedInteger_Complete
+GroupByColumnList
+ : DerivedColumnOrUnsignedInteger
+ | GroupByColumnList, DerivedColumnOrUnsignedInteger
  ;
 
-GroupByColumnList_Cursored
- : DerivedColumnOrUnsignedInteger_Cursored
- | 'CURSOR' DerivedColumnOrUnsignedInteger_Complete
+GroupByColumnList_EDIT
+ : DerivedColumnOrUnsignedInteger_EDIT
+ | 'CURSOR' DerivedColumnOrUnsignedInteger
    {
      suggestColumns();
    }
- | GroupByColumnList_Complete ',' GroupByColumnListPartTwo_Cursored
- | GroupByColumnList_Complete ',' GroupByColumnListPartTwo_Cursored ','
- | GroupByColumnList_Complete ',' GroupByColumnListPartTwo_Cursored ',' GroupByColumnList_Complete
+ | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT
+ | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT ','
+ | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT ',' GroupByColumnList
  ;
 
-GroupByColumnListPartTwo_Cursored
- : DerivedColumnOrUnsignedInteger_Cursored
+GroupByColumnListPartTwo_EDIT
+ : DerivedColumnOrUnsignedInteger_EDIT
  | AnyCursor
    {
      suggestColumns();
    }
  ;
 
-OptionalOrderByClause_Complete
+OptionalOrderByClause
  :
- | 'ORDER' 'BY' OrderByColumnList_Complete
+ | 'ORDER' 'BY' OrderByColumnList
    {
      $$ = $3;
    }
  ;
 
-OptionalOrderByClause_Cursored
- : 'ORDER' 'BY' OrderByColumnList_Cursored
-   {
-     delete parser.yy.result.suggestStar;
-   }
+OptionalOrderByClause_EDIT
+ : 'ORDER' 'BY' OrderByColumnList_EDIT
  | 'ORDER' 'CURSOR'
    {
      suggestKeywords(['BY']);
    }
  ;
 
-OrderByColumnList_Complete
- : OrderByIdentifier_Complete
- | OrderByColumnList_Complete ',' OrderByIdentifier_Complete
+OrderByColumnList
+ : OrderByIdentifier
+ | OrderByColumnList ',' OrderByIdentifier
    {
      $$ = $3;
    }
  ;
 
-OrderByColumnList_Cursored
- : OrderByIdentifier_Cursored
- | 'CURSOR' OrderByIdentifier_Complete
+OrderByColumnList_EDIT
+ : OrderByIdentifier_EDIT
+ | 'CURSOR' OrderByIdentifier
    {
      suggestColumns();
    }
- | OrderByColumnList_Complete ',' OrderByIdentifier_Cursored
- | OrderByColumnList_Complete ',' OrderByIdentifier_Cursored ','
- | OrderByColumnList_Complete ',' OrderByIdentifier_Cursored ',' OrderByColumnList_Complete
+ | OrderByColumnList ',' OrderByIdentifier_EDIT
+ | OrderByColumnList ',' OrderByIdentifier_EDIT ','
+ | OrderByColumnList ',' OrderByIdentifier_EDIT ',' OrderByColumnList
  ;
 
-OrderByIdentifier_Complete
- : DerivedColumnOrUnsignedInteger_Complete OptionalAscOrDesc_Complete OptionalImpalaNullsFirstOrLast_Complete
+OrderByIdentifier
+ : DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
      $$ = mergeSuggestKeywords($2, $3);
    }
  ;
 
-OrderByIdentifier_Cursored
- : DerivedColumnOrUnsignedInteger_Cursored OptionalAscOrDesc_Complete OptionalImpalaNullsFirstOrLast_Complete
- | DerivedColumnOrUnsignedInteger_Complete OptionalAscOrDesc_Complete OptionalImpalaNullsFirstOrLast_Cursored
- | AnyCursor OptionalAscOrDesc_Complete OptionalImpalaNullsFirstOrLast_Complete
+OrderByIdentifier_EDIT
+ : DerivedColumnOrUnsignedInteger_EDIT OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
+ | DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
+ | AnyCursor OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
      suggestColumns();
    }
  ;
 
-DerivedColumnOrUnsignedInteger_Complete
- : DerivedColumn_Complete
+DerivedColumnOrUnsignedInteger
+ : DerivedColumn_TWO
  | 'UNSIGNED_INTEGER'
  ;
 
-DerivedColumnOrUnsignedInteger_Cursored
- : DerivedColumn_Cursored
+DerivedColumnOrUnsignedInteger_EDIT
+ : DerivedColumn_EDIT_TWO
  ;
 
-OptionalAscOrDesc_Complete
+OptionalAscOrDesc
  :
   {
     $$ = { suggestKeywords: ['ASC', 'DESC'] }
@@ -1369,7 +1397,7 @@ OptionalAscOrDesc_Complete
  | 'DESC'
  ;
 
-OptionalImpalaNullsFirstOrLast_Complete
+OptionalImpalaNullsFirstOrLast
  :
   {
     if (isImpala()) {
@@ -1382,321 +1410,312 @@ OptionalImpalaNullsFirstOrLast_Complete
  | '<impala>NULLS' '<impala>LAST'
  ;
 
-OptionalImpalaNullsFirstOrLast_Cursored
+OptionalImpalaNullsFirstOrLast_EDIT
  : '<impala>NULLS' 'CURSOR'
    {
      suggestKeywords(['FIRST', 'LAST']);
    }
  ;
 
-OptionalLimitClause_Complete
+OptionalLimitClause
  :
  | 'LIMIT' 'UNSIGNED_INTEGER'
  ;
 
-OptionalLimitClause_Cursored
+OptionalLimitClause_EDIT
  : 'LIMIT' 'CURSOR'
    {
      suggestNumbers([1, 5, 10]);
    }
  ;
 
-SearchCondition_Complete
- : BooleanValueExpression_Complete
- ;
-
-SearchCondition_Cursored
- : BooleanValueExpression_Cursored
- ;
-
-BooleanValueExpression_Complete
- : BooleanTerm_Complete
- | BooleanValueExpression_Complete 'OR' BooleanTerm_Complete
- ;
-
-BooleanValueExpression_Cursored
- : BooleanTerm_Cursored
- | BooleanValueExpression_Complete 'OR' BooleanTerm_Cursored
- | BooleanValueExpression_Cursored 'OR' BooleanTerm_Complete
- ;
-
-BooleanTerm_Complete
- : BooleanFactor_Complete
- | BooleanFactor_Complete 'AND' BooleanTerm_Complete
- ;
-
-BooleanTerm_Cursored
- : BooleanFactor_Cursored
- | BooleanFactor_Complete 'AND' 'CURSOR'
+SearchCondition
+ : ValueExpression
    {
-     // TODO: Fix issue when EOF after 'CURSOR' in started parenthesized expression it now throws a parser error
+     $$ = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'NOT IN', 'IN', 'OR'] };
+   }
+ ;
+
+SearchCondition_EDIT
+ : ValueExpression_EDIT
+ ;
+
+ValueExpression
+ : NonParenthesizedValueExpressionPrimary
+ | 'NOT' ValueExpression
+ | '-' ValueExpression
+ | ValueExpression InClause
+ | ValueExpression 'IS' OptionalNot TruthValue
+ | ValueExpression '=' ValueExpression
+ | ValueExpression '<=' ValueExpression
+ | ValueExpression '>=' ValueExpression
+ | ValueExpression '<' ValueExpression
+ | ValueExpression '>' ValueExpression
+ | ValueExpression '<>' ValueExpression
+ | '(' ValueExpression ')'
+// | NumericValueFunction
+ | ValueExpression '+' ValueExpression
+ | ValueExpression '-' ValueExpression
+ | ValueExpression '*' ValueExpression
+ | ValueExpression '/' ValueExpression
+ | ValueExpression 'OR' ValueExpression
+ | ValueExpression 'AND' ValueExpression
+ ;
+
+ValueExpression_EDIT
+ : NonParenthesizedValueExpressionPrimary_EDIT
+ | 'NOT' ValueExpression_EDIT
+ | '-' ValueExpression_EDIT
+ | ValueExpression InClause_EDIT
+ | ValueExpression 'IS' OptionalNot 'CURSOR'
+ | ValueExpression 'IS' OptionalNot 'CURSOR' TruthValue
+ | ValueExpression ComparisonOperators AnyCursor
+   {
+     if ($1.columnReference) {
+       suggestValues({ identifierChain: $1.columnReference });
+     }
      suggestColumns();
    }
- | BooleanFactor_Complete 'AND' BooleanTerm_Cursored
- | BooleanFactor_Cursored 'AND' BooleanTerm_Complete
+ | 'CURSOR' ComparisonOperators ValueExpression
+   {
+     if ($3.columnReference) {
+       suggestValues({ identifierChain: $3.columnReference });
+     }
+     suggestColumns();
+   }
+ | ValueExpression NumericExpressionOperator AnyCursor
+   {
+     suggestColumns();
+   }
+ | ValueExpression AndOrOr 'CURSOR'
+   {
+     suggestColumns();
+   }
  ;
 
-BooleanFactor_Complete
- : 'NOT' BooleanTest_Complete
- | BooleanTest_Complete
+InClause
+ : 'NOT' 'IN' TableSubquery
+ | 'IN' TableSubquery
  ;
 
-BooleanFactor_Cursored
- : 'NOT' BooleanTest_Cursored
- | BooleanTest_Cursored
+InClause_EDIT
+ : 'NOT' 'CURSOR'
+   {
+     suggestKeywords(['IN']);
+   }
+ | 'NOT' 'IN' TableSubquery_EDIT
+ | 'IN' TableSubquery_EDIT
  ;
 
-BooleanTest_Complete
- : BooleanPrimary_Complete OptionalIsNotTruthValue_Complete
+NumericExpressionOperator
+ : '+'
+ | '-'
+ | '*'
+ | '/'
  ;
 
-BooleanTest_Cursored
- : BooleanPrimary_Cursored OptionalIsNotTruthValue_Complete
+AndOrOr
+ : 'AND'
+ | 'OR'
  ;
 
-OptionalIsNotTruthValue_Complete
- :
- | 'IS' OptionalNot_Complete TruthValue_Complete
+ComparisonOperators
+ : '='
+ | '<'
+ | '>'
+ | '>='
+ | '<='
+ | '<>'
  ;
 
-TruthValue_Complete
+// TODO: Expand with more choices
+NonParenthesizedValueExpressionPrimary
+ : UnsignedValueSpecification
+ | ColumnReference
+   {
+     $$ = { columnReference: $1 };
+   }
+ | SetFunctionSpecification
+ ;
+
+NonParenthesizedValueExpressionPrimary_EDIT
+ : ColumnReference_EDIT
+ | SetFunctionSpecification_EDIT
+ ;
+
+UnsignedValueSpecification
+ : UnsignedLiteral
+// | GeneralValueSpecification
+ ;
+
+UnsignedLiteral
+ : UnsignedNumericLiteral
+ | GeneralLiteral
+ ;
+
+UnsignedNumericLiteral
+ : ExactNumericLiteral
+ | ApproximateNumericLiteral
+ ;
+
+ExactNumericLiteral
+ : 'UNSIGNED_INTEGER'
+ | 'UNSIGNED_INTEGER' '.'
+ | 'UNSIGNED_INTEGER' '.' 'UNSIGNED_INTEGER'
+ | '.' 'UNSIGNED_INTEGER'
+ ;
+
+ApproximateNumericLiteral
+ : UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
+ | '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
+ | 'UNSIGNED_INTEGER' '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
+ ;
+
+GeneralLiteral
+ : SingleQuotedValue
+ ;
+
+TruthValue
  : 'TRUE'
  | 'FALSE'
  ;
 
-OptionalNot_Complete
+OptionalNot
  :
  | 'NOT'
  ;
 
-BooleanPrimary_Complete
- : Predicate_Complete
- | BooleanPredicand_Complete
-   {
-     $$ = { suggestKeywords: ['<', '<=', '<>', '=', '=>', '>', 'IN', 'NOT IN'] }
-   }
+ColumnReferenceList
+ : ColumnReference
+ | ColumnReferenceList ',' ColumnReference
  ;
 
-BooleanPrimary_Cursored
- : Predicate_Cursored
- | BooleanPredicand_Cursored
+ColumnReference
+ : BasicIdentifierChain
+ | BasicIdentifierChain AnyDot '*'
  ;
 
-Predicate_Complete
- : ComparisonPredicate_Complete
-   {
-     $$ = { suggestKeywords: ['AND'] }
-   }
- | InPredicate_Complete
+ColumnReference_EDIT
+ : BasicIdentifierChain_EDIT
  ;
 
-Predicate_Cursored
- : ComparisonPredicate_Cursored
- | InPredicate_Cursored
- ;
-
-AnyIn
- : 'IN'
- | '<hive>IN'
- | '<impala>IN'
- ;
-
-ComparisonPredicate_Complete
- : BooleanPredicand_Complete ComparisonOperators BooleanPredicand_Complete
- ;
-
-ComparisonPredicate_Cursored
- : BooleanPredicand_Cursored ComparisonOperators BooleanPredicand_Complete
- | BooleanPredicand_Complete ComparisonOperators BooleanPredicand_Cursored
- | BooleanPredicand_Complete ComparisonOperators AnyCursor
-   {
-     if (typeof $1 !== 'undefined') {
-       suggestValues({ identifierChain: $1});
-     }
-   }
- ;
-
-BooleanPredicand_Complete
- : ParenthesizedBooleanValueExpression_Complete
- | NonParenthesizedValueExpressionPrimary_Complete
- | CommonValueExpression_Complete
- ;
-
-BooleanPredicand_Cursored
- : ParenthesizedBooleanValueExpression_Cursored
- | NonParenthesizedValueExpressionPrimary_Cursored
- ;
-
-CommonValueExpression_Complete
- : SignedInteger_Complete
- | SingleQuotedValue_Complete
- ;
-
-InPredicate_Complete
- : BooleanPredicand_Complete InPredicatePartTwo_Complete
- ;
-
-InPredicate_Cursored
- : BooleanPredicand_Cursored InPredicatePartTwo_Complete
- | BooleanPredicand_Complete InPredicatePartTwo_Cursored
- ;
-
-InPredicatePartTwo_Complete
- : AnyIn InPredicateValue_Complete
- | 'NOT' AnyIn InPredicateValue_Complete
- ;
-
-InPredicatePartTwo_Cursored
- : AnyIn InPredicateValue_Cursored
- | AnyIn 'CURSOR'
- | 'NOT' AnyIn InPredicateValue_Cursored
- | 'NOT' 'CURSOR'
-   {
-     suggestKeywords(['IN']);
-   }
- ;
-
-InPredicateValue_Complete
- : TableSubquery_Complete
- ;
-
-InPredicateValue_Cursored
- : TableSubquery_Cursored
- ;
-
-ParenthesizedBooleanValueExpression_Complete
- : '(' BooleanValueExpression_Complete ')'
- ;
-
-ParenthesizedBooleanValueExpression_Cursored
- : '(' BooleanValueExpression_Cursored ')'
- | '(' AnyCursor // Could be either (| or ( |
-   {
-     // For '...FROM tableA JOIN tableB ON (|', might need an ON flag
-     suggestColumns();
-   }
- ;
-
-
-// TODO: Expand with more choices
-NonParenthesizedValueExpressionPrimary_Complete
- : ColumnReference_Complete
-   {
-     $$ = $1;
-   }
- ;
-
-NonParenthesizedValueExpressionPrimary_Cursored
- : ColumnReference_Cursored
- ;
-
-ColumnReference_Complete
- : BasicIdentifierChain_Complete
- ;
-
-ColumnReference_Cursored
- : BasicIdentifierChain_Cursored
- ;
-
-
-BasicIdentifierChain_Complete
- : Identifier_Complete
+BasicIdentifierChain
+ : Identifier
    {
      $$ = [ $1 ];
    }
- | BasicIdentifierChain_Complete AnyDot Identifier_Complete
+ | BasicIdentifierChain AnyDot Identifier
    {
      $$ = $1.concat($3);
    }
  ;
 
-BasicIdentifierChain_Cursored
- : Identifier_Cursored
- | BasicIdentifierChain_Complete AnyDot Identifier_Cursored
- | BasicIdentifierChain_Complete AnyDot 'PARTIAL_CURSOR'
+BasicIdentifierChain_EDIT
+ : Identifier_EDIT
+ | BasicIdentifierChain AnyDot Identifier_EDIT
+ | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor
    {
+     $$ = {
+       suggestKeywords: ['*']
+     }
      suggestColumns({
        identifierChain: $1
      });
    }
  ;
 
-Identifier_Complete
- : ColumnIdentifier_Complete
- | DoubleQuotedValue_Complete
+Identifier
+ : ColumnIdentifier
+ | DoubleQuotedValue
    {
      $$ = { name: $1 }
    }
  ;
 
-Identifier_Cursored
- : ColumnIdentifier_Complete 'PARTIAL_CURSOR'
+Identifier_EDIT
+ : ColumnIdentifier 'PARTIAL_CURSOR'
    {
      suggestColumns();
    }
  ;
 
-SelectList_Complete
- : SelectSubList_Complete
- | '*'
+SelectList
+ : SelectListPartTwo
  ;
 
-SelectList_Cursored
- : SelectSubList_Cursored
+SelectList_EDIT
+ : SelectListPartTwo_EDIT
+   {
+     if ($1 && $1.suggestKeywords) {
+       suggestKeywords($1.suggestKeywords);
+     }
+   }
  ;
 
-SelectSubList_Complete
- : ColumnList_Complete
- ;
-
-SelectSubList_Cursored
- : ColumnList_Cursored
- ;
-
-ColumnList_Complete
- : DerivedColumn_Complete OptionalCorrelationName_Complete
+SelectSubList
+ : ValueExpression OptionalCorrelationName // <derived column>
    {
      $$ = $2;
    }
- | ColumnList_Complete ',' DerivedColumn_Complete OptionalCorrelationName_Complete
+ | '*'
+ ;
+
+SelectSubList_EDIT
+ : ValueExpression_EDIT OptionalCorrelationName
+ | ValueExpression OptionalCorrelationName_EDIT
    {
-     $$ = $4;
+     $$ = $2;
    }
  ;
 
-ColumnList_Cursored
- : DerivedColumn_Cursored OptionalCorrelationName_Complete
- | DerivedColumn_Complete OptionalCorrelationName_Cursored
- | 'CURSOR' ColumnList_Complete
+SelectListPartTwo
+ : SelectSubList
+ | SelectListPartTwo ',' SelectSubList
    {
-     parser.yy.result.suggestStar = true;
+     $$ = $3;
+   }
+ ;
+
+SelectListPartTwo_EDIT
+ : SelectSubList_EDIT
+ | 'CURSOR' SelectListPartTwo
+   {
+     suggestKeywords(['*']);
      suggestColumns();
    }
- | ColumnList_Complete ',' DerivedColumn_Complete OptionalCorrelationName_Cursored
- | ColumnList_Complete ',' ColumnListPartTwo_Cursored
- | ColumnList_Complete ',' ColumnListPartTwo_Cursored ','
- | ColumnList_Complete ',' ColumnListPartTwo_Cursored ',' ColumnList_Complete
+ | SelectListPartTwo ',' SelectListPartThree_EDIT
+   {
+     $$ = $3;
+   }
+ | SelectListPartTwo ',' SelectListPartThree_EDIT ','
+   {
+     $$ = $3;
+   }
+ | SelectListPartTwo ',' SelectListPartThree_EDIT ',' SelectListPartTwo
+    {
+      $$ = $3;
+    }
  ;
 
-ColumnListPartTwo_Cursored
- : DerivedColumn_Cursored
+SelectListPartThree_EDIT
+ : SelectSubList_EDIT
  | AnyCursor
    {
-     parser.yy.result.suggestStar = true;
+     suggestKeywords(['*']);
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  ;
 
-DerivedColumn_Complete
- : ColumnIdentifier_Complete
- | ColumnIdentifier_Complete AnyDot '*'
- | ColumnIdentifier_Complete AnyDot DerivedColumnChain_Complete
+DerivedColumn_TWO
+ : ColumnIdentifier
+ | ColumnIdentifier AnyDot '*'
+ | ColumnIdentifier AnyDot DerivedColumnChain
  ;
 
-DerivedColumn_Cursored
- : ColumnIdentifier_Complete AnyDot PartialBacktickedOrPartialCursor
+DerivedColumn_EDIT_TWO
+ : ColumnIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
      // TODO: Check if valid: SELECT testMap["key"].* FROM foo
      if (typeof $1.key === 'undefined') {
@@ -1706,14 +1725,14 @@ DerivedColumn_Cursored
        identifierChain: [ $1 ]
      });
    }
- | ColumnIdentifier_Complete AnyDot DerivedColumnChain_Complete '<impala>.' 'PARTIAL_CURSOR'
+ | ColumnIdentifier AnyDot DerivedColumnChain '<impala>.' 'PARTIAL_CURSOR'
    {
       $3.unshift($1);
       suggestColumns({
         identifierChain: $3
       });
     }
- | ColumnIdentifier_Complete AnyDot DerivedColumnChain_Complete '<hive>.' 'PARTIAL_CURSOR'
+ | ColumnIdentifier AnyDot DerivedColumnChain '<hive>.' 'PARTIAL_CURSOR'
    {
       $3.unshift($1);
       suggestColumns({
@@ -1722,88 +1741,96 @@ DerivedColumn_Cursored
     }
  ;
 
-TableReferenceList_Complete
- : TableReference_Complete
- | TableReferenceList_Complete ',' TableReference_Complete
+TableReferenceList
+ : TableReference
+ | TableReferenceList ',' TableReference
    {
      $$ = $3;
    }
  ;
 
-TableReferenceList_Cursored
- : TableReference_Cursored
- | TableReferenceList_Cursored ',' TableReference_Complete
- | TableReferenceList_Complete ',' TableReference_Cursored
- | TableReferenceList_Complete ',' 'CURSOR'
+TableReferenceList_EDIT
+ : TableReference_EDIT
+ | TableReferenceList_EDIT ',' TableReference
+ | TableReferenceList ',' TableReference_EDIT
+ | TableReferenceList ',' 'CURSOR'
    {
        suggestTables();
        suggestDatabases({ appendDot: true });
    }
  ;
 
-TableReference_Complete
- : TablePrimaryOrJoinedTable_Complete
+TableReference
+ : TablePrimaryOrJoinedTable
  ;
 
-TableReference_Cursored
- : TablePrimaryOrJoinedTable_Cursored
+TableReference_EDIT
+ : TablePrimaryOrJoinedTable_EDIT
  ;
 
-TablePrimaryOrJoinedTable_Complete
- : TablePrimary_Complete
- | JoinedTable_Complete
+TablePrimaryOrJoinedTable
+ : TablePrimary
+ | JoinedTable
  ;
 
-TablePrimaryOrJoinedTable_Cursored
- : TablePrimary_Cursored
- | JoinedTable_Cursored
+TablePrimaryOrJoinedTable_EDIT
+ : TablePrimary_EDIT
+ | JoinedTable_EDIT
  ;
 
-JoinedTable_Complete
- : TablePrimary_Complete Joins_Complete
+JoinedTable
+ : TablePrimary Joins
    {
      $$ = $2;
    }
  ;
 
-JoinedTable_Cursored
- : TablePrimary_Complete Joins_Cursored
- | TablePrimary_Cursored Joins_Complete
+JoinedTable_EDIT
+ : TablePrimary Joins_EDIT
+ | TablePrimary_EDIT Joins
  ;
 
-Joins_Complete
- : JoinTypes_Complete 'JOIN' TablePrimary_Complete
+// TODO: Joins 'JOIN' Joins
+Joins
+ : JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
    {
      $$ = { hasJoinCondition: false }
    }
- | JoinTypes_Complete 'JOIN' TablePrimary_Complete JoinCondition_Complete
+ | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
    {
      $$ = { hasJoinCondition: true }
    }
- | Joins_Complete JoinTypes_Complete 'JOIN' TablePrimary_Complete
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
    {
      $$ = { hasJoinCondition: false }
    }
- | Joins_Complete JoinTypes_Complete 'JOIN' TablePrimary_Complete JoinCondition_Complete
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
    {
      $$ = { hasJoinCondition: true }
    }
  ;
 
-Joins_Cursored
- : JoinTypes_Cursored 'JOIN' TablePrimary_Complete
- | JoinTypes_Complete 'JOIN' TablePrimary_Cursored
- | JoinTypes_Cursored 'JOIN' TablePrimary_Complete JoinCondition_Complete
- | JoinTypes_Complete 'JOIN' TablePrimary_Cursored JoinCondition_Complete
- | JoinTypes_Complete 'JOIN' TablePrimary_Complete JoinCondition_Cursored
- | Joins_Cursored JoinTypes_Complete 'JOIN' TablePrimary_Complete
- | Joins_Complete JoinTypes_Cursored 'JOIN' TablePrimary_Complete
- | Joins_Complete JoinTypes_Complete 'JOIN' TablePrimary_Cursored
- | Joins_Cursored JoinTypes_Complete 'JOIN' TablePrimary_Complete JoinCondition_Complete
- | Joins_Complete JoinTypes_Cursored 'JOIN' TablePrimary_Complete JoinCondition_Complete
- | Joins_Complete JoinTypes_Complete 'JOIN' TablePrimary_Cursored JoinCondition_Complete
- | Joins_Complete JoinTypes_Complete 'JOIN' TablePrimary_Complete JoinCondition_Cursored
- | JoinsTableSuggestions_Cursored
+OptionalImpalaBroadcastOrShuffle
+ :
+ | '<impala>BROADCAST'
+ | '<impala>SHUFFLE'
+ ;
+
+Joins_EDIT
+ : JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
+ | JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle
+ | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT
+ | JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
+ | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT JoinCondition
+ | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
+ | Joins_EDIT JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
+ | Joins JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT
+ | Joins_EDIT JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
+ | Joins JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT JoinCondition
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
+ | JoinsTableSuggestions_EDIT
    {
      suggestTables();
      suggestDatabases({
@@ -1812,14 +1839,14 @@ Joins_Cursored
    }
  ;
 
-JoinsTableSuggestions_Cursored
- : JoinTypes_Complete 'JOIN' 'CURSOR'
- | JoinTypes_Complete 'JOIN' 'CURSOR' JoinCondition_Complete
- | Joins_Complete JoinTypes_Complete 'JOIN' 'CURSOR'
- | Joins_Complete JoinTypes_Complete 'JOIN' 'CURSOR' JoinCondition_Complete
+JoinsTableSuggestions_EDIT
+ : JoinTypes 'JOIN' 'CURSOR'
+ | JoinTypes 'JOIN' 'CURSOR' JoinCondition
+ | Joins JoinTypes 'JOIN' 'CURSOR'
+ | Joins JoinTypes 'JOIN' 'CURSOR' JoinCondition
  ;
 
-JoinTypes_Complete
+JoinTypes
  :
  | '<hive>CROSS'
  | 'FULL' OptionalOuter
@@ -1831,7 +1858,7 @@ JoinTypes_Complete
  | '<impala>RIGHT' OptionalOuter
  ;
 
-JoinTypes_Cursored
+JoinTypes_EDIT
  : 'FULL' OptionalOuter 'CURSOR'
    {
      if (!$2) {
@@ -1874,87 +1901,89 @@ OptionalOuter
  | 'OUTER'
  ;
 
-JoinCondition_Cursored
- : 'ON' JoinEqualityExpression_Cursored
- | 'ON' ParenthesizedJoinEqualityExpression_Cursored
+JoinCondition
+ : 'ON' JoinEqualityExpression
+ | 'ON' ParenthesizedJoinEqualityExpression
+ ;
+
+JoinCondition_EDIT
+ : 'ON' JoinEqualityExpression_EDIT
+ | 'ON' ParenthesizedJoinEqualityExpression_EDIT
  | 'ON' 'CURSOR'
    {
      suggestColumns();
    }
  ;
 
-JoinCondition_Complete
- : 'ON' JoinEqualityExpression_Complete
- | 'ON' ParenthesizedJoinEqualityExpression_Complete
+ParenthesizedJoinEqualityExpression
+ : '(' JoinEqualityExpression ')'
  ;
 
-ParenthesizedJoinEqualityExpression_Complete
- : '(' JoinEqualityExpression_Complete ')'
- ;
-
-ParenthesizedJoinEqualityExpression_Cursored
- : '(' JoinEqualityExpression_Cursored ')'
- | '(' 'PARTIAL_CURSOR'
+ParenthesizedJoinEqualityExpression_EDIT
+ : '(' JoinEqualityExpression_EDIT ')'
+ | '(' JoinEqualityExpression_EDIT error
+ | '(' PartialBacktickedOrPartialCursor
    {
      suggestColumns();
    }
- | '(' 'PARTIAL_CURSOR' 'AND' JoinEqualityExpression_Complete
+ | '(' PartialBacktickedOrPartialCursor 'AND' JoinEqualityExpression
     {
       suggestColumns();
     }
  ;
 
-JoinEqualityExpression_Complete
- : EqualityExpression_Complete
- | JoinEqualityExpression_Complete 'AND' EqualityExpression_Complete
+JoinEqualityExpression
+ : EqualityExpression
+ | JoinEqualityExpression 'AND' EqualityExpression
  ;
 
-JoinEqualityExpression_Cursored
- : EqualityExpression_Cursored
- | EqualityExpression_Cursored 'AND' JoinEqualityExpression_Complete
- | 'CURSOR' 'AND' JoinEqualityExpression_Complete
+JoinEqualityExpression_EDIT
+ : EqualityExpression_EDIT
+ | EqualityExpression_EDIT 'AND' JoinEqualityExpression
+ | 'CURSOR' 'AND' JoinEqualityExpression
    {
      suggestColumns();
    }
- | JoinEqualityExpression_Complete 'AND' EqualityExpression_Cursored
- | JoinEqualityExpression_Complete 'AND' 'CURSOR'
+ | JoinEqualityExpression 'AND' EqualityExpression_EDIT
+ | JoinEqualityExpression 'AND' PartialBacktickedOrCursor
    {
      suggestColumns();
    }
- | JoinEqualityExpression_Complete 'AND' EqualityExpression_Cursored 'AND' JoinEqualityExpression_Complete
- | JoinEqualityExpression_Complete 'AND' 'CURSOR' 'AND' JoinEqualityExpression_Complete
-   {
-     suggestColumns();
-   }
- ;
-
-EqualityExpression_Complete
- : ColumnReference_Complete '=' ColumnReference_Complete
- ;
-
-EqualityExpression_Cursored
- : ColumnReference_Complete '=' ColumnReference_Cursored
- | ColumnReference_Cursored '=' ColumnReference_Complete
- | ColumnReference_Complete '=' 'CURSOR'
-   {
-     suggestColumns();
-   }
- | 'CURSOR' '=' ColumnReference_Complete
-   {
-     suggestColumns();
-   }
- | 'PARTIAL_CURSOR' '=' ColumnReference_Complete
-   {
-     suggestColumns();
-   }
- | ColumnReference_Complete '=' 'PARTIAL_CURSOR'
+ | JoinEqualityExpression 'AND' EqualityExpression_EDIT 'AND' JoinEqualityExpression
+ | JoinEqualityExpression 'AND' PartialBacktickedOrCursor 'AND' JoinEqualityExpression
    {
      suggestColumns();
    }
  ;
 
-TablePrimary_Complete
- : TableOrQueryName_Complete OptionalCorrelationName_Complete OptionalLateralViews_Complete
+EqualityExpression
+ : ColumnReference '=' ColumnReference
+ ;
+
+EqualityExpression_EDIT
+ : ColumnReference '=' ColumnReference_EDIT
+ | ColumnReference_EDIT '=' ColumnReference
+ | ColumnReference '=' 'CURSOR'
+   {
+     suggestColumns();
+   }
+ | 'CURSOR' '=' ColumnReference
+   {
+     suggestColumns();
+   }
+ | 'PARTIAL_CURSOR' '=' ColumnReference
+   {
+     suggestColumns();
+   }
+ | ColumnReference '=' 'PARTIAL_CURSOR'
+   {
+     suggestColumns();
+   }
+ | ColumnReference_EDIT
+ ;
+
+TablePrimary
+ : TableOrQueryName OptionalCorrelationName OptionalLateralViews
    {
      if ($1.identifierChain) {
        if ($2 && !$2.suggestKeywords) {
@@ -1966,7 +1995,7 @@ TablePrimary_Complete
        addTablePrimary($1);
      }
    }
- | DerivedTable_Complete OptionalCorrelationName_Complete
+ | DerivedTable OptionalCorrelationName
    {
      if ($2 && !$2.suggestKeywords) {
        // TODO: Potentially add columns for SELECT bla.| FROM (SELECT * FROM foo) AS bla;
@@ -1975,33 +2004,39 @@ TablePrimary_Complete
    }
  ;
 
-TablePrimary_Cursored
- : TableOrQueryName_Cursored OptionalCorrelationName_Complete OptionalLateralViews_Complete
- | TableOrQueryName_Complete OptionalCorrelationName_Complete OptionalLateralViews_Cursored
- | DerivedTable_Cursored OptionalCorrelationName_Complete
+TablePrimary_EDIT
+ : TableOrQueryName_EDIT OptionalCorrelationName OptionalLateralViews
+ | TableOrQueryName OptionalCorrelationName OptionalLateralViews_EDIT
+   {
+     if ($2 && !$2.suggestKeywords) {
+       $1.alias = $2;
+     }
+     addTablePrimary($1);
+   }
+ | DerivedTable_EDIT OptionalCorrelationName
    {
      if ($2 && !$2.suggestKeywords) {
        // TODO: Potentially add columns for SELECT bla.| FROM (SELECT * FROM foo) AS bla;
        addTablePrimary({ subqueryAlias: $2 });
      }
    }
- | DerivedTable_Complete OptionalCorrelationName_Cursored // TODO: OptionalLateralViews?
+ | DerivedTable OptionalCorrelationName_EDIT // TODO: OptionalLateralViews?
  ;
 
-TableOrQueryName_Complete
- : SchemaQualifiedTableIdentifier_Complete
+TableOrQueryName
+ : SchemaQualifiedTableIdentifier
  ;
 
-TableOrQueryName_Cursored
- : SchemaQualifiedTableIdentifier_Cursored
+TableOrQueryName_EDIT
+ : SchemaQualifiedTableIdentifier_EDIT
  ;
 
-DerivedTable_Complete
- : TableSubquery_Complete
+DerivedTable
+ : TableSubquery
  ;
 
-DerivedTable_Cursored
- : TableSubquery_Cursored
+DerivedTable_EDIT
+ : TableSubquery_EDIT
  ;
 
 PushQueryState
@@ -2031,80 +2066,80 @@ PopQueryState
    }
  ;
 
-TableSubquery_Complete
- : '(' PushQueryState Subquery_Complete PopQueryState ')'
+TableSubquery
+ : '(' PushQueryState Subquery PopQueryState ')'
  ;
 
-TableSubquery_Cursored
- : '(' PushQueryState Subquery_Cursored PopQueryState ')'
+TableSubquery_EDIT
+ : '(' PushQueryState Subquery_EDIT PopQueryState ')'
  | '(' PushQueryState AnyCursor PopQueryState ')'
    {
      suggestKeywords(['SELECT']);
    }
- | '(' PushQueryState Subquery_Cursored error
+ | '(' PushQueryState Subquery_EDIT error
  | '(' PushQueryState AnyCursor error
    {
      suggestKeywords(['SELECT']);
    }
  ;
 
-Subquery_Complete
- : QueryExpression_Complete
+Subquery
+ : QueryExpression
  ;
 
-Subquery_Cursored
- : QueryExpression_Cursored
+Subquery_EDIT
+ : QueryExpression_EDIT
  ;
 
-QueryExpression_Complete
- : QueryExpressionBody_Complete
+QueryExpression
+ : QueryExpressionBody
  ;
 
-QueryExpression_Cursored
- : QueryExpressionBody_Cursored
+QueryExpression_EDIT
+ : QueryExpressionBody_EDIT
  ;
 
-QueryExpressionBody_Complete
- : NonJoinQueryExpression_Complete
+QueryExpressionBody
+ : NonJoinQueryExpression
  ;
 
-QueryExpressionBody_Cursored
- : NonJoinQueryExpression_Cursored
+QueryExpressionBody_EDIT
+ : NonJoinQueryExpression_EDIT
  ;
 
-NonJoinQueryExpression_Complete
- : NonJoinQueryTerm_Complete
+NonJoinQueryExpression
+ : NonJoinQueryTerm
  ;
 
-NonJoinQueryExpression_Cursored
- : NonJoinQueryTerm_Cursored
+NonJoinQueryExpression_EDIT
+ : NonJoinQueryTerm_EDIT
  ;
 
-NonJoinQueryTerm_Complete
- : NonJoinQueryPrimary_Complete
+NonJoinQueryTerm
+ : NonJoinQueryPrimary
  ;
 
-NonJoinQueryTerm_Cursored
- : NonJoinQueryPrimary_Cursored
+NonJoinQueryTerm_EDIT
+ : NonJoinQueryPrimary_EDIT
  ;
 
-NonJoinQueryPrimary_Complete
- : SimpleTable_Complete
+NonJoinQueryPrimary
+ : SimpleTable
  ;
 
-NonJoinQueryPrimary_Cursored
- : SimpleTable_Cursored
+NonJoinQueryPrimary_EDIT
+ : SimpleTable_EDIT
  ;
 
-SimpleTable_Complete
- : QuerySpecification_Complete
+SimpleTable
+ : QuerySpecification
  ;
 
-SimpleTable_Cursored
- : QuerySpecification_Cursored
+SimpleTable_EDIT
+ : QuerySpecification_EDIT
  ;
 
-OptionalCorrelationName_Complete
+OptionalCorrelationName
  :
    {
      $$ = { suggestKeywords: ['AS'] }
@@ -2119,15 +2154,15 @@ OptionalCorrelationName_Complete
    }
  ;
 
-OptionalCorrelationName_Cursored
+OptionalCorrelationName_EDIT
  : PartialBacktickedIdentifier
  | AnyAs PartialBacktickedIdentifier
  | AnyAs 'CURSOR'
  ;
 
-OptionalLateralViews_Complete
+OptionalLateralViews
  :
- | OptionalLateralViews_Complete LateralView_Complete
+ | OptionalLateralViews LateralView
    {
      if ($1) {
        $$ = $1.concat($2);
@@ -2137,47 +2172,235 @@ OptionalLateralViews_Complete
    }
  ;
 
-OptionalLateralViews_Cursored
- : OptionalLateralViews_Complete LateralView_Cursored OptionalLateralViews_Complete
+OptionalLateralViews_EDIT
+ : OptionalLateralViews LateralView_EDIT OptionalLateralViews
  ;
 
 // TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
-UserDefinedTableGeneratingFunction_Complete
- : '<hive>explode' '(' DerivedColumnChain_Complete ')'
+UserDefinedTableGeneratingFunction
+ : '<hive>explode' '(' DerivedColumnChain ')'
    {
      $$ = { function: $1, expression: $3 }
    }
- | '<hive>posexplode' '(' DerivedColumnChain_Complete ')'
+ | '<hive>posexplode' '(' DerivedColumnChain ')'
    {
      $$ = { function: $1, expression: $3 }
    }
  ;
 
-UserDefinedTableGeneratingFunction_Cursored
- : '<hive>explode' '(' PartialBacktickedOrPartialCursor
- | '<hive>posexplode' '(' PartialBacktickedOrPartialCursor
+UserDefinedTableGeneratingFunction_EDIT
+ : '<hive>explode' '(' DerivedColumnChain_EDIT error
+   {
+     suggestColumns($3);
+   }
+ | '<hive>explode' '(' PartialBacktickedOrPartialCursor error
+    {
+      suggestColumns();
+    }
+ | '<hive>posexplode' '(' PartialBacktickedOrPartialCursor error
+    {
+      suggestColumns();
+    }
  ;
 
 
-LateralView_Complete
- : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_Complete 'REGULAR_IDENTIFIER' LateralViewColumnAliases_Complete
+SetFunctionSpecification
+ : AggregateFunction
+ | GroupingOperation
+ ;
+
+SetFunctionSpecification_EDIT
+ : AggregateFunction_EDIT
+ ;
+
+GroupingOperation
+ : 'GROUPING' '(' ColumnReferenceList ')'
+ ;
+
+AggregateFunction
+ : GeneralSetFunction OptionalFilterClause
+ | BinarySetFunction OptionalFilterClause
+ | OrderedSetFunction OptionalFilterClause
+ | HiveAggregateFunction OptionalFilterClause
+ | ImpalaAggregateFunction OptionalFilterClause
+ ;
+
+AggregateFunction_EDIT
+ : GeneralSetFunction_EDIT OptionalFilterClause
+ ;
+
+OptionalFilterClause
+ :
+ | 'FILTER' '(' 'WHERE' SearchCondition ')'
+ | '<impala>OVER' '(' 'WHERE' SearchCondition ')'
+ ;
+
+GeneralSetFunction
+ : 'COUNT' '(' AsteriskOrValueExpression ')'
+ | SetFunctionType '(' OptionalSetQuantifier ValueExpression ')'
+ ;
+
+AsteriskOrValueExpression
+ : '*'
+ | ValueExpression
+ ;
+
+GeneralSetFunction_EDIT
+ : 'COUNT' '(' AnyCursor ')'
+   {
+     suggestColumns();
+     suggestKeywords(['*']);
+   }
+ | 'COUNT' '(' AnyCursor error
+   {
+     suggestColumns();
+     suggestKeywords(['*']);
+   }
+ | 'COUNT' '(' ValueExpression_EDIT ')'
+ | SetFunctionType '(' OptionalSetQuantifier AnyCursor error
+   {
+     suggestColumns();
+   }
+ | SetFunctionType '(' OptionalSetQuantifier ValueExpression_EDIT ')'
+ | SetFunctionType '(' OptionalSetQuantifier ValueExpression_EDIT error
+ | SetFunctionType '(' OptionalSetQuantifier AnyCursor ')'
+   {
+     suggestColumns();
+   }
+ ;
+
+BinarySetFunction
+ : BinarySetFunctionType '(' DependentVariableExpression ',' IndependentVariableExpression ')'
+ ;
+
+DependentVariableExpression
+ : ValueExpression
+ ;
+
+IndependentVariableExpression
+ : ValueExpression
+ ;
+
+OrderedSetFunction
+ : HypotheticalSetFunction
+ | InverseDistributionFunction
+ ;
+
+HypotheticalSetFunction
+ : RankFunctionType '(' HypotheticalSetFunctionValueExpressionList ')' WithinGroupSpecification
+ ;
+
+HypotheticalSetFunctionValueExpressionList
+ : ValueExpression
+ | HypotheticalSetFunctionValueExpressionList ',' ValueExpression
+ ;
+
+InverseDistributionFunction
+ : InverseDistributionFunctionType '(' InverseDistributionFunctionArgument ')' WithinGroupSpecification
+ ;
+
+InverseDistributionFunctionArgument
+ : ValueExpression
+ ;
+
+WithinGroupSpecification
+ : 'WITHIN' 'GROUP' '(' 'ORDER' 'BY' SortSpecificationList ')'
+ ;
+
+SetFunctionType
+ : ComputationalOperation
+ ;
+
+ComputationalOperation
+ : 'ANY' // SQL-2003, Hive and Impala
+// | 'COLLECT'
+ | '<hive>COLLECT_LIST'
+ | '<hive>COLLECT_SET'
+// | 'EVERY'
+// | 'FUSION'
+// | 'INTERSECTION'
+ | 'MAX' // SQL-2003, Hive and Impala
+ | 'MIN' // SQL-2003, Hive and Impala
+// | 'SOME'
+ | '<impala>STDDEV'
+ | 'STDDEV_POP' // SQL-2003, Hive and Impala
+ | 'STDDEV_SAMP' // SQL-2003, Hive and Impala
+ | 'SUM' // SQL-2003, Hive and Impala
+ | '<hive>VARIANCE'
+ | '<impala>VARIANCE'
+ | '<impala>VARIANCE_POP'
+ | '<impala>VARIANCE_SAMP'
+ | 'VAR_POP' // SQL-2003, Hive and Impala
+ | 'VAR_SAMP' // SQL-2003, Hive and Impala
+ ;
+
+BinarySetFunctionType
+ : '<hive>CORR'
+ | '<hive>COVAR_POP'
+ | '<hive>COVAR_SAMP'
+// | 'REGR_AVGX'
+// | 'REGR_AVGY'
+// | 'REGR_COUNT'
+// | 'REGR_INTERCEPT'
+// | 'REGR_R2'
+// | 'REGR_SLOPE'
+// | 'REGR_SXX'
+// | 'REGR_SXY'
+// | 'REGR_SYY'
+ ;
+
+RankFunctionType
+ : 'CUME_DIST'
+ | '<hive>CUME_DIST'
+ | 'DENSE_RANK' // SQL-2003, Hive and Impala
+// | 'PERCENT_RANK'
+ | '<hive>PERCENT_RANK'
+ | 'RANK' // SQL-2003, Hive and Impala
+ ;
+
+InverseDistributionFunctionType
+ : '<hive>PERCENTILE'
+ | '<hive>PERCENTILE_APPROX'
+// | 'PERCENTILE_CONT'
+// | 'PERCENTILE_DISC'
+ ;
+
+HiveAggregateFunction
+ : '<hive>HISTOGRAM_NUMERIC' '(' ')'
+ | '<hive>NTILE' '(' ')'
+ ;
+
+ImpalaAggregateFunction
+ : '<impala>GROUP_CONCAT' '(' ')'
+ | '<impala>NDV' '(' ')'
+ ;
+
+OptionalSetQuantifier
+ :
+ | 'DISINCT'
+ | 'ALL'
+ ;
+
+LateralView
+ : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' LateralViewColumnAliases
    {
      $$ = [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
    }
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_Complete LateralViewColumnAliases_Complete
+ | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction LateralViewColumnAliases
     {
       $$ = [{ udtf: $3, columnAliases: $4 }]
     }
  ;
 
-LateralView_Cursored
- : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_Cursored LateralViewColumnAliases_Complete
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_Complete 'REGULAR_IDENTIFIER' 'CURSOR'
+LateralView_EDIT
+ : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_EDIT
+ | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_EDIT LateralViewColumnAliases
+ | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' 'CURSOR'
    {
      $$ = [];
      suggestKeywords(['AS']);
    }
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_Complete 'CURSOR'
+ | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'CURSOR'
    {
      $$ = [];
      suggestKeywords(['AS']);
@@ -2194,7 +2417,7 @@ LateralView_Cursored
    }
  ;
 
-LateralViewColumnAliases_Complete
+LateralViewColumnAliases
  : '<hive>AS' 'REGULAR_IDENTIFIER'
    {
      $$ = [ $2 ]
@@ -2224,7 +2447,7 @@ ShowStatement
        suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
      }
    }
- | 'SHOW' 'CURSOR' LIKE SingleQuotedValue_Complete
+ | 'SHOW' 'CURSOR' LIKE SingleQuotedValue
    {
      if (isImpala()) {
        suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
@@ -2240,8 +2463,8 @@ ShowStatement
  | ShowCurrentStatement
  | ShowDatabasesStatement
  | ShowFunctionsStatement
- | ShowGrantStatement_Complete
- | ShowGrantStatement_Cursored
+ | ShowGrantStatement
+ | ShowGrantStatement_EDIT
  | ShowIndexStatement
  | ShowLocksStatement
  | ShowPartitionsStatement
@@ -2357,13 +2580,13 @@ ShowDatabasesStatement
    {
      suggestKeywords(['LIKE']);
    }
- | 'SHOW' HiveOrImpalaDatabasesOrSchemas 'LIKE' SingleQuotedValue_Complete
- | 'SHOW' '<impala>DATABASES' SingleQuotedValue_Complete
+ | 'SHOW' HiveOrImpalaDatabasesOrSchemas 'LIKE' SingleQuotedValue
+ | 'SHOW' '<impala>DATABASES' SingleQuotedValue
  ;
 
 ShowFunctionsStatement
  : 'SHOW' '<hive>FUNCTIONS'
- | 'SHOW' '<hive>FUNCTIONS' DoubleQuotedValue_Complete
+ | 'SHOW' '<hive>FUNCTIONS' DoubleQuotedValue
  | 'SHOW' AggregateOrAnalytic 'CURSOR'
    {
      suggestKeywords(['FUNCTIONS']);
@@ -2400,29 +2623,29 @@ ShowFunctionsStatement
    }
  ;
 
-ShowGrantStatement_Complete
- : 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete 'ON' '<hive>ALL'
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete 'ON' RegularOrBacktickedIdentifier
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete 'ON' AnyTable RegularOrBacktickedIdentifier
+ShowGrantStatement
+ : 'SHOW' '<hive>GRANT' OptionalPrincipalName
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' '<hive>ALL'
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' RegularOrBacktickedIdentifier
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable RegularOrBacktickedIdentifier
  ;
 
-ShowGrantStatement_Cursored
- : 'SHOW' '<hive>GRANT' OptionalPrincipalName_Cursored
+ShowGrantStatement_EDIT
+ : 'SHOW' '<hive>GRANT' OptionalPrincipalName_EDIT
    {
      suggestKeywords(['ON']);
    }
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Cursored 'ON' '<hive>ALL'
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete 'ON' 'CURSOR'
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName_EDIT 'ON' '<hive>ALL'
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' 'CURSOR'
    {
      suggestKeywords(['ALL', 'TABLE']);
      suggestTables();
    }
- | 'SHOW'  '<hive>GRANT' OptionalPrincipalName_Complete 'ON' AnyTable 'CURSOR'
+ | 'SHOW'  '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable 'CURSOR'
    {
      suggestTables();
    }
- | 'SHOW' '<hive>GRANT' OptionalPrincipalName_Complete 'ON' 'CURSOR' RegularOrBacktickedIdentifier
+ | 'SHOW' '<hive>GRANT' OptionalPrincipalName 'ON' 'CURSOR' RegularOrBacktickedIdentifier
    {
      suggestKeywords(['TABLE']);
    }
@@ -2432,49 +2655,49 @@ ShowGrantStatement_Cursored
    }
  ;
 
-OptionalPrincipalName_Complete
+OptionalPrincipalName
  :
  | 'REGULAR_IDENTIFIER'
  ;
 
-OptionalPrincipalName_Cursored
+OptionalPrincipalName_EDIT
  : 'CURSOR'
  | 'REGULAR_IDENTIFIER' 'CURSOR'
  ;
 
 
 ShowIndexStatement
- : 'SHOW' OptionallyFormattedIndex_Complete
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' RegularOrBacktickedIdentifier
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
- | 'SHOW' OptionallyFormattedIndex_Cursored
- | 'SHOW' OptionallyFormattedIndex_Cursored 'ON' RegularOrBacktickedIdentifier
- | 'SHOW' OptionallyFormattedIndex_Cursored 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
- | 'SHOW' OptionallyFormattedIndex_Complete 'CURSOR'
+ : 'SHOW' OptionallyFormattedIndex
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex_EDIT
+ | 'SHOW' OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'CURSOR'
    {
      suggestKeywords(['ON']);
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' 'CURSOR'
+ | 'SHOW' OptionallyFormattedIndex 'ON' 'CURSOR'
    {
      suggestTables();
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'CURSOR' RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'CURSOR' RegularOrBacktickedIdentifier
    {
      suggestKeywords(['ON']);
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' RegularOrBacktickedIdentifier 'CURSOR'
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier 'CURSOR'
    {
      suggestKeywords(['FROM', 'IN']);
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
    {
      suggestKeywords(['FROM', 'IN']);
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
+ | 'SHOW' OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
    {
      suggestDatabases();
    }
- | 'SHOW' OptionallyFormattedIndex_Complete 'ON' 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
+ | 'SHOW' OptionallyFormattedIndex 'ON' 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
    {
      suggestTablesOrColumns($6);
    }
@@ -2598,9 +2821,9 @@ ShowTableStatement
    {
      suggestKeywords(['EXTENDED']);
    }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Cursored
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'CURSOR'
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR'
     {
       if ($4) {
         suggestKeywords(['LIKE']);
@@ -2608,33 +2831,33 @@ ShowTableStatement
         suggestKeywords(['FROM', 'IN', 'LIKE']);
       }
     }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Cursored 'LIKE' SingleQuotedValue_Complete
- | 'SHOW' '<hive>TABLE' 'CURSOR' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue
+ | 'SHOW' '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue
     {
       if (isHive())
         suggestKeywords(['EXTENDED']);
       }
     }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'CURSOR' SingleQuotedValue_Complete
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue
     {
       suggestKeywords(['LIKE']);
     }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete 'CURSOR'
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue 'CURSOR'
     {
       suggestKeywords(['PARTITION']);
     }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete '<hive>PARTITION' PartitionSpecList
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Cursored 'LIKE' SingleQuotedValue_Complete '<hive>PARTITION' PartitionSpecList
- | 'SHOW' '<hive>TABLE' 'CURSOR' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
    {
      suggestKeywords(['EXTENDED']);
    }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'CURSOR' SingleQuotedValue_Complete '<hive>PARTITION' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue '<hive>PARTITION' PartitionSpecList
    {
      suggestKeywords(['LIKE']);
    }
- | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_Complete 'LIKE' SingleQuotedValue_Complete 'CURSOR' PartitionSpecList
+ | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue 'CURSOR' PartitionSpecList
    {
      suggestKeywords(['PARTITION']);
    }
@@ -2667,8 +2890,8 @@ ShowTablesStatement
        suggestKeywords(['LIKE']);
      }
    }
- | 'SHOW' HiveOrImpalaTables OptionalInDatabase SingleQuotedValue_Complete
- | 'SHOW' HiveOrImpalaTables OptionalInDatabase 'LIKE' SingleQuotedValue_Complete
+ | 'SHOW' HiveOrImpalaTables OptionalInDatabase SingleQuotedValue
+ | 'SHOW' HiveOrImpalaTables OptionalInDatabase 'LIKE' SingleQuotedValue
  ;
 
 ShowTblPropertiesStatement
@@ -2687,15 +2910,15 @@ ShowTransactionsStatement
 // ===================================== UPDATE statement =====================================
 
 UpdateStatement
- : 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_Complete
+ : 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause
    {
      linkTablePrimaries();
    }
- | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_Cursored
+ | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_EDIT
     {
       linkTablePrimaries();
     }
- | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_Complete 'CURSOR'
+ | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause 'CURSOR'
    {
      if (!$5) {
        suggestKeywords([ 'WHERE' ]);
@@ -2755,12 +2978,6 @@ SetTarget
 UpdateSource
  : ValueExpression
  ;
-
-ValueExpression
- : BooleanValueExpression_Complete
- | BooleanValueExpression_Cursored
- ;
-
 
 
 // ===================================== USE Statement =====================================
@@ -2925,7 +3142,6 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
     identifierChain = parser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
     suggestion.identifierChain = identifierChain;
   }
-
   // Expand exploded views in the identifier chain
   if (isHive()) {
     if (identifierChain.length === 0) {
@@ -3035,9 +3251,6 @@ var linkTablePrimaries = function () {
    }
    if (typeof parser.yy.result.suggestValues !== 'undefined') {
      linkSuggestion(parser.yy.result.suggestValues, false);
-     if (parser.yy.latestTablePrimaries.length > 1) {
-       suggestTablePrimariesAsIdentifiers();
-     }
    }
 }
 
@@ -3164,18 +3377,18 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
 
   if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
     // Remove any expected tokens from other dialects, jison doesn't remove tokens from other lexer states.
-    var actualExpected = [];
+    var actualExpected = {};
     result.error.expected.forEach(function (expected) {
       var match = expected.match(/\<([a-z]+)\>(.*)/);
       if (match !== null) {
         if (typeof parser.yy.dialect !== 'undefined' && parser.yy.dialect === match[1]) {
-          actualExpected.push(match[2]);
+          actualExpected[("'" + match[2])] = true;
         }
-      } else {
-        actualExpected.push(expected);
+      } else if (expected.indexOf('CURSOR') == - 1) {
+        actualExpected[expected] = true;
       }
     });
-    result.error.expected = actualExpected;
+    result.error.expected = Object.keys(actualExpected);
   }
 
   if (typeof result.error !== 'undefined' && result.error.recoverable) {

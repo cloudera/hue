@@ -55,10 +55,6 @@
       });
     }
 
-    if (parseResult.suggestStar) {
-      completions.push({ value: '*', meta: 'keyword' });
-    }
-
     if (parseResult.suggestDatabases || parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
       var database = parseResult.useDatabase || self.snippet.database();
 

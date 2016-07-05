@@ -180,7 +180,8 @@ define([
             database: 'bar',
             table: 'foo',
             identifierChain: [{ name: 'id' }]
-          }
+          },
+          suggestColumns : { database: 'bar', table: 'foo' }
         }
       });
     });
