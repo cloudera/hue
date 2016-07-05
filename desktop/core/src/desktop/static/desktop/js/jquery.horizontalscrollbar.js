@@ -49,10 +49,10 @@
             $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left / (scrollbarRail.width() - $(this).width())))
           }
         });
-        $(el).parents('.dataTables_wrapper').bind('mousewheel DOMMouseScroll wheel', function (e) {
-          var _e = e.originalEvent,
-              _deltaX = _e.wheelDeltaX || -_e.deltaX,
-              _deltaY = _e.wheelDeltaY || -_e.deltaY;
+        $(el).parents('.dataTables_wrapper').bind('mousewheel', function (e) {
+          var _deltaX = -e.deltaX*e.deltaFactor,
+              _deltaY = -e.deltaY;
+
           if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
             this.scrollLeft += -_deltaX / 2;
             e.stopPropagation();
