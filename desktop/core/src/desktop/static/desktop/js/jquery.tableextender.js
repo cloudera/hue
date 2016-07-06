@@ -24,6 +24,7 @@
     defaults = {
       fixedHeader: false,
       fixedFirstColumn: false,
+      lockSelectedRow: true,
       firstColumnTooltip: false,
       classToRemove: 'resultTable',
       hintElement: null,
@@ -168,6 +169,16 @@
       drawFirstColumn(_this);
     }
 
+    $(document).on('click', '.dataTables_wrapper > table tbody tr', function () {
+      $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr.selected').removeClass('selected');
+      if ($(this).hasClass('selected')) {
+        $(this).removeClass('selected');
+      } else {
+        $('.dataTables_wrapper > table tbody tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+        $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr:eq('+($(this).index())+')').addClass('selected');
+      }
+    });
   };
 
   function s4() {
@@ -179,6 +190,28 @@
 
   function UUID() {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  }
+
+  function drawLockedRow(plugin, rowNo) {
+    var $pluginElement = $(plugin.element);
+    var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
+    var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
+    var $clone = $pluginElement.find('tbody tr:eq('+ rowNo +')').clone();
+    $clone.addClass('locked');
+    $header.addClass('locked');
+    $headerCounter.addClass('locked');
+    $clone.appendTo($header.find('tbody'));
+    var $newTr = $('<tr>');
+    $newTr.addClass('locked').html('<td class="pointer">' + (rowNo+1) + '</td>').appendTo($headerCounter.find('tbody'));
+    $newTr.find('td').on('click', function(){
+      var idx = $(this).parent().index();
+      $header.find('tbody tr:eq('+ idx +')').remove();
+      $(this).parent().remove();
+      if ($header.find('tbody tr').length == 0){
+        $header.removeClass('locked');
+        $headerCounter.removeClass('locked');
+      }
+    });
   }
 
   function drawFirstColumn(plugin) {
@@ -199,7 +232,7 @@
     $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell").remove();
     var clonedCell = $(plugin.element).clone();
     clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedCell.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
+    clonedCell.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
     clonedCell.find("thead>tr th:not(:eq(0))").remove();
     clonedCell.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
     clonedCell.find("thead>tr th:eq(0)").click(function () {
@@ -208,7 +241,7 @@
       $(this).attr("class", originalTh.attr("class"));
     });
 
-    var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(originalTh.outerHeight());
+    var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth());
     clonedCell.appendTo(clonedCellContainer);
 
     var clonedCellVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").addClass("jHueTableExtenderClonedContainerCell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
@@ -223,6 +256,9 @@
     clonedTable.find("thead>tr th:not(:eq(0))").remove();
     clonedTable.find("tbody>tr").each(function () {
       $(this).find("td:not(:eq(0))").remove();
+      $(this).find('td').addClass('pointer').on('click', function(){
+        drawLockedRow(plugin, $(this).parent().index());
+      });
     });
     clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
 
@@ -296,7 +332,7 @@
     $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $pluginElement.clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").remove();
+    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
     $pluginElement.find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
