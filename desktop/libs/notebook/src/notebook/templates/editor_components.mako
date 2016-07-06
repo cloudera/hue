@@ -3205,17 +3205,6 @@ ${ hueIcons.symbols() }
         }
       });
 
-      $(document).on('click', '.dataTables_wrapper > table tbody tr', function () {
-        $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr.selected').removeClass('selected');
-        if ($(this).hasClass('selected')) {
-          $(this).removeClass('selected');
-        } else {
-          $('.dataTables_wrapper > table tbody tr.selected').removeClass('selected');
-          $(this).addClass('selected');
-          $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr:eq('+($(this).index())+')').addClass('selected');
-        }
-      });
-
       function resizeToggleResultSettings (snippet) {
         var _dtElement;
         if (snippet.showGrid()) {

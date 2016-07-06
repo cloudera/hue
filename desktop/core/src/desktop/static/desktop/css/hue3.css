@@ -1009,6 +1009,13 @@ div.box {
   background-color: #DBE8F1!important;
 }
 
+.table tr.locked, .table tr.locked td {
+  background-color: #fcf8e3!important;
+}
+
+div.locked {
+  border-bottom: 1px solid #f0c36d;
+}
 
 .nounderline:hover {
   text-decoration: none;
