@@ -338,6 +338,7 @@
     var clonedTable = $pluginElement.clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
     clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
+    clonedTable.find("thead>tr th").wrapInner('<span></span>');
     $pluginElement.find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
@@ -363,7 +364,20 @@
     clonedTableVisibleContainer.prependTo($pluginElement.parent());
 
     $pluginElement.parent().scroll(function () {
-      clonedTableVisibleContainer.scrollLeft($(this).scrollLeft());
+      var scrollLeft = $(this).scrollLeft();
+      clonedTableVisibleContainer.scrollLeft(scrollLeft);
+      var firstCellWidth = clonedTable.find("thead>tr th:eq(0)").outerWidth();
+      clonedTable.find("thead>tr th").each(function () {
+        var leftPosition = $(this).position().left - firstCellWidth;
+        if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
+          if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
+            $(this).find('span').css('paddingLeft', -leftPosition);
+          }
+        }
+        else {
+          $(this).find('span').css('paddingLeft', 0);
+        }
+      });
     });
 
     clonedTableVisibleContainer.scrollLeft($pluginElement.parent().scrollLeft());
