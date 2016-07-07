@@ -57,6 +57,7 @@ LOG = logging.getLogger(__name__)
 # For scraping Job IDs from logs
 HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
 SPARK_APPLICATION_RE = re.compile("Running with YARN Application = (?P<application_id>application_\d+_\d+)")
+TEZ_APPLICATION_RE = re.compile("Executing on YARN cluster with App id ([a-z0-9_]+?)\)")
 
 
 def index(request):
@@ -511,7 +512,7 @@ def view_results(request, id, first_row=0):
     'columns': columns,
     'expected_first_row': first_row,
     'log': log,
-    'hadoop_jobs': app_name != 'impala' and _parse_out_hadoop_jobs(log),
+    'hadoop_jobs': app_name != 'impala' and parse_out_jobs(log),
     'query_context': query_context,
     'can_save': False,
     'context_param': context_param,
@@ -885,7 +886,7 @@ def parse_query_context(context):
   return pair
 
 
-def _parse_out_hadoop_jobs(log, engine='mr', with_state=False):
+def parse_out_jobs(log, engine='mr', with_state=False):
   """
   Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
 
@@ -897,6 +898,8 @@ def _parse_out_hadoop_jobs(log, engine='mr', with_state=False):
     start_pattern = HADOOP_JOBS_RE
   elif engine.lower() == 'spark':
     start_pattern = SPARK_APPLICATION_RE
+  elif engine.lower() == 'tez':
+    start_pattern = TEZ_APPLICATION_RE
   else:
     raise ValueError(_('Cannot parse job IDs for execution engine %(engine)s') % {'engine': engine})
 

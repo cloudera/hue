@@ -46,7 +46,7 @@ try:
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
-  from beeswax.views import _parse_out_hadoop_jobs
+  from beeswax.views import parse_out_jobs
 except ImportError, e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
   hive_settings = None
@@ -360,7 +360,7 @@ class HS2Api(Api):
 
     if snippet['type'] == 'hive':
       engine = self._get_hive_execution_engine(notebook, snippet)
-      jobs_with_state = _parse_out_hadoop_jobs(logs, engine=engine, with_state=True)
+      jobs_with_state = parse_out_jobs(logs, engine=engine, with_state=True)
 
       jobs = [{
         'name': job.get('job_id', ''),

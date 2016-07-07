@@ -68,7 +68,7 @@ import beeswax.views
 from beeswax import conf, hive_site
 from beeswax.common import apply_natural_sort
 from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PASSWORD_SCRIPT
-from beeswax.views import collapse_whitespace, _save_design
+from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
@@ -79,7 +79,7 @@ from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
   PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable,\
   HiveServerTColumnValue2
-from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark
+from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_available_execution_engines
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
 
@@ -362,20 +362,22 @@ for x in sys.stdin:
     """
     Testing query with udf
     """
-    response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
-      udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
-            ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')], local=False, database=self.db_name)
-    response = wait_for_query_to_finish(self.client, response, max=60.0)
-    content = fetch_query_result_data(self.client, response)
+    execution_engines = get_available_execution_engines()
 
-    assert_equal([2.0, 4.0], content["results"][0])
-    log = content['log']
+    for engine in execution_engines:
+      response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
+        udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
+              ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')],
+        local=False, database=self.db_name, settings=[('hive.execution.engine', engine)])
+      response = wait_for_query_to_finish(self.client, response, max=60.0)
+      content = fetch_query_result_data(self.client, response)
 
-    if not is_hive_on_spark():
-      assert_true(search_log_line('map = 100%', log), log)
-      assert_true(search_log_line('reduce = 100%', log), log)
+      assert_equal([2.0, 4.0], content["results"][0])
+      log = content['log']
+
+      assert_true(search_log_line('Completed executing command', log), log)
       # Test job extraction while we're at it
-      assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
+      assert_equal(1, len(parse_out_jobs(log, engine)), "Should have started 1 job and extracted it.")
 
 
   def test_query_with_remote_udf(self):
@@ -2043,18 +2045,18 @@ for x in sys.stdin:
     """
     Test that the HS2 logs send back the ql.Driver log output with JobID
     """
-    if is_hive_on_spark():
-      raise SkipTest
+    execution_engines = get_available_execution_engines()
 
-    hql = "SELECT foo FROM `%(db)s`.`test` GROUP BY foo" % {'db': self.db_name}  # GROUP BY forces the MR job
-    response = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
-    content = fetch_query_result_data(self.client, response)
+    for engine in execution_engines:
+      hql = "SELECT foo FROM `%(db)s`.`test` GROUP BY foo" % {'db': self.db_name}  # GROUP BY forces the MR job
+      response = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name,
+                             settings=[('hive.execution.engine', engine)])
+      content = fetch_query_result_data(self.client, response)
 
-    log = content['log']
-    assert_true(search_log_line('Starting Job = ', log), log)
-    assert_true(search_log_line('Ended Job = ', log), log)
-    # Test job extraction while we're at it
-    assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
+      log = content['log']
+      assert_true(search_log_line('Completed executing command', log), log)
+      # Test job extraction while we're at it
+      assert_equal(1, len(parse_out_jobs(log, engine)), "Should have started 1 job and extracted it.")
 
 
 
@@ -2173,8 +2175,8 @@ Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobd
 """
   assert_equal(
     ["job_201003191517_0002", "job_201003191517_0003", "job_1402420825148_0001"],
-    beeswax.views._parse_out_hadoop_jobs(sample_log))
-  assert_equal([], beeswax.views._parse_out_hadoop_jobs("nothing to see here"))
+    parse_out_jobs(sample_log))
+  assert_equal([], parse_out_jobs("nothing to see here"))
 
   sample_log_no_direct_url = """
 14/06/09 08:40:38 INFO impl.YarnClientImpl: Submitted application application_1402269517321_0003
@@ -2185,7 +2187,18 @@ Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobd
 """
   assert_equal(
       ["job_1402269517321_0003"],
-      beeswax.views._parse_out_hadoop_jobs(sample_log_no_direct_url))
+      parse_out_jobs(sample_log_no_direct_url))
+
+
+def test_tez_job_extraction():
+  sample_log = """
+16/07/12 05:47:08 INFO SessionState:
+16/07/12 05:47:08 INFO SessionState: Status: Running (Executing on YARN cluster with App id application_1465862139975_0002)
+16/07/12 05:47:08 INFO SessionState: Map 1: -/-	Reducer 2: 0/1
+"""
+
+  assert_equal(["application_1465862139975_0002"], parse_out_jobs(sample_log, 'tez'))
+  assert_equal([], parse_out_jobs("Tez job doesn't exist.", 'tez'))
 
 
 def test_hive_site():

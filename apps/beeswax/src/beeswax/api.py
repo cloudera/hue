@@ -46,7 +46,7 @@ from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
-                          _parse_out_hadoop_jobs
+                          parse_out_jobs
 
 
 LOG = logging.getLogger(__name__)
@@ -216,7 +216,7 @@ def watch_query_refresh_json(request, id):
   except Exception, ex:
     log = str(ex)
 
-  jobs = _parse_out_hadoop_jobs(log)
+  jobs = parse_out_jobs(log)
   job_urls = massage_job_urls_for_json(jobs)
 
   result = {
