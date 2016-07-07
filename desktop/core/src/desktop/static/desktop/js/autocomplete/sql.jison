@@ -16,7 +16,7 @@
 
 %lex
 %options case-insensitive
-%s hive impala
+%s between hive impala
 %x hdfs DoubleQuotedValue SingleQuotedValue backtickedValue
 %%
 
@@ -132,11 +132,14 @@
 <impala>\[                          { return '<impala>['; }
 <impala>\]                          { return '<impala>]'; }
 
+<between>'AND'                      { this.popState(); return 'BETWEEN_AND'; }
+
 'ALL'                               { return 'ALL'; }
 'AND'                               { return 'AND'; }
 'ANY'                               { return 'ANY'; }
 'AS'                                { return 'AS'; }
 'ASC'                               { return 'ASC'; }
+'BETWEEN'                           { this.begin('between'); return 'BETWEEN'; }
 'BIGINT'                            { return 'BIGINT'; }
 'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
@@ -158,6 +161,8 @@
 'OUTER'                             { return 'OUTER'; }
 'INNER'                             { return 'INNER'; }
 'RIGHT'                             { return 'RIGHT'; }
+'RLIKE'                             { return 'RLIKE'; }
+'REGEXP'                            { return 'REGEXP'; }
 'FULL'                              { return 'FULL'; }
 'GROUP'                             { return 'GROUP'; }
 'GROUPING'                          { return 'GROUPING'; }
@@ -172,6 +177,7 @@
 'MAX'                               { return 'MAX'; }
 'MIN'                               { return 'MIN'; }
 'NOT'                               { return 'NOT'; }
+'NULL'                              { return 'NULL'; }
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
@@ -211,8 +217,28 @@
 <hdfs>[']                           { this.popState(); return 'HDFS_END_QUOTE'; }
 <hdfs><<EOF>>                       { return 'EOF'; }
 
-[-+&~|^/%*(),.;!]                   { return yytext; }
-[=<>]+                              { return yytext; }
+'&&'                                { return 'AND'; }
+'||'                                { return 'OR'; }
+
+'='                                 { return '='; }
+'!='                                { return 'COMPARISON_OPERATOR'; }
+'<'                                 { return 'COMPARISON_OPERATOR'; }
+'<='                                { return 'COMPARISON_OPERATOR'; }
+'<=>'                               { return 'COMPARISON_OPERATOR'; }
+'<>'                                { return 'COMPARISON_OPERATOR'; }
+'>='                                { return 'COMPARISON_OPERATOR'; }
+'>'                                 { return 'COMPARISON_OPERATOR'; }
+
+'-'                                 { return '-'; }
+'*'                                 { return '*'; }
+'+'                                 { return 'ARITHMETIC_OPERATOR'; }
+'/'                                 { return 'ARITHMETIC_OPERATOR'; }
+'%'                                 { return 'ARITHMETIC_OPERATOR'; }
+'|'                                 { return 'ARITHMETIC_OPERATOR'; }
+'^'                                 { return 'ARITHMETIC_OPERATOR'; }
+'&'                                 { return 'ARITHMETIC_OPERATOR'; }
+
+[~(),.;!]                           { return yytext; }
 
 \[                                  { return '['; }
 \]                                  { return ']'; }
@@ -240,15 +266,14 @@
 
 /* operators and precedence levels */
 
-%left 'OR'
-%left 'AND'
-%nonassoc 'IN' 'IS' 'LIKE'
-%left 'NOT' '!'
-%left  '=' '<>' '<' '>' '<=' '>=' '<=>'
-%left '|'
-%left '&'
-%left '+' '-'
-%left '*' '/' '%' 'MOD'
+%left 'AND' 'OR'
+%left 'BETWEEN'
+%left 'NOT' '!' '~'
+%left '=' 'COMPARISON_OPERATOR'
+%left '-' '*' 'ARITHMETIC_OPERATOR'
+
+%nonassoc 'CURSOR' 'PARTIAL_CURSOR'
+%nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS'
 
 %start Sql
 
@@ -1432,7 +1457,18 @@ OptionalLimitClause_EDIT
 SearchCondition
  : ValueExpression
    {
-     $$ = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'NOT IN', 'IN', 'OR'] };
+     $$ = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'NOT BETWEEN', 'NOT IN', 'OR'] };
+     if (isHive()) {
+       $$.suggestKeywords.push('<=>');
+     }
+     if ($1.columnReference) {
+       $$.suggestKeywords.push('EXISTS');
+       $$.suggestKeywords.push('LIKE');
+       $$.suggestKeywords.push('NOT EXISTS');
+       $$.suggestKeywords.push('NOT LIKE');
+       $$.suggestKeywords.push('RLIKE');
+       $$.suggestKeywords.push('REGEX');
+     }
    }
  ;
 
@@ -1442,55 +1478,121 @@ SearchCondition_EDIT
 
 ValueExpression
  : NonParenthesizedValueExpressionPrimary
- | 'NOT' ValueExpression
- | '-' ValueExpression
- | ValueExpression InClause
- | ValueExpression 'IS' OptionalNot TruthValue
- | ValueExpression '=' ValueExpression
- | ValueExpression '<=' ValueExpression
- | ValueExpression '>=' ValueExpression
- | ValueExpression '<' ValueExpression
- | ValueExpression '>' ValueExpression
- | ValueExpression '<>' ValueExpression
- | '(' ValueExpression ')'
 // | NumericValueFunction
- | ValueExpression '+' ValueExpression
- | ValueExpression '-' ValueExpression
- | ValueExpression '*' ValueExpression
- | ValueExpression '/' ValueExpression
- | ValueExpression 'OR' ValueExpression
- | ValueExpression 'AND' ValueExpression
+ | 'NOT' ValueExpression
+ | '~' ValueExpression
+ | '-' ValueExpression
+ | ValueExpression 'NOT' 'LIKE' SingleQuotedValue
+ | ValueExpression 'LIKE' SingleQuotedValue
+ | ValueExpression 'RLIKE' SingleQuotedValue
+ | ValueExpression 'REGEXP' SingleQuotedValue
+ | ValueExpression 'NOT' 'EXISTS' TableSubquery
+ | ValueExpression 'EXISTS' TableSubquery
+ | '(' ValueExpression ')' { $$ = {}; }
+ | ValueExpression 'IS' OptionalNot TruthValueOrNull { $$ = {}; }
+ | ValueExpression '=' ValueExpression { $$ = {}; }
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression { $$ = {}; }
+ | ValueExpression '-' ValueExpression { $$ = {}; }
+ | ValueExpression '*' ValueExpression { $$ = {}; }
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression { $$ = {}; }
+ | ValueExpression 'OR' ValueExpression { $$ = {}; }
+ | ValueExpression 'AND' ValueExpression { $$ = {}; }
+ | ValueExpression InClause { $$ = {}; }
+ ;
+
+ValueExpression
+ : ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression { $$ = {}; }
  ;
 
 ValueExpression_EDIT
  : NonParenthesizedValueExpressionPrimary_EDIT
  | 'NOT' ValueExpression_EDIT
+ | '~' ValueExpression_EDIT
  | '-' ValueExpression_EDIT
+ | ValueExpression_EDIT 'NOT' 'LIKE' SingleQuotedValue
+ | ValueExpression_EDIT 'LIKE' SingleQuotedValue
+ | ValueExpression_EDIT 'RLIKE' SingleQuotedValue
+ | ValueExpression_EDIT 'REGEXP' SingleQuotedValue
+ | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery
+ | ValueExpression_EDIT 'EXISTS' TableSubquery
+ | ValueExpression 'NOT' 'EXISTS' TableSubquery_EDIT
+ | ValueExpression 'EXISTS' TableSubquery_EDIT
+ | '(' ValueExpression_EDIT ')'
+ | '(' ValueExpression_EDIT error
+ | ValueExpression 'IS' 'NOT' 'CURSOR'
+   {
+     suggestKeywords(['FALSE', 'NULL', 'TRUE']);
+   }
+ | ValueExpression 'IS' 'CURSOR'
+   {
+     suggestKeywords(['FALSE', 'NOT FALSE', 'NOT NULL', 'NOT TRUE', 'NULL', 'TRUE']);
+   }
+ | ValueExpression 'IS' 'CURSOR' TruthValue
+   {
+     suggestKeywords(['NOT']);
+   }
+ | ValueExpression 'NOT' 'CURSOR'
+   {
+     suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
+   }
  | ValueExpression InClause_EDIT
- | ValueExpression 'IS' OptionalNot 'CURSOR'
- | ValueExpression 'IS' OptionalNot 'CURSOR' TruthValue
- | ValueExpression ComparisonOperators AnyCursor
+ ;
+
+ValueExpression_EDIT
+ : ValueExpression_EDIT 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+ | ValueExpression 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
+ | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
+ | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
-     if ($1.columnReference) {
-       suggestValues({ identifierChain: $1.columnReference });
-     }
-     suggestColumns();
+     valueExpressionSuggest($1);
    }
- | 'CURSOR' ComparisonOperators ValueExpression
+ | ValueExpression 'BETWEEN' ValueExpression 'CURSOR'
    {
-     if ($3.columnReference) {
-       suggestValues({ identifierChain: $3.columnReference });
-     }
-     suggestColumns();
+     suggestKeywords(['AND']);
    }
- | ValueExpression NumericExpressionOperator AnyCursor
+ | ValueExpression 'BETWEEN' 'CURSOR'
    {
-     suggestColumns();
+     valueExpressionSuggest($1);
    }
- | ValueExpression AndOrOr 'CURSOR'
-   {
-     suggestColumns();
-   }
+ ;
+
+ValueExpression_EDIT
+ : ValueExpression '=' ValueExpression_EDIT
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
+ | ValueExpression '-' ValueExpression_EDIT
+ | ValueExpression '*' ValueExpression_EDIT
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
+ | ValueExpression 'OR' ValueExpression_EDIT
+ | ValueExpression 'AND' ValueExpression_EDIT
+ | ValueExpression '=' RightPart_EDIT { valueExpressionSuggest($1) }
+ | ValueExpression 'COMPARISON_OPERATOR' RightPart_EDIT { valueExpressionSuggest($1) }
+ | ValueExpression '-' RightPart_EDIT { suggestColumns() }
+ | ValueExpression '*' RightPart_EDIT { suggestColumns() }
+ | ValueExpression 'ARITHMETIC_OPERATOR' RightPart_EDIT { suggestColumns() }
+ | ValueExpression 'OR' RightPart_EDIT { suggestColumns() }
+ | ValueExpression 'AND' RightPart_EDIT { suggestColumns() }
+ ;
+
+ValueExpression_EDIT
+ : ValueExpression_EDIT '=' ValueExpression
+ | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
+ | ValueExpression_EDIT '-' ValueExpression
+ | ValueExpression_EDIT '*' ValueExpression
+ | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
+ | ValueExpression_EDIT 'OR' ValueExpression
+ | ValueExpression_EDIT 'AND' ValueExpression
+ | 'CURSOR' '=' ValueExpression { valueExpressionSuggest($3) }
+ | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression { valueExpressionSuggest($3) }
+// | 'CURSOR' '-' ValueExpression { suggestColumns() }
+ | 'CURSOR' '*' ValueExpression { suggestColumns() }
+ | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression { suggestColumns() }
+ | 'CURSOR' 'OR' ValueExpression { suggestColumns() }
+ | 'CURSOR' 'AND' ValueExpression { suggestColumns() }
+ ;
+
+RightPart_EDIT
+ : AnyCursor
+ | PartialBacktickedIdentifier
  ;
 
 InClause
@@ -1499,33 +1601,8 @@ InClause
  ;
 
 InClause_EDIT
- : 'NOT' 'CURSOR'
-   {
-     suggestKeywords(['IN']);
-   }
- | 'NOT' 'IN' TableSubquery_EDIT
+ : 'NOT' 'IN' TableSubquery_EDIT
  | 'IN' TableSubquery_EDIT
- ;
-
-NumericExpressionOperator
- : '+'
- | '-'
- | '*'
- | '/'
- ;
-
-AndOrOr
- : 'AND'
- | 'OR'
- ;
-
-ComparisonOperators
- : '='
- | '<'
- | '>'
- | '>='
- | '<='
- | '<>'
  ;
 
 // TODO: Expand with more choices
@@ -1578,6 +1655,12 @@ GeneralLiteral
 TruthValue
  : 'TRUE'
  | 'FALSE'
+ ;
+
+TruthValueOrNull
+ : 'TRUE'
+ | 'FALSE'
+ | 'NULL'
  ;
 
 OptionalNot
@@ -3017,6 +3100,13 @@ var mergeSuggestKeywords = function() {
   return {}
 }
 
+var valueExpressionSuggest = function(other) {
+  if (other.columnReference) {
+    suggestValues({ identifierChain: other.columnReference });
+  }
+  suggestColumns();
+}
+
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
   if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
@@ -3087,8 +3177,8 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
 };
 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
-  var beforeMatch = beforeCursor.match(/[a-zA-Z_]*$/);
-  var afterMatch = afterCursor.match(/^[a-zA-Z_]*/);
+  var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
+  var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*/);
   return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0}
 };
 

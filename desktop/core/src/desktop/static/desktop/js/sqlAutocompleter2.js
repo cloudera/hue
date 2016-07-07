@@ -61,6 +61,11 @@
       var deferrals = [];
 
       if (parseResult.suggestDatabases) {
+        var prefix = parseResult.suggestDatabases.prependQuestionMark ? '? ' : '';
+        if (parseResult.suggestDatabases.prependFrom) {
+          prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
+        }
+
         var databaseDeferred = $.Deferred();
         deferrals.push(databaseDeferred);
 
@@ -68,7 +73,7 @@
           sourceType: self.snippet.type(),
           successCallback: function (data) {
             data.forEach(function (db) {
-              completions.push({ value: db + (parseResult.suggestDatabases.appendDot ? '.' : ''), meta: 'database' });
+              completions.push({ value: prefix + db + (parseResult.suggestDatabases.appendDot ? '.' : ''), meta: 'database' });
             });
             databaseDeferred.resolve();
 
