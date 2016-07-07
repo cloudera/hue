@@ -50,6 +50,7 @@ _SHARED_HIVE_SERVER_PROCESS = None
 _SHARED_HIVE_SERVER = None
 _SHARED_HIVE_SERVER_LOCK = threading.Lock()
 _SHARED_HIVE_SERVER_CLOSER = None
+_SUPPORTED_EXECUTION_ENGINES = ['mr', 'spark', 'tez']
 
 
 LOG = logging.getLogger(__name__)
@@ -57,6 +58,13 @@ LOG = logging.getLogger(__name__)
 
 def is_hive_on_spark():
   return os.environ.get('ENABLE_HIVE_ON_SPARK', 'false').lower() == 'true'
+
+def get_available_execution_engines():
+  available_engines = os.environ.get('AVAILABLE_EXECUTION_ENGINES_FOR_TEST', 'mr').lower().split(",")
+  if any(engine not in _SUPPORTED_EXECUTION_ENGINES for engine in available_engines):
+    raise ValueError("Unknown available execution engines: " + available_engines +
+                     ". Supported engines are: " + _SUPPORTED_EXECUTION_ENGINES)
+  return available_engines
 
 
 def _start_server(cluster):
