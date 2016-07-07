@@ -40,3 +40,7 @@ urlpatterns = patterns('useradmin.views',
   url(r'^users/delete', 'delete_user'),
   url(r'^groups/delete$', 'delete_group'),
 )
+
+urlpatterns += patterns('useradmin.api',
+  url(r'^api/get_users/?', 'get_users', name='api_get_users'),
+)
