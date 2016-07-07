@@ -136,9 +136,10 @@ define([
       assertAutoComplete({
         beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
         afterCursor: '',
+        dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
+          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
         }
       });
     });
@@ -147,9 +148,10 @@ define([
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM foo WHERE id = 1 ',
         afterCursor: '',
+        dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
+          suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
         }
       });
     });
@@ -222,7 +224,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
+            suggestKeywords: ['<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
           }
         });
       });
@@ -1501,6 +1503,84 @@ define([
         });
       });
 
+      it('should suggest keywords for between after value expression', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a ',
+          afterCursor: '',
+          containsKeywords: ['BETWEEN', 'NOT BETWEEN'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for like and regex after value expression', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a ',
+          afterCursor: '',
+          containsKeywords: ['LIKE', 'RLIKE', 'REGEX', 'NOT LIKE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for between after value expression', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a NOT ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BETWEEN', 'EXISTS', 'IN', 'LIKE']
+          }
+        });
+      });
+
+      it('should suggest values after between', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a BETWEEN ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: { table: 'testTable', identifierChain: [{ name: 'a' }] },
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest suggest select for exists subquery', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a NOT EXISTS (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest keywords after IS', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a IS ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FALSE', 'NOT FALSE', 'NOT NULL', 'NOT TRUE', 'NULL', 'TRUE']
+          }
+        });
+      });
+
+      it('should suggest keywords after IS and before TRUE', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE a IS ',
+          afterCursor: ' TRUE',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT']
+          }
+        });
+      });
+
       describe('ORDER BY Clause', function () {
         it('should handle complete ORDER BY', function () {
           assertAutoComplete({
@@ -2233,9 +2313,10 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar ',
           afterCursor: '',
+          dialect: 'generic',
+          containsKeywords: ['IN', 'NOT IN'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'GROUP BY', 'IN', 'LIMIT', 'NOT IN', 'OR', 'ORDER BY']
+            lowerCase: false
           }
         });
       });
@@ -2244,9 +2325,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar NOT ',
           afterCursor: '',
+          containsKeywords: ['IN'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['IN']
+            lowerCase: false
           }
         });
       });
