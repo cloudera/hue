@@ -50,3 +50,8 @@ urlpatterns = patterns('filebrowser.views',
   url(r'^chmod$', 'chmod', name='chmod'),
   url(r'^chown$', 'chown', name='chown'),
 )
+
+# API
+urlpatterns += patterns('filebrowser.api',
+  url(r'^api/get_filesystems/?', 'get_filesystems', name='get_filesystems'),
+)
