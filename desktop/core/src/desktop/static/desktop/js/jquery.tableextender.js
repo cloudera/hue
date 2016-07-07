@@ -181,19 +181,11 @@
     });
   };
 
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
-
-  function UUID() {
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-  }
-
   function drawLockedRow(plugin, rowNo) {
     var $pluginElement = $(plugin.element);
+    var lockedRows = $pluginElement.data('lockedRows') || [];
+    lockedRows.push(rowNo);
+    $pluginElement.data('lockedRows', lockedRows);
     var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
     var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
     var $clone = $pluginElement.find('tbody tr:eq('+ rowNo +')').clone();
@@ -206,10 +198,15 @@
     $newTr.find('td').on('click', function(){
       var idx = $(this).parent().index();
       $header.find('tbody tr:eq('+ idx +')').remove();
+      var arrIdx = $pluginElement.data('lockedRows').indexOf(idx);
+      if (arrIdx > -1) {
+        $pluginElement.data('lockedRows').splice(arrIdx, 1);
+      }
       $(this).parent().remove();
       if ($header.find('tbody tr').length == 0){
         $header.removeClass('locked');
         $headerCounter.removeClass('locked');
+        $pluginElement.data('lockedRows', []);
       }
     });
   }
@@ -320,6 +317,14 @@
     positionClones();
 
     $(mainScrollable).on('scroll', positionClones);
+
+    if ($pluginElement.data('lockedRows')) {
+      var locks = $pluginElement.data('lockedRows');
+      $pluginElement.data('lockedRows', []);
+      locks.forEach(function (idx) {
+        drawLockedRow(plugin, idx);
+      });
+    }
   }
 
 
