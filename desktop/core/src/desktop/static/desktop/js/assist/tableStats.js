@@ -233,6 +233,7 @@
         self.samples(data);
         self.loadingSamples(false);
         self.refreshing(false);
+        huePubSub.publish('sample.rendered', data);
       },
       errorCallback: function() {
         self.loadingSamples(false);

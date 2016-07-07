@@ -111,23 +111,26 @@ from desktop.views import _ko
           </li>
           <!-- /ko -->
         </ul>
-        <div class="tab-content" style="border: none">
-          <div class="tab-pane" id="sampleTab" data-bind="css: { 'active' : activeTab() === 'sample' }">
+        <div class="tab-content" style="border: none; overflow: hidden">
+          <div class="tab-pane" id="sampleTab" data-bind="css: { 'active' : activeTab() === 'sample' }" style="overflow: hidden">
             <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
             <!-- ko ifnot: loadingSamples -->
-            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;" data-bind="niceScroll">
+            <div class="sample-scroll" style="text-align: left; padding: 3px; overflow: hidden">
               <!-- ko with: samples -->
               <!-- ko if: rows.length == 0 -->
               <div class="alert">${ _('The selected table has no data.') }</div>
               <!-- /ko -->
               <!-- ko if: rows.length > 0 -->
-              <table class="samples-table table table-striped table-condensed ">
+              <div class="dataTables_wrapper" style="max-height: 300px; overflow: auto">
+              <table id="samples-table" class="samples-table table table-striped table-condensed">
+                <thead>
                 <tr>
-                  <th style="width: 10px"></th>
+                  <th style="width: 10px">&nbsp;</th>
                   <!-- ko foreach: headers -->
                   <th data-bind="text: $data"></th>
                   <!-- /ko -->
                 </tr>
+                </thead>
                 <tbody>
                 <!-- ko foreach: rows -->
                 <tr>
@@ -139,6 +142,7 @@ from desktop.views import _ko
                 <!-- /ko -->
                 </tbody>
               </table>
+              </div>
               <!-- /ko -->
               <!-- /ko -->
             </div>
@@ -277,6 +281,36 @@ from desktop.views import _ko
 
             ko.renderTemplate('stats-popover', self, {
               afterRender: function(renderedElement) {
+
+                huePubSub.subscribe('sample.rendered', function () {
+                  window.setTimeout(function () {
+                    $('.samples-table').hueDataTable({
+                      "oLanguage": {
+                        "sEmptyTable": "${_('No data available')}",
+                        "sZeroRecords": "${_('No matching records')}"
+                      }
+                    });
+                    $('.samples-table').jHueTableExtender({
+                      fixedHeader: true,
+                      fixedFirstColumn: true,
+                      includeNavigator: false,
+                      parentId: 'sampleTab',
+                      classToRemove: 'samples-table',
+                      clonedContainerPosition: "absolute"
+                    });
+                    $('.samples-table').parents('.dataTables_wrapper').niceScroll({
+                      cursorcolor: "#CCC",
+                      cursorborder: "1px solid #CCC",
+                      cursoropacitymin: 0,
+                      cursoropacitymax: 0.75,
+                      scrollspeed: 100,
+                      mousescrollstep: 60,
+                      cursorminheight: 20,
+                      horizrailenabled: true
+                    });
+                  }, 0);
+                });
+
                 var hideWhenClickOutside = function (event) {
                   if(!$(event.target).closest($statsContainer).length) {
                     self.analysisStats(null)
