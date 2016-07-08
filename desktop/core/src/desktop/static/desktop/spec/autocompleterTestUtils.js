@@ -63,6 +63,34 @@ define([
               }
               delete actualResponse.suggestKeywords;
             }
+            if (typeof testDefinition.containsFunctions !== 'undefined') {
+              var funcs = actualResponse.suggestFunctions;
+              var contains = true;
+              testDefinition.containsFunctions.forEach(function (func) {
+                if (typeof funcs !== 'undefined') {
+                  var foundFuncs = funcs.filter(function (otherFunc) {
+                    return otherFunc.name === func;
+                  });
+                  if (foundFuncs.length === 0) {
+                    contains = false;
+                    return false;
+                  }
+                } else {
+                  contains = false;
+                  return false;
+                }
+              });
+              if (!contains) {
+                return {
+                  pass: false,
+                  message: '\n         Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                  '           Dialect: ' + testDefinition.dialect + '\n' +
+                  'Expected functions: ' + JSON.stringify(testDefinition.containsFunctions) + '\n' +
+                  '  Parser functions: ' + JSON.stringify(funcs) +   '\n'
+                }
+              }
+              delete actualResponse.suggestFunctions;
+            }
             return {
               pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
