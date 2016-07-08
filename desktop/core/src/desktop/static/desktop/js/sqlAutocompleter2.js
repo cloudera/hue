@@ -54,6 +54,12 @@
         completions.push({ value: identifier.name, meta: identifier.type });
       });
     }
+    
+    if (parseResult.suggestFunctions) {
+      parseResult.suggestFunctions.forEach(function (func) {
+        completions.push({ value: func.name, meta: 'UDAF' });
+      });
+    }
 
     if (parseResult.suggestDatabases || parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
       var database = parseResult.useDatabase || self.snippet.database();
@@ -210,31 +216,9 @@
       }
 
       if (parseResult.suggestValues) {
-        var valuesDeferred = $.Deferred();
-        var impalaValuesDeferred = $.Deferred();
-        deferrals.push(valuesDeferred);
-        deferrals.push(impalaValuesDeferred);
-
-        self.snippet.getApiHelper().fetchTableSample({
-          sourceType: self.snippet.type(),
-          databaseName: parseResult.suggestValues.database || database,
-          tableName: parseResult.suggestValues.table,
-          columnName: parseResult.suggestValues.identifierChain[0].name,
-          editor: editor,
-          timeout: self.timeout,
-          successCallback: function (data) {
-            if (data.status === 0 && data.headers.length === 1) {
-              data.rows.forEach(function (row) {
-                completions.push({ value: typeof row[0] === 'string' ? "'" + row[0] + "'" :  '' + row[0], meta: 'value' });
-              });
-            }
-            valuesDeferred.resolve();
-          },
-          silenceErrors: true,
-          errorCallback: valuesDeferred.resolve
-        });
-
         if (self.snippet.type() === 'impala') {
+          var impalaValuesDeferred = $.Deferred();
+          deferrals.push(impalaValuesDeferred);
           // TODO: Fetch for each identifier in the chain, we need to add key or value for impala
           //       select a.key from customers c, c.addresses a WHERE a.zip_code = |
           // Same goes for Hive
@@ -259,7 +243,26 @@
             errorCallback: impalaValuesDeferred.resolve
           });
         } else {
-          impalaValuesDeferred.resolve();
+          var valuesDeferred = $.Deferred();
+          deferrals.push(valuesDeferred);
+          self.snippet.getApiHelper().fetchTableSample({
+            sourceType: self.snippet.type(),
+            databaseName: parseResult.suggestValues.database || database,
+            tableName: parseResult.suggestValues.table,
+            columnName: parseResult.suggestValues.identifierChain[0].name,
+            editor: editor,
+            timeout: self.timeout,
+            successCallback: function (data) {
+              if (data.status === 0 && data.headers.length === 1) {
+                data.rows.forEach(function (row) {
+                  completions.push({ value: typeof row[0] === 'string' ? "'" + row[0] + "'" :  '' + row[0], meta: 'sample' });
+                });
+              }
+              valuesDeferred.resolve();
+            },
+            silenceErrors: true,
+            errorCallback: valuesDeferred.resolve
+          });
         }
       }
 
@@ -288,7 +291,7 @@
     callback(completions);
   };
 
-  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'database': 4, 'identifier': 5, 'key' : 6, 'value' : 7, 'keyword': 8 };
+  var typeOrder = { 'star': 1, 'alias': 2, 'table': 3, 'database': 4, 'identifier': 5, 'key' : 6, 'keyword': 7, 'UDAF': 8, 'sample' : 9 };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {
     completions.sort(function (a, b) {

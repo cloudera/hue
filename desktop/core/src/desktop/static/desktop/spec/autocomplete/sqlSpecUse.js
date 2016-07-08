@@ -69,10 +69,11 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE database_two; \n\select ',
         afterCursor: '',
+        containsFunctions: ['count(col)'],
         expectedResult: {
           useDatabase: 'database_two',
           lowerCase: true,
-          suggestKeywords: ['*'],
+          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -90,10 +91,11 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '',
+        containsFunctions: ['count(col)'],
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestKeywords: ['*'],
+          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -111,10 +113,11 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '; USE some_other_db;',
+        containsFunctions: ['count(col)'],
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestKeywords: ['*'],
+          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true

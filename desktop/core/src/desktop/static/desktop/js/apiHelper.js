@@ -856,6 +856,7 @@
     if (typeof data !== 'undefined' && data !== null) {
       return (typeof data.item !== 'undefined' && data.item !== null) ||
           (typeof data.key !== 'undefined' && data.key !== null) ||
+          (typeof data.sample !== 'undefined' && data.sample !== null) ||
           (typeof data.tables_meta !== 'undefined' && data.tables_meta !== null && data.tables_meta.length > 0) ||
           (typeof data.extended_columns !== 'undefined' && data.extended_columns !== null && data.extended_columns.length > 0) ||
           (typeof data.columns !== 'undefined' && data.columns !== null && data.columns.length > 0) ||

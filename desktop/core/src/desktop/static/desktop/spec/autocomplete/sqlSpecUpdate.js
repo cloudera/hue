@@ -165,7 +165,8 @@ define([
           suggestColumns: {
             database: 'bar',
             table: 'foo'
-          }
+          },
+          suggestKeywords: ['EXISTS', 'NOT EXISTS']
         }
       });
     });
