@@ -15,7 +15,7 @@
 // limitations under the License.
 
 %lex
-%options case-insensitive
+%options case-insensitive flex
 %s between hive impala
 %x hdfs DoubleQuotedValue SingleQuotedValue backtickedValue
 %%
@@ -33,13 +33,7 @@
 <hive>'COLUMNS'                     { return '<hive>COLUMNS'; }
 <hive>'COMMENT'                     { return '<hive>COMMENT'; }
 <hive>'COMPACTIONS'                 { return '<hive>COMPACTIONS'; }
-<hive>'COLLECT_LIST'                { return '<hive>COLLECT_LIST'; }
-<hive>'COLLECT_SET'                 { return '<hive>COLLECT_SET'; }
 <hive>'CONF'                        { return '<hive>CONF'; }
-<hive>'CORR'                        { return '<hive>CORR'; }
-<hive>'COVAR_POP'                   { return '<hive>COVAR_POP'; }
-<hive>'COVAR_SAMP'                  { return '<hive>COVAR_SAMP'; }
-<hive>'CUME_DIST'                   { return '<hive>CUME_DIST'; }
 <hive>'CREATE'                      { determineCase(yytext); return '<hive>CREATE'; }
 <hive>'CROSS'                       { return '<hive>CROSS'; }
 <hive>'CURRENT'                     { return '<hive>CURRENT'; }
@@ -53,7 +47,6 @@
 <hive>'FUNCTION'                    { return '<hive>FUNCTION'; }
 <hive>'FUNCTIONS'                   { return '<hive>FUNCTIONS'; }
 <hive>'GRANT'                       { return '<hive>GRANT'; }
-<hive>'HISTOGRAM_NUMERIC'           { return '<hive>HISTOGRAM_NUMERIC'; }
 <hive>'INDEX'                       { return '<hive>INDEX'; }
 <hive>'INDEXES'                     { return '<hive>INDEXES'; }
 <hive>'INPATH'                      { this.begin('hdfs'); return '<hive>INPATH'; }
@@ -62,11 +55,8 @@
 <hive>'LOCATION'                    { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCKS'                       { return '<hive>LOCKS'; }
 <hive>'MACRO'                       { return '<hive>MACRO'; }
-<hive>'NTILE'                       { return '<hive>NTILE'; }
 <hive>'PARTITION'                   { return '<hive>PARTITION'; }
 <hive>'PARTITIONS'                  { return '<hive>PARTITIONS'; }
-<hive>'PERCENTILE'                  { return '<hive>PERCENTILE'; }
-<hive>'PERCENTILE_APPROX'           { return '<hive>PERCENTILE_APPROX'; }
 <hive>'ROLE'                        { return '<hive>ROLE'; }
 <hive>'ROLES'                       { return '<hive>ROLES'; }
 <hive>'SCHEMAS'                     { return '<hive>SCHEMAS'; }
@@ -76,10 +66,6 @@
 <hive>'TEMPORARY'                   { return '<hive>TEMPORARY'; }
 <hive>'TRANSACTIONS'                { return '<hive>TRANSACTIONS'; }
 <hive>'USER'                        { return '<hive>USER'; }
-<hive>'VARIANCE'                    { return '<hive>VARIANCE'; }
-
-<hive>'explode'                     { return '<hive>explode'; }
-<hive>'posexplode'                  { return '<hive>posexplode'; }
 
 <hive>[.]                           { return '<hive>.'; }
 <hive>\[                            { return '<hive>['; }
@@ -92,7 +78,6 @@
 <impala>'COLUMN'                    { return '<impala>COLUMN'; }
 <impala>'COMMENT'                   { return '<impala>COMMENT'; }
 <impala>'CREATE'                    { determineCase(yytext); return '<impala>CREATE'; }
-<impala>'CUME_DIST'                 { return '<impala>CUME_DIST'; } // Not supported but in SQL 2003 and Hive
 <impala>'CURRENT'                   { return '<impala>CURRENT'; }
 <impala>'DATA'                      { return '<impala>DATA'; }
 <impala>'DATABASES'                 { return '<impala>DATABASES'; }
@@ -104,14 +89,12 @@
 <impala>'FUNCTIONS'                 { return '<impala>FUNCTIONS'; }
 <impala>'GRANT'                     { return '<impala>GRANT'; }
 <impala>'GROUP'                     { return '<impala>GROUP'; }
-<impala>'GROUP_CONCAT'              { return '<impala>GROUP_CONCAT'; }
 <impala>'INCREMENTAL'               { return '<impala>INCREMENTAL'; }
 <impala>'INPATH'                    { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'INNER'                     { return '<impala>INNER'; }
 <impala>'LAST'                      { return '<impala>LAST'; }
 <impala>'LOAD'                      { return '<impala>LOAD'; }
 <impala>'LOCATION'                  { this.begin('hdfs'); return '<impala>LOCATION'; }
-<impala>'NDV'                       { return '<impala>NDV'; }
 <impala>'NULLS'                     { return '<impala>NULLS'; }
 <impala>'OVER'                      { return '<impala>OVER'; }
 <impala>'PARTITIONS'                { return '<impala>PARTITIONS'; }
@@ -120,14 +103,11 @@
 <impala>'ROLES'                     { return '<impala>ROLES'; }
 <impala>'SCHEMAS'                   { return '<impala>SCHEMAS'; }
 <impala>'STATS'                     { return '<impala>STATS'; }
-<impala>'STDDEV'                    { return '<impala>STDDEV'; }
 <impala>'TABLE'                     { return '<impala>TABLE'; }
 <impala>'TABLES'                    { return '<impala>TABLES'; }
-<impala>'VARIANCE'                  { return '<impala>VARIANCE'; }
-<impala>'VARIANCE_POP'              { return '<impala>VARIANCE_POP'; }
-<impala>'VARIANCE_SAMP'             { return '<impala>VARIANCE_SAMP'; }
 <impala>\[SHUFFLE\]                 { return '<impala>SHUFFLE'; }
 <impala>\[BROADCAST\]               { return '<impala>BROADCAST'; }
+
 <impala>[.]                         { return '<impala>.'; }
 <impala>\[                          { return '<impala>['; }
 <impala>\]                          { return '<impala>]'; }
@@ -136,7 +116,6 @@
 
 'ALL'                               { return 'ALL'; }
 'AND'                               { return 'AND'; }
-'ANY'                               { return 'ANY'; }
 'AS'                                { return 'AS'; }
 'ASC'                               { return 'ASC'; }
 'BETWEEN'                           { this.begin('between'); return 'BETWEEN'; }
@@ -144,15 +123,12 @@
 'BOOLEAN'                           { return 'BOOLEAN'; }
 'BY'                                { return 'BY'; }
 'CHAR'                              { return 'CHAR'; }
-'COUNT'                             { return 'COUNT'; }
 'CREATE'                            { determineCase(yytext); return 'CREATE'; }
-'CUME_DIST'                         { return 'CUME_DIST'; }
 'DATABASE'                          { return 'DATABASE'; }
 'DECIMAL'                           { return 'DECIMAL'; }
 'DESC'                              { return 'DESC'; }
 'DISTINCT'                          { return 'DISTINCT'; }
 'DOUBLE'                            { return 'DOUBLE'; }
-'DISTINCT'                          { return 'DISTINCT'; }
 'DROP'                              { determineCase(yytext); return 'DROP'; }
 'EXISTS'                            { parser.yy.correlatedSubquery = true; return 'EXISTS'; }
 'FALSE'                             { return 'FALSE'; }
@@ -175,14 +151,11 @@
 'JOIN'                              { return 'JOIN'; }
 'LEFT'                              { return 'LEFT'; }
 'LIKE'                              { return 'LIKE'; }
-'MAX'                               { return 'MAX'; }
-'MIN'                               { return 'MIN'; }
 'NOT'                               { return 'NOT'; }
 'NULL'                              { return 'NULL'; }
 'ON'                                { return 'ON'; }
 'OR'                                { return 'OR'; }
 'ORDER'                             { return 'ORDER'; }
-'RANK'                              { return 'RANK'; }
 'ROLE'                              { return 'ROLE'; }
 'SCHEMA'                            { return 'SCHEMA'; }
 'SELECT'                            { determineCase(yytext); return 'SELECT'; }
@@ -190,10 +163,7 @@
 'SET'                               { return 'SET'; }
 'SHOW'                              { determineCase(yytext); return 'SHOW'; }
 'SMALLINT'                          { return 'SMALLINT'; }
-'STDDEV_POP'                        { return 'STDDEV_POP'; }
-'STDDEV_SAMP'                       { return 'STDDEV_SAMP'; }
 'STRING'                            { return 'STRING'; }
-'SUM'                               { return 'SUM'; }
 'TABLE'                             { return 'TABLE'; }
 'TIMESTAMP'                         { return 'TIMESTAMP'; }
 'TINYINT'                           { return 'TINYINT'; }
@@ -201,11 +171,14 @@
 'UPDATE'                            { determineCase(yytext); return 'UPDATE'; }
 'USE'                               { determineCase(yytext); return 'USE'; }
 'VARCHAR'                           { return 'VARCHAR'; }
-'VAR_POP'                           { return 'VAR_POP'; }
-'VAR_SAMP'                          { return 'VAR_SAMP'; }
 'VIEW'                              { return 'VIEW'; }
 'WHERE'                             { return 'WHERE'; }
 'WITHIN'                            { return 'WITHIN'; }
+
+// --- UDFs ---
+COUNT\(                          { return 'COUNT('; }
+SUM\(                            { return 'SUM('; }
+[A-Za-z][A-Za-z0-9_]*\(          { return 'UDF('; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                             { return 'UNSIGNED_INTEGER_E'; }
@@ -221,14 +194,14 @@
 '&&'                                { return 'AND'; }
 '||'                                { return 'OR'; }
 
-'<=>'                               { return 'COMPARISON_OPERATOR'; }
-'<='                                { return 'COMPARISON_OPERATOR'; }
-'<>'                                { return 'COMPARISON_OPERATOR'; }
-'>='                                { return 'COMPARISON_OPERATOR'; }
-'!='                                { return 'COMPARISON_OPERATOR'; }
 '='                                 { return '='; }
-'>'                                 { return 'COMPARISON_OPERATOR'; }
+'!='                                { return 'COMPARISON_OPERATOR'; }
 '<'                                 { return 'COMPARISON_OPERATOR'; }
+'>'                                 { return 'COMPARISON_OPERATOR'; }
+'<='                                { return 'COMPARISON_OPERATOR'; }
+'>='                                { return 'COMPARISON_OPERATOR'; }
+'<>'                                { return 'COMPARISON_OPERATOR'; }
+'<=>'                               { return 'COMPARISON_OPERATOR'; }
 
 '-'                                 { return '-'; }
 '*'                                 { return '*'; }
@@ -274,11 +247,15 @@
 %left '-' '*' 'ARITHMETIC_OPERATOR'
 
 %nonassoc 'CURSOR' 'PARTIAL_CURSOR'
-%nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS'
+%nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
 
 %start Sql
 
 %%
+
+RegularIdentifier
+ : 'REGULAR_IDENTIFIER'
+ ;
 
 InitResults
  : /* empty */
@@ -322,8 +299,8 @@ SqlStatement
  | DataManipulation
  | QuerySpecification
  | QuerySpecification_EDIT
- | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR' 'REGULAR_IDENTIFIER'
- | 'REGULAR_IDENTIFIER' 'PARTIAL_CURSOR'
+ | RegularIdentifier 'PARTIAL_CURSOR' RegularIdentifier
+ | RegularIdentifier 'PARTIAL_CURSOR'
    {
      suggestDdlAndDmlKeywords();
    }
@@ -476,17 +453,11 @@ HiveRoleOrUser
  ;
 
 SingleQuotedValue
- : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE'
-   {
-     $$ = $2;
-   }
+ : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE' -> $2
  ;
 
 DoubleQuotedValue
- : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'
-   {
-     $$ = $2;
-   }
+ : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE' -> $2
  ;
 
 AnyAs
@@ -598,9 +569,9 @@ OptionalInDatabase
  ;
 
 ConfigurationName
- : 'REGULAR_IDENTIFIER'
+ : RegularIdentifier
  | 'CURSOR'
- | ConfigurationName '<hive>.' 'REGULAR_IDENTIFIER'
+ | ConfigurationName '<hive>.' RegularIdentifier
  | ConfigurationName '<hive>.' 'PARTIAL_CURSOR'
  ;
 
@@ -616,6 +587,11 @@ PartialBacktickedOrPartialCursor
 
 PartialBacktickedIdentifier
  : 'BACKTICK' 'PARTIAL_VALUE'
+ ;
+
+RightParenthesisOrError
+ : ')'
+ | error
  ;
 
 SchemaQualifiedTableIdentifier
@@ -665,40 +641,34 @@ PartitionSpecList
  ;
 
 PartitionSpec
- : 'REGULAR_IDENTIFIER' '=' SingleQuotedValue
+ : RegularIdentifier '=' SingleQuotedValue
  ;
 
 // TODO: Move into RegularOrBackTickedSchemaQualifiedName
 CleanRegularOrBackTickedSchemaQualifiedName
- : 'REGULAR_IDENTIFIER'
+ : RegularIdentifier
    {
      $$ = { identifierChain: [ { name: $1 } ] }
    }
  | RegularOrBackTickedSchemaQualifiedName
-   {
-     $$ = $1;
-   }
  ;
 
 
 RegularOrBacktickedIdentifier
- : 'REGULAR_IDENTIFIER'
- | 'BACKTICK' 'VALUE' 'BACKTICK'
-   {
-     $$ = $2;
-   }
+ : RegularIdentifier
+ | 'BACKTICK' 'VALUE' 'BACKTICK' -> $2
  ;
 
 RegularOrBackTickedSchemaQualifiedName
- : 'REGULAR_IDENTIFIER' AnyDot 'REGULAR_IDENTIFIER'
+ : RegularIdentifier AnyDot RegularIdentifier
    {
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] }
    }
- | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot 'REGULAR_IDENTIFIER'
+ | 'BACKTICK' 'VALUE' 'BACKTICK' AnyDot RegularIdentifier
    {
      $$ = { identifierChain: [ { name: $2 }, { name: $5 } ] }
    }
- | 'REGULAR_IDENTIFIER' AnyDot 'BACKTICK' 'VALUE' 'BACKTICK'
+ | RegularIdentifier AnyDot 'BACKTICK' 'VALUE' 'BACKTICK'
    {
      $$ = { identifierChain: [ { name: $1 }, { name: $4 } ] }
    }
@@ -710,7 +680,7 @@ RegularOrBackTickedSchemaQualifiedName
    {
      $$ = { partial: true, identifierChain: [ { name: $2 } ] };
    }
- | 'REGULAR_IDENTIFIER' AnyDot PartialBacktickedOrPartialCursor
+ | RegularIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
      $$ = { partial: true, identifierChain: [ { name: $1 } ] };
    }
@@ -725,16 +695,16 @@ RegularOrBackTickedSchemaQualifiedName
  ;
 
 LocalOrSchemaQualifiedName
- : 'REGULAR_IDENTIFIER'
+ : RegularIdentifier
    {
      $$ = { identifierChain: [ { name: $1 } ] }
    }
- | 'REGULAR_IDENTIFIER' 'REGULAR_IDENTIFIER'
+ | RegularIdentifier RegularIdentifier
    {
      $$ = { identifierChain: [ { name: $1 } ], alias: $2 };
    }
  | RegularOrBackTickedSchemaQualifiedName
- | RegularOrBackTickedSchemaQualifiedName 'REGULAR_IDENTIFIER'
+ | RegularOrBackTickedSchemaQualifiedName RegularIdentifier
    {
      $$ = { identifierChain: $1.identifierChain, alias: $2 }
    }
@@ -766,7 +736,7 @@ PartialBacktickedIdentifierOrPartialCursor
 ColumnIdentifier
  : RegularOrBacktickedIdentifier OptionalMapOrArrayKey
    {
-     if (typeof $2.key !== 'undefined') {
+     if ($2) {
        $$ = { name: $1, key: $2.key }
      } else {
        $$ = { name: $1 }
@@ -779,7 +749,7 @@ ColumnIdentifier_EDIT
  ;
 
 OptionalMapOrArrayKey
- :  { $$ = {} }
+ :
  | HiveOrImpalaLeftSquareBracket DoubleQuotedValue HiveOrImpalaRightSquareBracket
    {
      $$ = { key: '"' + $2 + '"' }
@@ -822,7 +792,7 @@ HivePropertyAssignmentList
  ;
 
 HivePropertyAssignment
- : 'REGULAR_IDENTIFIER' '=' 'REGULAR_IDENTIFIER'
+ : RegularIdentifier '=' RegularIdentifier
  | SINGLE_QUOTE VALUE SINGLE_QUOTE '=' SINGLE_QUOTE VALUE SINGLE_QUOTE
  ;
 
@@ -869,27 +839,25 @@ OptionalHiveDbProperties
 DatabaseDefinition
  : AnyCreate DatabaseOrSchema OptionalIfNotExists
  | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT
- | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER'
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT 'REGULAR_IDENTIFIER'
- | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals error
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT RegularIdentifier
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals error
    // For the HDFS open single quote completion
- | AnyCreate DatabaseOrSchema OptionalIfNotExists 'REGULAR_IDENTIFIER' DatabaseDefinitionOptionals 'CURSOR'
+ | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
    {
-     if ($5 && $5.suggestKeywords.length > 0) {
-       suggestKeywords($5.suggestKeywords);
-     }
+     checkForKeywords($5);
    }
  ;
 
 TableDefinition
- : AnyCreate TableScope AnyTable 'REGULAR_IDENTIFIER' TableElementList HdfsLocation
- | AnyCreate 'CURSOR' AnyTable 'REGULAR_IDENTIFIER' TableElementList
+ : AnyCreate TableScope AnyTable RegularIdentifier TableElementList HdfsLocation
+ | AnyCreate 'CURSOR' AnyTable RegularIdentifier TableElementList
     {
       if (isHive() || isImpala()) {
         suggestKeywords(['EXTERNAL']);
       }
     }
- | AnyCreate 'CURSOR' AnyTable 'REGULAR_IDENTIFIER'
+ | AnyCreate 'CURSOR' AnyTable RegularIdentifier
     {
       if (isHive() || isImpala()) {
         suggestKeywords(['EXTERNAL']);
@@ -901,13 +869,13 @@ TableDefinition
         suggestKeywords(['EXTERNAL']);
       }
     }
- | AnyCreate TableScope AnyTable 'REGULAR_IDENTIFIER' TableElementList 'CURSOR'
+ | AnyCreate TableScope AnyTable RegularIdentifier TableElementList 'CURSOR'
    {
      if (isHive() || isImpala()) {
        suggestKeywords(['LOCATION']);
      }
    }
- | AnyCreate AnyTable 'REGULAR_IDENTIFIER' TableElementList
+ | AnyCreate AnyTable RegularIdentifier TableElementList
  ;
 
 TableScope
@@ -928,8 +896,8 @@ TableElement
  ;
 
 ColumnDefinition
- : 'REGULAR_IDENTIFIER' PrimitiveType
- | 'REGULAR_IDENTIFIER' 'CURSOR'
+ : RegularIdentifier PrimitiveType
+ | RegularIdentifier 'CURSOR'
    {
      if (parser.yy.dialect == 'hive') {
        suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
@@ -937,7 +905,7 @@ ColumnDefinition
        suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
      }
    }
- | 'REGULAR_IDENTIFIER' 'CURSOR' ColumnDefinitionError error
+ | RegularIdentifier 'CURSOR' ColumnDefinitionError error
    // error here is because it expects closing ')'
  ;
 
@@ -1139,7 +1107,7 @@ DropTableStatement
 // ===================================== LOAD statement =====================================
 
 LoadStatement
- : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' AnyTable 'REGULAR_IDENTIFIER'
+ : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' AnyTable RegularIdentifier
  | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'CURSOR'
    {
      suggestKeywords([ 'TABLE' ]);
@@ -1180,12 +1148,12 @@ QuerySpecification_EDIT
        } else {
          suggestKeywords(['*', 'ALL', 'DISTINCT']);
        }
-     } else if ($3.suggestKeywords) {
-       suggestKeywords($3.suggestKeywords);
+     } else {
+       checkForKeywords($3);
      }
 
-     if ($3.suggestUDAFs && (!$2 || $2 === 'ALL')) {
-       suggestFunctions($3.suggestUDAFs);
+     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
+       suggestAggregateFunctions();
      }
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
@@ -1193,12 +1161,13 @@ QuerySpecification_EDIT
      if ($2) {
        suggestKeywords(['*']);
        if ($2 === 'ALL') {
-         suggestFunctions(getUDAFSuggestions());
+         suggestAggregateFunctions();
        }
      } else {
        suggestKeywords(['*', 'ALL', 'DISTINCT']);
-       suggestFunctions(getUDAFSuggestions());
+       suggestAggregateFunctions();
      }
+     suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
@@ -1215,12 +1184,12 @@ QuerySpecification_EDIT
        } else {
          suggestKeywords(['*', 'ALL', 'DISTINCT']);
        }
-     } else if ($3.suggestKeywords) {
-       suggestKeywords($3.suggestKeywords);
+     } else {
+       checkForKeywords($3);
      }
 
-     if ($3.suggestUDAFs && (!$2 || $2 === 'ALL')) {
-       suggestFunctions(getUDAFSuggestions());
+     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
+       suggestAggregateFunctions();
      }
      linkTablePrimaries();
    }
@@ -1229,12 +1198,13 @@ QuerySpecification_EDIT
      if ($2) {
        suggestKeywords(['*']);
        if ($2 === 'ALL') {
-         suggestFunctions(getUDAFSuggestions());
+         suggestAggregateFunctions();
        }
      } else {
        suggestKeywords(['*', 'ALL', 'DISTINCT']);
-       suggestFunctions(getUDAFSuggestions());
+       suggestAggregateFunctions();
      }
+     suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
@@ -1250,27 +1220,19 @@ QuerySpecification_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
-     if ($3.suggestKeywords) {
-       suggestKeywords($3.suggestKeywords);
-     }
+     checkForKeywords($3);
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' TableExpression
    {
-     if ($3.suggestKeywords) {
-       suggestKeywords($3.suggestKeywords);
-     }
+     checkForKeywords($3);
    }
-  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' error TableExpression
-    {
-      if ($3.suggestKeywords) {
-        suggestKeywords($3.suggestKeywords);
-      }
-    }
+ | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' error TableExpression
+   {
+     checkForKeywords($3);
+   }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
    {
-     if ($3.suggestKeywords) {
-       suggestKeywords($3.suggestKeywords);
-     }
+     checkForKeywords($3);
      suggestTables({ prependFrom: true });
      suggestDatabases({ prependFrom: true, appendDot: true });
    }
@@ -1292,7 +1254,7 @@ TableExpression_EDIT
  | FromClause_EDIT SelectConditions
  | FromClause SelectConditions 'CURSOR'
    {
-     if ($2.suggestKeywords.length == 0) {
+     if ($2.suggestKeywords && $2.suggestKeywords.length == 0) {
        var keywords = [];
        if (typeof $1.hasJoinCondition !== 'undefined' && ! $1.hasJoinCondition) {
          keywords.push('ON');
@@ -1305,8 +1267,8 @@ TableExpression_EDIT
          keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
        }
        suggestKeywords(keywords);
-     } else if ($2.suggestKeywords) {
-       suggestKeywords($2.suggestKeywords);
+     } else {
+       checkForKeywords($2);
      }
    }
  ;
@@ -1355,16 +1317,14 @@ SelectConditions_EDIT
 
 OptionalWhereClause
  :
- | 'WHERE' SearchCondition
-   {
-     $$ = $2;
-   }
+ | 'WHERE' SearchCondition -> $2
  ;
 
 OptionalWhereClause_EDIT
  : 'WHERE' SearchCondition_EDIT
  | 'WHERE' 'CURSOR'
    {
+     suggestFunctions();
      suggestColumns();
      suggestKeywords(['EXISTS', 'NOT EXISTS']);
    }
@@ -1415,10 +1375,7 @@ GroupByColumnListPartTwo_EDIT
 
 OptionalOrderByClause
  :
- | 'ORDER' 'BY' OrderByColumnList
-   {
-     $$ = $3;
-   }
+ | 'ORDER' 'BY' OrderByColumnList -> $3
  ;
 
 OptionalOrderByClause_EDIT
@@ -1431,10 +1388,7 @@ OptionalOrderByClause_EDIT
 
 OrderByColumnList
  : OrderByIdentifier
- | OrderByColumnList ',' OrderByIdentifier
-   {
-     $$ = $3;
-   }
+ | OrderByColumnList ',' OrderByIdentifier -> $3
  ;
 
 OrderByColumnList_EDIT
@@ -1516,18 +1470,6 @@ OptionalLimitClause_EDIT
 
 SearchCondition
  : ValueExpression
-   {
-     $$ = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR'] };
-     if (isHive()) {
-       $$.suggestKeywords.push('<=>');
-     }
-     if ($1.columnReference) {
-       $$.suggestKeywords.push('LIKE');
-       $$.suggestKeywords.push('NOT LIKE');
-       $$.suggestKeywords.push('RLIKE');
-       $$.suggestKeywords.push('REGEX');
-     }
-   }
  ;
 
 SearchCondition_EDIT
@@ -1535,76 +1477,80 @@ SearchCondition_EDIT
  ;
 
 ValueExpression
- : NonParenthesizedValueExpressionPrimary
-// | NumericValueFunction
- | 'NOT' ValueExpression
- | '!' ValueExpression
- | '~' ValueExpression
- | '-' ValueExpression
+ : NonParenthesizedValueExpressionPrimary                                           -> valueExpressionKeywords($1)
+// | NumericValueFunction                                                           -> valueExpressionKeywords($1)
+ | 'NOT' ValueExpression                                                            -> valueExpressionKeywords($2)
+ | '!' ValueExpression                                                              -> valueExpressionKeywords($2)
+ | '~' ValueExpression                                                              -> valueExpressionKeywords($2)
+ | '-' ValueExpression %prec NEGATION                                               -> valueExpressionKeywords()
  | 'EXISTS' TableSubquery
    {
+     $$ = valueExpressionKeywords();
      // clear correlated flag after completed subquery (set by lexer)
      parser.yy.correlatedSubquery = false;
    }
- | ValueExpression 'NOT' 'LIKE' SingleQuotedValue
- | ValueExpression 'LIKE' SingleQuotedValue
- | ValueExpression 'RLIKE' SingleQuotedValue
- | ValueExpression 'REGEXP' SingleQuotedValue
- | '(' ValueExpression ')' { $$ = {}; }
- | ValueExpression 'IS' OptionalNot 'NULL' { $$ = {}; }
- | ValueExpression '=' ValueExpression { $$ = {}; }
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression { $$ = {}; }
- | ValueExpression '-' ValueExpression { $$ = {}; }
- | ValueExpression '*' ValueExpression { $$ = {}; }
- | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression { $$ = {}; }
- | ValueExpression 'OR' ValueExpression { $$ = {}; }
- | ValueExpression 'AND' ValueExpression { $$ = {}; }
+ | ValueExpression 'NOT' 'LIKE' SingleQuotedValue                                   -> valueExpressionKeywords()
+ | ValueExpression 'LIKE' SingleQuotedValue                                         -> valueExpressionKeywords()
+ | ValueExpression 'RLIKE' SingleQuotedValue                                        -> valueExpressionKeywords()
+ | ValueExpression 'REGEXP' SingleQuotedValue                                       -> valueExpressionKeywords()
+ | '(' ValueExpression ')'                                                          -> valueExpressionKeywords()
+ | ValueExpression 'IS' OptionalNot 'NULL'                                          -> valueExpressionKeywords()
+ | ValueExpression '=' ValueExpression                                              -> valueExpressionKeywords()
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression                            -> valueExpressionKeywords()
+ | ValueExpression '-' ValueExpression                                              -> valueExpressionKeywords()
+ | ValueExpression '*' ValueExpression                                              -> valueExpressionKeywords()
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression                            -> valueExpressionKeywords()
+ | ValueExpression 'OR' ValueExpression                                             -> valueExpressionKeywords()
+ | ValueExpression 'AND' ValueExpression                                            -> valueExpressionKeywords()
  ;
 
 ValueExpression
- : ValueExpression 'NOT' 'IN' '(' TableSubqueryInner ')' { $$ = {}; }
- | ValueExpression 'NOT' 'IN' '(' InValueList ')' { $$ = {}; }
- | ValueExpression 'IN' '(' TableSubqueryInner ')' { $$ = {}; }
- | ValueExpression 'IN' '(' InValueList ')' { $$ = {}; }
+ : ValueExpression 'NOT' 'IN' '(' TableSubqueryInner ')'                            -> valueExpressionKeywords()
+ | ValueExpression 'NOT' 'IN' '(' InValueList ')'                                   -> valueExpressionKeywords()
+ | ValueExpression 'IN' '(' TableSubqueryInner ')'                                  -> valueExpressionKeywords()
+ | ValueExpression 'IN' '(' InValueList ')'                                         -> valueExpressionKeywords()
  ;
 
 ValueExpression
- : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression { $$ = {}; }
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression { $$ = {}; }
+ : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression    -> valueExpressionKeywords()
+ | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression          -> valueExpressionKeywords()
  ;
 
 ValueExpression_EDIT
  : NonParenthesizedValueExpressionPrimary_EDIT
- | 'NOT' ValueExpression_EDIT { $$ = $2; }
+ | 'NOT' ValueExpression_EDIT                               -> $2
  | 'NOT' 'CURSOR'
    {
+     suggestFunctions();
      suggestColumns();
      suggestKeywords(['EXISTS']);
    }
- | '!' ValueExpression_EDIT { $$ = $2; }
+ | '!' ValueExpression_EDIT                                 -> $2
  | '!' AnyCursor
    {
+     suggestFunctions();
      suggestColumns();
    }
- | '~' ValueExpression_EDIT { $$ = $2; }
+ | '~' ValueExpression_EDIT                                 -> $2
  | '~' 'PARTIAL_CURSOR'
    {
+     suggestFunctions();
      suggestColumns();
    }
- | '-' ValueExpression_EDIT { $$ = $2; }
- | '-' 'PARTIAL_CURSOR'
+ | '-' ValueExpression_EDIT %prec NEGATION                  -> $2
+ | '-' 'PARTIAL_CURSOR' %prec NEGATION
    {
+     suggestFunctions();
      suggestColumns();
    }
  | 'EXISTS' TableSubquery_EDIT
- | ValueExpression_EDIT 'NOT' 'LIKE' SingleQuotedValue{ $$ = $1; }
- | ValueExpression_EDIT 'LIKE' SingleQuotedValue{ $$ = $1; }
- | ValueExpression_EDIT 'RLIKE' SingleQuotedValue{ $$ = $1; }
- | ValueExpression_EDIT 'REGEXP' SingleQuotedValue{ $$ = $1; }
- | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery{ $$ = $1; }
- | ValueExpression_EDIT 'EXISTS' TableSubquery { $$ = $1; }
- | '(' ValueExpression_EDIT ')' { $$ = $2; }
- | '(' ValueExpression_EDIT error { $$ = $2; }
+ | ValueExpression_EDIT 'NOT' 'LIKE' SingleQuotedValue      -> $1
+ | ValueExpression_EDIT 'LIKE' SingleQuotedValue            -> $1
+ | ValueExpression_EDIT 'RLIKE' SingleQuotedValue           -> $1
+ | ValueExpression_EDIT 'REGEXP' SingleQuotedValue          -> $1
+ | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery        -> $1
+ | ValueExpression_EDIT 'EXISTS' TableSubquery              -> $1
+ | '(' ValueExpression_EDIT RightParenthesisOrError         -> $2
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
      suggestKeywords(['NULL']);
@@ -1627,7 +1573,7 @@ ValueExpression_EDIT
  : ValueExpression 'NOT' 'IN' ValueExpressionInSecondPart_EDIT
    {
      if ($4.inValueEdit) {
-       valueExpressionSuggest($1, true)
+       valueExpressionSuggest($1)
      }
      if ($4.cursorAtStart) {
        suggestKeywords(['SELECT']);
@@ -1636,38 +1582,22 @@ ValueExpression_EDIT
  | ValueExpression 'IN' ValueExpressionInSecondPart_EDIT
    {
      if ($3.inValueEdit) {
-       valueExpressionSuggest($1, true)
+       valueExpressionSuggest($1)
      }
      if ($3.cursorAtStart) {
        suggestKeywords(['SELECT']);
      }
    }
-
- | ValueExpression_EDIT 'NOT' 'IN' '(' InValueList ')'
- | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubqueryInner ')'
- | ValueExpression_EDIT 'IN' '(' InValueList ')'
- | ValueExpression_EDIT 'IN' '(' TableSubqueryInner ')'
+ | ValueExpression_EDIT 'NOT' 'IN' '(' InValueList RightParenthesisOrError
+ | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubqueryInner RightParenthesisOrError
+ | ValueExpression_EDIT 'IN' '(' InValueList RightParenthesisOrError
+ | ValueExpression_EDIT 'IN' '(' TableSubqueryInner RightParenthesisOrError
  ;
 
 ValueExpressionInSecondPart_EDIT
- : '(' TableSubqueryInner_EDIT ')'
- | '(' TableSubqueryInner_EDIT error
- | '(' InValueList_EDIT ')'
-   {
-     $$ = { inValueEdit: true }
-   }
- | '(' InValueList_EDIT error
-   {
-     $$ = { inValueEdit: true }
-   }
- | '(' AnyCursor ')'
-   {
-     $$ = { inValueEdit: true, cursorAtStart: true }
-   }
- | '(' AnyCursor error
-   {
-     $$ = { inValueEdit: true, cursorAtStart: true }
-   }
+ : '(' TableSubqueryInner_EDIT RightParenthesisOrError
+ | '(' InValueList_EDIT RightParenthesisOrError           -> { inValueEdit: true }
+ | '(' AnyCursor RightParenthesisOrError                  -> { inValueEdit: true, cursorAtStart: true }
  ;
 
 ValueExpression_EDIT
@@ -1713,11 +1643,11 @@ ValueExpression_EDIT
  | ValueExpression 'AND' ValueExpression_EDIT
  | ValueExpression '=' RightPart_EDIT { valueExpressionSuggest($1) }
  | ValueExpression 'COMPARISON_OPERATOR' RightPart_EDIT { valueExpressionSuggest($1) }
- | ValueExpression '-' RightPart_EDIT { suggestColumns() }
- | ValueExpression '*' RightPart_EDIT { suggestColumns() }
- | ValueExpression 'ARITHMETIC_OPERATOR' RightPart_EDIT { suggestColumns() }
- | ValueExpression 'OR' RightPart_EDIT { suggestColumns() }
- | ValueExpression 'AND' RightPart_EDIT { suggestColumns() }
+ | ValueExpression '-' RightPart_EDIT { valueExpressionSuggest() }
+ | ValueExpression '*' RightPart_EDIT { valueExpressionSuggest() }
+ | ValueExpression 'ARITHMETIC_OPERATOR' RightPart_EDIT { valueExpressionSuggest() }
+ | ValueExpression 'OR' RightPart_EDIT { valueExpressionSuggest() }
+ | ValueExpression 'AND' RightPart_EDIT { valueExpressionSuggest() }
  ;
 
 ValueExpression_EDIT
@@ -1730,13 +1660,48 @@ ValueExpression_EDIT
  | ValueExpression_EDIT 'AND' ValueExpression
  | 'CURSOR' '=' ValueExpression { valueExpressionSuggest($3) }
  | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression { valueExpressionSuggest($3) }
-// | 'CURSOR' '-' ValueExpression { suggestColumns() }
- | 'CURSOR' '*' ValueExpression { suggestColumns() }
- | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression { suggestColumns() }
- | 'CURSOR' 'OR' ValueExpression { suggestColumns() }
- | 'CURSOR' 'AND' ValueExpression { suggestColumns() }
+// | 'CURSOR' '-' ValueExpression { valueExpressionSuggest() }
+ | 'CURSOR' '*' ValueExpression { valueExpressionSuggest() }
+ | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression { valueExpressionSuggest() }
+ | 'CURSOR' 'OR' ValueExpression { valueExpressionSuggest() }
+ | 'CURSOR' 'AND' ValueExpression { valueExpressionSuggest() }
  ;
 
+ValueExpressionList
+ : ValueExpression                                                         -> $1
+ | ValueExpressionList ',' ValueExpression                                 -> $3
+ ;
+
+ValueExpressionList_EDIT
+ : ValueExpression_EDIT
+ | ValueExpressionList ',' ValueExpression_EDIT
+ | ValueExpression_EDIT ',' ValueExpressionList
+ | ValueExpressionList ',' ValueExpression_EDIT ',' ValueExpressionList
+ | ValueExpressionList ',' AnyCursor
+   {
+     valueExpressionSuggest();
+   }
+ | ValueExpressionList ',' AnyCursor ',' ValueExpressionList
+   {
+     valueExpressionSuggest();
+   }
+ | AnyCursor ',' ValueExpressionList
+   {
+     valueExpressionSuggest();
+   }
+ | AnyCursor ','
+   {
+     valueExpressionSuggest();
+   }
+ | ',' AnyCursor
+   {
+     valueExpressionSuggest();
+   }
+ | ',' AnyCursor ',' ValueExpressionList
+   {
+     valueExpressionSuggest();
+   }
+ ;
 
 InValueList
  : NonParenthesizedValueExpressionPrimary
@@ -1763,13 +1728,16 @@ NonParenthesizedValueExpressionPrimary
    {
      $$ = { columnReference: $1 };
    }
- | SetFunctionSpecification
+ | UserDefinedFunction
+ | GroupingOperation
+ | HiveComplexTypeConstructor
  | 'NULL'
  ;
 
 NonParenthesizedValueExpressionPrimary_EDIT
  : ColumnReference_EDIT
- | SetFunctionSpecification_EDIT
+ | UserDefinedFunction_EDIT
+ | HiveComplexTypeConstructor_EDIT
  ;
 
 UnsignedValueSpecification
@@ -1869,58 +1837,40 @@ Identifier_EDIT
  ;
 
 SelectSubList
- : ValueExpression OptionalCorrelationName // <derived column>
-   {
-     $$ = $2;
-   }
+ : ValueExpression OptionalCorrelationName -> $2 // <derived column>
  | '*'
  ;
 
 SelectSubList_EDIT
- : ValueExpression_EDIT OptionalCorrelationName
-   {
-     $$ = $1;
-   }
- | ValueExpression OptionalCorrelationName_EDIT
-   {
-     $$ = $2;
-   }
+ : ValueExpression_EDIT OptionalCorrelationName -> $1
+ | ValueExpression OptionalCorrelationName_EDIT -> $2
  ;
 
 SelectList
  : SelectSubList
- | SelectList ',' SelectSubList
-   {
-     $$ = $3;
-   }
+ | SelectList ',' SelectSubList -> $3
  ;
 
 SelectList_EDIT
  : SelectSubList_EDIT
  | 'CURSOR' SelectList
    {
-     $$ = { cursorAtStart : true, suggestUDAFs: true };
+     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
+     suggestFunctions();
      suggestColumns();
+     suggestFunctions();
    }
- | SelectList ',' SelectListPartTwo_EDIT
-   {
-     $$ = $3;
-   }
- | SelectList ',' SelectListPartTwo_EDIT ','
-   {
-     $$ = $3;
-   }
- | SelectList ',' SelectListPartTwo_EDIT ',' SelectList
-    {
-      $$ = $3;
-    }
+ | SelectList ',' SelectListPartTwo_EDIT -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ',' -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ',' SelectList -> $3
  ;
 
 SelectListPartTwo_EDIT
  : SelectSubList_EDIT
  | AnyCursor
    {
-     $$ = { suggestKeywords: ['*'], suggestUDAFs: true };
+     $$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
+     suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
@@ -1962,10 +1912,7 @@ DerivedColumn_EDIT_TWO
 
 TableReferenceList
  : TableReference
- | TableReferenceList ',' TableReference
-   {
-     $$ = $3;
-   }
+ | TableReferenceList ',' TableReference -> $3
  ;
 
 TableReferenceList_EDIT
@@ -1998,10 +1945,7 @@ TablePrimaryOrJoinedTable_EDIT
  ;
 
 JoinedTable
- : TablePrimary Joins
-   {
-     $$ = $2;
-   }
+ : TablePrimary Joins -> $2
  ;
 
 JoinedTable_EDIT
@@ -2139,13 +2083,12 @@ ParenthesizedJoinEqualityExpression
  ;
 
 ParenthesizedJoinEqualityExpression_EDIT
- : '(' JoinEqualityExpression_EDIT ')'
- | '(' JoinEqualityExpression_EDIT error
- | '(' PartialBacktickedOrPartialCursor
+ : '(' JoinEqualityExpression_EDIT RightParenthesisOrError
+ | '(' PartialBacktickedOrPartialCursor RightParenthesisOrError
    {
      suggestColumns();
    }
- | '(' PartialBacktickedOrPartialCursor 'AND' JoinEqualityExpression
+ | '(' PartialBacktickedOrPartialCursor 'AND' JoinEqualityExpression RightParenthesisOrError
     {
       suggestColumns();
     }
@@ -2294,13 +2237,8 @@ TableSubquery
  ;
 
 TableSubquery_EDIT
- : '(' TableSubqueryInner_EDIT ')'
- | '(' TableSubqueryInner_EDIT error
- | '(' AnyCursor ')'
-   {
-     suggestKeywords(['SELECT']);
-   }
- | '(' AnyCursor error
+ : '(' TableSubqueryInner_EDIT RightParenthesisOrError
+ | '(' AnyCursor RightParenthesisOrError
    {
      suggestKeywords(['SELECT']);
    }
@@ -2376,13 +2314,7 @@ OptionalCorrelationName
      $$ = { suggestKeywords: ['AS'] }
    }
  | RegularOrBacktickedIdentifier
-   {
-     $$ = $1
-   }
- | AnyAs RegularOrBacktickedIdentifier
-   {
-     $$ = $2
-   }
+ | AnyAs RegularOrBacktickedIdentifier -> $2
  ;
 
 OptionalCorrelationName_EDIT
@@ -2409,55 +2341,33 @@ OptionalLateralViews_EDIT
 
 // TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
 UserDefinedTableGeneratingFunction
- : '<hive>explode' '(' DerivedColumnChain ')'
+ : '<hive>EXPLODE(' DerivedColumnChain ')'
    {
-     $$ = { function: $1, expression: $3 }
+     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
    }
- | '<hive>posexplode' '(' DerivedColumnChain ')'
+ | '<hive>POSEXPLODE(' DerivedColumnChain ')'
    {
-     $$ = { function: $1, expression: $3 }
+     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
    }
  ;
 
 UserDefinedTableGeneratingFunction_EDIT
- : '<hive>explode' '(' DerivedColumnChain_EDIT error
+ : '<hive>EXPLODE(' DerivedColumnChain_EDIT error
    {
-     suggestColumns($3);
+     suggestColumns($2);
    }
- | '<hive>explode' '(' PartialBacktickedOrPartialCursor error
+ | '<hive>EXPLODE(' PartialBacktickedOrPartialCursor error
     {
       suggestColumns();
     }
- | '<hive>posexplode' '(' PartialBacktickedOrPartialCursor error
+ | '<hive>POSEXPLODE(' PartialBacktickedOrPartialCursor error
     {
       suggestColumns();
     }
- ;
-
-
-SetFunctionSpecification
- : AggregateFunction
- | GroupingOperation
- ;
-
-SetFunctionSpecification_EDIT
- : AggregateFunction_EDIT
  ;
 
 GroupingOperation
  : 'GROUPING' '(' ColumnReferenceList ')'
- ;
-
-AggregateFunction
- : GeneralSetFunction OptionalFilterClause
- | BinarySetFunction OptionalFilterClause
- | OrderedSetFunction OptionalFilterClause
- | HiveAggregateFunction OptionalFilterClause
- | ImpalaAggregateFunction OptionalFilterClause
- ;
-
-AggregateFunction_EDIT
- : GeneralSetFunction_EDIT OptionalFilterClause
  ;
 
 OptionalFilterClause
@@ -2466,172 +2376,113 @@ OptionalFilterClause
  | '<impala>OVER' '(' 'WHERE' SearchCondition ')'
  ;
 
-GeneralSetFunction
- : 'COUNT' '(' AsteriskOrValueExpression ')'
- | SetFunctionType '(' OptionalSetQuantifier ValueExpression ')'
+UserDefinedFunction
+ : CountFunction
+ | SumFunction
+ | ArbitraryFunction
  ;
 
-AsteriskOrValueExpression
- : '*'
- | ValueExpression
+UserDefinedFunction_EDIT
+ : CountFunction_EDIT
+ | SumFunction_EDIT
+ | ArbitraryFunction_EDIT
  ;
 
-GeneralSetFunction_EDIT
- : 'COUNT' '(' AnyCursor ')'
+ArbitraryFunction
+ : 'UDF(' ')'
+ | 'UDF(' ValueExpressionList ')'
    {
-     suggestColumns();
-     suggestKeywords(['*']);
-   }
- | 'COUNT' '(' AnyCursor error
-   {
-     suggestColumns();
-     suggestKeywords(['*']);
-   }
- | 'COUNT' '(' ValueExpression_EDIT ')'
- | SetFunctionType '(' OptionalSetQuantifier AnyCursor error
-   {
-     suggestColumns();
-   }
- | SetFunctionType '(' OptionalSetQuantifier ValueExpression_EDIT ')'
- | SetFunctionType '(' OptionalSetQuantifier ValueExpression_EDIT error
- | SetFunctionType '(' OptionalSetQuantifier AnyCursor ')'
-   {
-     suggestColumns();
+     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 };
    }
  ;
 
-BinarySetFunction
- : BinarySetFunctionType '(' DependentVariableExpression ',' IndependentVariableExpression ')'
+ArbitraryFunction_EDIT
+ : 'UDF(' AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+   }
+ | 'UDF(' ValueExpressionList 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($2);
+   }
+ | 'UDF(' ValueExpressionList 'CURSOR' ',' ValueExpressionList RightParenthesisOrError
+   {
+     checkForKeywords($2);
+   }
+ | 'UDF(' ValueExpressionList_EDIT RightParenthesisOrError
  ;
 
-DependentVariableExpression
- : ValueExpression
+CountFunction
+ : 'COUNT(' '*' ')'
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList ')'
  ;
 
-IndependentVariableExpression
- : ValueExpression
+CountFunction_EDIT
+ : 'COUNT(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
+   {
+     suggestColumns();
+     if (!$2) {
+       if (isImpala()) {
+         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['*', 'DISTINCT']);
+       }
+     }
+   }
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($3);
+   }
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
  ;
 
-OrderedSetFunction
- : HypotheticalSetFunction
- | InverseDistributionFunction
+SumFunction
+ : 'SUM(' OptionalAllOrDistinct ValueExpression ')'
  ;
 
-HypotheticalSetFunction
- : RankFunctionType '(' HypotheticalSetFunctionValueExpressionList ')' WithinGroupSpecification
- ;
-
-HypotheticalSetFunctionValueExpressionList
- : ValueExpression
- | HypotheticalSetFunctionValueExpressionList ',' ValueExpression
- ;
-
-InverseDistributionFunction
- : InverseDistributionFunctionType '(' InverseDistributionFunctionArgument ')' WithinGroupSpecification
- ;
-
-InverseDistributionFunctionArgument
- : ValueExpression
+SumFunction_EDIT
+ : 'SUM(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+     if (!$2) {
+       if (isImpala()) {
+         suggestKeywords(['ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['DISTINCT']);
+       }
+     }
+   }
+ | 'SUM(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($3);
+   }
+ | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
  ;
 
 WithinGroupSpecification
  : 'WITHIN' 'GROUP' '(' 'ORDER' 'BY' SortSpecificationList ')'
  ;
 
-SetFunctionType
- : ComputationalOperation
- ;
-
-ComputationalOperation
- : 'ANY' // SQL-2003, Hive and Impala
-// | 'COLLECT'
- | '<hive>COLLECT_LIST'
- | '<hive>COLLECT_SET'
-// | 'EVERY'
-// | 'FUSION'
-// | 'INTERSECTION'
- | 'MAX' // SQL-2003, Hive and Impala
- | 'MIN' // SQL-2003, Hive and Impala
-// | 'SOME'
- | '<impala>STDDEV'
- | 'STDDEV_POP' // SQL-2003, Hive and Impala
- | 'STDDEV_SAMP' // SQL-2003, Hive and Impala
- | 'SUM' // SQL-2003, Hive and Impala
- | '<hive>VARIANCE'
- | '<impala>VARIANCE'
- | '<impala>VARIANCE_POP'
- | '<impala>VARIANCE_SAMP'
- | 'VAR_POP' // SQL-2003, Hive and Impala
- | 'VAR_SAMP' // SQL-2003, Hive and Impala
- ;
-
-BinarySetFunctionType
- : '<hive>CORR'
- | '<hive>COVAR_POP'
- | '<hive>COVAR_SAMP'
-// | 'REGR_AVGX'
-// | 'REGR_AVGY'
-// | 'REGR_COUNT'
-// | 'REGR_INTERCEPT'
-// | 'REGR_R2'
-// | 'REGR_SLOPE'
-// | 'REGR_SXX'
-// | 'REGR_SXY'
-// | 'REGR_SYY'
- ;
-
-RankFunctionType
- : 'CUME_DIST'
- | '<hive>CUME_DIST'
- | 'DENSE_RANK' // SQL-2003, Hive and Impala
-// | 'PERCENT_RANK'
- | '<hive>PERCENT_RANK'
- | 'RANK' // SQL-2003, Hive and Impala
- ;
-
-InverseDistributionFunctionType
- : '<hive>PERCENTILE'
- | '<hive>PERCENTILE_APPROX'
-// | 'PERCENTILE_CONT'
-// | 'PERCENTILE_DISC'
- ;
-
-HiveAggregateFunction
- : '<hive>HISTOGRAM_NUMERIC' '(' ')'
- | '<hive>NTILE' '(' ')'
- ;
-
-ImpalaAggregateFunction
- : '<impala>GROUP_CONCAT' '(' ')'
- | '<impala>NDV' '(' ')'
- ;
-
-OptionalSetQuantifier
- :
- | 'DISINCT'
- | 'ALL'
- ;
-
 LateralView
- : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' LateralViewColumnAliases
+ : '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier LateralViewColumnAliases
    {
      $$ = [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
    }
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction LateralViewColumnAliases
-    {
-      $$ = [{ udtf: $3, columnAliases: $4 }]
-    }
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction LateralViewColumnAliases
+   {
+     $$ = [{ udtf: $3, columnAliases: $4 }]
+   }
  ;
 
 LateralView_EDIT
- : '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_EDIT
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction_EDIT LateralViewColumnAliases
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'REGULAR_IDENTIFIER' 'CURSOR'
+ : '<hive>LATERAL' 'VIEW' UserDefinedFunction_EDIT
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction_EDIT LateralViewColumnAliases
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier 'CURSOR'
    {
      $$ = [];
      suggestKeywords(['AS']);
    }
- | '<hive>LATERAL' 'VIEW' UserDefinedTableGeneratingFunction 'CURSOR'
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction 'CURSOR'
    {
      $$ = [];
      suggestKeywords(['AS']);
@@ -2649,11 +2500,11 @@ LateralView_EDIT
  ;
 
 LateralViewColumnAliases
- : '<hive>AS' 'REGULAR_IDENTIFIER'
+ : '<hive>AS' RegularIdentifier
    {
      $$ = [ $2 ]
    }
- | '<hive>AS' '(' 'REGULAR_IDENTIFIER' ',' 'REGULAR_IDENTIFIER' ')'
+ | '<hive>AS' '(' RegularIdentifier ',' RegularIdentifier ')'
    {
      $$ = [ $3, $5 ]
    }
@@ -2888,12 +2739,12 @@ ShowGrantStatement_EDIT
 
 OptionalPrincipalName
  :
- | 'REGULAR_IDENTIFIER'
+ | RegularIdentifier
  ;
 
 OptionalPrincipalName_EDIT
  : 'CURSOR'
- | 'REGULAR_IDENTIFIER' 'CURSOR'
+ | RegularIdentifier 'CURSOR'
  ;
 
 
@@ -3019,7 +2870,7 @@ ShowRoleStatement
    {
      suggestKeywords(['GRANT']);
    }
- | 'SHOW' HiveOrImpalaRole 'CURSOR' HiveRoleOrUser 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole 'CURSOR' HiveRoleOrUser RegularIdentifier
    {
      suggestKeywords(['GRANT']);
    }
@@ -3027,20 +2878,20 @@ ShowRoleStatement
    {
      suggestKeywords(['ROLE', 'USER']);
    }
- | 'SHOW' HiveOrImpalaRole '<hive>GRANT' 'CURSOR' 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole '<hive>GRANT' 'CURSOR' RegularIdentifier
    {
      suggestKeywords(['ROLE', 'USER']);
    }
- | 'SHOW' HiveOrImpalaRole '<hive>GRANT' HiveRoleOrUser 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole '<hive>GRANT' HiveRoleOrUser RegularIdentifier
  | 'SHOW' HiveOrImpalaRole '<impala>GRANT' 'CURSOR'
    {
      suggestKeywords(['GROUP']);
    }
- | 'SHOW' HiveOrImpalaRole '<impala>GRANT' 'CURSOR' 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole '<impala>GRANT' 'CURSOR' RegularIdentifier
    {
      suggestKeywords(['GROUP']);
    }
- | 'SHOW' HiveOrImpalaRole '<impala>GRANT' '<impala>GROUP' 'REGULAR_IDENTIFIER'
+ | 'SHOW' HiveOrImpalaRole '<impala>GRANT' '<impala>GROUP' RegularIdentifier
  ;
 
 ShowRolesStatement
@@ -3203,7 +3054,7 @@ SetClause
  ;
 
 SetTarget
- : 'REGULAR_IDENTIFIER'
+ : RegularIdentifier
  ;
 
 UpdateSource
@@ -3214,7 +3065,7 @@ UpdateSource
 // ===================================== USE Statement =====================================
 
 UseStatement
- : 'USE' 'REGULAR_IDENTIFIER'
+ : 'USE' RegularIdentifier
    {
      if (! parser.yy.cursorFound) {
        parser.yy.result.useDatabase = $2;
@@ -3248,13 +3099,27 @@ var mergeSuggestKeywords = function() {
   return {}
 }
 
-var valueExpressionSuggest = function(other, skipColumns) {
-  if (other.columnReference) {
+var valueExpressionKeywords = function (firstRef) {
+  var result = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR'] };
+  if (isHive()) {
+    result.suggestKeywords.push('<=>');
+  }
+  if (firstRef && firstRef.columnReference) {
+    result.columnReference = firstRef.columnReference;
+    result.suggestKeywords.push('LIKE');
+    result.suggestKeywords.push('NOT LIKE');
+    result.suggestKeywords.push('RLIKE');
+    result.suggestKeywords.push('REGEX');
+  }
+  return result;
+}
+
+var valueExpressionSuggest = function(other) {
+  if (other && other.columnReference) {
     suggestValues({ identifierChain: other.columnReference });
   }
-  if (!skipColumns) {
-    suggestColumns();
-  }
+  suggestColumns();
+  suggestFunctions();
 }
 
 var prioritizeSuggestions = function () {
@@ -3338,6 +3203,9 @@ parser.expandLateralViews = function (tablePrimaries, identifierChain) {
   tablePrimaries.forEach(function (tablePrimary) {
     if (typeof tablePrimary.lateralViews !== 'undefined') {
       tablePrimary.lateralViews.reverse().forEach(function (lateralView) {
+        if (!lateralView.udtf.expression.columnReference) {
+          return;
+        }
         if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
           identifierChain.shift();
           firstIdentifier = identifierChain[0];
@@ -3359,7 +3227,7 @@ parser.expandLateralViews = function (tablePrimaries, identifierChain) {
           } else {
             identifierChain[0] = { name: 'item' };
           }
-          identifierChain = lateralView.udtf.expression.concat(identifierChain);
+          identifierChain = lateralView.udtf.expression.columnReference.concat(identifierChain);
           firstIdentifier = identifierChain[0];
         }
       });
@@ -3519,6 +3387,12 @@ var suggestDdlAndDmlKeywords = function () {
   suggestKeywords(keywords);
 }
 
+var checkForKeywords = function (rule) {
+  if (rule && rule.suggestKeywords && rule.suggestKeywords.length > 0) {
+    suggestKeywords(rule.suggestKeywords);
+  }
+}
+
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords.sort();
 }
@@ -3538,52 +3412,12 @@ var suggestTablesOrColumns = function (identifier) {
   }
 }
 
-var getUDAFSuggestions = function () {
-  var result = [
-    { name: 'avg(col)', type: 'DOUBLE' },
-    { name: 'count(col)', type: 'BIGINT' },
-    { name: 'variance(col)', type: 'DOUBLE' },
-    { name: 'var_pop(col)', type: 'DOUBLE' },
-    { name: 'var_samp(col)', type: 'DOUBLE' },
-    { name: 'stddev_pop(col)', type: 'DOUBLE' },
-    { name: 'stddev_samp(col)', type: 'DOUBLE' }
-  ];
-
-  if (isHive()) {
-    return result.concat([
-      { name: 'sum(col)', type: 'DOUBLE' },
-      { name: 'max(col)', type: 'DOUBLE' },
-      { name: 'min(col)', type: 'DOUBLE' },
-      { name: 'covar_pop(col, col)', type: 'DOUBLE' },
-      { name: 'covar_samp(col, col)', type: 'DOUBLE' },
-      { name: 'collect_set(col)', type: 'array' },
-      { name: 'collect_list(col)', type: 'array' },
-      { name: 'histogram_numeric(col, b)', type: 'array<struct {\'x\', \'y\'}>' },
-      { name: 'ntile(INTEGER x)', type: 'INTEGER' },
-      { name: 'percentile(BIGINT col, p)', type: 'DOUBLE' },
-      { name: 'percentile(BIGINT col, array(p1 [, p2]...))', type: 'array<DOUBLE>' },
-      { name: 'percentile_approx(DOUBLE col, p, [, B])', type: 'DOUBLE' },
-      { name: 'percentile_approx(DOUBLE col, array(p1 [, p2]...), [, B])', type: 'array<DOUBLE>' }
-    ]);
-  } else if (isImpala()) {
-    return result.concat([
-      { name: 'max(col)', type: 'same' },
-      { name: 'min(col)', type: 'same' },
-      { name: 'sum(col)', type: 'BIGINT|DOUBLE' },
-      { name: 'appx_median(col)', type: 'same' },
-      { name: 'group_concat(col, separator)', type: 'STRING' },
-      { name: 'ndv(col, separator)', type: 'DOUBLE' },
-      { name: 'stddev(col)', type: 'DOUBLE' },
-      { name: 'variance(col)', type: 'DOUBLE' },
-      { name: 'variance_pop(col)', type: 'DOUBLE' },
-      { name: 'variance_samp(col)', type: 'DOUBLE' }
-    ]);
-  }
-  return result;
+var suggestFunctions = function () {
+  parser.yy.result.suggestFunctions = true;
 }
 
-var suggestFunctions = function (details) {
-  parser.yy.result.suggestFunctions = details || { identifierChain: [] };
+var suggestAggregateFunctions = function () {
+  parser.yy.result.suggestAggregateFunctions = true;
 }
 
 var suggestColumns = function (details) {
@@ -3656,7 +3490,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     if (typeof parser.yy.result === 'undefined') {
       throw err;
     }
-    if (parser.yy.result.error && !parser.yy.result.error.expected) {
+    if (parser.yy.result.error) {
       console.log(parser.yy.result.error);
     }
     result = parser.yy.result;

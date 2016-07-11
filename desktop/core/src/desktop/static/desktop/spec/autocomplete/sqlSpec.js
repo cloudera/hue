@@ -156,7 +156,7 @@ define([
             columnAliases: [ 'testItem' ],
             tableAlias: 'explodedTable',
             udtf: {
-              expression: [{ name: 'testArray' }],
+              expression: { columnReference: [{ name: 'testArray' }] },
               function: 'explode'
             }
           }]
@@ -175,7 +175,7 @@ define([
             columnAliases: [ 'testMapKey', 'testMapValue' ],
             tableAlias: 'explodedMap',
             udtf: {
-              expression: [{ name: 'testMap' }],
+              expression: { columnReference: [{ name: 'testMap' }] },
               function: 'explode'
             }
           }]
@@ -202,7 +202,7 @@ define([
             tableAlias: 'explodedTable',
             udtf: {
               function: 'explode',
-              expression: [{ name: 'testArray' }]
+              expression: { columnReference: [{ name: 'testArray' }] }
             }
           }]
         }];
@@ -219,14 +219,14 @@ define([
             tableAlias: 'explodedTableB',
             udtf: {
               function: 'explode',
-              expression: [{ name: 'testArrayB' }]
+              expression: { columnReference: [{ name: 'testArrayB' }] }
             }
           }, {
             columnAliases: [ 'testItemA' ],
             tableAlias: 'explodedTableA',
             udtf: {
               function: 'explode',
-              expression: [{ name: 'testArrayA' }]
+              expression: { columnReference: [{ name: 'testArrayA' }] }
             }
           }]
         }];
@@ -244,14 +244,14 @@ define([
             tableAlias: 'explodedTableB',
             udtf: {
               function: 'explode',
-              expression: [{ name: 'tt2' }, { name: 'testArrayB' }]
+              expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayB' }] }
             }
           }, {
             columnAliases: [ 'testItemA' ],
             tableAlias: 'explodedTableA',
             udtf: {
               function: 'explode',
-              expression: [{ name: 'tt2' }, { name: 'testArrayA' }]
+              expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayA' }] }
             }
           }]
         }];
@@ -268,14 +268,14 @@ define([
             columnAliases: [ 'ta1_exp' ],
             tableAlias: 'ta1',
             udtf: {
-              expression: [{ name: 'tt' }, { name: 'testArray1' }],
+              expression: { columnReference: [{ name: 'tt' }, { name: 'testArray1' }] },
               function: 'explode'
             }
           }, {
             columnAliases: [ 'ta2_exp' ],
             tableAlias: 'ta2',
             udtf: {
-              expression: [{ name: 'ta1_exp' },{ name: 'testArray2' }],
+              expression: { columnReference: [{ name: 'ta1_exp' },{ name: 'testArray2' }] },
               function: 'explode'
             }
           }]
@@ -294,7 +294,7 @@ define([
             columnAliases: [ 'testIndex', 'testValue' ],
             tableAlias: 'explodedTable',
             udtf: {
-              expression: [{ name: 'testArray' }],
+              expression: { columnReference: [{ name: 'testArray' }] },
               function: 'posexplode'
             }
           }]
@@ -313,7 +313,7 @@ define([
             columnAliases: [ 'testMapKey', 'testMapValue' ],
             tableAlias: 'explodedTable',
             udtf: {
-              expression: [{ name: 'testMap' }],
+              expression: { columnReference: [{ name: 'testMap' }] },
               function: 'explode'
             }
           }]

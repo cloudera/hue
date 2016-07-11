@@ -162,6 +162,7 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
+          suggestFunctions: true,
           suggestColumns: {
             database: 'bar',
             table: 'foo'
@@ -177,6 +178,7 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
+          suggestFunctions: true,
           suggestValues: {
             database: 'bar',
             table: 'foo',
@@ -193,6 +195,7 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
+          suggestFunctions: true,
           suggestColumns: {
             database: 'bar',
             table: 'foo'
