@@ -1449,6 +1449,7 @@
       ace().on('change', function () {
         if (autoExpand) {
           var maxAutoLines = Math.floor((($(window).height() - 80) / 2) / 16);
+          var resized = false;
           if (ace().session.getLength() > editorHeight) {
             if (ace().session.getLength() < maxAutoLines) {
               $target.height((ace().session.getLength() + 1) * 16);
@@ -1456,6 +1457,13 @@
             else {
               $target.height(maxAutoLines * 16); // height of maxAutoLines
             }
+            resized = true;
+          }
+          else if (ace().session.getLength() > 8) {
+            $target.height((ace().session.getLength()) * 16);
+            resized = true;
+          }
+          if (resized) {
             ace().resize();
             editorHeight = ace().session.getLength();
             huePubSub.publish('redraw.fixed.headers');
