@@ -94,7 +94,7 @@ def detect_conf_var():
 
 def run():
   if CONF.HUE_KEYTAB.get() is None:
-    LOG.debug("Keytab renewer not starting, no keytab configured")
+    LOG.info("Keytab renewer not starting, no keytab configured")
     sys.exit(0)
 
   while True:
