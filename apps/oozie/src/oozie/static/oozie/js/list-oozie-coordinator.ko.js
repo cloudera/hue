@@ -27,6 +27,7 @@
 }(this, function (ko) {
 
   var RunningCoordinatorModel = function (actions) {
+
     var self = this;
 
     self.Action = function (action) {
@@ -57,9 +58,9 @@
 
     self.isLoading = ko.observable(true);
 
-    self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
+    self.actions = ko.observableArray(ko.utils.arrayMap(actions, function (action) {
       return new self.Action(action);
-    });
+    }));
 
     self.allSelected = ko.observable(false);
 
