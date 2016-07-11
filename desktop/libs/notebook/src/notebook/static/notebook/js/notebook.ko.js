@@ -1268,7 +1268,8 @@
       self.fetchHistory();
     });
 
-    self.schedulerViewModel;
+    self.schedulerViewModel = null;
+    self.schedulerViewerViewModel = ko.observable();
 
     self.retryModalConfirm = null;
     self.retryModalCancel = null;
@@ -1757,11 +1758,7 @@
       $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
         format: 'json'
       }, function (data) {
-        $("#schedulerViewer").text(ko.mapping.toJSON(data));
-
-        // var viewModel = new RunningCoordinatorModel(data.actions);
-        // ko.cleanNode($("#schedulerViewer")[0]);
-        // ko.applyBindings(viewModel, $("#schedulerViewer")[0]);
+        self.schedulerViewerViewModel(new RunningCoordinatorModel(data.actions));
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
       }).always(function(){
