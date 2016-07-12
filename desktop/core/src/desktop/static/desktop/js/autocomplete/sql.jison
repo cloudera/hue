@@ -176,9 +176,10 @@
 'WITHIN'                            { return 'WITHIN'; }
 
 // --- UDFs ---
-COUNT\(                          { return 'COUNT('; }
-SUM\(                            { return 'SUM('; }
-[A-Za-z][A-Za-z0-9_]*\(          { return 'UDF('; }
+CAST\(                              { return 'CAST('; }
+COUNT\(                             { return 'COUNT('; }
+SUM\(                               { return 'SUM('; }
+[A-Za-z][A-Za-z0-9_]*\(             { return 'UDF('; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                             { return 'UNSIGNED_INTEGER_E'; }
@@ -227,12 +228,12 @@ SUM\(                            { return 'SUM('; }
 <backtickedValue>\`                 { this.popState(); return 'BACKTICK'; }
 
 \'                                  { this.begin('SingleQuotedValue'); return 'SINGLE_QUOTE'; }
-<SingleQuotedValue>[^']+   { return 'VALUE'; }
-<SingleQuotedValue>\'      { this.popState(); return 'SINGLE_QUOTE'; }
+<SingleQuotedValue>[^']+            { return 'VALUE'; }
+<SingleQuotedValue>\'               { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                  { this.begin('DoubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<DoubleQuotedValue>[^"]+   { return 'VALUE'; }
-<DoubleQuotedValue>\"      { this.popState(); return 'DOUBLE_QUOTE'; }
+<DoubleQuotedValue>[^"]+            { return 'VALUE'; }
+<DoubleQuotedValue>\"               { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
 
@@ -453,11 +454,11 @@ HiveRoleOrUser
  ;
 
 SingleQuotedValue
- : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE' -> $2
+ : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE'         -> $2
  ;
 
 DoubleQuotedValue
- : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE' -> $2
+ : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'         -> $2
  ;
 
 AnyAs
@@ -656,7 +657,7 @@ CleanRegularOrBackTickedSchemaQualifiedName
 
 RegularOrBacktickedIdentifier
  : RegularIdentifier
- | 'BACKTICK' 'VALUE' 'BACKTICK' -> $2
+ | 'BACKTICK' 'VALUE' 'BACKTICK'         -> $2
  ;
 
 RegularOrBackTickedSchemaQualifiedName
@@ -899,11 +900,7 @@ ColumnDefinition
  : RegularIdentifier PrimitiveType
  | RegularIdentifier 'CURSOR'
    {
-     if (parser.yy.dialect == 'hive') {
-       suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
-     } else {
-       suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
-     }
+     suggestTypeKeywords();
    }
  | RegularIdentifier 'CURSOR' ColumnDefinitionError error
    // error here is because it expects closing ')'
@@ -930,11 +927,7 @@ PrimitiveType
 ColumnDefinitionError
  : /* empty, on error we should still suggest the keywords */
    {
-     if (parser.yy.dialect == 'hive') {
-       suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
-     } else {
-       suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
-     }
+     suggestTypeKeywords();
    }
  ;
 
@@ -1317,7 +1310,7 @@ SelectConditions_EDIT
 
 OptionalWhereClause
  :
- | 'WHERE' SearchCondition -> $2
+ | 'WHERE' SearchCondition         -> $2
  ;
 
 OptionalWhereClause_EDIT
@@ -1375,7 +1368,7 @@ GroupByColumnListPartTwo_EDIT
 
 OptionalOrderByClause
  :
- | 'ORDER' 'BY' OrderByColumnList -> $3
+ | 'ORDER' 'BY' OrderByColumnList         -> $3
  ;
 
 OptionalOrderByClause_EDIT
@@ -1388,7 +1381,7 @@ OptionalOrderByClause_EDIT
 
 OrderByColumnList
  : OrderByIdentifier
- | OrderByColumnList ',' OrderByIdentifier -> $3
+ | OrderByColumnList ',' OrderByIdentifier         -> $3
  ;
 
 OrderByColumnList_EDIT
@@ -1837,18 +1830,18 @@ Identifier_EDIT
  ;
 
 SelectSubList
- : ValueExpression OptionalCorrelationName -> $2 // <derived column>
+ : ValueExpression OptionalCorrelationName         -> $2 // <derived column>
  | '*'
  ;
 
 SelectSubList_EDIT
- : ValueExpression_EDIT OptionalCorrelationName -> $1
- | ValueExpression OptionalCorrelationName_EDIT -> $2
+ : ValueExpression_EDIT OptionalCorrelationName         -> $1
+ | ValueExpression OptionalCorrelationName_EDIT         -> $2
  ;
 
 SelectList
  : SelectSubList
- | SelectList ',' SelectSubList -> $3
+ | SelectList ',' SelectSubList         -> $3
  ;
 
 SelectList_EDIT
@@ -1860,9 +1853,9 @@ SelectList_EDIT
      suggestColumns();
      suggestFunctions();
    }
- | SelectList ',' SelectListPartTwo_EDIT -> $3
- | SelectList ',' SelectListPartTwo_EDIT ',' -> $3
- | SelectList ',' SelectListPartTwo_EDIT ',' SelectList -> $3
+ | SelectList ',' SelectListPartTwo_EDIT                        -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ','                    -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ',' SelectList         -> $3
  ;
 
 SelectListPartTwo_EDIT
@@ -1912,7 +1905,7 @@ DerivedColumn_EDIT_TWO
 
 TableReferenceList
  : TableReference
- | TableReferenceList ',' TableReference -> $3
+ | TableReferenceList ',' TableReference         -> $3
  ;
 
 TableReferenceList_EDIT
@@ -1945,7 +1938,7 @@ TablePrimaryOrJoinedTable_EDIT
  ;
 
 JoinedTable
- : TablePrimary Joins -> $2
+ : TablePrimary Joins         -> $2
  ;
 
 JoinedTable_EDIT
@@ -2314,7 +2307,7 @@ OptionalCorrelationName
      $$ = { suggestKeywords: ['AS'] }
    }
  | RegularOrBacktickedIdentifier
- | AnyAs RegularOrBacktickedIdentifier -> $2
+ | AnyAs RegularOrBacktickedIdentifier         -> $2
  ;
 
 OptionalCorrelationName_EDIT
@@ -2379,12 +2372,14 @@ OptionalFilterClause
 UserDefinedFunction
  : CountFunction
  | SumFunction
+ | CastFunction
  | ArbitraryFunction
  ;
 
 UserDefinedFunction_EDIT
  : CountFunction_EDIT
  | SumFunction_EDIT
+ | CastFunction_EDIT
  | ArbitraryFunction_EDIT
  ;
 
@@ -2457,6 +2452,44 @@ SumFunction_EDIT
      checkForKeywords($3);
    }
  | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
+ ;
+
+CastFunction
+ : 'CAST(' ValueExpression AnyAs PrimitiveType ')'
+ ;
+
+CastFunction_EDIT
+ : 'CAST(' AnyCursor AnyAs PrimitiveType RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+   }
+ | 'CAST(' AnyCursor AnyAs RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+   }
+ | 'CAST(' AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+   }
+ | 'CAST(' ValueExpression_EDIT AnyAs PrimitiveType RightParenthesisOrError
+ | 'CAST(' ValueExpression_EDIT AnyAs RightParenthesisOrError
+ | 'CAST(' ValueExpression_EDIT RightParenthesisOrError
+ | 'CAST(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
+   {
+     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['AS'] }, $2).suggestKeywords);
+   }
+ | 'CAST(' ValueExpression 'CURSOR' RightParenthesisOrError
+   {
+     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['AS'] }, $2).suggestKeywords);
+   }
+ | 'CAST(' ValueExpression AnyAs 'CURSOR' RightParenthesisOrError
+   {
+     suggestTypeKeywords();
+   }
+ | 'CAST(' AnyAs 'CURSOR' RightParenthesisOrError
+    {
+      suggestTypeKeywords();
+    }
  ;
 
 WithinGroupSpecification
@@ -3112,6 +3145,14 @@ var valueExpressionKeywords = function (firstRef) {
     result.suggestKeywords.push('REGEX');
   }
   return result;
+}
+
+var suggestTypeKeywords = function () {
+  if (isHive()) {
+    suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
+  } else {
+    suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
+  }
 }
 
 var valueExpressionSuggest = function(other) {

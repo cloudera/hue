@@ -571,10 +571,10 @@ define([
         });
       });
 
-      it('should suggest columns for "SELECT | a, b, c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15"', function() {
+      it('should suggest columns for "SELECT | a, cast(b as int), c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
-          afterCursor: ' a, b, c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
+          afterCursor: ' a, cast(b as int), c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -674,6 +674,155 @@ define([
             suggestFunctions: true,
             suggestColumns: { table: 'bar' },
             suggestValues: { identifierChain: [ {name: 'bl' }], table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest functions for "SELECT CAST(|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(| FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(',
+          afterCursor: ' FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(bla| FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla',
+          afterCursor: ' FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(| AS FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(',
+          afterCursor: ' AS FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(| AS INT FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(',
+          afterCursor: ' AS INT FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(| AS STRING) FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(',
+          afterCursor: ' AS STRING) FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT CAST(bla| AS STRING) FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla',
+          afterCursor: ' AS STRING) FROM bar;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT CAST(bla |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla ',
+          afterCursor: '',
+          containsKeywords: ['AS', 'AND'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT CAST(bla | FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla ',
+          afterCursor: ' FROM bar;',
+          containsKeywords: ['AS', 'AND'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "select cast(bla as |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'select cast(bla as ',
+          afterCursor: '',
+          containsKeywords: ['INT', 'STRING'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT CAST(bla AS | FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla AS ',
+          afterCursor: ' FROM bar;',
+          containsKeywords: ['INT', 'STRING'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT CAST(bla AS ST|) FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(bla AS ST',
+          afterCursor: ') FROM bar;',
+          containsKeywords: ['INT', 'STRING'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT CAST(AS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(AS ',
+          afterCursor: '',
+          containsKeywords: ['INT', 'STRING'],
+          expectedResult: {
+            lowerCase: false
           }
         });
       });
