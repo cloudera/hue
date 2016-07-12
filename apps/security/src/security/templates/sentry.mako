@@ -242,7 +242,7 @@ ${ layout.menubar(section=component) }
                         </li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -368,7 +368,7 @@ ${ layout.menubar(section=component) }
                     </span>
                   </a>
                   <div data-bind="visible: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles())">
-                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', onBlur: function(){ showEditGroups(false); } }" size="5" multiple="true" style="width: 400px"></select>
+                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', onBlur: function(){ showEditGroups(false); } }" size="5" multiple="true" style="width: 400px"></select>
                     &nbsp;
                     <a class="pointer" data-bind="visible: groupsChanged() && !$root.isLoadingRoles(), click: resetGroups">
                       <i class="fa fa-undo"></i>
@@ -431,7 +431,7 @@ ${ layout.menubar(section=component) }
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
-        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', placeholder: '${ _ko("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', placeholder: '${ _ko("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
       </div>
     </div>
 
@@ -462,7 +462,7 @@ ${ layout.menubar(section=component) }
 
     <br/>
     <span>${ _('To role') }&nbsp;&nbsp;</span>
-    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role' }" style="width: 360px"></select>
+    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { dropdownAutoWidth: true, update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role' }" style="width: 360px"></select>
     <br/>
 
   </div>

@@ -53,11 +53,11 @@ ${ layout.menubar(section='hdfs') }
     </label>
     <div style="margin-left: 6px">
       <div data-bind="visible: type() == 'user'">
-        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
+        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
       </div>
 
       <div data-bind="visible: type() == 'group'">
-        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _ko("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
+        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
       </div>
 
       <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
@@ -112,7 +112,7 @@ ${ layout.menubar(section='hdfs') }
                         <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') }</a></li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
