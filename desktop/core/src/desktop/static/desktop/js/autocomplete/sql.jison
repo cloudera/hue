@@ -176,10 +176,32 @@
 'WITHIN'                            { return 'WITHIN'; }
 
 // --- UDFs ---
-CAST\(                              { return 'CAST('; }
-COUNT\(                             { return 'COUNT('; }
-SUM\(                               { return 'SUM('; }
-<impala>EXTRACT\(                   { return '<impala>EXTRACT('; }
+<impala>'APPX_MEDIAN('              { return '<impala>APPX_MEDIAN('; }
+'AVG('                              { return 'AVG('; }
+'CAST('                             { return 'CAST('; }
+'COUNT('                            { return 'COUNT('; }
+'MAX('                              { return 'MAX('; }
+'MIN('                              { return 'MIN('; }
+'STDDEV_POP('                       { return 'STDDEV_POP('; }
+'STDDEV_SAMP('                      { return 'STDDEV_SAMP('; }
+'SUM('                              { return 'SUM('; }
+'VARIANCE('                         { return 'VARIANCE('; }
+'VAR_POP('                          { return 'VAR_POP('; }
+'VAR_SAMP('                         { return 'VAR_SAMP('; }
+<hive>'COLLECT_SET('                { return '<hive>COLLECT_SET('; }
+<hive>'COLLECT_LIST('               { return '<hive>COLLECT_LIST('; }
+<hive>'CORR('                       { return '<hive>CORR('; }
+<hive>'COVAR_POP('                  { return '<hive>COVAR_POP('; }
+<hive>'COVAR_SAMP('                 { return '<hive>COVAR_SAMP('; }
+<hive>'HISTOGRAM_NUMERIC('          { return '<hive>HISTOGRAM_NUMERIC('; }
+<hive>'NTILE('                      { return '<hive>NTILE('; }
+<hive>'PERCENTILE('                 { return '<hive>PERCENTILE('; }
+<hive>'PERCENTILE_APPROX('          { return '<hive>PERCENTILE_APPROX('; }
+<impala>'EXTRACT('                  { return '<impala>EXTRACT('; }
+<impala>'GROUP_CONCAT('             { return '<impala>GROUP_CONCAT('; }
+<impala>'STDDEV('                   { return '<impala>STDDEV('; }
+<impala>'VARIANCE_POP('             { return '<impala>VARIANCE_POP('; }
+<impala>'VARIANCE_SAMP('            { return '<impala>VARIANCE_SAMP('; }
 
 [A-Za-z][A-Za-z0-9_]*\(             { return 'UDF('; }
 
@@ -1682,10 +1704,12 @@ ValueExpressionList_EDIT
    }
  | AnyCursor ',' ValueExpressionList
    {
+     $$ = { cursorAtStart : true };
      valueExpressionSuggest();
    }
  | AnyCursor ','
    {
+     $$ = { cursorAtStart : true };
      valueExpressionSuggest();
    }
  | ',' AnyCursor
@@ -2373,18 +2397,16 @@ OptionalFilterClause
 
 UserDefinedFunction
  : ArbitraryFunction
+ | AggregateFunction
  | CastFunction
- | CountFunction
  | ExtractFunction
- | SumFunction
  ;
 
 UserDefinedFunction_EDIT
  : ArbitraryFunction_EDIT
+ | AggregateFunction_EDIT
  | CastFunction_EDIT
- | CountFunction_EDIT
  | ExtractFunction_EDIT
- | SumFunction_EDIT
  ;
 
 ArbitraryFunction
@@ -2409,6 +2431,18 @@ ArbitraryFunction_EDIT
      checkForKeywords($2);
    }
  | 'UDF(' ValueExpressionList_EDIT RightParenthesisOrError
+ ;
+
+AggregateFunction
+ : CountFunction
+ | SumFunction
+ | OtherAggregateFunction
+ ;
+
+AggregateFunction_EDIT
+ : CountFunction_EDIT
+ | SumFunction_EDIT
+ | OtherAggregateFunction_EDIT
  ;
 
 CastFunction
@@ -2473,6 +2507,78 @@ CountFunction_EDIT
      checkForKeywords($3);
    }
  | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
+   {
+     if ($3.cursorAtStart && !$2) {
+       if (isImpala()) {
+         suggestKeywords(['ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['DISTINCT']);
+       }
+     }
+   }
+ ;
+
+OtherAggregateFunction
+ : OtherAggregateFunction_Type OptionalAllOrDistinct ')'
+ | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList ')'
+ ;
+
+OtherAggregateFunction_EDIT
+ : OtherAggregateFunction_Type OptionalAllOrDistinct AnyCursor RightParenthesisOrError
+   {
+     suggestFunctions();
+     suggestColumns();
+     if (!$2) {
+       if ($1.toLowerCase() === 'group_concat(') {
+         suggestKeywords(['ALL' ]);
+       } else if (isImpala()) {
+         suggestKeywords(['ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['DISTINCT']);
+       }
+     }
+   }
+ | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($3);
+   }
+ | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
+   {
+     if ($3.cursorAtStart && !$2) {
+       if ($1.toLowerCase() === 'group_concat(') {
+         suggestKeywords(['ALL' ]);
+       } else if (isImpala()) {
+         suggestKeywords(['ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['DISTINCT']);
+       }
+     }
+   }
+ ;
+
+OtherAggregateFunction_Type
+ : '<impala>APPX_MEDIAN('
+ | 'AVG('
+ | '<hive>COLLECT_SET('
+ | '<hive>COLLECT_LIST('
+ | '<hive>CORR('
+ | '<hive>COVAR_POP('
+ | '<hive>COVAR_SAMP('
+ | '<impala>GROUP_CONCAT('
+ | '<hive>HISTOGRAM_NUMERIC'
+ | '<impala>STDDEV('
+ | 'STDDEV_POP('
+ | 'STDDEV_SAMP('
+ | 'MAX('
+ | 'MIN('
+ | '<hive>NTILE('
+ | '<hive>PERCENTILE('
+ | '<hive>PERCENTILE_APPROX('
+ | 'VARIANCE('
+ | '<impala>VARIANCE_POP('
+ | '<impala>VARIANCE_SAMP('
+ | 'VAR_POP('
+ | 'VAR_SAMP('
  ;
 
 ExtractFunction
@@ -3584,7 +3690,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     if (typeof parser.yy.result === 'undefined') {
       throw err;
     }
-    if (parser.yy.result.error) {
+    if (parser.yy.result.error && !parser.yy.result.error.expected) {
       console.log(parser.yy.result.error);
     }
     result = parser.yy.result;

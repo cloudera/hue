@@ -882,26 +882,41 @@ define([
 
       it('should suggest columns for "SELECT <GeneralSetFunction>(|) FROM testTable"', function () {
         var aggregateFunctions = [
-          { name: 'AVG'},
+          { name: 'APPX_MEDIAN', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'AVG', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'AVG', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'AVG', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'collect_set', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'COLLECT_LIST', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
           { name: 'COUNT', dialect: 'generic', suggestKeywords: ['*', 'DISTINCT'] },
           { name: 'COUNT', dialect: 'hive', suggestKeywords: ['*', 'DISTINCT'] },
           { name: 'COUNT', dialect: 'impala', suggestKeywords: ['*', 'ALL', 'DISTINCT'] },
-          { name: 'STDDEV_POP' },
-          { name: 'STDDEV_SAMP' },
+          { name: 'GROUP_CONCAT', dialect: 'impala', suggestKeywords: ['ALL'] },
+          { name: 'stddev', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
           { name: 'SUM', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'SUM', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'sum', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
           { name: 'SUM', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'MAX' },
-          { name: 'MIN' },
-          { name: 'VAR_POP' },
-          { name: 'VAR_SAMP' },
-          { name: 'COLLECT_SET', dialect: 'hive' },
-          { name: 'COLLECT_LIST', dialect: 'hive' },
-          { name: 'APPX_MEDIAN', dialect: 'impala' },
-          { name: 'STDDEV', dialect: 'impala' },
-          { name: 'VARIANCE', dialect: 'impala' },
-          { name: 'VARIANCE_POP', dialect: 'impala' },
-          { name: 'VARIANCE_SAMP', dialect: 'impala' }
+          { name: 'MAX', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'MAX', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'max', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'MIN', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'MIN', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'MIN', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VARIANCE', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'variance_pop', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VARIANCE_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'var_samp', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
+          { name: 'VAR_SAMP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
+          { name: 'VAR_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] }
         ];
         aggregateFunctions.forEach(function (aggregateFunction) {
           if (aggregateFunction.name === 'COUNT') {
@@ -955,7 +970,8 @@ define([
               suggestFunctions: true,
               suggestColumns: {
                 table: 'testTable'
-              }
+              },
+              suggestKeywords: ['DISTINCT']
             }
           });
         })
@@ -1001,7 +1017,8 @@ define([
               suggestFunctions: true,
               suggestColumns: {
                 table: 'testTable'
-              }
+              },
+              suggestKeywords: ['DISTINCT']
             }
           });
         })
