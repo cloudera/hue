@@ -179,6 +179,8 @@
 CAST\(                              { return 'CAST('; }
 COUNT\(                             { return 'COUNT('; }
 SUM\(                               { return 'SUM('; }
+<impala>EXTRACT\(                   { return '<impala>EXTRACT('; }
+
 [A-Za-z][A-Za-z0-9_]*\(             { return 'UDF('; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
@@ -2370,17 +2372,19 @@ OptionalFilterClause
  ;
 
 UserDefinedFunction
- : CountFunction
- | SumFunction
+ : ArbitraryFunction
  | CastFunction
- | ArbitraryFunction
+ | CountFunction
+ | ExtractFunction
+ | SumFunction
  ;
 
 UserDefinedFunction_EDIT
- : CountFunction_EDIT
- | SumFunction_EDIT
+ : ArbitraryFunction_EDIT
  | CastFunction_EDIT
- | ArbitraryFunction_EDIT
+ | CountFunction_EDIT
+ | ExtractFunction_EDIT
+ | SumFunction_EDIT
  ;
 
 ArbitraryFunction
@@ -2407,55 +2411,9 @@ ArbitraryFunction_EDIT
  | 'UDF(' ValueExpressionList_EDIT RightParenthesisOrError
  ;
 
-CountFunction
- : 'COUNT(' '*' ')'
- | 'COUNT(' OptionalAllOrDistinct ValueExpressionList ')'
- ;
-
-CountFunction_EDIT
- : 'COUNT(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
-   {
-     suggestColumns();
-     if (!$2) {
-       if (isImpala()) {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
-       } else {
-         suggestKeywords(['*', 'DISTINCT']);
-       }
-     }
-   }
- | 'COUNT(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
-   {
-     checkForKeywords($3);
-   }
- | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
- ;
-
-SumFunction
- : 'SUM(' OptionalAllOrDistinct ValueExpression ')'
- ;
-
-SumFunction_EDIT
- : 'SUM(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
-   {
-     valueExpressionSuggest();
-     if (!$2) {
-       if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
-       } else {
-         suggestKeywords(['DISTINCT']);
-       }
-     }
-   }
- | 'SUM(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
-   {
-     checkForKeywords($3);
-   }
- | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
- ;
-
 CastFunction
  : 'CAST(' ValueExpression AnyAs PrimitiveType ')'
+ | 'CAST(' ')'
  ;
 
 CastFunction_EDIT
@@ -2490,6 +2448,101 @@ CastFunction_EDIT
     {
       suggestTypeKeywords();
     }
+ ;
+
+CountFunction
+ : 'COUNT(' '*' ')'
+ | 'COUNT(' ')'
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList ')'
+ ;
+
+CountFunction_EDIT
+ : 'COUNT(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
+   {
+     suggestColumns();
+     if (!$2) {
+       if (isImpala()) {
+         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['*', 'DISTINCT']);
+       }
+     }
+   }
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($3);
+   }
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
+ ;
+
+ExtractFunction
+ : '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression ')'
+ | '<impala>EXTRACT(' ')'
+ ;
+
+ExtractFunction_EDIT
+ : '<impala>EXTRACT(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
+    {
+      valueExpressionSuggest();
+    }
+ | '<impala>EXTRACT(' AnyCursor FromOrComma RightParenthesisOrError
+    {
+      valueExpressionSuggest();
+    }
+ | '<impala>EXTRACT(' AnyCursor RightParenthesisOrError
+    {
+      valueExpressionSuggest();
+    }
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
+    {
+      valueExpressionSuggest();
+    }
+ | '<impala>EXTRACT(' FromOrComma AnyCursor RightParenthesisOrError
+    {
+      valueExpressionSuggest();
+    }
+ | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
+ | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
+   {
+     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: [',', 'FROM'] }, $2).suggestKeywords);
+   }
+ | '<impala>EXTRACT(' ValueExpression 'CURSOR' RightParenthesisOrError
+   {
+     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: [',', 'FROM'] }, $2).suggestKeywords);
+   }
+ ;
+
+FromOrComma
+ : 'FROM'
+ | ','
+ ;
+
+SumFunction
+ : 'SUM(' OptionalAllOrDistinct ValueExpression ')'
+ | 'SUM(' ')'
+ ;
+
+SumFunction_EDIT
+ : 'SUM(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+     if (!$2) {
+       if (isImpala()) {
+         suggestKeywords(['ALL', 'DISTINCT']);
+       } else {
+         suggestKeywords(['DISTINCT']);
+       }
+     }
+   }
+ | 'SUM(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
+   {
+     checkForKeywords($3);
+   }
+ | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
  ;
 
 WithinGroupSpecification
