@@ -1691,6 +1691,9 @@
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
       $(element).val(ko.unwrap(valueAccessor()));
+      if ($(element).val() === '') {
+        $(element).removeClass('x');
+      }
     }
   }
 
