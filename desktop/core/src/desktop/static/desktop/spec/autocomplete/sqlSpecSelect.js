@@ -827,6 +827,59 @@ define([
         });
       });
 
+      it('should suggest columns for "SELECT extract(bla FROM |  FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract(bla FROM ',
+          afterCursor: ' FROM bar;',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT extract(bla ,|  FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract(bla ,',
+          afterCursor: ' FROM bar;',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT a, extract(bla FROM |)  FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a, extract(bla FROM ',
+          afterCursor: ') FROM bar;',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT extract(bla ,|)  FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract(bla ,',
+          afterCursor: ') FROM bar;',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: true,
+            suggestColumns: { table: 'bar' }
+          }
+        });
+      });
+
+
       it('should suggest columns for "SELECT <GeneralSetFunction>(|) FROM testTable"', function () {
         var aggregateFunctions = [
           { name: 'AVG'},
