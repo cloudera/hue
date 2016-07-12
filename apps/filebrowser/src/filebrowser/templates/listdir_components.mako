@@ -556,6 +556,7 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
 
   <script charset="utf-8">
@@ -834,6 +835,8 @@ from django.utils.translation import ugettext as _
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
+      self.searchQuery.extend({ rateLimit: 500 });
+      self.enableFilterAfterSearch = true;
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.pendingUploads = ko.observable(0);
       self.pendingUploads.subscribe(function (val) {
@@ -1097,7 +1100,10 @@ from django.utils.translation import ugettext as _
       };
 
       self.searchQuery.subscribe(function (newValue) {
-        self.filter();
+        if (newValue !== '' || self.enableFilterAfterSearch) {
+          self.filter();
+        }
+        self.enableFilterAfterSearch = true;
       });
 
       self.filter = function () {
@@ -1109,6 +1115,7 @@ from django.utils.translation import ugettext as _
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
           self.targetPageNum(1);
+          self.enableFilterAfterSearch = false;
           self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           location.hash = stripHashes(file.path);
@@ -1975,11 +1982,6 @@ from django.utils.translation import ugettext as _
       addPathToHistory(viewModel.targetPath())
 
       viewModel.retrieveData();
-
-      $(".search-query").jHueDelayedInput(function(){
-        viewModel.searchQuery($(".search-query").val());
-        viewModel.filter();
-      }, 500);
 
       $("#editBreadcrumb").click(function (e) {
         if ($(e.target).is('ul')){
