@@ -30,7 +30,7 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    it('should suggest keywords for empty statement', function() {
+    it('should suggest keywords for "|"', function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -41,7 +41,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE', function () {
+    it('should suggest keywords for "CREATE |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE ',
         afterCursor: '',
@@ -53,7 +53,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE DATABASE ', function () {
+    it('should suggest keywords for "CREATE DATABASE |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE DATABASE ',
         afterCursor: '',
@@ -64,7 +64,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE DATABASE IF ', function () {
+    it('should suggest keywords for "CREATE DATABASE IF |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE DATABASE IF ',
         afterCursor: '',
@@ -75,7 +75,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE SCHEMA ', function () {
+    it('should suggest keywords for "CREATE SCHEMA |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE SCHEMA ',
         afterCursor: '',
@@ -86,7 +86,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE DATABASE and before Identifier', function () {
+    it('should suggest keywords for "CREATE DATABASE | bla;"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE DATABASE ',
         afterCursor: ' bla;',
@@ -97,7 +97,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE TABLE identifier (identifier ', function () {
+    it('should suggest keywords for "CREATE TABLE foo (id |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id ',
         afterCursor: '',
@@ -109,7 +109,7 @@ define([
       });
     });
 
-    it('should suggest keywords after CREATE TABLE identifier (identifier INT, identifier FLOAT, identifier ', function () {
+    it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
         afterCursor: '',
@@ -122,7 +122,7 @@ define([
     });
 
     describe('Impala specific', function () {
-      it('should suggest keywords after CREATE DATABASE foo ', function () {
+      it('should suggest keywords for "CREATE DATABASE foo |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE DATABASE foo ',
           afterCursor: '',
@@ -136,7 +136,7 @@ define([
     });
 
     describe('Hive specific', function () {
-      it ('should suggest keywords after CREATE', function () {
+      it ('should suggest keywords for "CREATE |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE ',
           afterCursor: '',
@@ -148,7 +148,7 @@ define([
         });
       });
 
-      it ('should suggest keywords after CREATE EXTERNAL TABLE identifier tableElementList', function () {
+      it ('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int) |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) ',
           afterCursor: '',
@@ -160,7 +160,7 @@ define([
         });
       });
 
-      it('should suggest keywords in after CREATE TABLE identifier (identifier ', function () {
+      it('should suggest keywords for "CREATE TABLE foo (id |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE TABLE foo (id ',
           afterCursor: '',
@@ -172,7 +172,7 @@ define([
         });
       });
 
-      it('should suggest keywords after CREATE DATABASE foo ', function () {
+      it('should suggest keywords for "CREATE DATABASE foo |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE DATABASE foo ',
           afterCursor: '',
@@ -184,7 +184,7 @@ define([
         });
       });
 
-      it('should suggest keywords after CREATE DATABASE foo COMMENT ', function () {
+      it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' ',
           afterCursor: '',
@@ -196,7 +196,7 @@ define([
         });
       });
 
-      it('should suggest keywords after CREATE DATABASE foo COMMENT and LOCATION', function () {
+      it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
           afterCursor: '',

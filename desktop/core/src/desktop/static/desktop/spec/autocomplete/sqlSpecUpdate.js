@@ -30,7 +30,7 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    it('should suggest keywords for empty statement', function() {
+    it('should suggest keywords for "|"', function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -41,7 +41,7 @@ define([
       });
     });
 
-    it('should suggest keywords after UPDATE TableReference ', function () {
+    it('should suggest keywords for "UPDATE bar  |"', function () {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar  ',
         afterCursor: '',
@@ -52,7 +52,7 @@ define([
       });
     });
 
-    it('should suggest keywords after UPDATE TableReference SET SetClauseList ', function () {
+    it('should suggest keywords for "UPDATE bar SET id=1, foo=2 |"', function () {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar SET id=1, foo=2 ',
         afterCursor: '',
@@ -63,7 +63,7 @@ define([
       });
     });
 
-    it('should suggest keywords after UPDATE TableReference SET identifier ', function () {
+    it('should suggest keywords for "UPDATE bar SET id |"', function () {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar SET id ',
         afterCursor: '',
@@ -74,7 +74,7 @@ define([
       });
     });
 
-    it('should suggest tables after UPDATE', function() {
+    it('should suggest tables for "UPDATE |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE ',
         afterCursor: '',
@@ -88,7 +88,7 @@ define([
       });
     });
 
-    it('should suggest tables after UPDATE with partial table or schema ref', function() {
+    it('should suggest tables for "UPDATE bla|"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bla',
         afterCursor: '',
@@ -102,7 +102,7 @@ define([
       });
     });
 
-    it('should suggest tables after UPDATE with database', function() {
+    it('should suggest tables for "UPDATE bar.|"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.',
         afterCursor: '',
@@ -115,7 +115,7 @@ define([
       });
     });
 
-    it('should suggest tables after UPDATE with database and partial table', function() {
+    it('should suggest tables for "UPDATE bar.foo|"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo',
         afterCursor: '',
@@ -128,7 +128,7 @@ define([
       });
     });
 
-    it('should suggest columns after SET', function() {
+    it('should suggest columns for "UPDATE bar.foo SET |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET ',
         afterCursor: '',
@@ -142,7 +142,7 @@ define([
       });
     });
 
-    it('should suggest columns after SET id = 1, bar = \'foo\', ', function() {
+    it('should suggest columns for "UPDATE bar.foo SET id = 1, bar = \'foo\', |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET id = 1, bar = \'foo\', ',
         afterCursor: '',
@@ -156,7 +156,7 @@ define([
       });
     });
 
-    it('should suggest columns after SET bar = \'foo\' WHERE ', function() {
+    it('should suggest columns for "UPDATE bar.foo SET bar = \'foo\' WHERE |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE ',
         afterCursor: '',
@@ -172,7 +172,7 @@ define([
       });
     });
 
-    it('should suggest values after SET bar = \'foo\' WHERE id = ', function() {
+    it('should suggest values for "UPDATE bar.foo SET bar = \'foo\' WHERE id = |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = ',
         afterCursor: '',
@@ -189,7 +189,7 @@ define([
       });
     });
 
-    it('should suggest columns after SET bar = \'foo\' WHERE id = 1 AND ', function() {
+    it('should suggest columns for "UPDATE bar.foo SET bar = \'foo\' WHERE id = 1 AND |"', function() {
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = 1 AND ',
         afterCursor: '',

@@ -30,7 +30,7 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    it('should suggest keywords for empty statement', function() {
+    it('should suggest keywords for "|"', function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -41,7 +41,7 @@ define([
       });
     });
 
-    it('should suggest keywords after DROP', function() {
+    it('should suggest keywords for "DROP |"', function() {
       assertAutoComplete({
         beforeCursor: 'DROP ',
         afterCursor: '',
@@ -54,7 +54,7 @@ define([
     });
 
     describe('hive specific', function () {
-      it('should suggest keywords after DROP', function() {
+      it('should suggest keywords for "DROP |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP ',
           afterCursor: '',
@@ -68,7 +68,7 @@ define([
     });
 
     describe('hive specific', function () {
-      it('should follow case after drop', function() {
+      it('should follow case for "drop |"', function() {
         assertAutoComplete({
           beforeCursor: 'drop ',
           afterCursor: '',
@@ -82,7 +82,7 @@ define([
     });
 
     describe('impala specific', function () {
-      it('should suggest keywords after DROP', function() {
+      it('should suggest keywords for "DROP |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP ',
           afterCursor: '',
@@ -96,7 +96,7 @@ define([
     });
 
     describe('drop database statements', function () {
-      it('should suggest databases after DROP DATABASE ', function() {
+      it('should suggest databases for "DROP DATABASE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP DATABASE ',
           afterCursor: '',
@@ -109,7 +109,7 @@ define([
         });
       });
 
-      it('should suggest databases after DROP SCHEMA ', function() {
+      it('should suggest databases for "DROP SCHEMA |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP SCHEMA ',
           afterCursor: '',
@@ -121,7 +121,7 @@ define([
         });
       });
 
-      it('should suggest keywords after DROP DATABASE IF ', function() {
+      it('should suggest keywords for "DROP DATABASE IF |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP DATABASE IF ',
           afterCursor: '',
@@ -133,7 +133,7 @@ define([
         });
       });
 
-      it('should suggest databases after DROP DATABASE IF EXISTS ', function() {
+      it('should suggest databases for "DROP DATABASE IF EXISTS |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP DATABASE IF EXISTS ',
           afterCursor: '',
@@ -146,7 +146,7 @@ define([
       });
 
       describe('Hive specific', function () {
-        it('should suggest keywords after DROP DATABASE foo ', function() {
+        it('should suggest keywords for "DROP DATABASE foo |"', function() {
           assertAutoComplete({
             beforeCursor: 'DROP DATABASE foo ',
             afterCursor: '',
@@ -161,7 +161,7 @@ define([
     });
 
     describe('drop table statements', function () {
-      it('should suggest tables after DROP TABLE ', function() {
+      it('should suggest tables for "DROP TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE ',
           afterCursor: '',
@@ -176,7 +176,7 @@ define([
         });
       });
 
-      it('should suggest tables after DROP TABLE db. ', function() {
+      it('should suggest tables for "DROP TABLE db.|"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE db.',
           afterCursor: '',
@@ -187,7 +187,7 @@ define([
         });
       });
 
-      it('should suggest keywords after DROP TABLE IF ', function() {
+      it('should suggest keywords for "DROP TABLE IF |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE IF ',
           afterCursor: '',
@@ -198,7 +198,7 @@ define([
         });
       });
 
-      it('should suggest tables after DROP TABLE IF EXISTS ', function() {
+      it('should suggest tables for "DROP TABLE IF EXISTS |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE IF EXISTS ',
           afterCursor: '',
@@ -213,7 +213,7 @@ define([
       });
 
       describe('Hive specific', function () {
-        it('should suggest keywords after DROP TABLE foo ', function() {
+        it('should suggest keywords for "DROP TABLE foo |"', function() {
           assertAutoComplete({
             beforeCursor: 'DROP TABLE foo ',
             afterCursor: '',
