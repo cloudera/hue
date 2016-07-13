@@ -184,31 +184,33 @@
   function drawLockedRow(plugin, rowNo) {
     var $pluginElement = $(plugin.element);
     var lockedRows = $pluginElement.data('lockedRows') || [];
-    lockedRows.push(rowNo);
-    $pluginElement.data('lockedRows', lockedRows);
-    var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
-    var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
-    var $clone = $pluginElement.find('tbody tr:eq('+ rowNo +')').clone();
-    $clone.addClass('locked');
-    $header.addClass('locked');
-    $headerCounter.addClass('locked');
-    $clone.appendTo($header.find('tbody'));
-    var $newTr = $('<tr>');
-    $newTr.addClass('locked').html('<td class="pointer">' + (rowNo+1) + '</td>').appendTo($headerCounter.find('tbody'));
-    $newTr.find('td').on('click', function(){
-      var idx = $(this).parent().index();
-      $header.find('tbody tr:eq('+ idx +')').remove();
-      var arrIdx = $pluginElement.data('lockedRows').indexOf(idx);
-      if (arrIdx > -1) {
-        $pluginElement.data('lockedRows').splice(arrIdx, 1);
-      }
-      $(this).parent().remove();
-      if ($header.find('tbody tr').length == 0){
-        $header.removeClass('locked');
-        $headerCounter.removeClass('locked');
-        $pluginElement.data('lockedRows', []);
-      }
-    });
+    if (lockedRows.indexOf(rowNo) === -1) {
+      lockedRows.push(rowNo);
+      $pluginElement.data('lockedRows', lockedRows);
+      var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
+      var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
+      var $clone = $pluginElement.find('tbody tr:eq(' + rowNo + ')').clone();
+      $clone.addClass('locked');
+      $header.addClass('locked');
+      $headerCounter.addClass('locked');
+      $clone.appendTo($header.find('tbody'));
+      var $newTr = $('<tr>');
+      $newTr.addClass('locked').html('<td class="pointer">' + (rowNo + 1) + '</td>').appendTo($headerCounter.find('tbody'));
+      $newTr.find('td').on('click', function () {
+        var idx = $(this).parent().index();
+        $header.find('tbody tr:eq(' + idx + ')').remove();
+        var arrIdx = $pluginElement.data('lockedRows').indexOf(idx);
+        if (arrIdx > -1) {
+          $pluginElement.data('lockedRows').splice(arrIdx, 1);
+        }
+        $(this).parent().remove();
+        if ($header.find('tbody tr').length == 0) {
+          $header.removeClass('locked');
+          $headerCounter.removeClass('locked');
+          $pluginElement.data('lockedRows', []);
+        }
+      });
+    }
   }
 
   function drawFirstColumn(plugin) {
