@@ -796,9 +796,9 @@
 
   ko.bindingHandlers.scatterChart = {
     update: function (element, valueAccessor) {
+      var options = valueAccessor();
+      var _datum = options.transformer(options.datum);
       window.setTimeout(function () {
-        var options = valueAccessor();
-        var _datum = options.transformer(options.datum);
         $(element).height(300);
         if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
           $(element).find("svg").empty();
