@@ -665,8 +665,8 @@ ${ hueIcons.symbols() }
         <td>${ _('Go to end')}</td>
       </tr>
       <tr>
-        <td>Ctrl-L</td>
-        <td>Command-L</td>
+        <td>Ctrl-L, Ctrl-J</td>
+        <td>Command-L, Command-J</td>
         <td>${ _('Go to line')}</td>
       </tr>
       <tr>

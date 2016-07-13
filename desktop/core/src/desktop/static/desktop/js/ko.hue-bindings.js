@@ -3012,6 +3012,12 @@
         }
       });
 
+      editor.commands.addCommand({
+        name: "gotolinealternetive",
+        bindKey: {win: "Ctrl-j", mac: "Command-j|Ctrl-j"},
+        exec: editor.commands.commands['gotoline'].exec
+      });
+
       huePubSub.subscribe("assist.dblClickDbItem", function(assistDbEntry) {
         if ($el.data("last-active-editor")) {
           var text = assistDbEntry.editorText();
