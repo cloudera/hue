@@ -146,7 +146,7 @@
         $li.appendTo($ul);
       });
       $(self.element).find('.filechooser-services').empty().width(80);
-      $(self.element).find('.filechooser-tree').width(450).css('paddingLeft', '6px').css('borderLeft', '1px solid #EEE').css('marginLeft', '80px');
+      $(self.element).find('.filechooser-tree').width(470).css('paddingLeft', '6px').css('borderLeft', '1px solid #EEE').css('marginLeft', '80px');
       $ul.appendTo($(self.element).find('.filechooser-services'));
     }
   };
@@ -158,7 +158,10 @@
       $(_parent.element).find('.filechooser-tree').empty();
 
       path = data.current_dir_path; // use real path.
-      var _flist = $("<ul>").addClass("unstyled").css("margin-left", "2px");
+      var _flist = $("<ul>").addClass("unstyled").css({
+        'height': '270px',
+        'overflow-y': 'auto'
+      });
       if (data.title != null && data.title == "Error") {
         var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
         _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
@@ -175,7 +178,11 @@
         }
         $.totalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
         _parent.previousPath = path;
-        var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0").css("marginLeft", "0");
+        var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css({
+          'padding': '0',
+          'marginLeft': '0',
+          'white-space': 'nowrap'
+        });
 
         var _home = $("<li>");
         var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
@@ -338,12 +345,18 @@
           $(_parent.element).parent().scrollTop(0)
         }, 100);
       }
-    }).error(function () {
+    }).error(function (e) {
       if (!_parent.options.suppressErrors) {
         $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
         _parent.options.onError();
       }
-      _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3' ? 'S3://' : '/?default_to_home'));
+      if (e.status === 404) {
+        _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3' ? 'S3://' : '/?default_to_home'));
+      }
+      else {
+        console.error(e);
+        $(document).trigger("error", e.statusText);
+      }
     });
   };
 
@@ -384,7 +397,7 @@
 
   Plugin.prototype.init = function () {
     var self = this;
-    $(self.element).empty().html('<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: fixed"></div><div class="filechooser-tree" style="width: 540px"></div></div>');
+    $(self.element).empty().html('<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: fixed"></div><div class="filechooser-tree" style="width: 560px"></div></div>');
     $.post('/filebrowser/api/get_filesystems', function (data) {
       var initialPath = $.trim(self.options.initialPath);
       if (data && data.status == 0) {
