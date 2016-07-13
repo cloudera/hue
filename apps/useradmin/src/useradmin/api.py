@@ -19,6 +19,7 @@ import logging
 
 from django.contrib.auth.models import User, Group
 
+from desktop.decorators import check_superuser_permission
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_unicode
 
@@ -40,6 +41,7 @@ def error_handler(view_fn):
 
 
 @error_handler
+@check_superuser_permission
 def get_users(request):
   """
   Returns all users with username, ID, groups, active and superuser status by default.
