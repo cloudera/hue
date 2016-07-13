@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import errno
-import json
 import logging
 import mimetypes
 import operator
@@ -1142,6 +1141,7 @@ def trash_purge(request):
     return generic_op(TrashPurgeForm, request, request.fs.purge_trash, [], None)
 
 
+@require_http_methods(["POST"])
 def upload_file(request):
     """
     A wrapper around the actual upload view function to clean up the temporary file afterwards if it fails.
@@ -1151,19 +1151,17 @@ def upload_file(request):
     """
     response = {'status': -1, 'data': ''}
 
-    if request.method == 'POST':
-        try:
-            resp = _upload_file(request)
-            response.update(resp)
-        except Exception, ex:
-            response['data'] = str(ex).split('\n', 1)[0]
-            hdfs_file = request.FILES.get('hdfs_file')
-            if hdfs_file:
-                hdfs_file.remove()
-    else:
-        response['data'] = _('A POST request is required.')
+    try:
+        resp = _upload_file(request)
+        response.update(resp)
+    except Exception, ex:
+        response['data'] = str(ex).split('\n', 1)[0]
+        hdfs_file = request.FILES.get('hdfs_file')
+        if hdfs_file and hasattr(hdfs_file, 'remove'):  # TODO: Call from proxyFS
+            hdfs_file.remove()
 
-    return HttpResponse(json.dumps(response), content_type="text/plain")
+    return JsonResponse(response)
+
 
 def _upload_file(request):
     """
@@ -1185,13 +1183,8 @@ def _upload_file(request):
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
             raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
 
-        dest = request.fs.join(dest, uploaded_file.name)
-        tmp_file = uploaded_file.get_temp_path()
-        username = request.user.username
-
         try:
-            # Remove tmp suffix of the file
-            request.fs.do_as_user(username, request.fs.rename, tmp_file, dest)
+            request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
         except IOError, ex:
             already_exists = False
@@ -1216,6 +1209,7 @@ def _upload_file(request):
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
 
+@require_http_methods(["POST"])
 def upload_archive(request):
     """
     A wrapper around the actual upload view function to clean up the temporary file afterwards.
@@ -1225,21 +1219,18 @@ def upload_archive(request):
     """
     response = {'status': -1, 'data': ''}
 
-    if request.method == 'POST':
+    try:
         try:
-            try:
-                resp = _upload_archive(request)
-                response.update(resp)
-            except Exception, ex:
-                response['data'] = str(ex)
-        finally:
-            hdfs_file = request.FILES.get('hdfs_file')
-            if hdfs_file:
-                hdfs_file.remove()
-    else:
-        response['data'] = _('A POST request is required.')
+            resp = _upload_archive(request)
+            response.update(resp)
+        except Exception, ex:
+            response['data'] = str(ex)
+    finally:
+        hdfs_file = request.FILES.get('hdfs_file')
+        if hdfs_file:
+            hdfs_file.remove()
 
-    return HttpResponse(json.dumps(response), content_type="text/plain")
+    return JsonResponse(response)
 
 
 def _upload_archive(request):

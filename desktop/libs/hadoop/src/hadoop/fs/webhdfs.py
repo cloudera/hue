@@ -771,6 +771,16 @@ class WebHdfs(Hdfs):
       except Exception:
         pass
 
+  def upload(self, file, path, *args, **kwargs):
+    username = kwargs.get('username')
+    if not username:
+      raise WebHdfsException(_("Failed to upload file. WebHdfs requires a valid username to upload files."))
+
+    dst = self.join(path, file.name)
+    tmp_file = file.get_temp_path()
+
+    self.do_as_user(username, self.rename, tmp_file, dst)
+
 
 class File(object):
   """
