@@ -557,7 +557,7 @@
       if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
         return typeof self.chartX() != "undefined" && self.chartX() != null && self.chartYMulti().length > 0;
       }
-      return typeof self.chartX() != "undefined" && self.chartX() != null && typeof self.chartYSingle() != "undefined" && self.chartYSingle() != null ;
+      return typeof self.chartX() != "undefined" && self.chartX() != null && typeof self.chartYSingle() != "undefined" && self.chartYSingle() != null;
     });
 
     self.hasDataForChart.subscribe(function(newValue) {
