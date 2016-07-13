@@ -213,7 +213,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         </div>
 
-        <!-- ko if: editorMode() == 'editor' -->
+        <!-- ko ifnot: editorMode -->
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-bars"></i>
@@ -255,18 +255,18 @@ ${ hueIcons.symbols() }
 
         &nbsp;&nbsp;&nbsp;
 
-        <!-- ko if: editorMode() == 'editor' -->
+        <!-- ko if: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook(true); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _('Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         <!-- /ko -->
-        <!-- ko if: editorMode() != 'editor' -->
+        <!-- ko ifnot: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: newNotebook" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         <!-- /ko -->
 
-        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType(), 'title':  editorMode() == 'editor' ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
+        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType(), 'title':  editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
 
@@ -280,7 +280,7 @@ ${ hueIcons.symbols() }
       <div class="nav-collapse">
         <ul class="nav editor-nav">
           <li class="currentApp" data-bind="visible: editorMode" style="display: none">
-            <!-- ko if: editorMode() -->
+            <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
@@ -304,7 +304,7 @@ ${ hueIcons.symbols() }
               <!-- /ko -->
               </a>
             <!-- /ko -->
-            <!-- ko ifnot: editorMode() -->
+            <!-- ko ifnot: editorMode -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
             <!-- /ko -->            
