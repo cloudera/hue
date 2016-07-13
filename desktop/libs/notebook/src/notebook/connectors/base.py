@@ -90,6 +90,7 @@ def get_api(request, snippet):
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
+  from notebook.connectors.oozie_batch import OozieApi
   from notebook.connectors.pig_batch import PigApi
   from notebook.connectors.solr import SolrApi
   from notebook.connectors.spark_shell import SparkApi
@@ -104,6 +105,8 @@ def get_api(request, snippet):
 
   if interface == 'hiveserver2':
     return HS2Api(user=request.user, request=request)
+  elif interface == 'oozie':
+    return OozieApi(user=request.user, request=request, interpreter=snippet['type'])
   elif interface == 'livy':
     return SparkApi(request.user)
   elif interface == 'livy-batch':
