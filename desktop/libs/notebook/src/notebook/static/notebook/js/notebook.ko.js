@@ -865,6 +865,7 @@
       }
 
       self.result.explanation('');
+      self.errors([]);
       self.progress(0);
       self.status('ready');
 
@@ -877,7 +878,7 @@
           self.result.fetchedOnce(true);
           self.result.explanation(data.explanation);
         } else {
-          $(document).trigger("error", data.message);
+          self._ajaxError(data);
         }
       });
     }

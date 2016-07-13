@@ -384,7 +384,10 @@ class HS2Api(Api):
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
-    explanation = db.explain(query)
+    try:
+      explanation = db.explain(query)
+    except QueryServerException, ex:
+      raise QueryError(ex.message)
 
     return {
       'status': 0,
