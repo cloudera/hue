@@ -486,8 +486,6 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     LOG.exception('Error submitting workflow: %s' % smart_str(detail))
     raise PopupException(_("Error submitting workflow %s: %s") % (workflow, detail))
 
-  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
-
 
 @check_editor_access_permission
 def list_editor_coordinators(request):
