@@ -17,11 +17,9 @@
 
 import logging
 
-from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-
 from desktop.models import Document2
 
 
@@ -49,6 +47,14 @@ def hue_permission_required(action, app):
       return view_func(request, *args, **kwargs)
     return decorated
   return decorator
+
+
+def check_superuser_permission(view_func):
+  def decorate(request, *args, **kwargs):
+    if not request.user.is_superuser:
+      raise PopupException(_('You must be a superuser to perform this operation.'), error_code=401)
+    return view_func(request, *args, **kwargs)
+  return wraps(view_func)(decorate)
 
 
 def check_document_access_permission():
