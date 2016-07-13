@@ -137,7 +137,9 @@ if USE_NEW_EDITOR.get():
     jHueTableExtenderGlobals = {
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",
-        PLACEHOLDER: "${_('column name...')}"
+        PLACEHOLDER: "${_('column name...')}",
+        LOCK: "${_('Click to lock this row')}",
+        UNLOCK: "${_('Click to unlock this row')}"
       }
     };
 

@@ -1017,6 +1017,26 @@ div.locked {
   border-bottom: 1px solid #f0c36d;
 }
 
+.table tr.locked td.unlockable, .table tr td.lockable {
+  position: relative;
+}
+
+.table tr.locked td.unlockable .fa-unlock, .table tr td.lockable .fa-lock {
+  display: none;
+  position: absolute;
+  right: 4px;
+  margin-top: 3px;
+}
+
+.table tr.locked td.unlockable:hover, .table tr td.lockable:hover {
+  color: #CCC;
+}
+
+.table tr.locked td.unlockable:hover .fa-unlock, .table tr td.lockable:hover .fa-lock {
+  color: #666;
+  display: block;
+}
+
 .nounderline:hover {
   text-decoration: none;
 }
