@@ -2184,6 +2184,7 @@ ${ hueIcons.symbols() }
           $(el).jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
+            lockSelectedRow: true,
             includeNavigator: false,
             parentId: 'snippet_' + snippet.id(),
             mainScrollable: '.right-panel',
@@ -2200,6 +2201,7 @@ ${ hueIcons.symbols() }
           $(el).jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
+            lockSelectedRow: true,
             includeNavigator: false,
             mainScrollable: '.right-panel',
             parentId: 'snippet_' + snippet.id(),
@@ -2242,6 +2244,7 @@ ${ hueIcons.symbols() }
           $(el).jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
+            lockSelectedRow: true,
             includeNavigator: false,
             parentId: 'snippet_' + snippet.id(),
             mainScrollable: '.right-panel',
@@ -2257,6 +2260,7 @@ ${ hueIcons.symbols() }
           $(el).jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
+            lockSelectedRow: true,
             includeNavigator: false,
             mainScrollable: '.right-panel',
             parentId: 'snippet_' + snippet.id(),
@@ -2797,6 +2801,7 @@ ${ hueIcons.symbols() }
               _el.jHueTableExtender({
                 fixedHeader: true,
                 fixedFirstColumn: true,
+                lockSelectedRow: true,
                 includeNavigator: false,
                 mainScrollable: '.right-panel',
                 stickToTopPosition: viewModel.isPlayerMode() ? 1 : 73,
@@ -2808,6 +2813,7 @@ ${ hueIcons.symbols() }
               _el.jHueTableExtender({
                 fixedHeader: true,
                 fixedFirstColumn: true,
+                lockSelectedRow: true,
                 includeNavigator: false,
                 mainScrollable: '.right-panel',
                 parentId: 'snippet_' + snippet.id(),

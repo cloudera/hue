@@ -24,7 +24,7 @@
     defaults = {
       fixedHeader: false,
       fixedFirstColumn: false,
-      lockSelectedRow: true,
+      lockSelectedRow: false,
       firstColumnTooltip: false,
       classToRemove: 'resultTable',
       hintElement: null,
@@ -33,15 +33,23 @@
       stickToTopPosition: -1,
       labels: {
         GO_TO_COLUMN: "Go to column:",
-        PLACEHOLDER: "column name..."
+        PLACEHOLDER: "column name...",
+        LOCK: "Click to lock row",
+        UNLOCK: "Click to unlock row"
       }
     };
 
   function Plugin(element, options) {
     this.element = element;
+    this.setOptions(options);
+    this._name = pluginName;
+    this.init();
+  }
+
+  Plugin.prototype.setOptions = function (options) {
     if (typeof jHueTableExtenderGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
+      var extendedDefaults = $.extend({}, defaults, jHueTableExtenderGlobals);
+      extendedDefaults.labels = $.extend({}, defaults.labels, jHueTableExtenderGlobals.labels);
       this.options = $.extend({}, extendedDefaults, options);
       if (options != null) {
         this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
@@ -53,13 +61,9 @@
         this.options.labels = $.extend({}, defaults.labels, options.labels);
       }
     }
-    this._defaults = defaults;
-    this._name = pluginName;
-    this.init();
-  }
 
-  Plugin.prototype.setOptions = function (options) {
-    this.options = $.extend({}, defaults, options);
+    this._defaults = defaults;
+
     if (this.options.fixedHeader) {
       drawHeader(this);
     }
@@ -189,22 +193,19 @@
       $pluginElement.data('lockedRows', lockedRows);
       var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
       var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
-      var $clone = $pluginElement.find('tbody tr:eq(' + rowNo + ')').clone();
+      var $clone = $pluginElement.find('tbody tr:eq('+ rowNo +')').clone();
       $clone.addClass('locked');
       $header.addClass('locked');
       $headerCounter.addClass('locked');
       $clone.appendTo($header.find('tbody'));
       var $newTr = $('<tr>');
-      $newTr.addClass('locked').html('<td class="pointer">' + (rowNo + 1) + '</td>').appendTo($headerCounter.find('tbody'));
-      $newTr.find('td').on('click', function () {
+      $newTr.addClass('locked').html('<td class="pointer unlockable" title="' + plugin.options.labels.UNLOCK + '"><i class="fa fa-unlock muted"></i>' + (rowNo+1) + '</td>').appendTo($headerCounter.find('tbody'));
+      $newTr.find('td').on('click', function(){
         var idx = $(this).parent().index();
-        $header.find('tbody tr:eq(' + idx + ')').remove();
-        var arrIdx = $pluginElement.data('lockedRows').indexOf(idx);
-        if (arrIdx > -1) {
-          $pluginElement.data('lockedRows').splice(arrIdx, 1);
-        }
+        $header.find('tbody tr:eq('+ idx +')').remove();
+        $pluginElement.data('lockedRows').splice(idx, 1);
         $(this).parent().remove();
-        if ($header.find('tbody tr').length == 0) {
+        if ($header.find('tbody tr').length == 0){
           $header.removeClass('locked');
           $headerCounter.removeClass('locked');
           $pluginElement.data('lockedRows', []);
@@ -255,9 +256,13 @@
     clonedTable.find("thead>tr th:not(:eq(0))").remove();
     clonedTable.find("tbody>tr").each(function () {
       $(this).find("td:not(:eq(0))").remove();
-      $(this).find('td').addClass('pointer').on('click', function(){
-        drawLockedRow(plugin, $(this).parent().index());
-      });
+      if (plugin.options.lockSelectedRow) {
+        var cell = $(this).find('td:eq(0)');
+        cell.attr('title', plugin.options.labels.LOCK).addClass('lockable pointer').on('click', function(){
+          drawLockedRow(plugin, $(this).parent().index());
+        });
+        $('<i>').addClass('fa fa-lock muted').prependTo(cell);
+      }
     });
     clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
 
