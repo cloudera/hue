@@ -30,7 +30,7 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    it('should suggest keywords for empty statement', function() {
+    it('should suggest keywords for "|"', function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -42,7 +42,7 @@ define([
       });
     });
 
-    it('should suggest keywords after SHOW', function() {
+    it('should suggest keywords for "SHOW |"', function() {
       assertAutoComplete({
         beforeCursor: 'SHOW ',
         afterCursor: '',
@@ -55,7 +55,7 @@ define([
     });
 
     describe('hive specific', function () {
-      it('should suggest keywords after SHOW', function() {
+      it('should suggest keywords for "SHOW |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ',
           afterCursor: '',
@@ -67,7 +67,7 @@ define([
         });
       });
 
-      it('should handle SHOW COMPACTIONS', function() {
+      it('should handle "SHOW COMPACTIONS;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COMPACTIONS;',
           afterCursor: '',
@@ -79,7 +79,7 @@ define([
         });
       });
 
-      it('should handle SHOW CONF confName', function() {
+      it('should handle "SHOW CONF a.b.c;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CONF a.b.c;',
           afterCursor: '',
@@ -91,7 +91,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW COLUMNS', function() {
+      it('should suggest keywords for "SHOW COLUMNS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS ',
           afterCursor: '',
@@ -103,7 +103,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMNS FROM ', function() {
+      it('should suggest tables for "SHOW COLUMNS FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM ',
           afterCursor: '',
@@ -115,7 +115,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMNS FROM partial', function() {
+      it('should suggest tables for "SHOW COLUMNS FROM partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM partial',
           afterCursor: '',
@@ -127,7 +127,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW COLUMNS FROM tableName ', function() {
+      it('should suggest keywords for "SHOW COLUMNS FROM tableName |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM tableName ',
           afterCursor: '',
@@ -139,7 +139,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS FROM tableName FROM', function() {
+      it('should suggest databases for "SHOW COLUMNS FROM tableName FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM tableName FROM ',
           afterCursor: '',
@@ -151,7 +151,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS FROM tableName FROM partial', function() {
+      it('should suggest databases for "SHOW COLUMNS FROM tableName FROM partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM tableName FROM partial',
           afterCursor: '',
@@ -163,7 +163,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS FROM tableName IN', function() {
+      it('should suggest databases for "SHOW COLUMNS FROM tableName IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM tableName IN ',
           afterCursor: '',
@@ -175,7 +175,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS FROM tableName IN partial', function() {
+      it('should suggest databases for "SHOW COLUMNS FROM tableName IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS FROM tableName IN partial',
           afterCursor: '',
@@ -187,7 +187,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMNS IN ', function() {
+      it('should suggest tables for "SHOW COLUMNS IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN ',
           afterCursor: '',
@@ -199,7 +199,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMNS IN partial', function() {
+      it('should suggest tables for "SHOW COLUMNS IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN partial',
           afterCursor: '',
@@ -211,7 +211,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW COLUMNS IN tableName ', function() {
+      it('should suggest keywords for "SHOW COLUMNS IN tableName |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN tableName ',
           afterCursor: '',
@@ -223,7 +223,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS IN tableName FROM', function() {
+      it('should suggest databases for "SHOW COLUMNS IN tableName FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN tableName FROM ',
           afterCursor: '',
@@ -235,7 +235,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS IN tableName FROM partial', function() {
+      it('should suggest databases for "SHOW COLUMNS IN tableName FROM partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN tableName FROM partial',
           afterCursor: '',
@@ -247,7 +247,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS IN tableName IN', function() {
+      it('should suggest databases for "SHOW COLUMNS IN tableName IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN tableName IN ',
           afterCursor: '',
@@ -259,7 +259,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW COLUMNS IN tableName IN partial', function() {
+      it('should suggest databases for "SHOW COLUMNS IN tableName IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMNS IN tableName IN partial',
           afterCursor: '',
@@ -271,7 +271,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW CREATE', function() {
+      it('should suggest keywords for "SHOW CREATE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE ',
           afterCursor: '',
@@ -283,7 +283,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE', function() {
+      it('should suggest tables for "SHOW CREATE TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE ',
           afterCursor: '',
@@ -298,7 +298,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE partial', function() {
+      it('should suggest tables for "SHOW CREATE TABLE partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE partial',
           afterCursor: '',
@@ -313,7 +313,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE databaseOne.', function() {
+      it('should suggest tables for "SHOW CREATE TABLE databaseOne.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE databaseOne.',
           afterCursor: '',
@@ -327,7 +327,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE databaseOne.partial', function() {
+      it('should suggest tables for "SHOW CREATE TABLE databaseOne.partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE databaseOne.partial',
           afterCursor: '',
@@ -341,7 +341,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW CURRENT', function() {
+      it('should suggest keywords for "SHOW CURRENT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CURRENT ',
           afterCursor: '',
@@ -353,7 +353,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW DATABASES', function() {
+      it('should suggest keywords for "SHOW DATABASES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW DATABASES ',
           afterCursor: '',
@@ -365,7 +365,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED', function() {
+      it('should suggest keywords for "SHOW FORMATTED |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED ',
           afterCursor: '',
@@ -377,7 +377,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEX', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEX |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ',
           afterCursor: '',
@@ -389,7 +389,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW FORMATTED INDEX ON ', function() {
+      it('should suggest tables for "SHOW FORMATTED INDEX ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON ',
           afterCursor: '',
@@ -401,7 +401,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW FORMATTED INDEX ON partial', function() {
+      it('should suggest tables for "SHOW FORMATTED INDEX ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON partial',
           afterCursor: '',
@@ -413,7 +413,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEX ON table', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEX ON tableName |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON tableName ',
           afterCursor: '',
@@ -425,7 +425,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW FORMATTED INDEX ON table FROM ', function() {
+      it('should suggest databases for "SHOW FORMATTED INDEX ON table FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON tableName FROM ',
           afterCursor: '',
@@ -437,7 +437,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW FORMATTED INDEX ON with db specified ', function() {
+      it('should suggest tables for "SHOW FORMATTED INDEX ON | FROM databaseOne"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON ',
           afterCursor: ' FROM databaseOne',
@@ -451,7 +451,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEXES', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEXES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEXES ',
           afterCursor: '',
@@ -463,7 +463,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW FORMATTED INDEXES ON ', function() {
+      it('should suggest tables for "SHOW FORMATTED INDEXES ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEXES ON ',
           afterCursor: '',
@@ -475,7 +475,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW FORMATTED INDEXES ON partial', function() {
+      it('should suggest tables for "SHOW FORMATTED INDEXES ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEXES ON partial',
           afterCursor: '',
@@ -487,7 +487,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEX ON tableName ', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEX ON tableOne |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEX ON tableOne ',
           afterCursor: '',
@@ -499,7 +499,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEXES', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEXES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEXES ',
           afterCursor: '',
@@ -511,7 +511,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FORMATTED INDEXES ON tableName ', function() {
+      it('should suggest keywords for "SHOW FORMATTED INDEXES ON tableOne |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FORMATTED INDEXES ON tableOne ',
           afterCursor: '',
@@ -523,7 +523,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT', function() {
+      it('should suggest tables and keywords for "SHOW GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ',
           afterCursor: '',
@@ -535,7 +535,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT ON', function() {
+      it('should suggest tables for "SHOW GRANT ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ON ',
           afterCursor: '',
@@ -548,7 +548,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT ON partial', function() {
+      it('should suggest tables for "SHOW GRANT ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ON partial',
           afterCursor: '',
@@ -561,7 +561,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW GRANT ON TABLE', function() {
+      it('should suggest tables for "SHOW GRANT ON TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ON TABLE ',
           afterCursor: '',
@@ -573,7 +573,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW GRANT ON TABLE partial', function() {
+      it('should suggest tables for SHOW GRANT ON TABLE partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ON TABLE partial',
           afterCursor: '',
@@ -585,7 +585,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT principal', function() {
+      it('should suggest tables for "SHOW GRANT pcp |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT pcp ',
           afterCursor: '',
@@ -597,7 +597,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT principal ON', function() {
+      it('should suggest tables for "SHOW GRANT pcp ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT pcp ON ',
           afterCursor: '',
@@ -610,7 +610,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW GRANT principal ON partial', function() {
+      it('should suggest tables for "SHOW GRANT pcp ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT pcp ON partial',
           afterCursor: '',
@@ -623,7 +623,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW GRANT principal ON TABLE', function() {
+      it('should suggest tables for "SHOW GRANT pcp ON TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT pcp ON TABLE ',
           afterCursor: '',
@@ -635,7 +635,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW GRANT principal ON TABLE partial', function() {
+      it('should suggest tables for "SHOW GRANT pcp ON TABLE partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT pcp ON TABLE partial',
           afterCursor: '',
@@ -647,7 +647,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW INDEX', function() {
+      it('should suggest keywords for "SHOW INDEX |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEX ',
           afterCursor: '',
@@ -659,7 +659,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW INDEX ON ', function() {
+      it('should suggest tables for "SHOW INDEX ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEX ON ',
           afterCursor: '',
@@ -671,7 +671,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW INDEX ON partial', function() {
+      it('should suggest tables for "SHOW INDEX ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEX ON partial',
           afterCursor: '',
@@ -683,7 +683,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW INDEX ON tableName ', function() {
+      it('should suggest keywords for "SHOW INDEX ON tableOne |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEX ON tableOne ',
           afterCursor: '',
@@ -695,7 +695,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW INDEXES', function() {
+      it('should suggest keywords for "SHOW INDEXES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEXES ',
           afterCursor: '',
@@ -707,7 +707,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW INDEXES ON ', function() {
+      it('should suggest tables for "SHOW INDEXES ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEXES ON ',
           afterCursor: '',
@@ -719,7 +719,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW INDEXES ON partial', function() {
+      it('should suggest tables for "SHOW INDEXES ON partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEXES ON partial',
           afterCursor: '',
@@ -731,7 +731,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW INDEXES ON tableName ', function() {
+      it('should suggest keywords for "SHOW INDEXES ON tableOne |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW INDEXES ON tableOne ',
           afterCursor: '',
@@ -743,7 +743,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW LOCKS', function() {
+      it('should suggest tables for "SHOW LOCKS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS ',
           afterCursor: '',
@@ -759,7 +759,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after SHOW LOCKS partial', function() {
+      it('should suggest tables for "SHOW LOCKS partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS partial',
           afterCursor: '',
@@ -775,7 +775,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW LOCKS DATABASE', function() {
+      it('should suggest databases for "SHOW LOCKS DATABASE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS DATABASE ',
           afterCursor: '',
@@ -787,7 +787,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW LOCKS DATABASE partial', function() {
+      it('should suggest databases for "SHOW LOCKS DATABASE partial |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS DATABASE partial',
           afterCursor: '',
@@ -799,7 +799,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW LOCKS SCHEMA', function() {
+      it('should suggest databases for "SHOW LOCKS SCHEMA |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS SCHEMA ',
           afterCursor: '',
@@ -811,7 +811,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW LOCKS SCHEMA partial', function() {
+      it('should suggest databases for "SHOW LOCKS SCHEMA partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS SCHEMA partial',
           afterCursor: '',
@@ -823,7 +823,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW LOCKS tableName', function() {
+      it('should suggest keywords for "SHOW LOCKS tableName |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS tableName ',
           afterCursor: '',
@@ -835,7 +835,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW LOCKS tableName PARTITION partitionSpec', function() {
+      it('should suggest keywords for "SHOW LOCKS tableName PARTITION (ds=\'2010-03-03\', hr=\'12\') |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW LOCKS tableName PARTITION (ds=\'2010-03-03\', hr=\'12\') ',
           afterCursor: '',
@@ -847,7 +847,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW PARTITIONS ', function() {
+      it('should suggest tables for "SHOW PARTITIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW PARTITIONS ',
           afterCursor: '',
@@ -862,7 +862,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW PARTITIONS partial', function() {
+      it('should suggest tables for "SHOW PARTITIONS partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW PARTITIONS partial',
           afterCursor: '',
@@ -877,7 +877,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW PARTITIONS tableName', function() {
+      it('should suggest keywords for "SHOW PARTITIONS foo |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW PARTITIONS foo ',
           afterCursor: '',
@@ -889,7 +889,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ROLE', function() {
+      it('should suggest keywords for "SHOW ROLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ROLE ',
           afterCursor: '',
@@ -901,7 +901,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ROLE GRANT', function() {
+      it('should suggest keywords for "SHOW ROLE GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ROLE GRANT ',
           afterCursor: '',
@@ -913,7 +913,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW SCHEMAS', function() {
+      it('should suggest keywords for "SHOW SCHEMAS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW SCHEMAS ',
           afterCursor: '',
@@ -925,7 +925,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLE', function() {
+      it('should suggest keywords for "SHOW TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE ',
           afterCursor: '',
@@ -937,7 +937,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLE EXTENDED', function() {
+      it('should suggest keywords for "SHOW TABLE EXTENDED |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED ',
           afterCursor: '',
@@ -949,7 +949,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW TABLE EXTENDED FROM ', function() {
+      it('should suggest databases for "SHOW TABLE EXTENDED FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED FROM ',
           afterCursor: '',
@@ -961,7 +961,7 @@ define([
         });
       });
 
-      it('should suggest functions after SHOW TABLE EXTENDED FROM database LIKE identifier', function() {
+      it('should suggest functions for "SHOW TABLE EXTENDED FROM databaseOne LIKE \'f|oo*\' |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED FROM databaseOne LIKE \'f|oo*\' ',
           afterCursor: '',
@@ -973,7 +973,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW TABLE EXTENDED IN ', function() {
+      it('should suggest databases for "SHOW TABLE EXTENDED IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED IN ',
           afterCursor: '',
@@ -985,7 +985,7 @@ define([
         });
       });
 
-      it('should suggest functions after SHOW TABLE EXTENDED IN database LIKE identifier', function() {
+      it('should suggest functions for "SHOW TABLE EXTENDED IN databaseOne LIKE \'f|oo*\' |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED IN databaseOne LIKE \'f|oo*\' ',
           afterCursor: '',
@@ -997,7 +997,7 @@ define([
         });
       });
 
-      it('should suggest functions after SHOW TABLE EXTENDED LIKE identifier', function() {
+      it('should suggest functions for "SHOW TABLE EXTENDED LIKE \'f|oo*\' |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE EXTENDED LIKE \'f|oo*\' ',
           afterCursor: '',
@@ -1009,7 +1009,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLES', function() {
+      it('should suggest keywords for "SHOW TABLES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES ',
           afterCursor: '',
@@ -1021,7 +1021,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW TABLES IN', function() {
+      it('should suggest databases for "SHOW TABLES IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES IN ',
           afterCursor: '',
@@ -1033,7 +1033,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLES IN db ', function() {
+      it('should suggest keywords for "SHOW TABLES IN db |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES IN db ',
           afterCursor: '',
@@ -1045,31 +1045,33 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW TBLPROPERTIES', function() {
+      it('should suggest tables for "SHOW TBLPROPERTIES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TBLPROPERTIES ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { prependDot: true }
           }
         });
       });
 
-      it('should suggest tables after SHOW TBLPROPERTIES partial', function() {
+      it('should suggest tables for "SHOW TBLPROPERTIES partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TBLPROPERTIES partial',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {}
+            suggestTables: {},
+            suggestDatabases: { prependDot: true }
           }
         });
       });
 
-      it('should handle SHOW TRANSACTIONS', function() {
+      it('should handle "SHOW TRANSACTIONS;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TRANSACTIONS;',
           afterCursor: '',
@@ -1083,7 +1085,7 @@ define([
     });
 
     describe('impala specific', function () {
-      it('should suggest keywords after SHOW', function() {
+      it('should suggest keywords for "SHOW |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ',
           afterCursor: '',
@@ -1095,7 +1097,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW AGGREGATE', function() {
+      it('should suggest keywords for "SHOW AGGREGATE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW AGGREGATE ',
           afterCursor: '',
@@ -1107,7 +1109,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW AGGREGATE FUNCTIONS', function() {
+      it('should suggest keywords for "SHOW AGGREGATE FUNCTIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW AGGREGATE FUNCTIONS ',
           afterCursor: '',
@@ -1119,7 +1121,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW AGGREGATE FUNCTIONS IN', function() {
+      it('should suggest databases for "SHOW AGGREGATE FUNCTIONS IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW AGGREGATE FUNCTIONS IN ',
           afterCursor: '',
@@ -1131,7 +1133,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW AGGREGATE FUNCTIONS IN partial', function() {
+      it('should suggest databases for "SHOW AGGREGATE FUNCTIONS IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW AGGREGATE FUNCTIONS IN partial',
           afterCursor: '',
@@ -1143,7 +1145,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ANALYTIC', function() {
+      it('should suggest keywords for "SHOW ANALYTIC |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ANALYTIC ',
           afterCursor: '',
@@ -1155,7 +1157,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ANALYTIC FUNCTIONS', function() {
+      it('should suggest keywords for "SHOW ANALYTIC FUNCTIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ANALYTIC FUNCTIONS ',
           afterCursor: '',
@@ -1167,7 +1169,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW ANALYTIC FUNCTIONS IN', function() {
+      it('should suggest databases for "SHOW ANALYTIC FUNCTIONS IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ANALYTIC FUNCTIONS IN ',
           afterCursor: '',
@@ -1179,7 +1181,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW ANALYTIC FUNCTIONS IN partial', function() {
+      it('should suggest databases for "SHOW ANALYTIC FUNCTIONS IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ANALYTIC FUNCTIONS IN partial',
           afterCursor: '',
@@ -1191,7 +1193,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW COLUMN', function() {
+      it('should suggest keywords for "SHOW COLUMN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMN ',
           afterCursor: '',
@@ -1203,7 +1205,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMN STATS', function() {
+      it('should suggest tables for "SHOW COLUMN STATS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMN STATS ',
           afterCursor: '',
@@ -1218,7 +1220,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW COLUMN STATS partial', function() {
+      it('should suggest tables for "SHOW COLUMN STATS partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW COLUMN STATS partial',
           afterCursor: '',
@@ -1233,7 +1235,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW CREATE', function() {
+      it('should suggest keywords for "SHOW CREATE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE ',
           afterCursor: '',
@@ -1245,7 +1247,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE', function() {
+      it('should suggest tables for "SHOW CREATE TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE ',
           afterCursor: '',
@@ -1260,7 +1262,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW CREATE TABLE partial', function() {
+      it('should suggest tables for "SHOW CREATE TABLE partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CREATE TABLE partial',
           afterCursor: '',
@@ -1275,7 +1277,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW CURRENT', function() {
+      it('should suggest keywords for "SHOW CURRENT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CURRENT ',
           afterCursor: '',
@@ -1287,7 +1289,7 @@ define([
         });
       });
 
-      it('should handle SHOW CURRENT ROLES', function() {
+      it('should handle "SHOW CURRENT ROLES;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CURRENT ROLES;',
           afterCursor: '',
@@ -1299,7 +1301,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW DATABASES', function() {
+      it('should suggest keywords for "SHOW DATABASES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW DATABASES ',
           afterCursor: '',
@@ -1311,7 +1313,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW FUNCTIONS', function() {
+      it('should suggest keywords for "SHOW FUNCTIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FUNCTIONS ',
           afterCursor: '',
@@ -1323,7 +1325,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW FUNCTIONS IN', function() {
+      it('should suggest databases for "SHOW FUNCTIONS IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FUNCTIONS IN ',
           afterCursor: '',
@@ -1335,7 +1337,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW FUNCTIONS IN partial', function() {
+      it('should suggest databases for "SHOW FUNCTIONS IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FUNCTIONS IN partial',
           afterCursor: '',
@@ -1347,7 +1349,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW GRANT', function() {
+      it('should suggest keywords for "SHOW GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ',
           afterCursor: '',
@@ -1359,7 +1361,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW PARTITIONS', function() {
+      it('should suggest tables for "SHOW PARTITIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW PARTITIONS ',
           afterCursor: '',
@@ -1374,7 +1376,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW PARTITIONS partial', function() {
+      it('should suggest tables for "SHOW PARTITIONS partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW PARTITIONS partial',
           afterCursor: '',
@@ -1389,7 +1391,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ROLE', function() {
+      it('should suggest keywords for "SHOW ROLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ROLE ',
           afterCursor: '',
@@ -1401,7 +1403,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW ROLE GRANT', function() {
+      it('should suggest keywords for "SHOW ROLE GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ROLE GRANT ',
           afterCursor: '',
@@ -1413,7 +1415,7 @@ define([
         });
       });
 
-      it('should handle SHOW ROLES', function() {
+      it('should handle "SHOW ROLES;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW ROLES;',
           afterCursor: '',
@@ -1425,7 +1427,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW SCHEMAS', function() {
+      it('should suggest keywords for "SHOW SCHEMAS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW SCHEMAS ',
           afterCursor: '',
@@ -1437,7 +1439,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLE', function() {
+      it('should suggest keywords for "SHOW TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE ',
           afterCursor: '',
@@ -1449,7 +1451,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW TABLE STATS', function() {
+      it('should suggest tables for "SHOW TABLE STATS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE STATS ',
           afterCursor: '',
@@ -1464,7 +1466,7 @@ define([
         });
       });
 
-      it('should suggest tables after SHOW TABLE STATS partial', function() {
+      it('should suggest tables for "SHOW TABLE STATS partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLE STATS partial',
           afterCursor: '',
@@ -1479,7 +1481,7 @@ define([
         });
       });
 
-      it('should suggest keywords after SHOW TABLES', function() {
+      it('should suggest keywords for "SHOW TABLES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES ',
           afterCursor: '',
@@ -1491,7 +1493,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW TABLES IN', function() {
+      it('should suggest databases for "SHOW TABLES IN |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES IN ',
           afterCursor: '',
@@ -1503,7 +1505,7 @@ define([
         });
       });
 
-      it('should suggest databases after SHOW TABLES IN partial', function() {
+      it('should suggest databases for "SHOW TABLES IN partial|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TABLES IN partial',
           afterCursor: '',

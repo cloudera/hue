@@ -38,25 +38,55 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
+    it('should suggest keywords for ";;|"', function() {
+      assertAutoComplete({
+        beforeCursor: ';;',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for ";|;"', function() {
+      assertAutoComplete({
+        beforeCursor: ';',
+        afterCursor: ';',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "|;;;;', function() {
+      assertAutoComplete({
+        beforeCursor: '',
+        afterCursor: ';;;;',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "foo|bar"', function() {
+      assertAutoComplete({
+        beforeCursor: 'foo',
+        afterCursor: 'bar',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     describe('Impala specific', function () {
-      it('should suggest keywords for empty statement', function() {
+      it('should suggest keywords for "|"', function() {
         assertAutoComplete({
           beforeCursor: '',
           afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
-              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
-          }
-        });
-      });
-
-      it('should suggest keywords for partial statement', function() {
-        assertAutoComplete({
-          beforeCursor: 'foo',
-          afterCursor: 'bar',
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
@@ -69,24 +99,10 @@ define([
     });
 
     describe('Hive specific', function () {
-      it('should suggest keywords for empty statement', function() {
+      it('should suggest keywords for "|"', function() {
         assertAutoComplete({
           beforeCursor: '',
           afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'EXPORT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
-              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
-          }
-        });
-      });
-
-      it('should suggest keywords for partial statement', function() {
-        assertAutoComplete({
-          beforeCursor: 'foo',
-          afterCursor: 'bar',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
@@ -102,12 +118,9 @@ define([
       assertAutoComplete({
         beforeCursor: '-- line comment\nSELECT * from testTable1;\n',
         afterCursor: '\n-- other line comment',
-        dialect: 'generic',
+        containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
-            'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
-            'UPDATE', 'USE']
+          lowerCase: false
         }
       });
     });
@@ -116,12 +129,9 @@ define([
       assertAutoComplete({
         beforeCursor: '/* line 1\nline 2\n*/\nSELECT * from testTable1;\n',
         afterCursor: '',
-        dialect: 'generic',
+        containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP',
-            'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE',
-            'UPDATE', 'USE']
+          lowerCase: false
         }
       });
     });

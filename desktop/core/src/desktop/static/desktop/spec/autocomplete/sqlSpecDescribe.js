@@ -32,7 +32,7 @@ define([
 
 
     describe('hive specific', function () {
-      it('should handle DESCRIBE tbl', function() {
+      it('should handle "DESCRIBE tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE tbl;',
           afterCursor: '',
@@ -44,7 +44,7 @@ define([
         });
       });
 
-      it('should handle DESCRIBE tbl.col.field', function() {
+      it('should handle "DESCRIBE tbl.col.field;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE tbl col.field;',
           afterCursor: '',
@@ -56,7 +56,7 @@ define([
         });
       });
 
-      it('should handle EXTENDED tbl', function() {
+      it('should handle "DESCRIBE EXTENDED tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE EXTENDED tbl;',
           afterCursor: '',
@@ -68,7 +68,7 @@ define([
         });
       });
 
-      it('should handle EXTENDED tbl col.field', function() {
+      it('should handle "DESCRIBE EXTENDED tbl col.field;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE EXTENDED tbl col.field;',
           afterCursor: '',
@@ -80,7 +80,7 @@ define([
         });
       });
 
-      it('should handle FORMATTED tbl', function() {
+      it('should handle "DESCRIBE FORMATTED tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED tbl;',
           afterCursor: '',
@@ -92,7 +92,7 @@ define([
         });
       });
 
-      it('should handle FORMATTED tbl.col.field', function() {
+      it('should handle "DESCRIBE FORMATTED tbl col.field;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED tbl col.field;',
           afterCursor: '',
@@ -104,35 +104,107 @@ define([
         });
       });
 
-      it('should suggest keywords and tables after DESCRIBE', function() {
+      it('should handle "DESCRIBE FUNCTION cos;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE FUNCTION cos;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DESCRIBE FUNCTION EXTENDED cos;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE FUNCTION EXTENDED cos;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DESCRIBE DATABASE db;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE DATABASE db;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DESCRIBE DATABASE EXTENDED db;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE DATABASE EXTENDED db;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DESCRIBE SCHEMA db;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE SCHEMA db;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DESCRIBE SCHEMA EXTENDED db;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE SCHEMA EXTENDED db;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "DESCRIBE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA'],
+            suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
             suggestTables: {},
             suggestDatabases: { appendDot: true }
           }
         });
       });
 
-      it('should suggest keywords and tables after DESCRIBE partial', function() {
+      it('should suggest tables for "DESCRIBE tbl|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE tbl',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'SCHEMA'],
+            suggestKeywords: ['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA'],
             suggestTables: {},
             suggestDatabases: { appendDot: true }
           }
         });
       });
 
-      it('should suggest tables after DESCRIBE db.', function() {
+      it('should suggest tables for "DESCRIBE db.|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE db.',
           afterCursor: '',
@@ -144,7 +216,7 @@ define([
         });
       });
 
-      it('should suggest columns after DESCRIBE db.tb ', function() {
+      it('should suggest columns for "DESCRIBE db.tbl |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE db.tbl ',
           afterCursor: '',
@@ -159,55 +231,31 @@ define([
         });
       });
 
-      it('should handle DESCRIBE DATABASE db', function() {
+      it('should suggest keywords for "DESCRIBE FUNCTION |"', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE DATABASE db;',
+          beforeCursor: 'DESCRIBE FUNCTION ',
           afterCursor: '',
           dialect: 'hive',
-          containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestKeywords: ['EXTENDED']
           }
         });
       });
 
-      it('should handle DESCRIBE DATABASE EXTENDED db', function() {
+      it('should suggest keywords for "DESCRIBE FUNCTION | cos"', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE DATABASE EXTENDED db;',
-          afterCursor: '',
+          beforeCursor: 'DESCRIBE FUNCTION ',
+          afterCursor: ' cos',
           dialect: 'hive',
-          containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestKeywords: ['EXTENDED']
           }
         });
       });
 
-      it('should handle DESCRIBE SCHEMA db', function() {
-        assertAutoComplete({
-          beforeCursor: 'DESCRIBE SCHEMA db;',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should handle DESCRIBE SCHEMA EXTENDED db', function() {
-        assertAutoComplete({
-          beforeCursor: 'DESCRIBE SCHEMA EXTENDED db;',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords and databases after DESCRIBE DATABASE', function() {
+      it('should suggest databases for "DESCRIBE DATABASE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE DATABASE ',
           afterCursor: '',
@@ -220,7 +268,7 @@ define([
         });
       });
 
-      it('should suggest keywords and databases after DESCRIBE DATABASE partial', function() {
+      it('should suggest databases for "DESCRIBE DATABASE db|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE DATABASE db',
           afterCursor: '',
@@ -233,7 +281,7 @@ define([
         });
       });
 
-      it('should suggest databases after DESCRIBE DATABASE EXTENDED', function() {
+      it('should suggest databases for "DESCRIBE DATABASE EXTENDED |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE DATABASE EXTENDED ',
           afterCursor: '',
@@ -245,7 +293,7 @@ define([
         });
       });
 
-      it('should suggest keyworda and databases after DESCRIBE SCHEMA', function() {
+      it('should suggest databases for "DESCRIBE SCHEMA |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE SCHEMA ',
           afterCursor: '',
@@ -258,7 +306,7 @@ define([
         });
       });
 
-      it('should suggest keywords and databases after DESCRIBE SCHEMA partial', function() {
+      it('should suggest databases for "DESCRIBE SCHEMA db|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE SCHEMA db',
           afterCursor: '',
@@ -271,7 +319,7 @@ define([
         });
       });
 
-      it('should suggest databases after DESCRIBE SCHEMA EXTENDED', function() {
+      it('should suggest databases for "DESCRIBE SCHEMA EXTENDED |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE SCHEMA EXTENDED ',
           afterCursor: '',
@@ -283,7 +331,7 @@ define([
         });
       });
 
-      it('should suggest tables after DESCRIBE EXTENDED', function() {
+      it('should suggest tables for "DESCRIBE EXTENDED |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE EXTENDED ',
           afterCursor: '',
@@ -296,19 +344,19 @@ define([
         });
       });
 
-      it('should suggest tables after DESCRIBE EXTENDED db.', function() {
+      it('should suggest tables for "describe extended db.|"', function() {
         assertAutoComplete({
-          beforeCursor: 'DESCRIBE EXTENDED db.',
+          beforeCursor: 'describe extended db.',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
-            lowerCase: false,
+            lowerCase: true,
             suggestTables: { database: 'db' }
           }
         });
       });
 
-      it('should suggest columns after DESCRIBE EXTENDED db.tbl', function() {
+      it('should suggest columns for "DESCRIBE EXTENDED db.tbl |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE EXTENDED db.tbl ',
           afterCursor: '',
@@ -323,7 +371,7 @@ define([
         });
       });
 
-      it('should suggest tables after DESCRIBE FORMATTED', function() {
+      it('should suggest tables for "DESCRIBE FORMATTED |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED ',
           afterCursor: '',
@@ -336,7 +384,7 @@ define([
         });
       });
 
-      it('should suggest tables after DESCRIBE FORMATTED db.', function() {
+      it('should suggest tables for "DESCRIBE FORMATTED db.|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED db.',
           afterCursor: '',
@@ -350,7 +398,7 @@ define([
         });
       });
 
-      it('should suggest columns after DESCRIBE FORMATTED db.tbl', function() {
+      it('should suggest columns for "DESCRIBE FORMATTED db.tbl |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED db.tbl ',
           afterCursor: '',
@@ -365,7 +413,7 @@ define([
         });
       });
 
-      it('should suggest fields after DESCRIBE FORMATTED db.tbl col.', function() {
+      it('should suggest fields for "DESCRIBE FORMATTED db.tbl col.|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED db.tbl col.',
           afterCursor: '',
@@ -383,7 +431,7 @@ define([
     });
 
     describe('impala specific', function () {
-      it('should handle DESCRIBE tbl', function() {
+      it('should handle "DESCRIBE tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE tbl;',
           afterCursor: '',
@@ -395,7 +443,7 @@ define([
         });
       });
 
-      it('should handle DESCRIBE db.tbl', function() {
+      it('should handle "DESCRIBE db.tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE db.tbl;',
           afterCursor: '',
@@ -407,7 +455,7 @@ define([
         });
       });
 
-      it('should handle DESCRIBE FORMATTED db.tbl', function() {
+      it('should handle "DESCRIBE FORMATTED db.tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED db.tbl;',
           afterCursor: '',
@@ -419,7 +467,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after DESCRIBE', function() {
+      it('should suggest tables for "DESCRIBE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE ',
           afterCursor: '',
@@ -435,7 +483,7 @@ define([
         });
       });
 
-      it('should suggest tables and keywords after DESCRIBE partial', function() {
+      it('should suggest tables for "DESCRIBE db|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE db',
           afterCursor: '',
@@ -451,7 +499,7 @@ define([
         });
       });
 
-      it('should suggest tables after DESCRIBE db.', function() {
+      it('should suggest tables for "DESCRIBE db.|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE db.',
           afterCursor: '',

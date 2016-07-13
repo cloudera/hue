@@ -30,7 +30,7 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    it('should suggest keywords for empty statement', function() {
+    it('should suggest keywords for "|"', function() {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -41,7 +41,7 @@ define([
       });
     });
 
-    it('should suggest databases after use', function () {
+    it('should suggest databases for "USE |"', function () {
       assertAutoComplete({
         serverResponses: {},
         beforeCursor: 'USE ',
@@ -53,7 +53,7 @@ define([
       });
     });
 
-    it('should suggest databases after use with started identifier', function () {
+    it('should suggest databases for "USE bla|"', function () {
       assertAutoComplete({
         serverResponses: {},
         beforeCursor: 'USE bla',
@@ -65,9 +65,9 @@ define([
       });
     });
 
-    it('should use a use statement before the cursor if present', function () {
+    it('should use a use statement for "USE database_two; \\nselect |"', function () {
       assertAutoComplete({
-        beforeCursor: 'USE database_two; \n\select ',
+        beforeCursor: 'USE database_two; \nselect ',
         afterCursor: '',
         expectedResult: {
           useDatabase: 'database_two',
@@ -88,7 +88,7 @@ define([
       });
     });
 
-    it('should use the last use statement before the cursor if multiple are present', function () {
+    it('should use the last use statement for "USE other_db; USE closest_db; \\n\\tSELECT |"', function () {
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '',
@@ -111,7 +111,7 @@ define([
       });
     });
 
-    it('should use the use statement before the cursor if multiple are present after the cursor', function () {
+    it('should use the use statement for "USE other_db; USE closest_db; \\n\\tSELECT |; USE some_other_db;"', function () {
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '; USE some_other_db;',

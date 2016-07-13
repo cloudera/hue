@@ -31,7 +31,7 @@ define([
     var assertAutoComplete = testUtils.assertAutocomplete;
 
     describe('Impala specific', function () {
-      it('should suggest keywords for empty statement', function() {
+      it('should suggest keywords for "|"', function() {
         assertAutoComplete({
           beforeCursor: '',
           afterCursor: '',
@@ -43,7 +43,7 @@ define([
         });
       });
 
-      it ('should suggest keywords after LOAD', function () {
+      it('should suggest keywords for "LOAD |"', function () {
         assertAutoComplete({
           beforeCursor: 'LOAD ',
           afterCursor: '',
@@ -55,7 +55,7 @@ define([
         });
       });
 
-      it ('should suggest keywords after LOAD DATA', function () {
+      it('should suggest keywords for "LOAD DATA |"', function () {
         assertAutoComplete({
           beforeCursor: 'LOAD DATA ',
           afterCursor: '',
@@ -67,7 +67,7 @@ define([
         });
       });
 
-      it ('should suggest keywords after LOAD DATA hdfsPath', function () {
+      it('should suggest keywords for "LOAD DATA INPATH \'/some/path\' |"', function () {
         assertAutoComplete({
           beforeCursor: 'LOAD DATA INPATH \'/some/path\' ',
           afterCursor: '',
@@ -79,7 +79,7 @@ define([
         });
       });
 
-      it ('should suggest keywords after LOAD DATA hdfsPath INTO', function () {
+      it('should suggest keywords for "LOAD DATA INPATH \'some/path\' INTO |"', function () {
         assertAutoComplete({
           beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO ',
           afterCursor: '',
@@ -93,7 +93,7 @@ define([
     });
 
     describe('Hive specific', function () {
-      it('should suggest keywords for empty statement', function () {
+      it('should suggest keywords for "|"', function () {
         assertAutoComplete({
           beforeCursor: '',
           afterCursor: '',
@@ -106,7 +106,7 @@ define([
       });
     });
 
-    it('should autocomplete hdfs paths in location references without initial /', function () {
+    it('should suggest hdfs paths for "LOAD DATA INPATH \'|\'"', function () {
       assertAutoComplete({
         beforeCursor: 'LOAD DATA INPATH \'',
         afterCursor: '\'',
@@ -118,7 +118,7 @@ define([
       });
     });
 
-    it('should autocomplete hdfs paths in location references from root', function () {
+    it('should suggest hdfs paths for "LOAD DATA INPATH \'/|\'"', function () {
       assertAutoComplete({
         beforeCursor: 'LOAD DATA INPATH \'/',
         afterCursor: '\'',
@@ -130,7 +130,7 @@ define([
       });
     });
 
-    it('should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor', function () {
+    it('should suggest hdfs paths for "LOAD DATA INPATH \'/|"', function () {
       assertAutoComplete({
         beforeCursor: 'LOAD DATA INPATH \'/',
         afterCursor: '',
@@ -142,7 +142,7 @@ define([
       });
     });
 
-    it('should autocomplete hdfs paths in location references from inside a path', function () {
+    it('should suggest hdfs paths for "LOAD DATA INPATH \'/|/bar\' INTO TABLE foo"', function () {
       assertAutoComplete({
         serverResponses: {},
         beforeCursor: 'LOAD DATA INPATH \'/',
