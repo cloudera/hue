@@ -210,3 +210,6 @@ class ProxyFS(object):
 
   def _rename_star_between_filesystems(self, old, new):
     raise NotImplementedError("Will be addressed in HUE-2934")
+
+  def upload(self, file, path, *args, **kwargs):
+    self._get_fs(path).upload(file, path, *args, **kwargs)

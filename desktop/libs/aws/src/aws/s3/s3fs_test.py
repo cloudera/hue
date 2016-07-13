@@ -15,23 +15,34 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+import json
 import os
 import tempfile
 import string
 
-from nose.tools import assert_true, assert_false, assert_raises, eq_
+from nose.tools import assert_equal, assert_false, assert_true, assert_raises, eq_
+
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access, add_to_group
 
 from aws.s3 import join, parse_uri
 from aws.s3.s3fs import S3FileSystem
 from aws.s3.s3test_utils import S3TestBase, generate_id
+from aws.s3.upload import DEFAULT_WRITE_SIZE
 
 
 class S3FSTest(S3TestBase):
+
   @classmethod
   def setUpClass(cls):
     S3TestBase.setUpClass()
     if not cls.shouldSkip():
       cls.fs = S3FileSystem(cls.s3_connection)
+
+      cls.c = make_logged_in_client(username='test', is_superuser=False)
+      grant_access('test', 'test', 'filebrowser')
+      add_to_group('test')
+
 
   def test_open(self):
     path = self.get_test_path('test_open.txt')
@@ -53,6 +64,7 @@ class S3FSTest(S3TestBase):
       assert_raises(Exception, self.fs.open, path, mode='w')
       assert_raises(Exception, self.fs.open, path, mode='?r')
 
+
   def test_read(self):
     path = self.get_test_path('test_read.txt')
     with self.cleaning(path):
@@ -62,11 +74,14 @@ class S3FSTest(S3TestBase):
       eq_('Hel', self.fs.read(path, 0, 3))
       eq_('ell', self.fs.read(path, 1, 3))
 
+
   def test_isfile(self):
     pass
 
+
   def test_isdir(self):
     pass
+
 
   def test_exists(self):
     dir_path = self.get_test_path('test_exists')
@@ -85,6 +100,7 @@ class S3FSTest(S3TestBase):
     fake_bucket = 'fake%s' % generate_id(8, string.ascii_lowercase + string.digits)
     assert_false(self.fs.exists('s3://%s' % fake_bucket))
 
+
   def test_stats(self):
     assert_raises(ValueError, self.fs.stats, 'ftp://archive')
     not_exists = self.get_test_path('does_not_exist')
@@ -97,7 +113,8 @@ class S3FSTest(S3TestBase):
     bucket_stat = self.fs.stats('s3://%s' % self.bucket_name)
     eq_(True, bucket_stat.isDir)
     eq_('s3://%s' % self.bucket_name, bucket_stat.path)
-    
+
+
   def test_copyfile(self):
     src_path = self.get_test_path('test_copy_file_src')
     dst_path = self.get_test_path('test_copy_file_dst')
@@ -109,6 +126,7 @@ class S3FSTest(S3TestBase):
       self.fs.copyfile(src_path, dst_path)
       actual = self.fs.read(dst_path, 0, len(data) + 100)
       eq_(data, actual)
+
 
   def test_full_copy(self):
     src_path = self.get_test_path('test_full_copy_src')
@@ -138,6 +156,7 @@ class S3FSTest(S3TestBase):
       # Copy directory to file should fail.
       assert_raises(IOError, self.fs.copy, src_path, dst_file_path, True)
 
+
   def test_copy_remote_dir(self):
     src_dir = self.get_test_path('test_copy_remote_dir_src')
     dst_dir = self.get_test_path('test_copy_remote_dir_dst')
@@ -159,6 +178,7 @@ class S3FSTest(S3TestBase):
       assert_true(src_names)
       eq_(src_names, dst_names)
 
+
   def test_copy_from_local(self):
     src_name = 'test_copy_from_local_src'
     src_path = os.path.join(tempfile.gettempdir(), src_name)
@@ -173,6 +193,7 @@ class S3FSTest(S3TestBase):
       self.fs.copyFromLocal(src_path, dst_path)
       actual = self.fs.read(dst_path, 0, len(data) + 100)
       eq_(data, actual)
+
 
   def test_rename_star(self):
     src_dir = self.get_test_path('test_rename_star_src')
@@ -200,6 +221,7 @@ class S3FSTest(S3TestBase):
       assert_true(src_names)
       eq_(src_names, dst_names)
 
+
   def test_rmtree(self):
     assert_raises(NotImplementedError, self.fs.rmtree, 'universe', skipTrash=False)
 
@@ -218,9 +240,11 @@ class S3FSTest(S3TestBase):
       assert_false(self.fs.exists(nested_dir))
       assert_false(self.fs.exists(directory))
 
+
   def test_listing_buckets(self):
     buckets = self.fs.listdir('s3://')
     assert_true(len(buckets) > 0)
+
 
   def test_mkdir(self):
     dir_path = self.get_test_path('test_mkdir')
@@ -228,3 +252,27 @@ class S3FSTest(S3TestBase):
     
     self.fs.mkdir(dir_path)
     assert_true(self.fs.exists(dir_path))
+
+
+  def test_upload_file(self):
+    with tempfile.NamedTemporaryFile() as local_file:
+      # Make sure we can upload larger than the UPLOAD chunk size
+      file_size = DEFAULT_WRITE_SIZE * 2
+      local_file.write('0' * file_size)
+      local_file.flush()
+
+      dest_dir = self.get_test_path('test_upload')
+      local_file = local_file.name
+      dest_path = '%s/%s' % (dest_dir, os.path.basename(local_file))
+
+      # Just upload the current python file
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=file(local_file)))
+      response = json.loads(resp.content)
+
+      assert_equal(0, response['status'], response)
+      stats = self.fs.stats(dest_path)
+
+      f = self.fs.open(dest_path)
+      actual = f.read(file_size)
+      expected = file(local_file).read()
+      assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))

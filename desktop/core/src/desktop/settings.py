@@ -228,8 +228,9 @@ LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
 PYLINTRC = get_desktop_root('.pylintrc')
 
-# Insert our HDFS upload handler
+# Insert our custom upload handlers
 FILE_UPLOAD_HANDLERS = (
+  'aws.s3.upload.S3FileUploadHandler',
   'hadoop.fs.upload.HDFSfileUploadHandler',
   'django.core.files.uploadhandler.MemoryFileUploadHandler',
   'django.core.files.uploadhandler.TemporaryFileUploadHandler',

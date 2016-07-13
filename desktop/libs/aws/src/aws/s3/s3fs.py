@@ -36,6 +36,7 @@ from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
+
 LOG = logging.getLogger(__name__)
 
 
@@ -355,6 +356,11 @@ class S3FileSystem(object):
       else:
         remote_file = remote_dst
       _copy_file(local_src, remote_file)
+
+  @translate_s3_error
+  def upload(self, file, path, *args, **kwargs):
+    pass  # upload is handled by S3FileUploadHandler
+
 
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation

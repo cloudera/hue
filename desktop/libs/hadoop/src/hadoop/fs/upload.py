@@ -30,12 +30,10 @@ import logging
 import time
 
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
-from django.utils.translation import ugettext as _
 
 import hadoop.cluster
-
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from hadoop.fs.exceptions import WebHdfsException
+
 
 LOG = logging.getLogger(__name__)
 
@@ -135,9 +133,12 @@ class HDFSfileUploadHandler(FileUploadHandler):
     # Need to directly modify FileUploadHandler.chunk_size
     FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
 
+    LOG.debug("Chunk size = %d" % FileUploadHandler.chunk_size)
+
   def new_file(self, field_name, file_name, *args, **kwargs):
     # Detect "HDFS" in the field name.
     if field_name.upper().startswith('HDFS'):
+      LOG.info('Using HDFSfileUploadHandler to handle file upload.')
       try:
         self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
         LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
@@ -150,6 +151,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
       raise StopFutureHandlers()
 
   def receive_data_chunk(self, raw_data, start):
+    LOG.debug("HDFSfileUploadHandler receive_data_chunk")
+
     if not self._activated:
       if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
         raise StopUpload()
@@ -176,5 +179,5 @@ class HDFSfileUploadHandler(FileUploadHandler):
       raise
 
     elapsed = time.time() - self._starttime
-    LOG.debug('Uploaded %s bytes to HDFS in %s seconds' % (file_size, elapsed))
+    LOG.info('Uploaded %s bytes to HDFS in %s seconds' % (file_size, elapsed))
     return self._file
