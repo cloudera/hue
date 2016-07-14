@@ -358,11 +358,21 @@ nv.models.multiBarWithBrushChart = function() {
                   return "translate(" + x + "," + y + ")";
               };
 
+              var rangeBand = x.rangeBand();
+
               var staggerUp = 5, staggerDown = 17;  //pixels to stagger by
               // Issue #140
               xTicks
                 .selectAll("text")
                 .attr('transform', function(d,i,j) {
+                    var self = d3.select(this),
+                      textLength = self.node().getComputedTextLength(),
+                      text = self.text();
+                    while (textLength > rangeBand && text.length > 0) {
+                      text = text.slice(0, -1);
+                      self.text(text + '...');
+                      textLength = self.node().getComputedTextLength();
+                    }
                     return  getTranslate(0, (j % 2 == 0 ? staggerUp : staggerDown));
                   });
 
