@@ -57,16 +57,10 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     <div data-bind="visible: createWizard.fileFormat().show">
       <div data-bind="with: createWizard.fileFormat().format">
-          <h3>${_('File Type')}: <span data-bind="text: type"></span></h3>
-          <h4>${_('Has Header')}:</h4>
-          <input type="checkbox" data-bind="checked: hasHeader">
+          <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, value: type"></select>
+          </h3>
 
-          <h4>${_('Quote Character')}:</h4>
-          <input data-bind="value: quoteChar">
-          <h4>${_('Record Separator')}:</h4>
-          <input data-bind="value: recordSeparator">
-          <h4>${_('Field Separator')}:</h4>
-          <input data-bind="value: fieldSeparator">
+          <!-- ko template: {name: 'format-settings-'+type()}--><!-- /ko -->
         </div>
 
         <h3>${_('Fields')}</h3>
@@ -103,7 +97,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
         <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('Collection needs a name')}</h4>
 
 
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {           href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
           ${_('View Indexing Status')}
         </a>
 
@@ -111,6 +105,20 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     <br/>
   </div>
+</script>
+
+<script type="text/html" id="format-settings-hue">
+</script>
+
+<script type="text/html" id="format-settings-csv">
+  <h4>${_('Has Header')}:</h4>
+  <input type="checkbox" data-bind="checked: hasHeader">
+  <h4>${_('Quote Character')}:</h4>
+  <input data-bind="value: quoteChar">
+  <h4>${_('Record Separator')}:</h4>
+  <input data-bind="value: recordSeparator">
+  <h4>${_('Field Separator')}:</h4>
+  <input data-bind="value: fieldSeparator">
 </script>
 
 <script type="text/html" id="field-template">
@@ -306,6 +314,54 @@ var getNewFieldName = function(){
     }
   }
 
+  var getFileFormat = function(type){
+    if(type == "csv"){
+      return new CsvFileType();
+    }
+    else if(type == "hue"){
+      return new HueFileType();
+    }
+  }
+
+  var FileType = function(){
+    var self = this;
+
+    self.loadFromObj = function(args){
+      for (var attr in args){
+        self[attr] = ko.mapping.fromJS(args[attr]);
+      }
+    }
+  }
+
+  var HueFileType = function(args){
+    var self = new FileType();
+
+    self.type = ko.observable("hue");
+
+    if(args) self.loadFromObj(args);
+
+    return self;
+  }
+
+  var CsvFileType = function(args){
+    var self = new FileType();
+
+    self.quoteChar = ko.observable('"');
+    self.recordSeparator = ko.observable("\\n");
+    self.type = ko.observable("csv");
+    self.hasHeader = ko.observable(false);
+    self.fieldSeparator = ko.observable(',');
+
+    if(args) self.loadFromObj(args);
+
+    self.quoteChar.subscribe(viewModel.createWizard.guessFieldTypes);
+    self.recordSeparator.subscribe(viewModel.createWizard.guessFieldTypes);
+    self.hasHeader.subscribe(viewModel.createWizard.guessFieldTypes);
+    self.fieldSeparator.subscribe(viewModel.createWizard.guessFieldTypes);
+
+    return self;
+  }
+
   var File_Format = function (vm) {
     var self = this;
 
@@ -325,6 +381,8 @@ var getNewFieldName = function(){
     self.operationTypes = ${operators_json | n};
 
     self.fieldTypes = ko.observableArray(${fields_json | n});
+    self.fileTypes = ["csv","hue"];
+
 
     self.show = ko.observable(true);
     self.showCreate = ko.observable(false);
@@ -349,13 +407,13 @@ var getNewFieldName = function(){
     });
 
     self.fileFormat().format.subscribe(function(){
-      self.fileFormat().format().quoteChar.subscribe(self.guessFieldTypes);
-      self.fileFormat().format().recordSeparator.subscribe(self.guessFieldTypes);
-      self.fileFormat().format().type.subscribe(self.guessFieldTypes);
-      self.fileFormat().format().hasHeader.subscribe(self.guessFieldTypes);
-      self.fileFormat().format().fieldSeparator.subscribe(self.guessFieldTypes);
-
       self.guessFieldTypes();
+
+      if(self.fileFormat().format().type){
+        self.fileFormat().format().type.subscribe(function(newType){
+          self.fileFormat().format(getFileFormat(newType));
+        });
+      }
     });
 
     self.guessFormat = function() {
@@ -364,7 +422,7 @@ var getNewFieldName = function(){
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
       }, function(resp) {
 
-        self.fileFormat().format(ko.mapping.fromJS(resp));
+        self.fileFormat().format(new CsvFileType(resp));
 
         self.fileFormat().show(true);
 

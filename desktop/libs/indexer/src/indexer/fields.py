@@ -49,8 +49,8 @@ class Field(object):
     'required': self.required}
 
 FIELD_TYPES = [
-  FieldType('text', "^.{100,}$"),
-  FieldType('string', "^.*$"),
+  FieldType('text_en', "^[\\s\\S]{100,}$"),
+  FieldType('string', "^[\\s\\S]*$"),
   FieldType('double', "^([+-]?[0-9]+\\.?[0-9]+)?$"),
   FieldType('long', "^(?:[+-]?(?:[0-9]+))?$"),
   FieldType('date', "^([0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+(\\.[0-9]*)?Z)?$")
