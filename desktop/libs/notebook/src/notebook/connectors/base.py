@@ -83,7 +83,7 @@ class Notebook(object):
     return _data
 
   def get_str(self):
-    return '\n\n'.join([snippet['statement_raw'] for snippet in self.get_data()['snippets']])
+    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw']) for snippet in self.get_data()['snippets']])
 
 
 def get_api(request, snippet):
