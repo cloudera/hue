@@ -402,6 +402,11 @@ class HS2Api(Api):
       'statement': query.get_query_statement(0),
     }
 
+  def fetch_result_size(self, notebook, snippet):
+    return {
+      'rows': 1000,
+      'size': 1024 * 1024 * 100, # Until HUE-4181
+    }
 
   @query_error_handler
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
@@ -422,7 +427,7 @@ class HS2Api(Api):
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     if 'select' not in query.hql_query.strip().lower():
-      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+      raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
     database = snippet.get('database') or 'default'
     table = destination
@@ -446,7 +451,7 @@ class HS2Api(Api):
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     if 'select' not in query.hql_query.strip().lower():
-      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+      raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
     db.use(query.database)
 

@@ -244,6 +244,21 @@ def fetch_result_metadata(request):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
+def fetch_result_size(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
 def cancel_statement(request):
   response = {'status': -1}
 

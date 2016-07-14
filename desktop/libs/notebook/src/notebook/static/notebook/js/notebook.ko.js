@@ -46,6 +46,7 @@
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+    self.size = ko.observable(typeof result.size != "undefined" && result.size != null ? result.size : {});
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
     self.statement_range = ko.observable(typeof result.statement_range != "undefined" && result.statement_range != null ? result.statement_range : {
@@ -1033,6 +1034,21 @@
       });
     };
 
+    self.fetchResultSize = function() {
+      $.post("/notebook/api/fetch_result_size", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function (data) {
+        if (data.status == 0) {
+          self.result.size(data.result.size);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
     self.checkStatus = function () {
       $.post("/notebook/api/check_status", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -1054,6 +1070,7 @@
             }
             else if (self.status() == 'available') {
               self.fetchResult(100);
+              // self.fetchResultSize(); Disabled for now
               self.progress(100);
              if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
                 self.ddlNotification(Math.random());
