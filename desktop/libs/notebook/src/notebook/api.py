@@ -165,6 +165,7 @@ def check_status(request):
 
   try:
     response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
+
     response['status'] = 0
   except SessionExpired:
     response['status'] = 'expired'

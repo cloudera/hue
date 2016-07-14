@@ -20,10 +20,9 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, FilesystemException
+from desktop.models import Document2
 
-from liboozie.oozie_api import get_oozie
-from notebook.connectors.base import Api, QueryError
+from notebook.connectors.base import Api
 
 
 LOG = logging.getLogger(__name__)
@@ -57,7 +56,7 @@ class OozieApi(Api):
       raise PopupException(_('Oozie batch submission only accepts Hive queries at this time.'))
 
     # Create a managed workflow from the notebook doc
-    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True)
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name)
     workflow = Workflow(document=workflow_doc)
 
     # Submit workflow
@@ -69,28 +68,47 @@ class OozieApi(Api):
     }
 
   def check_status(self, notebook, snippet):
+    response = {}
     job_id = snippet['result']['handle']['id']
-    api = get_oozie(self.user)
-    status_resp = api.get_job_status(job_id)
-    return status_resp
+    oozie_job = check_job_access_permission(self.request, job_id)
+
+    response['status'] = 'running' if oozie_job.is_running() else 'available'
+
+    return response
 
   def fetch_result(self, notebook, snippet, rows, start_over):
-    pass
+    output = self.get_log(notebook, snippet)
+
+    return {
+        'data':  [[line] for line in output.split('\n')], # hdfs_link()
+        'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
+        'type': 'table',
+        'has_more': False,
+    }
 
   def cancel(self, notebook, snippet):
-    pass
+    job_id = snippet['result']['handle']['id']
+
+    job = check_job_access_permission(self, job_id)
+    oozie_job = check_job_edition_permission(job, self.user)
+
+    oozie_job.kill()
+
+    return {'status': 0}
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     job_id = snippet['result']['handle']['id']
-    api = get_oozie(self.user)
-    status_resp = api.get_job_log(job_id)
+
+    oozie_job = check_job_access_permission(self.request, job_id)
+    status_resp = oozie_job.log
+
     return status_resp
 
   def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
 
-    oozie_workflow = check_job_access_permission(self.request, job_id)
-    return oozie_workflow.get_progress(),
+    oozie_job = check_job_access_permission(self.request, job_id)
+    return oozie_job.get_progress(),
 
   def close_statement(self, snippet):
     pass

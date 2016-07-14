@@ -32,6 +32,7 @@ LOG = logging.getLogger(__name__)
 DEFAULT_USER = DEFAULT_USER.get()
 API_VERSION = 'v1' # Overridden to v2 for SLA
 
+
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
 
 

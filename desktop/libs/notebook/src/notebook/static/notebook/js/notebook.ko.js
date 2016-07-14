@@ -632,7 +632,8 @@
         statement: self.statement,
         properties: self.properties,
         result: self.result.getContext(),
-        database: self.database
+        database: self.database,
+        wasBatchExecuted: self.wasBatchExecuted()
       };
     };
 
@@ -678,6 +679,7 @@
       }
     };
 
+    self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
     self.executingBlockingOperation = null; // A ExecuteStatement()
