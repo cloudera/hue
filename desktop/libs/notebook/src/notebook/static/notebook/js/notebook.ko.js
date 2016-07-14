@@ -158,7 +158,11 @@
       self.data.removeAll();
       self.images.removeAll();
       self.logs('');
-      self.handle({});
+      self.handle({ // Keep multiquery indexing
+          has_more_statements: self.handle()['has_more_statements'],
+          statement_id: self.handle()['statement_id'],
+          statement_count: self.handle()['statement_count']
+      });
       self.startTime(new Date());
       self.endTime(new Date());
       self.explanation('');
