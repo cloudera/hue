@@ -49,14 +49,9 @@ def _escape_white_space_characters(s, inverse = False):
   return s
 
 def _convert_format(format_dict, inverse=False):
-  FIELDS = [
-    "fieldSeparator",
-    "quoteChar",
-    "recordSeparator"
-  ]
-
-  for field in FIELDS:
-    format_dict[field] = _escape_white_space_characters(format_dict[field], inverse)
+  for field in format_dict:
+    if isinstance(format_dict[field], basestring):
+      format_dict[field] = _escape_white_space_characters(format_dict[field], inverse)
 
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))

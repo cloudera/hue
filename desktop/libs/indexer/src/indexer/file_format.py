@@ -32,9 +32,20 @@ def _valid_csv_format(format_):
   return valid_has_header and valid_quote_char and valid_record_separator and valid_field_separator
 
 def get_file_format_instance(file_stream, format_=None):
-  if not format_ or _valid_csv_format(format_):
-    return CSVFormat(file_stream, format_)
-  return None
+  format_mapping = {
+    "csv": CSVFormat,
+    "hue": HueFormat
+  }
+
+  if format_ and "type" in format_:
+    type_ = format_["type"]
+  else:
+    type_ = "csv"
+
+  if type_ in format_mapping:
+    return format_mapping[type_](file_stream, format_)
+  else:
+    return None
 
 class FileFormat(object):
   def __init__(self):
@@ -72,6 +83,20 @@ class FileFormat(object):
 
     return obj
 
+class HueFormat(FileFormat):
+  def __init__(self, file_stream, format_):
+    self._fields = [
+      Field("date", "date"),
+      Field("component", "string"),
+      Field("log_level", "string"),
+      Field("details", "string"),
+      Field("message", "text")
+    ]
+
+  @property
+  def fields(self):
+    return self._fields
+
 class CSVFormat(FileFormat):
   def __init__(self, file_stream, format_=None):
     file_stream.seek(0)
@@ -84,10 +109,17 @@ class CSVFormat(FileFormat):
       self._quote_char = format_["quoteChar"].encode('utf-8')
       self._has_header = format_["hasHeader"]
     else:
-      dialect, self._has_header = self._guess_dialect(sample)
-      self._delimiter = dialect.delimiter
-      self._line_terminator = dialect.lineterminator
-      self._quote_char = dialect.quotechar
+      try:
+        dialect, self._has_header = self._guess_dialect(sample)
+        self._delimiter = dialect.delimiter
+        self._line_terminator = dialect.lineterminator
+        self._quote_char = dialect.quotechar
+      except Exception:
+        # guess dialect failed, fall back to defaults:
+        self._delimiter = ','
+        self._line_terminator = '\n'
+        self._quote_char = '"'
+        self._has_header = False
 
     # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
     self._line_terminator = self._line_terminator.replace("\r\n", "\n")
