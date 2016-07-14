@@ -74,7 +74,7 @@ define([
           lowerCase: true,
           suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
-          suggestFunctions: true,
+          suggestFunctions: {},
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -97,7 +97,7 @@ define([
           lowerCase: false,
           suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
-          suggestFunctions: true,
+          suggestFunctions: {},
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true
@@ -120,7 +120,7 @@ define([
           lowerCase: false,
           suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
-          suggestFunctions: true,
+          suggestFunctions: {},
           suggestTables: {
             prependQuestionMark: true,
             prependFrom: true

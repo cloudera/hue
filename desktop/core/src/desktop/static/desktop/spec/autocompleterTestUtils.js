@@ -43,6 +43,7 @@ define([
             if (testDefinition.ignoreErrors) {
               delete actualResponse.error;
             }
+            var deleteKeywords = false;
             if (typeof testDefinition.containsKeywords !== 'undefined') {
               var keywords = actualResponse.suggestKeywords;
               var contains = true;
@@ -61,6 +62,30 @@ define([
                              '  Parser keywords: ' + JSON.stringify(keywords) +   '\n'
                 }
               }
+              deleteKeywords = true;
+            }
+            if (typeof testDefinition.doesNotContainKeywords !== 'undefined') {
+              var keywords = actualResponse.suggestKeywords;
+              var contains = false;
+              testDefinition.doesNotContainKeywords.forEach(function (keyword) {
+                if (typeof keywords === 'undefined' || keywords.indexOf(keyword) !== -1) {
+                  contains = true;
+                  return false;
+                }
+              });
+              if (contains) {
+                return {
+                  pass: false,
+                  message: '\n            Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                  '              Dialect: ' + testDefinition.dialect + '\n' +
+                  'Not expected keywords: ' + JSON.stringify(testDefinition.doesNotContainKeywords) + '\n' +
+                  '      Parser keywords: ' + JSON.stringify(keywords) +   '\n'
+                }
+              }
+              deleteKeywords = true;
+            }
+
+            if (deleteKeywords) {
               delete actualResponse.suggestKeywords;
             }
             return {
