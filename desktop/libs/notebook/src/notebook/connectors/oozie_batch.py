@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
 
-from notebook.connectors.base import Api
+from notebook.connectors.base import Api, QueryError
 
 
 LOG = logging.getLogger(__name__)
@@ -71,6 +71,9 @@ class OozieApi(Api):
     response = {}
     job_id = snippet['result']['handle']['id']
     oozie_job = check_job_access_permission(self.request, job_id)
+
+    if oozie_job.status in ('KILLED', 'FAILED'):
+      raise QueryError(_('Job was %s') % oozie_job.status)
 
     response['status'] = 'running' if oozie_job.is_running() else 'available'
 
