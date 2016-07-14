@@ -56,7 +56,7 @@ class OozieApi(Api):
       raise PopupException(_('Oozie batch submission only accepts Hive queries at this time.'))
 
     # Create a managed workflow from the notebook doc
-    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name)
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name or notebook_doc.type)
     workflow = Workflow(document=workflow_doc)
 
     # Submit workflow

@@ -414,7 +414,7 @@ class HS2Api(Api):
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
-    if not query.hql_query.strip().lower().startswith('select'):
+    if 'select' not in query.hql_query.strip().lower():
       raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
     database = snippet.get('database') or 'default'
@@ -438,7 +438,7 @@ class HS2Api(Api):
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
-    if not query.hql_query.strip().lower().startswith('select'):
+    if 'select' not in query.hql_query.strip().lower():
       raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
     db.use(query.database)
