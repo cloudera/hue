@@ -97,6 +97,9 @@ def get_api(request, snippet):
   from notebook.connectors.spark_batch import SparkBatchApi
   from notebook.connectors.text import TextApi
 
+  if snippet.get('wasBatchExecuted'):
+    return OozieApi(user=request.user, request=request)
+
   interpreter = [interpreter for interpreter in get_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
@@ -106,7 +109,7 @@ def get_api(request, snippet):
   if interface == 'hiveserver2':
     return HS2Api(user=request.user, request=request)
   elif interface == 'oozie':
-    return OozieApi(user=request.user, request=request, interpreter=snippet['type'])
+    return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
     return SparkApi(request.user)
   elif interface == 'livy-batch':
