@@ -309,7 +309,7 @@ define([
               prependFrom: true
             },
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestDatabases: {
               prependQuestionMark: true,
               prependFrom: true,
@@ -327,7 +327,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -349,7 +349,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -370,7 +370,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -391,7 +391,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'tbl' }
           }
         });
@@ -405,7 +405,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
         });
@@ -419,7 +419,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testWHERE' }
           }
         });
@@ -433,7 +433,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testON' }
           }
         });
@@ -447,7 +447,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
@@ -461,7 +461,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable', database: 'database_two' }
           }
         });
@@ -475,7 +475,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'test table', database: 'database one' }
           }
         });
@@ -490,7 +490,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum.', type: 'subquery' }, { name: 'ttb.', type: 'alias' }]
           }
         });
@@ -504,7 +504,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
         });
@@ -518,7 +518,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -532,7 +532,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
         });
@@ -590,7 +590,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -604,7 +604,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -647,7 +647,7 @@ define([
           afterCursor: ') FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -659,7 +659,7 @@ define([
           afterCursor: ',bla) FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -676,13 +676,13 @@ define([
         });
       });
 
-      it('should suggest columns and values for "SELECT COUNT(foo, bl + |, bla) FROM bar;"', function() {
+      it('should suggest columns and values for "SELECT COUNT(foo, bl = |, bla) FROM bar;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo, bl = ',
           afterCursor: ',bla) FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' },
             suggestValues: { identifierChain: [ {name: 'bl' }], table: 'bar' }
           }
@@ -695,7 +695,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true
+            suggestFunctions: {}
           }
         });
       });
@@ -706,7 +706,7 @@ define([
           afterCursor: ' FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -718,7 +718,7 @@ define([
           afterCursor: ' FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -730,7 +730,7 @@ define([
           afterCursor: ' AS FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -742,7 +742,7 @@ define([
           afterCursor: ' AS INT FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -754,7 +754,7 @@ define([
           afterCursor: ' AS STRING) FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -766,7 +766,7 @@ define([
           afterCursor: ' AS STRING) FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -845,7 +845,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -858,7 +858,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -871,7 +871,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -884,7 +884,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'bar' }
           }
         });
@@ -946,7 +946,7 @@ define([
           } else {
             var expectedResult = {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               }
@@ -978,7 +978,7 @@ define([
             dialect: binaryFunction.dialect,
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               },
@@ -1002,7 +1002,7 @@ define([
             dialect: binaryFunction.dialect,
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               }
@@ -1025,7 +1025,7 @@ define([
             dialect: binaryFunction.dialect,
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               },
@@ -1041,8 +1041,9 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: { types: ['NUMBER'] },
             suggestColumns: {
+              types: ['NUMBER'],
               table: 'testTable'
             }
           }
@@ -1055,7 +1056,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1070,7 +1071,7 @@ define([
           afterCursor: ' THEN FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1084,7 +1085,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1096,7 +1097,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = b ',
           afterCursor: ' FROM testTable',
-          containsKeywords: ['WHEN', 'AND'],
+          containsKeywords: ['WHEN', 'AND', '<>'],
           expectedResult: {
             lowerCase: false
           }
@@ -1109,7 +1110,7 @@ define([
           afterCursor: ' THEN boo FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1123,7 +1124,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1137,7 +1138,7 @@ define([
           afterCursor: ' WHEN c THEN d END FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1152,7 +1153,7 @@ define([
           afterCursor: ' WHEN c THEN d ELSE e END FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1165,7 +1166,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ',
           afterCursor: ' FROM testTable',
-          containsKeywords: ['OR', 'END'],
+          containsKeywords: ['OR', 'END', '<>'],
           expectedResult: {
             lowerCase: false
           }
@@ -1178,7 +1179,7 @@ define([
           afterCursor: ' ELSE FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1191,7 +1192,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=1 ',
           afterCursor: ' bla=foo FROM testTable',
-          containsKeywords: ['<', 'WHEN', 'ELSE', 'END'],
+          containsKeywords: ['AND', 'WHEN', 'ELSE', 'END', '<'],
           expectedResult: {
             lowerCase: false
           }
@@ -1202,7 +1203,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=1 ',
           afterCursor: ' bla=foo FROM testTable',
-          containsKeywords: ['<', 'WHEN', 'ELSE'],
+          containsKeywords: ['AND', 'WHEN', 'ELSE', '>'],
           expectedResult: {
             lowerCase: false
           }
@@ -1215,7 +1216,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1229,7 +1230,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1243,7 +1244,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1257,7 +1258,7 @@ define([
           afterCursor: ' ELSE a FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1272,7 +1273,7 @@ define([
           afterCursor: ' ELSE FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1285,7 +1286,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ELSE e ',
           afterCursor: ' FROM testTable',
-          containsKeywords: ['OR', 'END'],
+          containsKeywords: ['OR', 'END', '='],
           expectedResult: {
             lowerCase: false
           }
@@ -1298,7 +1299,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1335,7 +1336,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WHEN'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1350,7 +1351,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1365,7 +1366,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1380,7 +1381,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1395,7 +1396,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1407,7 +1408,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a WHEN b THEN c ',
           afterCursor: ' WHEN d THEN e END FROM testTable',
-          containsKeywords: ['WHEN', 'AND'],
+          containsKeywords: ['WHEN', 'AND', '<'],
           expectedResult: {
             lowerCase: false
           }
@@ -1418,7 +1419,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a WHEN b THEN c ',
           afterCursor: ' FROM testTable',
-          containsKeywords: ['WHEN', 'AND'],
+          containsKeywords: ['WHEN', 'AND', '>'],
           expectedResult: {
             lowerCase: false
           }
@@ -1431,7 +1432,7 @@ define([
           afterCursor: ' THEN FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1445,7 +1446,7 @@ define([
           afterCursor: ' = a FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1460,7 +1461,7 @@ define([
           afterCursor: ' THEN bla ELSE foo FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1474,7 +1475,7 @@ define([
           afterCursor: ' THEN bla ELSE foo END FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1488,7 +1489,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1502,7 +1503,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1516,7 +1517,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             },
@@ -1529,7 +1530,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN a = b ',
           afterCursor: ' FROM testTable',
-          containsKeywords: ['AND', 'THEN'],
+          containsKeywords: ['AND', 'THEN', '<'],
           expectedResult: {
             lowerCase: false
           }
@@ -1540,7 +1541,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c ',
           afterCursor: ' d FROM testTable',
-          containsKeywords: ['THEN', 'OR'],
+          containsKeywords: ['THEN', 'OR', '>'],
           expectedResult: {
             lowerCase: false
           }
@@ -1553,7 +1554,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1567,7 +1568,7 @@ define([
           afterCursor: ' g FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1581,7 +1582,7 @@ define([
           afterCursor: ' g FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1595,7 +1596,7 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'testTable'
             }
@@ -1846,7 +1847,7 @@ define([
                 table: 'testTable'
               },
               suggestAggregateFunctions: true,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }]
             }
           });
@@ -1859,7 +1860,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               }
@@ -1889,7 +1890,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestColumns: {
                 table: 'testTable'
               }
@@ -1909,7 +1910,7 @@ define([
                 table: 'testTable'
               },
               suggestAggregateFunctions: true,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testKey', type: 'alias' }, { name: 'testValue', type: 'alias' }]
             }
           });
@@ -2072,7 +2073,7 @@ define([
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestAggregateFunctions: true,
-              suggestFunctions: true,
+              suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
               suggestColumns: {
                 table: 'testTable'
@@ -2236,7 +2237,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
         });
@@ -2280,7 +2281,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'key' }]
@@ -2297,7 +2298,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'field' }]
@@ -2377,7 +2378,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
@@ -2393,8 +2394,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'] , table: 'testTable' }
           }
         });
       });
@@ -2405,8 +2406,8 @@ define([
           afterCursor: ' FROM testTable WHERE id = 1;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2417,8 +2418,8 @@ define([
           afterCursor: ' FROM testTable WHERE id = 1;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2429,7 +2430,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
@@ -2445,7 +2446,7 @@ define([
           afterCursor: ' = id',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
@@ -2461,7 +2462,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2477,7 +2478,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2493,7 +2494,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2509,7 +2510,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2525,7 +2526,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2541,7 +2542,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2557,7 +2558,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2573,7 +2574,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
@@ -2589,8 +2590,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2601,8 +2602,8 @@ define([
           afterCursor: ' + 1 != 3',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2613,8 +2614,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2625,8 +2626,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2637,8 +2638,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2649,8 +2650,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2661,8 +2662,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2673,8 +2674,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2685,8 +2686,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2697,8 +2698,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2709,7 +2710,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -2721,8 +2722,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
           }
         });
       });
@@ -2733,7 +2734,7 @@ define([
           afterCursor: ' RLIKE \'bla bla\'',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -2813,7 +2814,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
           }
         });
@@ -2825,7 +2826,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'foo' }
           }
         });
@@ -2837,7 +2838,7 @@ define([
           afterCursor: ' AND 1 + 1 > 1',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'foo' }
           }
         });
@@ -2849,7 +2850,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'foo' }
           }
         });
@@ -2861,7 +2862,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'foo' },
             suggestKeywords: ['EXISTS']
           }
@@ -2874,8 +2875,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'foo' }
+            suggestFunctions: { types: ['BOOLEAN'] },
+            suggestColumns: { types: ['BOOLEAN'], table: 'foo' }
           }
         });
       });
@@ -2886,8 +2887,8 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
-            suggestColumns: { table: 'foo' }
+            suggestFunctions: { types: ['BOOLEAN'] },
+            suggestColumns: { types: ['BOOLEAN'], table: 'foo' }
           }
         });
       });
@@ -2914,7 +2915,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['EXISTS', 'NOT EXISTS']
           }
@@ -2927,7 +2928,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['EXISTS', 'NOT EXISTS']
           }
@@ -2940,7 +2941,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['EXISTS']
           }
@@ -2951,7 +2952,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE foo = \'bar\' ',
           afterCursor: '',
-          containsKeywords: ['AND'],
+          containsKeywords: ['AND', '<'],
           expectedResult: {
             lowerCase: false
           }
@@ -2962,7 +2963,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c, d, e FROM tableOne WHERE c >= 9998 an',
           afterCursor: '',
-          containsKeywords: ['AND'],
+          containsKeywords: ['AND', '='],
           expectedResult: {
             lowerCase: false
           }
@@ -2975,7 +2976,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -2988,7 +2989,7 @@ define([
           afterCursor: ' = \'bar\' AND ',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -3033,7 +3034,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: { table: 'testTable', identifierChain: [{ name: 'a' }] },
             suggestColumns: { table: 'testTable' }
           }
@@ -3452,6 +3453,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
           afterCursor: '',
+          dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable2'}
@@ -3770,7 +3772,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: { identifierChain: [{name: 'bar'}], table: 'foo' },
             suggestColumns: { table: 'foo' }
           }
@@ -3784,7 +3786,7 @@ define([
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['SELECT'],
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: { identifierChain: [{name: 'bla'}], table: 'bar' },
             suggestIdentifiers: [{ name: 'foo.', type: 'table'}, { name: 'bar.', type: 'table'}]
           }
@@ -3797,7 +3799,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestValues: { identifierChain: [{name: 'bla'}], table: 'bar' },
             suggestIdentifiers: [{ name: 'foo.', type: 'table'}, { name: 'bar.', type: 'table'}]
           }
@@ -3812,7 +3814,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -3835,7 +3837,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -3881,7 +3883,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -3901,8 +3903,8 @@ define([
           afterCursor: ' % 2 = 0',
           expectedResult: {
             lowerCase: true,
-            suggestFunctions: true,
-            suggestColumns: { table: 'tbl' }
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], table: 'tbl' }
           }
         });
       });
@@ -3913,7 +3915,7 @@ define([
           afterCursor: ' % 2 = 0',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: true,
+            suggestFunctions: { types: ['NUMBER'] },
             suggestIdentifiers: [{ name: 't1.', type: 'table' }, { name: 'ta2.', type: 'alias' }, { name: 't3.', type: 'table'}]
           }
         });
@@ -3927,7 +3929,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'bar.', type: 'subquery'}]
           }
         });
@@ -3941,7 +3943,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -3963,7 +3965,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'subqueryOne.', type: 'subquery'}, { name: 'tAlias.', type: 'alias'}, { name: 'tableThree.', type: 'table'}, { name: 'subqueryTwo.', type: 'subquery'}]
           }
         });
@@ -3977,7 +3979,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
-            suggestFunctions: true,
+            suggestFunctions: {},
             suggestColumns: {
               table: 'tableOne'
             }

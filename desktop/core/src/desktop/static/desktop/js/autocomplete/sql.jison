@@ -311,7 +311,7 @@ InitResults
 
      // TODO: Move these below before token or use $$ instead
      delete parser.yy.latestTablePrimaries;
-     delete parser.yy.correlatedSubquery
+     delete parser.yy.correlatedSubquery;
      delete parser.yy.keepColumns;
 
      parser.parseError = function (message, error) {
@@ -320,7 +320,7 @@ InitResults
        }
        parser.yy.result.error = error;
        return message;
-     }
+     };
    }
  ;
 
@@ -333,6 +333,10 @@ Sql
    {
      return parser.yy.result;
    }
+// | InitResults SqlStatements_EDIT error EOF // TODO: Investigate what this would mean
+//    {
+//      return parser.yy.result;
+//    }
  ;
 
 SqlStatements
@@ -351,6 +355,9 @@ SqlStatements_EDIT
  | DataDefinition_EDIT
  | DataManipulation_EDIT
  | QuerySpecification_EDIT
+   {
+     linkTablePrimaries();
+   }
  | SqlStatements_EDIT ';' SqlStatements
  | SqlStatements ';' SqlStatements_EDIT
  ;
@@ -379,6 +386,9 @@ DataManipulation
 DataManipulation_EDIT
  : LoadStatement_EDIT
  | UpdateStatement_EDIT
+   {
+     linkTablePrimaries();
+   }
  ;
 
 
@@ -651,14 +661,8 @@ RightParenthesisOrError
  ;
 
 SchemaQualifiedTableIdentifier
- : RegularOrBacktickedIdentifier
-   {
-     $$ = { identifierChain: [{ name: $1 }] }
-   }
- | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
-   {
-     $$ = { identifierChain: [{ name: $1 }, { name: $3 }] }
-   }
+ : RegularOrBacktickedIdentifier                                       -> { identifierChain: [{ name: $1 }] }
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier  -> { identifierChain: [{ name: $1 }, { name: $3 }] }
  ;
 
 SchemaQualifiedTableIdentifier_EDIT
@@ -670,7 +674,7 @@ SchemaQualifiedTableIdentifier_EDIT
  | PartialBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
      suggestDatabases();
-     $$ = { identifierChain: [{ name: $1 }] }
+     $$ = { identifierChain: [{ name: $1 }] };
    }
  | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
@@ -686,8 +690,8 @@ DatabaseIdentifier
 DatabaseIdentifier_EDIT
  : PartialBacktickedOrCursor
    {
-     $$ = { cursorOrPartialIdentifier: true }
      suggestDatabases();
+     $$ = { cursorOrPartialIdentifier: true };
    }
  ;
 
@@ -718,17 +722,14 @@ RegularOrBackTickedSchemaQualifiedName_EDIT
    }
  | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
-     suggestTablesOrColumns($1)
+     suggestTablesOrColumns($1);
    }
  ;
 
 
 LocalOrSchemaQualifiedName
  : RegularOrBackTickedSchemaQualifiedName
- | RegularOrBackTickedSchemaQualifiedName RegularOrBacktickedIdentifier
-   {
-     $$ = { identifierChain: $1.identifierChain, alias: $2 }
-   }
+ | RegularOrBackTickedSchemaQualifiedName RegularOrBacktickedIdentifier  -> { identifierChain: $1.identifierChain, alias: $2 }
  ;
 
 LocalOrSchemaQualifiedName_EDIT
@@ -737,21 +738,15 @@ LocalOrSchemaQualifiedName_EDIT
  ;
 
 DerivedColumnChain
- : ColumnIdentifier
-   {
-     $$ = [ $1 ]
-   }
+ : ColumnIdentifier  -> [ $1 ]
  | DerivedColumnChain AnyDot ColumnIdentifier
    {
-     $$ = $1.concat($3)
+     $1.push($3);
    }
  ;
 
 DerivedColumnChain_EDIT
- : DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor
-   {
-     $$ = { identifierChain: $1 }
-   }
+ : DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor  -> { identifierChain: $1 }
  ;
 
 PartialBacktickedIdentifierOrPartialCursor
@@ -763,9 +758,9 @@ ColumnIdentifier
  : RegularOrBacktickedIdentifier OptionalMapOrArrayKey
    {
      if ($2) {
-       $$ = { name: $1, key: $2.key }
+       $$ = { name: $1, key: $2.key };
      } else {
-       $$ = { name: $1 }
+       $$ = { name: $1 };
      }
    }
  ;
@@ -776,18 +771,9 @@ ColumnIdentifier_EDIT
 
 OptionalMapOrArrayKey
  :
- | HiveOrImpalaLeftSquareBracket DoubleQuotedValue HiveOrImpalaRightSquareBracket
-   {
-     $$ = { key: '"' + $2 + '"' }
-   }
- | HiveOrImpalaLeftSquareBracket 'UNSIGNED_INTEGER' HiveOrImpalaRightSquareBracket
-   {
-     $$ = { key: parseInt($2) }
-   }
- | HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket
-   {
-     $$ = { key: null }
-   }
+ | HiveOrImpalaLeftSquareBracket DoubleQuotedValue HiveOrImpalaRightSquareBracket   -> { key: '"' + $2 + '"' }
+ | HiveOrImpalaLeftSquareBracket 'UNSIGNED_INTEGER' HiveOrImpalaRightSquareBracket  -> { key: parseInt($2) }
+ | HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket                     -> { key: null }
  ;
 
 // TODO: Support | DECIMAL(precision, scale)  -- (Note: Available in Hive 0.13.0 and later)
@@ -857,10 +843,7 @@ HiveDbProperties
  ;
 
 DatabaseDefinitionOptionals
- : OptionalComment OptionalHdfsLocation OptionalHiveDbProperties
-   {
-     $$ = mergeSuggestKeywords($1, $2, $3);
-   }
+ : OptionalComment OptionalHdfsLocation OptionalHiveDbProperties  -> mergeSuggestKeywords($1, $2, $3)
  ;
 
 DatabaseDefinitionOptionals_EDIT
@@ -869,9 +852,8 @@ DatabaseDefinitionOptionals_EDIT
  ;
 
 OptionalComment
- :
-   {
-     $$ = { suggestKeywords: ['COMMENT'] }
+ : {
+     $$ = { suggestKeywords: ['COMMENT'] };
    }
  | Comment
  ;
@@ -883,7 +865,7 @@ OptionalComment_EDIT
 OptionalHdfsLocation
  :
    {
-     $$ = { suggestKeywords: ['LOCATION'] }
+     $$ = { suggestKeywords: ['LOCATION'] };
    }
  | HdfsLocation
  ;
@@ -895,7 +877,7 @@ OptionalHdfsLocation_EDIT
 OptionalHiveDbProperties
  :
    {
-     $$ = { suggestKeywords: isHive() ? ['WITH DBPROPERTIES'] : [] }
+     $$ = { suggestKeywords: isHive() ? ['WITH DBPROPERTIES'] : [] };
    }
  | HiveDbProperties
  ;
@@ -1046,6 +1028,9 @@ DescribeStatement
 
 DescribeStatement_EDIT
  : HiveDescribeStatement_EDIT
+   {
+     linkTablePrimaries();
+   }
  | ImpalaDescribeStatement_EDIT
  ;
 
@@ -1062,13 +1047,11 @@ HiveDescribeStatement_EDIT
    {
      addTablePrimary($3);
      suggestColumns($4);
-     linkTablePrimaries();
    }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR'
    {
      addTablePrimary($3);
      suggestColumns();
-     linkTablePrimaries();
    }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
    {
@@ -1123,7 +1106,7 @@ ImpalaDescribeStatement_EDIT
      }
      suggestTables();
      suggestDatabases({ appendDot: true });
-     $$ = { cursorOrPartialIdentifier: true }
+     $$ = { cursorOrPartialIdentifier: true };
    }
  ;
 
@@ -1245,9 +1228,6 @@ LoadStatement_EDIT
 QuerySpecification
  : 'SELECT' OptionalAllOrDistinct SelectList // TODO: Needed?
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression
-   {
-     linkTablePrimaries();
-   }
  ;
 
 QuerySpecification_EDIT
@@ -1284,9 +1264,6 @@ QuerySpecification_EDIT
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
-   {
-     linkTablePrimaries();
-   }
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
      if ($3.cursorAtStart) {
@@ -1302,7 +1279,6 @@ QuerySpecification_EDIT
      if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
        suggestAggregateFunctions();
      }
-     linkTablePrimaries();
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
@@ -1319,16 +1295,9 @@ QuerySpecification_EDIT
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-     linkTablePrimaries();
    }
  | 'SELECT' OptionalAllOrDistinct error TableExpression
-   {
-     linkTablePrimaries();
-   }
  | 'SELECT' OptionalAllOrDistinct error TableExpression_EDIT
-   {
-     linkTablePrimaries();
-   }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
      checkForKeywords($3);
@@ -1385,10 +1354,7 @@ TableExpression_EDIT
  ;
 
 FromClause
- : 'FROM' TableReferenceList
-   {
-     $$ = $2;
-   }
+ : 'FROM' TableReferenceList  -> $2
  ;
 
 FromClause_EDIT
@@ -1404,16 +1370,16 @@ SelectConditions
  : OptionalWhereClause OptionalGroupByClause OptionalOrderByClause OptionalLimitClause
    {
      if (!$1 && !$2 && !$3 && !$4) {
-       $$ = { suggestKeywords: [] }
+       $$ = { suggestKeywords: [] };
      } else if ($1 && !$2 && !$3 && !$4) {
-       $$ = mergeSuggestKeywords($1, { suggestKeywords: ['GROUP BY', 'LIMIT', 'ORDER BY'] });
+       $$ = { suggestKeywords: getValueExpressionKeywords($1, ['GROUP BY', 'LIMIT', 'ORDER BY']) }
      } else if ($2 && !$3 && !$4) {
-       $$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] }
+       $$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
      } else if ($3 && !$4) {
        if ($3.suggestKeywords) {
-         $$ = { suggestKeywords: $3.suggestKeywords.concat(['LIMIT']) }
+         $$ = { suggestKeywords: $3.suggestKeywords.concat(['LIMIT']) };
        } else {
-         $$ = { suggestKeywords: ['LIMIT'] }
+         $$ = { suggestKeywords: ['LIMIT'] };
        }
      }
    }
@@ -1428,7 +1394,7 @@ SelectConditions_EDIT
 
 OptionalWhereClause
  :
- | 'WHERE' SearchCondition         -> $2
+ | 'WHERE' SearchCondition  -> $2
  ;
 
 OptionalWhereClause_EDIT
@@ -1486,7 +1452,7 @@ GroupByColumnListPartTwo_EDIT
 
 OptionalOrderByClause
  :
- | 'ORDER' 'BY' OrderByColumnList         -> $3
+ | 'ORDER' 'BY' OrderByColumnList  -> $3
  ;
 
 OptionalOrderByClause_EDIT
@@ -1499,7 +1465,7 @@ OptionalOrderByClause_EDIT
 
 OrderByColumnList
  : OrderByIdentifier
- | OrderByColumnList ',' OrderByIdentifier         -> $3
+ | OrderByColumnList ',' OrderByIdentifier  -> $3
  ;
 
 OrderByColumnList_EDIT
@@ -1514,10 +1480,7 @@ OrderByColumnList_EDIT
  ;
 
 OrderByIdentifier
- : DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
-   {
-     $$ = mergeSuggestKeywords($2, $3);
-   }
+ : DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast  -> mergeSuggestKeywords($2, $3)
  ;
 
 OrderByIdentifier_EDIT
@@ -1541,7 +1504,7 @@ DerivedColumnOrUnsignedInteger_EDIT
 OptionalAscOrDesc
  :
   {
-    $$ = { suggestKeywords: ['ASC', 'DESC'] }
+    $$ = { suggestKeywords: ['ASC', 'DESC'] };
   }
  | 'ASC'
  | 'DESC'
@@ -1551,9 +1514,9 @@ OptionalImpalaNullsFirstOrLast
  :
   {
     if (isImpala()) {
-      $$ = { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] }
+      $$ = { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] };
     } else {
-      $$ = {}
+      $$ = {};
     }
   }
  | '<impala>NULLS' '<impala>FIRST'
@@ -1588,113 +1551,188 @@ SearchCondition_EDIT
  ;
 
 ValueExpression
- : NonParenthesizedValueExpressionPrimary                                           -> valueExpressionKeywords($1)
- | 'NOT' ValueExpression                                                            -> $2
- | '!' ValueExpression                                                              -> $2
+ : NonParenthesizedValueExpressionPrimary
+ | 'NOT' ValueExpression
+   {
+     // verifyType($2, 'BOOLEAN');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | '!' ValueExpression
+   {
+     // verifyType($2, 'BOOLEAN');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | '~' ValueExpression                                                              -> $2
- | '-' ValueExpression %prec NEGATION                                               -> $2
+ | '-' ValueExpression %prec NEGATION
+   {
+     // verifyType($2, 'NUMBER');
+     $$ = $2;
+   }
  | 'EXISTS' TableSubquery
    {
-     $$ = valueExpressionKeywords();
+     $$ = { types: [ 'BOOLEAN' ] };
      // clear correlated flag after completed subquery (set by lexer)
      parser.yy.correlatedSubquery = false;
    }
- | ValueExpression 'NOT' 'LIKE' SingleQuotedValue                                   -> valueExpressionKeywords()
- | ValueExpression 'LIKE' SingleQuotedValue                                         -> valueExpressionKeywords()
- | ValueExpression 'RLIKE' SingleQuotedValue                                        -> valueExpressionKeywords()
- | ValueExpression 'REGEXP' SingleQuotedValue                                       -> valueExpressionKeywords()
- | '(' ValueExpression ')'                                                          -> valueExpressionKeywords()
- | ValueExpression 'IS' OptionalNot 'NULL'                                          -> valueExpressionKeywords()
- | ValueExpression '=' ValueExpression                                              -> valueExpressionKeywords()
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression                            -> valueExpressionKeywords()
- | ValueExpression '-' ValueExpression                                              -> valueExpressionKeywords()
- | ValueExpression '*' ValueExpression                                              -> valueExpressionKeywords()
- | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression                            -> valueExpressionKeywords()
- | ValueExpression 'OR' ValueExpression                                             -> valueExpressionKeywords()
- | ValueExpression 'AND' ValueExpression                                            -> valueExpressionKeywords()
+ | ValueExpression 'NOT' 'LIKE' SingleQuotedValue
+   {
+     // verifyType($1, 'STRING');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'LIKE' SingleQuotedValue
+   {
+     // verifyType($1, 'STRING');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'RLIKE' SingleQuotedValue
+   {
+     // verifyType($1, 'STRING');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'REGEXP' SingleQuotedValue
+   {
+     // verifyType($1, 'STRING');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | '(' ValueExpression ')'                                -> $2
+ | ValueExpression 'IS' OptionalNot 'NULL'                -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression '=' ValueExpression                    -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression '-' ValueExpression
+   {
+     // verifyType($1, 'NUMBER');
+     // verifyType($3, 'NUMBER');
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression '*' ValueExpression
+   {
+     // verifyType($1, 'NUMBER');
+     // verifyType($3, 'NUMBER');
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression
+   {
+     // verifyType($1, 'NUMBER');
+     // verifyType($3, 'NUMBER');
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'OR' ValueExpression
+   {
+     // verifyType($1, 'BOOLEAN');
+     // verifyType($3, 'BOOLEAN');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'AND' ValueExpression
+   {
+     // verifyType($1, 'BOOLEAN');
+     // verifyType($3, 'BOOLEAN');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  ;
 
 ValueExpression
- : ValueExpression 'NOT' 'IN' '(' TableSubqueryInner ')'                            -> valueExpressionKeywords()
- | ValueExpression 'NOT' 'IN' '(' InValueList ')'                                   -> valueExpressionKeywords()
- | ValueExpression 'IN' '(' TableSubqueryInner ')'                                  -> valueExpressionKeywords()
- | ValueExpression 'IN' '(' InValueList ')'                                         -> valueExpressionKeywords()
+ : ValueExpression 'NOT' 'IN' '(' TableSubqueryInner ')'  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'NOT' 'IN' '(' InValueList ')'         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IN' '(' TableSubqueryInner ')'        -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IN' '(' InValueList ')'               -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpression
- : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression    -> valueExpressionKeywords()
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression          -> valueExpressionKeywords()
+ : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression        -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpression
- : 'CASE' CaseRightPart
- | 'CASE' ValueExpression CaseRightPart
+ : 'CASE' CaseRightPart                  -> $2
+ | 'CASE' ValueExpression CaseRightPart  -> $3
  ;
 
 ValueExpression_EDIT
- : 'CASE' CaseRightPart_EDIT
+ : 'CASE' CaseRightPart_EDIT                         -> $2
  | 'CASE' 'CURSOR' EndOrError
    {
      valueExpressionSuggest();
      suggestKeywords(['WHEN']);
+     $$ = { types: [ 'T' ] };
    }
- | 'CASE' ValueExpression CaseRightPart_EDIT
+ | 'CASE' ValueExpression CaseRightPart_EDIT         -> $3
  | 'CASE' ValueExpression 'CURSOR' EndOrError
    {
-     suggestKeywords(mergeSuggestKeywords($2, { suggestKeywords: ['WHEN'] }).suggestKeywords);
+     suggestValueExpressionKeywords($2, ['WHEN']);
+     $$ = { types: [ 'T' ] };
    }
- | 'CASE' ValueExpression_EDIT CaseRightPart
- | 'CASE' ValueExpression_EDIT EndOrError
- | 'CASE' 'CURSOR' CaseRightPart
+ | 'CASE' ValueExpression_EDIT CaseRightPart         -> $3
+ | 'CASE' ValueExpression_EDIT EndOrError            -> { types: [ 'T' ] }
+ | 'CASE' 'CURSOR' CaseRightPart                     -> { types: [ 'T' ] }
  ;
 
 CaseRightPart
- : CaseWhenThenList 'END'
+ : CaseWhenThenList 'END'                         -> findCaseType($1)
  | CaseWhenThenList 'ELSE' ValueExpression 'END'
+   {
+     $1.caseTypes.push($3);
+     $$ = findCaseType($1);
+   }
  ;
 
 CaseRightPart_EDIT
- : CaseWhenThenList_EDIT EndOrError
+ : CaseWhenThenList_EDIT EndOrError                            -> findCaseType($1)
  | CaseWhenThenList 'ELSE' ValueExpression 'CURSOR'
    {
-     suggestKeywords(mergeSuggestKeywords($3, { suggestKeywords: ['END'] }).suggestKeywords);
+     suggestValueExpressionKeywords($3, ['END']);
+     $1.caseTypes.push($3);
+     $$ = findCaseType($1);
    }
  | CaseWhenThenList_EDIT 'ELSE' ValueExpression EndOrError
- | CaseWhenThenList_EDIT 'ELSE' EndOrError
+   {
+     $1.caseTypes.push($3);
+     $$ = findCaseType($1);
+   }
+ | CaseWhenThenList_EDIT 'ELSE' EndOrError                      -> findCaseType($1)
  | CaseWhenThenList 'CURSOR' ValueExpression EndOrError
    {
      if ($4.toLowerCase() !== 'end') {
-       suggestKeywords(mergeSuggestKeywords(valueExpressionKeywords(), { suggestKeywords: ['END', 'ELSE', 'WHEN'] }).suggestKeywords);
+       suggestValueExpressionKeywords($1, ['END', 'ELSE', 'WHEN']);
      } else {
-       suggestKeywords(mergeSuggestKeywords(valueExpressionKeywords(), { suggestKeywords: ['ELSE', 'WHEN'] }).suggestKeywords);
+       suggestValueExpressionKeywords($1, ['ELSE', 'WHEN']);
      }
+     $$ = findCaseType($1);
    }
  | CaseWhenThenList 'CURSOR' EndOrError
    {
      if ($3.toLowerCase() !== 'end') {
-       suggestKeywords(mergeSuggestKeywords(valueExpressionKeywords(), { suggestKeywords: ['END', 'WHEN'] }).suggestKeywords);
+       suggestValueExpressionKeywords($1, ['END', 'ELSE', 'WHEN']);
      } else {
-       suggestKeywords(mergeSuggestKeywords(valueExpressionKeywords(), { suggestKeywords: ['WHEN'] }).suggestKeywords);
+       suggestValueExpressionKeywords($1, ['ELSE', 'WHEN']);
      }
+     $$ = findCaseType($1);
    }
  | CaseWhenThenList 'ELSE' ValueExpression_EDIT EndOrError
+   {
+     $1.caseTypes.push($3);
+     $$ = findCaseType($1);
+   }
  | CaseWhenThenList 'ELSE' 'CURSOR' EndOrError
    {
      valueExpressionSuggest();
+     $$ = findCaseType($1);
    }
  | 'ELSE' 'CURSOR' EndOrError
    {
      valueExpressionSuggest();
+     $$ = { types: [ 'T' ] };
    }
  | 'CURSOR' 'ELSE' ValueExpression EndOrError
    {
      valueExpressionSuggest();
      suggestKeywords(['WHEN']);
+     $$ = $3;
    }
  | 'CURSOR' 'ELSE' EndOrError
    {
      valueExpressionSuggest();
      suggestKeywords(['WHEN']);
+     $$ = { types: [ 'T' ] };
    }
  ;
 
@@ -1704,8 +1742,12 @@ EndOrError
  ;
 
 CaseWhenThenList
- : CaseWhenThenListPartTwo
- | CaseWhenThenList CaseWhenThenListPartTwo     -> $2
+ : CaseWhenThenListPartTwo                   -> { caseTypes: [ $1 ], lastType: $1 }
+ | CaseWhenThenList CaseWhenThenListPartTwo
+   {
+     $1.caseTypes.push($2);
+     $$ = { caseTypes: $1.caseTypes, lastType: $2 };
+   }
  ;
 
 CaseWhenThenList_EDIT
@@ -1714,132 +1756,158 @@ CaseWhenThenList_EDIT
  | CaseWhenThenList CaseWhenThenListPartTwo_EDIT CaseWhenThenList
  | CaseWhenThenList 'CURSOR' CaseWhenThenList
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['WHEN'] }, $1).suggestKeywords);
+     suggestValueExpressionKeywords($1, ['WHEN']);
    }
- | CaseWhenThenListPartTwo_EDIT CaseWhenThenList
+ | CaseWhenThenListPartTwo_EDIT CaseWhenThenList                   -> $2
  ;
 
 CaseWhenThenListPartTwo
- : 'WHEN' ValueExpression 'THEN' ValueExpression    -> $4
+ : 'WHEN' ValueExpression 'THEN' ValueExpression  -> $4
  ;
 
 CaseWhenThenListPartTwo_EDIT
- : 'WHEN' ValueExpression_EDIT
- | 'WHEN' ValueExpression_EDIT 'THEN'
- | 'WHEN' ValueExpression_EDIT 'THEN' ValueExpression
- | 'WHEN' ValueExpression 'THEN' ValueExpression_EDIT
- | 'WHEN' 'THEN' ValueExpression_EDIT
+ : 'WHEN' ValueExpression_EDIT                         -> { caseTypes: [{ types: ['T'] }] }
+ | 'WHEN' ValueExpression_EDIT 'THEN'                  -> { caseTypes: [{ types: ['T'] }] }
+ | 'WHEN' ValueExpression_EDIT 'THEN' ValueExpression  -> { caseTypes: [$4] }
+ | 'WHEN' ValueExpression 'THEN' ValueExpression_EDIT  -> { caseTypes: [$4] }
+ | 'WHEN' 'THEN' ValueExpression_EDIT                  -> { caseTypes: [$3] }
  | 'CURSOR' ValueExpression 'THEN'
    {
      suggestKeywords(['WHEN']);
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'CURSOR' ValueExpression 'THEN' ValueExpression
    {
      suggestKeywords(['WHEN']);
+     $$ = { caseTypes: [$4] };
    }
  | 'CURSOR' 'THEN'
    {
      valueExpressionSuggest();
      suggestKeywords(['WHEN']);
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'CURSOR' 'THEN' ValueExpression
     {
       valueExpressionSuggest();
       suggestKeywords(['WHEN']);
+      $$ = { caseTypes: [{ types: ['T'] }] };
     }
  | 'WHEN' 'CURSOR'
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' 'CURSOR' ValueExpression
    {
      valueExpressionSuggest();
      suggestKeywords(['THEN']);
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' 'CURSOR' 'THEN'
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' 'CURSOR' 'THEN' ValueExpression
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [$4] };
    }
  | 'WHEN' ValueExpression 'CURSOR'
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['THEN'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, ['THEN']);
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' ValueExpression 'CURSOR' ValueExpression
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['THEN'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, ['THEN']);
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' ValueExpression 'THEN' 'CURSOR'
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' ValueExpression 'THEN' 'CURSOR' ValueExpression
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' 'THEN' 'CURSOR' ValueExpression
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  | 'WHEN' 'THEN' 'CURSOR'
    {
      valueExpressionSuggest();
+     $$ = { caseTypes: [{ types: ['T'] }] };
    }
  ;
 
 ValueExpression_EDIT
  : NonParenthesizedValueExpressionPrimary_EDIT
- | 'NOT' ValueExpression_EDIT                               -> $2
+ | 'NOT' ValueExpression_EDIT                           -> { types: [ 'BOOLEAN' ] }
  | 'NOT' 'CURSOR'
    {
      suggestFunctions();
      suggestColumns();
      suggestKeywords(['EXISTS']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
- | '!' ValueExpression_EDIT                                 -> $2
+ | '!' ValueExpression_EDIT                             -> { types: [ 'BOOLEAN' ] }
  | '!' AnyCursor
    {
-     suggestFunctions();
-     suggestColumns();
+     suggestFunctions({ types: [ 'BOOLEAN' ] });
+     suggestColumns({ types: [ 'BOOLEAN' ] });
+     $$ = { types: [ 'BOOLEAN' ] };
    }
- | '~' ValueExpression_EDIT                                 -> $2
+ | '~' ValueExpression_EDIT                             -> { types: [ 'T' ] }
  | '~' 'PARTIAL_CURSOR'
    {
      suggestFunctions();
      suggestColumns();
+     $$ = { types: [ 'T' ] };
    }
- | '-' ValueExpression_EDIT %prec NEGATION                  -> $2
+ | '-' ValueExpression_EDIT %prec NEGATION
+   {
+     applyTypeToSuggestions('NUMBER')
+     $$ = { types: [ 'NUMBER' ] };
+   }
  | '-' 'PARTIAL_CURSOR' %prec NEGATION
    {
-     suggestFunctions();
-     suggestColumns();
+     suggestFunctions({ types: [ 'NUMBER' ] });
+     suggestColumns({ types: [ 'NUMBER' ] });
+     $$ = { types: [ 'NUMBER' ] };
    }
- | 'EXISTS' TableSubquery_EDIT
- | ValueExpression_EDIT 'NOT' 'LIKE' SingleQuotedValue      -> $1
- | ValueExpression_EDIT 'LIKE' SingleQuotedValue            -> $1
- | ValueExpression_EDIT 'RLIKE' SingleQuotedValue           -> $1
- | ValueExpression_EDIT 'REGEXP' SingleQuotedValue          -> $1
- | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery        -> $1
- | ValueExpression_EDIT 'EXISTS' TableSubquery              -> $1
- | '(' ValueExpression_EDIT RightParenthesisOrError         -> $2
+ | 'EXISTS' TableSubquery_EDIT                          -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'LIKE' SingleQuotedValue  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'LIKE' SingleQuotedValue        -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'RLIKE' SingleQuotedValue       -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'REGEXP' SingleQuotedValue      -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery    -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'EXISTS' TableSubquery          -> { types: [ 'BOOLEAN' ] }
+ | '(' ValueExpression_EDIT RightParenthesisOrError     -> $2
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
      suggestKeywords(['NULL']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'CURSOR'
    {
      suggestKeywords(['NOT NULL', 'NULL']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'CURSOR' 'NULL'
    {
      suggestKeywords(['NOT']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'NOT' 'CURSOR'
    {
      suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
 
@@ -1847,131 +1915,213 @@ ValueExpression_EDIT
  : ValueExpression 'NOT' 'IN' ValueExpressionInSecondPart_EDIT
    {
      if ($4.inValueEdit) {
-       valueExpressionSuggest($1)
+       valueExpressionSuggest($1);
      }
      if ($4.cursorAtStart) {
        suggestKeywords(['SELECT']);
      }
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IN' ValueExpressionInSecondPart_EDIT
    {
      if ($3.inValueEdit) {
-       valueExpressionSuggest($1)
+       valueExpressionSuggest($1);
      }
      if ($3.cursorAtStart) {
        suggestKeywords(['SELECT']);
      }
+     $$ = { types: [ 'BOOLEAN' ] };
    }
- | ValueExpression_EDIT 'NOT' 'IN' '(' InValueList RightParenthesisOrError
- | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubqueryInner RightParenthesisOrError
- | ValueExpression_EDIT 'IN' '(' InValueList RightParenthesisOrError
- | ValueExpression_EDIT 'IN' '(' TableSubqueryInner RightParenthesisOrError
+ | ValueExpression_EDIT 'NOT' 'IN' '(' InValueList RightParenthesisOrError         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubqueryInner RightParenthesisOrError  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'IN' '(' InValueList RightParenthesisOrError               -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'IN' '(' TableSubqueryInner RightParenthesisOrError        -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpressionInSecondPart_EDIT
  : '(' TableSubqueryInner_EDIT RightParenthesisOrError
- | '(' InValueList_EDIT RightParenthesisOrError           -> { inValueEdit: true }
- | '(' AnyCursor RightParenthesisOrError                  -> { inValueEdit: true, cursorAtStart: true }
+ | '(' InValueList_EDIT RightParenthesisOrError         -> { inValueEdit: true }
+ | '(' AnyCursor RightParenthesisOrError                -> { inValueEdit: true, cursorAtStart: true }
  ;
 
 ValueExpression_EDIT
  : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+   {
+     if ($4.types[0] === $6.types[0]) {
+       applyTypeToSuggestions($4.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
+   {
+     if ($1.types[0] === $6.types[0]) {
+       applyTypeToSuggestions($1.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
+   {
+     if ($1.types[0] === $4.types[0]) {
+       applyTypeToSuggestions($1.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'CURSOR'
    {
-     suggestKeywords(['AND']);
+     suggestValueExpressionKeywords($4, ['AND']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'NOT' 'BETWEEN' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression_EDIT 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+   {
+     if ($1.types[0] === $3.types[0]) {
+       applyTypeToSuggestions($1.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
+   {
+     if ($1.types[0] === $3.types[0]) {
+       applyTypeToSuggestions($1.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
+   {
+     if ($1.types[0] === $3.types[0]) {
+       applyTypeToSuggestions($1.types)
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'CURSOR'
    {
-     suggestKeywords(['AND']);
+     suggestValueExpressionKeywords($3, ['AND']);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'BETWEEN' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
 
 ValueExpression_EDIT
- : ValueExpression '=' ValueExpression_EDIT                    -> {}
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT  -> {}
- | ValueExpression '-' ValueExpression_EDIT                    -> {}
- | ValueExpression '*' ValueExpression_EDIT                    -> {}
- | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT  -> {}
- | ValueExpression 'OR' ValueExpression_EDIT                   -> {}
- | ValueExpression 'AND' ValueExpression_EDIT                  -> {}
+ : ValueExpression '=' ValueExpression_EDIT                    -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression '-' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression '*' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'OR' ValueExpression_EDIT                   -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'AND' ValueExpression_EDIT                  -> { types: [ 'BOOLEAN' ] }
  | ValueExpression '=' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'COMPARISON_OPERATOR' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest($1);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression '-' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression '*' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression 'ARITHMETIC_OPERATOR' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression 'OR' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest();
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'AND' RightPart_EDIT
    {
-     $$ = {};
      valueExpressionSuggest();
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
 
 ValueExpression_EDIT
- : ValueExpression_EDIT '=' ValueExpression
- | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
- | ValueExpression_EDIT '-' ValueExpression
- | ValueExpression_EDIT '*' ValueExpression
- | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
- | ValueExpression_EDIT 'OR' ValueExpression
- | ValueExpression_EDIT 'AND' ValueExpression
- | 'CURSOR' '=' ValueExpression { valueExpressionSuggest($3) }
- | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression { valueExpressionSuggest($3) }
-// | 'CURSOR' '-' ValueExpression { valueExpressionSuggest() }
- | 'CURSOR' '*' ValueExpression { valueExpressionSuggest() }
- | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression { valueExpressionSuggest() }
- | 'CURSOR' 'OR' ValueExpression { valueExpressionSuggest() }
- | 'CURSOR' 'AND' ValueExpression { valueExpressionSuggest() }
+ : ValueExpression_EDIT '=' ValueExpression                    -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT '-' ValueExpression                    -> { types: [ 'NUMBER' ] }
+ | ValueExpression_EDIT '*' ValueExpression                    -> { types: [ 'NUMBER' ] }
+ | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression  -> { types: [ 'NUMBER' ] }
+ | ValueExpression_EDIT 'OR' ValueExpression                   -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'AND' ValueExpression                  -> { types: [ 'BOOLEAN' ] }
+ | 'CURSOR' '=' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' '*' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | 'CURSOR' 'OR' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'AND' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  ;
 
 ValueExpressionList
- : ValueExpression                                                         -> $1
- | ValueExpressionList ',' ValueExpression                                 -> $3
+ : ValueExpression                          -> $1
+ | ValueExpressionList ',' ValueExpression  -> $3
  ;
 
 ValueExpressionList_EDIT
@@ -1989,13 +2139,13 @@ ValueExpressionList_EDIT
    }
  | AnyCursor ',' ValueExpressionList
    {
-     $$ = { cursorAtStart : true };
      valueExpressionSuggest();
+     $$ = { cursorAtStart : true };
    }
  | AnyCursor ','
    {
-     $$ = { cursorAtStart : true };
      valueExpressionSuggest();
+     $$ = { cursorAtStart : true };
    }
  | ',' AnyCursor
    {
@@ -2028,29 +2178,30 @@ RightPart_EDIT
 // TODO: Expand with more choices
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
- | ColumnReference
-   {
-     $$ = { columnReference: $1 };
-   }
+ | ColumnReference             -> { types: ['T'], columnReference: $1 }
  | UserDefinedFunction
- | GroupingOperation
- | HiveComplexTypeConstructor
- | 'NULL'
+// | GroupingOperation
+ | 'NULL'                      -> { types: [ 'NULL' ] }
  ;
 
 NonParenthesizedValueExpressionPrimary_EDIT
  : ColumnReference_EDIT
+   {
+     if ($1.suggestKeywords) {
+       $$ = { types: ['T'], columnReference: $1, suggestKeywords: $1.suggestKeywords };
+     } else {
+       $$ = { types: ['T'], columnReference: $1 };
+     }
+   }
  | UserDefinedFunction_EDIT
- | HiveComplexTypeConstructor_EDIT
  ;
 
 UnsignedValueSpecification
  : UnsignedLiteral
-// | GeneralValueSpecification
  ;
 
 UnsignedLiteral
- : UnsignedNumericLiteral
+ : UnsignedNumericLiteral  -> { types: [ 'NUMBER' ] }
  | GeneralLiteral
  ;
 
@@ -2073,7 +2224,8 @@ ApproximateNumericLiteral
  ;
 
 GeneralLiteral
- : SingleQuotedValue
+ : SingleQuotedValue  -> { types: [ 'STRING' ] }
+ | TruthValue         -> { types: [ 'BOOLEAN' ] }
  ;
 
 TruthValue
@@ -2101,13 +2253,10 @@ ColumnReference_EDIT
  ;
 
 BasicIdentifierChain
- : Identifier
-   {
-     $$ = [ $1 ];
-   }
+ : Identifier                              -> [ $1 ]
  | BasicIdentifierChain AnyDot Identifier
    {
-     $$ = $1.concat($3);
+     $1.push($3);
    }
  ;
 
@@ -2116,21 +2265,16 @@ BasicIdentifierChain_EDIT
  | BasicIdentifierChain AnyDot Identifier_EDIT
  | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor
    {
-     $$ = {
-       suggestKeywords: ['*']
-     }
      suggestColumns({
        identifierChain: $1
      });
+     $$ = { suggestKeywords: ['*'] };
    }
  ;
 
 Identifier
  : ColumnIdentifier
- | DoubleQuotedValue
-   {
-     $$ = { name: $1 }
-   }
+ | DoubleQuotedValue  -> { name: $1 }
  ;
 
 Identifier_EDIT
@@ -2141,43 +2285,43 @@ Identifier_EDIT
  ;
 
 SelectSubList
- : ValueExpression OptionalCorrelationName         -> $2 // <derived column>
+ : ValueExpression OptionalCorrelationName  -> $2 // <derived column>
  | '*'
  ;
 
 SelectSubList_EDIT
- : ValueExpression_EDIT OptionalCorrelationName         -> $1
- | ValueExpression OptionalCorrelationName_EDIT         -> $2
+ : ValueExpression_EDIT OptionalCorrelationName
+ | ValueExpression OptionalCorrelationName_EDIT  -> $2
  ;
 
 SelectList
  : SelectSubList
- | SelectList ',' SelectSubList         -> $3
+ | SelectList ',' SelectSubList  -> $3
  ;
 
 SelectList_EDIT
  : SelectSubList_EDIT
  | 'CURSOR' SelectList
    {
-     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
      suggestFunctions();
      suggestColumns();
      suggestFunctions();
+     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
    }
- | SelectList ',' SelectListPartTwo_EDIT                        -> $3
- | SelectList ',' SelectListPartTwo_EDIT ','                    -> $3
- | SelectList ',' SelectListPartTwo_EDIT ',' SelectList         -> $3
+ | SelectList ',' SelectListPartTwo_EDIT                 -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ','             -> $3
+ | SelectList ',' SelectListPartTwo_EDIT ',' SelectList  -> $3
  ;
 
 SelectListPartTwo_EDIT
  : SelectSubList_EDIT
  | AnyCursor
    {
-     $$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
      suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     $$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
    }
  ;
 
@@ -2216,7 +2360,7 @@ DerivedColumn_EDIT_TWO
 
 TableReferenceList
  : TableReference
- | TableReferenceList ',' TableReference         -> $3
+ | TableReferenceList ',' TableReference  -> $3
  ;
 
 TableReferenceList_EDIT
@@ -2249,7 +2393,7 @@ TablePrimaryOrJoinedTable_EDIT
  ;
 
 JoinedTable
- : TablePrimary Joins         -> $2
+ : TablePrimary Joins  -> $2
  ;
 
 JoinedTable_EDIT
@@ -2259,22 +2403,10 @@ JoinedTable_EDIT
 
 // TODO: Joins 'JOIN' Joins
 Joins
- : JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
-   {
-     $$ = { hasJoinCondition: false }
-   }
- | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
-   {
-     $$ = { hasJoinCondition: true }
-   }
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
-   {
-     $$ = { hasJoinCondition: false }
-   }
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
-   {
-     $$ = { hasJoinCondition: true }
-   }
+ : JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary                      -> { hasJoinCondition: false }
+ | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition        -> { hasJoinCondition: true }
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary                -> { hasJoinCondition: false }
+ | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition  -> { hasJoinCondition: true }
  ;
 
 OptionalImpalaBroadcastOrShuffle
@@ -2393,9 +2525,9 @@ ParenthesizedJoinEqualityExpression_EDIT
      suggestColumns();
    }
  | '(' PartialBacktickedOrPartialCursor 'AND' JoinEqualityExpression RightParenthesisOrError
-    {
-      suggestColumns();
-    }
+   {
+     suggestColumns();
+   }
  ;
 
 JoinEqualityExpression
@@ -2610,15 +2742,18 @@ SimpleTable
 
 SimpleTable_EDIT
  : QuerySpecification_EDIT
+   {
+     linkTablePrimaries();
+   }
  ;
 
 OptionalCorrelationName
  :
    {
-     $$ = { suggestKeywords: ['AS'] }
+     $$ = { suggestKeywords: ['AS'] };
    }
  | RegularOrBacktickedIdentifier
- | AnyAs RegularOrBacktickedIdentifier         -> $2
+ | AnyAs RegularOrBacktickedIdentifier  -> $2
  ;
 
 OptionalCorrelationName_EDIT
@@ -2645,14 +2780,8 @@ OptionalLateralViews_EDIT
 
 // TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
 UserDefinedTableGeneratingFunction
- : '<hive>EXPLODE(' DerivedColumnChain ')'
-   {
-     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
-   }
- | '<hive>POSEXPLODE(' DerivedColumnChain ')'
-   {
-     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
-   }
+ : '<hive>EXPLODE(' DerivedColumnChain ')'     -> { function: $1.substring(0, $1.length - 1), expression: $2 }
+ | '<hive>POSEXPLODE(' DerivedColumnChain ')'  -> { function: $1.substring(0, $1.length - 1), expression: $2 }
  ;
 
 UserDefinedTableGeneratingFunction_EDIT
@@ -2661,13 +2790,13 @@ UserDefinedTableGeneratingFunction_EDIT
      suggestColumns($2);
    }
  | '<hive>EXPLODE(' PartialBacktickedOrPartialCursor error
-    {
-      suggestColumns();
-    }
+   {
+     suggestColumns();
+   }
  | '<hive>POSEXPLODE(' PartialBacktickedOrPartialCursor error
-    {
-      suggestColumns();
-    }
+   {
+     suggestColumns();
+   }
  ;
 
 GroupingOperation
@@ -2696,10 +2825,7 @@ UserDefinedFunction_EDIT
 
 ArbitraryFunction
  : 'UDF(' ')'
- | 'UDF(' ValueExpressionList ')'
-   {
-     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 };
-   }
+ | 'UDF(' ValueExpressionList ')'  -> { function: $1.substring(0, $1.length - 1), expression: $2 }
  ;
 
 ArbitraryFunction_EDIT
@@ -2709,11 +2835,11 @@ ArbitraryFunction_EDIT
    }
  | 'UDF(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     checkForKeywords($2);
+     suggestValueExpressionKeywords($2);
    }
  | 'UDF(' ValueExpressionList 'CURSOR' ',' ValueExpressionList RightParenthesisOrError
    {
-     checkForKeywords($2);
+     suggestValueExpressionKeywords($2);
    }
  | 'UDF(' ValueExpressionList_EDIT RightParenthesisOrError
  ;
@@ -2753,11 +2879,11 @@ CastFunction_EDIT
  | 'CAST(' ValueExpression_EDIT RightParenthesisOrError
  | 'CAST(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['AS'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, ['AS']);
    }
  | 'CAST(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: ['AS'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, ['AS']);
    }
  | 'CAST(' ValueExpression AnyAs 'CURSOR' RightParenthesisOrError
    {
@@ -2789,7 +2915,7 @@ CountFunction_EDIT
    }
  | 'COUNT(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     checkForKeywords($3);
+     suggestValueExpressionKeywords($3);
    }
  | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -2825,7 +2951,7 @@ OtherAggregateFunction_EDIT
    }
  | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     checkForKeywords($3);
+     suggestValueExpressionKeywords($3);
    }
  | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -2873,37 +2999,37 @@ ExtractFunction
 
 ExtractFunction_EDIT
  : '<impala>EXTRACT(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
-    {
-      valueExpressionSuggest();
-    }
+   {
+     valueExpressionSuggest();
+   }
  | '<impala>EXTRACT(' AnyCursor FromOrComma RightParenthesisOrError
-    {
-      valueExpressionSuggest();
-    }
+   {
+     valueExpressionSuggest();
+   }
  | '<impala>EXTRACT(' AnyCursor RightParenthesisOrError
-    {
-      valueExpressionSuggest();
-    }
+   {
+     valueExpressionSuggest();
+   }
  | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
  | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
  | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError
  | '<impala>EXTRACT(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
-    {
-      valueExpressionSuggest();
-    }
+   {
+     valueExpressionSuggest();
+   }
  | '<impala>EXTRACT(' FromOrComma AnyCursor RightParenthesisOrError
-    {
-      valueExpressionSuggest();
-    }
+   {
+     valueExpressionSuggest();
+   }
  | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
  | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: [',', 'FROM'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, [',', 'FROM']);
    }
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(mergeSuggestKeywords({ suggestKeywords: [',', 'FROM'] }, $2).suggestKeywords);
+     suggestValueExpressionKeywords($2, [',', 'FROM']);
    }
  ;
 
@@ -2931,7 +3057,7 @@ SumFunction_EDIT
    }
  | 'SUM(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     checkForKeywords($3);
+     suggestValueExpressionKeywords($3);
    }
  | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
  ;
@@ -2941,14 +3067,8 @@ WithinGroupSpecification
  ;
 
 LateralView
- : '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier LateralViewColumnAliases
-   {
-     $$ = [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
-   }
- | '<hive>LATERAL' 'VIEW' UserDefinedFunction LateralViewColumnAliases
-   {
-     $$ = [{ udtf: $3, columnAliases: $4 }]
-   }
+ : '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $3, columnAliases: $4 }]
  ;
 
 LateralView_EDIT
@@ -2956,35 +3076,29 @@ LateralView_EDIT
  | '<hive>LATERAL' 'VIEW' UserDefinedFunction_EDIT LateralViewColumnAliases
  | '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier 'CURSOR'
    {
-     $$ = [];
      suggestKeywords(['AS']);
+     $$ = [];
    }
  | '<hive>LATERAL' 'VIEW' UserDefinedFunction 'CURSOR'
    {
-     $$ = [];
      suggestKeywords(['AS']);
+     $$ = [];
    }
  | '<hive>LATERAL' 'VIEW' 'CURSOR'
    {
-     $$ = [];
      suggestKeywords(['explode', 'posexplode']);
+     $$ = [];
    }
  | '<hive>LATERAL' 'CURSOR'
    {
-     $$ = [];
      suggestKeywords(['VIEW']);
+     $$ = [];
    }
  ;
 
 LateralViewColumnAliases
- : '<hive>AS' RegularIdentifier
-   {
-     $$ = [ $2 ]
-   }
- | '<hive>AS' '(' RegularIdentifier ',' RegularIdentifier ')'
-   {
-     $$ = [ $3, $5 ]
-   }
+ : '<hive>AS' RegularIdentifier                                -> [ $2 ]
+ | '<hive>AS' '(' RegularIdentifier ',' RegularIdentifier ')'  -> [ $3, $5 ]
  ;
 
 // ===================================== SHOW Statement =====================================
@@ -3074,7 +3188,7 @@ ShowColumnsStatement
  : 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier
  | 'SHOW' '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
  ;
- 
+
 ShowColumnsStatement_EDIT
  : 'SHOW' '<hive>COLUMNS' 'CURSOR'
    {
@@ -3417,7 +3531,7 @@ ShowTableStatement_EDIT
  | 'SHOW' '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue
  | 'SHOW' '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue
     {
-      if (isHive())
+      if (isHive()) {
         suggestKeywords(['EXTENDED']);
       }
     }
@@ -3497,24 +3611,13 @@ ShowTransactionsStatement
 
 UpdateStatement
  : 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause
-   {
-     linkTablePrimaries();
-   }
  ;
 
 UpdateStatement_EDIT
  : 'UPDATE' TargetTable_EDIT 'SET' SetClauseList OptionalWhereClause
-   {
-     linkTablePrimaries();
    }
  | 'UPDATE' TargetTable 'SET' SetClauseList_EDIT OptionalWhereClause
-   {
-     linkTablePrimaries();
-   }
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_EDIT
-    {
-      linkTablePrimaries();
-    }
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause 'CURSOR'
    {
      if (!$5) {
@@ -3632,24 +3735,38 @@ var mergeSuggestKeywords = function() {
     }
   });
   if (result.length > 0) {
-    return { suggestKeywords: result }
+    return { suggestKeywords: result };
   }
-  return {}
+  return {};
 }
 
-var valueExpressionKeywords = function (firstRef) {
-  var result = { suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR'] };
+var suggestValueExpressionKeywords = function (valueExpression, extras) {
+  suggestKeywords(getValueExpressionKeywords(valueExpression, extras));
+}
+
+var getValueExpressionKeywords = function (valueExpression, extras) {
+  var type = valueExpression.lastType ? valueExpression.lastType.types[0] : valueExpression.types[0];
+  // We could have valueExpression.columnReference to suggest based on column type
+  var keywords = ['<', '<=', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN'];
   if (isHive()) {
-    result.suggestKeywords.push('<=>');
+    keywords.push('<=>');
   }
-  if (firstRef && firstRef.columnReference) {
-    result.columnReference = firstRef.columnReference;
-    result.suggestKeywords.push('LIKE');
-    result.suggestKeywords.push('NOT LIKE');
-    result.suggestKeywords.push('RLIKE');
-    result.suggestKeywords.push('REGEX');
+  if (valueExpression.suggestKeywords) {
+    keywords = keywords.concat(valueExpression.suggestKeywords);
   }
-  return result;
+  if (type === 'BOOLEAN' || type === 'T') {
+    keywords = keywords.concat(['AND', 'OR']);
+  }
+  if (type === 'NUMBER' || type === 'T') {
+    keywords = keywords.concat(['+', '-', '*', '/', '%']);
+  }
+  if (type === 'STRING' || type === 'T') {
+    keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
+  }
+  if (extras) {
+    keywords = keywords.concat(extras);
+  }
+  return keywords;
 }
 
 var suggestTypeKeywords = function () {
@@ -3660,12 +3777,37 @@ var suggestTypeKeywords = function () {
   }
 }
 
-var valueExpressionSuggest = function(other) {
-  if (other && other.columnReference) {
-    suggestValues({ identifierChain: other.columnReference });
+var valueExpressionSuggest = function (oppositeValueExpression) {
+  if (oppositeValueExpression && oppositeValueExpression.columnReference) {
+    suggestValues({ identifierChain: oppositeValueExpression.columnReference });
   }
   suggestColumns();
   suggestFunctions();
+  if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
+    applyTypeToSuggestions(['NUMBER']);
+  }
+}
+
+var applyTypeToSuggestions = function (types) {
+  if (parser.yy.result.suggestFunctions) {
+    parser.yy.result.suggestFunctions.types = types;
+  }
+  if (parser.yy.result.suggestColumns) {
+    parser.yy.result.suggestColumns.types = types;
+  }
+}
+
+var findCaseType = function (whenThenList) {
+  var types = {};
+  whenThenList.caseTypes.forEach(function (valueExpression) {
+    valueExpression.types.forEach(function (type) {
+      types[type] = true;
+    });
+  });
+  if (Object.keys(types).length === 1) {
+    return { type: Object.keys(types)[0] };
+  }
+  return { types: [ 'T' ] };
 }
 
 var prioritizeSuggestions = function () {
@@ -3729,7 +3871,7 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
       firstPart.push({
         name: lastFromFirst.name,
         key: identifierChain[0].key
-      })
+      });
     }
     return firstPart.concat(secondPart);
   }
@@ -3740,7 +3882,7 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
   var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
   var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*/);
-  return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0}
+  return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
 };
 
 parser.expandLateralViews = function (tablePrimaries, identifierChain) {
@@ -3842,7 +3984,7 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
           return true;
         }
         return false;
-      })
+      });
     }
 
     if (foundTable.length === 1) {
@@ -3958,8 +4100,8 @@ var suggestTablesOrColumns = function (identifier) {
   }
 }
 
-var suggestFunctions = function () {
-  parser.yy.result.suggestFunctions = true;
+var suggestFunctions = function (details) {
+  parser.yy.result.suggestFunctions = details || {};
 }
 
 var suggestAggregateFunctions = function () {
@@ -3967,7 +4109,12 @@ var suggestAggregateFunctions = function () {
 }
 
 var suggestColumns = function (details) {
-  parser.yy.result.suggestColumns = details || { identifierChain: [] };
+  if (typeof details === 'undefined') {
+    details = { identifierChain: [] };
+  } else if (typeof details.identifierChain === 'undefined') {
+    details.identifierChain = [];
+  }
+  parser.yy.result.suggestColumns = details;
 }
 
 var suggestTables = function (details) {
@@ -3979,11 +4126,11 @@ var suggestDatabases = function (details) {
 }
 
 var suggestHdfs = function (details) {
-  parser.yy.result.suggestHdfs = details || {}
+  parser.yy.result.suggestHdfs = details || {};
 }
 
 var suggestValues = function (details) {
-  parser.yy.result.suggestValues = details || { identifierChain: [] }
+  parser.yy.result.suggestValues = details || {};
 }
 
 var determineCase = function (text) {
@@ -4020,7 +4167,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     parser.lexer.setInput = function (input) {
       var lexer = originalSetInput.bind(parser.lexer)(input);
       if (typeof parser.yy.activeDialect !== 'undefined') {
-        lexer.begin(parser.yy.activeDialect)
+        lexer.begin(parser.yy.activeDialect);
       }
     }
     lexerModified = true;
