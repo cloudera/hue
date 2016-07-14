@@ -977,6 +977,7 @@
             chartsUpdatingState();
             options.onSelectRange(from, to);
           });
+          _chart.staggerLabels(true);
           _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
           _chart.multibar.hideable(true);
           _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
@@ -1033,6 +1034,7 @@
             else {
               _chart.xAxis.showMaxMin(false).tickFormat(d3.format(",0f"));
             }
+            _chart.staggerLabels(true);
             _chart.multibar.hideable(true);
             _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
             _chart.onStateChange(options.onStateChange);
