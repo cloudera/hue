@@ -2655,7 +2655,7 @@
           editor.completers.push(langTools.keyWordCompleter);
         }
         editor.completers.push(snippet.autocompleter);
-      }
+      };
 
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
@@ -2666,7 +2666,7 @@
       var removeUnicodes = function (value) {
         var UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/ig;  //taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
         return value.replace(UNICODES_TO_REMOVE, ' ');
-      }
+      };
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
@@ -3074,7 +3074,7 @@
         editor.session.insert(editor.getCursorPosition(), text);
         menu.hide();
         editor.focus();
-      }
+      };
 
       $tableDropMenu.find('.editor-drop-value').click(function () {
         setFromDropMenu(lastMeta.table);
@@ -3129,11 +3129,10 @@
       editor.commands.on("afterExec", function (e) {
         if (e.command.name === "insertstring") {
           var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && (e.args == "." || e.args == " ")) || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
-          if(e.args.toLowerCase().indexOf("? from ") == 0) {
-            if (e.args[e.args.length - 1] !== '.') {
-              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
-              editor.removeTextBeforeCursor(1);
-            }
+          var questionMarkMatch = editor.getTextBeforeCursor().match(/select \? from \S+[^.]$/i);
+          if (questionMarkMatch) {
+            editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
+            editor.removeTextBeforeCursor(1);
             triggerAutocomplete = true;
           }
 
