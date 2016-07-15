@@ -39,7 +39,7 @@ class Field(object):
     self.field_type = field_type
     self.keep = True
     self.operations = []
-    self.required = True
+    self.required = False
 
   def to_dict(self):
     return {'name': self.name,
@@ -51,7 +51,7 @@ class Field(object):
 FIELD_TYPES = [
   FieldType('text_en', "^[\\s\\S]{100,}$"),
   FieldType('string', "^[\\s\\S]*$"),
-  FieldType('double', "^([+-]?[0-9]+\\.?[0-9]+)?$"),
+  FieldType('double', "^([+-]?[0-9]+(\\.[0-9]+)?)?$"),
   FieldType('long', "^(?:[+-]?(?:[0-9]+))?$"),
   FieldType('date', "^([0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+(\\.[0-9]*)?Z)?$")
 ]
