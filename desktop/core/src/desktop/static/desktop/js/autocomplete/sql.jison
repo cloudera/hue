@@ -2346,7 +2346,14 @@ Identifier_EDIT
  ;
 
 SelectSubList
- : ValueExpression OptionalCorrelationName  -> $2 // <derived column>
+ : ValueExpression OptionalCorrelationName
+   {
+     if ($2 && $2.suggestKeywords) {
+       $$ = { suggestKeywords: getValueExpressionKeywords($1, $2.suggestKeywords || []) }
+     } else {
+       $$ = $2;
+     }
+   }
  | '*'
  ;
 
@@ -2368,6 +2375,14 @@ SelectList_EDIT
      suggestColumns();
      suggestFunctions();
      $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
+   }
+ | SelectList 'CURSOR' SelectList
+ | SelectList ',' AnyCursor SelectList
+   {
+     suggestFunctions();
+     suggestColumns();
+     suggestFunctions();
+     $$ = { suggestAggregateFunctions: true, suggestKeywords: ['*'] };
    }
  | SelectList ',' SelectListPartTwo_EDIT                 -> $3
  | SelectList ',' SelectListPartTwo_EDIT ','             -> $3
@@ -3845,7 +3860,7 @@ var suggestValueExpressionKeywords = function (valueExpression, extras) {
 }
 
 var getValueExpressionKeywords = function (valueExpression, extras) {
-  var type = valueExpression.lastType ? valueExpression.lastType.types[0] : valueExpression.types[0];
+  var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
   // We could have valueExpression.columnReference to suggest based on column type
   var keywords = ['<', '<=', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN'];
   if (isHive()) {
@@ -3854,13 +3869,13 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
   if (valueExpression.suggestKeywords) {
     keywords = keywords.concat(valueExpression.suggestKeywords);
   }
-  if (type === 'BOOLEAN' || type === 'T') {
+  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
     keywords = keywords.concat(['AND', 'OR']);
   }
-  if (type === 'NUMBER' || type === 'T') {
+  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
     keywords = keywords.concat(['+', '-', '*', '/', '%']);
   }
-  if (type === 'STRING' || type === 'T') {
+  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
     keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
   }
   if (extras) {
@@ -3910,7 +3925,7 @@ var findCaseType = function (whenThenList) {
     });
   });
   if (Object.keys(types).length === 1) {
-    return { type: Object.keys(types)[0] };
+    return { types: [Object.keys(types)[0]] };
   }
   return { types: [ 'T' ] };
 }

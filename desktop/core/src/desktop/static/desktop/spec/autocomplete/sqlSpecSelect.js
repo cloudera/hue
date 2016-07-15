@@ -62,6 +62,7 @@ define([
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar ',
         afterCursor: '',
+        containsKeywords: ['AS', '+'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -70,8 +71,7 @@ define([
           suggestDatabases:{
             prependFrom:true,
             appendDot:true
-          },
-          suggestKeywords: ['AS']
+          }
         }
       });
     });
@@ -80,6 +80,7 @@ define([
       assertAutoComplete({
         beforeCursor: 'SELECT foo AS a, bar ',
         afterCursor: '',
+        containsKeywords: ['AS', '+'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -88,8 +89,7 @@ define([
           suggestDatabases:{
             prependFrom:true,
             appendDot:true
-          },
-          suggestKeywords: ['AS']
+          }
         }
       });
     });
@@ -542,9 +542,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a ',
           afterCursor: ' FROM tableA;',
+          containsKeywords: ['AS', '+'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
+            lowerCase: false
           }
         });
       });
@@ -553,9 +553,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a ',
           afterCursor: ', FROM tableA;',
+          containsKeywords: ['AS', '+'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
+            lowerCase: false
           }
         });
       });
@@ -564,9 +564,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b ',
           afterCursor: ' FROM tableA;',
+          containsKeywords: ['AS', '+'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
+            lowerCase: false
           }
         });
       });
@@ -575,9 +575,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a ',
           afterCursor: ', b, c AS foo, d FROM tableA;',
+          containsKeywords: ['AS', '+'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
+            lowerCase: false
           }
         });
       });
@@ -616,6 +616,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(*) ',
           afterCursor: '',
+          containsKeywords: ['AS', '+'],
           expectedResult: {
             lowerCase: false,
             suggestTables: {
@@ -624,8 +625,7 @@ define([
             suggestDatabases: {
               prependFrom: true,
               appendDot: true
-            },
-            suggestKeywords: ['AS']
+            }
           }
         });
       });
@@ -3360,6 +3360,58 @@ define([
         });
       });
 
+      it('should suggest columns for "SELECT a, b, \\nc,\\nd, |\\ng,\\nf\\nFROM testTable WHERE a > 1 AND b = \'b\' ORDER BY c;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a, b, \nc,\nd, ',
+          afterCursor: '\ng,\nf\nFROM testTable WHERE a > 1 AND b = \'b\' ORDER BY c;',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestAggregateFunctions: true,
+            suggestColumns: { table: 'testTable' },
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT a, b, | c FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a,b, ',
+          afterCursor: ' c FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestAggregateFunctions: true,
+            suggestColumns: { table: 'testTable' },
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT | a, b, c FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' a, b, c FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestAggregateFunctions: true,
+            suggestColumns: { table: 'testTable' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT a |, b, c FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT a ',
+          afterCursor: ', b, c FROM testTable',
+          containsKeywords: ['AS', '>', 'AND'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
 
       it('should suggest columns for "SELECT * FROM testTable WHERE | = \'bar\' AND "', function() {
         assertAutoComplete({
