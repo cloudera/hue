@@ -97,6 +97,7 @@
 <impala>'NULLS'                     { return '<impala>NULLS'; }
 <impala>'OVER'                      { return '<impala>OVER'; }
 <impala>'PARTITIONS'                { return '<impala>PARTITIONS'; }
+<impala>'REAL'                      { return '<impala>REAL'; }
 <impala>'RIGHT'                     { return '<impala>RIGHT'; }
 <impala>'ROLE'                      { return '<impala>ROLE'; }
 <impala>'ROLES'                     { return '<impala>ROLES'; }
@@ -206,7 +207,6 @@
 <impala>'STDDEV('                   { return '<impala>STDDEV('; }
 <impala>'VARIANCE_POP('             { return '<impala>VARIANCE_POP('; }
 <impala>'VARIANCE_SAMP('            { return '<impala>VARIANCE_SAMP('; }
-
 [A-Za-z][A-Za-z0-9_]*\(             { return 'UDF('; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
@@ -785,6 +785,7 @@ PrimitiveType
  | 'BOOLEAN'
  | 'FLOAT'
  | 'DOUBLE'
+ | '<impala>REAL'
  | 'STRING'
  | 'DECIMAL'
  | 'CHAR'
@@ -1567,6 +1568,7 @@ ValueExpression
    {
      // verifyType($2, 'NUMBER');
      $$ = $2;
+     $2.types = ['NUMBER'];
    }
  | 'EXISTS' TableSubquery
    {
@@ -2020,8 +2022,16 @@ ValueExpression_EDIT
  ;
 
 ValueExpression_EDIT
- : ValueExpression '=' ValueExpression_EDIT                    -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT  -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression '=' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions($1.types);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions($1.types);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
  | ValueExpression '-' ValueExpression_EDIT
    {
      applyTypeToSuggestions(['NUMBER']);
@@ -2042,11 +2052,13 @@ ValueExpression_EDIT
  | ValueExpression '=' RightPart_EDIT
    {
      valueExpressionSuggest($1);
+     applyTypeToSuggestions($1.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'COMPARISON_OPERATOR' RightPart_EDIT
    {
      valueExpressionSuggest($1);
+     applyTypeToSuggestions($1.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression '-' RightPart_EDIT
@@ -2080,31 +2092,55 @@ ValueExpression_EDIT
  ;
 
 ValueExpression_EDIT
- : ValueExpression_EDIT '=' ValueExpression                    -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT '-' ValueExpression                    -> { types: [ 'NUMBER' ] }
- | ValueExpression_EDIT '*' ValueExpression                    -> { types: [ 'NUMBER' ] }
- | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression  -> { types: [ 'NUMBER' ] }
- | ValueExpression_EDIT 'OR' ValueExpression                   -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'AND' ValueExpression                  -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression_EDIT '=' ValueExpression
+   {
+     applyTypeToSuggestions($3.types);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
+   {
+     applyTypeToSuggestions($3.types);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression_EDIT '-' ValueExpression
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] }
+   }
+ | ValueExpression_EDIT '*' ValueExpression
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] }
+   }
+ | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] }
+   }
+ | ValueExpression_EDIT 'OR' ValueExpression   -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'AND' ValueExpression  -> { types: [ 'BOOLEAN' ] }
  | 'CURSOR' '=' ValueExpression
    {
      valueExpressionSuggest($3);
+     applyTypeToSuggestions($3.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression
    {
      valueExpressionSuggest($3);
+     applyTypeToSuggestions($3.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | 'CURSOR' '*' ValueExpression
    {
      valueExpressionSuggest($3);
+     applyTypeToSuggestions([ 'NUMBER' ]);
      $$ = { types: [ 'NUMBER' ] };
    }
  | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression
    {
      valueExpressionSuggest($3);
+     applyTypeToSuggestions([ 'NUMBER' ]);
      $$ = { types: [ 'NUMBER' ] };
    }
  | 'CURSOR' 'OR' ValueExpression
@@ -2120,40 +2156,65 @@ ValueExpression_EDIT
  ;
 
 ValueExpressionList
- : ValueExpression                          -> $1
- | ValueExpressionList ',' ValueExpression  -> $3
+ : ValueExpression
+   {
+     $1.position = 1;
+   }
+ | ValueExpressionList ',' ValueExpression
+   {
+     $3.position = $1.position + 1;
+     $$ = $3;
+   }
  ;
 
 ValueExpressionList_EDIT
  : ValueExpression_EDIT
+   {
+     $1.position = 1;
+   }
  | ValueExpressionList ',' ValueExpression_EDIT
+   {
+     $1.position += 1;
+   }
  | ValueExpression_EDIT ',' ValueExpressionList
+   {
+     $1.position = 1;
+   }
  | ValueExpressionList ',' ValueExpression_EDIT ',' ValueExpressionList
+   {
+     // $3.position = $1.position + 1;
+     // $$ = $3
+     $1.position += 1;
+   }
  | ValueExpressionList ',' AnyCursor
    {
      valueExpressionSuggest();
+     $1.position += 1;
    }
  | ValueExpressionList ',' AnyCursor ',' ValueExpressionList
    {
      valueExpressionSuggest();
+     $1.position += 1;
    }
  | AnyCursor ',' ValueExpressionList
    {
      valueExpressionSuggest();
-     $$ = { cursorAtStart : true };
+     $$ = { cursorAtStart : true, position: 1 };
    }
  | AnyCursor ','
    {
      valueExpressionSuggest();
-     $$ = { cursorAtStart : true };
+     $$ = { cursorAtStart : true, position: 1 };
    }
  | ',' AnyCursor
    {
      valueExpressionSuggest();
+     $$ = { position: 2 };
    }
  | ',' AnyCursor ',' ValueExpressionList
    {
      valueExpressionSuggest();
+     $$ = { position: 2 };
    }
  ;
 
@@ -2824,24 +2885,32 @@ UserDefinedFunction_EDIT
  ;
 
 ArbitraryFunction
- : 'UDF(' ')'
- | 'UDF(' ValueExpressionList ')'  -> { function: $1.substring(0, $1.length - 1), expression: $2 }
+ : 'UDF(' ')'                      -> { types: findReturnTypes($1) }
+ | 'UDF(' ValueExpressionList ')'  -> { function: $1.substring(0, $1.length - 1), expression: $2, types: findReturnTypes($1) }
  ;
 
 ArbitraryFunction_EDIT
  : 'UDF(' AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyArgumentTypesToSuggestions($1, 1);
+     $$ = { types: findReturnTypes($1) };
    }
  | 'UDF(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2);
+     $$ = { types: findReturnTypes($1) };
    }
  | 'UDF(' ValueExpressionList 'CURSOR' ',' ValueExpressionList RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2);
+     $$ = { types: findReturnTypes($1) };
    }
  | 'UDF(' ValueExpressionList_EDIT RightParenthesisOrError
+   {
+     applyArgumentTypesToSuggestions($1, $2.position);
+     $$ = { types: findReturnTypes($1) };
+   }
  ;
 
 AggregateFunction
@@ -2857,48 +2926,55 @@ AggregateFunction_EDIT
  ;
 
 CastFunction
- : 'CAST(' ValueExpression AnyAs PrimitiveType ')'
- | 'CAST(' ')'
+ : 'CAST(' ValueExpression AnyAs PrimitiveType ')'  -> { types: [ $4.toUpperCase() ] }
+ | 'CAST(' ')'                                      -> { types: [ 'T' ] }
  ;
 
 CastFunction_EDIT
  : 'CAST(' AnyCursor AnyAs PrimitiveType RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: [ $4.toUpperCase() ] };
    }
  | 'CAST(' AnyCursor AnyAs RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: [ 'T' ] };
    }
  | 'CAST(' AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: [ 'T' ] };
    }
- | 'CAST(' ValueExpression_EDIT AnyAs PrimitiveType RightParenthesisOrError
- | 'CAST(' ValueExpression_EDIT AnyAs RightParenthesisOrError
- | 'CAST(' ValueExpression_EDIT RightParenthesisOrError
+ | 'CAST(' ValueExpression_EDIT AnyAs PrimitiveType RightParenthesisOrError  -> { types: [ $4.toUpperCase() ] }
+ | 'CAST(' ValueExpression_EDIT AnyAs RightParenthesisOrError                -> { types: [ 'T' ] }
+ | 'CAST(' ValueExpression_EDIT RightParenthesisOrError                      -> { types: [ 'T' ] }
  | 'CAST(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2, ['AS']);
+     $$ =  { types: [ $4.toUpperCase() ] };
    }
  | 'CAST(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2, ['AS']);
+     $$ = { types: [ 'T' ] };
    }
  | 'CAST(' ValueExpression AnyAs 'CURSOR' RightParenthesisOrError
    {
      suggestTypeKeywords();
+     $$ = { types: [ 'T' ] };
    }
  | 'CAST(' AnyAs 'CURSOR' RightParenthesisOrError
-    {
-      suggestTypeKeywords();
-    }
+   {
+     suggestTypeKeywords();
+     $$ = { types: [ 'T' ] };
+   }
  ;
 
 CountFunction
- : 'COUNT(' '*' ')'
- | 'COUNT(' ')'
- | 'COUNT(' OptionalAllOrDistinct ValueExpressionList ')'
+ : 'COUNT(' '*' ')'                                        -> { types: findReturnTypes($1) }
+ | 'COUNT(' ')'                                            -> { types: findReturnTypes($1) }
+ | 'COUNT(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: findReturnTypes($1) }
  ;
 
 CountFunction_EDIT
@@ -2912,10 +2988,12 @@ CountFunction_EDIT
          suggestKeywords(['*', 'DISTINCT']);
        }
      }
+     $$ = { types: findReturnTypes($1) };
    }
  | 'COUNT(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($3);
+     $$ = { types: findReturnTypes($1) };
    }
  | 'COUNT(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -2926,12 +3004,13 @@ CountFunction_EDIT
          suggestKeywords(['DISTINCT']);
        }
      }
+     $$ = { types: findReturnTypes($1) };
    }
  ;
 
 OtherAggregateFunction
- : OtherAggregateFunction_Type OptionalAllOrDistinct ')'
- | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList ')'
+ : OtherAggregateFunction_Type OptionalAllOrDistinct ')'                      -> { types: findReturnTypes($1) }
+ | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList ')'  -> { types: findReturnTypes($1) }
  ;
 
 OtherAggregateFunction_EDIT
@@ -2948,10 +3027,12 @@ OtherAggregateFunction_EDIT
          suggestKeywords(['DISTINCT']);
        }
      }
+     $$ = { types: findReturnTypes($1) };
    }
  | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($3);
+     $$ = { types: findReturnTypes($1) };
    }
  | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -2964,6 +3045,7 @@ OtherAggregateFunction_EDIT
          suggestKeywords(['DISTINCT']);
        }
      }
+     $$ = { types: findReturnTypes($1) };
    }
  ;
 
@@ -3001,35 +3083,42 @@ ExtractFunction_EDIT
  : '<impala>EXTRACT(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' AnyCursor FromOrComma RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: findReturnTypes($1) };
    }
- | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
- | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
- | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError  -> { types: findReturnTypes($1) }
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError                  -> { types: findReturnTypes($1) }
+ | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError                              -> { types: findReturnTypes($1) }
  | '<impala>EXTRACT(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' FromOrComma AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     $$ = { types: findReturnTypes($1) };
    }
- | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
- | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
+ | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError  -> { types: findReturnTypes($1) }
+ | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError                  -> { types: findReturnTypes($1) }
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2, [',', 'FROM']);
+     $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2, [',', 'FROM']);
+     $$ = { types: findReturnTypes($1) };
    }
  ;
 
@@ -3039,8 +3128,8 @@ FromOrComma
  ;
 
 SumFunction
- : 'SUM(' OptionalAllOrDistinct ValueExpression ')'
- | 'SUM(' ')'
+ : 'SUM(' OptionalAllOrDistinct ValueExpression ')'  -> { types: findReturnTypes($1) }
+ | 'SUM(' ')'                                        -> { types: findReturnTypes($1) }
  ;
 
 SumFunction_EDIT
@@ -3054,21 +3143,32 @@ SumFunction_EDIT
          suggestKeywords(['DISTINCT']);
        }
      }
+     $$ = { types: findReturnTypes($1) };
    }
  | 'SUM(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
    {
      suggestValueExpressionKeywords($3);
+     $$ = { types: findReturnTypes($1) };
    }
- | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
+ | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError  -> { types: findReturnTypes($1) }
  ;
 
-WithinGroupSpecification
- : 'WITHIN' 'GROUP' '(' 'ORDER' 'BY' SortSpecificationList ')'
- ;
+// TODO: WITHIN
+//WithinGroupSpecification
+// : 'WITHIN' 'GROUP' '(' 'ORDER' 'BY' SortSpecificationList ')'
+// ;
 
 LateralView
  : '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
  | '<hive>LATERAL' 'VIEW' UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $3, columnAliases: $4 }]
+ | LateralView_ERROR
+ ;
+
+LateralView_ERROR
+ : '<hive>LATERAL' 'VIEW' UserDefinedFunction RegularIdentifier error                     -> []
+ | '<hive>LATERAL' 'VIEW' UserDefinedFunction error                                       -> []
+ | '<hive>LATERAL' 'VIEW' error                                                           -> []
+ | '<hive>LATERAL' error                                                                  -> []
  ;
 
 LateralView_EDIT
@@ -3772,6 +3872,8 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
 var suggestTypeKeywords = function () {
   if (isHive()) {
     suggestKeywords(['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
+  } else if (isImpala()) {
+    suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'REAL', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
   } else {
     suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
   }
@@ -3789,6 +3891,9 @@ var valueExpressionSuggest = function (oppositeValueExpression) {
 }
 
 var applyTypeToSuggestions = function (types) {
+  if (types[0] === 'BOOLEAN') {
+    return;
+  }
   if (parser.yy.result.suggestFunctions) {
     parser.yy.result.suggestFunctions.types = types;
   }
@@ -3808,6 +3913,24 @@ var findCaseType = function (whenThenList) {
     return { type: Object.keys(types)[0] };
   }
   return { types: [ 'T' ] };
+}
+
+findReturnTypes = function (funcToken) {
+  var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
+  return parser.yy.sqlFunctions.getReturnTypes(parser.yy.activeDialect, funcName);
+}
+
+var applyArgumentTypesToSuggestions = function (funcToken, position) {
+  var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
+  var foundArguments = parser.yy.sqlFunctions.getArgumentTypes(parser.yy.activeDialect, funcName, position);
+  if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
+    delete parser.yy.result.suggestColumns;
+    delete parser.yy.result.suggestValues;
+    delete parser.yy.result.suggestFunctions;
+    delete parser.yy.result.suggestIdentifiers;
+  } else {
+    applyTypeToSuggestions(foundArguments);
+  }
 }
 
 var prioritizeSuggestions = function () {
@@ -3833,7 +3956,6 @@ var prioritizeSuggestions = function () {
     return;
   }
 }
-
 
 /**
  * Impala supports referencing maps and arrays in the the table reference list i.e.
@@ -4142,10 +4264,11 @@ var lexerModified = false;
 /**
  * Main parser function
  */
-parser.parseSql = function(beforeCursor, afterCursor, dialect) {
+parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, debug) {
   if (dialect === 'generic') {
     dialect = undefined;
   }
+  parser.yy.sqlFunctions = sqlFunctions;
   parser.yy.activeDialect = dialect;
   parser.yy.result = {};
   parser.yy.lowerCase = false;
@@ -4182,6 +4305,10 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect) {
     // On any error try to at least return any existing result
     if (typeof parser.yy.result === 'undefined') {
       throw err;
+    }
+    if (debug) {
+      console.log(err);
+      console.error(err.stack);
     }
     if (parser.yy.result.error && !parser.yy.result.error.recoverable) {
       console.log(parser.yy.result.error);

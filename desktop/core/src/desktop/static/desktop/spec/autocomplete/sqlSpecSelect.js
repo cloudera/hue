@@ -676,14 +676,14 @@ define([
         });
       });
 
-      it('should suggest columns and values for "SELECT COUNT(foo, bl = |, bla) FROM bar;"', function() {
+      it('should suggest columns and values for "SELECT COUNT(foo, bl = |,bla) FROM bar;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo, bl = ',
           afterCursor: ',bla) FROM bar;',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: { table: 'bar' },
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], table: 'bar' },
             suggestValues: { identifierChain: [ {name: 'bl' }], table: 'bar' }
           }
         });
@@ -1138,8 +1138,9 @@ define([
           afterCursor: ' WHEN c THEN d END FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestColumns: {
+              types: ['T'],
               table: 'testTable'
             },
             suggestValues: { identifierChain: [{ name: 'a' }], table: 'testTable' }
@@ -1153,8 +1154,9 @@ define([
           afterCursor: ' WHEN c THEN d ELSE e END FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestColumns: {
+              types: ['T'],
               table: 'testTable'
             },
             suggestValues: { identifierChain: [{ name: 'a' }], table: 'testTable' }
@@ -1179,8 +1181,9 @@ define([
           afterCursor: ' ELSE FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestColumns: {
+              types: ['T'],
               table: 'testTable'
             },
             suggestValues: { identifierChain: [{ name: 'd' }], table: 'testTable' }
@@ -1446,8 +1449,9 @@ define([
           afterCursor: ' = a FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestColumns: {
+              types: ['T'],
               table: 'testTable'
             },
             suggestValues: { identifierChain :[{ name :'a'}], table: 'testTable' }
@@ -1517,8 +1521,9 @@ define([
           afterCursor: ' FROM testTable',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestColumns: {
+              types: ['T'],
               table: 'testTable'
             },
             suggestValues: { identifierChain: [{ name: 'a' }], table: 'testTable' }
@@ -1853,6 +1858,37 @@ define([
           });
         });
 
+
+        it('should suggest tables for "SELECT * FROM | LATERAL VIEW explode("', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM ',
+            afterCursor: ' LATERAL VIEW explode(',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT | FROM testTable LATERAL VIEW explode("', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT ',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestAggregateFunctions: true,
+              suggestColumns: {
+                table: 'testTable'
+              },
+              suggestKeywords: ['*','ALL','DISTINCT']
+            }
+          });
+        });
+
         it('should suggest columns for "SELECT * FROM testTable LATERAL VIEW explode(|"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(',
@@ -1860,8 +1896,9 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: {},
+              suggestFunctions: { types: ['ARRAY', 'MAP' ] },
               suggestColumns: {
+                types: ['ARRAY', 'MAP' ],
                 table: 'testTable'
               }
             }
@@ -1876,6 +1913,7 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestColumns: {
+                types: ['ARRAY', 'MAP' ],
                 table: 'testTable',
                 identifierChain: [ { name: 'a' }, { name: 'b' }]
               }
@@ -1890,8 +1928,9 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestFunctions: {},
+              suggestFunctions: { types: ['ARRAY' ] },
               suggestColumns: {
+                types: ['ARRAY' ],
                 table: 'testTable'
               }
             }
@@ -2281,7 +2320,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'key' }]
@@ -2298,7 +2337,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }, { name: 'field' }]
@@ -2367,7 +2406,19 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'tbl2' }
+            suggestColumns: { types: ['T'], table: 'tbl2' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE cos(1) = atbl2.bla.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE cos(1) = atbl2.bla.',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { identifierChain: [{ name: 'bla' }], types: ['DOUBLE'], table: 'tbl2' }
           }
         });
       });
@@ -2378,12 +2429,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2430,12 +2481,339 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['NUMBER'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['NUMBER'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest values for "SELECT * FROM testTable WHERE \'foo\' = |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE \'foo\' = ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['STRING'] },
+            suggestColumns: { types: ['STRING'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed values for "SELECT * FROM testTable WHERE \'foo\' = |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE \'foo\' = ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['STRING'] },
+            suggestColumns: { types: ['STRING'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT cast(\'1\' AS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(\'1\' AS ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['BIGINT', 'DATE'],
+          doesNotContainKeywords: ['REAL'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT cast(\'1\' AS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(\'1\' AS ',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['BIGINT', 'REAL'],
+          doesNotContainKeywords: ['DATE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT cos(| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cos(',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+            suggestColumns: { types: ['DECIMAL', 'DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT cos(| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cos(',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DOUBLE'] },
+            suggestColumns: { types: ['DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT ceiling(| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ceiling(',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DOUBLE'] },
+            suggestColumns: { types: ['DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT ceiling(| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ceiling(',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+            suggestColumns: { types: ['DECIMAL', 'DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should not suggest columns for "SELECT cos(1, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cos(1, ',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should not suggest columns for "SELECT cos(1, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cos(1, ',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT greatest(1, 2, a, 4, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT greatest(1, 2, a, 4, ',
+          afterCursor: ' FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT greatest(1, |, a, 4) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT greatest(1, ',
+          afterCursor: ', a, 4) FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT log(a, |) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT log(a, ',
+          afterCursor: ') FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+            suggestColumns: { types: ['DECIMAL', 'DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT log(a, |) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT log(a, ',
+          afterCursor: ') FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DOUBLE'] },
+            suggestColumns: { types: ['DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should not suggest columns for "SELECT log(a, b, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT log(a, b, ',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should not suggest columns for "SELECT log(a, b, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT log(a, b, ',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT substr(\'foo\', |) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT substr(\'foo\', ',
+          afterCursor: ') FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'INT' ] },
+            suggestColumns: { types: [ 'INT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT substr(|, 1, 2) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT substr(',
+          afterCursor: ', 1, 2) FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'STRING' ] },
+            suggestColumns: { types: [ 'STRING' ], table: 'testTable' }
+          }
+        });
+      });
+
+      xit('should suggest typed columns for "SELECT substr(,,| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT substr(,,',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'INT' ] },
+            suggestColumns: { types: [ 'INT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(a AS BIGINT) = ',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'BIGINT' ] },
+            suggestColumns: { types: [ 'BIGINT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(a AS BIGINT) = ',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'BIGINT' ] },
+            suggestColumns: { types: [ 'BIGINT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(a AS BIGINT) = ',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'BIGINT' ] },
+            suggestColumns: { types: [ 'BIGINT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT years_add(a , 10) = | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT years_add(a , 10) = ',
+          afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'TIMESTAMP' ] },
+            suggestColumns: { types: [ 'TIMESTAMP' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT | > cast(years_add(a , 10) AS INT) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'INT' ] },
+            suggestColumns: { types: [ 'INT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT partial.parital| > cast(years_add(a , 10) AS INT) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT partial.partial',
+          afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { identifierChain: [{ name: 'partial' }], types: [ 'INT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT | > id FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' > id FROM testTable',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], table: 'testTable' },
+            suggestValues: { identifierChain: [{ name: 'id' }], table: 'testTable' }
           }
         });
       });
@@ -2446,12 +2824,12 @@ define([
           afterCursor: ' = id',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'id' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2462,12 +2840,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2478,12 +2856,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2494,12 +2872,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2510,12 +2888,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2526,12 +2904,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2542,12 +2920,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T']},
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2558,12 +2936,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2574,12 +2952,12 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
+            suggestFunctions: { types: ['T'] },
             suggestValues: {
               table: 'testTable',
               identifierChain: [{ name: 'd' }]
             },
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { types: ['T'], table: 'testTable' }
           }
         });
       });
@@ -2989,8 +3367,8 @@ define([
           afterCursor: ' = \'bar\' AND ',
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: { table: 'testTable' }
+            suggestFunctions: { types: ['STRING'] },
+            suggestColumns: { types: ['STRING'], table: 'testTable' }
           }
         });
       });
