@@ -34,13 +34,13 @@
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'DECIMAL'}, {type: 'DOUBLE'}]],
         signature: 'acos(DECIMAL|DOUBLE a)',
-        description: 'Returns the arccosine of a if -1&lt;=a&lt;=1 or NULL otherwise.'
+        description: 'Returns the arccosine of a if -1<=a<=1 or NULL otherwise.'
       },
       asin: {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'DECIMAL'}, {type: 'DOUBLE'}]],
         signature: 'asin(DECIMAL|DOUBLE a)',
-        description: 'Returns the arc sin of a if -1&lt;=a&lt;=1 or NULL otherwise.'
+        description: 'Returns the arc sin of a if -1<=a<=1 or NULL otherwise.'
       },
       atan: {
         returnTypes: ['DOUBLE'],
@@ -121,7 +121,7 @@
         returnTypes: ['T'],
         arguments: [[{type: 'T', multiple: true}]],
         signature: 'greatest(T a1, T a2, ...)',
-        description: 'Returns the greatest value of the list of values. Fixed to return NULL when one or more arguments are NULL, and strict type restriction relaxed, consistent with "&gt;" operator.'
+        description: 'Returns the greatest value of the list of values. Fixed to return NULL when one or more arguments are NULL, and strict type restriction relaxed, consistent with ">" operator.'
       },
       hex: {
         returnTypes: ['STRING'],
@@ -133,7 +133,7 @@
         returnTypes: ['T'],
         arguments: [[{type: 'T', multiple: true}]],
         signature: 'least(T a1, T a2, ...)',
-        description: 'Returns the least value of the list of values. Fixed to return NULL when one or more arguments are NULL, and strict type restriction relaxed, consistent with "&lt;" operator.'
+        description: 'Returns the least value of the list of values. Fixed to return NULL when one or more arguments are NULL, and strict type restriction relaxed, consistent with "<" operator.'
       },
       ln: {
         returnTypes: ['DOUBLE'],
@@ -162,7 +162,7 @@
       negative: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'INT'}]],
-        signature: 'negative(T&lt;DOUBLE|INT&gt; a)',
+        signature: 'negative(T<DOUBLE|INT> a)',
         description: 'Returns -a.'
       },
       pi: {
@@ -171,13 +171,13 @@
       pmod: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'INT'}], [{type: 'T'}]],
-        signature: 'pmod(T&lt;DOUBLE|INT&gt; a, T b)',
+        signature: 'pmod(T<DOUBLE|INT> a, T b)',
         description: 'Returns the positive value of a mod b'
       },
       positive: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'INT'}]],
-        signature: 'positive(T&lt;DOUBLE|INT&gt; a)',
+        signature: 'positive(T<DOUBLE|INT> a)',
         description: 'Returns a.'
       },
       pow: {
@@ -213,25 +213,25 @@
       shiftleft: {
         returnTypes: ['T'],
         arguments: [[{type: 'BIGINT'}, {type: 'INT'}, {type: 'SMALLINT'}, {type: 'TINYINT'}], [{type: 'INT'}]],
-        signature: 'shiftleft(T&lt;BIGINT|INT|SMALLINT|TINYINT&gt; a, INT b)',
+        signature: 'shiftleft(T<BIGINT|INT|SMALLINT|TINYINT> a, INT b)',
         description: 'Bitwise left shift. Shifts a b positions to the left. Returns int for tinyint, smallint and int a. Returns bigint for bigint a.'
       },
       shiftright: {
         returnTypes: ['T'],
         arguments: [[{type: 'BIGINT'}, {type: 'INT'}, {type: 'SMALLINT'}, {type: 'TINYINT'}], [{type: 'INT'}]],
-        signature: 'shiftright(T&lt;BIGINT|INT|SMALLINT|TINYINT&gt; a, INT b)',
+        signature: 'shiftright(T<BIGINT|INT|SMALLINT|TINYINT> a, INT b)',
         description: 'Bitwise right shift. Shifts a b positions to the right. Returns int for tinyint, smallint and int a. Returns bigint for bigint a.'
       },
       shiftrightunsigned: {
         returnTypes: ['T'],
         arguments: [[{type: 'BIGINT'}, {type: 'INT'}, {type: 'SMALLINT'}, {type: 'TINYINT'}], [{type: 'INT'}]],
-        signature: 'shiftrightunsigned(T&lt;BIGINT|INT|SMALLINT|TINYINT&gt; a, INT b)',
+        signature: 'shiftrightunsigned(T<BIGINT|INT|SMALLINT|TINYINT> a, INT b)',
         description: 'Bitwise unsigned right shift. Shifts a b positions to the right. Returns int for tinyint, smallint and int a. Returns bigint for bigint a.'
       },
       sign: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'INT'}]],
-        signature: 'sign(T&lt;DOUBLE|INT&gt; a)',
+        signature: 'sign(T<DOUBLE|INT> a)',
         description: 'Returns the sign of a as \'1.0\' (if a is positive) or \'-1.0\' (if a is negative), \'0.0\' otherwise. The decimal version returns INT instead of DOUBLE.'
       },
       sin: {
@@ -293,19 +293,19 @@
       ceil: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}]],
-        signature: 'ceil(T&lt;DOUBLE|DECIMAL&gt; a)',
+        signature: 'ceil(T<DOUBLE|DECIMAL> a)',
         description: 'Returns the smallest integer that is greater than or equal to the argument.'
       },
       ceiling: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}]],
-        signature: 'ceiling(T&lt;DOUBLE|DECIMAL&gt; a)',
+        signature: 'ceiling(T<DOUBLE|DECIMAL> a)',
         description: 'Returns the smallest integer that is greater than or equal to the argument.'
       },
       conv: {
         returnTypes: ['T'],
         arguments: [[{type: 'BIGINT'}, {type: 'STRING'}], [{type: 'INT'}], [{type: 'INT'}]],
-        signature: 'conv(T&lt;BIGINT|STRING&gt; a, INT from_base, INT to_base)',
+        signature: 'conv(T<BIGINT|STRING> a, INT from_base, INT to_base)',
         description: 'Returns a string representation of an integer value in a particular base. The input value can be a string, for example to convert a hexadecimal number such as fce2 to decimal. To use the return value as a number (for example, when converting to base 10), use CAST() to convert to the appropriate type.'
       },
       cos: {
@@ -338,7 +338,7 @@
       fmod: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'FLOAT'}], [{type: 'DOUBLE'}, {type: 'FLOAT'}]],
-        signature: 'fmod(T&lt;DOUBLE|FLOAT&gt; a, T&lt;DOUBLE|FLOAT&gt; b)',
+        signature: 'fmod(T<DOUBLE|FLOAT> a, T<DOUBLE|FLOAT> b)',
         description: 'Returns the modulus of a number.'
       },
       fnv_hash: {
@@ -356,7 +356,7 @@
       hex: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'BIGINT'}, {type: 'STRING'}]],
-        signature: 'hex(T&lt;BIGINT|STRING&gt; a)',
+        signature: 'hex(T<BIGINT|STRING> a)',
         description: 'Returns the hexadecimal representation of an integer value, or of the characters in a string.'
       },
       is_inf: {
@@ -461,7 +461,7 @@
       pmod: {
         returnTypes: ['T'],
         arguments: [[{type: 'DOUBLE'}, {type: 'INT'}], [{type: 'T'}]],
-        signature: 'pmod(T&lt;DOUBLE|INT&gt; a, T b)',
+        signature: 'pmod(T<DOUBLE|INT> a, T b)',
         description: 'Returns the positive modulus of a number.'
       },
       positive: {
@@ -508,8 +508,7 @@
       },
       round: {
         returnTypes: ['T'],
-        arguments: [[{type: 'DOUBLE'}], [{type: 'INT', optional: true}]],
-        altArguments: [[{type: 'DECIMAL'}], [{type: 'INT'}]],
+        arguments: [[{type: 'DECIMAL'}, {type: 'DOUBLE'}], [{type: 'INT', optional: true}]],
         signature: 'round(DOUBLE a [, INT d]), round(DECIMAL val, INT d)',
         description: 'Rounds a floating-point value. By default (with a single argument), rounds to the nearest integer. Values ending in .5 are rounded up for positive numbers, down for negative numbers (that is, away from zero). The optional second argument specifies how many digits to leave after the decimal point; values greater than zero produce a floating-point return value rounded to the requested number of digits to the right of the decimal point.'
       },
@@ -584,24 +583,11 @@
         signature: 'struct(val1, val2, ...)',
         description: 'Creates a struct with the given field values. Struct field names will be col1, col2, ....'
       }
-    }
+    },
+    impala: {}
   };
 
   var AGGREGATE_FUNCTIONS = {
-    shared: {
-      var_pop: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'var_pop(col)',
-        description: 'Returns the variance of a numeric column in the group.'
-      },
-      var_samp: {
-        returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'var_samp(col)',
-        description: 'Returns the unbiased sample variance of a numeric column in the group.'
-      }
-    },
     generic: {
       count: {
         returnTypes: ['BIGINT'],
@@ -690,21 +676,21 @@
         description: 'Returns the sample covariance of a pair of a numeric columns in the group.'
       },
       collect_set: {
-        returnTypes: ['array'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}]],
         signature: 'collect_set(col)',
         description: 'Returns a set of objects with duplicate elements eliminated.'
       },
       collect_list: {
-        returnTypes: ['array'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}]],
         signature: 'collect_list(col)',
         description: 'Returns a list of objects with duplicates. (As of Hive 0.13.0.)'
       },
       histogram_numeric: {
-        returnTypes: ['array<struct {\'x\', \'y\'}>'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}], [{type: 'INT'}]],
-        signature: 'histogram_numeric(col, b)',
+        signature: 'array<struct {\'x\', \'y\'}> histogram_numeric(col, b)',
         description: 'Computes a histogram of a numeric column in the group using b non-uniformly spaced bins. The output is an array of size b of double-valued (x,y) coordinates that represent the bin centers and heights'
       },
       ntile: {
@@ -714,15 +700,15 @@
         description: 'Divides an ordered partition into x groups called buckets and assigns a bucket number to each row in the partition. This allows easy calculation of tertiles, quartiles, deciles, percentiles and other common summary statistics. (As of Hive 0.11.0.)'
       },
       percentile: {
-        returnTypes: ['DOUBLE', 'array<DOUBLE>'],
-        arguments: [[{type: 'BIGINT'}], [{type: 'DOUBLE'}, {type: 'array'}]],
-        signature: 'percentile(BIGINT col, p), percentile(BIGINT col, array(p1 [, p2]...))',
+        returnTypes: ['DOUBLE', 'ARRAY'],
+        arguments: [[{type: 'BIGINT'}], [{type: 'ARRAY'}, {type: 'DOUBLE'}]],
+        signature: 'percentile(BIGINT col, p), array<DOUBLE> percentile(BIGINT col, array(p1 [, p2]...))',
         description: 'Returns the exact pth percentile (or percentiles p1, p2, ..) of a column in the group (does not work with floating point types). p must be between 0 and 1. NOTE: A true percentile can only be computed for integer values. Use PERCENTILE_APPROX if your input is non-integral.'
       },
       percentile_approx: {
-        returnTypes: ['DOUBLE', 'array<DOUBLE>'],
-        arguments: [[{type: 'DOUBLE'}], [{type: 'DOUBLE'}, {type: 'array'}], [{type: 'BIGINT', optional: true}]],
-        signature: 'percentile_approx(DOUBLE col, p, [, B]), percentile_approx(DOUBLE col, array(p1 [, p2]...), [, B])',
+        returnTypes: ['DOUBLE', 'ARRAY'],
+        arguments: [[{type: 'DOUBLE'}], [{type: 'DOUBLE'}, {type: 'ARRAY'}], [{type: 'BIGINT', optional: true}]],
+        signature: 'percentile_approx(DOUBLE col, p, [, B]), array<DOUBLE> percentile_approx(DOUBLE col, array(p1 [, p2]...), [, B])',
         description: 'Returns an approximate pth percentile (or percentiles p1, p2, ..) of a numeric column (including floating point types) in the group. The B parameter controls approximation accuracy at the cost of memory. Higher values yield better approximations, and the default is 10,000. When the number of distinct values in col is smaller than B, this gives an exact percentile value.'
       },
       variance: {
@@ -730,6 +716,18 @@
         arguments: [[{type: 'T'}]],
         signature: 'variance(col)',
         description: 'Returns the variance of a numeric column in the group.'
+      },
+      var_pop: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_pop(col)',
+        description: 'Returns the variance of a numeric column in the group.'
+      },
+      var_samp: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_samp(col)',
+        description: 'Returns the unbiased sample variance of a numeric column in the group.'
       }
     },
     impala: {
@@ -816,6 +814,18 @@
         arguments: [[{type: 'T'}]],
         signature: 'variance_samp([DISTINCT | ALL] col)',
         description: 'An aggregate function that returns the sample variance of a set of numbers. This is a mathematical property that signifies how far the values spread apart from the mean. The return value can be zero (if the input is a single value, or a set of identical values), or a positive number otherwise.'
+      },
+      var_pop: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_pop(col)',
+        description: 'Returns the variance of a numeric column in the group.'
+      },
+      var_samp: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'var_samp(col)',
+        description: 'Returns the unbiased sample variance of a numeric column in the group.'
       }
     }
   };
@@ -824,35 +834,36 @@
     hive: {
       array_contains: {
         returnTypes: ['BOOLEAN'],
-        arguments: [[{type: 'array'}], [{type: 'T'}]],
-        signature: 'array_contains(Array&lt;T&gt; a, val)',
+        arguments: [[{type: 'ARRAY'}], [{type: 'T'}]],
+        signature: 'array_contains(Array<T> a, val)',
         description: 'Returns TRUE if the array contains value.'
       },
       map_keys: {
-        returnTypes: ['array<K.V>'],
-        arguments: [[{type: 'map'}]],
-        signature: 'map_keys(Map&lt;K.V&gt; a)',
+        returnTypes: ['ARRAY'],
+        arguments: [[{type: 'MAP'}]],
+        signature: 'array<K.V> map_keys(Map<K.V> a)',
         description: 'Returns an unordered array containing the keys of the input map.'
       },
       map_values: {
-        returnTypes: ['array<K.V>'],
-        arguments: [[{type: 'map'}]],
-        signature: 'map_values(Map&lt;K.V&gt; a)',
+        returnTypes: ['ARRAY'],
+        arguments: [[{type: 'MAP'}]],
+        signature: 'array<K.V> map_values(Map<K.V> a)',
         description: 'Returns an unordered array containing the values of the input map.'
       },
       size: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'map'}, {type: 'array'}]],
-        signature: 'size(Map&lt;K.V&gt;|Array&lt;T&gt; a)',
+        arguments: [[{type: 'ARRAY'}, {type: 'MAP'}]],
+        signature: 'size(Map<K.V>|Array<T> a)',
         description: 'Returns the number of elements in the map or array type.'
       },
       sort_array: {
-        returnTypes: ['array<T>'],
-        arguments: [[{type: 'array'}]],
-        signature: 'sort_array(Array&lt;T&gt; a)',
+        returnTypes: ['ARRAY'],
+        arguments: [[{type: 'ARRAY'}]],
+        signature: 'sort_array(Array<T> a)',
         description: 'Sorts the input array in ascending order according to the natural ordering of the array elements and returns it.'
       }
-    }
+    },
+    impala: {}
   };
 
   var TYPE_CONVERSION_FUNCTIONS = {
@@ -914,7 +925,7 @@
       },
       date_format: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'DATE'}, {type: 'TIMESTAMP'}, {type: 'STRING'}], [{type: 'STRING'}]],
+        arguments: [[{type: 'DATE'}, {type: 'STRING'}, {type: 'TIMESTAMP'}], [{type: 'STRING'}]],
         signature: 'date_format(DATE|TIMESTAMP|STRING ts, STRING fmt)',
         description: 'Converts a date/timestamp/string to a value of string in the format specified by the date format fmt (as of Hive 1.2.0). Supported formats are Java SimpleDateFormat formats – https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html. The second argument fmt should be constant. Example: date_format(\'2015-04-08\', \'y\') = \'2015\'.'
       },
@@ -974,7 +985,7 @@
       },
       months_between: {
         returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'DATE'}, {type: 'TIMESTAMP'}, {type: 'STRING'}], [{type: 'DATE'}, {type: 'TIMESTAMP'}, {type: 'STRING'}]],
+        arguments: [[{type: 'DATE'}, {type: 'STRING'}, {type: 'TIMESTAMP'}], [{type: 'DATE'}, {type: 'STRING'}, {type: 'TIMESTAMP'}]],
         signature: 'months_between(DATE|TIMESTAMP|STRING date1, DATE|TIMESTAMP|STRING date2)',
         description: 'Returns number of months between dates date1 and date2 (as of Hive 1.2.0). If date1 is later than date2, then the result is positive. If date1 is earlier than date2, then the result is negative. If date1 and date2 are either the same days of the month or both last days of months, then the result is always an integer. Otherwise the UDF calculates the fractional portion of the result based on a 31-day month and considers the difference in time components date1 and date2. date1 and date2 type can be date, timestamp or string in the format \'yyyy-MM-dd\' or \'yyyy-MM-dd HH:mm:ss\'. The result is rounded to 8 decimal places. Example: months_between(\'1997-02-28 10:30:00\', \'1996-10-30\') = 3.94959677'
       },
@@ -986,7 +997,7 @@
       },
       quarter: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'DATE'}, {type: 'TIMESTAMP'}, {type: 'STRING'}]],
+        arguments: [[{type: 'DATE'}, {type: 'STRING'}, {type: 'TIMESTAMP'}]],
         signature: 'quarter(DATE|TIMESTAMP|STRING a)	',
         description: 'Returns the quarter of the year for a date, timestamp, or string in the range 1 to 4. Example: quarter(\'2015-04-08\') = 2.'
       },
@@ -1434,14 +1445,14 @@
       concat_ws: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING', multiple: true}]],
-        altArguments: [[{type: 'STRING'}], [{type: 'array'}]],
-        signature: 'concat_ws(STRING sep, STRING a, STRING b...), concat_ws(STRING sep, Array&lt;STRING&gt;)',
+        altArguments: [[{type: 'STRING'}], [{type: 'ARRAY'}]],
+        signature: 'concat_ws(STRING sep, STRING a, STRING b...), concat_ws(STRING sep, Array<STRING>)',
         description: 'Like concat(), but with custom separator SEP.'
       },
       context_ngrams: {
-        returnTypes: ['array<struct<STRING,DOUBLE>>'],
-        arguments: [[{type: 'array'}], [{type: 'array'}], [{type: 'INT'}], [{type: 'INT'}]],
-        signature: 'context_ngrams(Array&lt;Array&lt;STRING&gt;&gt;, Array&lt;STRING&gt;, INT k, INT pf)',
+        returnTypes: ['ARRAY'],
+        arguments: [[{type: 'ARRAY'}], [{type: 'ARRAY'}], [{type: 'INT'}], [{type: 'INT'}]],
+        signature: 'array<struct<STRING,DOUBLE>> context_ngrams(Array<Array<STRING>>, Array<STRING>, INT k, INT pf)',
         description: 'Returns the top-k contextual N-grams from a set of tokenized sentences, given a string of "context".'
       },
       decode: {
@@ -1535,9 +1546,9 @@
         description: 'Returns the string resulting from trimming spaces from the beginning(left hand side) of A. For example, ltrim(\' foobar \') results in \'foobar \'.'
       },
       ngrams: {
-        returnTypes: ['array<struct<STRING, DOUBLE>>'],
-        arguments: [[{type: 'array'}], [{type: 'INT'}], [{type: 'INT'}], [{type: 'INT'}]],
-        signature: 'ngrams(Array&lt;Array&lt;STRING&gt;&gt; a, INT n, INT k, INT pf)',
+        returnTypes: ['ARRAY'],
+        arguments: [[{type: 'ARRAY'}], [{type: 'INT'}], [{type: 'INT'}], [{type: 'INT'}]],
+        signature: 'array<struct<STRING, DOUBLE>> ngrams(Array<Array<STRING>> a, INT n, INT k, INT pf)',
         description: 'Returns the top-k N-grams from a set of tokenized sentences, such as those returned by the sentences() UDAF.'
       },
       parse_url: {
@@ -1589,9 +1600,9 @@
         description: 'Returns the string resulting from trimming spaces from the end(right hand side) of A. For example, rtrim(\' foobar \') results in \' foobar\'.'
       },
       sentences: {
-        returnTypes: ['array<array<STRING>>'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'sentences(STRING str, STRING lang, STRING locale)',
+        signature: 'array<array<STRING>> sentences(STRING str, STRING lang, STRING locale)',
         description: 'Tokenizes a string of natural language text into words and sentences, where each sentence is broken at the appropriate sentence boundary and returned as an array of words. The \'lang\' and \'locale\' are optional arguments. For example, sentences(\'Hello there! How are you?\') returns ( ("Hello", "there"), ("How", "are", "you") ).'
       },
       soundex: {
@@ -1607,15 +1618,15 @@
         description: 'Returns a string of n spaces.'
       },
       split: {
-        returnTypes: ['array<STRING>'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'split(STRING str, STRING pat)',
+        signature: 'array<STRING> split(STRING str, STRING pat)',
         description: 'Splits str around pat (pat is a regular expression).'
       },
       str_to_map: {
-        returnTypes: ['map<STRING,STRING>'],
+        returnTypes: ['MAP'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}], [{type: 'STRING', optional: true}]],
-        signature: 'str_to_map(STRING [, STRING delimiter1, STRING delimiter2])',
+        signature: 'map<STRING,STRING> str_to_map(STRING [, STRING delimiter1, STRING delimiter2])',
         description: 'Splits text into key-value pairs using two delimiters. Delimiter1 separates text into K-V pairs, and Delimiter2 splits each K-V pair. Default delimiters are \',\' for delimiter1 and \'=\' for delimiter2.'
       },
       substr: {
@@ -1861,13 +1872,13 @@
     hive: {
       explode: {
         returnTypes: ['table'],
-        arguments: [[{type: 'array'}, {type: 'map'}]],
+        arguments: [[{type: 'ARRAY'}, {type: 'MAP'}]],
         signature: 'explode(Array|Array<T>|Map a)',
         description: ''
       },
       inline: {
         returnTypes: ['table'],
-        arguments: [[{type: 'array'}]],
+        arguments: [[{type: 'ARRAY'}]],
         signature: 'inline(Array<Struct [, Struct]> a)',
         description: 'Explodes an array of structs into a table. (As of Hive 0.10.)'
       },
@@ -1885,7 +1896,7 @@
       },
       posexplode: {
         returnTypes: ['table'],
-        arguments: [[{type: 'array'}]],
+        arguments: [[{type: 'ARRAY'}]],
         signature: 'posexplode(ARRAY) ',
         description: 'posexplode() is similar to explode but instead of just returning the elements of the array it returns the element as well as its position  in the original array.'
       },
@@ -1895,7 +1906,8 @@
         signature: 'stack(INT n, v1, v2, ..., vk)',
         description: 'Breaks up v1, v2, ..., vk into n rows. Each row will have k/n columns. n must be constant.'
       }
-    }
+    },
+    impala: {}
   };
 
   var MISC_FUNCTIONS = {
@@ -1979,9 +1991,9 @@
         description: 'Calculates the SHA-2 family of hash functions (SHA-224, SHA-256, SHA-384, and SHA-512) (as of Hive 1.3.0). The first argument is the string or binary to be hashed. The second argument indicates the desired bit length of the result, which must have a value of 224, 256, 384, 512, or 0 (which is equivalent to 256). SHA-224 is supported starting from Java 8. If either argument is NULL or the hash length is not one of the permitted values, the return value is NULL. Example: sha2(\'ABC\', 256) = \'b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78\'.'
       },
       xpath: {
-        returnTypes: ['array<STRING>'],
+        returnTypes: ['ARRAY'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'xpath(STRING xml, STRING xpath)',
+        signature: 'array<STRING> xpath(STRING xml, STRING xpath)',
         description: 'The xpath family of UDFs are wrappers around the Java XPath library javax.xml.xpath provided by the JDK. The library is based on the XPath 1.0 specification.'
       },
       xpath_boolean: {
@@ -2161,33 +2173,10 @@
   var createDocHtml = function (funcDesc) {
     var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">' + funcDesc.signature + '</span></p>';
     if (funcDesc.description) {
-      html += '<p>' + funcDesc.description + '</p>';
+      html += '<p>' + funcDesc.description.replace(/[<]/g, "&lt;").replace(/[>]/g, "&gt;") + '</p>';
     }
     html += '<div>';
     return html;
-  };
-
-  var addFunctions = function (functionIndex, dialect, completions) {
-    if (typeof functionIndex.shared !== 'undefined') {
-      functionIndex.shared.forEach(function (func) {
-        completions.push({
-          value: func.name,
-          meta: func.returnType,
-          type: 'function',
-          docHTML: createDocHtml(func)
-        })
-      })
-    }
-    if (typeof functionIndex[dialect] !== 'undefined') {
-      functionIndex[dialect].forEach(function (func) {
-        completions.push({
-          value: func.name,
-          meta: func.returnType,
-          type: 'function',
-          docHTML: createDocHtml(func)
-        })
-      })
-    }
   };
 
   /**
@@ -2202,6 +2191,9 @@
     if (dialect !== 'hive') {
       dialect = 'impala';
     }
+    if (actualTypes.indexOf('ARRAY') !== -1 || actualTypes.indexOf('MAP') !== -1 || actualTypes.indexOf('STRUCT') !== -1) {
+      return true;
+    }
     for (var i = 0; i < expectedTypes.length; i++) {
       for (var j = 0; j < actualTypes.length; j++) {
         if (typeImplicitConversion[dialect][expectedTypes[i]] && typeImplicitConversion[dialect][expectedTypes[i]][actualTypes[j]]) {
@@ -2212,7 +2204,7 @@
     return false;
   };
 
-  var addFunctionsTwo = function (functionIndex, dialect, returnTypes, result) {
+  var addFunctions = function (functionIndex, dialect, returnTypes, result) {
     var indexForDialect = functionIndex[dialect || 'generic'];
     if (indexForDialect) {
       Object.keys(indexForDialect).forEach(function (funcName) {
@@ -2234,16 +2226,17 @@
 
   var suggestFunctions = function (dialect, returnTypes, includeAggregate, completions) {
     var functionsToSuggest = {};
-    addFunctionsTwo(COLLECTION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(CONDITIONAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(DATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(MATHEMATICAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(TYPE_CONVERSION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(STRING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(MISC_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctionsTwo(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(COMPLEX_TYPE_CONSTRUCTS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(DATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(MATHEMATICAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(TYPE_CONVERSION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(STRING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(MISC_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    addFunctions(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     if (includeAggregate) {
-      addFunctionsTwo(AGGREGATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+      addFunctions(AGGREGATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     }
     Object.keys(functionsToSuggest).forEach(function (name) {
       completions.push({
@@ -2255,15 +2248,60 @@
     });
   };
 
-  var getTypes = function (dialect, functionName, argumentPosition) {
+  var findFunction = function (dialect, functionName) {
+    return COLLECTION_FUNCTIONS[dialect][functionName] ||
+        CONDITIONAL_FUNCTIONS[dialect][functionName] ||
+        COMPLEX_TYPE_CONSTRUCTS[dialect][functionName] ||
+        DATE_FUNCTIONS[dialect][functionName] ||
+        MATHEMATICAL_FUNCTIONS[dialect][functionName] ||
+        TYPE_CONVERSION_FUNCTIONS[dialect][functionName] ||
+        STRING_FUNCTIONS[dialect][functionName] ||
+        MISC_FUNCTIONS[dialect][functionName] ||
+        TABLE_GENERATING_FUNCTIONS[dialect][functionName] ||
+        AGGREGATE_FUNCTIONS[dialect][functionName];
+  };
 
+  var getArgumentTypes = function (dialect, functionName, argumentPosition) {
+    if (dialect !== 'hive' && dialect !== 'impala') {
+      return ['T'];
+    }
+    var foundFunction = findFunction(dialect, functionName);
+    if (!foundFunction) {
+      return ['T'];
+    }
+    var arguments = foundFunction.arguments;
+    if (argumentPosition > arguments.length) {
+      var multiples = arguments[arguments.length - 1].filter(function (type) {
+        return type.multiple;
+      });
+      if (multiples.length > 0) {
+        return multiples.map(function (argument) {
+          return argument.type;
+        }).sort();
+      }
+      return [];
+    }
+    return arguments[argumentPosition - 1].map(function (argument) {
+      return argument.type;
+    }).sort();
+  };
+
+  var getReturnTypes = function (dialect, functionName) {
+    if (dialect !== 'hive' && dialect !== 'impala') {
+      return ['T'];
+    }
+    var foundFunction = findFunction(dialect, functionName);
+    if (!foundFunction) {
+      return ['T'];
+    }
+    return foundFunction.returnTypes;
   };
 
   return {
     suggestFunctions: suggestFunctions,
-    
-    getTypes: getTypes,
-
+    getArgumentTypes: getArgumentTypes,
+    getReturnTypes: getReturnTypes,
     matchesType: matchesType
   };
+
 }));

@@ -39,7 +39,7 @@
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
-    var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type());
+    var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions);
 
     var completions = [];
 

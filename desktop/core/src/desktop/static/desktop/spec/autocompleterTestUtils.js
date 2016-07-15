@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 define([
-  'desktop/js/autocomplete/sql'
-], function(sql) {
+  'desktop/js/autocomplete/sql',
+  'desktop/js/sqlFunctions'
+], function(sql, sqlFunctions) {
   return {
     autocompleteMatcher : {
       toEqualAutocompleteValues : function() {
@@ -100,14 +101,13 @@ define([
       }
     },
     assertAutocomplete: function(testDefinition) {
+      var debug = false;
       if (typeof testDefinition.dialect === 'undefined') {
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
-        testDefinition.dialect = 'hive';
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
-        testDefinition.dialect = 'impala';
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'impala')).toEqualDefinition(testDefinition);
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'hive', sqlFunctions, debug)).toEqualDefinition(testDefinition);
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'impala', sqlFunctions, debug)).toEqualDefinition(testDefinition);
       } else {
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect)).toEqualDefinition(testDefinition);
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
       }
     }
   }
