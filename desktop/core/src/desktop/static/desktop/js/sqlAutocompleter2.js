@@ -139,7 +139,7 @@
         deferrals.push(tableDeferred);
         self.snippet.getApiHelper().fetchTables({
           sourceType: self.snippet.type(),
-          databaseName: database,
+          databaseName: parseResult.suggestTables.database || database,
           successCallback: function (data) {
             data.tables_meta.forEach(function (tablesMeta) {
               completions.push({
