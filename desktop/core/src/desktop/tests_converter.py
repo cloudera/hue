@@ -24,12 +24,12 @@ from django.contrib.auth.models import User
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document, Document2, DocumentPermission, Document2Permission, DocumentTag
+from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
 from librdbms.design import SQLdesign
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
-from pig.models import create_or_update_script, PigScript
+from pig.models import create_or_update_script
 from useradmin.models import get_default_user_group
 
 
@@ -68,14 +68,30 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    query2 = SavedQuery.objects.create(
+        type=SavedQuery.TYPES_MAPPING['hql'],
+        owner=self.user,
+        data=design.dumps(),
+        name='Hive query history',
+        desc='Test Hive query history',
+        is_auto=True
+    )
+    doch = Document.objects.link(query2, owner=query2.owner, extra=query2.type, name=query2.name, description=query2.desc)
+    doch.add_to_history()
+
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-hive').exists())
+      assert_equal(0, Document2.objects.filter(owner=self.user, type='query-hive').count())
 
       converter = DocumentConverter(self.user)
       converter.convert()
 
-      doc2 = Document2.objects.get(owner=self.user, type='query-hive')
+      assert_equal(2, Document2.objects.filter(owner=self.user, type='query-hive').count())
+
+      #
+      # Query
+      #
+      doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
 
       # Verify Document2 attributes
       assert_equal(doc.name, doc2.data_dict['name'])
@@ -97,8 +113,45 @@ class TestDocumentConverter(object):
 
       # Verify default properties
       assert_true(doc2.data_dict['isSaved'])
+
+
+      #
+      # Query History
+      #
+      doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=True)
+
+      # Verify Document2 attributes
+      assert_equal(doch.name, doc2.data_dict['name'])
+      assert_equal(doch.description, doc2.data_dict['description'])
+
+      # Verify session type
+      assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
+
+      # Verify snippet values
+      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+      assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
+      assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
+      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
+
+      # Verify snippet properties
+      assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
+      assert_equal(file_resources, doc2.data_dict['snippets'][0]['properties']['files'])
+      assert_equal(functions, doc2.data_dict['snippets'][0]['properties']['functions'])
+
+      # Verify default properties
+      assert_false(doc2.data_dict['isSaved'])
+
+
+      #
+      # Check that we don't re-import again
+      #
+      converter = DocumentConverter(self.user)
+      converter.convert()
+
+      assert_equal(2, Document2.objects.filter(owner=self.user, type='query-hive').count())
     finally:
       query.delete()
+      query2.delete()
 
 
   def test_convert_impala_query(self):
