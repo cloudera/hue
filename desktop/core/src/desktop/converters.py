@@ -17,11 +17,12 @@
 
 import json
 import logging
+import time
 
 from django.db import transaction
 
-from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
-    FilesystemException
+from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
+from notebook.api import _historify
 from notebook.models import import_saved_beeswax_query
 
 
@@ -51,6 +52,10 @@ class DocumentConverter(object):
         if doc.content_object:
           notebook = import_saved_beeswax_query(doc.content_object)
           data = notebook.get_data()
+
+          if doc.is_historic():
+            data['isSaved'] = False
+
           doc2 = self._create_doc2(
               document=doc,
               doctype=data['type'],
@@ -58,9 +63,48 @@ class DocumentConverter(object):
               description=data['description'],
               data=notebook.get_json()
           )
+
+          if doc.is_historic():
+            doc2.is_history = False
+
           self.imported_docs.append(doc2)
     except ImportError, e:
       LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
+
+    # Convert SQL Query history documents
+    try:
+      from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
+
+      docs = self._get_unconverted_docs(SavedQuery, with_history=True).filter(extra__in=[HQL, IMPALA, RDBMS]).order_by('-last_modified')
+
+      for doc in docs:
+        if doc.content_object:
+          notebook = import_saved_beeswax_query(doc.content_object)
+          data = notebook.get_data()
+
+          data['isSaved'] = False
+          data['snippets'][0]['lastExecuted'] = time.mktime(doc.last_modified.timetuple()) * 1000
+
+          doc2 = _historify(data, self.user)
+          doc2.last_modified = doc.last_modified
+          doc2.save()
+
+          self.imported_docs.append(doc2)
+
+          # Tag for not re-importing
+          Document.objects.link(
+            doc2,
+            owner=doc2.owner,
+            name=doc2.name,
+            description=doc2.description,
+            extra=doc.extra
+          )
+
+          doc.add_tag(self.imported_tag)
+          doc.save()
+    except ImportError, e:
+      LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
+
 
     # Convert Job Designer documents
     try:
@@ -107,14 +151,19 @@ class DocumentConverter(object):
       LOG.info('Successfully imported %d documents' % len(self.imported_docs))
 
 
-  def _get_unconverted_docs(self, content_type):
+  def _get_unconverted_docs(self, content_type, with_history=False):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
-    return docs.exclude(tags__in=[
+
+    tags = [
       DocumentTag.objects.get_trash_tag(user=self.user), # No trashed docs
-      DocumentTag.objects.get_history_tag(user=self.user), # No history yet
       DocumentTag.objects.get_example_tag(user=self.user), # No examples
       self.imported_tag # No already imported docs
-    ])
+    ]
+
+    if not with_history:
+      tags.append(DocumentTag.objects.get_history_tag(user=self.user)) # No history yet
+
+    return docs.exclude(tags__in=tags)
 
 
   def _get_parent_directory(self, document):
