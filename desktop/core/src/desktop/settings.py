@@ -29,11 +29,11 @@ from guppy import hpy
 
 from django.utils.translation import ugettext_lazy as _
 
-import desktop.conf
-import desktop.log
 import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
+
+from aws.conf import is_default_configured as is_s3_enabled
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -227,14 +227,6 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
 PYLINTRC = get_desktop_root('.pylintrc')
-
-# Insert our custom upload handlers
-FILE_UPLOAD_HANDLERS = (
-  'aws.s3.upload.S3FileUploadHandler',
-  'hadoop.fs.upload.HDFSfileUploadHandler',
-  'django.core.files.uploadhandler.MemoryFileUploadHandler',
-  'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
@@ -439,6 +431,23 @@ if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
 # Add last activity tracking and idle session timeout
 if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
   MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
+
+################################################################
+# Register file upload handlers
+# This section must go after the desktop lib modules are loaded
+################################################################
+
+# Insert our custom upload handlers
+file_upload_handlers = [
+    'hadoop.fs.upload.HDFSfileUploadHandler',
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+if is_s3_enabled():
+  file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
+
+FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
 
