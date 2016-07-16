@@ -13,22 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
-
-class Argument():
-  def __init__(self, type_, name):
-    self._name = name
-    self._type = type_
-
-  @property
-  def name(self):
-    return self._name
-
-  @property
-  def type(self):
-    return self._type
-
-  def to_dict(self):
-    return {"name": self._name, "type": self._type}
+from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
 
 class Operator():
   def __init__(self, name, args, output_type):
@@ -55,66 +40,66 @@ OPERATORS = [
   Operator(
     name="split",
     args=[
-      Argument("text", "splitChar")
+      TextArgument("splitChar")
     ],
     output_type="custom_fields"
   ),
   Operator(
     name="grok",
     args=[
-      Argument("text", "regexp")
+      TextArgument("regexp")
     ],
     output_type="custom_fields"
   ),
   Operator(
     name="convert_date",
     args=[
-      Argument("text", "format")
+      TextArgument("format")
     ],
     output_type="inplace"
   ),
   Operator(
     name="extract_uri_components",
     args=[
-      Argument("checkbox", "authority"),
-      Argument("checkbox", "fragment"),
-      Argument("checkbox", "host"),
-      Argument("checkbox", "path"),
-      Argument("checkbox", "port"),
-      Argument("checkbox", "query"),
-      Argument("checkbox", "scheme"),
-      Argument("checkbox", "scheme_specific_path"),
-      Argument("checkbox", "user_info")
+      CheckboxArgument("authority"),
+      CheckboxArgument("fragment"),
+      CheckboxArgument("host"),
+      CheckboxArgument("path"),
+      CheckboxArgument("port"),
+      CheckboxArgument("query"),
+      CheckboxArgument("scheme"),
+      CheckboxArgument("scheme_specific_path"),
+      CheckboxArgument("user_info")
     ],
     output_type="checkbox_fields"
   ),
   Operator(
     name="geo_ip",
     args=[
-      Argument("checkbox", "/country/iso_code"),
-      Argument("checkbox", "/country/names/en"),
-      Argument("checkbox", "/subdivisions[]/names/en"),
-      Argument("checkbox", "/subdivisions[]/iso_code"),
-      Argument("checkbox", "/city/names/en"),
-      Argument("checkbox", "/postal/code"),
-      Argument("checkbox", "/location/latitude"),
-      Argument("checkbox", "/location/longitude"),
+      CheckboxArgument("/country/iso_code"),
+      CheckboxArgument("/country/names/en"),
+      CheckboxArgument("/subdivisions[]/names/en"),
+      CheckboxArgument("/subdivisions[]/iso_code"),
+      CheckboxArgument("/city/names/en"),
+      CheckboxArgument("/postal/code"),
+      CheckboxArgument("/location/latitude"),
+      CheckboxArgument("/location/longitude"),
     ],
     output_type="checkbox_fields"
   ),
   Operator(
     name="translate",
     args=[
-      Argument("text", "default"),
-      Argument("mapping", "mapping")
+      TextArgument("default"),
+      MappingArgument("mapping")
     ],
     output_type="inplace"
   ),
   Operator(
     name="find_replace",
     args=[
-      Argument("text", "find"),
-      Argument("text", "replace")
+      TextArgument("find"),
+      TextArgument("replace")
     ],
     output_type="inplace"
   ),

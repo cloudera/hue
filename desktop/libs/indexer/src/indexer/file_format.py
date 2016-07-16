@@ -19,9 +19,18 @@ import itertools
 import logging
 
 from indexer.fields import Field, guess_field_type_from_samples
+from indexer.argument import TextArgument, CheckboxArgument
 
 LOG = logging.getLogger(__name__)
 
+def get_format_types():
+  return [
+    CSVFormat,
+    HueFormat
+  ]
+
+def get_format_mapping():
+  return dict([(format_.get_name(), format_) for format_ in get_format_types()])
 
 def _valid_csv_format(format_):
   valid_field_separator = "fieldSeparator" in format_ and len(format_["fieldSeparator"]) == 1
@@ -32,15 +41,12 @@ def _valid_csv_format(format_):
   return valid_has_header and valid_quote_char and valid_record_separator and valid_field_separator
 
 def get_file_format_instance(file_stream, format_=None):
-  format_mapping = {
-    "csv": CSVFormat,
-    "hue": HueFormat
-  }
+  format_mapping = get_format_mapping()
 
   if format_ and "type" in format_:
     type_ = format_["type"]
   else:
-    type_ = "csv"
+    type_ = CSVFormat.get_name()
 
   if type_ in format_mapping:
     return format_mapping[type_](file_stream, format_)
@@ -48,6 +54,28 @@ def get_file_format_instance(file_stream, format_=None):
     return None
 
 class FileFormat(object):
+  _name = "undefined"
+  _args = []
+
+  @classmethod
+  def get_name(cls):
+    return cls._name
+
+  @classmethod
+  def get_arguments(cls):
+    return cls._args
+
+  @classmethod
+  def _valid_format(cls, format_):
+    return format_ and all([arg.name in format_ for arg in cls.get_arguments()])
+
+  @classmethod
+  def format_info(cls):
+    return {
+      "name": cls.get_name(),
+      "args": [arg.to_dict() for arg in cls.get_arguments()]
+    }
+
   def __init__(self):
     pass
 
@@ -84,6 +112,8 @@ class FileFormat(object):
     return obj
 
 class HueFormat(FileFormat):
+  _name = "hue"
+
   def __init__(self, file_stream, format_):
     self._fields = [
       Field("date", "date"),
@@ -98,12 +128,20 @@ class HueFormat(FileFormat):
     return self._fields
 
 class CSVFormat(FileFormat):
+  _name = "csv"
+  _args = [
+    TextArgument("fieldSeparator"),
+    TextArgument("recordSeparator"),
+    TextArgument("quoteChar"),
+    CheckboxArgument("hasHeader")
+  ]
+
   def __init__(self, file_stream, format_=None):
     file_stream.seek(0)
     sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
     file_stream.seek(0)
 
-    if format_:
+    if self._valid_format(format_):
       self._delimiter = format_["fieldSeparator"].encode('utf-8')
       self._line_terminator = format_["recordSeparator"].encode('utf-8')
       self._quote_char = format_["quoteChar"].encode('utf-8')
