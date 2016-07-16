@@ -57,10 +57,10 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     <div data-bind="visible: createWizard.fileFormat().show">
       <div data-bind="with: createWizard.fileFormat().format">
-          <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, value: type"></select>
+          <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes.map(function(f){return f.name}), value: type"></select>
           </h3>
 
-          <!-- ko template: {name: 'format-settings-'+type()}--><!-- /ko -->
+          <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
         </div>
 
         <h3>${_('Fields')}</h3>
@@ -107,18 +107,11 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="format-settings-hue">
-</script>
-
-<script type="text/html" id="format-settings-csv">
-  <h4>${_('Has Header')}:</h4>
-  <input type="checkbox" data-bind="checked: hasHeader">
-  <h4>${_('Quote Character')}:</h4>
-  <input data-bind="value: quoteChar">
-  <h4>${_('Record Separator')}:</h4>
-  <input data-bind="value: recordSeparator">
-  <h4>${_('Field Separator')}:</h4>
-  <input data-bind="value: fieldSeparator">
+<script type="text/html" id="format-settings">
+  <!-- ko foreach: {data: getArguments(), as: 'argument'} -->
+    <h4 data-bind="text: argument.name"></h4>
+    <!-- ko template: {name: 'arg-'+argument.type, data:{name: argument.name, value: $parent[argument.name]}}--><!-- /ko -->
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="field-template">
@@ -135,7 +128,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="operation-template">
   <div><select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
-  <!-- ko template: "operation-args-template" --><!-- /ko -->
+  <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <input type="number" data-bind="value: operation.numExpectedFields">
     <!-- /ko -->
@@ -167,31 +160,31 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   <!--/ko -->
 </script>
 
-<script type="text/html" id="operation-args-template">
+<script type="text/html" id="args-template">
   <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
-    <!-- ko template: {name: 'operation-arg-'+argument.type, data:{operation: $parent.operation, argVal: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
+    <h4 data-bind="text: name"></h4>
+    <!-- ko template: {name: 'arg-'+argument.type, data:{name: argument.name, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 
 </script>
 
-<script type="text/html" id="operation-arg-text">
-  <input type="text" data-bind="attr: {placeholder: argument.name}, value: argVal">
+<script type="text/html" id="arg-text">
+  <input type="text" data-bind="attr: {placeholder: name}, value: value">
 </script>
 
-<script type="text/html" id="operation-arg-checkbox">
-  <h4 data-bind="text: argument.name"></h4>
-  <input type="checkbox" data-bind="checked: argVal">
+<script type="text/html" id="arg-checkbox">
+  <input type="checkbox" data-bind="checked: value">
 </script>
 
-<script type="text/html" id="operation-arg-mapping">
+<script type="text/html" id="arg-mapping">
   <!-- ko foreach: argVal-->
     <div>
       <input type="text" data-bind="value: key, attr: {placeholder: 'key'}">
       <input type="text" data-bind="value: value, attr: {placeholder: 'value'}">
-      <button class="btn" data-bind="click: function(){$parent.operation.settings().mapping.remove($data)}">${_('Remove Pair')}</button>
+      <button class="btn" data-bind="click: function(){$parent.value.remove($data)}">${_('Remove Pair')}</button>
     </div>
   <!-- /ko -->
-  <button class="btn" data-bind="click: operation.addPair">${_('Add Pair')}</button>
+  <button class="btn" data-bind="click: function(){value.push({key: ko.observable(''), value: ko.observable('')})}">${_('Add Pair')}</button>
   <br>
 </script>
 
@@ -308,58 +301,45 @@ var getNewFieldName = function(){
     self.type.subscribe(function(newType){
       init();
     });
-
-    self.addPair = function(){
-      self.settings().mapping.push({key: ko.observable(""), value: ko.observable("")});
-    }
   }
 
-  var getFileFormat = function(type){
-    if(type == "csv"){
-      return new CsvFileType();
-    }
-    else if(type == "hue"){
-      return new HueFileType();
-    }
-  }
-
-  var FileType = function(){
+  var FileType = function(typeName, args){
     var self = this;
+    var type;
 
-    self.loadFromObj = function(args){
+    var init = function(){
+      self.type = ko.observable(typeName);
+
+      var types = viewModel.createWizard.fileTypes
+      for(var i = 0; i < types.length; i++){
+        if(types[i].name == typeName){
+          type = types[i];
+          break;
+        }
+      }
+
+      for(var i = 0; i < type.args.length; i++){
+        self[type.args[i].name] = ko.observable();
+      }
+
+      if(args) loadFromObj(args);
+
+      for(var i = 0; i < type.args.length; i++){
+        self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
+      }
+    }
+
+    var loadFromObj = function(args){
       for (var attr in args){
         self[attr] = ko.mapping.fromJS(args[attr]);
       }
     }
-  }
 
-  var HueFileType = function(args){
-    var self = new FileType();
+    self.getArguments = function(){
+      return type.args;
+    }
 
-    self.type = ko.observable("hue");
-
-    if(args) self.loadFromObj(args);
-
-    return self;
-  }
-
-  var CsvFileType = function(args){
-    var self = new FileType();
-
-    self.quoteChar = ko.observable('"');
-    self.recordSeparator = ko.observable("\\n");
-    self.type = ko.observable("csv");
-    self.hasHeader = ko.observable(false);
-    self.fieldSeparator = ko.observable(',');
-
-    if(args) self.loadFromObj(args);
-
-    self.quoteChar.subscribe(viewModel.createWizard.guessFieldTypes);
-    self.recordSeparator.subscribe(viewModel.createWizard.guessFieldTypes);
-    self.hasHeader.subscribe(viewModel.createWizard.guessFieldTypes);
-    self.fieldSeparator.subscribe(viewModel.createWizard.guessFieldTypes);
-
-    return self;
+    init();
   }
 
   var File_Format = function (vm) {
@@ -380,8 +360,8 @@ var getNewFieldName = function(){
 
     self.operationTypes = ${operators_json | n};
 
-    self.fieldTypes = ko.observableArray(${fields_json | n});
-    self.fileTypes = ["csv","hue"];
+    self.fieldTypes = ${fields_json | n};
+    self.fileTypes = ${file_types_json | n};
 
 
     self.show = ko.observable(true);
@@ -411,7 +391,7 @@ var getNewFieldName = function(){
 
       if(self.fileFormat().format().type){
         self.fileFormat().format().type.subscribe(function(newType){
-          self.fileFormat().format(getFileFormat(newType));
+          self.fileFormat().format(new FileType(newType));
         });
       }
     });
@@ -421,8 +401,7 @@ var getNewFieldName = function(){
       $.post("${ url('indexer:guess_format') }", {
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
       }, function(resp) {
-
-        self.fileFormat().format(new CsvFileType(resp));
+        self.fileFormat().format(new FileType(resp['type'], resp));
 
         self.fileFormat().show(true);
 
