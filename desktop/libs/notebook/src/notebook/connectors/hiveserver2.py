@@ -315,17 +315,18 @@ class HS2Api(Api):
     try:
       db = self._get_db(snippet)
       handle = self._get_handle(snippet)
-      # Test handle to verify still valid
-      db.get_state(handle)
+      # Test handle to verify if still valid
+      db.fetch(handle, start_over=True, rows=1)
       return data_export.download(handle, format, db)
     except Exception, e:
-      LOG.exception('error downloading notebook')
+      title = 'The query result cannot be downloaded.'
+      LOG.exception(title)
 
-      if not hasattr(e, 'message') or not e.message:
-        message = e
-      else:
+      if hasattr(e, 'message') and e.message:
         message = e.message
-      raise PopupException(message, detail='')
+      else:
+        message = e
+      raise PopupException(_(title), detail=message)
 
 
   @query_error_handler
