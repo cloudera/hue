@@ -510,7 +510,10 @@ case 309:
      if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: [] };
      } else if ($$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: getValueExpressionKeywords($$[$0-3], ['GROUP BY', 'LIMIT', 'ORDER BY']) }
+       this.$ = getValueExpressionKeywords($$[$0-3], ['GROUP BY', 'LIMIT', 'ORDER BY']);
+       if ($$[$0-3].columnReference) {
+         this.$.columnReference = $$[$0-3].columnReference
+       }
      } else if ($$[$0-2] && !$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
      } else if ($$[$0-1] && !$$[$0]) {
@@ -605,7 +608,7 @@ case 369: case 370: case 371:
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
-case 373: case 374: case 375: case 381: case 382: case 383: case 384: case 385: case 386: case 397: case 399: case 405: case 406: case 407: case 408: case 409: case 410: case 411: case 419: case 420: case 421: case 422: case 440: case 441: case 454: case 455: case 547:
+case 373: case 374: case 375: case 381: case 382: case 383: case 384: case 385: case 386: case 397: case 399: case 405: case 406: case 407: case 408: case 409: case 410: case 411: case 419: case 420: case 421: case 422: case 547:
 this.$ = { types: [ 'BOOLEAN' ] };
 break;
 case 376: case 377: case 378:
@@ -701,6 +704,7 @@ case 417:
 
      if ($$[$0].inValueEdit) {
        valueExpressionSuggest($$[$0-3]);
+       applyTypeToSuggestions($$[$0-3].types);
      }
      if ($$[$0].cursorAtStart) {
        suggestKeywords(['SELECT']);
@@ -712,6 +716,7 @@ case 418:
 
      if ($$[$0].inValueEdit) {
        valueExpressionSuggest($$[$0-2]);
+       applyTypeToSuggestions($$[$0-2].types);
      }
      if ($$[$0].cursorAtStart) {
        suggestKeywords(['SELECT']);
@@ -722,7 +727,7 @@ break;
 case 423:
 
      if ($$[$0-2].types[0] === $$[$0].types[0]) {
-       applyTypeToSuggestions($$[$0-2].types)
+       applyTypeToSuggestions($$[$0-2].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -730,7 +735,7 @@ break;
 case 424:
 
      if ($$[$0-5].types[0] === $$[$0].types[0]) {
-       applyTypeToSuggestions($$[$0-5].types)
+       applyTypeToSuggestions($$[$0-5].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -738,7 +743,7 @@ break;
 case 425:
 
      if ($$[$0-5].types[0] === $$[$0-2].types[0]) {
-       applyTypeToSuggestions($$[$0-5].types)
+       applyTypeToSuggestions($$[$0-5].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -772,32 +777,35 @@ break;
 case 432:
 
      valueExpressionSuggest($$[$0-4]);
+     applyTypeToSuggestions($$[$0-4].types);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
-case 434:
+case 434: case 442: case 443:
 
      valueExpressionSuggest($$[$0-2]);
+     applyTypeToSuggestions($$[$0-2].types);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 435: case 436:
 
      applyTypeToSuggestions($$[$0-2].types);
+     addColRefIfExists($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 437: case 438: case 439:
 
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($$[$0-2]);
      this.$ = { types: [ 'NUMBER' ] };
    
 break;
-case 442: case 443:
+case 440: case 441:
 
-     valueExpressionSuggest($$[$0-2]);
-     applyTypeToSuggestions($$[$0-2].types);
-     this.$ = { types: [ 'BOOLEAN' ] };
+     addColRefIfExists($$[$0-2]);
+     this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 444: case 445: case 446:
@@ -816,13 +824,21 @@ break;
 case 449: case 450:
 
      applyTypeToSuggestions($$[$0].types);
+     addColRefIfExists($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 451: case 452: case 453:
 
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($$[$0]);
      this.$ = { types: [ 'NUMBER' ] }
+   
+break;
+case 454: case 455:
+
+     addColRefIfExists($$[$0]);
+     this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 456: case 457:
@@ -1039,7 +1055,7 @@ case 517: case 518:
    
 break;
 case 529:
-this.$ = { types: ['T'], columnReference: $$[$0] };
+this.$ = { types: ['COLREF'], columnReference: $$[$0] };
 break;
 case 531:
 this.$ = { types: [ 'NULL' ] };
@@ -1047,9 +1063,9 @@ break;
 case 532:
 
      if ($$[$0].suggestKeywords) {
-       this.$ = { types: ['T'], columnReference: $$[$0], suggestKeywords: $$[$0].suggestKeywords };
+       this.$ = { types: ['COLREF'], columnReference: $$[$0], suggestKeywords: $$[$0].suggestKeywords };
      } else {
-       this.$ = { types: ['T'], columnReference: $$[$0] };
+       this.$ = { types: ['COLREF'], columnReference: $$[$0] };
      }
    
 break;
@@ -1073,7 +1089,11 @@ break;
 case 565:
 
      if ($$[$0] && $$[$0].suggestKeywords) {
-       this.$ = { suggestKeywords: getValueExpressionKeywords($$[$0-1], $$[$0].suggestKeywords || []) }
+       var result = getValueExpressionKeywords($$[$0-1], $$[$0].suggestKeywords || [])
+       if ($$[$0-1].columnReference) {
+         result.columnReference = $$[$0-1].columnReference;
+       }
+       this.$ = result;
      } else {
        this.$ = $$[$0];
      }
@@ -1313,10 +1333,10 @@ case 746: case 747:
      this.$ = { types: [ 'T' ] };
    
 break;
-case 748: case 754: case 788:
+case 748: case 754:
 this.$ = { types: findReturnTypes($$[$0-2]) };
 break;
-case 750: case 755: case 787: case 792: case 797: case 801:
+case 750: case 755: case 797:
 this.$ = { types: findReturnTypes($$[$0-3]) };
 break;
 case 751:
@@ -1363,6 +1383,7 @@ case 756:
          suggestKeywords(['DISTINCT']);
        }
      }
+     applyArgumentTypesToSuggestions($$[$0-3], 1);
      this.$ = { types: findReturnTypes($$[$0-3]) };
    
 break;
@@ -1377,51 +1398,115 @@ case 758:
          suggestKeywords(['DISTINCT']);
        }
      }
+     if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
+       applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
+     }
      this.$ = { types: findReturnTypes($$[$0-3]) };
    
 break;
-case 783: case 789:
+case 783:
 
      valueExpressionSuggest();
+     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
      this.$ = { types: findReturnTypes($$[$0-4]) };
    
 break;
-case 784: case 790:
+case 784:
 
      valueExpressionSuggest();
+     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
      this.$ = { types: findReturnTypes($$[$0-3]) };
    
 break;
 case 785:
 
      valueExpressionSuggest();
+     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
      this.$ = { types: findReturnTypes($$[$0-2]) };
    
 break;
-case 786: case 791:
-this.$ = { types: findReturnTypes($$[$0-4]) };
+case 786:
+
+     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: findReturnTypes($$[$0-4]) };
+   
+break;
+case 787:
+
+     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: findReturnTypes($$[$0-3]) };
+   
+break;
+case 788:
+
+     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     this.$ = { types: findReturnTypes($$[$0-2]) };
+   
+break;
+case 789:
+
+     valueExpressionSuggest();
+     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: findReturnTypes($$[$0-4]) };
+   
+break;
+case 790:
+
+     valueExpressionSuggest();
+     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: findReturnTypes($$[$0-3]) };
+   
+break;
+case 791:
+
+     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: findReturnTypes($$[$0-4]) };
+   
+break;
+case 792:
+
+    applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: findReturnTypes($$[$0-3]) };
+   
 break;
 case 793:
 
-     suggestValueExpressionKeywords($$[$0-3], [',', 'FROM']);
+     if ($$[$0-4].types[0] === 'STRING') {
+       suggestValueExpressionKeywords($$[$0-3], ['FROM']);
+     } else {
+       suggestValueExpressionKeywords($$[$0-3]);
+     }
      this.$ = { types: findReturnTypes($$[$0-4]) };
    
 break;
 case 794:
 
-     suggestValueExpressionKeywords($$[$0-2], [',', 'FROM']);
+     if ($$[$0-3].types[0] === 'STRING') {
+       suggestValueExpressionKeywords($$[$0-2], ['FROM']);
+     } else {
+       suggestValueExpressionKeywords($$[$0-2]);
+     }
      this.$ = { types: findReturnTypes($$[$0-3]) };
    
 break;
 case 799:
 
      valueExpressionSuggest();
+     applyArgumentTypesToSuggestions($$[$0-3], 1);
      if (!$$[$0-2]) {
        if (isImpala()) {
          suggestKeywords(['ALL', 'DISTINCT']);
        } else {
          suggestKeywords(['DISTINCT']);
        }
+     }
+     this.$ = { types: findReturnTypes($$[$0-3]) };
+   
+break;
+case 801:
+
+     if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
+       applyArgumentTypesToSuggestions($$[$0-3], 1);
      }
      this.$ = { types: findReturnTypes($$[$0-3]) };
    
@@ -1945,7 +2030,16 @@ var mergeSuggestKeywords = function() {
 }
 
 var suggestValueExpressionKeywords = function (valueExpression, extras) {
-  suggestKeywords(getValueExpressionKeywords(valueExpression, extras));
+  var expressionKeywords = getValueExpressionKeywords(valueExpression, extras)
+  suggestKeywords(expressionKeywords.suggestKeywords);
+  if (expressionKeywords.suggestColRefKeywords) {
+    suggestColRefKeywords(expressionKeywords.suggestColRefKeywords);
+  }
+  if (valueExpression.lastType) {
+    addColRefIfExists(valueExpression.lastType);
+  } else {
+    addColRefIfExists(valueExpression);
+  }
 }
 
 var getValueExpressionKeywords = function (valueExpression, extras) {
@@ -1955,8 +2049,21 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
   if (isHive()) {
     keywords.push('<=>');
   }
+  if (extras) {
+    keywords = keywords.concat(extras);
+  }
   if (valueExpression.suggestKeywords) {
     keywords = keywords.concat(valueExpression.suggestKeywords);
+  }
+  if (types.length === 1 &&  types[0] === 'COLREF') {
+    return {
+      suggestKeywords: keywords,
+      suggestColRefKeywords: {
+        BOOLEAN: ['AND', 'OR'],
+        NUMBER: ['+', '-', '*', '/', '%'],
+        STRING: ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
+      }
+    }
   }
   if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
     keywords = keywords.concat(['AND', 'OR']);
@@ -1967,10 +2074,7 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
   if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
     keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
   }
-  if (extras) {
-    keywords = keywords.concat(extras);
-  }
-  return keywords;
+  return { suggestKeywords: keywords };
 }
 
 var suggestTypeKeywords = function () {
@@ -1983,9 +2087,16 @@ var suggestTypeKeywords = function () {
   }
 }
 
+var addColRefIfExists = function (valueExpression) {
+  if (valueExpression.columnReference) {
+    parser.yy.result.colRef = { identifierChain: valueExpression.columnReference };
+  }
+}
+
 var valueExpressionSuggest = function (oppositeValueExpression) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
-    suggestValues({ identifierChain: oppositeValueExpression.columnReference });
+    suggestValues();
+    parser.yy.result.colRef = { identifierChain: oppositeValueExpression.columnReference };
   }
   suggestColumns();
   suggestFunctions();
@@ -2039,6 +2150,30 @@ var applyArgumentTypesToSuggestions = function (funcToken, position) {
 
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    if (typeof parser.yy.result.colRef.table === 'undefined') {
+      delete parser.yy.result.colRef;
+      if (typeof parser.yy.result.suggestColRefKeywords !== 'undefined') {
+        Object.keys(parser.yy.result.suggestColRefKeywords).forEach(function (type) {
+          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(parser.yy.result.suggestColRefKeywords[type]);
+        });
+        delete parser.yy.result.suggestColRefKeywords;
+      }
+      if (parser.yy.result.suggestColumns && parser.yy.result.suggestColumns.types.length === 1 && parser.yy.result.suggestColumns.types[0] === 'COLREF') {
+        parser.yy.result.suggestColumns.types = ['T'];
+      }
+      delete parser.yy.result.suggestValues;
+    }
+  }
+
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    if (!parser.yy.result.suggestValues &&
+        !parser.yy.result.suggestColRefKeywords &&
+        (!parser.yy.result.suggestColumns ||
+          parser.yy.result.suggestColumns.types[0] !== 'COLREF')) {
+      delete parser.yy.result.colRef;
+    }
+  }
   if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
     if (!parser.yy.keepColumns) {
      delete parser.yy.result.suggestColumns;
@@ -2271,8 +2406,8 @@ var linkTablePrimaries = function () {
    if (typeof parser.yy.result.suggestColumns !== 'undefined') {
      linkSuggestion(parser.yy.result.suggestColumns, true);
    }
-   if (typeof parser.yy.result.suggestValues !== 'undefined') {
-     linkSuggestion(parser.yy.result.suggestValues, false);
+   if (typeof parser.yy.result.colRef !== 'undefined') {
+     linkSuggestion(parser.yy.result.colRef, false);
    }
 }
 
@@ -2301,14 +2436,24 @@ var suggestDdlAndDmlKeywords = function () {
   suggestKeywords(keywords);
 }
 
-var checkForKeywords = function (rule) {
-  if (rule && rule.suggestKeywords && rule.suggestKeywords.length > 0) {
-    suggestKeywords(rule.suggestKeywords);
+var checkForKeywords = function (expression) {
+  if (expression) {
+    if (expression.suggestKeywords && expression.suggestKeywords.length > 0) {
+      suggestKeywords(expression.suggestKeywords);
+    }
+    if (expression.suggestColRefKeywords) {
+      suggestColRefKeywords(expression.suggestColRefKeywords)
+      addColRefIfExists(expression);
+    }
   }
 }
 
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords.sort();
+}
+
+var suggestColRefKeywords = function (colRefKeywords) {
+  parser.yy.result.suggestColRefKeywords = colRefKeywords;
 }
 
 var suggestTablesOrColumns = function (identifier) {
@@ -2356,7 +2501,7 @@ var suggestHdfs = function (details) {
 }
 
 var suggestValues = function (details) {
-  parser.yy.result.suggestValues = details || {};
+  parser.yy.result.suggestValues = true;
 }
 
 var determineCase = function (text) {

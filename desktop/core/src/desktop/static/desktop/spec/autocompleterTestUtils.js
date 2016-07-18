@@ -45,6 +45,19 @@ define([
               delete actualResponse.error;
             }
             var deleteKeywords = false;
+            if (testDefinition.containsColRefKeywords) {
+              if (typeof actualResponse.suggestColRefKeywords == 'undefined') {
+                return {
+                  pass: false,
+                  message: '\nStatement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                  '  Dialect: ' + testDefinition.dialect + '\n' +
+                  '           No colRef keywords found'
+                }
+              } else {
+                delete actualResponse.suggestColRefKeywords;
+              }
+            }
+
             if (typeof testDefinition.containsKeywords !== 'undefined') {
               var keywords = actualResponse.suggestKeywords;
               var contains = true;

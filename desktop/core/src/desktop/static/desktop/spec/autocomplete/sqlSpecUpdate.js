@@ -178,13 +178,14 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
-          suggestValues: {
+          suggestFunctions: { types: ['COLREF'] },
+          suggestValues: true,
+          colRef: {
             database: 'bar',
             table: 'foo',
             identifierChain: [{ name: 'id' }]
           },
-          suggestColumns : { types: ['T'] , database: 'bar', table: 'foo' }
+          suggestColumns : { types: ['COLREF'] , database: 'bar', table: 'foo' }
         }
       });
     });

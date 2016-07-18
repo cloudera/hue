@@ -1373,7 +1373,10 @@ SelectConditions
      if (!$1 && !$2 && !$3 && !$4) {
        $$ = { suggestKeywords: [] };
      } else if ($1 && !$2 && !$3 && !$4) {
-       $$ = { suggestKeywords: getValueExpressionKeywords($1, ['GROUP BY', 'LIMIT', 'ORDER BY']) }
+       $$ = getValueExpressionKeywords($1, ['GROUP BY', 'LIMIT', 'ORDER BY']);
+       if ($1.columnReference) {
+         $$.columnReference = $1.columnReference
+       }
      } else if ($2 && !$3 && !$4) {
        $$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
      } else if ($3 && !$4) {
@@ -1918,6 +1921,7 @@ ValueExpression_EDIT
    {
      if ($4.inValueEdit) {
        valueExpressionSuggest($1);
+       applyTypeToSuggestions($1.types);
      }
      if ($4.cursorAtStart) {
        suggestKeywords(['SELECT']);
@@ -1928,6 +1932,7 @@ ValueExpression_EDIT
    {
      if ($3.inValueEdit) {
        valueExpressionSuggest($1);
+       applyTypeToSuggestions($1.types);
      }
      if ($3.cursorAtStart) {
        suggestKeywords(['SELECT']);
@@ -1950,21 +1955,21 @@ ValueExpression_EDIT
  : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
    {
      if ($4.types[0] === $6.types[0]) {
-       applyTypeToSuggestions($4.types)
+       applyTypeToSuggestions($4.types);
      }
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $6.types[0]) {
-       applyTypeToSuggestions($1.types)
+       applyTypeToSuggestions($1.types);
      }
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
    {
      if ($1.types[0] === $4.types[0]) {
-       applyTypeToSuggestions($1.types)
+       applyTypeToSuggestions($1.types);
      }
      $$ = { types: [ 'BOOLEAN' ] };
    }
@@ -2007,6 +2012,7 @@ ValueExpression_EDIT
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     applyTypeToSuggestions($1.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'CURSOR'
@@ -2017,6 +2023,7 @@ ValueExpression_EDIT
  | ValueExpression 'BETWEEN' 'CURSOR'
    {
      valueExpressionSuggest($1);
+     applyTypeToSuggestions($1.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
@@ -2025,30 +2032,43 @@ ValueExpression_EDIT
  : ValueExpression '=' ValueExpression_EDIT
    {
      applyTypeToSuggestions($1.types);
+     addColRefIfExists($1);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
    {
      applyTypeToSuggestions($1.types);
+     addColRefIfExists($1);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression '-' ValueExpression_EDIT
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
      $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression '*' ValueExpression_EDIT
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
      $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
      $$ = { types: [ 'NUMBER' ] };
    }
- | ValueExpression 'OR' ValueExpression_EDIT                   -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'AND' ValueExpression_EDIT                  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'OR' ValueExpression_EDIT
+   {
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression 'AND' ValueExpression_EDIT
+   {
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
  | ValueExpression '=' RightPart_EDIT
    {
      valueExpressionSuggest($1);
@@ -2095,30 +2115,43 @@ ValueExpression_EDIT
  : ValueExpression_EDIT '=' ValueExpression
    {
      applyTypeToSuggestions($3.types);
+     addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
    {
      applyTypeToSuggestions($3.types);
+     addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression_EDIT '-' ValueExpression
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($3);
      $$ = { types: [ 'NUMBER' ] }
    }
  | ValueExpression_EDIT '*' ValueExpression
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($3);
      $$ = { types: [ 'NUMBER' ] }
    }
  | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
    {
      applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($3);
      $$ = { types: [ 'NUMBER' ] }
    }
- | ValueExpression_EDIT 'OR' ValueExpression   -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'AND' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'OR' ValueExpression
+   {
+     addColRefIfExists($3);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression_EDIT 'AND' ValueExpression
+   {
+     addColRefIfExists($3);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
  | 'CURSOR' '=' ValueExpression
    {
      valueExpressionSuggest($3);
@@ -2239,7 +2272,7 @@ RightPart_EDIT
 // TODO: Expand with more choices
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
- | ColumnReference             -> { types: ['T'], columnReference: $1 }
+ | ColumnReference             -> { types: ['COLREF'], columnReference: $1 }
  | UserDefinedFunction
 // | GroupingOperation
  | 'NULL'                      -> { types: [ 'NULL' ] }
@@ -2249,9 +2282,9 @@ NonParenthesizedValueExpressionPrimary_EDIT
  : ColumnReference_EDIT
    {
      if ($1.suggestKeywords) {
-       $$ = { types: ['T'], columnReference: $1, suggestKeywords: $1.suggestKeywords };
+       $$ = { types: ['COLREF'], columnReference: $1, suggestKeywords: $1.suggestKeywords };
      } else {
-       $$ = { types: ['T'], columnReference: $1 };
+       $$ = { types: ['COLREF'], columnReference: $1 };
      }
    }
  | UserDefinedFunction_EDIT
@@ -2349,7 +2382,11 @@ SelectSubList
  : ValueExpression OptionalCorrelationName
    {
      if ($2 && $2.suggestKeywords) {
-       $$ = { suggestKeywords: getValueExpressionKeywords($1, $2.suggestKeywords || []) }
+       var result = getValueExpressionKeywords($1, $2.suggestKeywords || [])
+       if ($1.columnReference) {
+         result.columnReference = $1.columnReference;
+       }
+       $$ = result;
      } else {
        $$ = $2;
      }
@@ -3042,6 +3079,7 @@ OtherAggregateFunction_EDIT
          suggestKeywords(['DISTINCT']);
        }
      }
+     applyArgumentTypesToSuggestions($1, 1);
      $$ = { types: findReturnTypes($1) };
    }
  | OtherAggregateFunction_Type OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
@@ -3059,6 +3097,9 @@ OtherAggregateFunction_EDIT
        } else {
          suggestKeywords(['DISTINCT']);
        }
+     }
+     if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
+       applyArgumentTypesToSuggestions($1, $3.position);
      }
      $$ = { types: findReturnTypes($1) };
    }
@@ -3098,41 +3139,74 @@ ExtractFunction_EDIT
  : '<impala>EXTRACT(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
      $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' AnyCursor FromOrComma RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
      $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
      $$ = { types: findReturnTypes($1) };
    }
- | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError  -> { types: findReturnTypes($1) }
- | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError                  -> { types: findReturnTypes($1) }
- | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError                              -> { types: findReturnTypes($1) }
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
+   {
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: findReturnTypes($1) };
+   }
+ | '<impala>EXTRACT(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
+   {
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: findReturnTypes($1) };
+   }
+ | '<impala>EXTRACT(' ValueExpression_EDIT RightParenthesisOrError
+   {
+     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     $$ = { types: findReturnTypes($1) };
+   }
  | '<impala>EXTRACT(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
      $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' FromOrComma AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
      $$ = { types: findReturnTypes($1) };
    }
- | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError  -> { types: findReturnTypes($1) }
- | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError                  -> { types: findReturnTypes($1) }
+ | '<impala>EXTRACT(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
+   {
+     applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: findReturnTypes($1) };
+   }
+ | '<impala>EXTRACT(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
+   {
+    applyTypeToSuggestions($3.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: findReturnTypes($1) };
+   }
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($2, [',', 'FROM']);
+     if ($1.types[0] === 'STRING') {
+       suggestValueExpressionKeywords($2, ['FROM']);
+     } else {
+       suggestValueExpressionKeywords($2);
+     }
      $$ = { types: findReturnTypes($1) };
    }
  | '<impala>EXTRACT(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($2, [',', 'FROM']);
+     if ($1.types[0] === 'STRING') {
+       suggestValueExpressionKeywords($2, ['FROM']);
+     } else {
+       suggestValueExpressionKeywords($2);
+     }
      $$ = { types: findReturnTypes($1) };
    }
  ;
@@ -3151,6 +3225,7 @@ SumFunction_EDIT
  : 'SUM(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
      valueExpressionSuggest();
+     applyArgumentTypesToSuggestions($1, 1);
      if (!$2) {
        if (isImpala()) {
          suggestKeywords(['ALL', 'DISTINCT']);
@@ -3165,7 +3240,13 @@ SumFunction_EDIT
      suggestValueExpressionKeywords($3);
      $$ = { types: findReturnTypes($1) };
    }
- | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError  -> { types: findReturnTypes($1) }
+ | 'SUM(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
+   {
+     if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
+       applyArgumentTypesToSuggestions($1, 1);
+     }
+     $$ = { types: findReturnTypes($1) };
+   }
  ;
 
 // TODO: WITHIN
@@ -3856,7 +3937,16 @@ var mergeSuggestKeywords = function() {
 }
 
 var suggestValueExpressionKeywords = function (valueExpression, extras) {
-  suggestKeywords(getValueExpressionKeywords(valueExpression, extras));
+  var expressionKeywords = getValueExpressionKeywords(valueExpression, extras)
+  suggestKeywords(expressionKeywords.suggestKeywords);
+  if (expressionKeywords.suggestColRefKeywords) {
+    suggestColRefKeywords(expressionKeywords.suggestColRefKeywords);
+  }
+  if (valueExpression.lastType) {
+    addColRefIfExists(valueExpression.lastType);
+  } else {
+    addColRefIfExists(valueExpression);
+  }
 }
 
 var getValueExpressionKeywords = function (valueExpression, extras) {
@@ -3866,8 +3956,21 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
   if (isHive()) {
     keywords.push('<=>');
   }
+  if (extras) {
+    keywords = keywords.concat(extras);
+  }
   if (valueExpression.suggestKeywords) {
     keywords = keywords.concat(valueExpression.suggestKeywords);
+  }
+  if (types.length === 1 &&  types[0] === 'COLREF') {
+    return {
+      suggestKeywords: keywords,
+      suggestColRefKeywords: {
+        BOOLEAN: ['AND', 'OR'],
+        NUMBER: ['+', '-', '*', '/', '%'],
+        STRING: ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
+      }
+    }
   }
   if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
     keywords = keywords.concat(['AND', 'OR']);
@@ -3878,10 +3981,7 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
   if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
     keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
   }
-  if (extras) {
-    keywords = keywords.concat(extras);
-  }
-  return keywords;
+  return { suggestKeywords: keywords };
 }
 
 var suggestTypeKeywords = function () {
@@ -3894,9 +3994,16 @@ var suggestTypeKeywords = function () {
   }
 }
 
+var addColRefIfExists = function (valueExpression) {
+  if (valueExpression.columnReference) {
+    parser.yy.result.colRef = { identifierChain: valueExpression.columnReference };
+  }
+}
+
 var valueExpressionSuggest = function (oppositeValueExpression) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
-    suggestValues({ identifierChain: oppositeValueExpression.columnReference });
+    suggestValues();
+    parser.yy.result.colRef = { identifierChain: oppositeValueExpression.columnReference };
   }
   suggestColumns();
   suggestFunctions();
@@ -3950,6 +4057,30 @@ var applyArgumentTypesToSuggestions = function (funcToken, position) {
 
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    if (typeof parser.yy.result.colRef.table === 'undefined') {
+      delete parser.yy.result.colRef;
+      if (typeof parser.yy.result.suggestColRefKeywords !== 'undefined') {
+        Object.keys(parser.yy.result.suggestColRefKeywords).forEach(function (type) {
+          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(parser.yy.result.suggestColRefKeywords[type]);
+        });
+        delete parser.yy.result.suggestColRefKeywords;
+      }
+      if (parser.yy.result.suggestColumns && parser.yy.result.suggestColumns.types.length === 1 && parser.yy.result.suggestColumns.types[0] === 'COLREF') {
+        parser.yy.result.suggestColumns.types = ['T'];
+      }
+      delete parser.yy.result.suggestValues;
+    }
+  }
+
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    if (!parser.yy.result.suggestValues &&
+        !parser.yy.result.suggestColRefKeywords &&
+        (!parser.yy.result.suggestColumns ||
+          parser.yy.result.suggestColumns.types[0] !== 'COLREF')) {
+      delete parser.yy.result.colRef;
+    }
+  }
   if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
     if (!parser.yy.keepColumns) {
      delete parser.yy.result.suggestColumns;
@@ -4182,8 +4313,8 @@ var linkTablePrimaries = function () {
    if (typeof parser.yy.result.suggestColumns !== 'undefined') {
      linkSuggestion(parser.yy.result.suggestColumns, true);
    }
-   if (typeof parser.yy.result.suggestValues !== 'undefined') {
-     linkSuggestion(parser.yy.result.suggestValues, false);
+   if (typeof parser.yy.result.colRef !== 'undefined') {
+     linkSuggestion(parser.yy.result.colRef, false);
    }
 }
 
@@ -4212,14 +4343,24 @@ var suggestDdlAndDmlKeywords = function () {
   suggestKeywords(keywords);
 }
 
-var checkForKeywords = function (rule) {
-  if (rule && rule.suggestKeywords && rule.suggestKeywords.length > 0) {
-    suggestKeywords(rule.suggestKeywords);
+var checkForKeywords = function (expression) {
+  if (expression) {
+    if (expression.suggestKeywords && expression.suggestKeywords.length > 0) {
+      suggestKeywords(expression.suggestKeywords);
+    }
+    if (expression.suggestColRefKeywords) {
+      suggestColRefKeywords(expression.suggestColRefKeywords)
+      addColRefIfExists(expression);
+    }
   }
 }
 
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords.sort();
+}
+
+var suggestColRefKeywords = function (colRefKeywords) {
+  parser.yy.result.suggestColRefKeywords = colRefKeywords;
 }
 
 var suggestTablesOrColumns = function (identifier) {
@@ -4267,7 +4408,7 @@ var suggestHdfs = function (details) {
 }
 
 var suggestValues = function (details) {
-  parser.yy.result.suggestValues = details || {};
+  parser.yy.result.suggestValues = true;
 }
 
 var determineCase = function (text) {
