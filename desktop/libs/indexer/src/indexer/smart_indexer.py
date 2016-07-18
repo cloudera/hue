@@ -184,7 +184,7 @@ class Indexer(object):
       "get_regex":Indexer._get_regex_for_type,
       "format":data['format'],
       "get_kept_args": get_checked_args,
-      "grok_dictionaries_location" : grok_dicts_loc if self.fs.exists(geolite_loc) else None,
+      "grok_dictionaries_location" : grok_dicts_loc if self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location" : geolite_loc if self.fs.exists(geolite_loc) else None,
       "zk_host": zkensemble()
     }
