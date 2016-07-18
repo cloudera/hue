@@ -28,10 +28,13 @@ def is_selected(section, matcher):
 <%def name="render_field(field, show_label=True, extra_attrs={})">
   % if not field.is_hidden:
     <% group_class = field.errors and "error" or "" %>
-    <div class="control-group ${group_class}"
-      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+    <div class="control-group ${group_class}" data-original-title="${ field.label }" data-content="${ field.help_text }">
       % if show_label:
-        <label class="control-label">${ field.label }</label>
+        <label class="control-label">${ field.label }
+          % if field.help_text:
+          <sup title="${ field.help_text }" data-rel="tooltip"><i class="fa fa-question"></i></sup>
+          % endif
+        </label>
       % endif
       <div class="controls">
         <% field.field.widget.attrs.update(extra_attrs) %>
@@ -93,6 +96,9 @@ def is_selected(section, matcher):
         if (shown == 0) {
           $(".datatables tfoot").show();
         }
+      });
+      $('[data-rel="tooltip"]').tooltip({
+        placement: 'right'
       });
     });
   </script>
