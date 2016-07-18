@@ -23,8 +23,9 @@ define([
 
       expect(completions.length).not.toEqual(0);
 
+      console.log(completions);
       var completionsWithCorrectType = completions.filter(function (completion) {
-        return completion.meta === 'BOOLEAN' || completion.meta === 'T';
+        return completion.meta === 'BOOLEAN' || completion.meta === 'T' || completion.meta === 'ARRAY' || completion.meta === 'MAP' || completion.meta === 'STRUCT';
       });
 
       expect(completionsWithCorrectType.length).toEqual(completions.length);
@@ -117,54 +118,55 @@ define([
     });
 
     it('should give the expected argument types at a specific position', function () {
-      expect(sqlFunctions.getArgumentTypes('hive', 'cos', 1)).toEqual([{ type:'DECIMAL' }, { type:'DOUBLE' }]);
+      console.log(sqlFunctions.getArgumentTypes('hive', 'cos', 1));
+      expect(sqlFunctions.getArgumentTypes('hive', 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);
       expect(sqlFunctions.getArgumentTypes('hive', 'cos', 2)).toEqual([]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'cos', 1)).toEqual([{ type:'DOUBLE' }]);
+      expect(sqlFunctions.getArgumentTypes('impala', 'cos', 1)).toEqual(['DOUBLE']);
       expect(sqlFunctions.getArgumentTypes('impala', 'cos', 2)).toEqual([]);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'greatest', 1)).toEqual([{ type:'T', multiple: true }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'greatest', 200)).toEqual([{ type:'T', multiple: true }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'greatest', 1)).toEqual([{ type:'T', multiple: true }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'greatest', 200)).toEqual([{ type:'T', multiple: true }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'greatest', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'greatest', 200)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'greatest', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'greatest', 200)).toEqual(['T']);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 1)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 2)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 3)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 200)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 1)).toEqual([{ type:'STRING' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 2)).toEqual([{ type:'INT' }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 2)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 3)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'strleft', 200)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 1)).toEqual(['STRING']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 2)).toEqual(['INT']);
       expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 3)).toEqual([]);
       expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 200)).toEqual([]);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 1)).toEqual([{ type:'STRING' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 2)).toEqual([{ type:'STRING' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 3)).toEqual([{ type:'INT' }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 1)).toEqual(['STRING']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 2)).toEqual(['STRING']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 3)).toEqual(['INT']);
       expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 200)).toEqual([]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 1)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 2)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 3)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 200)).toEqual([{ type:'T' }]);
+      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 2)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 3)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'substring_index', 200)).toEqual(['T']);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 1)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 2)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 3)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 200)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 1)).toEqual([{ type:'TIMESTAMP' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 2)).toEqual([{ type:'BIGINT'}, { type:'INT' }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 2)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 3)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'weeks_add', 200)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 1)).toEqual(['TIMESTAMP']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 2)).toEqual(['BIGINT', 'INT']);
       expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 3)).toEqual([]);
       expect(sqlFunctions.getArgumentTypes('impala', 'weeks_add', 200)).toEqual([]);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 1)).toEqual([{ type:'STRING' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 2)).toEqual([{ type:'STRING' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 3)).toEqual([{ type:'T', multiple: true, optional: true }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 200)).toEqual([{ type:'T', multiple: true, optional: true }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'reflect', 1)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'reflect', 200)).toEqual([{ type:'T' }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 1)).toEqual(['STRING']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 2)).toEqual(['STRING']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 3)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'reflect', 200)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'reflect', 1)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'reflect', 200)).toEqual(['T']);
 
-      expect(sqlFunctions.getArgumentTypes('hive', 'blabla', 2)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('hive', 'blabla', 200)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'blabla', 2)).toEqual([{ type:'T' }]);
-      expect(sqlFunctions.getArgumentTypes('impala', 'blabla', 200)).toEqual([{ type:'T' }]);
+      expect(sqlFunctions.getArgumentTypes('hive', 'blabla', 2)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('hive', 'blabla', 200)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'blabla', 2)).toEqual(['T']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'blabla', 200)).toEqual(['T']);
     });
   });
 });

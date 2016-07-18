@@ -41,6 +41,7 @@
     var self = this;
     var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions);
 
+    var deferrals = [];
     var completions = [];
 
     if (parseResult.suggestKeywords) {
@@ -59,245 +60,300 @@
       });
     }
 
-    if (parseResult.suggestFunctions) {
-      sqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, completions);
-    }
+    var database = parseResult.useDatabase || self.snippet.database();
 
-    if (parseResult.suggestDatabases || parseResult.suggestHdfs || parseResult.suggestTables || parseResult.suggestColumns || parseResult.suggestValues) {
-      var database = parseResult.useDatabase || self.snippet.database();
+    var colRefDeferral = $.Deferred();
+    deferrals.push(colRefDeferral);
+    var colRef = null;
 
-      var deferrals = [];
-
-      if (parseResult.suggestDatabases) {
-        var prefix = parseResult.suggestDatabases.prependQuestionMark ? '? ' : '';
-        if (parseResult.suggestDatabases.prependFrom) {
-          prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
-        }
-
-        var databaseDeferred = $.Deferred();
-        deferrals.push(databaseDeferred);
-
-        self.snippet.getApiHelper().loadDatabases({
-          sourceType: self.snippet.type(),
-          successCallback: function (data) {
-            data.forEach(function (db) {
-              completions.push({
-                value: prefix + db + (parseResult.suggestDatabases.appendDot ? '.' : ''),
-                meta: 'database',
-                type: 'database'
-              });
-            });
-            databaseDeferred.resolve();
-
-          },
-          silenceErrors: true,
-          errorCallback: databaseDeferred.resolve
-        })
-
-      }
-
-      if (parseResult.suggestHdfs) {
-        var parts = parseResult.suggestHdfs.path.split('/');
-        // Drop the first " or '
-        parts.shift();
-        // Last one is either partial name or empty
-        parts.pop();
-
-        var hdfsDeferred = $.Deferred();
-        deferrals.push(hdfsDeferred);
-
-        self.snippet.getApiHelper().fetchHdfsPath({
-          pathParts: parts,
-          successCallback: function (data) {
-            if (!data.error) {
-              data.files.forEach(function (file) {
-                if (file.name !== '..' && file.name !== '.') {
-                  completions.push({
-                    value: parseResult.suggestHdfs.path === '' ? '/' + file.name : file.name,
-                    meta: file.type,
-                    type: 'HDFS'
-                  });
-                }
-              });
-            }
-            hdfsDeferred.resolve();
-          },
-          silenceErrors: true,
-          errorCallback: hdfsDeferred.resolve,
-          editor: editor,
-          timeout: self.timeout
-        });
-      }
-
-      if (parseResult.suggestTables) {
-        var prefix = parseResult.suggestTables.prependQuestionMark ? '? ' : '';
-        if (parseResult.suggestTables.prependFrom) {
-          prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
-        }
-
-        var tableDeferred = $.Deferred();
-        deferrals.push(tableDeferred);
-        self.snippet.getApiHelper().fetchTables({
-          sourceType: self.snippet.type(),
-          databaseName: parseResult.suggestTables.database || database,
-          successCallback: function (data) {
-            data.tables_meta.forEach(function (tablesMeta) {
-              completions.push({
-                value: prefix + tablesMeta.name,
-                meta: tablesMeta.type.toLowerCase(),
-                type: 'table'
-              })
-            });
-            tableDeferred.resolve();
-          },
-          silenceErrors: true,
-          errorCallback: tableDeferred.resolve,
-          editor: editor,
-          timeout: self.timeout
-        });
-      }
-
-      if (parseResult.suggestColumns) {
-        var columnsDeferred = $.Deferred();
-        deferrals.push(columnsDeferred);
-
-        var fields = [];
-        if (parseResult.suggestColumns.identifierChain) {
-          parseResult.suggestColumns.identifierChain.forEach(function (identifier) {
-            var field = identifier.name;
-            if (identifier.key) {
-              field += '[' + identifier.key + ']';
-            }
-            fields.push(field);
-          });
-        }
-
-        self.snippet.getApiHelper().fetchFields({
-          sourceType: self.snippet.type(),
-          databaseName: parseResult.suggestColumns.database || database,
-          tableName: parseResult.suggestColumns.table,
-          fields: fields,
-          editor: editor,
-          timeout: self.timeout,
-          successCallback: function (data) {
-            if (data.extended_columns) {
-              data.extended_columns.forEach(function (column) {
-                if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-                  completions.push({value: column.name + '[]', meta: 'map', type: 'column'})
-                } else if (column.type.indexOf('map') === 0) {
-                  completions.push({value: column.name, meta: 'map', type: 'column'})
-                } else if (column.type.indexOf('struct') === 0) {
-                  completions.push({value: column.name, meta: 'struct', type: 'column'})
-                } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-                  completions.push({value: column.name + '[]', meta: 'array', type: 'column'})
-                } else if (column.type.indexOf('array') === 0) {
-                  completions.push({value: column.name, meta: 'array', type: 'column'})
-                } else if (sqlFunctions.matchesType(self.snippet.type(), parseResult.suggestColumns.types || ['T'], [column.type.toUpperCase()])) {
-                  completions.push({value: column.name, meta: column.type, type: 'column'})
-                }
-              });
-            } else if (data.columns) {
-              data.columns.forEach(function (column) {
-                completions.push({value: column, meta: 'column', type: 'column'})
-              });
-            }
-            if (data.type === 'map' && self.snippet.type() === 'impala') {
-              completions.push({value: 'key', meta: 'key', type: 'column'});
-              completions.push({value: 'value', meta: 'value', type: 'column'});
-            }
-            if (data.type === 'struct') {
-              data.fields.forEach(function (field) {
-                completions.push({value: field.name, meta: 'struct', type: 'column'})
-              });
-            } else if (data.type === 'map' && (data.value && data.value.fields)) {
-              data.value.fields.forEach(function (field) {
-                if (sqlFunctions.matchesType(self.snippet.type(), parseResult.suggestColumns.types || ['T'], [field.type.toUpperCase()])) {
-                  completions.push({value: field.name, meta: field.type, type: 'column'});
-                }
-              });
-            } else if (data.type === 'array' && (data.item && data.item.fields)) {
-              data.item.fields.forEach(function (field) {
-                if ((field.type === 'array' || field.type === 'map')) {
-                  if (self.snippet.type() === 'hive') {
-                    completions.push({value: field.name + '[]', meta: field.type, type: 'column'});
-                  } else {
-                    completions.push({value: field.name, meta: field.type, type: 'column'});
-                  }
-                } else if (sqlFunctions.matchesType(self.snippet.type(), parseResult.suggestColumns.types || ['T'], [field.type.toUpperCase()])) {
-                  completions.push({value: field.name, meta: field.type, type: 'column'});
-                }
-              });
-            }
-            columnsDeferred.resolve();
-          },
-          silenceErrors: true,
-          errorCallback: columnsDeferred.resolve
-        });
-      }
-
-      if (parseResult.suggestValues) {
-        if (self.snippet.type() === 'impala') {
-          var impalaValuesDeferred = $.Deferred();
-          deferrals.push(impalaValuesDeferred);
-          // TODO: Fetch for each identifier in the chain, we need to add key or value for impala
-          //       select a.key from customers c, c.addresses a WHERE a.zip_code = |
-          // Same goes for Hive
-          //       SELECT orders[].items[].| FROM customers
-          self.snippet.getApiHelper().fetchFields({
-            sourceType: self.snippet.type(),
-            databaseName: parseResult.suggestValues.database || database,
-            tableName: parseResult.suggestValues.table,
-            fields: $.map(parseResult.suggestValues.identifierChain, function (value) {
-              return value.name
-            }),
-            editor: editor,
-            timeout: self.timeout,
-            successCallback: function (data) {
-              if (data.sample) {
-                var isString = data.type === "string";
-                data.sample.forEach(function (sample) {
-                  completions.push({meta: 'value', value: isString ? "'" + sample + "'" : new String(sample), type: 'sample'})
-                });
-              }
-              impalaValuesDeferred.resolve();
-            },
-            silenceErrors: true,
-            errorCallback: impalaValuesDeferred.resolve
-          });
-        } else {
-          var valuesDeferred = $.Deferred();
-          deferrals.push(valuesDeferred);
-          self.snippet.getApiHelper().fetchTableSample({
-            sourceType: self.snippet.type(),
-            databaseName: parseResult.suggestValues.database || database,
-            tableName: parseResult.suggestValues.table,
-            columnName: parseResult.suggestValues.identifierChain[0].name,
-            editor: editor,
-            timeout: self.timeout,
-            successCallback: function (data) {
-              if (data.status === 0 && data.headers.length === 1) {
-                data.rows.forEach(function (row) {
-                  completions.push({
-                    value: typeof row[0] === 'string' ? "'" + row[0] + "'" : '' + row[0],
-                    meta: 'sample',
-                    type: 'sample'
-                  });
-                });
-              }
-              valuesDeferred.resolve();
-            },
-            silenceErrors: true,
-            errorCallback: valuesDeferred.resolve
-          });
-        }
-      }
-
-      $.when.apply($, deferrals).done(function () {
-        self.finalizeCompletions(completions, callback, editor);
+    if (parseResult.colRef) {
+      self.snippet.getApiHelper().fetchFields({
+        sourceType: self.snippet.type(),
+        databaseName: parseResult.colRef.database || database,
+        tableName: parseResult.colRef.table,
+        fields: $.map(parseResult.colRef.identifierChain, function (value) {
+          return value.name
+        }),
+        editor: editor,
+        timeout: self.timeout,
+        successCallback: function (data) {
+          colRef = data;
+          colRefDeferral.resolve();
+        },
+        silenceErrors: true,
+        errorCallback: colRefDeferral.resolve
       });
     } else {
-      self.finalizeCompletions(completions, callback, editor);
+      colRefDeferral.resolve();
     }
+
+    if (parseResult.suggestFunctions) {
+      var suggestFunctionsDeferral = $.Deferred();
+      if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
+        $.when.apply($, colRefDeferral).done(function () {
+          if (colRef !== null) {
+            sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, completions);
+          } else {
+            sqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, completions);
+          }
+          suggestFunctionsDeferral.resolve();
+        });
+      } else {
+        sqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, completions);
+        suggestFunctionsDeferral.resolve();
+      }
+      deferrals.push(suggestFunctionsDeferral);
+    }
+
+    if (parseResult.suggestValues) {
+      var suggestValuesDeferral = $.Deferred();
+      $.when.apply($, colRefDeferral).done(function () {
+        if (colRef !== null) {
+          self.addValues(colRef, completions);
+        }
+        suggestValuesDeferral.resolve();
+      });
+      deferrals.push(suggestValuesDeferral);
+    }
+
+    if (parseResult.suggestColRefKeywords) {
+      var suggestColRefKeywordsDeferral = $.Deferred();
+      $.when.apply($, colRefDeferral).done(function () {
+        if (colRef !== null) {
+          self.addColRefKeywords(parseResult, colRef.type, completions);
+        }
+        suggestColRefKeywordsDeferral.resolve();
+      });
+      deferrals.push(suggestColRefKeywordsDeferral);
+    }
+
+    if (parseResult.suggestColumns) {
+      var suggestColumnsDeferral =  $.Deferred();
+      if (parseResult.suggestColumns.types && parseResult.suggestColumns.types[0] === 'COLREF') {
+        $.when.apply($, colRefDeferral).done(function () {
+          if (colRef !== null) {
+            deferrals.push(self.addColumns(parseResult, editor, database, [colRef.type.toUpperCase()], completions));
+          } else {
+            deferrals.push(self.addColumns(parseResult, editor, database, ['T'], completions));
+          }
+          suggestColumnsDeferral.resolve();
+        });
+      } else {
+        deferrals.push(self.addColumns(parseResult, editor, database, parseResult.suggestColumns.types || ['T'], completions));
+        suggestColumnsDeferral.resolve();
+      }
+      deferrals.push(suggestColumnsDeferral);
+    }
+
+    if (parseResult.suggestDatabases) {
+      deferrals.push(self.addDatabases(parseResult, completions));
+    }
+
+    if (parseResult.suggestHdfs) {
+      deferrals.push(self.addHdfs(parseResult, completions));
+    }
+
+    if (parseResult.suggestTables) {
+      deferrals.push(self.addTables(parseResult, editor, database, completions))
+    }
+
+    $.when.apply($, deferrals).done(function () {
+      self.finalizeCompletions(completions, callback, editor);
+    });
+  };
+
+  SqlAutocompleter2.prototype.addValues = function (columnReference, completions) {
+    if (columnReference.sample) {
+      var isString = columnReference.type === "string";
+      columnReference.sample.forEach(function (sample) {
+        completions.push({meta: 'value', value: isString ? "'" + sample + "'" : new String(sample), type: 'sample'})
+      });
+    }
+  };
+
+  SqlAutocompleter2.prototype.addColRefKeywords = function (parseResult, type, completions) {
+    var self = this;
+    Object.keys(parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
+      if (sqlFunctions.matchesType(self.snippet.type(), [typeForKeywords], [type.toUpperCase()])) {
+        parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
+          completions.push({
+            value: parseResult.lowerCase ? keyword.toLowerCase() : keyword,
+            meta: 'keyword',
+            type: 'keyword'
+          });
+        })
+      }
+    });
+  };
+
+  SqlAutocompleter2.prototype.addTables = function (parseResult, editor, database, completions) {
+    var self = this;
+    var tableDeferred = $.Deferred();
+    var prefix = parseResult.suggestTables.prependQuestionMark ? '? ' : '';
+    if (parseResult.suggestTables.prependFrom) {
+      prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
+    }
+
+    self.snippet.getApiHelper().fetchTables({
+      sourceType: self.snippet.type(),
+      databaseName: parseResult.suggestTables.database || database,
+      successCallback: function (data) {
+        data.tables_meta.forEach(function (tablesMeta) {
+          completions.push({
+            value: prefix + tablesMeta.name,
+            meta: tablesMeta.type.toLowerCase(),
+            type: 'table'
+          })
+        });
+        tableDeferred.resolve();
+      },
+      silenceErrors: true,
+      errorCallback: tableDeferred.resolve,
+      editor: editor,
+      timeout: self.timeout
+    });
+    return tableDeferred;
+  }
+
+  SqlAutocompleter2.prototype.addColumns = function (parseResult, editor, database, types, completions) {
+    var self = this;
+    var addColumnsDeferred = $.Deferred();
+    var fields = [];
+    if (parseResult.suggestColumns.identifierChain) {
+      parseResult.suggestColumns.identifierChain.forEach(function (identifier) {
+        var field = identifier.name;
+        if (identifier.key) {
+          field += '[' + identifier.key + ']';
+        }
+        fields.push(field);
+      });
+    }
+
+    self.snippet.getApiHelper().fetchFields({
+      sourceType: self.snippet.type(),
+      databaseName: parseResult.suggestColumns.database || database,
+      tableName: parseResult.suggestColumns.table,
+      fields: fields,
+      editor: editor,
+      timeout: self.timeout,
+      successCallback: function (data) {
+        if (data.extended_columns) {
+          data.extended_columns.forEach(function (column) {
+            if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
+              completions.push({value: column.name + '[]', meta: 'map', type: 'column'})
+            } else if (column.type.indexOf('map') === 0) {
+              completions.push({value: column.name, meta: 'map', type: 'column'})
+            } else if (column.type.indexOf('struct') === 0) {
+              completions.push({value: column.name, meta: 'struct', type: 'column'})
+            } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
+              completions.push({value: column.name + '[]', meta: 'array', type: 'column'})
+            } else if (column.type.indexOf('array') === 0) {
+              completions.push({value: column.name, meta: 'array', type: 'column'})
+            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              completions.push({value: column.name, meta: column.type, type: 'column'})
+            }
+          });
+        } else if (data.columns) {
+          data.columns.forEach(function (column) {
+            completions.push({value: column, meta: 'column', type: 'column'})
+          });
+        }
+        if (data.type === 'map' && self.snippet.type() === 'impala') {
+          completions.push({value: 'key', meta: 'key', type: 'column'});
+          completions.push({value: 'value', meta: 'value', type: 'column'});
+        }
+        if (data.type === 'struct') {
+          data.fields.forEach(function (field) {
+            completions.push({value: field.name, meta: 'struct', type: 'column'})
+          });
+        } else if (data.type === 'map' && (data.value && data.value.fields)) {
+          data.value.fields.forEach(function (field) {
+            if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              completions.push({value: field.name, meta: field.type, type: 'column'});
+            }
+          });
+        } else if (data.type === 'array' && (data.item && data.item.fields)) {
+          data.item.fields.forEach(function (field) {
+            if ((field.type === 'array' || field.type === 'map')) {
+              if (self.snippet.type() === 'hive') {
+                completions.push({value: field.name + '[]', meta: field.type, type: 'column'});
+              } else {
+                completions.push({value: field.name, meta: field.type, type: 'column'});
+              }
+            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              completions.push({value: field.name, meta: field.type, type: 'column'});
+            }
+          });
+        }
+        addColumnsDeferred.resolve();
+      },
+      silenceErrors: true,
+      errorCallback: addColumnsDeferred.resolve
+    });
+
+    return addColumnsDeferred;
+  };
+
+  SqlAutocompleter2.prototype.addDatabases = function (parseResult, completions) {
+    var self = this;
+    var databasesDeferred = $.Deferred();
+    var prefix = parseResult.suggestDatabases.prependQuestionMark ? '? ' : '';
+    if (parseResult.suggestDatabases.prependFrom) {
+      prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
+    }
+    self.snippet.getApiHelper().loadDatabases({
+      sourceType: self.snippet.type(),
+      successCallback: function (data) {
+        data.forEach(function (db) {
+          completions.push({
+            value: prefix + db + (parseResult.suggestDatabases.appendDot ? '.' : ''),
+            meta: 'database',
+            type: 'database'
+          });
+        });
+        databasesDeferred.resolve();
+      },
+      silenceErrors: true,
+      errorCallback: databasesDeferred.resolve
+    });
+    return databasesDeferred;
+  };
+
+  SqlAutocompleter2.prototype.addHdfs = function (parseResult, completions) {
+    var self = this;
+    var hdfsDeferred = $.Deferred();
+    var parts = parseResult.suggestHdfs.path.split('/');
+    // Drop the first " or '
+    parts.shift();
+    // Last one is either partial name or empty
+    parts.pop();
+
+    self.snippet.getApiHelper().fetchHdfsPath({
+      pathParts: parts,
+      successCallback: function (data) {
+        if (!data.error) {
+          data.files.forEach(function (file) {
+            if (file.name !== '..' && file.name !== '.') {
+              completions.push({
+                value: parseResult.suggestHdfs.path === '' ? '/' + file.name : file.name,
+                meta: file.type,
+                type: 'HDFS'
+              });
+            }
+          });
+        }
+        hdfsDeferred.resolve();
+      },
+      silenceErrors: true,
+      errorCallback: hdfsDeferred.resolve,
+      editor: editor,
+      timeout: self.timeout
+    });
+
+    return hdfsDeferred;
   };
 
   SqlAutocompleter2.prototype.finalizeCompletions = function (completions, callback, editor) {
