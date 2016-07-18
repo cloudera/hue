@@ -1823,27 +1823,32 @@ ${ hueIcons.symbols() }
     </a>
 
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }">
-      <a class="snippet-side-btn" style="padding-right:0;" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }">
-        <i class="fa fa-fw fa-play snippet-side-single"></i>
+      <!-- ko if: type() == 'hive' && wasBatchExecuted() -->
+      <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }">
+        <i class="fa fa-fw fa-send"></i>
       </a>
-      <!-- ko if: type() == 'hive' -->
-      <span data-bind="visible: status() != 'running' && status() != 'loading'">
+      <!-- /ko -->
+      <!-- ko if: type() != 'hive' || !wasBatchExecuted() -->
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }, style: {'padding-left': type() == 'hive' ? '2px' : '0' }">
+        <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : type() !== 'hive' }"></i>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: type() == 'hive' && status() != 'running' && status() != 'loading' -->
         <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '', 'blue': currentQueryTab() == 'queryExplain' }">
           <i class="fa fa-caret-down"></i>
         </a>
         <ul class="dropdown-menu less-padding">
           <li>
-            <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(false); execute(); }, style: { color: statement() === '' || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Execute interactively the current statement') }">
-              <i class="fa fa-fw fa-play snippet-side-single"></i> ${_('Execute')}
+            <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(false); $('.dropdown-toggle').dropdown('toggle'); execute(); }, style: { color: statement() === '' || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Execute interactively the current statement') }">
+              <i class="fa fa-fw fa-play"></i> ${_('Execute')}
             </a>
           </li>
           <li>
-            <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(true); execute(); }, css: {'disabled': statement() === '' }" title="${ _('Submit all the queries as a background batch job.') }">
+            <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(true); $('.dropdown-toggle').dropdown('toggle'); execute(); }, css: {'disabled': statement() === '' }" title="${ _('Submit all the queries as a background batch job.') }">
               <i class="fa fa-fw fa-send"></i> ${_('Batch')}
             </a>
           </li>
         </ul>
-        </span>
       <!-- /ko -->
     </div>
 
