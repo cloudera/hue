@@ -1699,7 +1699,9 @@
       }
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-      $(element).val(ko.unwrap(valueAccessor()));
+      if (!$(element).is(':focus')) {
+        $(element).val(ko.unwrap(valueAccessor()));
+      }
       if ($(element).val() === '') {
         $(element).removeClass('x');
       }
@@ -1996,11 +1998,13 @@
     update: function (element, valueAccessor) {
       var elem = $(element);
       var valueAccessor = valueAccessor();
-      if (typeof valueAccessor.target == "function") {
-        elem.val(valueAccessor.target());
-      }
-      else {
-        elem.val(valueAccessor.target);
+      if (typeof valueAccessor.completeSolrRanges === 'undefined') {
+        if (typeof valueAccessor.target == "function") {
+          elem.val(valueAccessor.target());
+        }
+        else {
+          elem.val(valueAccessor.target);
+        }
       }
       if (valueAccessor.forceUpdateSource) {
         element.typeahead.data('typeahead').source = function () {
