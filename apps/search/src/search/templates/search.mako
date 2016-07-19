@@ -272,7 +272,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <h4 data-bind="text: collection.label"></h4>
   <form class="form-search" data-bind="submit: searchBtn">
   <span data-bind="foreach: query.qs">
-    <input data-bind="clearable: q, typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+    <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
     <!-- ko if: $parent.query.qs().length > 1 -->
     <div class="pointer muted link" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></div>
     <!-- /ko -->
