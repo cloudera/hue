@@ -18,6 +18,8 @@ import operator
 import itertools
 import logging
 
+from django.utils.translation import ugettext as _
+
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.argument import TextArgument, CheckboxArgument
 
@@ -32,55 +34,65 @@ def get_format_types():
 def get_format_mapping():
   return dict([(format_.get_name(), format_) for format_ in get_format_types()])
 
-def _valid_csv_format(format_):
-  valid_field_separator = "fieldSeparator" in format_ and len(format_["fieldSeparator"]) == 1
-  valid_record_separator = "recordSeparator" in format_ and len(format_["recordSeparator"]) == 1
-  valid_quote_char = "quoteChar" in format_ and len(format_["quoteChar"]) == 1
-  valid_has_header = "recordSeparator" in format_
+def get_file_format_instance(file, format_=None):
+  file_stream = file['stream']
+  file_extension = file['name'].split('.')[-1] if '.' in file['name'] else ''
 
-  return valid_has_header and valid_quote_char and valid_record_separator and valid_field_separator
-
-def get_file_format_instance(file_stream, format_=None):
   format_mapping = get_format_mapping()
 
   if format_ and "type" in format_:
     type_ = format_["type"]
-  else:
-    type_ = CSVFormat.get_name()
+    if type_ in format_mapping:
+      if format_mapping[type_].valid_format(format_):
+        return format_mapping[type_](file_stream, format_)
+      else:
+        return None
 
-  if type_ in format_mapping:
-    return format_mapping[type_](file_stream, format_)
-  else:
-    return None
+  matches = [type_ for type_ in get_format_types() if file_extension in type_.get_extensions()]
+
+  return (matches[0] if matches else get_format_types()[0])(file_stream, format_)
 
 class FileFormat(object):
-  _name = "undefined"
+  _name = None
+  _description = None
+  _customizable = True
   _args = []
+  _extensions = []
+
+  @classmethod
+  def get_extensions(cls):
+    return cls._extensions
 
   @classmethod
   def get_name(cls):
     return cls._name
 
   @classmethod
+  def get_description(cls):
+    return cls._description
+
+  @classmethod
   def get_arguments(cls):
     return cls._args
 
   @classmethod
-  def _valid_format(cls, format_):
+  def is_customizable(cls):
+    return cls._customizable
+
+  @classmethod
+  def valid_format(cls, format_):
     return format_ and all([arg.name in format_ for arg in cls.get_arguments()])
 
   @classmethod
   def format_info(cls):
     return {
       "name": cls.get_name(),
-      "args": [arg.to_dict() for arg in cls.get_arguments()]
+      "args": [arg.to_dict() for arg in cls.get_arguments()],
+      "description": cls.get_description(),
+      "isCustomizable": cls.is_customizable()
     }
 
   def __init__(self):
-    pass
-
-  @property
-  def format_(self):
     pass
 
   @property
@@ -92,7 +104,7 @@ class FileFormat(object):
     return []
 
   def get_format(self):
-    return self.format_
+    return {"type": self.get_name()}
 
   def get_fields(self):
     obj = {}
@@ -105,7 +117,7 @@ class FileFormat(object):
   def to_dict(self):
     obj = {}
 
-    obj['format'] = self.format_
+    obj['format'] = self.get_format()
     obj['columns'] = [field.to_dict() for field in self.fields]
     obj['sample'] = self.sample
 
@@ -113,6 +125,9 @@ class FileFormat(object):
 
 class HueFormat(FileFormat):
   _name = "hue"
+  _description = _("Hue Log File")
+  _customizable = False
+  _extensions = ["log"]
 
   def __init__(self, file_stream, format_):
     self._fields = [
@@ -129,19 +144,35 @@ class HueFormat(FileFormat):
 
 class CSVFormat(FileFormat):
   _name = "csv"
+  _description = _("CSV File")
   _args = [
-    TextArgument("fieldSeparator"),
-    TextArgument("recordSeparator"),
-    TextArgument("quoteChar"),
-    CheckboxArgument("hasHeader")
+    TextArgument("fieldSeparator", "Field Separator"),
+    TextArgument("recordSeparator", "Record Separator"),
+    TextArgument("quoteChar", "Quote Character"),
+    CheckboxArgument("hasHeader", "Has Header")
   ]
+  _extensions = ["csv", "tsv"]
+
+  @classmethod
+  def _valid_character(self, char):
+    return isinstance(char, basestring) and len(char) == 1
+
+  @classmethod
+  def valid_format(cls, format_):
+    valid = super(CSVFormat, cls).valid_format(format_)
+    valid = valid and cls._valid_character(format_["fieldSeparator"])
+    valid = valid and cls._valid_character(format_["recordSeparator"])
+    valid = valid and cls._valid_character(format_["quoteChar"])
+    valid = valid and isinstance(format_["hasHeader"], bool)
+
+    return valid
 
   def __init__(self, file_stream, format_=None):
     file_stream.seek(0)
     sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
     file_stream.seek(0)
 
-    if self._valid_format(format_):
+    if self.valid_format(format_):
       self._delimiter = format_["fieldSeparator"].encode('utf-8')
       self._line_terminator = format_["recordSeparator"].encode('utf-8')
       self._quote_char = format_["quoteChar"].encode('utf-8')
@@ -190,15 +221,17 @@ class CSVFormat(FileFormat):
   def quote_char(self):
     return self._quote_char
 
-  @property
-  def format_(self):
-    return {
-      "type":"csv",
+  def get_format(self):
+    format_ = super(CSVFormat, self).get_format()
+    specific_format = {
       "fieldSeparator":self.delimiter,
       "recordSeparator":self.line_terminator,
       "quoteChar":self.quote_char,
       "hasHeader":self._has_header
     }
+    format_.update(specific_format)
+
+    return format_
 
   def _guess_dialect(self, sample):
     sniffer = csv.Sniffer()
