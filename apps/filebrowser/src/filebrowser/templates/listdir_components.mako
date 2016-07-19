@@ -786,6 +786,11 @@ from django.utils.translation import ugettext as _
           if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
             this.selected(true);
             cm.css({ display: 'block', top: e.pageY - 15, left: (e.pageX < rect.right - 200 ) ? e.pageX : e.pageX - 250 });
+            if ($(window).height() - 55 < $('.context-menu').position().top - $('body').scrollTop() + $('.context-menu').height()) {
+              cm.css({
+                top: e.pageY - $('.context-menu').height()
+              });
+            }
           } else {
             cm.css({ display: 'none' });
           }
