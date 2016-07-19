@@ -370,9 +370,8 @@
     clonedTableContainer.appendTo(clonedTableVisibleContainer);
     clonedTableVisibleContainer.prependTo($pluginElement.parent());
 
-    $pluginElement.parent().scroll(function () {
-      var scrollLeft = $(this).scrollLeft();
-      clonedTableVisibleContainer.scrollLeft(scrollLeft);
+
+    function throttledHeaderPadding() {
       var firstCellWidth = clonedTable.find("thead>tr th:eq(0)").outerWidth();
       clonedTable.find("thead>tr th").each(function () {
         var leftPosition = $(this).position().left - firstCellWidth;
@@ -385,6 +384,14 @@
           $(this).find('span').css('paddingLeft', 0);
         }
       });
+    }
+
+    var scrollTimeout = -1;
+    $pluginElement.parent().scroll(function () {
+      var scrollLeft = $(this).scrollLeft();
+      clonedTableVisibleContainer.scrollLeft(scrollLeft);
+      window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
     });
 
     clonedTableVisibleContainer.scrollLeft($pluginElement.parent().scrollLeft());
