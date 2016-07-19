@@ -58,7 +58,12 @@ def guess_format(request):
 
   indexer = Indexer(request.user, request.fs)
   stream = request.fs.open(file_format["path"])
-  format_ = indexer.guess_format({"file":stream})
+  format_ = indexer.guess_format({
+    "file":{
+      "stream":stream,
+      "name":file_format['path']
+      }
+    })
   _convert_format(format_)
 
   return JsonResponse(format_)
@@ -68,7 +73,13 @@ def guess_field_types(request):
   indexer = Indexer(request.user, request.fs)
   stream = request.fs.open(file_format["path"])
   _convert_format(file_format["format"], inverse = True)
-  format_ = indexer.guess_field_types({"file":stream, "format":file_format['format']})
+  format_ = indexer.guess_field_types({
+    "file":{
+      "stream":stream,
+      "name":file_format['path']
+      },
+    "format":file_format['format']
+    })
 
   return JsonResponse(format_)
 

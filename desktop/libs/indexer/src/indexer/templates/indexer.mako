@@ -56,38 +56,40 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 
     <div data-bind="visible: createWizard.fileFormat().show">
+      <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
+      </h3>
       <div data-bind="with: createWizard.fileFormat().format">
-          <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes.map(function(f){return f.name}), value: type"></select>
-          </h3>
 
-          <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
-        </div>
+        <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+      </div>
 
-        <h3>${_('Fields')}</h3>
-        <div data-bind="foreach: createWizard.fileFormat().columns">
-          <div data-bind="template: { name:'field-template',data:$data}"></div>
-        </div>
+        <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
+          <h3>${_('Fields')}</h3>
+          <div data-bind="foreach: createWizard.fileFormat().columns">
+            <div data-bind="template: { name:'field-template',data:$data}"></div>
+          </div>
 
-        <h3>${_('Preview')}</h3>
-        <table style="margin:auto;text-align:left">
-          <thead>
-            <tr data-bind="foreach: createWizard.fileFormat().columns">
-              <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: createWizard.sample">
-            <tr data-bind="foreach: $data">
-              <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
-                <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
-                </td>
+          <h3>${_('Preview')}</h3>
+          <table style="margin:auto;text-align:left">
+            <thead>
+              <tr data-bind="foreach: createWizard.fileFormat().columns">
+                <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: createWizard.sample">
+              <tr data-bind="foreach: $data">
+                <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
+                  <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
+                  </td>
 
-                <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
-                  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+                  <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
+                    <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+                  <!-- /ko -->
                 <!-- /ko -->
-              <!-- /ko -->
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
+        <!-- /ko -->
 
         <br><hr><br>
 
@@ -109,8 +111,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="format-settings">
   <!-- ko foreach: {data: getArguments(), as: 'argument'} -->
-    <h4 data-bind="text: argument.name"></h4>
-    <!-- ko template: {name: 'arg-'+argument.type, data:{name: argument.name, value: $parent[argument.name]}}--><!-- /ko -->
+    <h4 data-bind="text: argument.description"></h4>
+    <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 </script>
 
@@ -162,14 +164,14 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 <script type="text/html" id="args-template">
   <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
-    <h4 data-bind="text: name"></h4>
-    <!-- ko template: {name: 'arg-'+argument.type, data:{name: argument.name, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
+    <h4 data-bind="text: description"></h4>
+    <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 
 </script>
 
 <script type="text/html" id="arg-text">
-  <input type="text" data-bind="attr: {placeholder: name}, value: value">
+  <input type="text" data-bind="attr: {placeholder: description}, value: value">
 </script>
 
 <script type="text/html" id="arg-checkbox">
@@ -311,6 +313,7 @@ var getNewFieldName = function(){
       self.type = ko.observable(typeName);
 
       var types = viewModel.createWizard.fileTypes
+
       for(var i = 0; i < types.length; i++){
         if(types[i].name == typeName){
           type = types[i];
@@ -339,6 +342,10 @@ var getNewFieldName = function(){
       return type.args;
     }
 
+    self.isCustomizable = function(){
+      return type.isCustomizable;
+    }
+
     init();
   }
 
@@ -357,6 +364,11 @@ var getNewFieldName = function(){
   var CreateWizard = function (vm) {
     var self = this;
     var guessFieldTypesXhr;
+
+    self.fileType = ko.observable();
+    self.fileType.subscribe(function(newType){
+      if(self.fileFormat().format()) self.fileFormat().format().type(newType.name);
+    });
 
     self.operationTypes = ${operators_json | n};
 
@@ -388,6 +400,12 @@ var getNewFieldName = function(){
 
     self.fileFormat().format.subscribe(function(){
       self.guessFieldTypes();
+      for(var i = 0; i < self.fileTypes.length; i++){
+        if(self.fileTypes[i].name == self.fileFormat().format().type()){
+          self.fileType(self.fileTypes[i]);
+          break;
+        }
+      }
 
       if(self.fileFormat().format().type){
         self.fileFormat().format().type.subscribe(function(newType){
@@ -401,7 +419,8 @@ var getNewFieldName = function(){
       $.post("${ url('indexer:guess_format') }", {
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
       }, function(resp) {
-        self.fileFormat().format(new FileType(resp['type'], resp));
+        var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
+        self.fileFormat().format(newFormat);
 
         self.fileFormat().show(true);
 

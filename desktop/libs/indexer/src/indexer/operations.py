@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+from django.utils.translation import ugettext as _
 from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
 
 class Operator():
@@ -40,66 +41,66 @@ OPERATORS = [
   Operator(
     name="split",
     args=[
-      TextArgument("splitChar")
+      TextArgument("splitChar", _("Split Chararacter"))
     ],
     output_type="custom_fields"
   ),
   Operator(
     name="grok",
     args=[
-      TextArgument("regexp")
+      TextArgument("regexp", _("Regular Expression"))
     ],
     output_type="custom_fields"
   ),
   Operator(
     name="convert_date",
     args=[
-      TextArgument("format")
+      TextArgument("format", _("Date Format (eg: yyyy/MM/dd)"))
     ],
     output_type="inplace"
   ),
   Operator(
     name="extract_uri_components",
     args=[
-      CheckboxArgument("authority"),
-      CheckboxArgument("fragment"),
-      CheckboxArgument("host"),
-      CheckboxArgument("path"),
-      CheckboxArgument("port"),
-      CheckboxArgument("query"),
-      CheckboxArgument("scheme"),
-      CheckboxArgument("scheme_specific_path"),
-      CheckboxArgument("user_info")
+      CheckboxArgument("authority", _("Authority")),
+      CheckboxArgument("fragment", _("Fragment")),
+      CheckboxArgument("host", _("Host")),
+      CheckboxArgument("path", _("Path")),
+      CheckboxArgument("port", _("Port")),
+      CheckboxArgument("query", _("Query")),
+      CheckboxArgument("scheme", _("Scheme")),
+      CheckboxArgument("scheme_specific_path", _("Scheme Specific Path")),
+      CheckboxArgument("user_info", _("User Info"))
     ],
     output_type="checkbox_fields"
   ),
   Operator(
     name="geo_ip",
     args=[
-      CheckboxArgument("/country/iso_code"),
-      CheckboxArgument("/country/names/en"),
-      CheckboxArgument("/subdivisions[]/names/en"),
-      CheckboxArgument("/subdivisions[]/iso_code"),
-      CheckboxArgument("/city/names/en"),
-      CheckboxArgument("/postal/code"),
-      CheckboxArgument("/location/latitude"),
-      CheckboxArgument("/location/longitude"),
+      CheckboxArgument("/country/iso_code", _("ISO Code")),
+      CheckboxArgument("/country/names/en", _("Country Name")),
+      CheckboxArgument("/subdivisions[]/names/en", _("Subdivisions Names")),
+      CheckboxArgument("/subdivisions[]/iso_code", _("Subdivisons ISO Code")),
+      CheckboxArgument("/city/names/en", _("City Name")),
+      CheckboxArgument("/postal/code", _("Postal Code")),
+      CheckboxArgument("/location/latitude", _("Latitude")),
+      CheckboxArgument("/location/longitude", _("Longitude")),
     ],
     output_type="checkbox_fields"
   ),
   Operator(
     name="translate",
     args=[
-      TextArgument("default"),
-      MappingArgument("mapping")
+      TextArgument("default", "Default Value (if no match found)"),
+      MappingArgument("mapping", _("Mapping"))
     ],
     output_type="inplace"
   ),
   Operator(
     name="find_replace",
     args=[
-      TextArgument("find"),
-      TextArgument("replace")
+      TextArgument("find", _("Find")),
+      TextArgument("replace", _("Replace"))
     ],
     output_type="inplace"
   ),

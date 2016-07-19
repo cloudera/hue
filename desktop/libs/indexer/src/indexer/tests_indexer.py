@@ -42,9 +42,9 @@ class IndexerTest():
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
     indexer = Indexer("test", None)
 
-    guessed_format = indexer.guess_format({'file': stream})
+    guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
-    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    fields = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     # test format
     assert_equal('csv', guessed_format['type'])
     assert_equal(',', guessed_format['fieldSeparator'])
@@ -82,27 +82,27 @@ class IndexerTest():
     indexer = Indexer("test", None)
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
 
-    guessed_format = indexer.guess_format({'file': stream})
+    guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
     guessed_format["fieldSeparator"] = "invalid separator"
 
-    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     assert_equal(fields, [])
 
     stream.seek(0)
-    guessed_format = indexer.guess_format({'file': stream})
+    guessed_format = indexer.guess_format({'file':  {"stream": stream, "name": "test.csv"}})
 
     guessed_format["recordSeparator"] = "invalid separator"
 
-    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     assert_equal(fields, [])
 
     stream.seek(0)
-    guessed_format = indexer.guess_format({'file': stream})
+    guessed_format = indexer.guess_format({'file':  {"stream": stream, "name": "test.csv"}})
 
     guessed_format["quoteChar"] = "invalid quoteChar"
 
-    fields = indexer.guess_field_types({"file":stream, "format": guessed_format})['columns']
+    fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     assert_equal(fields, [])
 
   def test_end_to_end(self):
@@ -118,9 +118,9 @@ class IndexerTest():
     stream = fs.open(input_loc)
 
     # guess the format of the file
-    file_type_format = indexer.guess_format({'file': stream})
+    file_type_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
-    field_types = indexer.guess_field_types({"file":stream, "format": file_type_format})
+    field_types = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": file_type_format})
 
     format_ = field_types.copy()
     format_['format'] = file_type_format

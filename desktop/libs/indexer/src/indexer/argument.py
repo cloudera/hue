@@ -13,10 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+from django.utils.translation import ugettext as _
+
 class Argument():
   _type = None
-  def __init__(self, name):
+  def __init__(self, name, description=None):
     self._name = name
+    self._description = _(description if description else name)
 
   @property
   def name(self):
@@ -27,7 +30,7 @@ class Argument():
     return self._type
 
   def to_dict(self):
-    return {"name": self._name, "type": self._type}
+    return {"name": self._name, "type": self._type, "description": self._description}
 
 class TextArgument(Argument):
   _type = "text"
