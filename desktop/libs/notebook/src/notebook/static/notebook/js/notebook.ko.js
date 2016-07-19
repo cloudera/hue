@@ -1681,7 +1681,7 @@
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
-          hueUtils.changeURL('/notebook/editor');
+          hueUtils.changeURL('/notebook/editor?type=' + vm.editorType());
         }
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
@@ -2077,7 +2077,7 @@
           if (window.location.getParameter('type')) {
             hueUtils.changeURL('/notebook/editor?type=' + window.location.getParameter('type'));
           } else {
-            hueUtils.changeURL('/notebook/editor');
+            hueUtils.changeURL('/notebook/editor?type=' + self.editorType());
           }
         } else {
           hueUtils.changeURL('/notebook/notebook');
