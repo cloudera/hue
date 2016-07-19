@@ -48,9 +48,7 @@
         var aoColumns = self.$table.data('aoColumns');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
 
-        var invisibleOffset = aoColumns.length > 30 ? 1 : 10;
-
-
+        var invisibleOffset = 30;
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
         var visibleRows = Math.ceil(scrollable.height() / rowHeight) + invisibleOffset;
 
@@ -59,41 +57,49 @@
 
         var northSpace = rowHeight * startRow;
         if ($t.find('.ht-north-spacer').length === 0) {
-          $('<tr>').addClass('ht-north-spacer').html('<td colspan="' + (aoColumns.length) + '" style="display: none"></td>').appendTo(appendable);
+          $('<tr>').addClass('ht-north-spacer').hide().html('<td colspan="' + (aoColumns.length) + '"></td>').appendTo(appendable);
         }
         else {
           if (northSpace > 0) {
-            $t.find('.ht-north-spacer td').show().height(northSpace);
+            $t.find('.ht-north-spacer').show().html('<td colspan="' + (aoColumns.length) + '" style="height: ' + northSpace + 'px"></td>');
           }
           else {
-            $t.find('.ht-north-spacer td').hide();
+            $t.find('.ht-north-spacer').hide();
           }
         }
 
-        $t.find('.ht-visible-row').remove();
-
-        var html = '';
-        for (var i = startRow; i < Math.min(startRow + visibleRows, $t.data('data').length); i++) {
-          var row = $t.data('data')[i];
-          html += '<tr class="ht-visible-row ht-visible-row-' + i + '">';
-          for (var j = 0; j < aoColumns.length; j++) {
-            html += '<td class="ht-cell-' + i + '-' + j + '">' + row[j] + '</td>';
+        if ($t.find('.ht-visible-row-0').length === 0) {
+          var html = '';
+          for (var i = 0; i < visibleRows; i++) {
+            html += '<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>';
           }
-          html += '</tr>';
+          $t.find('.ht-north-spacer').after(html);
         }
 
-        $t.find('.ht-north-spacer').after(html);
+        $t.find('.ht-visible-row').each(function(idx, el){
+          var row = $t.data('data')[startRow + idx];
+          var html = '';
+          if (row){
+            for (var j = 0; j < aoColumns.length; j++) {
+              html += '<td>' + row[j] + '</td>';
+            }
+          }
+          $(el).html(html);
+        });
+
 
         var southSpace = rowHeight * ($t.data('data').length - endRow);
         if ($t.find('.ht-south-spacer').length === 0) {
           $('<tr>').addClass('ht-south-spacer').html('<td colspan="' + (aoColumns.length) + '" style="height: ' + southSpace + 'px"></td>').appendTo(appendable);
         }
         else {
-          $t.find('.ht-south-spacer td').height(southSpace);
+          $t.find('.ht-south-spacer').html('<td colspan="' + (aoColumns.length) + '" style="height: ' + southSpace + 'px"></td>');
         }
 
         if ($t.data('oInit')['fnDrawCallback']) {
-          $t.data('oInit')['fnDrawCallback']();
+          window.setTimeout(function(){
+            $t.data('oInit')['fnDrawCallback']();
+          }, 0);
         }
         self.isDrawing = false;
       }

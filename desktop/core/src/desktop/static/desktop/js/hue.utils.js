@@ -311,6 +311,36 @@ var huePubSub = (function () {
   };
 })();
 
+var hueDebugTimer = (function () {
+  var initialTime = null;
+  var times = [];
+  var withConsole = false;
+  return {
+    start: function (enableConsole) {
+      times = [];
+      initialTime = (new Date()).getTime();
+      times.push(initialTime);
+      if (enableConsole){
+        withConsole = true;
+      }
+    },
+    mark: function (label) {
+      var mark = (new Date()).getTime();
+      times.push(mark);
+      if (withConsole){
+        console.log(label ? label : times.length, mark - times[times.length - 2]);
+      }
+      return mark - times[times.length - 2];
+    },
+    total: function () {
+      return times[times.length - 1] - times[0];
+    },
+    timeline: function () {
+      return times;
+    }
+  };
+})();
+
 
 Number.prototype.toHHMMSS = function () {
   var _s = this;
