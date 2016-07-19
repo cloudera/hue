@@ -792,6 +792,10 @@ input[type="text"].filechooser-input {
   height: 31px;
 }
 
+#saveResultsForm .fileChooserBtn {
+  margin-top: -3px;
+}
+
 table.airy tr td {
   padding: 4px;
 }
