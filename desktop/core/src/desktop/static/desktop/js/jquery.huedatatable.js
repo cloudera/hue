@@ -48,9 +48,9 @@
         var aoColumns = self.$table.data('aoColumns');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
 
-        var invisibleOffset = 30;
+        var invisibleOffset = 1;
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
-        var visibleRows = Math.ceil(scrollable.height() / rowHeight) + invisibleOffset;
+        var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight) + invisibleOffset;
 
         var startRow = $t.offset().top - 73 < 0 ? Math.max(Math.floor(Math.abs($t.offset().top - 73) / rowHeight) - invisibleOffset, 0) : 0;
         var endRow = startRow + visibleRows;
@@ -68,12 +68,12 @@
           }
         }
 
-        if ($t.find('.ht-visible-row-0').length === 0) {
-          var html = '';
-          for (var i = 0; i < visibleRows; i++) {
-            html += '<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>';
+        $t.find('.ht-visible-row').empty();
+
+        for (var i=0; i<visibleRows; i++) {
+          if ($t.find('.ht-visible-row-' + i).length === 0) {
+            $t.find('.ht-north-spacer').after('<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>');
           }
-          $t.find('.ht-north-spacer').after(html);
         }
 
         $t.find('.ht-visible-row').each(function(idx, el){
