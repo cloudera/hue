@@ -236,7 +236,7 @@
       .replace(/ ELSE /ig, "~::~" + tab + "ELSE ")
       .replace(/ END /ig, "~::~" + tab + "END ")
       .replace(/ FROM /ig, "~::~FROM ")
-      .replace(/ GROUP\s{1,}BY/ig, "~::~GROUP BY ")
+      .replace(/ GROUP\s{1,}BY /ig, "~::~GROUP BY ")
       .replace(/ HAVING /ig, "~::~HAVING ")
       //.replace(/ SET /ig," SET~::~")
       .replace(/ IN /ig, " IN ")
@@ -249,7 +249,7 @@
 
       .replace(/ ON /ig, "~::~" + tab + "ON ")
       .replace(/ OR /ig, "~::~" + tab + tab + "OR ")
-      .replace(/ ORDER\s{1,}BY/ig, "~::~ORDER BY ")
+      .replace(/ ORDER\s{1,}BY /ig, "~::~ORDER BY ")
       .replace(/ OVER /ig, "~::~" + tab + "OVER ")
 
       .replace(/\(\s{0,}SELECT /ig, "~::~(SELECT ")
@@ -261,6 +261,7 @@
       .replace(/ WHEN /ig, "~::~" + tab + "WHEN ")
       .replace(/ WHERE /ig, "~::~WHERE ")
       .replace(/ WITH /ig, "~::~WITH ")
+      .replace(/ LIMIT /ig, "~::~LIMIT ")
 
       //.replace(/\,\s{0,}\(/ig,",~::~( ")
       //.replace(/\,/ig,",~::~"+tab+tab+"")
