@@ -67,22 +67,13 @@
     var colRef = null;
 
     if (parseResult.colRef) {
-      self.snippet.getApiHelper().fetchFields({
-        sourceType: self.snippet.type(),
-        databaseName: parseResult.colRef.database || database,
-        tableName: parseResult.colRef.table,
-        fields: $.map(parseResult.colRef.identifierChain, function (value) {
-          return value.name
-        }),
-        editor: editor,
-        timeout: self.timeout,
-        successCallback: function (data) {
-          colRef = data;
-          colRefDeferral.resolve();
-        },
-        silenceErrors: true,
-        errorCallback: colRefDeferral.resolve
-      });
+      var colRefCallback = function (data) {
+        colRef = data;
+        colRefDeferral.resolve();
+      };
+
+      self.fetchFieldsForIdentifiers(editor, parseResult.colRef.table, parseResult.colRef.database || database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+
     } else {
       colRefDeferral.resolve();
     }
@@ -186,6 +177,44 @@
     });
   };
 
+  SqlAutocompleter2.prototype.fetchFieldsForIdentifiers = function (editor, tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields) {
+    var self = this;
+    if (!fetchedFields) {
+      fetchedFields = [];
+    }
+    if (!identifierChain) {
+      identifierChain = [];
+    }
+    if (identifierChain.length > 0) {
+      fetchedFields.push(identifierChain[0].name);
+      identifierChain = identifierChain.slice(1);
+    }
+
+    self.snippet.getApiHelper().fetchFields({
+      sourceType: self.snippet.type(),
+      databaseName: databaseName,
+      tableName: tableName,
+      fields: fetchedFields,
+      editor: editor,
+      timeout: self.timeout,
+      successCallback: function (data) {
+        if (identifierChain.length > 0) {
+          if (data.type === 'array') {
+            fetchedFields.push('item')
+          }
+          if (data.type === 'map') {
+            fetchedFields.push('value')
+          }
+          self.fetchFieldsForIdentifiers(editor, tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields)
+        } else {
+          callback(data);
+        }
+      },
+      silenceErrors: true,
+      errorCallback: errorCallback
+    });
+  };
+
   SqlAutocompleter2.prototype.addTables = function (parseResult, editor, database, completions) {
     var self = this;
     var tableDeferred = $.Deferred();
@@ -213,86 +242,68 @@
       timeout: self.timeout
     });
     return tableDeferred;
-  }
+  };
 
   SqlAutocompleter2.prototype.addColumns = function (parseResult, editor, database, types, completions) {
     var self = this;
     var addColumnsDeferred = $.Deferred();
-    var fields = [];
-    if (parseResult.suggestColumns.identifierChain) {
-      parseResult.suggestColumns.identifierChain.forEach(function (identifier) {
-        var field = identifier.name;
-        if (identifier.key) {
-          field += '[' + identifier.key + ']';
-        }
-        fields.push(field);
-      });
-    }
 
-    self.snippet.getApiHelper().fetchFields({
-      sourceType: self.snippet.type(),
-      databaseName: parseResult.suggestColumns.database || database,
-      tableName: parseResult.suggestColumns.table,
-      fields: fields,
-      editor: editor,
-      timeout: self.timeout,
-      successCallback: function (data) {
-        if (data.extended_columns) {
-          data.extended_columns.forEach(function (column) {
-            if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-              completions.push({value: column.name + '[]', meta: 'map', type: 'column'})
-            } else if (column.type.indexOf('map') === 0) {
-              completions.push({value: column.name, meta: 'map', type: 'column'})
-            } else if (column.type.indexOf('struct') === 0) {
-              completions.push({value: column.name, meta: 'struct', type: 'column'})
-            } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-              completions.push({value: column.name + '[]', meta: 'array', type: 'column'})
-            } else if (column.type.indexOf('array') === 0) {
-              completions.push({value: column.name, meta: 'array', type: 'column'})
-            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              completions.push({value: column.name, meta: column.type, type: 'column'})
-            }
-          });
-        } else if (data.columns) {
-          data.columns.forEach(function (column) {
-            completions.push({value: column, meta: 'column', type: 'column'})
-          });
-        }
-        if (data.type === 'map' && self.snippet.type() === 'impala') {
-          completions.push({value: 'key', meta: 'key', type: 'column'});
-          completions.push({value: 'value', meta: 'value', type: 'column'});
-        }
-        if (data.type === 'struct') {
-          data.fields.forEach(function (field) {
-            completions.push({value: field.name, meta: 'struct', type: 'column'})
-          });
-        } else if (data.type === 'map' && (data.value && data.value.fields)) {
-          data.value.fields.forEach(function (field) {
-            if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+    var callback = function (data) {
+      if (data.extended_columns) {
+        data.extended_columns.forEach(function (column) {
+          if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
+            completions.push({value: column.name + '[]', meta: 'map', type: 'column'})
+          } else if (column.type.indexOf('map') === 0) {
+            completions.push({value: column.name, meta: 'map', type: 'column'})
+          } else if (column.type.indexOf('struct') === 0) {
+            completions.push({value: column.name, meta: 'struct', type: 'column'})
+          } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
+            completions.push({value: column.name + '[]', meta: 'array', type: 'column'})
+          } else if (column.type.indexOf('array') === 0) {
+            completions.push({value: column.name, meta: 'array', type: 'column'})
+          } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
+              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+            completions.push({value: column.name, meta: column.type, type: 'column'})
+          }
+        });
+      } else if (data.columns) {
+        data.columns.forEach(function (column) {
+          completions.push({value: column, meta: 'column', type: 'column'})
+        });
+      }
+      if (data.type === 'map' && self.snippet.type() === 'impala') {
+        completions.push({value: 'key', meta: 'key', type: 'column'});
+        completions.push({value: 'value', meta: 'value', type: 'column'});
+      }
+      if (data.type === 'struct') {
+        data.fields.forEach(function (field) {
+          completions.push({value: field.name, meta: 'struct', type: 'column'})
+        });
+      } else if (data.type === 'map' && (data.value && data.value.fields)) {
+        data.value.fields.forEach(function (field) {
+          if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+            completions.push({value: field.name, meta: field.type, type: 'column'});
+          }
+        });
+      } else if (data.type === 'array' && (data.item && data.item.fields)) {
+        data.item.fields.forEach(function (field) {
+          if ((field.type === 'array' || field.type === 'map')) {
+            if (self.snippet.type() === 'hive') {
+              completions.push({value: field.name + '[]', meta: field.type, type: 'column'});
+            } else {
               completions.push({value: field.name, meta: field.type, type: 'column'});
             }
-          });
-        } else if (data.type === 'array' && (data.item && data.item.fields)) {
-          data.item.fields.forEach(function (field) {
-            if ((field.type === 'array' || field.type === 'map')) {
-              if (self.snippet.type() === 'hive') {
-                completions.push({value: field.name + '[]', meta: field.type, type: 'column'});
-              } else {
-                completions.push({value: field.name, meta: field.type, type: 'column'});
-              }
-            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              completions.push({value: field.name, meta: field.type, type: 'column'});
-            }
-          });
-        }
-        addColumnsDeferred.resolve();
-      },
-      silenceErrors: true,
-      errorCallback: addColumnsDeferred.resolve
-    });
+          } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+            completions.push({value: field.name, meta: field.type, type: 'column'});
+          }
+        });
+      }
+      addColumnsDeferred.resolve();
+    };
+
+    self.fetchFieldsForIdentifiers(editor, parseResult.suggestColumns.table, parseResult.suggestColumns.database || database, parseResult.suggestColumns.identifierChain, callback, addColumnsDeferred.resolve);
 
     return addColumnsDeferred;
   };

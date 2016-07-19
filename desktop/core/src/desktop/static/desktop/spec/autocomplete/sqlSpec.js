@@ -199,9 +199,9 @@ define([
 
       it('should expand 3', function () {
         var tablePrimaries = [{ identifierChain: [{ name: 'testTable' }] }];
-        var identifierChain = [{ name: 'testMap', key: 'anyKey' }];
+        var identifierChain = [{ name: 'testMap', keySet: true }];
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(result).toEqual([{ name: 'testMap', key: 'anyKey' }]);
+        expect(result).toEqual([{ name: 'testMap', keySet: true }]);
       });
 
       it('should expand 4', function () {
@@ -341,11 +341,11 @@ define([
           { alias: 'm', identifierChain: [{ name: 't' }, { name: 'someMap' }] }
         ];
 
-        var identifierChain = [{ name: 'm', key: 'foo' }, { name: 'bar' }];
+        var identifierChain = [{ name: 'm', keySet: true }, { name: 'bar' }];
 
         var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
-        expect(actual).toEqual([{ name: 't' }, { name: 'someMap', key: 'foo' }, { name: 'bar' }]);
+        expect(actual).toEqual([{ name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' }]);
       });
 
       it('should expand without map reference', function () {

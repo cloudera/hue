@@ -1773,22 +1773,6 @@ define([
         });
       });
 
-      it('should suggest columns for "SELECT testMap[\"anyKey\"].| FROM testTable"', function() {
-        assertAutoComplete({
-          beforeCursor: 'SELECT testMap[\"anyKey\"].',
-          afterCursor: ' FROM testTable',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns : {
-              table: 'testTable',
-              identifierChain: [{ name: 'testMap', key: '\"anyKey\"' }]
-            },
-            suggestKeywords: ['*']
-          }
-        });
-      });
-
       it('should suggest columns for "SELECT testMap[].| FROM testTable"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testMap[].',
@@ -1798,7 +1782,58 @@ define([
             lowerCase: false,
             suggestColumns : {
               table: 'testTable',
-              identifierChain: [{ name: 'testMap', key: null }]
+              identifierChain: [{ name: 'testMap', keySet: true }]
+            },
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest values for "SELECT testMap[|] FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testMap[',
+          afterCursor: '] FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { }, // TODO: types: ['COLREF_KEY']
+            suggestColumns : {
+              table: 'testTable'
+            },
+            suggestKeyValues: {
+              identifierChain: [{ name: 'testMap' }],
+              table: 'testTable'
+            }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT testMap[\'anyKey\'].| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testMap[\'anyKey\'].',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns : {
+              table: 'testTable',
+              identifierChain: [{ name: 'testMap', keySet: true }]
+            },
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT testMap[substr(\'bla\', 1)].| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testMap[substr(\'bla\', 1)].',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns : {
+              table: 'testTable',
+              identifierChain: [{ name: 'testMap', keySet: true }]
             },
             suggestKeywords: ['*']
           }
@@ -1814,7 +1849,7 @@ define([
             lowerCase: false,
             suggestColumns : {
               table: 'testTable',
-              identifierChain: [{ name: 'testMap', key: '\"anyKey\"' }, { name: 'fieldC' }]
+              identifierChain: [{ name: 'testMap', keySet: true }, { name: 'fieldC' }]
             },
             suggestKeywords: ['*']
           }
@@ -1830,30 +1865,30 @@ define([
             lowerCase: false,
             suggestColumns : {
               table: 'testTable',
-              identifierChain: [{ name: 'testArray', key: 1 }, { name: 'fieldC' }]
+              identifierChain: [{ name: 'testArray', keySet: true }, { name: 'fieldC' }]
             },
             suggestKeywords: ['*']
           }
         });
       });
 
-      it('should suggest columns for "SELECT testArray[1].testMap[\"key\"].| FROM testTable"', function() {
+      it('should suggest columns for "SELECT testFoo[1].testBar[\"key\"].| FROM testTable"', function() {
         assertAutoComplete({
-          beforeCursor: 'SELECT testArray[1].testMap[\"key\"].',
+          beforeCursor: 'SELECT testFoo[1].testBar[\"key\"].',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
               table: 'testTable',
-              identifierChain: [{ name: 'testArray', key: 1 }, { name: 'testMap', key: '\"key\"' }]
+              identifierChain: [{ name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }]
             },
             suggestKeywords: ['*']
           }
         });
       });
 
-      it('should suggest identifiers for "SELECT * FROM testTable WHERE testMap[].|"', function() {
+      it('should suggest columns for "SELECT * FROM testTable WHERE testMap[].|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE testMap[].',
           afterCursor: '',
@@ -1862,7 +1897,7 @@ define([
             lowerCase: false,
             suggestColumns : {
               table: 'testTable',
-              identifierChain: [{ name: 'testMap', key: null }]
+              identifierChain: [{ name: 'testMap', keySet: true }]
             }
           }
         });
@@ -2175,7 +2210,7 @@ define([
             lowerCase: false,
             suggestColumns: {
               table: 'testTable',
-              identifierChain: [{ name: 'testMap',  key: '\"anyKey\"' }]
+              identifierChain: [{ name: 'testMap',  keySet: true }]
             },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }

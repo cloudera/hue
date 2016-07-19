@@ -68,8 +68,8 @@
 <hive>'USER'                        { return '<hive>USER'; }
 
 <hive>[.]                           { return '<hive>.'; }
-<hive>\[                            { return '<hive>['; }
-<hive>\]                            { return '<hive>]'; }
+<hive>'['                           { return '<hive>['; }
+<hive>']'                           { return '<hive>]'; }
 
 <impala>'AGGREGATE'                 { return '<impala>AGGREGATE'; }
 <impala>'ANALYTIC'                  { return '<impala>ANALYTIC'; }
@@ -109,8 +109,8 @@
 <impala>\[BROADCAST\]               { return '<impala>BROADCAST'; }
 
 <impala>[.]                         { return '<impala>.'; }
-<impala>\[                          { return '<impala>['; }
-<impala>\]                          { return '<impala>]'; }
+<impala>'['                          { return '<impala>['; }
+<impala>']'                          { return '<impala>]'; }
 
 <between>'AND'                      { this.popState(); return 'BETWEEN_AND'; }
 
@@ -737,6 +737,64 @@ LocalOrSchemaQualifiedName_EDIT
  | RegularOrBackTickedSchemaQualifiedName_EDIT RegularOrBacktickedIdentifier
  ;
 
+ColumnReferenceList
+ : ColumnReference
+ | ColumnReferenceList ',' ColumnReference
+ ;
+
+ColumnReference
+ : BasicIdentifierChain
+ | BasicIdentifierChain AnyDot '*'
+ ;
+
+ColumnReference_EDIT
+ : BasicIdentifierChain_EDIT
+ ;
+
+BasicIdentifierChain
+ : ColumnIdentifier                              -> [ $1 ]
+ | BasicIdentifierChain AnyDot ColumnIdentifier
+   {
+     $1.push($3);
+   }
+ ;
+
+// TODO: Merge with DerivedColumnChain_EDIT ( issue is starting with PartialBacktickedOrPartialCursor)
+BasicIdentifierChain_EDIT
+ : ColumnIdentifier_EDIT
+   {
+     if ($1.insideKey) {
+       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | BasicIdentifierChain AnyDot ColumnIdentifier_EDIT
+   {
+     if ($3.insideKey) {
+       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | BasicIdentifierChain AnyDot ColumnIdentifier_EDIT AnyDot BasicIdentifierChain
+ | ColumnIdentifier_EDIT AnyDot BasicIdentifierChain
+ | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor
+   {
+     suggestColumns({
+       identifierChain: $1
+     });
+     $$ = { suggestKeywords: ['*'] };
+   }
+ | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor AnyDot BasicIdentifierChain
+   {
+     suggestColumns({
+       identifierChain: $1
+     });
+     $$ = { suggestKeywords: ['*'] };
+   }
+ ;
+
 DerivedColumnChain
  : ColumnIdentifier  -> [ $1 ]
  | DerivedColumnChain AnyDot ColumnIdentifier
@@ -746,19 +804,61 @@ DerivedColumnChain
  ;
 
 DerivedColumnChain_EDIT
- : DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor  -> { identifierChain: $1 }
- ;
-
-PartialBacktickedIdentifierOrPartialCursor
- : PartialBacktickedIdentifier
- | 'PARTIAL_CURSOR'
+ : ColumnIdentifier_EDIT
+   {
+     if ($1.insideKey) {
+       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | DerivedColumnChain AnyDot ColumnIdentifier_EDIT
+   {
+     if ($3.insideKey) {
+       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | DerivedColumnChain AnyDot ColumnIdentifier_EDIT AnyDot DerivedColumnChain
+   {
+     if ($3.insideKey) {
+       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | ColumnIdentifier_EDIT AnyDot DerivedColumnChain
+   {
+     if ($1.insideKey) {
+       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       suggestColumns();
+       suggestFunctions();
+     }
+   }
+ | PartialBacktickedIdentifierOrPartialCursor
+   {
+     suggestColumns();
+   }
+ | DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor
+   {
+     suggestColumns({ identifierChain: $1 });
+   }
+ | DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor AnyDot DerivedColumnChain
+   {
+     suggestColumns({ identifierChain: $1 });
+   }
+ | PartialBacktickedIdentifierOrPartialCursor AnyDot DerivedColumnChain
+   {
+     suggestColumns();
+   }
  ;
 
 ColumnIdentifier
  : RegularOrBacktickedIdentifier OptionalMapOrArrayKey
    {
      if ($2) {
-       $$ = { name: $1, key: $2.key };
+       $$ = { name: $1, keySet: true };
      } else {
        $$ = { name: $1 };
      }
@@ -766,14 +866,30 @@ ColumnIdentifier
  ;
 
 ColumnIdentifier_EDIT
- : PartialBacktickedOrCursor OptionalMapOrArrayKey
+ : RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket AnyCursor HiveOrImpalaRightSquareBracketOrError
+   {
+     $$ = { name: $1, insideKey: true }
+   }
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression_EDIT HiveOrImpalaRightSquareBracketOrError
+   {
+     $$ = { name: $1 }
+   }
+ ;
+
+PartialBacktickedIdentifierOrPartialCursor
+ : PartialBacktickedIdentifier
+ | 'PARTIAL_CURSOR'
  ;
 
 OptionalMapOrArrayKey
  :
- | HiveOrImpalaLeftSquareBracket DoubleQuotedValue HiveOrImpalaRightSquareBracket   -> { key: '"' + $2 + '"' }
- | HiveOrImpalaLeftSquareBracket 'UNSIGNED_INTEGER' HiveOrImpalaRightSquareBracket  -> { key: parseInt($2) }
- | HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket                     -> { key: null }
+ | HiveOrImpalaLeftSquareBracket ValueExpression HiveOrImpalaRightSquareBracket
+ | HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket
+ ;
+
+HiveOrImpalaRightSquareBracketOrError
+ : HiveOrImpalaRightSquareBracket
+ | error
  ;
 
 // TODO: Support | DECIMAL(precision, scale)  -- (Note: Available in Hive 0.13.0 and later)
@@ -1047,7 +1163,6 @@ HiveDescribeStatement_EDIT
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT
    {
      addTablePrimary($3);
-     suggestColumns($4);
    }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR'
    {
@@ -2319,6 +2434,7 @@ ApproximateNumericLiteral
 
 GeneralLiteral
  : SingleQuotedValue  -> { types: [ 'STRING' ] }
+ | DoubleQuotedValue  -> { types: [ 'STRING' ] }
  | TruthValue         -> { types: [ 'BOOLEAN' ] }
  ;
 
@@ -2330,52 +2446,6 @@ TruthValue
 OptionalNot
  :
  | 'NOT'
- ;
-
-ColumnReferenceList
- : ColumnReference
- | ColumnReferenceList ',' ColumnReference
- ;
-
-ColumnReference
- : BasicIdentifierChain
- | BasicIdentifierChain AnyDot '*'
- ;
-
-ColumnReference_EDIT
- : BasicIdentifierChain_EDIT
- ;
-
-BasicIdentifierChain
- : Identifier                              -> [ $1 ]
- | BasicIdentifierChain AnyDot Identifier
-   {
-     $1.push($3);
-   }
- ;
-
-BasicIdentifierChain_EDIT
- : Identifier_EDIT
- | BasicIdentifierChain AnyDot Identifier_EDIT
- | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor
-   {
-     suggestColumns({
-       identifierChain: $1
-     });
-     $$ = { suggestKeywords: ['*'] };
-   }
- ;
-
-Identifier
- : ColumnIdentifier
- | DoubleQuotedValue  -> { name: $1 }
- ;
-
-Identifier_EDIT
- : ColumnIdentifier 'PARTIAL_CURSOR'
-   {
-     suggestColumns();
-   }
  ;
 
 SelectSubList
@@ -2901,10 +2971,6 @@ UserDefinedTableGeneratingFunction_EDIT
  : '<hive>EXPLODE(' DerivedColumnChain_EDIT error
    {
      suggestColumns($2);
-   }
- | '<hive>EXPLODE(' PartialBacktickedOrPartialCursor error
-   {
-     suggestColumns();
    }
  | '<hive>POSEXPLODE(' PartialBacktickedOrPartialCursor error
    {
@@ -4047,6 +4113,7 @@ var applyArgumentTypesToSuggestions = function (funcToken, position) {
   var foundArguments = parser.yy.sqlFunctions.getArgumentTypes(parser.yy.activeDialect, funcName, position);
   if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
     delete parser.yy.result.suggestColumns;
+    delete parser.yy.result.suggestKeyValues;
     delete parser.yy.result.suggestValues;
     delete parser.yy.result.suggestFunctions;
     delete parser.yy.result.suggestIdentifiers;
@@ -4115,11 +4182,11 @@ var prioritizeSuggestions = function () {
  *
  * with an identifierChain from the select list:
  *
- * [ { name: 'm', key: 'foo' }, { name: 'bar' } ]
+ * [ { name: 'm', keySet: true }, { name: 'bar' } ]
  *
  * Calling this would return an expanded identifierChain, given the above it would be:
  *
- * [ { name: 't' }, { name: 'someMap', key: 'foo' }, { name: 'bar' } ]
+ * [ { name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' } ]
  */
 parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) {
   if (typeof identifierChain === 'undefined' || identifierChain.length === 0) {
@@ -4134,11 +4201,11 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
   if (foundPrimary.length === 1) {
     var firstPart = foundPrimary[0].identifierChain.concat();
     var secondPart = identifierChain.slice(1);
-    if (typeof identifierChain[0].key !== 'undefined') {
+    if (typeof identifierChain[0].keySet !== 'undefined') {
       var lastFromFirst = firstPart.pop();
       firstPart.push({
         name: lastFromFirst.name,
-        key: identifierChain[0].key
+        keySet: identifierChain[0].keySet
       });
     }
     return firstPart.concat(secondPart);
@@ -4316,6 +4383,9 @@ var linkTablePrimaries = function () {
    if (typeof parser.yy.result.colRef !== 'undefined') {
      linkSuggestion(parser.yy.result.colRef, false);
    }
+   if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
+     linkSuggestion(parser.yy.result.suggestKeyValues, true);
+   }
 }
 
 var addTablePrimary = function (ref) {
@@ -4393,6 +4463,10 @@ var suggestColumns = function (details) {
     details.identifierChain = [];
   }
   parser.yy.result.suggestColumns = details;
+}
+
+var suggestKeyValues = function (details) {
+  parser.yy.result.suggestKeyValues = details || {};
 }
 
 var suggestTables = function (details) {
