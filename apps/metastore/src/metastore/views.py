@@ -31,7 +31,7 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 
-from metadata.conf import has_optimizer, get_optimizer_url, get_navigator_url
+from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
@@ -183,6 +183,7 @@ def show_tables(request, database=None):
     'partitions': [],
     'has_write_access': has_write_access(request.user),
     'is_optimizer_enabled': has_optimizer(),
+    'is_navigator_enabled': has_navigator(),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
     })
@@ -257,6 +258,7 @@ def describe_table(request, database, table):
       'database': database,
       'has_write_access': has_write_access(request.user),
       'is_optimizer_enabled': has_optimizer(),
+      'is_navigator_enabled': has_navigator(),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
     })
@@ -445,6 +447,7 @@ def describe_partitions(request, database, table):
         'request': request,
         'has_write_access': has_write_access(request.user),
         'is_optimizer_enabled': has_optimizer(),
+        'is_navigator_enabled': has_navigator(),
     })
 
 

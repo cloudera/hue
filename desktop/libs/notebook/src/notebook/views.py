@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
-from metadata.conf import has_optimizer
+from metadata.conf import has_optimizer, has_navigator
 
 from notebook.conf import get_interpreters
 from notebook.connectors.base import Notebook, get_api
@@ -78,6 +78,7 @@ def notebook(request):
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
+          'is_navigator_enabled': has_navigator(),
           'editor_type': 'notebook'
       }),
       'is_yarn_mode': is_yarn_mode,
@@ -100,6 +101,7 @@ def editor(request):
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
           'is_optimizer_enabled': has_optimizer(),
+          'is_navigator_enabled': has_navigator(),
           'editor_type': editor_type
       })
   })

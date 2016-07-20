@@ -1852,6 +1852,7 @@
     self.isFullscreenMode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url);
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
+    self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
     self.canSave = ko.computed(function() {
       // Saved query or history but history coming from a saved query
       return self.selectedNotebook() && self.selectedNotebook().canWrite() && (

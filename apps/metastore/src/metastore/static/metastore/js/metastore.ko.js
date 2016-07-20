@@ -118,7 +118,7 @@
     };
   }
 
-  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled) {
+  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
     var self = this;
     if (self.loading()) {
       return;
@@ -137,12 +137,13 @@
             comment: tableMeta.comment,
             apiHelper: self.apiHelper,
             i18n: self.i18n,
-            optimizerEnabled: optimizerEnabled
+            optimizerEnabled: optimizerEnabled,
+            navigatorEnabled: navigatorEnabled
           })
         }));
         self.loaded(true);
         self.loading(false);
-        if (optimizerEnabled) {
+        if (optimizerEnabled && navigatorEnabled) {
           $.get('/metadata/api/navigator/find_entity', {
             type: 'database',
             name: self.name
@@ -343,6 +344,7 @@
     self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
     self.optimizerEnabled = options.optimizerEnabled;
+    self.navigatorEnabled = options.navigatorEnabled;
     self.name = options.name;
     self.type = options.type;
 
@@ -469,7 +471,7 @@
               self.partitions.loading(false);
               self.partitions.loaded(true);
             }
-            if (self.optimizerEnabled) {
+            if (self.navigatorEnabled) {
               $.get('/metadata/api/navigator/find_entity', {
                 type: 'table',
                 database: self.database.name,
@@ -484,7 +486,7 @@
               }).fail(function (xhr, textStatus, errorThrown) {
                 $(document).trigger("error", xhr.responseText);
               });
-
+            } else if (self.optimizerEnabled) {
               $.post('/metadata/api/optimizer_api/table_details', {
                 tableName: self.name
               }, function(data){
@@ -646,9 +648,10 @@
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
+    self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
 
-    self.optimizerEnabled.subscribe(function (newValue) {
-      huePubSub.publish('meta.optimizer.enabled', newValue);
+    self.navigatorEnabled.subscribe(function (newValue) {
+      huePubSub.publish('meta.navigator.enabled', newValue);
     });
 
     self.optimizerUrl = ko.observable(options.optimizerUrl);
@@ -695,7 +698,8 @@
               name: name,
               apiHelper: self.apiHelper,
               i18n: self.i18n,
-              optimizerEnabled: self.optimizerEnabled
+              optimizerEnabled: self.optimizerEnabled,
+              navigatorEnabled: self.navigatorEnabled
             })
           }));
           self.loading(false);
@@ -748,7 +752,7 @@
               clearAll: false,
               databaseName: self.database().name
             });
-            self.database().load(setTableAfterLoad, self.optimizerEnabled());
+            self.database().load(setTableAfterLoad, self.optimizerEnabled(), self.navigatorEnabled());
           }
         };
 
@@ -873,7 +877,7 @@
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback, self.optimizerEnabled());
+      metastoreDatabase.load(callback, self.optimizerEnabled(), self.navigatorEnabled());
     } else if (callback) {
       callback();
     }

@@ -2792,7 +2792,7 @@ ${ hueIcons.symbols() }
 
     window.redrawFixedHeaders = redrawFixedHeaders;
 
-    function addAce (content, snippetType) {
+    function addAce(content, snippetType) {
       var snip = viewModel.selectedNotebook().addSnippet({type: snippetType, result: {}}, true);
       snip.statement_raw(content);
       aceChecks++;

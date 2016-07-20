@@ -402,7 +402,7 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
-      <!-- ko if: $root.optimizerEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->
+      <!-- ko if: $root.navigatorEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->
         <!-- ko template: { name: 'metastore-databases-tags', data: $root.database() }--><!-- /ko -->
       <!-- /ko -->
       </div>
@@ -624,7 +624,7 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    <!-- ko if: $root.optimizerEnabled() && navigatorStats() -->
+    <!-- ko if: $root.navigatorEnabled() && navigatorStats() -->
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
@@ -1238,6 +1238,7 @@ ${ assist.assistPanel() }
           errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
         },
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
+        navigatorEnabled: '${ is_navigator_enabled }' === 'True',
         optimizerUrl: '${ optimizer_url }',
         navigatorUrl: '${ navigator_url }'
       };
@@ -1303,7 +1304,6 @@ ${ assist.assistPanel() }
       });
 
       ko.applyBindings(viewModel);
-      viewModel.optimizerEnabled(false);
 
       if (location.getParameter('refresh') === 'true') {
         huePubSub.publish('assist.db.refresh', 'hive');
