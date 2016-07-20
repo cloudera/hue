@@ -398,7 +398,7 @@
               clickHandlerFunction.apply(viewModel, clickArgs);
               dblClickTimeout = window.setTimeout(function() {
                 clickedOnce = false;
-              }, 275);
+              }, 100);
             }, 225);
           }
         }
