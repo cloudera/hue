@@ -89,11 +89,14 @@ from desktop.views import _ko
         <!-- /ko -->
         <i data-bind="visible: loadingStats" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
-        <strong class="table-name" data-bind="text: table"></strong> ${ _(' table') }
+        <i class="pull-left fa fa-table muted" style="margin-top: 3px"></i>
+        <div class="pull-left stats-popover-name"><strong class="table-name" data-bind="text: table, attr: {title: table}"></strong></div>
         <!-- /ko -->
         <!-- ko ifnot: column == null -->
-        <strong class="table-name" data-bind="text: column"></strong> ${ _(' column') }
+        <i class="pull-left fa fa-column muted" style="margin-top: 3px"></i>
+        <div class="inline-block stats-popover-name"><strong class="table-name" data-bind="text: column, attr: {title: column}"></strong></div>
         <!-- /ko -->
+        <div class="clearfix"></div>
       </h3>
       <div class="popover-content">
         <ul class="nav nav-tabs">
