@@ -20,8 +20,10 @@ import logging
 import os
 
 from django.utils.translation import ugettext_lazy as _t
+
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 from desktop.conf import default_ssl_validate
+
 
 LOG = logging.getLogger(__name__)
 DEFAULT_NN_HTTP_PORT = 50070
@@ -42,6 +44,7 @@ def find_file_recursive(desired_glob, root):
 
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
   return f
+
 
 
 UPLOAD_CHUNK_SIZE = Config(

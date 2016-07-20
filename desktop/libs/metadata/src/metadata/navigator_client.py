@@ -32,10 +32,6 @@ LOG = logging.getLogger(__name__)
 VERSION = 'v3'
 
 
-def is_navigator_enabled():
-  return NAVIGATOR.API_URL.get()
-
-
 def get_filesystem_host():
   host = None
   hadoop_fs = HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()

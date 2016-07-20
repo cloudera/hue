@@ -32,6 +32,7 @@ LOG = logging.getLogger(__name__)
 
 
 FS_CACHE = None
+FS_DEFAULT_NAME = 'default'
 MR_CACHE = None
 MR_NAME_CACHE = 'default'
 DEFAULT_USER = DEFAULT_USER.get()
@@ -134,6 +135,13 @@ def get_default_yarncluster():
     return conf.YARN_CLUSTERS[MR_NAME_CACHE]
   except KeyError:
     return get_yarn()
+
+
+def get_default_fscluster_config():
+  """
+  Get the default FS config.
+  """
+  return conf.HDFS_CLUSTERS[FS_DEFAULT_NAME]
 
 
 def get_next_ha_mrcluster():
