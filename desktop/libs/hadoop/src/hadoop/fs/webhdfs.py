@@ -579,6 +579,10 @@ class WebHdfs(Hdfs):
 
     while True:
       data = self.read(src, offset, UPLOAD_CHUNK_SIZE.get())
+
+      if skip_header:
+        data = '\n'.join(data.splitlines())
+
       cnt = len(data)
 
       if offset == 0:
