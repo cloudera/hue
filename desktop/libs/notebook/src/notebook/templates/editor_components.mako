@@ -2297,6 +2297,16 @@ ${ hueIcons.symbols() }
     }
 
     scrollElement.on('scroll', function () {
+      if (vm.editorMode()) {
+        if (snippet.isResultSettingsVisible()) {
+          var snippetEl = $("#snippet_" + snippet.id());
+          var topCoord = vm.isPlayerMode() ? 1 : 73;
+          if ($("#snippet_" + snippet.id()).find(".dataTables_wrapper").offset().top < topCoord) {
+            var margin = (snippetEl.find(".dataTables_wrapper").offset().top - topCoord) * -1;
+            snippetEl.find('.result-settings').css('marginTop', margin);
+          }
+        }
+      }
       if (!vm.editorMode() || (vm.editorMode() && snippet.currentQueryTab() === 'queryResults')) {
         var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
         window.clearTimeout(_scrollTimeout);
