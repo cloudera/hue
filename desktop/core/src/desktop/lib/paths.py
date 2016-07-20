@@ -85,3 +85,13 @@ def get_run_root(*append):
   Returns the run time root directory
   """
   return __get_root(*append)
+
+
+def get_config_root(*append):
+  """
+  Currently gets it based on the Hadoop configuration location.
+  """
+  from hadoop.cluster import get_default_fscluster_config
+
+  yarn_site_path = get_default_fscluster_config().HADOOP_CONF_DIR.get()
+  return os.path.abspath(os.path.join(yarn_site_path, '..', *append))

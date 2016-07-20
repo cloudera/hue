@@ -25,7 +25,8 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
-from metadata.navigator_client import NavigatorApi, is_navigator_enabled
+from metadata.conf import has_navigator
+from metadata.navigator_client import NavigatorApi
 
 LOG = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class MetadataApiException(Exception):
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
-      if is_navigator_enabled():
+      if has_navigator():
         return view_fn(*args, **kwargs)
       else:
         raise MetadataApiException('Navigator API is not configured.')
