@@ -21,9 +21,6 @@ from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD a
                          AUTH_PASSWORD_SCRIPT, default_ssl_validate
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root
-from hadoop.cluster import get_default_yarncluster
-
-
 
 
 def get_auth_username():
