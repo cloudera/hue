@@ -448,7 +448,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="key-value-list-input-template">
-    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li style="clear:both;">
         <!-- ko if: $parent.options.length > 0 -->
         <div class="selectize-wrapper" style="min-width: 200px;">
@@ -528,7 +528,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="name-value-list-input-template">
-    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li style="clear:both;">
         <!-- ko if: $parent.options.length > 0 -->
         <div class="selectize-wrapper" style="min-width: 200px;">
@@ -608,7 +608,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="function-list-input-template">
-    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
           <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
@@ -670,7 +670,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hdfs-file-list-input-template">
-    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
           <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
@@ -754,7 +754,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="csv-list-input-template">
-    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li style="margin-bottom: 4px">
         <div class="input-append">
           <!-- ko ifnot: $parent.inputTemplate -->
