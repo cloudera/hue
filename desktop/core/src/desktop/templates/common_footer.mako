@@ -215,28 +215,27 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     %if collect_usage:
 
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-40351920-1']);
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-40351920-1', 'auto');
 
       // We collect only 2 path levels: not hostname, no IDs, no anchors...
       var _pathName = location.pathname;
       var _splits = _pathName.substr(1).split("/");
       _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
-      _gaq.push(['_trackPageview', '/remote/${ version }/' + _pathName]);
-
-      (function () {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ga, s);
-      })();
+      ga('send', 'pageview', {
+        'page': '/remote/${ version }/' + _pathName
+      });
 
       function trackOnGA(path) {
-        if (typeof _gaq != "undefined" && _gaq != null) {
-          _gaq.push(['_trackPageview', '/remote/${ version }/' + path]);
+        if (typeof ga != "undefined" && ga != null) {
+          ga('send', 'pageview', {
+            'page': '/remote/${ version }/' + path
+          });
         }
       }
 
