@@ -45,7 +45,7 @@ def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 def has_navigator():
-  return bool(get_navigator_url())
+  return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get())
 
 
 OPTIMIZER = ConfigSection(
