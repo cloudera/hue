@@ -85,7 +85,7 @@
     self.options = $.extend({}, defaults, options);
 
     var initialPath = $.trim(self.options.initialPath);
-    if (initialPath && initialPath.toLowerCase().indexOf('s3') > -1 && self.options.filesystems.indexOf('s3') > -1) {
+    if (initialPath && initialPath.toLowerCase().indexOf('s3') > -1 && $(self.element).data('fs').indexOf('s3') > -1) {
       self.options.fsSelected = 's3';
     }
 
@@ -119,6 +119,7 @@
       }
     });
     self.options.filesystems.sort();
+    $(self.element).data('fs', self.options.filesystems);
     if (self.options.filesystems.length > 1) {
       var $ul = $('<ul>').addClass('nav nav-list').css('border', 'none');
       self.options.filesystems.forEach(function (fs) {
@@ -350,7 +351,7 @@
         $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
         _parent.options.onError();
       }
-      if (e.status === 404) {
+      if (e.status === 404 || e.status === 500) {
         _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3' ? 'S3://' : '/?default_to_home'));
       }
       else {
@@ -401,7 +402,7 @@
     $.post('/filebrowser/api/get_filesystems', function (data) {
       var initialPath = $.trim(self.options.initialPath);
       if (data && data.status == 0) {
-        if (initialPath && initialPath.toLowerCase().indexOf('s3') > -1 && self.options.filesystems.indexOf('s3') > -1) {
+        if (initialPath && initialPath.toLowerCase().indexOf('s3') > -1 && data.filesystems['s3']) {
           self.options.fsSelected = 's3';
         }
         self.setFileSystems(data.filesystems);
