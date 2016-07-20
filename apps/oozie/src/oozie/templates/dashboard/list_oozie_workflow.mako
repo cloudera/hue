@@ -64,21 +64,19 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           </li>
 
           <li class="nav-header">${ _('Id') }</li>
-          <li class="white">${  oozie_workflow.id }</li>
+          <li class="white">${ oozie_workflow.id }</li>
 
-          % if parameters and len(parameters) < 10:
-              <li class="nav-header">${ _('Variables') }</li>
-              % for var, value in parameters.iteritems():
-                % if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path':
-                  % if utils.is_linkable(var, str(value)):
+          % if parameters and len(parameters) <= 15:
+            <li class="nav-header">${ _('Variables') }</li>
+            % for var, value in parameters.iteritems():
+                % if utils.is_linkable(var, str(value)):
                   <li rel="tooltip" title="${ var } : ${ str(value) }">
                     <a href="${ utils.hdfs_link_js(str(value)) }"><i class="fa fa-eye"></i> <span class="variable hide">${ var }</span></a>
-                  % else:
+                % else:
                   <li rel="tooltip" title="${ var } : ${ str(value) }" class="white">
                     <i class="fa fa-eye"></i> <span class="variable">${ var }</span>
-                  % endif
-                  </li>
                 % endif
+                  </li>
               % endfor
           % endif
 

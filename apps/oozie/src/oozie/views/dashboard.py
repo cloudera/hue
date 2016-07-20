@@ -392,7 +392,7 @@ def list_oozie_workflow(request, job_id):
     'oozie_slas': oozie_slas,
     'hue_workflow': hue_workflow,
     'hue_coord': hue_coord,
-    'parameters': parameters,
+    'parameters': dict((var, val) for var, val in parameters.iteritems() if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path'),
     'has_job_edition_permission': has_job_edition_permission,
     'workflow_graph': workflow_graph,
     'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML) if workflow_data else '',
