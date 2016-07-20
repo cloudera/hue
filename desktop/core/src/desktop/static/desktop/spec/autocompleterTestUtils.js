@@ -44,6 +44,19 @@ define([
             if (testDefinition.ignoreErrors) {
               delete actualResponse.error;
             }
+            if (testDefinition.hasLocations) {
+              if (actualResponse.locations.length === 0) {
+                return {
+                  pass: false,
+                  message: '\nStatement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                  '  Dialect: ' + testDefinition.dialect + '\n' +
+                  '           No locations found'
+                }
+              }
+            }
+            if (testDefinition.hasLocations || actualResponse.locations.length === 0) {
+              delete actualResponse.locations;
+            }
             var deleteKeywords = false;
             if (testDefinition.containsColRefKeywords) {
               if (typeof actualResponse.suggestColRefKeywords == 'undefined') {
@@ -117,8 +130,10 @@ define([
       var debug = false;
       if (typeof testDefinition.dialect === 'undefined') {
         expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'hive', sqlFunctions, debug)).toEqualDefinition(testDefinition);
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, 'impala', sqlFunctions, debug)).toEqualDefinition(testDefinition);
+        testDefinition.dialect = 'hive';
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
+        testDefinition.dialect = 'impala';
+        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
       } else {
         expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
       }

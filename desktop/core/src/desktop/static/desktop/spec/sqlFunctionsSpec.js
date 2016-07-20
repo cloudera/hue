@@ -23,7 +23,6 @@ define([
 
       expect(completions.length).not.toEqual(0);
 
-      console.log(completions);
       var completionsWithCorrectType = completions.filter(function (completion) {
         return completion.meta === 'BOOLEAN' || completion.meta === 'T' || completion.meta === 'ARRAY' || completion.meta === 'MAP' || completion.meta === 'STRUCT';
       });
@@ -118,7 +117,6 @@ define([
     });
 
     it('should give the expected argument types at a specific position', function () {
-      console.log(sqlFunctions.getArgumentTypes('hive', 'cos', 1));
       expect(sqlFunctions.getArgumentTypes('hive', 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);
       expect(sqlFunctions.getArgumentTypes('hive', 'cos', 2)).toEqual([]);
       expect(sqlFunctions.getArgumentTypes('impala', 'cos', 1)).toEqual(['DOUBLE']);

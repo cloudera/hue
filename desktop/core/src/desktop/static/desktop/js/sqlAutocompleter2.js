@@ -190,6 +190,12 @@
       identifierChain = identifierChain.slice(1);
     }
 
+    // Parser sometimes knows if it's a map or array.
+    if (identifierChain.length > 0 && (identifierChain[0].name === 'item' || identifierChain[0].name === 'value')) {
+      fetchedFields.push(identifierChain[0].name);
+      identifierChain = identifierChain.slice(1);
+    }
+
     self.snippet.getApiHelper().fetchFields({
       sourceType: self.snippet.type(),
       databaseName: databaseName,

@@ -39,19 +39,26 @@ define([
           dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, table:'tbl' }
+            ]
           }
         });
       });
 
-      it('should handle "DESCRIBE tbl.col.field;|"', function() {
+      it('should handle "DESCRIBE tbl col.field;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, table:'tbl' },
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'col' }, { name: 'field'}], table:'tbl' }
+            ]
           }
         });
       });
@@ -63,7 +70,10 @@ define([
           dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 22 }, table:'tbl' }
+            ]
           }
         });
       });
@@ -73,6 +83,7 @@ define([
           beforeCursor: 'DESCRIBE EXTENDED tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -85,6 +96,7 @@ define([
           beforeCursor: 'DESCRIBE FORMATTED tbl;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -97,6 +109,7 @@ define([
           beforeCursor: 'DESCRIBE FORMATTED tbl col.field;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -133,6 +146,7 @@ define([
           beforeCursor: 'DESCRIBE DATABASE db;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -145,6 +159,7 @@ define([
           beforeCursor: 'DESCRIBE DATABASE EXTENDED db;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -157,6 +172,7 @@ define([
           beforeCursor: 'DESCRIBE SCHEMA db;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -169,6 +185,7 @@ define([
           beforeCursor: 'DESCRIBE SCHEMA EXTENDED db;',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -221,6 +238,7 @@ define([
           beforeCursor: 'DESCRIBE db.tbl ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -361,6 +379,7 @@ define([
           beforeCursor: 'DESCRIBE EXTENDED db.tbl ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -403,6 +422,7 @@ define([
           beforeCursor: 'DESCRIBE FORMATTED db.tbl ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -418,6 +438,7 @@ define([
           beforeCursor: 'DESCRIBE FORMATTED db.tbl col.',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -438,7 +459,10 @@ define([
           dialect: 'impala',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13}, table:'tbl' }
+            ]
           }
         });
       });
@@ -450,7 +474,10 @@ define([
           dialect: 'impala',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16}, database:'db', table:'tbl' }
+            ]
           }
         });
       });
@@ -460,6 +487,7 @@ define([
           beforeCursor: 'DESCRIBE FORMATTED db.tbl;',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false

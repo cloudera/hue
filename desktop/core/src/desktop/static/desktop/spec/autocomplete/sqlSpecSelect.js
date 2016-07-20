@@ -99,12 +99,14 @@ define([
         beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
         afterCursor: '',
         dialect: 'generic',
+        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
         }
       });
     });
+
     it('should suggest databases or tables for "SELECT * fr|"', function() {
       assertAutoComplete({
         beforeCursor: 'SELECT * fr',
@@ -203,6 +205,187 @@ define([
       });
     });
 
+    describe('Locations', function () {
+      it('should suggest locations for "SELECT   |    FROM    testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT   ',
+          afterCursor: '    FROM    testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 32}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT   a.|    FROM    testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT   a.',
+          afterCursor: '    FROM    testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { identifierChain: [{ name: 'a' }], table: 'testTableA' },
+            suggestKeywords: ['*'],
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 34}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT aaa| FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT aaa',
+          afterCursor: ' FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 27}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT aaa| \\nFROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT aaa',
+          afterCursor: ' \nFROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'table', location: { first_line: 2, last_line: 2, first_column: 6, last_column: 16}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT |bbbb FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: 'bbbb FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 28}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT a.aaaaa|bbbb FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT aaaaa',
+          afterCursor: 'bbbb FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 23, last_column: 33}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT foo.aaaaa|bbbb FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT foo.aaaaa',
+          afterCursor: 'bbbb FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { identifierChain: [{ name: 'foo' }], table: 'testTableA' },
+            suggestKeywords: ['*'],
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 27, last_column: 37}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT b, foo.aaaaa|bbbb FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT b, foo.aaaaa',
+          afterCursor: 'bbbb FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { identifierChain: [{ name: 'foo' }], table: 'testTableA' },
+            suggestKeywords: ['*'],
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9}, identifierChain: [{ name: 'b' }], table: 'testTableA'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 40}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT foo, aaaaa|bbbb FROM testTableA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT foo, aaaaa',
+          afterCursor: 'bbbb FROM testTableA',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'foo' }], table: 'testTableA'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 38}, table: 'testTableA'}
+            ]
+          }
+        });
+      });
+
+      it('should suggest locations for "SELECT testTableB.a, cos(1), tta.abcdefg|hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testTableB.a, cos(1), tta.abcdefg',
+          afterCursor: 'hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTableA' },
+            suggestKeywords: ['*'],
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 20}, identifierChain: [{ name: 'a'}], table: 'testTableB'},
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25}, function: 'cos'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 54}, identifierChain: [{ name: 'bla'}], table: 'testTableA'},
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 56, last_column: 59}, function: 'cos'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 68, last_column: 78}, table: 'testTableA'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 84, last_column: 94}, table: 'testTableB'}
+            ]
+          }
+        });
+      });
+    });
+
     describe('Complete Statements', function () {
       it('should handle "SELECT tta.* FROM testTableA tta, testTableB; |"', function() {
         assertAutoComplete({
@@ -210,7 +393,11 @@ define([
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 29}, table: 'testTableA'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 35, last_column: 45}, table: 'testTableB'}
+            ]
           }
         });
       });
@@ -221,7 +408,11 @@ define([
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'function', location:{ first_line: 1, last_line: 1, first_column: 8, last_column: 13}, function: 'count'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 31}, table: 'testTable'}
+            ]
           }
         });
       });
@@ -244,8 +435,35 @@ define([
           beforeCursor: 'SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; ',
           afterCursor: '',
           containsKeywords: ['SELECT'],
+          dialect: 'hive',
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35},identifierChain: [{ name: 'a'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42},identifierChain: [{ name: 'b'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45},identifierChain: [{ name: 'c'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53},identifierChain: [{ name: 'd'}], table:'testTable'}
+            ]
+          }
+        });
+      });
+
+      xit('should handle "SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35},identifierChain: { name: 'a'}, table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42},identifierChain: { name: 'b'}, table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45},identifierChain: { name: 'c'}, table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53},identifierChain: { name: 'd'}, table:'testTable'}
+            ]
           }
         });
       });
@@ -256,7 +474,11 @@ define([
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25 }, table: 'testTable1' },
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 35, last_column: 41 }, database: 'db1', table: 'table2'}
+            ]
           }
         });
       });
@@ -268,7 +490,15 @@ define([
           dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }, identifierChain: [{ name: 'foo' }], table: 'table1' },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 26 }, table: 'table1'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 }, table: 'table2'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 64, last_column: 70 }, table: 'table3'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 76, last_column: 82 }, table: 'table4'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 90, last_column: 95 }, identifierChain: [{ name: 'c1'}], table: 'table1'}
+            ]
           }
         });
       });
@@ -277,20 +507,46 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);',
           afterCursor: '',
+          dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, table: 'foo'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'bar'}], table: 'foo'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 }, table: 'bla'}
+            ]
           }
         });
       });
 
-      it('should handle "SELECT CASE a WHEN b THEN c WHEN d THEN e WHEN f THEN g ELSE h END FROM foo WHERE bar IN (SELECT * FROM bla);|"', function() {
+    it('should handle "SELECT CASE cos(boo.a) > baa.boo \\n' +
+        '\\tWHEN baa.b THEN true \\n' +
+        '\\tWHEN boo.c THEN false \\n' +
+        '\\tWHEN baa.blue THEN boo.d \\n' +
+        '\\tELSE baa.e END \\n' +
+        '\\t FROM db1.foo boo, bar baa WHERE baa.bla IN (SELECT ble FROM bla);|"', function() {
         assertAutoComplete({
-          beforeCursor: 'SELECT CASE a WHEN b THEN c WHEN d THEN e ELSE h END FROM foo WHERE bar IN (SELECT * FROM bla);',
+          beforeCursor: 'SELECT CASE cos(boo.a) > baa.boo \n\tWHEN baa.b THEN true \n\tWHEN boo.c THEN false \n\tWHEN baa.blue THEN boo.d \n\tELSE baa.e END \n\t FROM db1.foo boo, bar baa WHERE baa.bla IN (SELECT ble FROM bla);',
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              {type: 'function', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16 }, function: 'cos'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 22 }, identifierChain: [{ name: 'a'}], database: 'db1', table: 'foo'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 33 }, identifierChain: [{ name: 'boo'}], table: 'bar'},
+              {type: 'column', location: { first_line: 2, last_line: 2, first_column: 7, last_column: 12 }, identifierChain: [{ name: 'b'}], table: 'bar'},
+              {type: 'column', location: { first_line: 3, last_line: 3, first_column: 7, last_column: 12 }, identifierChain: [{ name: 'c'}], database: 'db1', table: 'foo'},
+              {type: 'column', location: { first_line: 4, last_line: 4, first_column: 7, last_column: 15 }, identifierChain: [{ name: 'blue'}], table: 'bar'},
+              {type: 'column', location: { first_line: 4, last_line: 4, first_column: 21, last_column: 26 }, identifierChain: [{ name: 'd'}], database: 'db1', table: 'foo'},
+              {type: 'column', location: { first_line: 5, last_line: 5, first_column: 7, last_column: 12 }, identifierChain: [{ name: 'e'}], table: 'bar'},
+              {type: 'table', location: { first_line: 6, last_line: 6, first_column: 12, last_column: 15 }, database: 'db1', table: 'foo'},
+              {type: 'table', location: { first_line: 6, last_line: 6, first_column: 21, last_column: 24 }, table: 'bar'},
+              {type: 'column', location: { first_line: 6, last_line: 6, first_column: 35, last_column: 42 }, identifierChain: [{ name: 'bla'}], table: 'bar'},
+              {type: 'column', location: { first_line: 6, last_line: 6, first_column: 54, last_column: 57 }, identifierChain: [{ name: 'ble'}], table: 'bla'},
+              {type: 'table', location: { first_line: 6, last_line: 6, first_column: 63, last_column: 66 }, table: 'bla'}
+            ]
           }
         });
       });
@@ -392,15 +648,24 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestFunctions: {},
-            suggestColumns: { table: 'tbl' }
+            suggestColumns: { table: 'tbl' },
+            locations: [
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 19 }, identifierChain:[{ name: 'a'}], table: 'tbl'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 22 }, identifierChain:[{ name: 'b'}], table: 'tbl'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 25 }, identifierChain:[{ name: 'c'}], table: 'tbl'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 34 }, table: 'tbl'}
+            ]
           }
         });
       });
+
+
 
       it('should suggest tables for "SELECT | FROM tableA;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM tableA;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -415,6 +680,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testWHERE',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -429,6 +695,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testON',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -443,6 +710,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTableA tta, testTableB',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -457,6 +725,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select ',
           afterCursor: ' from database_two.testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -476,16 +745,20 @@ define([
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestFunctions: {},
-            suggestColumns: { table: 'test table', database: 'database one' }
+            suggestColumns: { table: 'test table', database: 'database one' },
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 29, last_column: 41}, database: 'database one', table: 'test table' }
+            ]
           }
         });
       });
 
-      it('should suggest aliases for "SELECT | FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.array) ttaSum, testTableB ttb"', function() {
+    it('should suggest aliases for "SELECT | FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.array) ttaSum, testTableB ttb"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.array) ttaSum, testTableB ttb',
           ignoreErrors: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -500,6 +773,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, ',
           afterCursor: ' FROM tableA;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -514,6 +788,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a,',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -528,6 +803,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT *, ',
           afterCursor: ' FROM tableA;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -544,6 +820,7 @@ define([
           afterCursor: ' FROM tableA;',
           containsKeywords: ['AS', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'a' }], table: 'tableA' }
@@ -557,6 +834,7 @@ define([
           afterCursor: ', FROM tableA;',
           containsKeywords: ['AS', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'a' }], table: 'tableA' }
@@ -570,6 +848,7 @@ define([
           afterCursor: ' FROM tableA;',
           containsKeywords: ['AS', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'b' }], table: 'tableA' }
@@ -583,6 +862,7 @@ define([
           afterCursor: ', b, c AS foo, d FROM tableA;',
           containsKeywords: ['AS', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'a' }], table: 'tableA' }
@@ -594,6 +874,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' a, cast(b as int), c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -613,7 +894,17 @@ define([
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
             suggestFunctions: {},
-            suggestColumns: { table: 'testTable' }
+            suggestColumns: { table: 'testTable' },
+            locations: [
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9} , identifierChain: [{ name: 'a'}], table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 11, last_column: 12 }, identifierChain: [{ name: 'b'}], table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 16 }, identifierChain: [{ name: 'c'}], table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 19 }, identifierChain: [{ name: 'd'}], table: 'testTable'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 34 }, table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42 }, identifierChain: [{ name: 'a'}], table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 54, last_column: 55 }, identifierChain: [{ name: 'b'}], table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 72, last_column: 73 }, identifierChain: [{ name: 'c'}], table: 'testTable'}
+            ]
           }
         });
       });
@@ -625,6 +916,7 @@ define([
           beforeCursor: 'SELECT COUNT(*) ',
           afterCursor: '',
           containsKeywords: ['AS', '+'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {
@@ -642,6 +934,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo ',
           afterCursor: '',
+          hasLocations: true,
           containsKeywords: ['AND', '='],
           expectedResult: {
             lowerCase: false
@@ -653,6 +946,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo, ',
           afterCursor: ') FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -665,6 +959,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo, bl',
           afterCursor: ',bla) FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -678,6 +973,7 @@ define([
           beforeCursor: 'SELECT COUNT(foo ',
           afterCursor: ', bar)',
           containsKeywords: ['AND', '='],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -688,6 +984,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(foo, bl = ',
           afterCursor: ',bla) FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -702,6 +999,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {}
@@ -713,6 +1011,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -725,6 +1024,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(bla',
           afterCursor: ' FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -737,6 +1037,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -749,6 +1050,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS INT FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -761,6 +1063,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS STRING) FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -773,6 +1076,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CAST(bla',
           afterCursor: ' AS STRING) FROM bar;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -786,6 +1090,7 @@ define([
           beforeCursor: 'SELECT CAST(bla ',
           afterCursor: '',
           containsKeywords: ['AS', 'AND'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -798,6 +1103,7 @@ define([
           afterCursor: ' FROM bar;',
           containsKeywords: ['AS', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'bla'}], table: 'bar'}
@@ -810,6 +1116,7 @@ define([
           beforeCursor: 'select cast(bla as ',
           afterCursor: '',
           containsKeywords: ['INT', 'STRING'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: true
           }
@@ -821,6 +1128,7 @@ define([
           beforeCursor: 'SELECT CAST(bla AS ',
           afterCursor: ' FROM bar;',
           containsKeywords: ['INT', 'STRING'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -832,6 +1140,7 @@ define([
           beforeCursor: 'SELECT CAST(bla AS ST',
           afterCursor: ') FROM bar;',
           containsKeywords: ['INT', 'STRING'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -843,6 +1152,7 @@ define([
           beforeCursor: 'SELECT CAST(AS ',
           afterCursor: '',
           containsKeywords: ['INT', 'STRING'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -854,6 +1164,7 @@ define([
           beforeCursor: 'SELECT extract(bla FROM ',
           afterCursor: ' FROM bar;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['TIMESTAMP'] },
@@ -867,6 +1178,7 @@ define([
           beforeCursor: 'SELECT extract(bla ,',
           afterCursor: ' FROM bar;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -880,6 +1192,7 @@ define([
           beforeCursor: 'SELECT a, extract(bla FROM ',
           afterCursor: ') FROM bar;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['TIMESTAMP'] },
@@ -893,6 +1206,7 @@ define([
           beforeCursor: 'SELECT extract(bla ,',
           afterCursor: ') FROM bar;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -946,6 +1260,7 @@ define([
               beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
               afterCursor: ') FROM testTable',
               dialect: aggregateFunction.dialect,
+              hasLocations: true,
               expectedResult: {
                 lowerCase: false,
                 suggestColumns: {
@@ -970,6 +1285,7 @@ define([
               beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
               afterCursor: ') FROM testTable',
               dialect: aggregateFunction.dialect,
+              hasLocations: true,
               expectedResult: expectedResult
             });
           }
@@ -988,6 +1304,7 @@ define([
             beforeCursor: 'SELECT ' + binaryFunction.name + '(',
             afterCursor: ',col) FROM testTable',
             dialect: binaryFunction.dialect,
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
@@ -1013,6 +1330,7 @@ define([
             beforeCursor: 'SELECT ' + binaryFunction.name + '(,',
             afterCursor: ') FROM testTable',
             dialect: binaryFunction.dialect,
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
@@ -1037,6 +1355,7 @@ define([
             beforeCursor: 'SELECT ' + binaryFunction.name + '(',
             afterCursor: ' FROM testTable',
             dialect: binaryFunction.dialect,
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
@@ -1054,6 +1373,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT id, SUM(a * ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -1069,6 +1389,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1084,6 +1405,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN a = b AND ',
           afterCursor: ' THEN FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1098,6 +1420,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = b AND ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1113,6 +1436,7 @@ define([
           beforeCursor: 'SELECT CASE a = b ',
           afterCursor: ' FROM testTable',
           containsKeywords: ['WHEN', 'AND', '<>'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1123,6 +1447,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN a = b OR ',
           afterCursor: ' THEN boo FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1137,6 +1462,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN a = b OR c THEN boo OR ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1151,6 +1477,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a =',
           afterCursor: ' WHEN c THEN d END FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1168,6 +1495,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a =',
           afterCursor: ' WHEN c THEN d ELSE e END FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1187,6 +1515,7 @@ define([
           afterCursor: ' FROM testTable',
           containsKeywords: ['END', '<>'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'd' }], table: 'testTable' }
@@ -1198,6 +1527,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=',
           afterCursor: ' ELSE FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1216,6 +1546,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=1 ',
           afterCursor: ' bla=foo FROM testTable',
           containsKeywords: ['AND', 'WHEN', 'ELSE', 'END', '<'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1227,6 +1558,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=1 ',
           afterCursor: ' bla=foo FROM testTable',
           containsKeywords: ['AND', 'WHEN', 'ELSE', '>'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1237,6 +1569,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ELSE ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1251,6 +1584,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ELSE e AND ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1265,6 +1599,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ELSE ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1279,6 +1614,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' ELSE a FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1294,6 +1630,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' ELSE FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1311,6 +1648,7 @@ define([
           afterCursor: ' FROM testTable',
           containsKeywords: ['END', '='],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'e' }], table: 'testTable' }
@@ -1322,6 +1660,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN THEN boo OR ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1336,6 +1675,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' a = b THEN FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WHEN']
@@ -1347,6 +1687,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' a = b THEN boo FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WHEN']
@@ -1358,6 +1699,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE ',
           afterCursor: ' THEN boo FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WHEN'],
@@ -1373,6 +1715,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' boo FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
@@ -1388,6 +1731,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN bla',
           afterCursor: ' boo WHEN b THEN c END FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
@@ -1403,6 +1747,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a WHEN b THEN c WHEN ',
           afterCursor: ' boo ELSE c FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
@@ -1418,6 +1763,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a WHEN b THEN c WHEN ',
           afterCursor: ' boo WHEN d THEN e END FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['THEN'],
@@ -1435,6 +1781,7 @@ define([
           afterCursor: ' WHEN d THEN e END FROM testTable',
           containsKeywords: ['WHEN', '<'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'c' }], table: 'testTable' }
@@ -1448,6 +1795,7 @@ define([
           afterCursor: ' FROM testTable',
           containsKeywords: ['WHEN', '>'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'c' }], table: 'testTable' }
@@ -1459,6 +1807,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' THEN FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1473,6 +1822,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' = a FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1490,6 +1840,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN ab',
           afterCursor: ' THEN bla ELSE foo FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1504,6 +1855,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE bla WHEN ab',
           afterCursor: ' THEN bla ELSE foo END FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1518,6 +1870,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1532,6 +1885,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a WHEN ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1546,6 +1900,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN a = ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1564,6 +1919,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN a = b ',
           afterCursor: ' FROM testTable',
           containsKeywords: ['AND', 'THEN', '<'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1576,6 +1932,7 @@ define([
           afterCursor: ' d FROM testTable',
           containsKeywords: ['THEN', '>'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'c' }], table: 'testTable' }
@@ -1587,6 +1944,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1601,6 +1959,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE a = c WHEN c THEN ',
           afterCursor: ' g FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1615,6 +1974,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN THEN ',
           afterCursor: ' g FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1629,6 +1989,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT CASE WHEN THEN ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1646,6 +2007,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
@@ -1658,6 +2020,7 @@ define([
           beforeCursor: 'SELECT bar FROM db.foo f ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
@@ -1670,6 +2033,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo JOIN baz ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           containsKeywords: ['ON'],
           expectedResult: {
             lowerCase: false
@@ -1683,6 +2047,7 @@ define([
           afterCursor: ' JOIN bla',
           dialect: 'hive',
           containsKeywords: ['ON'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1694,6 +2059,7 @@ define([
           beforeCursor: 'SELECT bar\nFROM foo\n',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
@@ -1706,6 +2072,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo LATERAL ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['VIEW']
@@ -1718,6 +2085,7 @@ define([
           beforeCursor: 'SELECT bar FROM db.foo f LATERAL ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['VIEW']
@@ -1730,6 +2098,7 @@ define([
           beforeCursor: 'SELECT bar FROM db.foo AS f LATERAL ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['VIEW']
@@ -1742,6 +2111,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo LATERAL VIEW ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['explode', 'posexplode']
@@ -1754,6 +2124,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -1766,6 +2137,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) b ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -1778,6 +2150,7 @@ define([
           beforeCursor: 'SELECT testMap[].',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1794,6 +2167,7 @@ define([
           beforeCursor: 'SELECT testMap[',
           afterCursor: '] FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { }, // TODO: types: ['COLREF_KEY']
@@ -1813,6 +2187,7 @@ define([
           beforeCursor: 'SELECT testMap[\'anyKey\'].',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1829,6 +2204,7 @@ define([
           beforeCursor: 'SELECT testMap[substr(\'bla\', 1)].',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1845,6 +2221,7 @@ define([
           beforeCursor: 'SELECT testMap["anyKey"].fieldC.',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1861,6 +2238,7 @@ define([
           beforeCursor: 'SELECT testArray[1].fieldC.',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1877,6 +2255,7 @@ define([
           beforeCursor: 'SELECT testFoo[1].testBar[\"key\"].',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1893,6 +2272,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE testMap[].',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -1918,13 +2298,17 @@ define([
               },
               suggestAggregateFunctions: true,
               suggestFunctions: {},
-              suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }]
+              suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }],
+              locations: [
+                {type: 'table', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, table: 'testTable' },
+                {type: 'function', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 44 }, function: 'explode'},
+                {type: 'column', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 54 }, identifierChain: [{ name: 'testArray' }], table: 'testTable'}
+              ]
             }
           });
         });
 
-
-        it('should suggest tables for "SELECT * FROM | LATERAL VIEW explode("', function () {
+        xit('should suggest tables for "SELECT * FROM | LATERAL VIEW explode("', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM ',
             afterCursor: ' LATERAL VIEW explode(',
@@ -1932,7 +2316,10 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
-              suggestDatabases: { appendDot: true }
+              suggestDatabases: { appendDot: true },
+              locations: [
+                {type: 'function', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 35 }, function: 'explode'},
+              ]
             }
           });
         });
@@ -1942,6 +2329,7 @@ define([
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -1959,6 +2347,7 @@ define([
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['ARRAY', 'MAP' ] },
@@ -1975,6 +2364,7 @@ define([
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(a.b.',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: {
@@ -1991,6 +2381,7 @@ define([
             beforeCursor: 'SELECT * FROM testTable LATERAL VIEW posexplode(',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['ARRAY' ] },
@@ -2007,6 +2398,7 @@ define([
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS (testKey, testValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -2025,6 +2417,7 @@ define([
             beforeCursor: 'SELECT testItem.',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -2043,6 +2436,7 @@ define([
             ' LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA' +
             ' LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -2067,7 +2461,15 @@ define([
               suggestColumns: {
                 table: 'testTable2',
                 identifierChain: [{ name: 'testArrayB' }, { name: 'item' }]
-              }
+              },
+              locations: [
+                { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], table: 'testTable2'},
+                { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, table: 'testTable2'},
+                { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 23 }, function: 'EXPLODE'},
+                { type: 'column', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayA'}], table: 'testTable2'},
+                { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 23 }, function: 'EXPLODE'},
+                { type: 'column', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayB'}] ,table: 'testTable2'}
+              ]
             }
           });
         });
@@ -2080,6 +2482,7 @@ define([
             ' LATERAL VIEW explode(tt.testArray1) ta1 AS ta1_exp\n' +
             '   LATERAL VIEW explode(ta1_exp.testArray2)    ta2   AS  ta2_exp',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -2096,6 +2499,7 @@ define([
             beforeCursor: 'SELECT explodedTable.testItem.',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: {
@@ -2112,6 +2516,7 @@ define([
             beforeCursor: 'SELECT testValue.',
             afterCursor: ' FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS (testIndex, testValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -2128,6 +2533,7 @@ define([
             beforeCursor: 'SELECT testMapValue.',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) AS (testMapKey, testMapValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: {
@@ -2144,6 +2550,7 @@ define([
             beforeCursor: 'SELECT explodedMap.testMapValue.',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: {
@@ -2160,6 +2567,7 @@ define([
             beforeCursor: 'SELECT explodedMap.',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
@@ -2173,6 +2581,7 @@ define([
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -2196,7 +2605,11 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']
+            suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE'],
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25}, table: 'testTableA'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 41}, table: 'testTableB'}
+            ]
           }
         });
       });
@@ -2206,6 +2619,7 @@ define([
           beforeCursor: 'SELECT testMap["anyKey"].',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2222,6 +2636,7 @@ define([
           beforeCursor: 'SELECT columnA.fieldC.',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2238,6 +2653,7 @@ define([
           beforeCursor: 'SELECT tt.columnA.fieldC.',
           afterCursor: ' FROM testTable tt',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2254,6 +2670,7 @@ define([
           beforeCursor: 'SELECT tt.columnA.fieldC.',
           afterCursor: ' FROM testTable tt',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2281,7 +2698,11 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }]
-            }
+            },
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column :26}, table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testMap'}], table: 'testTable'}
+            ]
           }
         });
       });
@@ -2297,7 +2718,12 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testMap' }]
-            }
+            },
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column :27}, table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column :40}, identifierChain: [{ name: 'testMap'}], table: 'testTable'}
+            ]
+
           }
         });
       });
@@ -2313,7 +2739,12 @@ define([
             suggestColumns : {
               table: 'testTable',
               identifierChain: [{ name: 'testArray' }]
-            }
+            },
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testArray'}], table: 'testTable'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 27 }, table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 42 }, identifierChain: [{ name: 'testArray'}], table: 'testTable'}
+            ]
           }
         });
       });
@@ -2323,6 +2754,7 @@ define([
           beforeCursor: 'SELECT t.*  FROM testTable t, t.',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns : {
@@ -2337,6 +2769,7 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTable t, t.testMap tm;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -2353,6 +2786,7 @@ define([
           beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2368,6 +2802,7 @@ define([
           beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2383,6 +2818,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable t, t.testMap tm WHERE tm.key =',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2403,10 +2839,15 @@ define([
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: true,
             suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
-            colRef: { identifierChain: [{ name: 'testMap' }, { name: 'field' }], table: 'testTable' }
+            colRef: { identifierChain: [{ name: 'testMap' }, { name: 'field' }], table: 'testTable' },
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 37}, identifierChain: [{ name: 'testMap'}], table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 53}, identifierChain: [{ name: 'testMap'},{ name: 'field'}], table: 'testTable'}
+            ]
           }
         });
-      })
+      });
     });
 
     describe('Hive and Impala Struct Completion', function() {
@@ -2415,6 +2856,7 @@ define([
           beforeCursor: 'SELECT columnA.',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -2431,6 +2873,7 @@ define([
           beforeCursor: 'SELECT columnA.fieldC.',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2447,6 +2890,7 @@ define([
           beforeCursor: 'SELECT columnA.fieldC.',
           afterCursor: ' FROM database_two.testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: {
@@ -2465,6 +2909,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { types: ['T'], table: 'tbl2' }
@@ -2477,6 +2922,7 @@ define([
           beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE cos(1) = atbl2.bla.',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { identifierChain: [{ name: 'bla' }], types: ['DOUBLE'], table: 'tbl2' }
@@ -2488,6 +2934,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE id =',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2502,6 +2949,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE -',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -2514,6 +2962,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT -',
           afterCursor: ' FROM testTable WHERE id = 1;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -2526,6 +2975,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT 1 < ',
           afterCursor: ' FROM testTable WHERE id = 1;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -2538,6 +2988,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE -id = ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -2553,6 +3004,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE \'foo\' = ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -2566,6 +3018,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE \'foo\' = ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -2581,6 +3034,7 @@ define([
           dialect: 'hive',
           containsKeywords: ['BIGINT', 'DATE'],
           doesNotContainKeywords: ['REAL'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2594,6 +3048,7 @@ define([
           dialect: 'impala',
           containsKeywords: ['BIGINT', 'REAL'],
           doesNotContainKeywords: ['DATE'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2605,6 +3060,7 @@ define([
           beforeCursor: 'SELECT cos(',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -2618,6 +3074,7 @@ define([
           beforeCursor: 'SELECT cos(',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -2631,6 +3088,7 @@ define([
           beforeCursor: 'SELECT ceiling(',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -2644,6 +3102,7 @@ define([
           beforeCursor: 'SELECT ceiling(',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -2657,6 +3116,7 @@ define([
           beforeCursor: 'SELECT cos(1, ',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2668,6 +3128,7 @@ define([
           beforeCursor: 'SELECT cos(1, ',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2678,6 +3139,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT greatest(1, 2, a, 4, ',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['T'] },
@@ -2690,6 +3152,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT greatest(1, ',
           afterCursor: ', a, 4) FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['T'] },
@@ -2702,6 +3165,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT log(a, ',
           afterCursor: ') FROM testTable',
+          hasLocations: true,
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
@@ -2716,6 +3180,7 @@ define([
           beforeCursor: 'SELECT log(a, ',
           afterCursor: ') FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -2729,6 +3194,7 @@ define([
           beforeCursor: 'SELECT log(a, b, ',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2740,6 +3206,7 @@ define([
           beforeCursor: 'SELECT log(a, b, ',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -2751,6 +3218,7 @@ define([
           beforeCursor: 'SELECT substr(\'foo\', ',
           afterCursor: ') FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -2764,6 +3232,7 @@ define([
           beforeCursor: 'SELECT substr(',
           afterCursor: ', 1, 2) FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'STRING' ] },
@@ -2777,6 +3246,7 @@ define([
           beforeCursor: 'SELECT substr(,,',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -2790,6 +3260,7 @@ define([
           beforeCursor: 'SELECT cast(a AS BIGINT) = ',
           afterCursor: ' FROM testTable',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
@@ -2803,6 +3274,7 @@ define([
           beforeCursor: 'SELECT cast(a AS BIGINT) = ',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
@@ -2816,6 +3288,7 @@ define([
           beforeCursor: 'SELECT cast(a AS BIGINT) = ',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
@@ -2829,6 +3302,7 @@ define([
           beforeCursor: 'SELECT years_add(a , 10) = ',
           afterCursor: ' FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'TIMESTAMP' ] },
@@ -2842,6 +3316,7 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -2855,6 +3330,7 @@ define([
           beforeCursor: 'SELECT partial.partial',
           afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { identifierChain: [{ name: 'partial' }], types: [ 'INT' ], table: 'testTable' }
@@ -2866,6 +3342,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' > id FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2880,6 +3357,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' = id',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2894,6 +3372,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d >= ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2908,6 +3387,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d < ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2922,6 +3402,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <= ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2936,6 +3417,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <=> ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2950,6 +3432,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <> ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2964,6 +3447,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d >= ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2978,6 +3462,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d > ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2992,6 +3477,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d != ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3006,6 +3492,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d + 1 != ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3018,6 +3505,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE bla',
           afterCursor: ' + 1 != 3',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3030,6 +3518,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d + ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3042,6 +3531,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d - ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3054,6 +3544,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d * ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3066,6 +3557,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d / ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3078,6 +3570,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d % ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3090,6 +3583,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d | ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3102,6 +3596,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d & ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3114,6 +3609,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d ^ ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3126,6 +3622,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE ~',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3138,6 +3635,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE -',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3150,6 +3648,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d ',
           afterCursor: ' RLIKE \'bla bla\'',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3163,6 +3662,7 @@ define([
           beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
           afterCursor: '',
           dialect: 'generic',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
@@ -3175,6 +3675,7 @@ define([
           beforeCursor: 'SELECT * FROM foo WHERE id <=> 1 ',
           afterCursor: '',
           dialect: 'generic',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
@@ -3186,6 +3687,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT NULL', 'NULL']
@@ -3197,6 +3699,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS NOT ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NULL']
@@ -3208,6 +3711,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS ',
           afterCursor: ' NULL',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT']
@@ -3219,6 +3723,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id ',
           afterCursor: ' LIKE \'bla bla\'',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT']
@@ -3230,6 +3735,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo bla, bar WHERE id IS NULL AND ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3242,6 +3748,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL && ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3254,6 +3761,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL OR ',
           afterCursor: ' AND 1 + 1 > 1',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3266,6 +3774,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL || ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3278,6 +3787,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo bar WHERE NOT ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3291,6 +3801,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo bar WHERE ! ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['BOOLEAN'] },
@@ -3303,6 +3814,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo bar WHERE !',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['BOOLEAN'] },
@@ -3317,6 +3829,7 @@ define([
             beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
@@ -3331,6 +3844,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3344,6 +3858,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE a',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3357,6 +3872,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE NOT ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3370,6 +3886,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE foo = \'bar\' ',
           afterCursor: '',
+          hasLocations: true,
           containsKeywords: ['AND', '<'],
           expectedResult: {
             lowerCase: false
@@ -3381,6 +3898,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c, d, e FROM tableOne WHERE c >= 9998 an',
           afterCursor: '',
+          hasLocations: true,
           containsKeywords: ['AND', '='],
           expectedResult: {
             lowerCase: false
@@ -3392,6 +3910,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE foo = \'bar\' AND ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3404,6 +3923,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, \nc,\nd, ',
           afterCursor: '\ng,\nf\nFROM testTable WHERE a > 1 AND b = \'b\' ORDER BY c;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3418,6 +3938,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT a,b, ',
           afterCursor: ' c FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3432,6 +3953,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' a, b, c FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -3448,6 +3970,7 @@ define([
           afterCursor: ', b, c FROM testTable',
           containsKeywords: ['AS', '>'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'a' }], table: 'testTable' }
@@ -3459,6 +3982,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' = \'bar\' AND ',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -3473,6 +3997,7 @@ define([
           afterCursor: '',
           containsKeywords: ['BETWEEN', 'NOT BETWEEN'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'a'}], table: 'testTable' }
@@ -3484,6 +4009,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE a NOT ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['BETWEEN', 'EXISTS', 'IN', 'LIKE']
@@ -3495,6 +4021,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE a BETWEEN ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3509,6 +4036,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE a OR NOT EXISTS (',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -3521,6 +4049,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable ORDER ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BY']
@@ -3532,6 +4061,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable ORDER BY ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { table: 'testTable' }
@@ -3543,6 +4073,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { database: 'database_two', table: 'testTable' }
@@ -3555,6 +4086,7 @@ define([
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
             afterCursor: '',
             dialect: 'generic',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ASC', 'DESC', 'LIMIT']
@@ -3566,6 +4098,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo, ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { database: 'database_two', table: 'testTable' }
@@ -3577,6 +4110,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ASC, ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { database: 'database_two', table: 'testTable' }
@@ -3589,6 +4123,7 @@ define([
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
             afterCursor: '',
             dialect: 'generic',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ASC', 'DESC', 'LIMIT']
@@ -3601,6 +4136,7 @@ define([
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
             afterCursor: ', bla',
             containsKeywords: ['ASC', 'DESC'],
+            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -3613,6 +4149,7 @@ define([
               beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
               afterCursor: '',
               dialect: 'impala',
+              hasLocations: true,
               expectedResult: {
                 lowerCase: false,
                 suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
@@ -3625,6 +4162,7 @@ define([
               beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY 1 ',
               afterCursor: '',
               dialect: 'impala',
+              hasLocations: true,
               expectedResult: {
                 lowerCase: false,
                 suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
@@ -3637,6 +4175,7 @@ define([
               beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo NULLS ',
               afterCursor: '',
               dialect: 'impala',
+              hasLocations: true,
               expectedResult: {
                 lowerCase: false,
                 suggestKeywords: ['FIRST', 'LAST']
@@ -3649,6 +4188,7 @@ define([
               beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
               afterCursor: '',
               dialect: 'impala',
+              hasLocations: true,
               expectedResult: {
                 lowerCase: false,
                 suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
@@ -3661,6 +4201,7 @@ define([
                 afterCursor: ', bla',
                 dialect: 'impala',
                 containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
+                hasLocations: true,
                 expectedResult: {
                   lowerCase: false
                 }
@@ -3673,6 +4214,7 @@ define([
                 afterCursor: ', bla',
                 dialect: 'impala',
                 containsKeywords: ['FIRST', 'LAST'],
+                hasLocations: true,
                 expectedResult: {
                   lowerCase: false
                 }
@@ -3688,6 +4230,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable GROUP ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BY']
@@ -3700,6 +4243,7 @@ define([
             beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY ',
             afterCursor: '',
             dialect: 'generic',
+            hasLocations: true,
             expectedResult : {
               lowerCase: false,
               suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
@@ -3712,6 +4256,7 @@ define([
             beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
             afterCursor: '',
             dialect: 'generic',
+            hasLocations: true,
             expectedResult : {
               lowerCase: false,
               suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
@@ -3724,6 +4269,7 @@ define([
             beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
             afterCursor: ', foo',
             dialect: 'generic',
+            hasLocations: true,
             expectedResult : {
               lowerCase: false,
               suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
@@ -3735,6 +4281,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM testTable GROUP BY ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { table: 'testTable' }
@@ -3746,6 +4293,7 @@ define([
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY ',
             afterCursor: '',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { database: 'database_two', table: 'testTable' }
@@ -3758,6 +4306,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 t1 JOIN testTable2 t2 ON t1.',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable1' }
@@ -3769,6 +4318,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT t1.testTableColumn1, t2.testTableColumn3 FROM database_two.testTable1 t1 JOIN testTable2 t2 ON t1.',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable1', database: 'database_two' }
@@ -3780,6 +4330,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable.',
           afterCursor: ' FROM testTable',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -3792,6 +4343,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT tt.',
           afterCursor: ' FROM testTable tt',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -3804,6 +4356,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT tt.',
           afterCursor: ' FROM database_two.testTable tt',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -3816,6 +4369,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT tta.',
           afterCursor: ' FROM testTableA tta, testTableB ttb',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -3825,6 +4379,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ttb.',
           afterCursor: ' FROM testTableA tta, testTableB ttb',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
@@ -3839,6 +4394,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable1 JOIN ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -3851,6 +4407,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable1 JOIN db1.',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: { database: 'db1' }
@@ -3862,6 +4419,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable1 JOIN db1.',
           afterCursor: ' JOIN foo',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: { database: 'db1' }
@@ -3873,6 +4431,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
@@ -3884,6 +4443,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
@@ -3895,6 +4455,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
@@ -3908,7 +4469,13 @@ define([
           afterCursor: ' AND testTable1.testColumn1 = testTable2.testColumn3',
           expectedResult: {
             lowerCase: false,
-            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, table: 'testTable1'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 42, last_column: 52}, table: 'testTable2'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 62, last_column: 84}, identifierChain: [{ name: 'testColumn1'}], table: 'testTable1'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 87, last_column: 109}, identifierChain: [{ name: 'testColumn3'}], table: 'testTable2'}
+            ]
           }
         });
       });
@@ -3918,6 +4485,7 @@ define([
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable2'}
@@ -3929,6 +4497,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select * from testTable1 cross join testTable2 on testTable1.',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestColumns: { table: 'testTable1'}
@@ -3940,6 +4509,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select * from testTable1 join db.testTable2 on ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'db.testTable2.', type: 'table' }]
@@ -3951,6 +4521,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
@@ -3963,6 +4534,7 @@ define([
           beforeCursor: 'select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = testTable2.',
           afterCursor: '',
           ignoreErrors: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestColumns: { table: 'testTable2'}
@@ -3975,6 +4547,7 @@ define([
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND testTable1.',
           afterCursor: '',
           ignoreErrors: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTable1'}
@@ -3987,6 +4560,7 @@ define([
           beforeCursor: 'SELECT t1.* FROM table1 t1 ',
           afterCursor: ' JOIN',
           dialect: 'generic',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
@@ -3999,6 +4573,7 @@ define([
           beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
           afterCursor: ' JOIN',
           dialect: 'generic',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['OUTER']
@@ -4011,6 +4586,7 @@ define([
           beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
           afterCursor: ' JOIN',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
@@ -4023,6 +4599,7 @@ define([
           beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
           afterCursor: ' JOIN',
           dialect: 'generic',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['OUTER']
@@ -4036,6 +4613,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
             expectedResult: {
               lowerCase: false
@@ -4048,6 +4626,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
             afterCursor: ' JOIN',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
@@ -4060,6 +4639,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
             afterCursor: ' JOIN',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['OUTER']
@@ -4072,6 +4652,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
             afterCursor: ' JOIN',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['OUTER', 'SEMI']
@@ -4084,6 +4665,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
             afterCursor: ' JOIN',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['OUTER']
@@ -4096,6 +4678,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (',
             afterCursor: ' AND t1.c1 = t2.c2',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
@@ -4108,6 +4691,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
             afterCursor: ' CROSS JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
@@ -4124,6 +4708,7 @@ define([
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['LEFT ANTI JOIN', 'RIGHT ANTI JOIN'], // Tested in full above
+            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -4135,6 +4720,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
             afterCursor: ' JOIN',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT ANTI', 'RIGHT OUTER', 'RIGHT SEMI']
@@ -4147,6 +4733,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
             afterCursor: ' JOIN',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['OUTER']
@@ -4159,6 +4746,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
             afterCursor: ' JOIN',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
@@ -4171,6 +4759,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
             afterCursor: ' JOIN',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
@@ -4183,6 +4772,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (',
             afterCursor: ' AND t1.c1 = t2.c2',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
@@ -4195,6 +4785,7 @@ define([
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
             afterCursor: ' INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
@@ -4213,6 +4804,7 @@ define([
           dialect: 'generic',
           containsKeywords: ['IN', 'NOT IN'],
           containsColRefKeywords: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             colRef: { identifierChain: [{ name: 'bar' }], table: 'foo' }
@@ -4225,6 +4817,7 @@ define([
           beforeCursor: 'SELECT * FROM foo WHERE bar NOT ',
           afterCursor: '',
           containsKeywords: ['IN'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -4235,6 +4828,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT'],
@@ -4250,6 +4844,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select * from foo, bar where bar.bla in (',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['SELECT'],
@@ -4265,6 +4860,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select * from foo, bar where bar.bla in (\'a\', ',
           afterCursor: '',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['COLREF'] },
@@ -4279,6 +4875,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT ',
           afterCursor: '',
+          //hasLocations: true, // TODO: fix locations for invalid subquery
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -4302,6 +4899,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM bar WHERE foo NOT IN (SELECT ',
           afterCursor: ')',
+          //hasLocations: true, // TODO: fix locations for invalid subquery
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -4370,6 +4968,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'select foo from tbl where ',
           afterCursor: ' % 2 = 0',
+          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4385,21 +4984,31 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
-            suggestIdentifiers: [{ name: 't1.', type: 'table' }, { name: 'ta2.', type: 'alias' }, { name: 't3.', type: 'table'}]
+            suggestIdentifiers: [{ name: 't1.', type: 'table' }, { name: 'ta2.', type: 'alias' }, { name: 't3.', type: 'table'}],
+            locations: [
+              // TODO: Should have t1 and t2 here as well (invalid subquery) see next test below for proper result
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 83, last_column: 85}, table: 't3' }
+            ]
           }
         });
       });
 
-      it('should suggest identifiers for "SELECT | FROM (SELECT bla FROM abc WHERE foo > 1) bar"', function() {
+      it('should suggest identifiers for "SELECT | FROM testTable tt, (SELECT bla FROM abc WHERE foo > 1) bar"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
-          afterCursor: ' FROM (SELECT bla FROM abc WHERE foo > 1) bar',
+          afterCursor: ' FROM testTable tt, (SELECT bla FROM abc WHERE foo > 1) bar',
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestFunctions: {},
-            suggestIdentifiers: [{ name: 'bar.', type: 'subquery'}]
+            suggestIdentifiers: [{ name: 'tt.', type: 'alias'}, { name: 'bar.', type: 'subquery'}],
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23}, table: 'testTable'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 36, last_column: 39}, identifierChain: [{ name: 'bla'}], table: 'abc'},
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 48}, table: 'abc'},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 55, last_column: 58}, identifierChain: [{ name: 'foo'}], table: 'abc'}
+            ]
           }
         });
       });
@@ -4430,6 +5039,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM (SELECT * FROM tableOne) AS subqueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) subqueryTwo;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -4444,6 +5054,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM (SELECT ',
           afterCursor: ' FROM tableOne) subqueryOne, someDb.tableTwo talias, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) AS subqueryTwo;',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],

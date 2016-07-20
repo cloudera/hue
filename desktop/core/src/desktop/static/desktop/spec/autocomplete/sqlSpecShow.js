@@ -828,6 +828,7 @@ define([
           beforeCursor: 'SHOW LOCKS tableName ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['EXTENDED', 'PARTITION']
@@ -840,6 +841,7 @@ define([
           beforeCursor: 'SHOW LOCKS tableName PARTITION (ds=\'2010-03-03\', hr=\'12\') ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['EXTENDED']
@@ -882,6 +884,7 @@ define([
           beforeCursor: 'SHOW PARTITIONS foo ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
