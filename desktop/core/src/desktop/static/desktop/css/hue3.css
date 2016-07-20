@@ -2645,3 +2645,9 @@ body {
 *::-ms-clear {
   display: none;
 }
+
+.stats-popover-name {
+  max-width: 440px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
