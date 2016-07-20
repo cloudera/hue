@@ -55,3 +55,21 @@ navigator.audit_log_max_file_size=100
       for reset in resets:
         reset()
       shutil.rmtree(tmpdir)
+
+
+  def test_missing_navigator_site(self):
+    tmpdir = tempfile.mkdtemp()
+    shutil.rmtree(tmpdir)
+
+    resets = [
+        NAVIGATOR.CONF_DIR.set_for_testing(tmpdir)
+    ]
+
+    try:
+      metadata_sites.reset()
+
+      assert_equal(get_navigator_server_url(), 'http://localhost:7187')
+    finally:
+      metadata_sites.reset()
+      for reset in resets:
+        reset()

@@ -46,7 +46,7 @@ def get_conf(name='navigator'):
 
 
 def get_navigator_server_url():
-  return get_conf().get(_CONF_NAVIGATOR_SERVER_URL, 'http://localhost:7187/api')
+  return get_conf().get(_CONF_NAVIGATOR_SERVER_URL, 'http://localhost:7187')
 
 def get_navigator_audit_log_dir():
   return get_conf().get(_CONF_NAVIGATOR_AUDIT_LOG_DIR)
@@ -73,15 +73,4 @@ def _parse_property(file_path):
   except IOError, err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (file_path, err))
-    return ""
-
-def _parse_site(site_path):
-  try:
-    data = file(site_path, 'r').read()
-  except IOError, err:
-    if err.errno != errno.ENOENT:
-      LOG.error('Cannot read from "%s": %s' % (site_path, err))
-      return
-    data = ""
-
-  return confparse.ConfParse(data)
+    return {}
