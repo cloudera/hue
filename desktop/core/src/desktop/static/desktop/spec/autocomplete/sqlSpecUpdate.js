@@ -47,7 +47,10 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['SET']
+          suggestKeywords: ['SET'],
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, table: 'bar'}
+          ]
         }
       });
     });
@@ -58,7 +61,12 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['WHERE']
+          suggestKeywords: ['WHERE'],
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, table: 'bar'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 18}, table: 'bar', identifierChain: [{ name: 'id' }]},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25}, table: 'bar', identifierChain: [{ name: 'foo' }]}
+          ]
         }
       });
     });
@@ -69,7 +77,11 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['=']
+          suggestKeywords: ['='],
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, table: 'bar'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 18}, table: 'bar', identifierChain: [{ name: 'id' }]}
+          ]
         }
       });
     });
@@ -137,28 +149,36 @@ define([
           suggestColumns: {
             database: 'bar',
             table: 'foo'
-          }
+          },
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'}
+          ]
         }
       });
     });
 
-    it('should suggest columns for "UPDATE bar.foo SET id = 1, bar = \'foo\', |"', function() {
+    it('should suggest columns for "UPDATE bar.foo SET id = 1, bla = \'foo\', |"', function() {
       assertAutoComplete({
-        beforeCursor: 'UPDATE bar.foo SET id = 1, bar = \'foo\', ',
+        beforeCursor: 'UPDATE bar.foo SET id = 1, bla = \'foo\', ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
           suggestColumns: {
             database: 'bar',
             table: 'foo'
-          }
+          },
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 22}, database: 'bar', table: 'foo', identifierChain: [{ name: 'id' }]},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 31}, database: 'bar', table: 'foo', identifierChain: [{ name: 'bla' }]}
+          ]
         }
       });
     });
 
-    it('should suggest columns for "UPDATE bar.foo SET bar = \'foo\' WHERE |"', function() {
+    it('should suggest columns for "UPDATE bar.foo SET bla = \'foo\' WHERE |"', function() {
       assertAutoComplete({
-        beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE ',
+        beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' WHERE ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
@@ -167,14 +187,18 @@ define([
             database: 'bar',
             table: 'foo'
           },
-          suggestKeywords: ['EXISTS', 'NOT EXISTS']
+          suggestKeywords: ['EXISTS', 'NOT EXISTS'],
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23}, database: 'bar', table: 'foo', identifierChain: [{ name: 'bla' }]}
+          ]
         }
       });
     });
 
-    it('should suggest values for "UPDATE bar.foo SET bar = \'foo\' WHERE id = |"', function() {
+    it('should suggest values for "UPDATE bar.foo SET bla = \'foo\' WHERE id = |"', function() {
       assertAutoComplete({
-        beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = ',
+        beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' WHERE id = ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
@@ -185,14 +209,21 @@ define([
             table: 'foo',
             identifierChain: [{ name: 'id' }]
           },
-          suggestColumns : { types: ['COLREF'] , database: 'bar', table: 'foo' }
+          suggestColumns : { types: ['COLREF'] , database: 'bar', table: 'foo' },
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, database:'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bla'}], database: 'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 40 }, identifierChain: [{ name: 'id'}], database: 'bar', table: 'foo'}
+          ]
         }
       });
     });
 
-    it('should suggest columns for "UPDATE bar.foo SET bar = \'foo\' WHERE id = 1 AND |"', function() {
+
+
+    it('should suggest columns for "UPDATE bar.foo SET bla = \'foo\' WHERE id = 1 AND |"', function() {
       assertAutoComplete({
-        beforeCursor: 'UPDATE bar.foo SET bar = \'foo\' WHERE id = 1 AND ',
+        beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' WHERE id = 1 AND ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
@@ -200,7 +231,12 @@ define([
           suggestColumns: {
             database: 'bar',
             table: 'foo'
-          }
+          },
+          locations: [
+            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, database:'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bla'}], database: 'bar', table: 'foo'},
+            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 40 }, identifierChain: [{ name: 'id'}], database: 'bar', table: 'foo'}
+          ]
         }
       });
     });

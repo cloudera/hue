@@ -220,7 +220,10 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['PURGE']
+              suggestKeywords: ['PURGE'],
+              locations: [
+                {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, table: 'foo'}
+              ]
             }
           });
         });

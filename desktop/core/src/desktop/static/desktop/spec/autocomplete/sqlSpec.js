@@ -120,7 +120,8 @@ define([
         afterCursor: '\n-- other line comment',
         containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          locations: [{ type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, table: 'testTable1' }]
         }
       });
     });
@@ -131,7 +132,8 @@ define([
         afterCursor: '',
         containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          locations: [{ type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, table: 'testTable1' }]
         }
       });
     });
@@ -174,7 +176,9 @@ define([
 
         var identifierChain = [{ name: 'explodedTable' }, { name: 'testItem' }];
 
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -193,14 +197,18 @@ define([
 
         var identifierChain = [{ name: 'explodedMap' }, { name: 'testMapValue' }];
 
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
       });
 
       it('should expand 3', function () {
         var tablePrimaries = [{ identifierChain: [{ name: 'testTable' }] }];
         var identifierChain = [{ name: 'testMap', keySet: true }];
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testMap', keySet: true }]);
       });
 
@@ -217,7 +225,9 @@ define([
           }]
         }];
         var identifierChain = [{ name: 'testItem' }];
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -241,7 +251,9 @@ define([
           }]
         }];
         var identifierChain = [{ name: 'testItemA' }];
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testArrayA' }, { name: 'item' }]);
       });
 
@@ -266,7 +278,9 @@ define([
           }]
         }];
         var identifierChain = [{ name: 'testItemB' }];
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'tt2' }, { name: 'testArrayB' }, { name: 'item' }]);
       });
 
@@ -293,7 +307,9 @@ define([
 
         var identifierChain = [{ name: 'ta2_exp' }];
 
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'tt' }, { name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }]);
       });
 
@@ -312,7 +328,9 @@ define([
 
         var identifierChain = [{ name: 'testValue' }];
 
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -331,8 +349,32 @@ define([
 
         var identifierChain = [{ name: 'testMapValue' }];
 
+        var tablePrimariesBefore = tablePrimaries.concat();
         var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
+      });
+
+
+      it('should expand 10', function () {
+        var tablePrimaries = [{
+          identifierChain: [{ name: 'testTable' }],
+          lateralViews: [{
+            columnAliases: [ 'testItem' ],
+            tableAlias: 'explodedTable',
+            udtf: {
+              expression: { columnReference: [{ name: 'testArray' }] },
+              function: 'explode'
+            }
+          }]
+        }];
+
+        var identifierChain = [{ name: 'testItem' }];
+
+        var tablePrimariesBefore = tablePrimaries.concat();
+        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
+        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
       it('should expand a simple map reference', function () {
@@ -346,6 +388,19 @@ define([
         var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
         expect(actual).toEqual([{ name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' }]);
+      });
+
+      it('should expand a simple map reference 2', function () {
+        var tablePrimaries = [
+          { alias: 't', identifierChain: [{ name: 'testTable' }] },
+          { alias: 'tm', identifierChain: [{ name: 't' }, { name: 'testMap' }] }
+        ];
+
+        var identifierChain = [{ name: 'tm' }];
+
+        var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+
+        expect(actual).toEqual([{ name: 't' }, { name: 'testMap' }]);
       });
 
       it('should expand without map reference', function () {

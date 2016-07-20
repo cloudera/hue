@@ -24,8 +24,8 @@
 '--'.*                              { /* skip comments */ }
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/] { /* skip comments */ }
 
-'\u2020'                            { parser.yy.cursorFound = true; return 'CURSOR'; }
-'\u2021'                            { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+'\u2020'                            { parser.yy.partialCursor = false; parser.yy.cursorFound = yylloc; return 'CURSOR'; }
+'\u2021'                            { parser.yy.partialCursor = true; parser.yy.cursorFound = yylloc; return 'PARTIAL_CURSOR'; }
 
 <hive>'AS'                          { return '<hive>AS'; }
 <hive>'ALL'                         { return '<hive>ALL'; }
@@ -154,6 +154,7 @@
 'JOIN'                              { return 'JOIN'; }
 'LEFT'                              { return 'LEFT'; }
 'LIKE'                              { return 'LIKE'; }
+'LIMIT'                             { return 'LIMIT'; }
 'NOT'                               { return 'NOT'; }
 'NULL'                              { return 'NULL'; }
 'ON'                                { return 'ON'; }
@@ -181,33 +182,33 @@
 'WITHIN'                            { return 'WITHIN'; }
 
 // --- UDFs ---
-'AVG('                              { return 'AVG('; }
-'CAST('                             { return 'CAST('; }
-'COUNT('                            { return 'COUNT('; }
-'MAX('                              { return 'MAX('; }
-'MIN('                              { return 'MIN('; }
-'STDDEV_POP('                       { return 'STDDEV_POP('; }
-'STDDEV_SAMP('                      { return 'STDDEV_SAMP('; }
-'SUM('                              { return 'SUM('; }
-'VARIANCE('                         { return 'VARIANCE('; }
-'VAR_POP('                          { return 'VAR_POP('; }
-'VAR_SAMP('                         { return 'VAR_SAMP('; }
-<hive>'COLLECT_SET('                { return '<hive>COLLECT_SET('; }
-<hive>'COLLECT_LIST('               { return '<hive>COLLECT_LIST('; }
-<hive>'CORR('                       { return '<hive>CORR('; }
-<hive>'COVAR_POP('                  { return '<hive>COVAR_POP('; }
-<hive>'COVAR_SAMP('                 { return '<hive>COVAR_SAMP('; }
-<hive>'HISTOGRAM_NUMERIC('          { return '<hive>HISTOGRAM_NUMERIC('; }
-<hive>'NTILE('                      { return '<hive>NTILE('; }
-<hive>'PERCENTILE('                 { return '<hive>PERCENTILE('; }
-<hive>'PERCENTILE_APPROX('          { return '<hive>PERCENTILE_APPROX('; }
-<impala>'APPX_MEDIAN('              { return '<impala>APPX_MEDIAN('; }
-<impala>'EXTRACT('                  { return '<impala>EXTRACT('; }
-<impala>'GROUP_CONCAT('             { return '<impala>GROUP_CONCAT('; }
-<impala>'STDDEV('                   { return '<impala>STDDEV('; }
-<impala>'VARIANCE_POP('             { return '<impala>VARIANCE_POP('; }
-<impala>'VARIANCE_SAMP('            { return '<impala>VARIANCE_SAMP('; }
-[A-Za-z][A-Za-z0-9_]*\(             { return 'UDF('; }
+'AVG('                              { addFunctionLocation(yylloc, 'avg'); return 'AVG('; }
+'CAST('                             { addFunctionLocation(yylloc, 'cast');return 'CAST('; }
+'COUNT('                            { addFunctionLocation(yylloc, 'count');return 'COUNT('; }
+'MAX('                              { addFunctionLocation(yylloc, 'max');return 'MAX('; }
+'MIN('                              { addFunctionLocation(yylloc, 'min');return 'MIN('; }
+'STDDEV_POP('                       { addFunctionLocation(yylloc, 'stddev_pop');return 'STDDEV_POP('; }
+'STDDEV_SAMP('                      { addFunctionLocation(yylloc, 'stddev_samp');return 'STDDEV_SAMP('; }
+'SUM('                              { addFunctionLocation(yylloc, 'sum');return 'SUM('; }
+'VARIANCE('                         { addFunctionLocation(yylloc, 'variance');return 'VARIANCE('; }
+'VAR_POP('                          { addFunctionLocation(yylloc, 'var_pop');return 'VAR_POP('; }
+'VAR_SAMP('                         { addFunctionLocation(yylloc, 'var_samp');return 'VAR_SAMP('; }
+<hive>'COLLECT_SET('                { addFunctionLocation(yylloc, 'collect_set');return '<hive>COLLECT_SET('; }
+<hive>'COLLECT_LIST('               { addFunctionLocation(yylloc, 'collect_list');return '<hive>COLLECT_LIST('; }
+<hive>'CORR('                       { addFunctionLocation(yylloc, 'corr');return '<hive>CORR('; }
+<hive>'COVAR_POP('                  { addFunctionLocation(yylloc, 'covar_pop');return '<hive>COVAR_POP('; }
+<hive>'COVAR_SAMP('                 { addFunctionLocation(yylloc, 'covar_samp');return '<hive>COVAR_SAMP('; }
+<hive>'HISTOGRAM_NUMERIC('          { addFunctionLocation(yylloc, 'histogram_numeric');return '<hive>HISTOGRAM_NUMERIC('; }
+<hive>'NTILE('                      { addFunctionLocation(yylloc, 'ntile');return '<hive>NTILE('; }
+<hive>'PERCENTILE('                 { addFunctionLocation(yylloc, 'percentile');return '<hive>PERCENTILE('; }
+<hive>'PERCENTILE_APPROX('          { addFunctionLocation(yylloc, 'percentile_approx');return '<hive>PERCENTILE_APPROX('; }
+<impala>'APPX_MEDIAN('              { addFunctionLocation(yylloc, 'appx_median');return '<impala>APPX_MEDIAN('; }
+<impala>'EXTRACT('                  { addFunctionLocation(yylloc, 'extract');return '<impala>EXTRACT('; }
+<impala>'GROUP_CONCAT('             { addFunctionLocation(yylloc, 'group_concat');return '<impala>GROUP_CONCAT('; }
+<impala>'STDDEV('                   { addFunctionLocation(yylloc, 'stddev');return '<impala>STDDEV('; }
+<impala>'VARIANCE_POP('             { addFunctionLocation(yylloc, 'variance_pop');return '<impala>VARIANCE_POP('; }
+<impala>'VARIANCE_SAMP('            { addFunctionLocation(yylloc, 'variance_samp');return '<impala>VARIANCE_SAMP('; }
+[A-Za-z][A-Za-z0-9_]*\(             { addFunctionLocation(yylloc, yytext.substring(0, yytext.length - 1)); return 'UDF('; }
 
 [0-9]+                              { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                             { return 'UNSIGNED_INTEGER_E'; }
@@ -306,7 +307,6 @@ RegularIdentifier
 InitResults
  : /* empty */
    {
-     parser.yy.result = {};
      parser.yy.cursorFound = false;
 
      // TODO: Move these below before token or use $$ instead
@@ -342,8 +342,17 @@ Sql
 SqlStatements
  :
  | DataDefinition
+   {
+     linkLocations();
+   }
  | DataManipulation
+   {
+     linkLocations();
+   }
  | QuerySpecification
+   {
+     linkLocations();
+   }
  | SqlStatements ';' SqlStatements
  ;
 
@@ -353,9 +362,16 @@ SqlStatements_EDIT
      suggestDdlAndDmlKeywords();
    }
  | DataDefinition_EDIT
+   {
+     linkLocations();
+   }
  | DataManipulation_EDIT
+   {
+     linkLocations();
+   }
  | QuerySpecification_EDIT
    {
+     linkLocations();
      linkTablePrimaries();
    }
  | SqlStatements_EDIT ';' SqlStatements
@@ -661,8 +677,16 @@ RightParenthesisOrError
  ;
 
 SchemaQualifiedTableIdentifier
- : RegularOrBacktickedIdentifier                                       -> { identifierChain: [{ name: $1 }] }
- | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier  -> { identifierChain: [{ name: $1 }, { name: $3 }] }
+ : RegularOrBacktickedIdentifier
+   {
+     addTableLocation(@1, [ { name: $1 } ]);
+     $$ = { identifierChain: [ { name: $1 } ] };
+   }
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
+   {
+     addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
+     $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
+   }
  ;
 
 SchemaQualifiedTableIdentifier_EDIT
@@ -709,9 +733,18 @@ RegularOrBacktickedIdentifier
  | 'BACKTICK' 'VALUE' 'BACKTICK'  -> $2
  ;
 
+// TODO: Same as SchemaQualifiedTableIdentifier?
 RegularOrBackTickedSchemaQualifiedName
- : RegularOrBacktickedIdentifier                                       -> { identifierChain: [ { name: $1 } ] }
- | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier  -> { identifierChain: [ { name: $1 }, { name: $3 } ] }
+ : RegularOrBacktickedIdentifier
+   {
+     addTableLocation(@1, [ { name: $1 } ]);
+     $$ = { identifierChain: [ { name: $1 } ] };
+   }
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
+   {
+     addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
+     $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
+   }
  ;
 
 RegularOrBackTickedSchemaQualifiedName_EDIT
@@ -744,7 +777,13 @@ ColumnReferenceList
 
 ColumnReference
  : BasicIdentifierChain
+   {
+     addColumnLocation(@1, $1);
+   }
  | BasicIdentifierChain AnyDot '*'
+   {
+     addColumnLocation(@1, $1);
+   }
  ;
 
 ColumnReference_EDIT
@@ -1153,8 +1192,18 @@ DescribeStatement_EDIT
 
 HiveDescribeStatement
  : '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain
+   {
+     addTablePrimary($3);
+     addColumnLocation(@4, $4);
+   }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
  | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier
+   {
+     addDatabaseLocation(@4, $4);
+   }
  | '<hive>DESCRIBE' '<hive>FUNCTION' OptionalExtended RegularIdentifier
  ;
 
@@ -1205,12 +1254,16 @@ HiveDescribeStatement_EDIT
 
 ImpalaDescribeStatement
  : '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
  ;
 
 ImpalaDescribeStatement_EDIT
  : '<impala>DESCRIBE' OptionalFormatted SchemaQualifiedTableIdentifier_EDIT
  | '<impala>DESCRIBE' OptionalFormatted 'CURSOR' SchemaQualifiedTableIdentifier
    {
+     addTablePrimary($4);
      if (!$2) {
        suggestKeywords(['FORMATTED']);
      }
@@ -2488,7 +2541,6 @@ SelectList_EDIT
    {
      suggestFunctions();
      suggestColumns();
-     suggestFunctions();
      $$ = { suggestAggregateFunctions: true, suggestKeywords: ['*'] };
    }
  | SelectList ',' SelectListPartTwo_EDIT                 -> $3
@@ -2502,6 +2554,7 @@ SelectListPartTwo_EDIT
    {
      suggestFunctions();
      suggestColumns();
+     // TODO: Only if there's no FROM
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      $$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
@@ -2510,8 +2563,17 @@ SelectListPartTwo_EDIT
 
 DerivedColumn_TWO
  : ColumnIdentifier
+   {
+     addColumnLocation(@1, [$1]);
+   }
  | ColumnIdentifier AnyDot '*'
+   {
+     addColumnLocation(@1, [$1]);
+   }
  | ColumnIdentifier AnyDot DerivedColumnChain
+   {
+     addColumnLocation(@2, [$1].concat($3));
+   }
  ;
 
 DerivedColumn_EDIT_TWO
@@ -2832,7 +2894,7 @@ PushQueryState
      parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
      parser.yy.resultStack.push(parser.yy.result);
 
-     parser.yy.result = {};
+     parser.yy.result = { locations: [] };
      if (parser.yy.correlatedSubquery) {
        parser.yy.latestTablePrimaries = parser.yy.latestTablePrimaries.concat();
      } else {
@@ -2844,9 +2906,15 @@ PushQueryState
 PopQueryState
  :
    {
-     if (Object.keys(parser.yy.result).length === 0) {
+     linkLocations();
+     var locations = parser.yy.result.locations;
+     if (Object.keys(parser.yy.result).length === 1) {
        parser.yy.result = parser.yy.resultStack.pop();
+       parser.yy.result.locations = parser.yy.result.locations.concat(locations);
        parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
+     } else {
+       var oldResult = parser.yy.resultStack.pop();
+       parser.yy.result.locations = oldResult.concat(locations);
      }
    }
  ;
@@ -2963,8 +3031,16 @@ OptionalLateralViews_EDIT
 
 // TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
 UserDefinedTableGeneratingFunction
- : '<hive>EXPLODE(' DerivedColumnChain ')'     -> { function: $1.substring(0, $1.length - 1), expression: $2 }
- | '<hive>POSEXPLODE(' DerivedColumnChain ')'  -> { function: $1.substring(0, $1.length - 1), expression: $2 }
+ : '<hive>EXPLODE(' DerivedColumnChain ')'
+   {
+     addColumnLocation(@2, $2);
+     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
+   }
+ | '<hive>POSEXPLODE(' DerivedColumnChain ')'
+   {
+     addColumnLocation(@2, $2);
+     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
+   }
  ;
 
 UserDefinedTableGeneratingFunction_EDIT
@@ -3399,6 +3475,7 @@ ShowStatement_EDIT
    }
  | 'SHOW' 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
+     addTablePrimary($3);
      if (isImpala()) {
        suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
      }
@@ -3429,6 +3506,9 @@ ShowStatement_EDIT
 
 ShowColumnStatsStatement
  : 'SHOW' '<impala>COLUMN' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($4);
+   }
  ;
 
 ShowColumnStatsStatement_EDIT
@@ -3496,6 +3576,9 @@ ShowConfStatement
 
 ShowCreateTableStatement
  : 'SHOW' HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($4);
+   }
  ;
 
 ShowCreateTableStatement_EDIT
@@ -3513,6 +3596,7 @@ ShowCreateTableStatement_EDIT
  | 'SHOW' HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName_EDIT
  | 'SHOW' HiveOrImpalaCreate 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
+     addTablePrimary($4);
      suggestKeywords(['TABLE']);
    }
  ;
@@ -3671,9 +3755,21 @@ ShowIndexStatement_EDIT
 
 ShowLocksStatement
  : 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName '<hive>EXTENDED'
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')'
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')' '<hive>EXTENDED'
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<hive>LOCKS' DatabaseOrSchema RegularOrBacktickedIdentifier
  ;
 
@@ -3689,12 +3785,14 @@ ShowLocksStatement_EDIT
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName 'CURSOR'
     {
+      addTablePrimary($3);
       suggestKeywords(['EXTENDED', 'PARTITION']);
     }
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>EXTENDED'
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>PARTITION' '(' PartitionSpecList ')'
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' '(' PartitionSpecList ')' 'CURSOR'
    {
+     addTablePrimary($3);
      suggestKeywords(['EXTENDED']);
    }
  | 'SHOW' '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>PARTITION' '(' PartitionSpecList ')' '<hive>EXTENDED'
@@ -3706,8 +3804,17 @@ ShowLocksStatement_EDIT
 
 ShowPartitionsStatement
  : 'SHOW' '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName '<hive>PARTITION' PartitionSpecList
+   {
+     addTablePrimary($3);
+   }
  | 'SHOW' '<impala>PARTITIONS' RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($3);
+   }
  ;
 
 ShowPartitionsStatement_EDIT
@@ -3721,6 +3828,7 @@ ShowPartitionsStatement_EDIT
  | 'SHOW' '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT
  | 'SHOW' '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName 'CURSOR'
    {
+     addTablePrimary($3);
      suggestKeywords(['PARTITION']);
    }
  | 'SHOW' '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>PARTITION' PartitionSpecList
@@ -3830,6 +3938,9 @@ ShowTableStatement_EDIT
      });
    }
  | 'SHOW' '<impala>TABLE' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName
+    {
+      addTablePrimary($4);
+    }
  | 'SHOW' '<impala>TABLE' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName_EDIT
  ;
 
@@ -3852,6 +3963,9 @@ ShowTablesStatement_EDIT
 
 ShowTblPropertiesStatement
  : 'SHOW' '<hive>TBLPROPERTIES' RegularOrBackTickedSchemaQualifiedName
+   {
+     addTablePrimary($3);
+   }
  ;
 
 ShowTblPropertiesStatement_EDIT
@@ -3947,7 +4061,7 @@ SetClause_EDIT
  ;
 
 SetTarget
- : RegularIdentifier
+ : ColumnReference
  ;
 
 UpdateSource
@@ -4140,6 +4254,14 @@ var prioritizeSuggestions = function () {
     }
   }
 
+  var i = parser.yy.result.locations.length;
+  while (i--) {
+    var location = parser.yy.result.locations[i];
+    if (location.type === 'column' && (typeof location.table === 'undefined' || typeof location.identifierChain === 'undefined')) {
+      parser.yy.result.locations.splice(i, 1);
+    }
+  }
+
   if (typeof parser.yy.result.colRef !== 'undefined') {
     if (!parser.yy.result.suggestValues &&
         !parser.yy.result.suggestColRefKeywords &&
@@ -4188,24 +4310,29 @@ var prioritizeSuggestions = function () {
  *
  * [ { name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' } ]
  */
-parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) {
+parser.expandImpalaIdentifierChain = function (tablePrimaries, originalIdentifierChain) {
+  var identifierChain = originalIdentifierChain.concat(); // Clone in case it's called multiple times.
   if (typeof identifierChain === 'undefined' || identifierChain.length === 0) {
     return identifierChain;
   }
   var firstIdentifier = identifierChain[0].name;
 
-  foundPrimary = tablePrimaries.filter(function (tablePrimary) {
+  var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
     return tablePrimary.alias === firstIdentifier;
   });
 
   if (foundPrimary.length === 1) {
     var firstPart = foundPrimary[0].identifierChain.concat();
     var secondPart = identifierChain.slice(1);
+    var lastFromFirst = firstPart.pop();
     if (typeof identifierChain[0].keySet !== 'undefined') {
-      var lastFromFirst = firstPart.pop();
       firstPart.push({
         name: lastFromFirst.name,
         keySet: identifierChain[0].keySet
+      });
+    } else {
+      firstPart.push({
+        name: lastFromFirst.name
       });
     }
     return firstPart.concat(secondPart);
@@ -4220,12 +4347,12 @@ parser.identifyPartials = function (beforeCursor, afterCursor) {
   return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
 };
 
-parser.expandLateralViews = function (tablePrimaries, identifierChain) {
+parser.expandLateralViews = function (tablePrimaries, originalIdentifierChain) {
+  var identifierChain = originalIdentifierChain.concat(); // Clone in case it's re-used
   var firstIdentifier = identifierChain[0];
-  var identifierChainParts = [];
   tablePrimaries.forEach(function (tablePrimary) {
     if (typeof tablePrimary.lateralViews !== 'undefined') {
-      tablePrimary.lateralViews.reverse().forEach(function (lateralView) {
+      tablePrimary.lateralViews.concat().reverse().forEach(function (lateralView) {
         if (!lateralView.udtf.expression.columnReference) {
           return;
         }
@@ -4260,12 +4387,12 @@ parser.expandLateralViews = function (tablePrimaries, identifierChain) {
 };
 
 var linkSuggestion = function (suggestion, isColumnSuggestion) {
-  var identifierChain = suggestion.identifierChain;
-  var tablePrimaries = parser.yy.latestTablePrimaries;
-
-  if (typeof identifierChain === 'undefined' || typeof tablePrimaries === 'undefined') {
+  if (typeof suggestion.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
     return;
   }
+
+  var identifierChain = suggestion.identifierChain.concat();
+  var tablePrimaries = parser.yy.latestTablePrimaries;
 
   // Impala can have references to maps or array, i.e. FROM table t, t.map m
   // We need to replace those in the identifierChain
@@ -4312,7 +4439,7 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
     var dbAndTable = false;
     if (foundTable.length === 0) {
       foundTable = tablePrimaries.filter(function (tablePrimary) {
-        if (identifierChain[0].name === tablePrimary.identifierChain[0].name) {
+        if (tablePrimary.identifierChain && identifierChain[0].name === tablePrimary.identifierChain[0].name) {
           if (identifierChain.length > 1 && tablePrimary.identifierChain.length > 1) {
             dbAndTable = identifierChain[1].name === tablePrimary.identifierChain[1].name;
           }
@@ -4328,6 +4455,7 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
       if (dbAndTable) {
         identifierChain.shift();
       }
+      suggestion.identifierChain = identifierChain;
     }
   }
 
@@ -4373,19 +4501,32 @@ var suggestTablePrimariesAsIdentifiers = function () {
   }
 }
 
+var linkLocations = function () {
+  parser.yy.result.locations.forEach(function (location) {
+    if (location.type === 'column' || location.type === 'table') {
+      linkSuggestion(location);
+      // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
+      // In this testArray would be marked a type table so we need to switch it to column.
+      if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
+        location.type = 'column';
+      }
+    }
+  });
+}
+
 var linkTablePrimaries = function () {
-   if (!parser.yy.cursorFound) {
-     return;
-   }
-   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-     linkSuggestion(parser.yy.result.suggestColumns, true);
-   }
-   if (typeof parser.yy.result.colRef !== 'undefined') {
-     linkSuggestion(parser.yy.result.colRef, false);
-   }
-   if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
-     linkSuggestion(parser.yy.result.suggestKeyValues, true);
-   }
+  if (!parser.yy.cursorFound) {
+    return;
+  }
+  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+    linkSuggestion(parser.yy.result.suggestColumns, true);
+  }
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    linkSuggestion(parser.yy.result.colRef, false);
+  }
+  if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
+    linkSuggestion(parser.yy.result.suggestKeyValues, true);
+  }
 }
 
 var addTablePrimary = function (ref) {
@@ -4473,6 +4614,48 @@ var suggestTables = function (details) {
   parser.yy.result.suggestTables = details || {};
 }
 
+var adjustLocationForCursor = function (location) {
+   // columns are 0-based and lines not, so add 1 to cols
+   var newLocation = {
+     first_line: location.first_line,
+     last_line: location.last_line,
+     first_column: location.first_column + 1,
+     last_column: location.last_column + 1
+   };
+   if (parser.yy.cursorFound) {
+     if (parser.yy.cursorFound.first_line === newLocation.first_line && parser.yy.cursorFound.last_column <= newLocation.first_column) {
+       var additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
+       additionalSpace -= parser.yy.partialCursor ? 1 : 3; // For some reason the normal cursor eats 3 positions.
+       newLocation.first_column = newLocation.first_column + additionalSpace;
+       newLocation.last_column = newLocation.last_column + additionalSpace;
+     }
+   }
+   return newLocation;
+};
+
+var addFunctionLocation = function (location, functionName) {
+  // Remove trailing '(' from location
+  var adjustedLocation = {
+    first_line: location.first_line,
+    last_line: location.last_line,
+    first_column: location.first_column,
+    last_column: location.last_column - 1
+  }
+  parser.yy.result.locations.push({ type: 'function', location: adjustLocationForCursor(adjustedLocation), function: functionName });
+}
+
+var addDatabaseLocation = function (location, database) {
+  parser.yy.result.locations.push({ type: 'database', location: adjustLocationForCursor(location), database: database });
+}
+
+var addTableLocation = function (location, identifierChain) {
+  parser.yy.result.locations.push({ type: 'table', location: adjustLocationForCursor(location), identifierChain: identifierChain });
+}
+
+var addColumnLocation = function (location, identifierChain) {
+  parser.yy.result.locations.push({ type: 'column', location: adjustLocationForCursor(location), identifierChain: identifierChain });
+}
+
 var suggestDatabases = function (details) {
   parser.yy.result.suggestDatabases = details || {};
 }
@@ -4500,17 +4683,17 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
   }
   parser.yy.sqlFunctions = sqlFunctions;
   parser.yy.activeDialect = dialect;
-  parser.yy.result = {};
+  parser.yy.result = { locations: [] };
   parser.yy.lowerCase = false;
 
-  var partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
+  parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
 
-  if (partialLengths.left > 0) {
-    beforeCursor = beforeCursor.substring(0, beforeCursor.length - partialLengths.left);
+  if (parser.yy.partialLengths.left > 0) {
+    beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
   }
 
-  if (partialLengths.right > 0) {
-    afterCursor = afterCursor.substring(partialLengths.right);
+  if (parser.yy.partialLengths.right > 0) {
+    afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
   }
 
   // Hack to set the inital state of the lexer without first having to hit a token
