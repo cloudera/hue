@@ -91,7 +91,7 @@ def get_config_root(*append):
   """
   Currently gets it based on the Hadoop configuration location.
   """
-  from hadoop.cluster import get_default_fscluster_config
+  from hadoop.conf import HDFS_CLUSTERS
 
-  yarn_site_path = get_default_fscluster_config().HADOOP_CONF_DIR.get()
+  yarn_site_path = HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.get()
   return os.path.abspath(os.path.join(yarn_site_path, '..', *append))

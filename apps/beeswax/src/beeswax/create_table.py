@@ -479,7 +479,9 @@ def load_after_create(request, database):
     try:
       remove_header(request.fs, path)
     except Exception, e:
-      raise PopupException(_("The headers of the file could not be removed."), detail=e)
+      msg = "The headers of the file could not be removed."
+      LOG.exception(msg)
+      raise PopupException(_(msg), detail=e)
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
