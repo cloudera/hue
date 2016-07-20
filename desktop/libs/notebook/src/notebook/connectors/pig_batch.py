@@ -17,6 +17,8 @@
 
 import logging
 import json
+import re
+import time
 
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
@@ -31,6 +33,7 @@ LOG = logging.getLogger(__name__)
 try:
   from pig import api
   from pig.models import PigScript2, get_workflow_output, hdfs_link
+  from oozie.views.api import get_log as get_workflow_logs
   from oozie.views.dashboard import check_job_access_permission, check_job_edition_permission
 except Exception, e:
   LOG.exception('Pig application is not enabled: %s' % e)
@@ -38,11 +41,14 @@ except Exception, e:
 
 class PigApi(Api):
 
+  RESULTS_PATTERN = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
+
   def __init__(self, *args, **kwargs):
     Api.__init__(self, *args, **kwargs)
 
     self.fs = self.request.fs
     self.jt = self.request.jt
+
 
   def execute(self, notebook, snippet):
 
@@ -65,16 +71,18 @@ class PigApi(Api):
       'has_result_set': True,
     }
 
+
   def check_status(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
 
     oozie_workflow = check_job_access_permission(self.request, job_id)
-    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
+    logs, workflow_actions, is_really_done = self._get_log_output(oozie_workflow)
+    results = self._get_results(logs)
 
     if is_really_done and not oozie_workflow.is_running():
       if oozie_workflow.status in ('KILLED', 'FAILED'):
         raise QueryError(_('The script failed to run and was stopped'))
-      if logs:
+      if results:
         status = 'available'
       else:
         status = 'running' # Tricky case when the logs are being moved by YARN at job completion
@@ -87,29 +95,20 @@ class PigApi(Api):
         'status': status
     }
 
-  def _get_output(self, oozie_workflow):
-    q = QueryDict(self.request.GET, mutable=True)
-    q['format'] = 'python' # Hack for triggering the good section in single_task_attempt_logs
-    self.request.GET = q
-
-    logs, workflow_actions, is_really_done = api.get(self.fs, self.jt, self.user).get_log(self.request, oozie_workflow)
-
-    return logs, workflow_actions, is_really_done
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     job_id = snippet['result']['handle']['id']
 
-    oozie_workflow = check_job_access_permission(self.request, job_id)
-    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
-
-    output = logs.get('pig', _('No result'))
+    log_output = self.get_log(notebook, snippet)
+    results = self._get_results(log_output)
 
     return {
-        'data':  [[line] for line in output.split('\n')], # hdfs_link()
+        'data':  [[line] for line in results.split('\n')], # hdfs_link()
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
         'type': 'table',
         'has_more': False,
     }
+
 
   def cancel(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
@@ -121,13 +120,14 @@ class PigApi(Api):
 
     return {'status': 0}
 
+
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     job_id = snippet['result']['handle']['id']
 
     oozie_workflow = check_job_access_permission(self.request, job_id)
-    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
+    logs, workflow_actions, is_really_done = self._get_log_output(oozie_workflow)
+    return logs
 
-    return logs.get('pig', _('No result'))
 
   def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
@@ -135,8 +135,42 @@ class PigApi(Api):
     oozie_workflow = check_job_access_permission(self.request, job_id)
     return oozie_workflow.get_progress(),
 
+
   def close_statement(self, snippet):
     pass
 
+
   def close_session(self, session):
     pass
+
+
+  def _get_log_output(self, oozie_workflow):
+    log_output = ''
+
+    q = QueryDict(self.request.GET, mutable=True)
+    q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
+    self.request.GET = q
+
+    logs, workflow_actions, is_really_done = api.get(self.fs, self.jt, self.user).get_log(self.request, oozie_workflow,
+                                                                                          make_links=False)
+
+    if len(logs) > 0:
+      log_output = logs.values()[0]
+      if log_output.startswith('Unable to locate'):
+        LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
+        time.sleep(5.0)
+        logs, workflow_actions, is_really_done = api.get(self.fs, self.jt, self.user).get_log(self.request, oozie_workflow,
+                                                                                              make_links=False)
+        if len(logs) > 0:
+          log_output = logs.values()[0]
+
+    return log_output, workflow_actions, is_really_done
+
+
+  def _get_results(self, log_output):
+    results = ''
+    re_results = re.compile(self.RESULTS_PATTERN, re.M | re.DOTALL)
+    if re_results.search(log_output):
+      results = re.search(re_results, log_output).group('results').strip()
+    return results
+
