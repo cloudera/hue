@@ -647,6 +647,9 @@ function BeeswaxViewModel(server, apiHelper) {
           if (typeof window.console !== 'undefined') {
             console.error(data.message);
           }
+          if (data.log) {
+            self.applyLogs(data.log);
+          }
         } else {
           $(document).trigger('watched.query', data);
         }
