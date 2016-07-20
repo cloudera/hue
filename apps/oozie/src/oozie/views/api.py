@@ -17,6 +17,7 @@
 
 import json
 import logging
+import re
 import sys
 
 from django.http import Http404
@@ -27,6 +28,8 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document
 
+from jobbrowser.views import job_single_logs
+from jobbrowser.models import LinkJobLogs
 from oozie.forms import WorkflowForm, NodeForm, design_form_by_type
 from oozie.models import Workflow, Node, Start, End, Kill,\
                          Link, Decision, Fork, DecisionEnd, Join,\
@@ -419,3 +422,72 @@ def workflows(request):
 
 def autocomplete_properties(request):
   return JsonResponse({ 'properties': _STD_PROPERTIES })
+
+
+@error_handler
+def get_log(request, oozie_workflow, make_links=True, log_start_pattern=None, log_end_pattern=None):
+  logs = {}
+  is_really_done = False
+
+  for action in oozie_workflow.get_working_actions():
+    try:
+      if action.externalId:
+        data = job_single_logs(request, **{'job': action.externalId})
+
+        if data and 'logs' in data:
+          action_logs = data['logs'][1]
+
+          if log_start_pattern:
+            re_log_start = re.compile(log_start_pattern, re.M | re.DOTALL)
+            if re_log_start.search(action_logs):
+              action_logs = re.search(re_log_start, action_logs).group(1).strip()
+            else:
+              LOG.debug('Failed to find given start log pattern in logs: %s' % log_start_pattern)
+
+          if make_links:
+            action_logs = LinkJobLogs._make_links(action_logs)
+
+          logs[action.name] = action_logs
+
+          if log_end_pattern:
+            re_log_end = re.compile(log_end_pattern)
+            is_really_done = re_log_end.search(action_logs) is not None
+            if is_really_done and not action_logs:
+              LOG.warn('Unable to scrape full logs, try increasing the jobbrowser log_offset configuration value.')
+    except Exception, e:
+      LOG.error('An error occurred while watching the job running: %(error)s' % {'error': e})
+      is_really_done = True
+
+  workflow_actions = _get_workflow_actions(oozie_workflow, logs, is_really_done)
+
+  return logs, workflow_actions, is_really_done
+
+
+def _get_workflow_actions(oozie_workflow, logs, is_really_done=False):
+  workflow_actions = []
+
+  # Return metadata for workflow actions (required for Pig)
+  for action in oozie_workflow.get_working_actions():
+    progress = _get_progress(oozie_workflow, logs.get(action.name, ''))
+    appendable = {
+      'name': action.name,
+      'status': action.status,
+      'logs': logs.get(action.name, ''),
+      'isReallyDone': is_really_done,
+      'progress': progress,
+      'progressPercent': '%d%%' % progress,
+      'absoluteUrl': oozie_workflow.get_absolute_url(),
+    }
+    workflow_actions.append(appendable)
+
+  return workflow_actions
+
+
+def _get_progress(job, log):
+  if job.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
+    return 100
+  else:
+    try:
+      return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
+    except:
+      return 0

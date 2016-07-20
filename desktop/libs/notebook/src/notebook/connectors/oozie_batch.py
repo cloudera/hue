@@ -16,7 +16,10 @@
 # limitations under the License.
 
 import logging
+import re
+import time
 
+from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -30,6 +33,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.models2 import Workflow, WorkflowBuilder
+  from oozie.views.api import get_log as get_workflow_logs
   from oozie.views.dashboard import check_job_access_permission, check_job_edition_permission
   from oozie.views.editor2 import _submit_workflow
 except Exception, e:
@@ -38,11 +42,16 @@ except Exception, e:
 
 class OozieApi(Api):
 
+  LOG_START_PATTERN = '(>>> Invoking Main class now >>>.+)'
+  LOG_END_PATTERN = '<<< Invocation of Main class completed <<<'
+  RESULTS_PATTERN = "(?P<results>>>> Invoking Beeline command line now >>>.+<<< Invocation of Beeline command completed <<<)"
+
   def __init__(self, *args, **kwargs):
     Api.__init__(self, *args, **kwargs)
 
     self.fs = self.request.fs
     self.jt = self.request.jt
+
 
   def execute(self, notebook, snippet):
     # Get document from notebook
@@ -67,6 +76,7 @@ class OozieApi(Api):
       'has_result_set': True,
     }
 
+
   def check_status(self, notebook, snippet):
     response = {}
     job_id = snippet['result']['handle']['id']
@@ -79,15 +89,18 @@ class OozieApi(Api):
 
     return response
 
+
   def fetch_result(self, notebook, snippet, rows, start_over):
-    output = self.get_log(notebook, snippet)
+    log_output = self.get_log(notebook, snippet)
+    results = self._get_results(log_output)
 
     return {
-        'data':  [[line] for line in output.split('\n')], # hdfs_link()
+        'data':  [[line] for line in results.split('\n')],  # hdfs_link()
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
         'type': 'table',
         'has_more': False,
     }
+
 
   def cancel(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
@@ -99,13 +112,13 @@ class OozieApi(Api):
 
     return {'status': 0}
 
+
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
-    status_resp = oozie_job.log
+    return self._get_log_output(oozie_job)
 
-    return status_resp
 
   def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
@@ -113,8 +126,44 @@ class OozieApi(Api):
     oozie_job = check_job_access_permission(self.request, job_id)
     return oozie_job.get_progress(),
 
+
   def close_statement(self, snippet):
     pass
 
+
   def close_session(self, session):
     pass
+
+
+  def _get_log_output(self, oozie_workflow):
+    log_output = ''
+
+    q = QueryDict(self.request.GET, mutable=True)
+    q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
+    self.request.GET = q
+
+    logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
+                                                                 log_start_pattern=self.LOG_START_PATTERN,
+                                                                 log_end_pattern=self.LOG_END_PATTERN)
+
+    if len(logs) > 0:
+      log_output = logs.values()[0]
+      if log_output.startswith('Unable to locate'):
+        LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
+        time.sleep(5.0)
+        logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
+                                                                   log_start_pattern=self.LOG_START_PATTERN,
+                                                                   log_end_pattern=self.LOG_END_PATTERN)
+        if len(logs) > 0:
+          log_output = logs.values()[0]
+
+    return log_output
+
+
+
+  def _get_results(self, log_output):
+    results = ''
+    re_results = re.compile(self.RESULTS_PATTERN, re.M | re.DOTALL)
+    if re_results.search(log_output):
+      results = re.search(re_results, log_output).group('results').strip()
+    return results
