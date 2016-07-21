@@ -212,6 +212,17 @@
     }
   };
 
+  HueFileEntry.prototype.showRenameDirectoryModal = function () {
+    var self = this;
+    if (!self.selected()) {
+      self = self.selectedEntry();
+    }
+    if (! self.isTrash() && ! self.isTrashed()) {
+      $('#renameDirectoryName').val(self.definition().name);
+      $('#renameDirectoryModal').modal('show');
+    }
+  };
+
   HueFileEntry.prototype.setSort = function (name) {
     var self = this;
     if (self.activeSort().indexOf(name) === -1) {
@@ -594,6 +605,18 @@
         name: name
       });
       $('#newDirectoryName').val(null)
+    }
+  };
+
+  HueFileEntry.prototype.renameDirectory = function (name) {
+    var self = this;
+    if (name && self.app === 'documents') {
+      self.apiHelper.updateDocument({
+        successCallback: self.load.bind(self),
+        uuid: self.definition().uuid,
+        name: name
+      });
+      $('#renameDirectoryName').val(null)
     }
   };
 
