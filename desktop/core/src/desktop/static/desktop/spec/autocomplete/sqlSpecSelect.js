@@ -417,15 +417,53 @@ define([
         });
       });
 
-      // Fails on YEAR( in JOIN condition (should be valueExpression)
-      xit('should handle "SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60; |"', function () {
+      it('should handle "SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60;',
           afterCursor: '',
           dialect: 'impala',
           containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            locations: [
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 21 }, function: 'round' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 51, last_column: 64 }, identifierChain: [{ name: 'cat'}], database: 'tstDb1', table: 'b1' },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 72, last_column: 75 }, function: 'sum' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 76, last_column: 91 }, identifierChain: [{ name: 'price' }],database: 'tstDb1', table: 'b1' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 94, last_column: 102 }, identifierChain: [{ name: 'qua' }], table: 'tran' },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 121, last_column: 123 }, database: 'tstDb1', table: 'b1' },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 139, last_column: 143 }, table: 'tran' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 149, last_column: 158 }, identifierChain: [{ name: 'b_id'}], table: 'tran' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 161, last_column: 173 }, identifierChain: [{ name: 'id'}], database: 'tstDb1', table: 'b1' },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 178, last_column: 182 }, function: 'year' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 183, last_column: 194 }, identifierChain: [{ name: 'tran_d' }], table: 'tran' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 234, last_column: 235 }, identifierChain: [{ name: 'cat' }], database: 'tstDb1', table: 'b1' }
+            ]
+          }
+        });
+      });
+
+      it('should handle "SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\\nSELECT t1.bla FROM testTable2 t1;\nSELECT * FROM testTable3 t3 WHERE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\nSELECT t1.bla FROM testTable2 t1;\nSELECT * FROM testTable3 t3, testTable4 t4 WHERE ',
+          afterCursor: '',
+          containsKeywords: ['EXISTS'],
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestIdentifiers: [{ name: 't3.', type: 'alias'}, { name: 't4.', type: 'alias'}],
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40},identifierChain: [{ name: 'a'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 49, last_column: 50},identifierChain: [{ name: 'b'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 55, last_column: 56},identifierChain: [{ name: 'c'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 66, last_column: 67},identifierChain: [{ name: 'd'}], table:'testTable'},
+              { type: 'column', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 14},identifierChain: [{ name: 'bla'}], table:'testTable2'},
+              { type: 'table', location: { first_line: 2, last_line: 2, first_column: 20, last_column: 30}, table: 'testTable2'},
+              { type: 'table', location: { first_line: 3, last_line: 3, first_column: 15, last_column: 25}, table: 'testTable3'},
+              { type: 'table', location: { first_line: 3, last_line: 3, first_column: 30, last_column: 40}, table: 'testTable4'}
+            ]
           }
         });
       });
@@ -435,7 +473,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; ',
           afterCursor: '',
           containsKeywords: ['SELECT'],
-          dialect: 'hive',
+          dialect: 'impala',
           expectedResult: {
             lowerCase: false,
             locations: [
@@ -444,25 +482,6 @@ define([
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42},identifierChain: [{ name: 'b'}], table:'testTable'},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45},identifierChain: [{ name: 'c'}], table:'testTable'},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53},identifierChain: [{ name: 'd'}], table:'testTable'}
-            ]
-          }
-        });
-      });
-
-      xit('should handle "SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; |"', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; ',
-          afterCursor: '',
-          containsKeywords: ['SELECT'],
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            locations: [
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35},identifierChain: { name: 'a'}, table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42},identifierChain: { name: 'b'}, table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45},identifierChain: { name: 'c'}, table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53},identifierChain: { name: 'd'}, table:'testTable'}
             ]
           }
         });
@@ -2308,22 +2327,6 @@ define([
           });
         });
 
-        xit('should suggest tables for "SELECT * FROM | LATERAL VIEW explode("', function () {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM ',
-            afterCursor: ' LATERAL VIEW explode(',
-            dialect: 'hive',
-            expectedResult: {
-              lowerCase: false,
-              suggestTables: {},
-              suggestDatabases: { appendDot: true },
-              locations: [
-                {type: 'function', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 35 }, function: 'explode'},
-              ]
-            }
-          });
-        });
-
         it('should suggest columns for "SELECT | FROM testTable LATERAL VIEW explode("', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT ',
@@ -2465,9 +2468,9 @@ define([
               locations: [
                 { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], table: 'testTable2'},
                 { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, table: 'testTable2'},
-                { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 23 }, function: 'EXPLODE'},
+                { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 23 }, function: 'explode'},
                 { type: 'column', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayA'}], table: 'testTable2'},
-                { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 23 }, function: 'EXPLODE'},
+                { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 23 }, function: 'explode'},
                 { type: 'column', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayB'}] ,table: 'testTable2'}
               ]
             }
@@ -3241,6 +3244,7 @@ define([
         });
       });
 
+      // Fails because valueExpressionList_EDIT doesn't support empty value expression around ','
       xit('should suggest typed columns for "SELECT substr(,,| FROM testTable"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT substr(,,',
@@ -3644,15 +3648,16 @@ define([
         });
       });
 
-      xit('should suggest columns for "SELECT a, b, c FROM testTable WHERE | RLIKE \'bla bla\'"', function() {
+      it('should suggest columns for "SELECT a, b, c FROM testTable WHERE | RLIKE \'bla bla\'"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d ',
           afterCursor: ' RLIKE \'bla bla\'',
           hasLocations: true,
+          containsKeywords: ['<', 'IN'],
+          containsColRefKeywords: true,
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: { table: 'testTable' }
+            colRef: { identifierChain: [{ name: 'd'}], table: 'testTable' }
           }
         });
       });
@@ -3719,14 +3724,17 @@ define([
         });
       });
 
+      // Fails because "NOT" is missing
       xit('should suggest keywords for "SELECT * FROM foo WHERE id | LIKE \'bla bla\'"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id ',
           afterCursor: ' LIKE \'bla bla\'',
           hasLocations: true,
+          containsKeywords: ['<', 'IN', 'NOT'],
+          containsColRefKeywords: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['NOT']
+            colRef: { identifierChain: [{ name: 'id' }], table: 'foo' }
           }
         });
       });
@@ -4395,6 +4403,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable1 JOIN ',
           afterCursor: '',
           hasLocations: true,
+          dialect: 'generic',
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -4434,6 +4443,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
@@ -4446,6 +4456,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
@@ -4458,6 +4469,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
@@ -4470,6 +4482,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
+            suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, table: 'testTable1'},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 42, last_column: 52}, table: 'testTable2'},
@@ -4480,7 +4493,7 @@ define([
         });
       });
 
-      it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', function() {
+    it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
           afterCursor: '',
@@ -4512,6 +4525,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: true,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'db.testTable2.', type: 'table' }]
           }
         });
@@ -4524,6 +4538,9 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: true,
+            suggestFunctions: { types: ['COLREF' ]},
+            suggestValues: true,
+            colRef: { identifierChain: [{ name: 'testColumn1'}], table: 'testTable1' },
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
@@ -4537,7 +4554,8 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: true,
-            suggestColumns: { table: 'testTable2'}
+            colRef: { identifierChain: [{ name: 'testColumn1'}], table: 'testTable1' },
+            suggestColumns: { types: ['COLREF'], table: 'testTable2'}
           }
         });
       });
@@ -4555,7 +4573,7 @@ define([
         });
       });
 
-      xit('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
+      it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT t1.* FROM table1 t1 ',
           afterCursor: ' JOIN',
@@ -4564,6 +4582,60 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN table2 t2 ON t1.bla = t2.bla"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+          afterCursor: ' JOIN table2 t2 ON t1.bla = t2.bla',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 | JOIN table3"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ',
+          afterCursor: ' JOIN table3',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'ON', 'RIGHT', 'RIGHT OUTER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla = t2.bla | JOIN table3"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla = t2.bla ',
+          afterCursor: ' JOIN table3',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['AND', '=', 'IN', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla | JOIN table3"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla ',
+          afterCursor: ' JOIN table3',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['=', 'LEFT OUTER'],
+          containsColRefKeywords: true,
+          expectedResult: {
+            lowerCase: false,
+            colRef: { identifierChain: [{ name: 'bla' }], table: 'table1' }
           }
         });
       });
@@ -4621,7 +4693,7 @@ define([
           });
         });
 
-        xit('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
+        it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
             afterCursor: ' JOIN',
@@ -4681,6 +4753,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestFunctions: {},
               suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
             }
           });
@@ -4702,6 +4775,21 @@ define([
       });
 
       describe('Impala specific', function () {
+        it('should suggest identifiers for "SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE "', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestKeywords: ['EXISTS', 'NOT EXISTS'],
+              suggestIdentifiers: [{ name: 't1.', type: 'alias'}, { name: 't2.', type: 'alias' }]
+            }
+          });
+        });
+
         it('should suggest keywords for "SELECT t1.* FROM table1 t1 |"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
@@ -4715,7 +4803,35 @@ define([
           });
         });
 
-        xit('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
+        it('should suggest tables for "SELECT * FROM testTable1 JOIN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable1 JOIN ',
+            afterCursor: '',
+            hasLocations: true,
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true },
+              suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 | JOIN table3"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ',
+            afterCursor: ' JOIN table3',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'ON', 'RIGHT', 'RIGHT OUTER', 'USING'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT t1.* FROM table1 t1 ',
             afterCursor: ' JOIN',
@@ -4775,6 +4891,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestFunctions: {},
               suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
             }
           });
@@ -4789,7 +4906,8 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
-              suggestDatabases: { appendDot: true }
+              suggestDatabases: { appendDot: true },
+              suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
             }
           });
         });
@@ -4875,7 +4993,6 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT ',
           afterCursor: '',
-          //hasLocations: true, // TODO: fix locations for invalid subquery
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -4889,7 +5006,11 @@ define([
               prependQuestionMark: true,
               prependFrom: true,
               appendDot: true
-            }
+            },
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18}, table: 'foo' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28}, identifierChain: [{ name: 'bar'}], table: 'foo'}
+            ]
           }
         });
       });
@@ -4899,7 +5020,6 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM bar WHERE foo NOT IN (SELECT ',
           afterCursor: ')',
-          //hasLocations: true, // TODO: fix locations for invalid subquery
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
@@ -4913,7 +5033,11 @@ define([
               prependQuestionMark: true,
               prependFrom: true,
               appendDot: true
-            }
+            },
+            locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18}, table: 'bar' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28}, identifierChain: [{ name: 'foo'}], table: 'bar'}
+            ]
           }
         });
       });
@@ -4977,17 +5101,19 @@ define([
         });
       });
 
-      it('should suggest columns for "SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT foo FROM t3 WHERE | % 2 = 0"', function() {
+      it('should suggest columns for "SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE | % 2 = 0"', function() {
         assertAutoComplete({
-          beforeCursor: 'SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT foo FROM t3 WHERE ',
+          beforeCursor: 'SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE ',
           afterCursor: ' % 2 = 0',
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
             suggestIdentifiers: [{ name: 't1.', type: 'table' }, { name: 'ta2.', type: 'alias' }, { name: 't3.', type: 'table'}],
             locations: [
-              // TODO: Should have t1 and t2 here as well (invalid subquery) see next test below for proper result
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 83, last_column: 85}, table: 't3' }
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 41}, table: 't1' },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 43, last_column: 45}, table: 't2' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 74, last_column: 80}, identifierChain: [{ name: 'foo'}], table: 't3'},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 86, last_column: 88}, table: 't3' }
             ]
           }
         });

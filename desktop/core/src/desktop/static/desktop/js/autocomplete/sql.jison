@@ -105,6 +105,7 @@
 <impala>'STATS'                     { return '<impala>STATS'; }
 <impala>'TABLE'                     { return '<impala>TABLE'; }
 <impala>'TABLES'                    { return '<impala>TABLES'; }
+<impala>'USING'                     { return '<impala>USING'; }
 <impala>\[SHUFFLE\]                 { return '<impala>SHUFFLE'; }
 <impala>\[BROADCAST\]               { return '<impala>BROADCAST'; }
 
@@ -304,32 +305,19 @@ RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  ;
 
-InitResults
+NewStatement
  : /* empty */
    {
-     parser.yy.cursorFound = false;
-
-     // TODO: Move these below before token or use $$ instead
-     delete parser.yy.latestTablePrimaries;
-     delete parser.yy.correlatedSubquery;
-     delete parser.yy.keepColumns;
-
-     parser.parseError = function (message, error) {
-       if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-         linkTablePrimaries();
-       }
-       parser.yy.result.error = error;
-       return message;
-     };
+     prepareNewStatement();
    }
  ;
 
 Sql
- : InitResults SqlStatements EOF
+ : NewStatement SqlStatements EOF
    {
      return parser.yy.result;
    }
- | InitResults SqlStatements_EDIT EOF
+ | NewStatement SqlStatements_EDIT EOF
    {
      return parser.yy.result;
    }
@@ -342,40 +330,26 @@ Sql
 SqlStatements
  :
  | DataDefinition
-   {
-     linkLocations();
-   }
  | DataManipulation
-   {
-     linkLocations();
-   }
  | QuerySpecification
-   {
-     linkLocations();
-   }
- | SqlStatements ';' SqlStatements
+ | SqlStatements ';' NewStatement SqlStatements
  ;
 
 SqlStatements_EDIT
+ : SqlStatement_EDIT
+ | SqlStatement_EDIT ';' NewStatement SqlStatements
+ | SqlStatements ';' NewStatement SqlStatement_EDIT
+ | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
+ ;
+
+SqlStatement_EDIT
  : AnyCursor
    {
      suggestDdlAndDmlKeywords();
    }
  | DataDefinition_EDIT
-   {
-     linkLocations();
-   }
  | DataManipulation_EDIT
-   {
-     linkLocations();
-   }
  | QuerySpecification_EDIT
-   {
-     linkLocations();
-     linkTablePrimaries();
-   }
- | SqlStatements_EDIT ';' SqlStatements
- | SqlStatements ';' SqlStatements_EDIT
  ;
 
 DataDefinition
@@ -402,9 +376,6 @@ DataManipulation
 DataManipulation_EDIT
  : LoadStatement_EDIT
  | UpdateStatement_EDIT
-   {
-     linkTablePrimaries();
-   }
  ;
 
 
@@ -1184,9 +1155,6 @@ DescribeStatement
 
 DescribeStatement_EDIT
  : HiveDescribeStatement_EDIT
-   {
-     linkTablePrimaries();
-   }
  | ImpalaDescribeStatement_EDIT
  ;
 
@@ -1495,31 +1463,69 @@ OptionalAllOrDistinct
  ;
 
 TableExpression
- : FromClause SelectConditions
+ : FromClause OptionalSelectConditions
  ;
 
 TableExpression_EDIT
- : FromClause SelectConditions_EDIT
- | FromClause_EDIT SelectConditions
- | FromClause SelectConditions 'CURSOR'
+ : FromClause OptionalSelectConditions_EDIT
+ | FromClause_EDIT OptionalSelectConditions
+ | FromClause OptionalSelectConditions 'CURSOR' OptionalJoins
    {
-     if ($2.suggestKeywords && $2.suggestKeywords.length == 0) {
+     // A couple of things are going on here:
+     // - If there are no SelectConditions (WHERE, GROUP BY, etc.) we should suggest complete join options
+     // - If there's an OptionalJoin at the end, i.e. 'SELECT * FROM foo | JOIN ...' we should suggest
+     //   different join types
+     // - The FromClause could end with a valueExpression, in which case we should suggest keywords like '='
+     //   or 'AND' based on type
+     // The reason for the join mess is because for "SELECT * FROM foo | JOIN bar" the parts surrounding the
+     // cursor are complete and not in _EDIT rules.
+
+     if (!$2) {
        var keywords = [];
        if (typeof $1.hasJoinCondition !== 'undefined' && ! $1.hasJoinCondition) {
          keywords.push('ON');
+         if (isImpala()) {
+           keywords.push('USING');
+         }
        }
        if (isHive()) {
-         keywords = keywords.concat(['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+         if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
+           keywords = keywords.concat(['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']);
+         } else {
+           keywords = keywords.concat(['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+         }
        } else if (isImpala()) {
-         keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']);
+         if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
+           keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT ANTI', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT', 'RIGHT OUTER', 'RIGHT SEMI']);
+         } else {
+           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']);
+         }
        } else {
-         keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+         if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
+           keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
+         } else {
+           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+         }
        }
-       suggestKeywords(keywords);
+       if ($1.suggestKeywords) {
+         keywords = keywords.concat($1.suggestKeywords);
+         suggestKeywords(keywords);
+       } else if ($1.types) {
+        // Checks if valueExpression could happen when there's no OptionalJoinCondition
+         suggestValueExpressionKeywords($1, keywords);
+       } else {
+         suggestKeywords(keywords);
+       }
      } else {
        checkForKeywords($2);
      }
    }
+ ;
+
+OptionalJoins
+ :
+ | Joins
+ | Joins_ERROR
  ;
 
 FromClause
@@ -1535,12 +1541,10 @@ FromClause_EDIT
    }
  ;
 
-SelectConditions
+OptionalSelectConditions
  : OptionalWhereClause OptionalGroupByClause OptionalOrderByClause OptionalLimitClause
    {
-     if (!$1 && !$2 && !$3 && !$4) {
-       $$ = { suggestKeywords: [] };
-     } else if ($1 && !$2 && !$3 && !$4) {
+     if ($1 && !$2 && !$3 && !$4) {
        $$ = getValueExpressionKeywords($1, ['GROUP BY', 'LIMIT', 'ORDER BY']);
        if ($1.columnReference) {
          $$.columnReference = $1.columnReference
@@ -1557,7 +1561,7 @@ SelectConditions
    }
  ;
 
-SelectConditions_EDIT
+OptionalSelectConditions_EDIT
  : OptionalWhereClause_EDIT OptionalGroupByClause OptionalOrderByClause OptionalLimitClause
  | OptionalWhereClause OptionalGroupByClause_EDIT OptionalOrderByClause OptionalLimitClause
  | OptionalWhereClause OptionalGroupByClause OptionalOrderByClause_EDIT OptionalLimitClause
@@ -2062,6 +2066,11 @@ ValueExpression_EDIT
  | ValueExpression_EDIT 'NOT' 'EXISTS' TableSubquery    -> { types: [ 'BOOLEAN' ] }
  | ValueExpression_EDIT 'EXISTS' TableSubquery          -> { types: [ 'BOOLEAN' ] }
  | '(' ValueExpression_EDIT RightParenthesisOrError     -> $2
+ | '(' AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+     $$ = { types: ['T'] };
+   }
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
      suggestKeywords(['NULL']);
@@ -2397,6 +2406,10 @@ ValueExpressionList_EDIT
      valueExpressionSuggest();
      $1.position += 1;
    }
+ | ValueExpressionList 'CURSOR' ',' ValueExpressionList
+   {
+     suggestValueExpressionKeywords($1);
+   }
  | AnyCursor ',' ValueExpressionList
    {
      valueExpressionSuggest();
@@ -2646,36 +2659,39 @@ JoinedTable_EDIT
  | TablePrimary_EDIT Joins
  ;
 
-// TODO: Joins 'JOIN' Joins
 Joins
- : JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary                      -> { hasJoinCondition: false }
- | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition        -> { hasJoinCondition: true }
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary                -> { hasJoinCondition: false }
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition  -> { hasJoinCondition: true }
+ : JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+   {
+     $4.joinType = $1;
+     $$ = $4;
+   }
+ | Joins JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+   {
+     $4.joinType = $1;
+     $$ = $4;
+   }
  ;
 
+Joins_ERROR
+ : JoinTypes OptionalImpalaBroadcastOrShuffle                                           -> { joinType: $1 }
+ | JoinTypes OptionalImpalaBroadcastOrShuffle Joins                                     -> { joinType: $1 }
+ ;
 OptionalImpalaBroadcastOrShuffle
  :
  | '<impala>BROADCAST'
  | '<impala>SHUFFLE'
  ;
 
-Joins_EDIT
- : JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
- | JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle
- | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT
- | JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
- | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT JoinCondition
- | JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
- | Joins_EDIT JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
- | Joins JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT
- | Joins_EDIT JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
- | Joins JoinTypes_EDIT 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT JoinCondition
- | Joins JoinTypes 'JOIN' OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
- | JoinsTableSuggestions_EDIT
+Join_EDIT
+ : JoinTypes_EDIT OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ | JoinTypes_EDIT OptionalImpalaBroadcastOrShuffle
+ | JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT OptionalJoinCondition
+ | JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
+ | JoinTypes OptionalImpalaBroadcastOrShuffle 'CURSOR' OptionalJoinCondition
    {
+     if (!$2 && isImpala()) {
+       suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
+     }
      suggestTables();
      suggestDatabases({
        appendDot: true
@@ -2683,59 +2699,54 @@ Joins_EDIT
    }
  ;
 
-JoinsTableSuggestions_EDIT
- : JoinTypes 'JOIN' 'CURSOR'
- | JoinTypes 'JOIN' 'CURSOR' JoinCondition
- | Joins JoinTypes 'JOIN' 'CURSOR'
- | Joins JoinTypes 'JOIN' 'CURSOR' JoinCondition
+Joins_EDIT
+ : Join_EDIT
+ | Join_EDIT Joins
+ | Joins Join_EDIT
+ | Joins Join_EDIT Joins
  ;
 
 JoinTypes
- :
- | '<hive>CROSS'
- | 'FULL' OptionalOuter
- | '<impala>INNER'
- | 'LEFT' 'SEMI'
- | 'LEFT' OptionalOuter
- | 'RIGHT' OptionalOuter
- | '<impala>RIGHT' 'SEMI'
- | '<impala>RIGHT' OptionalOuter
+ : 'JOIN'
+ | '<hive>CROSS' 'JOIN'
+ | 'FULL' OptionalOuter 'JOIN'
+ | '<impala>INNER' 'JOIN'
+ | 'LEFT' 'SEMI' 'JOIN'
+ | 'LEFT' OptionalOuter 'JOIN'
+ | 'RIGHT' OptionalOuter 'JOIN'
+ | '<impala>RIGHT' 'SEMI' 'JOIN'
+ | '<impala>RIGHT' OptionalOuter 'JOIN'
  ;
 
 JoinTypes_EDIT
- : 'FULL' OptionalOuter 'CURSOR'
+ : 'FULL' OptionalOuter 'CURSOR' 'JOIN'
    {
      if (!$2) {
        suggestKeywords(['OUTER']);
      }
    }
- | 'LEFT' OptionalOuter 'CURSOR'
+ | 'LEFT' OptionalOuter 'CURSOR' 'JOIN'
    {
-     var keywords = [];
-     if (isImpala()) {
-       keywords.push('ANTI');
-       keywords.push('SEMI');
-     }
-     if (isHive()) {
-       keywords.push('SEMI');
-     }
      if (!$2) {
-       keywords.push('OUTER');
+       if (isImpala()) {
+         suggestKeywords(['ANTI', 'OUTER', 'SEMI']);
+       } else if (isHive()) {
+         suggestKeywords(['OUTER', 'SEMI']);
+       } else {
+         suggestKeywords(['OUTER']);
+       }
      }
-     suggestKeywords(keywords);
    }
- | 'RIGHT' OptionalOuter 'CURSOR'
+ | 'RIGHT' OptionalOuter 'CURSOR' 'JOIN'
    {
      if (!$2) {
        suggestKeywords(['OUTER']);
      }
    }
- | '<impala>RIGHT' OptionalOuter 'CURSOR'
+ | '<impala>RIGHT' OptionalOuter 'CURSOR' 'JOIN'
    {
      if (!$2) {
        suggestKeywords(['ANTI', 'SEMI', 'OUTER']);
-     } else {
-       suggestKeywords(['ANTI', 'SEMI']);
      }
    }
  ;
@@ -2745,17 +2756,22 @@ OptionalOuter
  | 'OUTER'
  ;
 
-JoinCondition
- : 'ON' JoinEqualityExpression
- | 'ON' ParenthesizedJoinEqualityExpression
+OptionalJoinCondition
+ :                       -> { suggestKeywords: isImpala() ? ['ON', 'USING'] : ['ON'] }
+ | 'ON' ValueExpression  -> $2
+ | '<impala>USING' '(' UsingColList ')'
+ ;
+
+UsingColList
+ : RegularOrBacktickedIdentifier
+ | UsingColList ',' RegularOrBacktickedIdentifier
  ;
 
 JoinCondition_EDIT
- : 'ON' JoinEqualityExpression_EDIT
- | 'ON' ParenthesizedJoinEqualityExpression_EDIT
+ : 'ON' ValueExpression_EDIT
  | 'ON' 'CURSOR'
    {
-     suggestColumns();
+     valueExpressionSuggest();
    }
  ;
 
@@ -2885,6 +2901,9 @@ DerivedTable_EDIT
 PushQueryState
  :
    {
+     if (typeof parser.yy.locationsStack === 'undefined') {
+       parser.yy.locationsStack = [];
+     }
      if (typeof parser.yy.primariesStack === 'undefined') {
        parser.yy.primariesStack = [];
      }
@@ -2893,8 +2912,10 @@ PushQueryState
      }
      parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
      parser.yy.resultStack.push(parser.yy.result);
+     parser.yy.locationsStack.push(parser.yy.locations);
 
-     parser.yy.result = { locations: [] };
+     parser.yy.result = {};
+     parser.yy.locations = [];
      if (parser.yy.correlatedSubquery) {
        parser.yy.latestTablePrimaries = parser.yy.latestTablePrimaries.concat();
      } else {
@@ -2906,16 +2927,17 @@ PushQueryState
 PopQueryState
  :
    {
-     linkLocations();
-     var locations = parser.yy.result.locations;
-     if (Object.keys(parser.yy.result).length === 1) {
+     linkTablePrimaries();
+     commitLocations();
+
+     if (Object.keys(parser.yy.result).length === 0) {
        parser.yy.result = parser.yy.resultStack.pop();
-       parser.yy.result.locations = parser.yy.result.locations.concat(locations);
-       parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
      } else {
-       var oldResult = parser.yy.resultStack.pop();
-       parser.yy.result.locations = oldResult.concat(locations);
+       parser.yy.resultStack.pop();
      }
+
+     parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
+     parser.yy.locations = parser.yy.locationsStack.pop();
    }
  ;
 
@@ -2993,9 +3015,6 @@ SimpleTable
 
 SimpleTable_EDIT
  : QuerySpecification_EDIT
-   {
-     linkTablePrimaries();
-   }
  ;
 
 OptionalCorrelationName
@@ -3091,11 +3110,6 @@ ArbitraryFunction_EDIT
      $$ = { types: findReturnTypes($1) };
    }
  | 'UDF(' ValueExpressionList 'CURSOR' RightParenthesisOrError
-   {
-     suggestValueExpressionKeywords($2);
-     $$ = { types: findReturnTypes($1) };
-   }
- | 'UDF(' ValueExpressionList 'CURSOR' ',' ValueExpressionList RightParenthesisOrError
    {
      suggestValueExpressionKeywords($2);
      $$ = { types: findReturnTypes($1) };
@@ -4095,6 +4109,19 @@ UseStatement_EDIT
 // ===================================== Fin =====================================
 %%
 
+var prepareNewStatement = function () {
+  linkTablePrimaries();
+  commitLocations();
+
+  delete parser.yy.latestTablePrimaries;
+  delete parser.yy.correlatedSubquery;
+
+  parser.parseError = function (message, error) {
+    parser.yy.result.error = error;
+    return message;
+  };
+}
+
 var isHive = function () {
   return parser.yy.dialect === 'hive';
 }
@@ -4236,6 +4263,26 @@ var applyArgumentTypesToSuggestions = function (funcToken, position) {
   }
 }
 
+var commitLocations = function () {
+  var i = parser.yy.locations.length;
+  while (i--) {
+    var location = parser.yy.locations[i];
+    linkSuggestion(location);
+    // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
+    // In this testArray would be marked a type table so we need to switch it to column.
+    if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
+      location.type = 'column';
+    }
+    if (location.type === 'column' && (typeof location.table === 'undefined' || typeof location.identifierChain === 'undefined')) {
+      parser.yy.locations.splice(i, 1);
+    }
+  }
+  if (parser.yy.locations.length > 0) {
+    parser.yy.allLocations = parser.yy.allLocations.concat(parser.yy.locations);
+    parser.yy.locations = [];
+  }
+};
+
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
   if (typeof parser.yy.result.colRef !== 'undefined') {
@@ -4254,14 +4301,6 @@ var prioritizeSuggestions = function () {
     }
   }
 
-  var i = parser.yy.result.locations.length;
-  while (i--) {
-    var location = parser.yy.result.locations[i];
-    if (location.type === 'column' && (typeof location.table === 'undefined' || typeof location.identifierChain === 'undefined')) {
-      parser.yy.result.locations.splice(i, 1);
-    }
-  }
-
   if (typeof parser.yy.result.colRef !== 'undefined') {
     if (!parser.yy.result.suggestValues &&
         !parser.yy.result.suggestColRefKeywords &&
@@ -4271,9 +4310,6 @@ var prioritizeSuggestions = function () {
     }
   }
   if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' &&  parser.yy.result.suggestIdentifiers.length > 0) {
-    if (!parser.yy.keepColumns) {
-     delete parser.yy.result.suggestColumns;
-    }
     delete parser.yy.result.suggestTables;
     delete parser.yy.result.suggestDatabases;
     return;
@@ -4401,32 +4437,9 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
     suggestion.identifierChain = identifierChain;
   }
   // Expand exploded views in the identifier chain
-  if (isHive()) {
-    if (identifierChain.length === 0) {
-      if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-        parser.yy.result.suggestIdentifiers = [];
-      }
-      tablePrimaries.forEach(function (tablePrimary) {
-        if (typeof tablePrimary.lateralViews !== 'undefined') {
-          tablePrimary.lateralViews.forEach(function (lateralView) {
-            if (typeof lateralView.tableAlias !== 'undefined') {
-              parser.yy.result.suggestIdentifiers.push({ name: lateralView.tableAlias + '.', type: 'alias' });
-              parser.yy.keepColumns = true;
-            }
-            lateralView.columnAliases.forEach(function (columnAlias) {
-              parser.yy.result.suggestIdentifiers.push({ name: columnAlias, type: 'alias' });
-              parser.yy.keepColumns = true;
-            });
-          });
-        }
-      });
-      if (parser.yy.result.suggestIdentifiers.length === 0) {
-        delete parser.yy.result.suggestIdentifiers;
-      }
-    } else {
-      identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
-      suggestion.identifierChain = identifierChain;
-    }
+  if (isHive() && identifierChain.length > 0) {
+    identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
+    suggestion.identifierChain = identifierChain;
   }
 
   // IdentifierChain contains a possibly started identifier or empty, example: a.b.c = ['a', 'b', 'c']
@@ -4471,14 +4484,9 @@ var linkSuggestion = function (suggestion, isColumnSuggestion) {
       } else {
         suggestion.table = tablePrimaries[0].identifierChain[0].name;
       }
-    } else if (typeof tablePrimaries[0].subqueryAlias !== 'undefined') {
-      suggestTablePrimariesAsIdentifiers();
     }
-  } else if (tablePrimaries.length > 1 && isColumnSuggestion) {
-    // Table identifier is required for column completion
-    delete parser.yy.result.suggestColumns;
-    suggestTablePrimariesAsIdentifiers();
   }
+  suggestion.linked = true;
 }
 
 var suggestTablePrimariesAsIdentifiers = function () {
@@ -4501,31 +4509,49 @@ var suggestTablePrimariesAsIdentifiers = function () {
   }
 }
 
-var linkLocations = function () {
-  parser.yy.result.locations.forEach(function (location) {
-    if (location.type === 'column' || location.type === 'table') {
-      linkSuggestion(location);
-      // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
-      // In this testArray would be marked a type table so we need to switch it to column.
-      if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
-        location.type = 'column';
-      }
+var suggestLateralViewAliasesAsIdentifiers = function () {
+  if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+    parser.yy.result.suggestIdentifiers = [];
+  }
+  parser.yy.latestTablePrimaries.forEach(function (tablePrimary) {
+    if (typeof tablePrimary.lateralViews !== 'undefined') {
+      tablePrimary.lateralViews.forEach(function (lateralView) {
+        if (typeof lateralView.tableAlias !== 'undefined') {
+          parser.yy.result.suggestIdentifiers.push({ name: lateralView.tableAlias + '.', type: 'alias' });
+        }
+        lateralView.columnAliases.forEach(function (columnAlias) {
+          parser.yy.result.suggestIdentifiers.push({ name: columnAlias, type: 'alias' });
+        });
+      });
     }
   });
-}
+  if (parser.yy.result.suggestIdentifiers.length === 0) {
+    delete parser.yy.result.suggestIdentifiers;
+  }
+};
 
 var linkTablePrimaries = function () {
-  if (!parser.yy.cursorFound) {
+  if (!parser.yy.cursorFound || typeof parser.yy.latestTablePrimaries === 'undefined') {
     return;
   }
-  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-    linkSuggestion(parser.yy.result.suggestColumns, true);
+  if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
+    if (typeof parser.yy.result.suggestColumns.identifierChain === 'undefined' || parser.yy.result.suggestColumns.identifierChain.length === 0) {
+      if (parser.yy.latestTablePrimaries.length > 1) {
+        suggestTablePrimariesAsIdentifiers();
+        delete parser.yy.result.suggestColumns;
+      } else {
+        suggestLateralViewAliasesAsIdentifiers();
+        linkSuggestion(parser.yy.result.suggestColumns);
+      }
+    } else {
+      linkSuggestion(parser.yy.result.suggestColumns);
+    }
   }
-  if (typeof parser.yy.result.colRef !== 'undefined') {
-    linkSuggestion(parser.yy.result.colRef, false);
+  if (typeof parser.yy.result.colRef !== 'undefined' && !parser.yy.result.colRef.linked) {
+    linkSuggestion(parser.yy.result.colRef);
   }
-  if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
-    linkSuggestion(parser.yy.result.suggestKeyValues, true);
+  if (typeof parser.yy.result.suggestKeyValues !== 'undefined' && !parser.yy.result.suggestKeyValues.linked) {
+    linkSuggestion(parser.yy.result.suggestKeyValues);
   }
 }
 
@@ -4641,19 +4667,19 @@ var addFunctionLocation = function (location, functionName) {
     first_column: location.first_column,
     last_column: location.last_column - 1
   }
-  parser.yy.result.locations.push({ type: 'function', location: adjustLocationForCursor(adjustedLocation), function: functionName });
+  parser.yy.locations.push({ type: 'function', location: adjustLocationForCursor(adjustedLocation), function: functionName.toLowerCase() });
 }
 
 var addDatabaseLocation = function (location, database) {
-  parser.yy.result.locations.push({ type: 'database', location: adjustLocationForCursor(location), database: database });
+  parser.yy.locations.push({ type: 'database', location: adjustLocationForCursor(location), database: database });
 }
 
 var addTableLocation = function (location, identifierChain) {
-  parser.yy.result.locations.push({ type: 'table', location: adjustLocationForCursor(location), identifierChain: identifierChain });
+  parser.yy.locations.push({ type: 'table', location: adjustLocationForCursor(location), identifierChain: identifierChain });
 }
 
 var addColumnLocation = function (location, identifierChain) {
-  parser.yy.result.locations.push({ type: 'column', location: adjustLocationForCursor(location), identifierChain: identifierChain });
+  parser.yy.locations.push({ type: 'column', location: adjustLocationForCursor(location), identifierChain: identifierChain });
 }
 
 var suggestDatabases = function (details) {
@@ -4685,6 +4711,13 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
   parser.yy.activeDialect = dialect;
   parser.yy.result = { locations: [] };
   parser.yy.lowerCase = false;
+  parser.yy.locations = [];
+  parser.yy.allLocations = [];
+
+  delete parser.yy.cursorFound;
+  delete parser.yy.partialCursor;
+
+  prepareNewStatement();
 
   parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
 
@@ -4728,6 +4761,31 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
     }
     result = parser.yy.result;
   }
+  linkTablePrimaries();
+  commitLocations();
+
+  // Clean up and prioritize
+  parser.yy.allLocations.sort(function (a, b) {
+    if (a.location.first_line !== b.location.first_line) {
+      return a.location.first_line - b.location.first_line;
+    }
+    return a.location.first_column - b.location.first_column;
+  });
+  parser.yy.result.locations = parser.yy.allLocations;
+
+  parser.yy.result.locations.forEach(function (location) {
+    delete location.linked;
+  })
+  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+    delete parser.yy.result.suggestColumns.linked;
+  }
+  if (typeof parser.yy.result.colRef !== 'undefined') {
+    delete parser.yy.result.colRef.linked;
+  }
+  if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
+    delete parser.yy.result.suggestKeyValues.linked;
+  }
+
   prioritizeSuggestions();
 
   if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
