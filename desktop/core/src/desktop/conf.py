@@ -1103,7 +1103,7 @@ DJANGO_EMAIL_BACKEND = Config(
 
 USE_NEW_AUTOCOMPLETER = Config( # To remove when it's working properly, not supported by old editor
   key='use_new_autocompleter',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Enable the new editor SQL autocompleter')
 )
