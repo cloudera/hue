@@ -100,7 +100,7 @@ class TestDocument2(object):
     assert_true('not found' in data['message'])
 
 
-  def test_directory_create(self):
+  def test_directory_create_and_rename(self):
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')})
     data = json.loads(response.content)
 
@@ -108,6 +108,13 @@ class TestDocument2(object):
     assert_true('directory' in data)
     assert_equal(data['directory']['name'], 'test_mkdir', data)
     assert_equal(data['directory']['type'], 'directory', data)
+
+    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(data['directory']['uuid']),
+                                                             'name': 'updated'})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+    assert_equal('updated', data['document']['name'], data)
 
 
   def test_file_move(self):

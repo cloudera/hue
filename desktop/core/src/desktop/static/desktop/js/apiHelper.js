@@ -457,6 +457,23 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.uuid
+   * @param {string} options.name
+   */
+  ApiHelper.prototype.updateDocument = function (options) {
+    var self = this;
+    self.simplePost("/desktop/api2/doc/update", {
+      uuid: ko.mapping.toJSON(options.uuid),
+      name: options.name
+    }, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    * @param {Function} [options.progressHandler]
    * @param {boolean} [options.silenceErrors]
    *

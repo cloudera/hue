@@ -469,6 +469,24 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
+    <div id="renameDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+      <!-- ko with: activeEntry -->
+      <form class="form-horizontal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" data-bind="click: function () { $('#renameDirectoryName').val(null) }" aria-hidden="true">&times;</button>
+          <h3>${_('Rename Directory')}</h3>
+        </div>
+        <div class="modal-body ">
+          <input id="renameDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
+        </div>
+        <div class="modal-footer">
+          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#renameDirectoryName').val(null) }" value="${ _('Cancel') }">
+          <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Rename') }" data-bind="click: function () { if ($('#renameDirectoryName').val()) { $data.selectedEntry().renameDirectory($('#renameDirectoryName').val()); $('#renameDirectoryModal').modal('hide'); } }"/>
+        </div>
+      </form>
+      <!-- /ko -->
+    </div>
+
     <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
@@ -560,6 +578,7 @@ from desktop.views import _ko
           </div>
           <!-- /ko -->
           <div><a class="inactive-action fb-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
+          <div><a class="inactive-action fb-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || (selectedEntry() != null && !selectedEntry().isDirectory()) }"><i class="fa fa-fw fa-edit"></i></a></div>
           <div><a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed() || (sharedWithMeSelected() && superuser)) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div><a class="inactive-action fb-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
@@ -618,6 +637,9 @@ from desktop.views import _ko
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
+                <!-- ko if: isDirectory -->
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: showRenameDirectoryModal, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-edit"></i> ${ _('Rename') }</a></li>
+                <!-- /ko -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="visible: ! $altDown() && !($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
