@@ -187,29 +187,46 @@
 
   function drawLockedRow(plugin, rowNo) {
     var $pluginElement = $(plugin.element);
-    var lockedRows = $pluginElement.data('lockedRows') || [];
-    if (lockedRows.indexOf(rowNo) === -1) {
-      lockedRows.push(rowNo);
-      $pluginElement.data('lockedRows', lockedRows);
-      var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
-      var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
-      var $clone = $pluginElement.find('tbody tr:eq('+ rowNo +')').clone();
+    var lockedRows = $pluginElement.data('lockedRows') || {};
+    var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
+    var $headerCounter = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell");
+    $header.addClass('locked');
+    $headerCounter.addClass('locked');
+
+    function unlock($el) {
+      var idx = $el.parent().index();
+      $header.find('tbody tr:eq('+ idx +')').remove();
+      delete lockedRows[$el.text()]
+      $el.parent().remove();
+      if ($header.find('tbody tr').length == 0){
+        $header.removeClass('locked');
+        $headerCounter.removeClass('locked');
+        $pluginElement.data('lockedRows', {});
+      }
+    }
+
+    if (Object.keys(lockedRows).indexOf(rowNo) === -1) {
+      var $clone = $pluginElement.find('tr td:first-child').filter(function() {
+        return $(this).text() === rowNo+'';
+      }).closest('tr').clone();
       $clone.addClass('locked');
-      $header.addClass('locked');
-      $headerCounter.addClass('locked');
       $clone.appendTo($header.find('tbody'));
+      $pluginElement.data('lockedRows', lockedRows);
       var $newTr = $('<tr>');
-      $newTr.addClass('locked').html('<td class="pointer unlockable" title="' + plugin.options.labels.UNLOCK + '"><i class="fa fa-unlock muted"></i>' + (rowNo+1) + '</td>').appendTo($headerCounter.find('tbody'));
+      $newTr.addClass('locked').html('<td class="pointer unlockable" title="' + plugin.options.labels.UNLOCK + '"><i class="fa fa-unlock muted"></i>' + rowNo + '</td>').appendTo($headerCounter.find('tbody'));
       $newTr.find('td').on('click', function(){
-        var idx = $(this).parent().index();
-        $header.find('tbody tr:eq('+ idx +')').remove();
-        $pluginElement.data('lockedRows').splice(idx, 1);
-        $(this).parent().remove();
-        if ($header.find('tbody tr').length == 0){
-          $header.removeClass('locked');
-          $headerCounter.removeClass('locked');
-          $pluginElement.data('lockedRows', []);
-        }
+        unlock($(this));
+      });
+      lockedRows[rowNo] = {
+        row: $clone,
+        cell: $newTr
+      };
+    }
+    else {
+      lockedRows[rowNo].row.appendTo($header.find('tbody'));
+      lockedRows[rowNo].cell.appendTo($headerCounter.find('tbody'));
+      lockedRows[rowNo].cell.find('td').on('click', function(){
+        unlock($(this));
       });
     }
   }
@@ -259,7 +276,7 @@
       if (plugin.options.lockSelectedRow) {
         var cell = $(this).find('td:eq(0)');
         cell.attr('title', plugin.options.labels.LOCK).addClass('lockable pointer').on('click', function(){
-          drawLockedRow(plugin, $(this).parent().index());
+          drawLockedRow(plugin, $(this).text()*1);
         });
         $('<i>').addClass('fa fa-lock muted').prependTo(cell);
       }
@@ -327,8 +344,7 @@
 
     if ($pluginElement.data('lockedRows')) {
       var locks = $pluginElement.data('lockedRows');
-      $pluginElement.data('lockedRows', []);
-      locks.forEach(function (idx) {
+      Object.keys(locks).forEach(function (idx) {
         drawLockedRow(plugin, idx);
       });
     }
