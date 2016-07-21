@@ -22,11 +22,12 @@ except ImportError:
 
 from django.utils.translation import ugettext_lazy as _t
 
+from desktop import appmanager
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_string, coerce_bool
 
 
-def get_interpreters(user=None):  
+def get_interpreters(user=None):
   if not INTERPRETERS.get():
     _default_interpreters()
 
@@ -39,6 +40,10 @@ def get_interpreters(user=None):
       "options": interpreters[i].OPTIONS.get()}
       for i in interpreters
   ]
+
+def is_oozie_enabled():
+  """Oozie needs to be available as it is the backend."""
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
 
 
 SHOW_NOTEBOOKS = Config(
@@ -96,6 +101,14 @@ ENABLE_QUERY_SCHEDULING = Config(
   type=bool,
   default=True
 )
+
+ENABLE_BATCH_EXECUTE = Config(
+  key="enable_batch_execute",
+  help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
+  type=bool,
+  dynamic_default=is_oozie_enabled
+)
+
 
 GITHUB_REMOTE_URL = Config(
     key="github_remote_url",
