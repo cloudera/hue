@@ -28,7 +28,8 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
-from metadata.navigator_client import NavigatorApi, is_navigator_enabled
+from metadata.conf import has_navigator
+from metadata.navigator_client import NavigatorApi
 
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class TestNavigatorApi(object):
   @classmethod
   def setup_class(cls):
 
-    if not is_live_cluster() or not is_navigator_enabled():
+    if not is_live_cluster() or not has_navigator():
       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
