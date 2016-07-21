@@ -15,11 +15,13 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
+
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
 %>
 
 <%namespace name="require" file="/require.mako" />
@@ -1834,6 +1836,7 @@ ${ hueIcons.symbols() }
         <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : type() !== 'hive' }"></i>
       </a>
       <!-- /ko -->
+      % if ENABLE_BATCH_EXECUTE.get():
       <!-- ko if: type() == 'hive' && status() != 'running' && status() != 'loading' -->
         <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '', 'blue': currentQueryTab() == 'queryExplain' }">
           <i class="fa fa-caret-down"></i>
@@ -1851,6 +1854,7 @@ ${ hueIcons.symbols() }
           </li>
         </ul>
       <!-- /ko -->
+      % endif
     </div>
 
     <!-- ko if: isSqlDialect -->
