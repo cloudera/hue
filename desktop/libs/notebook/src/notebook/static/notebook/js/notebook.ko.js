@@ -258,6 +258,12 @@
       }
     };
 
+    huePubSub.subscribe('assist.db.refresh', function (type) {
+      if (self.type() == type) {
+        updateDatabases();
+      }
+    });
+
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
 
