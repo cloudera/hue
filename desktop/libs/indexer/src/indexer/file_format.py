@@ -135,7 +135,12 @@ class HueFormat(FileFormat):
       Field("component", "string"),
       Field("log_level", "string"),
       Field("details", "string"),
-      Field("message", "text")
+      Field("message", "text_en"),
+      Field("ip", "string"),
+      Field("user", "string"),
+      Field("http_method", "string"),
+      Field("path", "string"),
+      Field("protocol", "string")
     ]
 
   @property
