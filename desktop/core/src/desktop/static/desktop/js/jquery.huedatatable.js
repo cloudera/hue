@@ -48,9 +48,13 @@
         var aoColumns = self.$table.data('aoColumns');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
 
-        var invisibleOffset = 1;
+        var maxDOMCells = 20000;
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
-        var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight) + invisibleOffset;
+        var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
+
+        var invisibleOffset = Math.ceil(Math.min(Math.max(0, (visibleRows * (maxDOMCells / (aoColumns.length * visibleRows))) - visibleRows), 100 - visibleRows));
+
+        visibleRows += invisibleOffset;
 
         var startRow = $t.offset().top - 73 < 0 ? Math.max(Math.floor(Math.abs($t.offset().top - 73) / rowHeight) - invisibleOffset, 0) : 0;
         var endRow = startRow + visibleRows;
@@ -68,11 +72,13 @@
           }
         }
 
-        $t.find('.ht-visible-row').empty();
+        if ($t.data('fnDraws') == 0){
+          $t.find('.ht-visible-row').empty();
 
-        for (var i=0; i<visibleRows; i++) {
-          if ($t.find('.ht-visible-row-' + i).length === 0) {
-            $t.find('.ht-north-spacer').after('<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>');
+          for (var i=visibleRows - 1; i >= 0; i--) {
+            if ($t.find('.ht-visible-row-' + i).length === 0) {
+              $t.find('.ht-north-spacer').after('<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>');
+            }
           }
         }
 
@@ -97,10 +103,9 @@
         }
 
         if ($t.data('oInit')['fnDrawCallback']) {
-          window.setTimeout(function(){
-            $t.data('oInit')['fnDrawCallback']();
-          }, 0);
+          $t.data('oInit')['fnDrawCallback']();
         }
+        $t.data('fnDraws', $t.data('fnDraws') + 1);
         self.isDrawing = false;
       }
     };
@@ -144,6 +149,9 @@
         $t.children('tr').remove();
       }
       $t.data('data', []);
+      $t.data('aoRows', []);
+      $t.data('aoColumns', []);
+      $t.data('fnDraws', 0);
     };
 
     self.fnDestroy = function () {
@@ -161,6 +169,7 @@
       self.$table.data('data', []);
       self.$table.data('aoRows', []);
       self.$table.data('aoColumns', []);
+      self.$table.data('fnDraws', 0);
       self.$table.wrap('<div class="dataTables_wrapper"></div>');
 
       if (typeof oInit !== 'undefined') {

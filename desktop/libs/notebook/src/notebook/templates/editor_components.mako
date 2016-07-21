@@ -3192,6 +3192,7 @@ ${ hueIcons.symbols() }
             _el.hueDataTable().fnDestroy();
           }
           _el.find("thead tr").empty();
+          _el.data('lockedRows', {});
         }
       });
 

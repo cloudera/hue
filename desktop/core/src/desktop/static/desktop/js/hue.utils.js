@@ -328,7 +328,7 @@ var hueDebugTimer = (function () {
       var mark = (new Date()).getTime();
       times.push(mark);
       if (withConsole){
-        console.log(label ? label : times.length, mark - times[times.length - 2]);
+        console.log(label ? label : times.length, mark - times[times.length - 2], mark - initialTime);
       }
       return mark - times[times.length - 2];
     },
