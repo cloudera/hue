@@ -19,6 +19,7 @@ import logging
 import re
 import time
 
+from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
@@ -125,6 +126,23 @@ class OozieApi(Api):
 
     oozie_job = check_job_access_permission(self.request, job_id)
     return oozie_job.get_progress(),
+
+
+  def get_jobs(self, notebook, snippet, logs):
+    jobs = []
+    job_id = snippet['result']['handle']['id']
+
+    oozie_job = check_job_access_permission(self.request, job_id)
+    actions = oozie_job.get_working_actions()
+    for action in actions:
+      if action.externalId is not None:
+        jobs.append({
+          'name': action.externalId,
+          'url': reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}),
+          'started': action.startTime is not None,
+          'finished': action.endTime is not None
+        })
+    return jobs
 
 
   def close_statement(self, snippet):
