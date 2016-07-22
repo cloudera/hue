@@ -670,3 +670,17 @@ class MetricsMiddleware(object):
     self._response_timer.stop()
     metrics.active_requests.dec()
     return response
+
+
+class ContentSecurityPolicyMiddleware(object):
+  def __init__(self, get_response=None):
+    self.secure_content_security_policy = desktop.conf.SECURE_CONTENT_SECURITY_POLICY.get()
+    if not self.secure_content_security_policy:
+      LOG.info('Unloading ContentSecurityPolicyMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
+      response["Content-Security-Policy"] = self.secure_content_security_policy
+
+    return response

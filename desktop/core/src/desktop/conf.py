@@ -162,6 +162,54 @@ SSL_VALIDATE = Config(
   type=coerce_bool,
   default=True)
 
+SECURE_HSTS_SECONDS = Config(
+  key="secure_hsts_seconds",
+  help=_('Strict-Transport-Security: max-age=31536000 This is a HTTP response header, Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the specified domain and will instead send all communications over HTTPS.'),
+  type=int,
+  default=31536000)
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = Config(
+  key="secure_hsts_include_subdomains",
+  help=_('Strict-Transport-Security: This is a HTTP response header, Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the specified domain and will instead send all communications over HTTPS.'),
+  type=coerce_bool,
+  default=True)
+
+SECURE_CONTENT_TYPE_NOSNIFF = Config(
+  key="secure_content_type_nosniff",
+  help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
+  type=coerce_bool,
+  default=True)
+
+SECURE_BROWSER_XSS_FILTER = Config(
+  key="secure_browser_xss_filter",
+  help=_('X-Xss-Protection: \"1; mode=block\" This is a HTTP response header feature to force XSS protection.'),
+  type=coerce_bool,
+  default=True)
+
+SECURE_CONTENT_SECURITY_POLICY = Config(
+  key="secure_content_security_policy",
+  help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
+  type=str,
+  default="img-src 'self' www.google-analytics.com; connect-src 'self'; child-src 'none'; object-src 'none'")
+
+SECURE_SSL_REDIRECT = Config(
+  key="secure_ssl_redirect",
+  help=_('If all non-SSL requests should be permanently redirected to SSL.'),
+  type=coerce_bool,
+  default=False)
+
+SECURE_SSL_HOST = Config(
+  key="secure_redirect_host",
+  help=_('If all non-SSL requests should be permanently redirected to this SSL host.'),
+  type=str,
+  default="0.0.0.0")
+
+SECURE_REDIRECT_EXEMPT = Config(
+  key="secure_redirect_exempt",
+  help=_('Comma separated list of strings representing the host/domain names that the Hue server can not serve https.'),
+  type=coerce_csv,
+  default=[])
+
 # Deprecated by AUTH_PASSWORD
 LDAP_PASSWORD = Config(
   key="ldap_password",

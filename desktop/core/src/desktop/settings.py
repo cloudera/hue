@@ -148,7 +148,9 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.locale.LocaleMiddleware',
     'babeldjango.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'desktop.middleware.ContentSecurityPolicyMiddleware',
     # Must be after Session, Auth, and Ajax. Before everything else.
     'desktop.middleware.LoginAndPermissionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -347,6 +349,14 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.g
 
 # HTTP only
 SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
+
+SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
+SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()
+SECURE_CONTENT_TYPE_NOSNIFF = desktop.conf.SECURE_CONTENT_TYPE_NOSNIFF.get()
+SECURE_BROWSER_XSS_FILTER = desktop.conf.SECURE_BROWSER_XSS_FILTER.get()
+SECURE_SSL_REDIRECT = desktop.conf.SECURE_SSL_REDIRECT.get()
+SECURE_SSL_HOST = desktop.conf.SECURE_SSL_HOST.get()
+SECURE_REDIRECT_EXEMPT = desktop.conf.SECURE_REDIRECT_EXEMPT.get()
 
 # django-nose test specifics
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
