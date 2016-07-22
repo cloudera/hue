@@ -2504,13 +2504,14 @@ body {
   color: #aaa;
 }
 
-.dataTables_wrapper:hover > .hue-scrollbar-x-rail {
+.dataTables_wrapper:hover > .hue-scrollbar-x-rail, .hue-scrollbar-x-rail:hover {
   opacity: 0.75
 }
 
 .hue-scrollbar-x-rail {
   opacity: 0;
   position: fixed;
+  z-index: 10000;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
@@ -2519,7 +2520,7 @@ body {
   -o-transition: background-color .2s linear, opacity .2s linear;
   transition: background-color .2s linear, opacity .2s linear;
   bottom: 3px;
-  height: 10px;
+  height: 9px;
 }
 
 
@@ -2533,8 +2534,8 @@ body {
   -moz-transition: background-color .2s linear;
   -o-transition: background-color .2s linear;
   transition: background-color .2s linear;
-  bottom: 0;
-  height: 10px;
+  bottom: 1px;
+  height: 9px;
   z-index: 10000;
 }
 
