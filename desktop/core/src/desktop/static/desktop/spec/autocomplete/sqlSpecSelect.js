@@ -725,6 +725,21 @@ define([
         });
       });
 
+      it('should suggest columns for "SELECT | FROM transactions"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM transactions',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { table: 'transactions' }
+          }
+        });
+      });
+
       it('should suggest aliases for "SELECT | FROM testTableA tta, testTableB"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',

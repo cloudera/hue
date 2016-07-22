@@ -1292,6 +1292,18 @@ define([
         });
       });
 
+      it('should suggest keywords for "SHOW | ROLES"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW ',
+          afterCursor: ' ROLES',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CURRENT']
+          }
+        });
+      });
+
       it('should handle "SHOW CURRENT ROLES;|"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW CURRENT ROLES;',
