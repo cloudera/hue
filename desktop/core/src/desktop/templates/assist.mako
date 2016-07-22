@@ -19,6 +19,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 from desktop.views import _ko
+from metadata.conf import has_navigator
 %>
 
 <%def name="assistPanel()">
@@ -1182,11 +1183,7 @@ from desktop.views import _ko
           user: params.user
         });
 
-        self.navigatorEnabled = ko.observable(true);
-
-        huePubSub.subscribe('meta.navigator.enabled', function (newValue) {
-          self.navigatorEnabled(newValue);
-        });
+        self.navigatorEnabled = ko.observable('${ has_navigator() }' === 'True');
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
