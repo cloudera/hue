@@ -16,9 +16,14 @@
 import re
 
 class FieldType():
-  def __init__(self, name, regex):
+  def __init__(self, name, regex, heuristic_regex=None):
     self._name = name
     self._regex = regex
+    self._heuristic_regex = heuristic_regex
+
+  @property
+  def heuristic_regex(self):
+    return self._heuristic_regex if self._heuristic_regex else self.regex
 
   @property
   def name(self):
@@ -28,8 +33,8 @@ class FieldType():
   def regex(self):
     return self._regex
 
-  def matches(self, field):
-    pattern = re.compile(self._regex)
+  def heuristic_match(self, field):
+    pattern = re.compile(self.heuristic_regex)
 
     return pattern.match(field)
 
@@ -49,8 +54,8 @@ class Field(object):
     'required': self.required}
 
 FIELD_TYPES = [
-  FieldType('text_en', "^[\\s\\S]{100,}$"),
-  FieldType('string', "^[\\s\\S]*$"),
+  FieldType('text_en', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{101,}$"),
+  FieldType('string', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{1,100}$"),
   FieldType('double', "^([+-]?[0-9]+(\\.[0-9]+)?)?$"),
   FieldType('long', "^(?:[+-]?(?:[0-9]+))?$"),
   FieldType('date', "^([0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+(\\.[0-9]*)?Z)?$")
@@ -66,7 +71,7 @@ def _guess_field_type(field_val):
     return None
 
   for field_type in FIELD_TYPES[::-1]:
-    if field_type.matches(field_val):
+    if field_type.heuristic_match(field_val):
       return field_type.name
 
 def _pick_best_field(types):
