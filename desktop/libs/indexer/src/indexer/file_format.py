@@ -28,7 +28,8 @@ LOG = logging.getLogger(__name__)
 def get_format_types():
   return [
     CSVFormat,
-    HueFormat
+    HueFormat,
+    ApacheFormat
   ]
 
 def get_format_mapping():
@@ -141,6 +142,32 @@ class HueFormat(FileFormat):
       Field("http_method", "string"),
       Field("path", "string"),
       Field("protocol", "string")
+    ]
+
+  @property
+  def fields(self):
+    return self._fields
+
+class ApacheFormat(FileFormat):
+  _name = "combined_apache"
+  _description = _("Combined Apache Log File")
+  _customizable = False
+  _extensions = ["log"]
+
+  def __init__(self, file_stream, format_):
+    self._fields = [
+      Field("clientip", "string"),
+      Field("ident", "string"),
+      Field("auth", "string"),
+      Field("timestamp", "date"),
+      Field("verb", "string"),
+      Field("request", "string"),
+      Field("httpversion", "double"),
+      Field("rawrequest", "long"),
+      Field("response", "long"),
+      Field("bytes", "long"),
+      Field("referrer", "string"),
+      Field("message", "text_en")
     ]
 
   @property
