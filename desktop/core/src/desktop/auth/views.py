@@ -159,7 +159,7 @@ def dt_login(request, from_modal=False):
     auth_form = AuthenticationForm()
 
   if DEMO_ENABLED.get() and not 'admin' in request.REQUEST:
-    user = authenticate(username='', password='')
+    user = authenticate(username=request.user.username, password='HueRocks')
     login(request, user)
     ensure_home_directory(request.fs, user.username)
     return HttpResponseRedirect(redirect_to)
