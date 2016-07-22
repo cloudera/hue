@@ -54,6 +54,7 @@
 <hive>'COMPACTIONS'                 { return '<hive>COMPACTIONS'; }
 <hive>'DATA'                        { return '<hive>DATA'; }
 <hive>'DATABASES'                   { return '<hive>DATABASES'; }
+<hive>'DESC'                        { return '<hive>DESC'; }
 <hive>'FORMATTED'                   { return '<hive>FORMATTED'; }
 <hive>'FUNCTIONS'                   { return '<hive>FUNCTIONS'; }
 <hive>'INDEX'                       { return '<hive>INDEX'; }
@@ -87,6 +88,7 @@
 <impala>'AGGREGATE'                 { return '<impala>AGGREGATE'; }
 <impala>'COLUMN'                    { return '<impala>COLUMN'; }
 <impala>'COMMENT'                   { return '<impala>COMMENT'; }
+<impala>'CREATE'                    { determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                      { return '<impala>DATA'; }
 <impala>'DATABASES'                 { return '<impala>DATABASES'; }
 <impala>'DESCRIBE'                  { determineCase(yytext); return '<impala>DESCRIBE'; }
@@ -115,7 +117,6 @@
 // Non-reserved Keywords
 <impala>'ANALYTIC'                  { return '<impala>ANALYTIC'; }
 <impala>'ANTI'                      { return '<impala>ANTI'; }
-<impala>'CREATE'                    { determineCase(yytext); return '<impala>CREATE'; }
 <impala>'CURRENT'                   { return '<impala>CURRENT'; }
 <impala>'GRANT'                     { return '<impala>GRANT'; }
 <impala>'OVER'                      { return '<impala>OVER'; }
@@ -341,6 +342,7 @@ NonReservedKeyword
  | '<hive>USE'
  | '<hive>VIEW'
 // | '<hive>ASC'      // These cause conflicts, we need separate lexer state for DESCRIBE and SHOW then it should be fine
+// | '<hive>DESC'
 // | '<hive>FORMATTED'
 // | '<hive>INDEX'
 // | '<hive>INDEXES'
@@ -349,7 +351,6 @@ NonReservedKeyword
 // | '<hive>SHOW'
  | '<impala>ANALYTIC'
  | '<impala>ANTI'
- | '<impala>CREATE'
  | '<impala>CURRENT'
  | '<impala>GRANT'
  | '<impala>OVER'
@@ -1742,6 +1743,7 @@ OptionalAscOrDesc
  | 'ASC'
  | '<hive>ASC'
  | 'DESC'
+ | '<hive>DESC'
  ;
 
 OptionalImpalaNullsFirstOrLast
