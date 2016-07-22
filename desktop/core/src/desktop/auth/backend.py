@@ -280,7 +280,7 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
     if not user:
       username = self._random_name()
 
-      user = find_or_create_user(username, None)
+      user = find_or_create_user(username, 'HueRocks')
 
       user.is_superuser = False
       user.save()
