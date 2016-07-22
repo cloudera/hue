@@ -235,7 +235,7 @@
       successCallback: function (data) {
         data.tables_meta.forEach(function (tablesMeta) {
           completions.push({
-            value: prefix + tablesMeta.name,
+            value: prefix + self.backTickIfNeeded(tablesMeta.name),
             meta: tablesMeta.type.toLowerCase(),
             type: 'table'
           })
@@ -258,23 +258,23 @@
       if (data.extended_columns) {
         data.extended_columns.forEach(function (column) {
           if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-            completions.push({value: column.name + '[]', meta: 'map', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', type: 'column'})
           } else if (column.type.indexOf('map') === 0) {
-            completions.push({value: column.name, meta: 'map', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name), meta: 'map', type: 'column'})
           } else if (column.type.indexOf('struct') === 0) {
-            completions.push({value: column.name, meta: 'struct', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', type: 'column'})
           } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-            completions.push({value: column.name + '[]', meta: 'array', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', type: 'column'})
           } else if (column.type.indexOf('array') === 0) {
-            completions.push({value: column.name, meta: 'array', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name), meta: 'array', type: 'column'})
           } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
               sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: column.name, meta: column.type, type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column.name), meta: column.type, type: 'column'})
           }
         });
       } else if (data.columns) {
         data.columns.forEach(function (column) {
-          completions.push({value: column, meta: 'column', type: 'column'})
+          completions.push({value: self.backTickIfNeeded(column), meta: 'column', type: 'column'})
         });
       }
       if (data.type === 'map' && self.snippet.type() === 'impala') {
@@ -283,26 +283,26 @@
       }
       if (data.type === 'struct') {
         data.fields.forEach(function (field) {
-          completions.push({value: field.name, meta: 'struct', type: 'column'})
+          completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', type: 'column'})
         });
       } else if (data.type === 'map' && (data.value && data.value.fields)) {
         data.value.fields.forEach(function (field) {
           if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
               sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: field.name, meta: field.type, type: 'column'});
+            completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
           }
         });
       } else if (data.type === 'array' && (data.item && data.item.fields)) {
         data.item.fields.forEach(function (field) {
           if ((field.type === 'array' || field.type === 'map')) {
             if (self.snippet.type() === 'hive') {
-              completions.push({value: field.name + '[]', meta: field.type, type: 'column'});
+              completions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, type: 'column'});
             } else {
-              completions.push({value: field.name, meta: field.type, type: 'column'});
+              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
             }
           } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
               sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: field.name, meta: field.type, type: 'column'});
+            completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
           }
         });
       }
@@ -326,7 +326,7 @@
       successCallback: function (data) {
         data.forEach(function (db) {
           completions.push({
-            value: prefix + db + (parseResult.suggestDatabases.appendDot ? '.' : ''),
+            value: prefix + self.backTickIfNeeded(db) + (parseResult.suggestDatabases.appendDot ? '.' : ''),
             meta: 'database',
             type: 'database'
           });
@@ -412,6 +412,49 @@
 
   SqlAutocompleter2.prototype.getDocTooltip = function (item) {
 
+  };
+
+  var hiveReservedKeywords = {
+    ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CASE: true, CAST: true, 
+    CHAR: true, COLUMN: true, CONF: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_TIMESTAMP: true, CURSOR: true, 
+    DATABASE: true, DATE: true, DECIMAL: true, DELETE: true, DESCRIBE: true, DISTINCT: true, DOUBLE: true, DROP: true, ELSE: true, END: true, EXCHANGE: true, EXISTS: true, 
+    EXTENDED: true, EXTERNAL: true, FALSE: true, FETCH: true, FLOAT: true, FOLLOWING: true, FOR: true, FROM: true, FULL: true, FUNCTION: true, GRANT: true, GROUP: true, 
+    GROUPING: true, HAVING: true, IF: true, IMPORT: true, IN: true, INNER: true, INSERT: true, INT: true, INTERSECT: true, INTERVAL: true, INTO: true, IS: true, JOIN: true, LATERAL: true, 
+    LEFT: true, LESS: true, LIKE: true, LOCAL: true, MACRO: true, MAP: true, MORE: true, NONE: true, NOT: true, NULL: true, OF: true, ON: true, OR: true, ORDER: true, OUT: true, OUTER: true, OVER: true, 
+    PARTIALSCAN: true, PARTITION: true, PERCENT: true, PRECEDING: true, PRESERVE: true, PROCEDURE: true, RANGE: true, READS: true, REDUCE: true, 
+    REGEXP: true, REVOKE: true, RIGHT: true, RLIKE: true, ROLLUP: true, ROW: true, ROWS: true, 
+    SELECT: true, SET: true, SMALLINT: true, TABLE: true, TABLESAMPLE: true, THEN: true, TIMESTAMP: true, TO: true, TRANSFORM: true, TRIGGER: true, TRUE: true, 
+    TRUNCATE: true, UNBOUNDED: true, UNION: true, UNIQUEJOIN: true, UPDATE: true, USER: true, USING: true, VALUES: true, VARCHAR: true, WHEN: true, WHERE: true, 
+    WINDOW: true, WITH: true
+  };
+
+  var extraHiveReservedKeywords = {
+    ASC: true, DESC: true, FORMATTED: true, INDEX: true, INDEXES: true, LIMIT: true, SCHEMA: true, SHOW: true
+  };
+
+  var impalaReservedKeywords = {
+    ADD: true, AGGREGATE: true, ALL: true, ALTER: true, AND: true, API_VERSION: true, AS: true, ASC: true, AVRO: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BY: true, CACHED: true, CASE: true, CAST: true, CHANGE: true, CHAR: true, CLASS: true, CLOSE_FN: true,
+    COLUMN: true, COLUMNS: true, COMMENT: true, COMPUTE: true, CREATE: true, CROSS: true, DATA: true, DATABASE: true, DATABASES: true, DATE: true, DATETIME: true, DECIMAL: true, DELIMITED: true, DESC: true, DESCRIBE: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, ELSE: true, END: true,
+    ESCAPED: true, EXISTS: true, EXPLAIN: true, EXTERNAL: true, FALSE: true, FIELDS: true, FILEFORMAT: true, FINALIZE_FN: true, FIRST: true, FLOAT: true, FORMAT: true, FORMATTED: true, FROM: true, FULL: true, FUNCTION: true, FUNCTIONS: true, GROUP: true, HAVING: true, IF: true, IN: true, INCREMENTAL: true,
+    INIT_FN: true, INNER: true, INPATH: true, INSERT: true, INT: true, INTEGER: true, INTERMEDIATE: true, INTERVAL: true, INTO: true, INVALIDATE: true, IS: true, JOIN: true, LAST: true, LEFT: true, LIKE: true, LIMIT: true, LINES: true, LOAD: true, LOCATION: true, MERGE_FN: true, METADATA: true,
+    NOT: true, NULL: true, NULLS: true, OFFSET: true, ON: true, OR: true, ORDER: true, OUTER: true, OVERWRITE: true, PARQUET: true, PARQUETFILE: true, PARTITION: true, PARTITIONED: true, PARTITIONS: true, PREPARE_FN: true, PRODUCED: true, RCFILE: true, REAL: true, REFRESH: true, REGEXP: true, RENAME: true,
+    REPLACE: true, RETURNS: true, RIGHT: true, RLIKE: true, ROW: true, SCHEMA: true, SCHEMAS: true, SELECT: true, SEMI: true, SEQUENCEFILE: true, SERDEPROPERTIES: true, SERIALIZE_FN: true, SET: true, SHOW: true, SMALLINT: true, STATS: true, STORED: true, STRAIGHT_JOIN: true, STRING: true, SYMBOL: true, TABLE: true,
+    TABLES: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true,
+  };
+
+  SqlAutocompleter2.prototype.backTickIfNeeded = function (text) {
+    var self = this;
+    var upperText = text.toUpperCase();
+    if (self.snippet.type() === 'hive' && (hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText])) {
+      return '`' + text + '`';
+    } else if (self.snippet.type() === 'impala' && impalaReservedKeywords[upperText]) {
+      return '`' + text + '`';
+    } else if (impalaReservedKeywords[upperText] || hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText]) {
+      return '`' + text + '`';
+    } else if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(text)) {
+      return '`' + text + '`';
+    }
+    return text;
   };
 
   return SqlAutocompleter2;
