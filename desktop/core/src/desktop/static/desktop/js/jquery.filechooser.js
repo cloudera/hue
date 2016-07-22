@@ -266,7 +266,7 @@
         var _createFolderBtn;
         var _selectFolderBtn;
         if (_parent.options.uploadFile) {
-          _uploadFileBtn = $("<div>").attr("id", "file-uploader");
+          _uploadFileBtn = $("<div>").attr("id", "file-uploader").addClass('fileChooserActionUploader');
           _uploadFileBtn.appendTo(_actions);
           _showActions = true;
           initUploader(path, _parent, _uploadFileBtn, _parent.options.labels);
@@ -383,7 +383,7 @@
       template: '<div class="qq-uploader">' +
       '<div class="qq-upload-drop-area"><span></span></div>' +
       '<div class="qq-upload-button">' + labels.UPLOAD_FILE + '</div>' +
-      '<ul class="qq-upload-list"></ul>' +
+      '<ul class="qq-upload-list" style="position: fixed"></ul>' +
       '</div>',
       fileTemplate: '<li>' +
       '<span class="qq-upload-file"></span>' +
