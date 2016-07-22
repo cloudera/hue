@@ -1592,6 +1592,8 @@
     return tip
   };
 
-  d3.tip = tipBuilder;
+  if (typeof d3 !== 'undefined') {
+    d3.tip = tipBuilder;
+  }
 
 }));
