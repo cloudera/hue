@@ -15,27 +15,109 @@
 ## limitations under the License.
 
 <%!
+  from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
+<%namespace name="assist" file="/assist.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="require" file="/require.mako" />
 
 ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
+${ require.config() }
 
-<div class="container-fluid">
-  <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Solr Indexer') }</h1>
+${ tableStats.tableStats() }
+${ assist.assistPanel() }
+
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .show-assist {
+    top: 110px!important;
+  }
+  .main-content {
+    top: 112px!important;
+  }
+% endif
+  .path {
+    margin-bottom: 0!important;
+    border-right: none!important;
+  }
+</style>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="/indexer/indexer">
+              <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
+  <i class="fa fa-chevron-right"></i>
+</a>
 
-<!-- ko template: 'create-index-wizard' --><!-- /ko -->
+
+<div class="main-content">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+    <div class="vertical-full">
+      <div class="vertical-full row-fluid panel-container">
+
+        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: {
+                user: '${user.username}',
+                sql: {
+                  sourceTypes: [{
+                    name: 'hive',
+                    type: 'hive'
+                  }],
+                  navigationSettings: {
+                    openItem: false,
+                    showStats: true
+                  }
+                },
+                visibleAssistPanels: ['sql']
+              }
+            }"></div>
+        </div>
+        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+
+        <div class="right-panel" style="padding: 10px">
+          <!-- ko template: 'create-index-wizard' --><!-- /ko -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="chooseFile" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+    <div id="filechooser"></div>
+  </div>
+  <div class="modal-footer"></div>
+</div>
 
 <script type="text/html" id="create-index-wizard">
-  <div class="snippet-settings" data-bind="visible: createWizard.show" style="
-  text-align: center;">
-
+  <div data-bind="visible: createWizard.show">
     <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
@@ -49,8 +131,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
     <div class="control-group">
       <label for="path" class="control-label">${ _('Path') }</label>
       <div class="controls">
-        <input type="text" class="form-control" id = "path" data-bind="value: createWizard.fileFormat().path">
-        <a style="margin-bottom:10px" href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+        <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
       </div>
     </div>
 
@@ -70,25 +152,27 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
           </div>
 
           <h3>${_('Preview')}</h3>
-          <table style="margin:auto;text-align:left">
-            <thead>
-              <tr data-bind="foreach: createWizard.fileFormat().columns">
-                <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: createWizard.sample">
-              <tr data-bind="foreach: $data">
-                <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
-                  <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
-                  </td>
+          <div style="overflow: auto">
+            <table style="margin:auto;text-align:left">
+              <thead>
+                <tr data-bind="foreach: createWizard.fileFormat().columns">
+                  <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: createWizard.sample">
+                <tr data-bind="foreach: $data">
+                  <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
+                    <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
+                    </td>
 
-                  <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
-                    <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+                    <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
+                      <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+                    <!-- /ko -->
                   <!-- /ko -->
-                <!-- /ko -->
-              </tr>
-            </tbody>
-          </table>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         <!-- /ko -->
 
         <br><hr><br>
@@ -200,20 +284,31 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 </div>
 
 
-<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-
 <script type="text/javascript" charset="utf-8">
-var fieldNum = 0;
 
-var getNewFieldName = function(){
-  fieldNum++;
-  return "new_field_" + fieldNum
-}
+  require([
+    "knockout",
+    "ko.charts",
+    "desktop/js/apiHelper",
+    "assistPanel",
+    "tableStats",
+    "knockout-mapping",
+    "knockout-sortable",
+    "ko.editable",
+    "ko.hue-bindings"
+  ], function (ko, charts, ApiHelper) {
 
-  var createDefaultField = function(){
+    ko.options.deferUpdates = true;
+
+
+  var fieldNum = 0;
+
+  var getNewFieldName = function () {
+    fieldNum++;
+    return "new_field_" + fieldNum
+  }
+
+  var createDefaultField = function () {
     return {
       name: ko.observable(getNewFieldName()),
       type: ko.observable("string"),
@@ -223,37 +318,37 @@ var getNewFieldName = function(){
     }
   };
 
-  var Operation = function(type){
+  var Operation = function (type) {
     var self = this;
 
-    var createArgumentValue = function(arg){
-      if(arg.type == "mapping"){
+    var createArgumentValue = function (arg) {
+      if (arg.type == "mapping") {
         return ko.observableArray([]);
       }
-      else if(arg.type =="checkbox"){
+      else if (arg.type == "checkbox") {
         return ko.observable(false);
       }
-      else{
+      else {
         return ko.observable("");
       }
     }
 
-    var constructSettings = function(type){
+    var constructSettings = function (type) {
       var settings = {};
 
-      var operation = viewModel.createWizard.operationTypes.find(function(currOperation){
+      var operation = viewModel.createWizard.operationTypes.find(function (currOperation) {
         return currOperation.name == type;
       });
 
-      for(var i = 0; i < operation.args.length; i++){
+      for (var i = 0; i < operation.args.length; i++) {
         argVal = createArgumentValue(operation.args[i]);
 
-        if(operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields"){
-          argVal.subscribe(function(newVal){
-            if(newVal){
+        if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
+          argVal.subscribe(function (newVal) {
+            if (newVal) {
               self.fields.push(createDefaultField());
             }
-            else{
+            else {
               self.fields.pop();
             }
           });
@@ -262,29 +357,29 @@ var getNewFieldName = function(){
         settings[operation.args[i].name] = argVal;
       }
 
-      settings.getArguments = function(){
+      settings.getArguments = function () {
         return operation.args
       };
 
-      settings.outputType= function(){
+      settings.outputType = function () {
         return operation.outputType;
       }
 
       return settings;
     };
 
-    var init = function(){
+    var init = function () {
       self.fields([]);
       self.numExpectedFields(0);
 
-      self.numExpectedFields.subscribe(function(numExpectedFields){
-        if(numExpectedFields < self.fields().length){
-          self.fields(self.fields().slice(0,numExpectedFields));
+      self.numExpectedFields.subscribe(function (numExpectedFields) {
+        if (numExpectedFields < self.fields().length) {
+          self.fields(self.fields().slice(0, numExpectedFields));
         }
-        else if (numExpectedFields > self.fields().length){
+        else if (numExpectedFields > self.fields().length) {
           difference = numExpectedFields - self.fields().length;
 
-          for(var i = 0; i < difference; i++){
+          for (var i = 0; i < difference; i++) {
             self.fields.push(createDefaultField());
           }
         }
@@ -300,49 +395,49 @@ var getNewFieldName = function(){
 
     init();
 
-    self.type.subscribe(function(newType){
+    self.type.subscribe(function (newType) {
       init();
     });
   }
 
-  var FileType = function(typeName, args){
+  var FileType = function (typeName, args) {
     var self = this;
     var type;
 
-    var init = function(){
+    var init = function () {
       self.type = ko.observable(typeName);
 
       var types = viewModel.createWizard.fileTypes
 
-      for(var i = 0; i < types.length; i++){
-        if(types[i].name == typeName){
+      for (var i = 0; i < types.length; i++) {
+        if (types[i].name == typeName) {
           type = types[i];
           break;
         }
       }
 
-      for(var i = 0; i < type.args.length; i++){
+      for (var i = 0; i < type.args.length; i++) {
         self[type.args[i].name] = ko.observable();
       }
 
-      if(args) loadFromObj(args);
+      if (args) loadFromObj(args);
 
-      for(var i = 0; i < type.args.length; i++){
+      for (var i = 0; i < type.args.length; i++) {
         self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
       }
     }
 
-    var loadFromObj = function(args){
-      for (var attr in args){
+    var loadFromObj = function (args) {
+      for (var attr in args) {
         self[attr] = ko.mapping.fromJS(args[attr]);
       }
     }
 
-    self.getArguments = function(){
+    self.getArguments = function () {
       return type.args;
     }
 
-    self.isCustomizable = function(){
+    self.isCustomizable = function () {
       return type.isCustomizable;
     }
 
@@ -356,7 +451,7 @@ var getNewFieldName = function(){
     self.name = ko.observable('');
     self.show = ko.observable(false);
 
-    self.path = ko.observable('/tmp/test.csv');
+    self.path = ko.observable('');
     self.format = ko.observable();
     self.columns = ko.observableArray();
   };
@@ -366,8 +461,8 @@ var getNewFieldName = function(){
     var guessFieldTypesXhr;
 
     self.fileType = ko.observable();
-    self.fileType.subscribe(function(newType){
-      if(self.fileFormat().format()) self.fileFormat().format().type(newType.name);
+    self.fileType.subscribe(function (newType) {
+      if (self.fileFormat().format()) self.fileFormat().format().type(newType.name);
     });
 
     self.operationTypes = ${operators_json | n};
@@ -387,38 +482,38 @@ var getNewFieldName = function(){
 
     self.indexingStarted = ko.observable(false);
 
-    self.isNameAvailable = ko.computed(function(){
+    self.isNameAvailable = ko.computed(function () {
       var name = self.fileFormat().name();
       return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
     });
 
-    self.readyToIndex = ko.computed(function(){
+    self.readyToIndex = ko.computed(function () {
       var validFields = self.fileFormat().columns().length
 
       return self.isNameAvailable() && validFields;
     });
 
-    self.fileFormat().format.subscribe(function(){
+    self.fileFormat().format.subscribe(function () {
       self.guessFieldTypes();
-      for(var i = 0; i < self.fileTypes.length; i++){
-        if(self.fileTypes[i].name == self.fileFormat().format().type()){
+      for (var i = 0; i < self.fileTypes.length; i++) {
+        if (self.fileTypes[i].name == self.fileFormat().format().type()) {
           self.fileType(self.fileTypes[i]);
           break;
         }
       }
 
-      if(self.fileFormat().format().type){
-        self.fileFormat().format().type.subscribe(function(newType){
+      if (self.fileFormat().format().type) {
+        self.fileFormat().format().type.subscribe(function (newType) {
           self.fileFormat().format(new FileType(newType));
         });
       }
     });
 
-    self.guessFormat = function() {
+    self.guessFormat = function () {
       viewModel.isLoading(true);
       $.post("${ url('indexer:guess_format') }", {
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function(resp) {
+      }, function (resp) {
         var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
         self.fileFormat().format(newFormat);
 
@@ -432,12 +527,12 @@ var getNewFieldName = function(){
       });
     }
 
-    self.guessFieldTypes = function(){
-      if(guessFieldTypesXhr) guessFieldTypesXhr.abort();
-      guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }",{
+    self.guessFieldTypes = function () {
+      if (guessFieldTypesXhr) guessFieldTypesXhr.abort();
+      guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }", {
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function(resp){
-        resp.columns.forEach(function(entry, i, arr){
+      }, function (resp) {
+        resp.columns.forEach(function (entry, i, arr) {
           arr[i] = ko.mapping.fromJS(entry);
         });
         self.fileFormat().columns(resp.columns);
@@ -447,11 +542,12 @@ var getNewFieldName = function(){
         $(document).trigger("error", xhr.responseText);
 
         viewModel.isLoading(false);
-      });;
+      });
+      ;
     };
 
-    self.indexFile = function() {
-      if(!self.readyToIndex()) return;
+    self.indexFile = function () {
+      if (!self.readyToIndex()) return;
 
       self.indexingStarted(true);
 
@@ -459,7 +555,7 @@ var getNewFieldName = function(){
 
       $.post("${ url('indexer:index_file') }", {
         "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function(resp) {
+      }, function (resp) {
         self.showCreate(true);
         self.jobId(resp.jobId);
         viewModel.isLoading(false);
@@ -469,27 +565,34 @@ var getNewFieldName = function(){
       });
     }
 
-    self.removeOperation = function(operation, operationList){
+    self.removeOperation = function (operation, operationList) {
       operationList.remove(operation);
     }
 
-    self.addOperation = function(field){
+    self.addOperation = function (field) {
       field.operations.push(new Operation("split"));
     }
   };
 
-  var Editor = function () {
+  var Editor = function (options) {
     var self = this;
 
-    self.collections = ${ indexes_json | n }.filter(function(index){
+    self.apiHelper = ApiHelper.getInstance(options);
+    self.assistAvailable = ko.observable(true);
+    self.isLeftPanelVisible = ko.observable();
+    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
+    self.collections = ${ indexes_json | n }.
+    filter(function (index) {
       return index.type == 'collection';
-    });;
+    });
+    ;
 
     self.createWizard = new CreateWizard(self);
     self.isLoading = ko.observable(false);
 
-    self.collectionNameAvailable = function(name){
-      var matchingCollections = self.collections.filter(function(collection){
+    self.collectionNameAvailable = function (name) {
+      var matchingCollections = self.collections.filter(function (collection) {
         return collection.name == name;
       });
 
@@ -498,11 +601,19 @@ var getNewFieldName = function(){
 
   };
 
-  var viewModel;
+    var viewModel;
 
-  $(document).ready(function () {
-    viewModel = new Editor();
-    ko.applyBindings(viewModel);
+    $(document).ready(function () {
+      var options = {
+        user: '${ user.username }',
+        i18n: {
+          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
+        }
+      }
+      viewModel = new Editor(options);
+      ko.applyBindings(viewModel);
+    });
   });
 </script>
 
