@@ -17,7 +17,7 @@
 %lex
 %options case-insensitive flex
 %s between hive impala
-%x hdfs DoubleQuotedValue SingleQuotedValue backtickedValue
+%x hdfs doubleQuotedValue singleQuotedValue backtickedValue
 %%
 
 [ \t\n]                             { /* skip whitespace */ }
@@ -279,6 +279,8 @@
 '['                                 { return '['; }
 ']'                                 { return ']'; }
 
+\$\{[^}]*\}                         { return 'VARIABLE_REFERENCE'; }
+
 \`                                  { this.begin('backtickedValue'); return 'BACKTICK'; }
 <backtickedValue>[^`]+              {
                                       if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
@@ -289,15 +291,17 @@
                                     }
 <backtickedValue>\`                 { this.popState(); return 'BACKTICK'; }
 
-\'                                  { this.begin('SingleQuotedValue'); return 'SINGLE_QUOTE'; }
-<SingleQuotedValue>[^']+            { return 'VALUE'; }
-<SingleQuotedValue>\'               { this.popState(); return 'SINGLE_QUOTE'; }
+\'                                  { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
+<singleQuotedValue>[^']+            { return 'VALUE'; }
+<singleQuotedValue>\'               { this.popState(); return 'SINGLE_QUOTE'; }
 
-\"                                  { this.begin('DoubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<DoubleQuotedValue>[^"]+            { return 'VALUE'; }
-<DoubleQuotedValue>\"               { this.popState(); return 'DOUBLE_QUOTE'; }
+\"                                  { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
+<doubleQuotedValue>[^"]+            { return 'VALUE'; }
+<doubleQuotedValue>\"               { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                             { return 'EOF'; }
+
+.                                   { /* Ignore anything else, to prevent console logging */ }
 
 /lex
 
@@ -361,6 +365,7 @@ NonReservedKeyword
 
 RegularIdentifier
  : 'REGULAR_IDENTIFIER'
+ | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
  ;
 
@@ -2515,12 +2520,10 @@ RightPart_EDIT
  | PartialBacktickedIdentifier
  ;
 
-// TODO: Expand with more choices
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
  | ColumnReference             -> { types: ['COLREF'], columnReference: $1 }
  | UserDefinedFunction
-// | GroupingOperation
  | 'NULL'                      -> { types: [ 'NULL' ] }
  ;
 
