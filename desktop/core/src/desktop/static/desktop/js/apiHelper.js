@@ -397,7 +397,8 @@
         text: options.query,
         type: options.type,
         page: options.page,
-        limit: options.limit
+        limit: options.limit,
+        include_trashed: options.include_trashed
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
