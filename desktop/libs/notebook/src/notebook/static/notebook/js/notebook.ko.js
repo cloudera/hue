@@ -265,7 +265,8 @@
         page: self.queriesCurrentPage(),
         limit: QUERIES_PER_PAGE,
         type: 'query-' + self.type(),
-        query: self.queriesFilter()
+        query: self.queriesFilter(),
+        include_trashed: false
       });
     }
 
