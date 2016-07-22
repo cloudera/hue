@@ -203,11 +203,12 @@ class S3FileSystem(object):
         res.append(self._stats_key(item))
     return res
 
+  @translate_s3_error
   def listdir(self, path, glob=None):
     return [s3.parse_uri(x.path)[2] for x in self.listdir_stats(path, glob)]
 
   @translate_s3_error
-  def rmtree(self, path, skipTrash=False):
+  def rmtree(self, path, skipTrash=True):
     if not skipTrash:
       raise NotImplementedError(_('Moving to trash is not implemented for S3'))
 
@@ -236,11 +237,8 @@ class S3FileSystem(object):
       raise IOError(msg)
 
   @translate_s3_error
-  def remove(self, path, skip_trash=False):
-    if not skip_trash:
-      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
-    key = self._get_key(path, validate=False)
-    key.bucket.delete_key(key.name)
+  def remove(self, path, skip_trash=True):
+    self.rmtree(path, skipTrash=skip_trash)
 
   def restore(self, *args, **kwargs):
     raise NotImplementedError(_('Moving to trash is not implemented for S3'))
@@ -361,6 +359,12 @@ class S3FileSystem(object):
   def upload(self, file, path, *args, **kwargs):
     pass  # upload is handled by S3FileUploadHandler
 
+  @translate_s3_error
+  def append(self, path, data):
+    key = self._get_key(path, validate=False)
+    current_data = key.get_contents_as_string() or ''
+    new_data = data or ''
+    key.set_contents_from_string(current_data + new_data, replace=True)
 
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation
