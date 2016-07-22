@@ -944,6 +944,50 @@ define([
       });
     });
 
+    describe('Variable References', function () {
+      it('should suggest tables for "SELECT | FROM ${some_variable};"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM ${some_variable};',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: {table: '${some_variable}'}
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT * FROM testTable WHERE ${some_variable} |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} ',
+          afterCursor: '',
+          hasLocations: true,
+          containsKeywords: ['<', 'BETWEEN'],
+          containsColRefKeywords: true,
+          expectedResult: {
+            lowerCase: false,
+            colRef: { identifierChain:[{ name: '${some_variable}' }], table: 'testTable'}
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT * FROM testTable WHERE ${some_variable} + 1 = |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} + 1 = ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['NUMBER']},
+            suggestColumns: { types: ['NUMBER'], table: 'testTable'}
+          }
+        });
+      });
+    });
+
     describe('Functions', function () {
       it('should suggest tables for "SELECT COUNT(*) |"', function() {
         assertAutoComplete({

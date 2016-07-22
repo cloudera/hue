@@ -72,7 +72,15 @@
         colRefDeferral.resolve();
       };
 
-      self.fetchFieldsForIdentifiers(editor, parseResult.colRef.table, parseResult.colRef.database || database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+      var foundVarRef = parseResult.colRef.identifierChain.filter(function (identifier) {
+        return identifier.name.indexOf('${') === 0;
+      });
+
+      if (foundVarRef.length > 0) {
+        colRefCallback({ type: 'T' });
+      } else {
+        self.fetchFieldsForIdentifiers(editor, parseResult.colRef.table, parseResult.colRef.database || database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+      }
 
     } else {
       colRefDeferral.resolve();
