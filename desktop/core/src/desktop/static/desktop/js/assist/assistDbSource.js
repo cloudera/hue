@@ -201,10 +201,8 @@
 
   AssistDbSource.prototype.toggleSearch = function () {
     var self = this;
-    if (!self.isSearchVisible()) {
-      self.isSearchVisible(true);
-      self.editingSearch(self.isSearchVisible());
-    }
+    self.isSearchVisible(!self.isSearchVisible());
+    self.editingSearch(self.isSearchVisible());
   };
 
   AssistDbSource.prototype.triggerRefresh = function () {
