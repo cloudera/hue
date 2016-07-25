@@ -2601,6 +2601,7 @@
         showGutter: false,
         showLineNumbers: false,
         showPrintMargin: false,
+        scrollPastEnd: true,
         minLines: 1,
         maxLines: 25
       };
