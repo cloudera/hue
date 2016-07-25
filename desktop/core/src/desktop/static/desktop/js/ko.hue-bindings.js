@@ -2586,6 +2586,9 @@
               editor.addError(err.message, err.line + offset);
               if (cnt == 0) {
                 editor.scrollToLine(err.line + offset, true, true, function () {});
+                if (err.col !== null){
+                  editor.renderer.scrollCursorIntoView({row: err.line + offset, column: err.col + 10}, 0.5)
+                }
               }
             }
           });
