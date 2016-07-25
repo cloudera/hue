@@ -1755,7 +1755,7 @@
     };
 
     self.showSubmitPopup = function () {
-      $.get('/oozie/editor/coordinator/submit/' + self.dependentsCoordinator()[0].id(), {
+      $.get('/oozie/editor/coordinator/submit/' + self.coordinatorUuid(), {
         format: 'json'
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);

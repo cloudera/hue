@@ -698,7 +698,11 @@ def coordinator_parameters(request):
 @check_editor_access_permission
 @check_document_access_permission()
 def submit_coordinator(request, doc_id):
-  coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
+  if doc_id.isdigit():
+    coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
+  else:
+    coordinator = Coordinator(document=Document2.objects.get_by_uuid(user=request.user, uuid=doc_id))
+
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
