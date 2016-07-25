@@ -46,8 +46,7 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
             <button href="#" class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
-            data-bind="visible:
-             !inTrash(), enable: selectedFiles().length > 0">
+            data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && (!isS3() || (isS3() && !isS3Root()))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
             </button>
@@ -91,7 +90,7 @@ ${ fb_components.menubar() }
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           <!-- ko if: $root.isS3 -->
-          <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
+          <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0 && (!isS3() || (isS3() && !isS3Root())), click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
           <!-- /ko -->
           <!-- ko ifnot: $root.isS3 -->
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
@@ -119,7 +118,7 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           % if show_upload_button:
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash()">
+            <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
               <span class="caret"></span>
             </a>
@@ -130,7 +129,7 @@ ${ fb_components.menubar() }
           </div>
           % endif
           <div class="btn-group" style="vertical-align: middle">
-            <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
+            <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
               <i class="fa fa-plus-circle"></i> ${_('New')}
               <span class="caret"></span>
             </a>
