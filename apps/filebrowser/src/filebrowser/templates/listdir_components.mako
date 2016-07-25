@@ -1193,10 +1193,11 @@ from django.utils.translation import ugettext as _
               $("#moveHdfsTree").remove();
               $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
               $("#moveHdfsTree").jHueHdfsTree({
-                home: "/user/${ user }",
+                home: viewModel.isS3() ? "" : "/user/${ user }",
+                isS3: viewModel.isS3(),
                 initialPath: viewModel.currentPath(),
                 onPathChange: function (path) {
-                  $("#moveDestination").val((path.indexOf("/") == 0 ? "" : "/") + path);
+                  $("#moveDestination").val((viewModel.isS3() ? "" : (path.indexOf("/") == 0 ? "" : "/")) + path);
                   $("#moveNameRequiredAlert").hide();
                 }
               });
@@ -1229,10 +1230,11 @@ from django.utils.translation import ugettext as _
           $("#copyHdfsTree").remove();
           $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
           $("#copyHdfsTree").jHueHdfsTree({
-            home: "/user/${ user }",
+            home: viewModel.isS3() ? "" : "/user/${ user }",
+            isS3: viewModel.isS3(),
             initialPath: viewModel.currentPath(),
             onPathChange: function(path){
-              $("#copyDestination").val((path.indexOf("/") == 0 ? "" : "/") + path);
+              $("#copyDestination").val((viewModel.isS3() ? "" : (path.indexOf("/") == 0 ? "" : "/")) + path);
               $("#copyNameRequiredAlert").hide();
             }
           });
