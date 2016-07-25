@@ -46,7 +46,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+
+%if 'oozie' in apps:
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+% endif
 
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
@@ -86,7 +89,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 </script>
 <!-- End query builder imports -->
-%endif
+% endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -155,20 +158,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
-## Scheduler
-## ChangeTracker
 <%namespace name="dashboard" file="/common_dashboard.mako" />
-## ${ dashboard.import_layout() }
-## <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
-## <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
-## <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
-## <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
-## submit popup
+% if 'oozie' in apps:
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+% endif
 
 ${ require.config() }
 
@@ -292,10 +289,12 @@ ${ hueIcons.symbols() }
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 DB Query
               <!-- /ko -->
+              % if 'pig' in apps:
               <!-- ko if: editorType() == 'pig' -->
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
               <!-- /ko -->
+              % endif
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
@@ -885,7 +884,7 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
-%if ENABLE_QUERY_BUILDER.get():
+% if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -898,7 +897,7 @@ ${ hueIcons.symbols() }
     <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
-%endif
+% endif
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
   <i class="fa fa-chevron-right"></i>
@@ -984,9 +983,9 @@ ${ hueIcons.symbols() }
           }
         }">
       </div>
-      %if hasattr(caller, "addSnippetHTML"):
+      % if hasattr(caller, "addSnippetHTML"):
         ${ caller.addSnippetHTML() }
-      %endif
+      % endif
     </div>
   </div>
 
@@ -994,7 +993,7 @@ ${ hueIcons.symbols() }
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-      % if ENABLE_QUERY_SCHEDULING.get():
+      % if ENABLE_QUERY_SCHEDULING.get() and 'oozie' in apps:
       <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
       <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
       % endif
@@ -1185,9 +1184,9 @@ ${ hueIcons.symbols() }
             <input class="input-small history-filter" type="text" data-bind="visible: queriesFilterVisible, blurHide: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           </a>
         </li>
-        %if ENABLE_QUERY_BUILDER.get():
+        % if ENABLE_QUERY_BUILDER.get():
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
-        %endif
+        % endif
         <!-- ko if: result.hasSomeResults -->
         <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
           <a class="inactive-action" href="#queryResults" data-toggle="tab">${_('Results')}
@@ -1294,7 +1293,7 @@ ${ hueIcons.symbols() }
           </div>
         </div>
 
-        %if ENABLE_QUERY_BUILDER.get():
+        % if ENABLE_QUERY_BUILDER.get():
         <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: {'active': currentQueryTab() == 'queryBuilderTab'}">
           <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
           <table id="queryBuilder" class="table table-condensed">
@@ -1311,7 +1310,7 @@ ${ hueIcons.symbols() }
             <button class="btn btn-primary disable-feedback" data-bind="click: generateQuery">${_('Build query')}</button>
           </div>
         </div>
-        %endif
+        % endif
 
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
           <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
@@ -2600,14 +2599,17 @@ ${ hueIcons.symbols() }
     "knockout",
     "ko.charts",
     "notebook/js/notebook.ko",
+    % if 'oozie' in apps:
     "oozie/js/coordinator-editor.ko",
+    "oozie/js/list-oozie-coordinator.ko",
+    % endif
     "assistPanel",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
     "ko.hue-bindings",
     "ko.switch-case"
-  ], function (ko, charts, EditorViewModel, CoordinatorEditorViewModel) {
+  ], function (ko, charts, EditorViewModel, CoordinatorEditorViewModel, RunningCoordinatorModel) {
 
     ko.options.deferUpdates = true;
 
@@ -2615,9 +2617,9 @@ ${ hueIcons.symbols() }
       user: '${ user.username }',
       userId: ${ user.id },
       assistAvailable: true,
-      %if conf.USE_NEW_AUTOCOMPLETER.get():
+      % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,
-      %endif
+      % endif
       autocompleteTimeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
       snippetViewSettings: {
         default: {
@@ -2995,7 +2997,11 @@ ${ hueIcons.symbols() }
       var i18n = {
         errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
       }
+      % if 'oozie' in apps:
+      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n, CoordinatorEditorViewModel, RunningCoordinatorModel);
+      % else:
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
+      % endif
       ko.applyBindings(viewModel);
       viewModel.init();
 
@@ -3037,9 +3043,9 @@ ${ hueIcons.symbols() }
           $(".add-snippet").show();
           % if conf.CUSTOM.BANNER_TOP_HTML.get():
           $(".main-content").css("top", "112px");
-          %else:
+          % else:
           $(".main-content").css("top", "82px");
-          %endif
+          % endif
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);
         }
