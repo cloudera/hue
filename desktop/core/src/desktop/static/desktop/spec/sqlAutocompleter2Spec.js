@@ -77,5 +77,10 @@ define([
       expect(hiveSubject.backTickIfNeeded('Kada')).toEqual('Kada');
     });
 
+    it('should not backtick identifiers that are backticked', function () {
+      // [A-Za-z][A-Za-z0-9_]*
+      expect(hiveSubject.backTickIfNeeded('`bla bla`')).toEqual('`bla bla`');
+    });
+
   });
 });
