@@ -1465,7 +1465,7 @@
           }
           if (resized) {
             ace().resize();
-            editorHeight = ace().session.getLength();
+            editorHeight = Math.min(maxAutoLines, ace().session.getLength());
             huePubSub.publish('redraw.fixed.headers');
           }
         }
