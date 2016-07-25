@@ -32,6 +32,7 @@
       defaults = {
         home: "",
         initialPath: "/",
+        isS3: false,
         onPathChange: function () {
         },
         createFolder: true,
@@ -156,7 +157,12 @@
 
       if (options.paths != null && options.paths.length > 0) {
         var shiftedPath = options.paths.shift();
-        currentPath = (shiftedPath != "" ? shiftedPath : "/");
+        if (_this.options.isS3){
+          currentPath = shiftedPath;
+        }
+        else {
+          currentPath = (shiftedPath != "" ? shiftedPath : "/");
+        }
       }
       else {
         currentPath = (options.leaf != null ? options.leaf : "/");
@@ -165,7 +171,8 @@
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {
-          var _dataPathForCurrent = currentPath != "" ? removeLeadingSlash(currentPath) : "__JHUEHDFSTREE__ROOT__";
+          var filteredCurrentPath = _this.options.isS3 ? currentPath.substr(5) : currentPath;
+          var _dataPathForCurrent = filteredCurrentPath != "" ? removeLeadingSlash(filteredCurrentPath) : "__JHUEHDFSTREE__ROOT__";
           _el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").attr("data-loaded", true);
           _el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").siblings("a").find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
           _tree.find("a").removeClass("selected");
@@ -177,10 +184,11 @@
           $(data.files).each(function (cnt, item) {
             if (item.name != "." && item.name != ".." && item.type == "dir") {
               var _path = item.path;
-              var _escapedPath = escapeSingleQuote(_path);
+              var filteredPath = _this.options.isS3 ? _path.substr(5) : _path;
+              var _escapedPath = escapeSingleQuote(filteredPath);
               if (_el.find("[data-path='" + removeLeadingSlash(_escapedPath) + "']").length == 0) {
                 var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + removeLeadingSlash(_escapedPath) + '" data-loaded="false"></ul>');
-                var _destination = _path.substr(0, _path.lastIndexOf("/"));
+                var _destination = filteredPath.substr(0, filteredPath.lastIndexOf("/"));
                 if (_destination == "") {
                   _destination = "__JHUEHDFSTREE__ROOT__";
                 }
@@ -210,8 +218,9 @@
             }
           });
           if (_this.options.createFolder) {
+            var filteredCurrentPath = _this.options.isS3 ? currentPath.substr(5) : currentPath;
             var _createFolderLi = $("<li>").html('<a class="pointer"><i class="fa fa-plus-square-o"></i> ' + _this.options.labels.CREATE_FOLDER + '</a>');
-            _createFolderLi.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(currentPath)) + "']"));
+            _createFolderLi.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(filteredCurrentPath)) + "']"));
 
             var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("form-inline");
             _createFolderDetails.hide();
@@ -245,7 +254,7 @@
               });
 
             });
-            _createFolderDetails.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(currentPath)) + "']"));
+            _createFolderDetails.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(filteredCurrentPath)) + "']"));
 
             _createFolderLi.find("a").on("click", function () {
               _createFolderDetails.slideDown();
@@ -273,6 +282,11 @@
         _paths.push(_this.options.initialPath.substr(0, match.index));
       }
       _paths.push(_this.options.initialPath);
+    }
+
+    if (_this.options.isS3){
+      _paths.shift();
+      _paths[0] = 's3://';
     }
 
     showHdfsLeaf({
