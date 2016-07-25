@@ -22,7 +22,9 @@ from django.utils.translation import ugettext as _
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
       <ul class="nav nav-pills hueBreadcrumbBar">
+        %if path.lower().find('s3://') != 0:
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        %endif
         <li>
             <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
                 <li data-bind="visible: label.slice(-1) == '/'"><a data-bind="click: show, attr:{'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"><span class="divider" data-bind="text: label"></span></a></li>
