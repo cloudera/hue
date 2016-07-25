@@ -458,7 +458,7 @@ from django.utils.translation import ugettext as _
     % if show_download_button:
     <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     % endif
-    <li class="divider"></li>
+    <li class="divider" data-bind="visible: !isS3()"></li>
     % if is_fs_superuser:
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }">
       <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
@@ -466,7 +466,7 @@ from django.utils.translation import ugettext as _
       </a>
     </li>
     % endif
-    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
       <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
         <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
       </a>
@@ -476,8 +476,8 @@ from django.utils.translation import ugettext as _
     <li><a href="#" data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: $root.trashSelected"><i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
     %endif
     <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
-    <li class="divider"></li>
-    <li data-bind="css: {'disabled': selectedFiles().length > 1 }">
+    <li class="divider" data-bind="visible: !isS3()"></li>
+    <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
     </li>
   <!-- /ko -->
@@ -524,9 +524,9 @@ from django.utils.translation import ugettext as _
       </td>
       <td>
         % if is_fs_superuser:
-        <span data-bind="text: stats.user, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: stats.user, visible: !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
         <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}"
-            data-bind="text: stats.user, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
+            data-bind="text: stats.user, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
         % else:
         <span data-bind="text: stats.user"></span>
         % endif
@@ -535,15 +535,15 @@ from django.utils.translation import ugettext as _
         % if is_fs_superuser:
         <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
         <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}"
-            data-bind="text: stats.group, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changeOwner"></a>
+            data-bind="text: stats.group, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner"></a>
         % else:
         <span data-bind="text: stats.group"></span>
         % endif
       </td>
       <td>
-        <span data-bind="text: permissions, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: permissions, visible: $root.isS3() || !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
         <a href="#" rel="tooltip" title="${_('Change permissions')}"
-            data-bind="text: permissions, visible: ! $root.inTrash() && selected() && ! $root.isCurrentDirSentryManaged() && ! isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
+            data-bind="text: permissions, visible: !$root.isS3() && !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changePermissions" data-original-title="${_('Change permissions')}"></a>
       </td>
       <td data-bind="text: stats.mtime" style="white-space: nowrap;"></td>
     </tr>

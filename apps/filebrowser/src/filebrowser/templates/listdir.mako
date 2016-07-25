@@ -66,7 +66,7 @@ ${ fb_components.menubar() }
                 </a>
               </li>
               % endif
-              <li class="divider"></li>
+              <li class="divider" data-bind="visible: !isS3()"></li>
               % if is_fs_superuser:
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
                 <a href="#" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
@@ -74,13 +74,13 @@ ${ fb_components.menubar() }
                 </a>
               </li>
               % endif
-              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
                 <a href="#" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
                   <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
                 </a>
               </li>
-              <li class="divider"></li>
-              <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }">
+              <li class="divider" data-bind="visible: !isS3()"></li>
+              <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }, visible: !isS3()">
                 <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
                   <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
