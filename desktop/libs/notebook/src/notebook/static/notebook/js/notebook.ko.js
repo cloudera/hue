@@ -1494,6 +1494,9 @@
         snippet.progress = 0; // Remove progress
         snippet.jobs.length = 0;
       });
+      if (cp.schedulerViewModel) {
+        cp.schedulerViewModel.availableTimezones = [];
+      }
 
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
