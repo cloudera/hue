@@ -950,6 +950,10 @@ from django.utils.translation import ugettext as _
         $(document).trigger('currPathLoaded', { path: path });
       });
 
+      self.isS3 = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('s3://') == 0;
+      });
+
       self.inTrash = ko.computed(function() {
         return self.currentPath().match(/^\/user\/.+?\/\.Trash/);
       });
