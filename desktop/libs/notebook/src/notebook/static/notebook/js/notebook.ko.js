@@ -206,7 +206,7 @@
     return properties;
   };
 
-  var ERROR_REGEX = /line ([0-9]+)/i;
+  var ERROR_REGEX = /line ([0-9]+)(\:([0-9]+))?/i;
 
   var Snippet = function (vm, notebook, snippet) {
     var self = this;
@@ -680,7 +680,8 @@
         var match = ERROR_REGEX.exec(data.message);
         self.errors.push({
           message: data.message,
-          line: match === null ? null : parseInt(match[1]) - 1
+          line: match === null ? null : parseInt(match[1]) - 1,
+          col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
         });
       } else {
         $(document).trigger("error", data.message);
