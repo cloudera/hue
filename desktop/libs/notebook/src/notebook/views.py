@@ -21,6 +21,7 @@ import logging
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
+from desktop import appmanager
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -74,6 +75,7 @@ def notebook(request):
   return render('notebook.mako', request, {
       'editor_id': notebook_id or None,
       'notebooks_json': '{}',
+      'apps': appmanager.get_apps_dict(request.user).keys(),
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
@@ -97,6 +99,7 @@ def editor(request):
   return render('editor.mako', request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
+      'apps': appmanager.get_apps_dict(request.user).keys(),
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',

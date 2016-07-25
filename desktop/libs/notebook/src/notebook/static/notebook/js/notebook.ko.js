@@ -20,15 +20,13 @@
       'knockout',
       'desktop/js/apiHelper',
       'desktop/js/autocompleter',
-      'oozie/js/coordinator-editor.ko',
-      'oozie/js/list-oozie-coordinator.ko',
       'knockout-mapping',
       'ko.charts'
     ], factory);
   } else {
     root.EditorViewModel = factory(ko, ApiHelper, Autocompleter);
   }
-}(this, function (ko, ApiHelper, Autocompleter, CoordinatorEditorViewModel, RunningCoordinatorModel) {
+}(this, function (ko, ApiHelper, Autocompleter) {
 
   var NOTEBOOK_MAPPING = {
     ignore: [
@@ -1697,37 +1695,39 @@
     };
 
     self.loadScheduler = function () {
-      var _action;
-      if (self.coordinatorUuid()) {
-        _action = 'edit';
-      } else {
-        _action = 'new';
-      }
-      logGA('schedule/' + _action);
-
-      $.get('/oozie/editor/coordinator/' + _action + '/', {
-        format: 'json',
-        document: self.uuid(),
-        coordinator: self.coordinatorUuid()
-      }, function (data) {
-        $("#schedulerEditor").html(data.layout);
-        self.schedulerViewModel = new CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
-
-        ko.cleanNode($("#schedulerEditor")[0]);
-        ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
-
-        huePubSub.publish('render.jqcron');
-
-        self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-        self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-        self.schedulerViewModel.isEditing(true);
-
-        if (_action == 'new') {
-          self.saveScheduler();
+      if (typeof vm.CoordinatorEditorViewModel !== 'undefined') {
+        var _action;
+        if (self.coordinatorUuid()) {
+          _action = 'edit';
+        } else {
+          _action = 'new';
         }
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
+        logGA('schedule/' + _action);
+
+        $.get('/oozie/editor/coordinator/' + _action + '/', {
+          format: 'json',
+          document: self.uuid(),
+          coordinator: self.coordinatorUuid()
+        }, function (data) {
+          $("#schedulerEditor").html(data.layout);
+          self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+
+          ko.cleanNode($("#schedulerEditor")[0]);
+          ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+
+          huePubSub.publish('render.jqcron');
+
+          self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+          self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+          self.schedulerViewModel.isEditing(true);
+
+          if (_action == 'new') {
+            self.saveScheduler();
+          }
+        }).fail(function (xhr) {
+          $(document).trigger("error", xhr.responseText);
+        });
+      }
     };
 
     self.refreshSchedulerParameters = function() {
@@ -1767,17 +1767,19 @@
     self.viewSchedulerId = ko.observable('0000025-160525025600562-oozie-oozi-C');
     self.loadingScheduler = ko.observable(false);
     self.viewScheduler = function() {
-      logGA('schedule/view');
-      self.loadingScheduler(true);
-      $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
-        format: 'json'
-      }, function (data) {
-        self.schedulerViewerViewModel(new RunningCoordinatorModel(data.actions));
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      }).always(function(){
-        self.loadingScheduler(false);
-      });
+      if (typeof vm.RunningCoordinatorModel !== 'undefined') {
+        logGA('schedule/view');
+        self.loadingScheduler(true);
+        $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
+          format: 'json'
+        }, function (data) {
+          self.schedulerViewerViewModel(new vm.RunningCoordinatorModel(data.actions));
+        }).fail(function (xhr) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.loadingScheduler(false);
+        });
+      }
     };
 
     self.exportJupyterNotebook = function () {
@@ -1841,7 +1843,7 @@
   };
 
 
-  function EditorViewModel(editor_id, notebooks, options, i18n) {
+  function EditorViewModel(editor_id, notebooks, options, i18n, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     var self = this;
     self.i18n = i18n;
     self.user = options.user;
@@ -1860,6 +1862,9 @@
     self.successUrl = ko.observable(options.success_url);
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
+
+    self.CoordinatorEditorViewModel = CoordinatorEditorViewModel;
+    self.RunningCoordinatorModel = RunningCoordinatorModel;
 
     self.canSave = ko.computed(function() {
       // Saved query or history but history coming from a saved query
