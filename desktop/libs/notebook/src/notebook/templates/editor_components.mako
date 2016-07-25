@@ -1605,7 +1605,7 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="snippet-grid-settings">
-  <div style="overflow:auto">
+  <div class="snippet-grid-settings" style="overflow:auto">
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
       <li class="nav-header" title="${_('Hide columns')}" style="margin-left: -2px">
         <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
@@ -2218,16 +2218,6 @@ ${ hueIcons.symbols() }
         if (vm.editorMode()) {
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-          $(el).jHueTableExtender({
-            fixedHeader: true,
-            fixedFirstColumn: true,
-            lockSelectedRow: true,
-            includeNavigator: false,
-            parentId: 'snippet_' + snippet.id(),
-            mainScrollable: '.right-panel',
-            stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
-            clonedContainerPosition: "fixed"
-          });
           $(el).jHueHorizontalScrollbar();
         }
         else {
@@ -2251,6 +2241,18 @@ ${ hueIcons.symbols() }
 
     if (vm.editorMode()) {
       $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+      if (!snippet.result.hasManyColumns()) {
+        $(el).jHueTableExtender({
+          fixedHeader: true,
+          fixedFirstColumn: true,
+          lockSelectedRow: true,
+          includeNavigator: false,
+          mainScrollable: '.right-panel',
+          stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
+          parentId: 'snippet_' + snippet.id(),
+          clonedContainerPosition: "fixed"
+        });
+      }
       $(el).jHueHorizontalScrollbar();
     } else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -2763,21 +2765,9 @@ ${ hueIcons.symbols() }
           return;
         }
         viewModel.selectedNotebook().snippets().forEach(function (snippet) {
-          if (snippet.result.meta().length > 0 && ! snippet.result.hasManyColumns()) {
+          if (snippet.result.meta().length > 0 && !snippet.result.hasManyColumns()) {
             var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-            if (viewModel.editorMode()) {
-              _el.jHueTableExtender({
-                fixedHeader: true,
-                fixedFirstColumn: true,
-                lockSelectedRow: true,
-                includeNavigator: false,
-                mainScrollable: '.right-panel',
-                stickToTopPosition: viewModel.isPlayerMode() ? 1 : 73,
-                parentId: 'snippet_' + snippet.id(),
-                clonedContainerPosition: "fixed"
-              });
-              _el.jHueHorizontalScrollbar();
-            } else {
+            if (!viewModel.editorMode()) {
               _el.jHueTableExtender({
                 fixedHeader: true,
                 fixedFirstColumn: true,
@@ -3216,6 +3206,10 @@ ${ hueIcons.symbols() }
         var _dtElement;
         if (snippet.showGrid()) {
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+          var topCoord = viewModel.isPlayerMode() ? 1 : 73;
+          $("#snippet_" + snippet.id()).find(".snippet-grid-settings").css({
+            "height": Math.ceil($(window).height() - topCoord) + 'px'
+          });
         } else {
           _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
         }
@@ -3226,6 +3220,7 @@ ${ hueIcons.symbols() }
           "height": (_dtElement.height() - 30) + "px",
           "line-height": (_dtElement.height() - 30) + "px"
         });
+
       }
 
       $(document).on("renderData", function (e, options) {

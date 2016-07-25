@@ -84,6 +84,26 @@
     }
   };
 
+  Plugin.prototype.drawHeader = function () {
+    drawHeader(this);
+  }
+
+  Plugin.prototype.drawFirstColumn = function () {
+    drawFirstColumn(this);
+  }
+
+  Plugin.prototype.drawLockedRows = function () {
+    var _this = this;
+    var $pluginElement = $(_this.element);
+    if ($pluginElement.data('lockedRows')) {
+      var locks = $pluginElement.data('lockedRows');
+      Object.keys(locks).forEach(function (idx) {
+        drawLockedRow(_this, idx.substr(1));
+      });
+    }
+  }
+
+
   Plugin.prototype.init = function () {
 
     $.expr[":"].econtains = function (obj, index, meta, stack) {
@@ -194,18 +214,16 @@
     $headerCounter.addClass('locked');
 
     function unlock($el) {
-      var idx = $el.parent().index();
-      $header.find('tbody tr:eq('+ idx +')').remove();
-      delete lockedRows[$el.text()]
+      $header.find('tr.ht-visible-row-'+(($el.text()*1)-1)).remove();
+      delete lockedRows['r' + $el.text()]
       $el.parent().remove();
-      if ($header.find('tbody tr').length == 0){
+      if ($header.find('tbody tr').length == 0) {
         $header.removeClass('locked');
         $headerCounter.removeClass('locked');
-        $pluginElement.data('lockedRows', {});
       }
     }
 
-    if (Object.keys(lockedRows).indexOf(rowNo) === -1) {
+    if (Object.keys(lockedRows).indexOf('r' + rowNo) === -1) {
       var $clone = $pluginElement.find('tr td:first-child').filter(function() {
         return $(this).text() === rowNo+'';
       }).closest('tr').clone();
@@ -217,15 +235,15 @@
       $newTr.find('td').on('click', function(){
         unlock($(this));
       });
-      lockedRows[rowNo] = {
+      lockedRows['r' + rowNo] = {
         row: $clone,
         cell: $newTr
       };
     }
     else {
-      lockedRows[rowNo].row.appendTo($header.find('tbody'));
-      lockedRows[rowNo].cell.appendTo($headerCounter.find('tbody'));
-      lockedRows[rowNo].cell.find('td').on('click', function(){
+      lockedRows['r' + rowNo].row.appendTo($header.find('tbody'));
+      lockedRows['r' + rowNo].cell.appendTo($headerCounter.find('tbody'));
+      lockedRows['r' + rowNo].cell.find('td').on('click', function(){
         unlock($(this));
       });
     }
@@ -342,12 +360,6 @@
 
     $(mainScrollable).on('scroll', positionClones);
 
-    if ($pluginElement.data('lockedRows')) {
-      var locks = $pluginElement.data('lockedRows');
-      Object.keys(locks).forEach(function (idx) {
-        drawLockedRow(plugin, idx);
-      });
-    }
   }
 
 

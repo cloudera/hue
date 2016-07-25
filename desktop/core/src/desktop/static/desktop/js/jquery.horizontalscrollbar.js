@@ -85,7 +85,7 @@
     var el = this.element;
 
     var checkWidth = function () {
-      if ($(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() > 0) {
+      if ($(el).parents('.dataTables_wrapper').width() > 0) {
         initWhenReady(el);
       } else {
         window.setTimeout(checkWidth, 100);
