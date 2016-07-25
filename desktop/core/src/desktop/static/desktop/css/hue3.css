@@ -628,8 +628,26 @@ table.display td.center {
   cursor: default;
   background: none;
   border-top: none;
-  padding-right: 0!important;
+  padding-right: 4px!important;
+  padding-left: 4px!important;
 }
+
+@keyframes barberpole {
+  from { background-position: 0 0; }
+  to   { background-position: 60px 30px; }
+}
+
+.table-huedatatable td.stripe {
+  background: repeating-linear-gradient(
+      -55deg,
+      #FFF,
+      #FFF 10px,
+      #f9f9f9 10px,
+      #f9f9f9 20px
+    );
+  animation: barberpole 0.5s linear infinite;
+}
+
 
 .sorting_disabled {
   vertical-align: middle!important;

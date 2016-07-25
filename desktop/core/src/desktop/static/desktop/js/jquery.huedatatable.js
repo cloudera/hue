@@ -39,82 +39,82 @@
     }
 
     self.isDrawing = false;
-    self.fnDraw = function () {
+
+    self.fnDraw = function (force) {
+
       if (!self.isDrawing) {
         self.isDrawing = true;
-        var rowHeight = 29;
         var $t = self.$table;
-
         var aoColumns = self.$table.data('aoColumns');
+        var data = self.$table.data('data');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
 
-        var maxDOMCells = 20000;
+        var rowHeight = 29;
+        var invisibleOffset = aoColumns.length < 500 ? 10 : 1;
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
         var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
-
-        var invisibleOffset = Math.ceil(Math.min(Math.max(0, (visibleRows * (maxDOMCells / (aoColumns.length * visibleRows))) - visibleRows), 100 - visibleRows));
 
         visibleRows += invisibleOffset;
 
         var startRow = $t.offset().top - 73 < 0 ? Math.max(Math.floor(Math.abs($t.offset().top - 73) / rowHeight) - invisibleOffset, 0) : 0;
-        var endRow = startRow + visibleRows;
+        var endRow = startRow + visibleRows + invisibleOffset;
 
-        var northSpace = rowHeight * startRow;
-        if ($t.find('.ht-north-spacer').length === 0) {
-          $('<tr>').addClass('ht-north-spacer').hide().html('<td colspan="' + (aoColumns.length) + '"></td>').appendTo(appendable);
+        if ($t.data('fnDraws') == 0) {
+          var html = '';
+          for (var i = 0; i < data.length; i++) {
+            html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+          }
+          appendable.html(html);
+          if (aoColumns.length < 500) {
+            $t.data('plugin_jHueTableExtender').drawFirstColumn();
+          }
         }
         else {
-          if (northSpace > 0) {
-            $t.find('.ht-north-spacer').show().html('<td colspan="' + (aoColumns.length) + '" style="height: ' + northSpace + 'px"></td>');
+          if (force) {
+            var html = '';
+            for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
+              html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+            }
+            appendable.html(appendable.html() + html);
+            if (aoColumns.length < 500) {
+              $t.data('plugin_jHueTableExtender').drawFirstColumn();
+            }
+          }
+        }
+
+        for (var i = 0; i < data.length; i++) {
+          var html = '';
+          if (i >= startRow && i <= endRow) {
+            var row = data[i];
+            if (row) {
+              for (var j = 0; j < aoColumns.length; j++) {
+                html += '<td>' + row[j] + '</td>';
+              }
+            }
           }
           else {
-            $t.find('.ht-north-spacer').hide();
+            html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
           }
+          appendable.children().eq(i).html(html);
         }
 
-        if ($t.data('fnDraws') == 0){
-          $t.find('.ht-visible-row').empty();
-
-          for (var i=visibleRows - 1; i >= 0; i--) {
-            if ($t.find('.ht-visible-row-' + i).length === 0) {
-              $t.find('.ht-north-spacer').after('<tr class="ht-visible-row ht-visible-row-' + i + '"></tr>');
-            }
-          }
+        if (aoColumns.length < 500) {
+          $t.data('plugin_jHueTableExtender').drawHeader();
+          $t.data('plugin_jHueTableExtender').drawLockedRows();
         }
-
-        $t.find('.ht-visible-row').each(function(idx, el){
-          var row = $t.data('data')[startRow + idx];
-          var html = '';
-          if (row){
-            for (var j = 0; j < aoColumns.length; j++) {
-              html += '<td>' + row[j] + '</td>';
-            }
-          }
-          $(el).html(html);
-        });
-
-
-        var southSpace = rowHeight * ($t.data('data').length - endRow);
-        if ($t.find('.ht-south-spacer').length === 0) {
-          $('<tr>').addClass('ht-south-spacer').html('<td colspan="' + (aoColumns.length) + '" style="height: ' + southSpace + 'px"></td>').appendTo(appendable);
-        }
-        else {
-          $t.find('.ht-south-spacer').html('<td colspan="' + (aoColumns.length) + '" style="height: ' + southSpace + 'px"></td>');
-        }
-
+        $t.data('fnDraws', $t.data('fnDraws') + 1);
         if ($t.data('oInit')['fnDrawCallback']) {
           $t.data('oInit')['fnDrawCallback']();
         }
-        $t.data('fnDraws', $t.data('fnDraws') + 1);
+
         self.isDrawing = false;
       }
-    };
+    }
 
     self.fnAddData = function (mData, bRedraw) {
-      var aoColumns = self.$table.data('aoColumns') || [];
-
       var $t = self.$table;
 
+      var aoColumns = $t.data('aoColumns') || [];
       $t.data('data', $t.data('data').concat(mData));
 
       if (mData.length === 0) {
@@ -129,7 +129,7 @@
         })
       }
 
-      self.fnDraw();
+      self.fnDraw(true);
 
     };
 
@@ -179,7 +179,7 @@
           self.$table.data('isScrollAttached', true);
           self.$table.parents(oInit['scrollable']).on('scroll', function () {
             window.clearTimeout(drawTimeout);
-            drawTimeout = window.setTimeout(self.fnDraw, 50);
+            drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns').length, 500)));
           });
         }
       }
