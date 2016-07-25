@@ -39,7 +39,7 @@
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
-    var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions);
+    var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions, true);
 
     var deferrals = [];
     var completions = [];
@@ -258,67 +258,104 @@
     return tableDeferred;
   };
 
+  SqlAutocompleter2.prototype.locateSubQuery = function (subQueries, subQueryName) {
+    var foundSubQueries = subQueries.filter(function (knownSubQuery) {
+      return knownSubQuery.alias === subQueryName
+    });
+    if (foundSubQueries.length > 0) {
+      return foundSubQueries[0];
+    }
+    return null;
+  };
+
   SqlAutocompleter2.prototype.addColumns = function (parseResult, editor, database, types, completions) {
     var self = this;
     var addColumnsDeferred = $.Deferred();
 
-    var callback = function (data) {
-      if (data.extended_columns) {
-        data.extended_columns.forEach(function (column) {
-          if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-            completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', type: 'column'})
-          } else if (column.type.indexOf('map') === 0) {
-            completions.push({value: self.backTickIfNeeded(column.name), meta: 'map', type: 'column'})
-          } else if (column.type.indexOf('struct') === 0) {
-            completions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', type: 'column'})
-          } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-            completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', type: 'column'})
-          } else if (column.type.indexOf('array') === 0) {
-            completions.push({value: self.backTickIfNeeded(column.name), meta: 'array', type: 'column'})
-          } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
-              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: self.backTickIfNeeded(column.name), meta: column.type, type: 'column'})
+    if (parseResult.suggestColumns.subQuery && !parseResult.suggestColumns.identifierChain) {
+      var foundSubQuery = self.locateSubQuery(parseResult.subQueries, parseResult.suggestColumns.subQuery);
+
+      var addSubQueryColumns = function (subQueryColumns) {
+        subQueryColumns.forEach(function (column) {
+          if (column.alias || column.identifierChain) {
+            // TODO: Potentially fetch column types for sub-queries, possible performance hit.
+            var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
+            if (column.alias) {
+              completions.push({value: self.backTickIfNeeded(column.alias), meta: type, type: 'column'})
+            } else if (column.identifierChain && column.identifierChain.length === 1) {
+              completions.push({value: self.backTickIfNeeded(column.identifierChain[0].name), meta: type, type: 'column'})
+            }
+            addColumnsDeferred.resolve();
+            return addColumnsDeferred;
+          } else if (column.subQuery && foundSubQuery.subQueries) {
+            var foundNestedSubQuery = self.locateSubQuery(foundSubQuery.subQueries, column.subQuery);
+            if (foundNestedSubQuery !== null) {
+              addSubQueryColumns(foundNestedSubQuery.columns);
+            }
           }
         });
-      } else if (data.columns) {
-        data.columns.forEach(function (column) {
-          completions.push({value: self.backTickIfNeeded(column), meta: 'column', type: 'column'})
-        });
+      };
+      if (foundSubQuery !== null) {
+        addSubQueryColumns(foundSubQuery.columns);
       }
-      if (data.type === 'map' && self.snippet.type() === 'impala') {
-        completions.push({value: 'key', meta: 'key', type: 'column'});
-        completions.push({value: 'value', meta: 'value', type: 'column'});
-      }
-      if (data.type === 'struct') {
-        data.fields.forEach(function (field) {
-          completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', type: 'column'})
-        });
-      } else if (data.type === 'map' && (data.value && data.value.fields)) {
-        data.value.fields.forEach(function (field) {
-          if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
-          }
-        });
-      } else if (data.type === 'array' && (data.item && data.item.fields)) {
-        data.item.fields.forEach(function (field) {
-          if ((field.type === 'array' || field.type === 'map')) {
-            if (self.snippet.type() === 'hive') {
-              completions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, type: 'column'});
-            } else {
+    } else {
+      var callback = function (data) {
+        if (data.extended_columns) {
+          data.extended_columns.forEach(function (column) {
+            if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
+              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', type: 'column'})
+            } else if (column.type.indexOf('map') === 0) {
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'map', type: 'column'})
+            } else if (column.type.indexOf('struct') === 0) {
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', type: 'column'})
+            } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
+              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', type: 'column'})
+            } else if (column.type.indexOf('array') === 0) {
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'array', type: 'column'})
+            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              completions.push({value: self.backTickIfNeeded(column.name), meta: column.type, type: 'column'})
+            }
+          });
+        } else if (data.columns) {
+          data.columns.forEach(function (column) {
+            completions.push({value: self.backTickIfNeeded(column), meta: 'column', type: 'column'})
+          });
+        }
+        if (data.type === 'map' && self.snippet.type() === 'impala') {
+          completions.push({value: 'key', meta: 'key', type: 'column'});
+          completions.push({value: 'value', meta: 'value', type: 'column'});
+        }
+        if (data.type === 'struct') {
+          data.fields.forEach(function (field) {
+            completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', type: 'column'})
+          });
+        } else if (data.type === 'map' && (data.value && data.value.fields)) {
+          data.value.fields.forEach(function (field) {
+            if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
               completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
             }
-          } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-              sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-            completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
-          }
-        });
-      }
-      addColumnsDeferred.resolve();
-    };
+          });
+        } else if (data.type === 'array' && (data.item && data.item.fields)) {
+          data.item.fields.forEach(function (field) {
+            if ((field.type === 'array' || field.type === 'map')) {
+              if (self.snippet.type() === 'hive') {
+                completions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, type: 'column'});
+              } else {
+                completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
+              }
+            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
+            }
+          });
+        }
+        addColumnsDeferred.resolve();
+      };
 
-    self.fetchFieldsForIdentifiers(editor, parseResult.suggestColumns.table, parseResult.suggestColumns.database || database, parseResult.suggestColumns.identifierChain, callback, addColumnsDeferred.resolve);
-
+      self.fetchFieldsForIdentifiers(editor, parseResult.suggestColumns.table, parseResult.suggestColumns.database || database, parseResult.suggestColumns.identifierChain, callback, addColumnsDeferred.resolve);
+    }
     return addColumnsDeferred;
   };
 
@@ -452,6 +489,9 @@
 
   SqlAutocompleter2.prototype.backTickIfNeeded = function (text) {
     var self = this;
+    if (text.indexOf('`') === 0) {
+      return text;
+    }
     var upperText = text.toUpperCase();
     if (self.snippet.type() === 'hive' && (hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText])) {
       return '`' + text + '`';

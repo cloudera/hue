@@ -82,6 +82,118 @@ define([
       });
     });
 
+    describe('Error Handling', function () {
+      it('should suggest keywords for "bla; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'bla; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "bla bla bla;bla; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'bla bla bla;bla; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "Åäö; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'Åäö; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "bla bla bla;bla;\\n|;bladiblaa blaa"', function() {
+        assertAutoComplete({
+          beforeCursor: 'bla bla bla;bla;\n',
+          afterCursor: ';bladiblaa blaa',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "FROM; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'FROM; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "FROM USE; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'FROM USE; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "FROM SELECT; OR FROM FROM; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'FROM SELECT; OR FROM FROM;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "FROM SELECT; OR FROM FROM; |;BLAAA; AND;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'FROM SELECT; OR FROM FROM;',
+          afterCursor: ';BLAAA; AND;',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+      
+      it('should suggest keywords for "FROM bla bla;AND booo; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'FROM bla bla;AND booo;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|; SELECT LIMIT 10"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '; SELECT LIMIT 10',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+    });
+
     describe('Impala specific', function () {
       it('should suggest keywords for "|"', function() {
         assertAutoComplete({
