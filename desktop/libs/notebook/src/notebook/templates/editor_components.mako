@@ -47,7 +47,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
-%if 'oozie' in apps:
+% if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 % endif
 
@@ -163,7 +163,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
-% if 'oozie' in apps:
+% if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 % endif
 
@@ -289,12 +289,10 @@ ${ hueIcons.symbols() }
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 DB Query
               <!-- /ko -->
-              % if 'pig' in apps:
               <!-- ko if: editorType() == 'pig' -->
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
               <!-- /ko -->
-              % endif
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
@@ -993,7 +991,7 @@ ${ hueIcons.symbols() }
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-      % if ENABLE_QUERY_SCHEDULING.get() and 'oozie' in apps:
+      % if ENABLE_QUERY_SCHEDULING.get():
       <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
       <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
       % endif
@@ -2599,7 +2597,7 @@ ${ hueIcons.symbols() }
     "knockout",
     "ko.charts",
     "notebook/js/notebook.ko",
-    % if 'oozie' in apps:
+    % if ENABLE_QUERY_SCHEDULING.get():
     "oozie/js/coordinator-editor.ko",
     "oozie/js/list-oozie-coordinator.ko",
     % endif
@@ -2997,7 +2995,7 @@ ${ hueIcons.symbols() }
       var i18n = {
         errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
       }
-      % if 'oozie' in apps:
+      % if ENABLE_QUERY_SCHEDULING.get():
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n, CoordinatorEditorViewModel, RunningCoordinatorModel);
       % else:
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
