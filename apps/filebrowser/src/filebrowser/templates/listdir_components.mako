@@ -954,7 +954,11 @@ from django.utils.translation import ugettext as _
       });
 
       self.isS3 = ko.pureComputed(function () {
-        return self.currentPath().toLowerCase().indexOf('s3://') == 0;
+        return self.currentPath().toLowerCase().indexOf('s3://') === 0;
+      });
+
+      self.isS3Root = ko.pureComputed(function () {
+        return self.isS3() && self.currentPath().toLowerCase() === 's3://';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1628,7 +1632,7 @@ from django.utils.translation import ugettext as _
         $('body').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible"))) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible")) && (!viewModel.isS3() || (viewModel.isS3() && !viewModel.isS3Root()))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -1658,7 +1662,7 @@ from django.utils.translation import ugettext as _
           try {
             _dropzone.destroy();
           }
-          catch (e) {
+          catch (exc) {
           }
           var options = {
             url: '/filebrowser/upload/file?dest=' + ops.path,
@@ -1722,17 +1726,19 @@ from django.utils.translation import ugettext as _
               }
             }
           };
-          _dropzone = new Dropzone(document.body, options);
+          if (ops.path.toLowerCase() !== 's3://') {
+            _dropzone = new Dropzone(document.body, options);
 
-          _dropzone.on('queuecomplete', function () {
+            _dropzone.on('queuecomplete', function () {
               setTimeout(function () {
-                $('#progressStatus').addClass('hide');
-                $('#progressStatusBar').addClass('hide');
-                $('#progressStatusBar div').css("width", "0");
-                viewModel.retrieveData();
-                },
-              2500);
-          });
+                    $('#progressStatus').addClass('hide');
+                    $('#progressStatusBar').addClass('hide');
+                    $('#progressStatusBar div').css("width", "0");
+                    viewModel.retrieveData();
+                  },
+                  2500);
+            });
+          }
         });
       }
 
