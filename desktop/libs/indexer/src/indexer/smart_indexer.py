@@ -25,7 +25,7 @@ from liboozie.submission2 import Submission
 
 from indexer.fields import Field, FIELD_TYPES
 from indexer.operations import get_checked_args
-from indexer.file_format import get_file_format_instance
+from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.conf import zkensemble
@@ -144,15 +144,6 @@ class Indexer(object):
     return base_name
 
   @staticmethod
-  def _format_character(string):
-    string = string.replace('\\', '\\\\')
-    string = string.replace('"', '\\"')
-    string = string.replace('\t', '\\t')
-    string = string.replace('\n', '\\n')
-
-    return string
-
-  @staticmethod
   def _get_regex_for_type(type_):
     matches = filter(lambda field_type: field_type.name == type_, FIELD_TYPES)
 
@@ -179,10 +170,10 @@ class Indexer(object):
       "collection_name":collection_name,
       "fields":self.get_field_list(data['columns']),
       "num_base_fields": len(data['columns']),
-      "format_character":Indexer._format_character,
       "uuid_name" : uuid_name,
       "get_regex":Indexer._get_regex_for_type,
-      "format":data['format'],
+      "format_settings": data['format'],
+      "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location" : grok_dicts_loc if self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location" : geolite_loc if self.fs.exists(geolite_loc) else None,
