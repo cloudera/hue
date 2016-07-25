@@ -48,6 +48,7 @@ try:
   from beeswax.views import _parse_out_hadoop_jobs
 except ImportError, e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
+  hive_settings = None
 
 try:
   from impala import api   # Force checking if Impala is enabled
@@ -71,6 +72,10 @@ def query_error_handler(func):
       else:
         raise QueryError(message)
   return decorator
+
+
+def is_hive_enabled():
+  return hive_settings is not None and type(hive_settings) == BoundConfig
 
 
 def is_impala_enabled():
@@ -106,7 +111,7 @@ class HiveConfiguration(object):
       "key": "settings",
       "help_text": _("Hive and Hadoop configuration properties."),
       "type": "settings",
-      "options": [config.lower() for config in hive_settings.get()] if hasattr(hive_settings, 'get') else []
+      "options": [config.lower() for config in hive_settings.get()] if is_hive_enabled() and hasattr(hive_settings, 'get') else []
     }
   ]
 
