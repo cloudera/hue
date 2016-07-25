@@ -244,7 +244,12 @@
 
             _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
             if (file.type == "dir") {
-              $("<i class='fa fa-folder'></i>").prependTo(_flink);
+              if (file.path.toLowerCase().indexOf('s3://') == 0 && file.path.substr(5).indexOf('/') == -1) {
+                $("<i class='fa fa-cloud'></i>").prependTo(_flink);
+              }
+              else {
+                $("<i class='fa fa-folder'></i>").prependTo(_flink);
+              }
               _f.click(function () {
                 _parent.options.onFolderChange(file.path);
                 _parent.navigateTo(file.path);

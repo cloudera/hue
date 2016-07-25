@@ -510,7 +510,7 @@ from django.utils.translation import ugettext as _
        % if 'oozie' in apps:
       'fa-play': $.inArray(name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1,
        % endif
-      'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered }"></i></td>
+      'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered(), 'fa-cloud': type != 'file' && isBucket() }"></i></td>
       <td data-bind="attr: {'title': tooltip}" rel="tooltip">
         <!-- ko if: name == '..' -->
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
@@ -760,6 +760,9 @@ from django.utils.translation import ugettext as _
           group: file.stats.group,
           mtime: file.mtime
         },
+        isBucket: ko.pureComputed(function(){
+          return file.path.toLowerCase().indexOf('s3://') == 0 && file.path.substr(5).indexOf('/') == -1
+        }),
         selected: ko.observable(false),
         highlighted: ko.observable(file.highlighted || false),
         handleSelect: function (row, e) {
