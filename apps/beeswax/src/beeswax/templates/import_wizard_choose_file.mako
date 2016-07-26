@@ -150,7 +150,7 @@ ${ assist.assistPanel() }
                         )}
                         <span  class="help-inline">${unicode(file_form["path"].errors) | n}</span>
                     <span class="help-block">
-                    ${_('The path to the file(s) on which to base this new table definition. It can be compressed (gzip) or not.')}
+                    ${_('The path to the file(s) or directory on which to base this new table definition. It can be compressed (gzip) or not.')}
                     </span>
                     </div>
                 </div>
@@ -160,6 +160,9 @@ ${ assist.assistPanel() }
                     ${comps.field(file_form["load_data"], render_default=True)}
                     <span class="help-block">
                     ${_('Select whether table data should be imported, external or empty.')}
+                    <div id="fileWillBeMoved" class="alert">
+                      <strong>${_('Warning:')}</strong> ${_('The selected file is going to be moved during the import.')}
+                    </div>
                   </span>
                   </div>
                 </div>
@@ -259,18 +262,25 @@ ${ assist.assistPanel() }
       $(".fileChooserBtn").click(function (e) {
         e.preventDefault();
         var _destination = $(this).attr("data-filechooser-destination");
+        var initialLoadValue = $('#id_load_data').val();
         $("#filechooser").jHueFileChooser({
           initialPath: $("input[name='" + _destination + "']").val(),
           onFileChoose: function (filePath) {
             $("input[name='" + _destination + "']").val(filePath);
             $("#chooseFile").modal("hide");
+            if (filePath.toLowerCase().indexOf('s3://') === 0){
+              $('#id_load_data').val('EXTERNAL').trigger('change').find('option[value="IMPORT"]').attr('disabled', 'disabled');
+            }
+            else {
+              $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
+            }
           },
-          createFolder: false
+          createFolder: $('#id_load_data').val() === 'EXTERNAL'
         });
         $("#chooseFile").modal("show");
       });
-      $("#id_do_import").change(function () {
-        if ($(this).is(":checked")) {
+      $("#id_load_data").change(function () {
+        if ($(this).val() === 'IMPORT') {
           $("#fileWillBeMoved").show();
         }
         else {

@@ -107,6 +107,9 @@
       if (initialPath != "") {
         self.navigateTo(self.options.initialPath);
       }
+      else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
+        self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+      }
     }
   };
 
