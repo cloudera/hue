@@ -492,9 +492,10 @@ class HS2Api(Api):
     if not settings:
       session = self._get_session(notebook, 'hive')
       if not session:
-        raise Exception(_('Cannot get jobs, failed to find active HS2 session for user: %s') % self.user.username)
-      properties = session['properties']
-      settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
+        LOG.warn('Cannot get jobs, failed to find active HS2 session for user: %s' % self.user.username)
+      else:
+        properties = session['properties']
+        settings = next((prop['value'] for prop in properties if prop['key'] == 'settings'), None)
 
     if settings:
       engine = next((setting['value'] for setting in settings if setting['key'] == 'hive.execution.engine'), DEFAULT_HIVE_ENGINE)
@@ -558,7 +559,7 @@ class HS2Api(Api):
     settings = snippet['properties'].get('settings', None)
     file_resources = snippet['properties'].get('files', None)
     functions = snippet['properties'].get('functions', None)
-    properties = session['properties']
+    properties = session['properties'] if session else []
 
     # Get properties from session if not defined in snippet
     if not settings:

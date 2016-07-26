@@ -1005,7 +1005,7 @@ ${ hueIcons.symbols() }
             <form class="form-horizontal session-config">
               <fieldset>
                 <!-- ko ifnot: sessions().length -->
-               <p>${ _('There are currently no active sessions.') }</p>
+               <p>${ _('There are currently no active sessions, please reload the page.') }</p>
                <!-- /ko -->
                <!-- ko foreach: sessions -->
                <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
