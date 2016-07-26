@@ -38,19 +38,21 @@ class Command(BaseCommand):
   help = textwrap.dedent("""\
     Use the following arguments:
 
-      all        Runs tests for all desktop applications and libraries
-                 Additional arguments are passed to nose.
+      all           Runs tests for all desktop applications and libraries
+                    Additional arguments are passed to nose.
 
-      fast       Runs the "fast" tests, namely those that don't start Hadoop.
+      fast          Runs the "fast" tests, namely those that don't start Hadoop.
 
-      specific   Explicitly run specific tests using nose.
-                 For example, to run all the filebrower tests or
-                 to run a specific test function, use
-                    test specific filebrowser
-                    test specific useradmin.tests:test_user_admin
-                 All additional arguments are passed directly to nose.
+      specific      Explicitly run specific tests using nose.
+                    For example, to run all the filebrower tests or
+                    to run a specific test function, use
+                       test specific filebrowser
+                       test specific useradmin.tests:test_user_admin
+                    All additional arguments are passed directly to nose.
 
-      windmill   Runs windmill tests
+      windmill      Runs windmill tests
+
+      list_modules  List test modules for all desktop applications and libraries
 
     Common useful extra arguments for nose:
       --nologcapture
@@ -92,6 +94,9 @@ class Command(BaseCommand):
       ret = test_windmill.Command().handle(*args)
     elif args[0] in ("specific", "nose"):
       nose_args = args
+    elif args[0] == "list_modules":
+      print '\n'.join(all_apps)
+      sys.exit(0)
     else:
       print self.help
       sys.exit(1)
