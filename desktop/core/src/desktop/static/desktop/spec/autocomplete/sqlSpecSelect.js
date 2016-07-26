@@ -3135,6 +3135,20 @@ define([
         });
       });
 
+      it('should suggest keywords for "SELECT cast(\'1\' AS | b, c bla, d"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cast(\'1\' AS ',
+          afterCursor: ' b, c bla, d',
+          dialect: 'impala',
+          containsKeywords: ['BIGINT', 'REAL'],
+          doesNotContainKeywords: ['DATE'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT cos(| FROM testTable"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT cos(',
@@ -3181,6 +3195,20 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ceiling(',
           afterCursor: ' FROM testTable',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+            suggestColumns: { types: ['DECIMAL', 'DOUBLE'], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT a, ceiling(| b, c AS bla, d FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ceiling(',
+          afterCursor: ' b, c AS bla, d FROM testTable',
           dialect: 'impala',
           hasLocations: true,
           expectedResult: {
@@ -5544,6 +5572,27 @@ define([
               alias: 'bar',
               columns: [{ identifierChain: [{ name: 'a' }], type: 'COLREF', table: 'bla' }]
             }]
+          }
+        });
+      });
+
+      it('should suggest identifiers for "SELECT cos(| FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT cos(',
+          afterCursor: ' FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar',
+          hasLocations: true,
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            subQueries: [{
+              alias: 'boo',
+              columns: [{ identifierChain: [{ name: 'b' }], type: 'COLREF', table: 'foo' }]
+            }, {
+              alias: 'bar',
+              columns: [{ identifierChain: [{ name: 'a' }], type: 'COLREF', table: 'bla' }]
+            }],
+            suggestIdentifiers: [{ name: 'boo.', type: 'sub-query' }, { name: 'bar.', type: 'sub-query' }]
           }
         });
       });
