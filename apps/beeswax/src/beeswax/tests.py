@@ -1440,6 +1440,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_file': 'on',
       'path': self.cluster.fs_prefix + '/comma.dat',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
     })
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
@@ -1448,6 +1449,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_file': 'on',
       'path': self.cluster.fs_prefix + '/comma.dat.gz',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
     })
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
@@ -1456,6 +1458,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
       'path': self.cluster.fs_prefix + '/spacé.dat',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
       'delimiter_0': ' ',
       'delimiter_1': '',
@@ -1467,6 +1470,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
       'path': self.cluster.fs_prefix + '/pipes.dat',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
       'delimiter_0': '__other__',
       'delimiter_1': '|',
@@ -1478,6 +1482,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
       'path': self.cluster.fs_prefix + '/comma.csv',
+      'load_data': 'IMPORT',
       'name': 'test_create_import_csv',
       'delimiter_0': '__other__',
       'delimiter_1': ',',
@@ -1493,6 +1498,7 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_delim': 'on',
       'path': self.cluster.fs_prefix + '/comma.dat.gz',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
       'delimiter_0': ',',
       'delimiter_1': '',
@@ -1505,11 +1511,11 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_create': 'on',
       'path': self.cluster.fs_prefix + '/comma.dat.gz',
+      'load_data': 'IMPORT',
       'name': 'test_create_import',
       'delimiter_0': ',',
       'delimiter_1': '',
       'file_type': 'gzip',
-      'do_import': 'True',
       'cols-0-_exists': 'True',
       'cols-0-column_name': 'col_a',
       'cols-0-column_type': 'string',
@@ -1567,11 +1573,11 @@ for x in sys.stdin:
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_create': 'on',
       'path': self.cluster.fs_prefix + '/comma.csv',
+      'load_data': 'IMPORT',
       'name': 'test_create_import_with_header',
       'delimiter_0': ',',
       'delimiter_1': '',
       'file_type': 'text',
-      'do_import': 'True',
       'cols-0-_exists': 'True',
       'cols-0-column_name': 'col_a',
       'cols-0-column_type': 'string',

@@ -46,7 +46,9 @@ def get_filesystems(request):
 
   filesystems = {}
   for k, v in FS_GETTERS.items():
-    filesystems[k] = v is not None
+    # TODO: Remove when we consolidate s3 with s3a
+    if k != 's3a':
+      filesystems[k] = v is not None
 
   response['status'] = 0
   response['filesystems'] = filesystems

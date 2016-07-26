@@ -35,8 +35,9 @@ ERRNO_MAP = {
 }
 DEFAULT_ERRNO = errno.EINVAL
 
-S3_PATH_RE = re.compile('^/*[sS]3://([^/]+)(/(.*?([^/]+)?/?))?$')
+S3_PATH_RE = re.compile('^/*[sS]3[a]?://([^/]+)(/(.*?([^/]+)?/?))?$')
 S3_ROOT = 's3://'
+S3A_ROOT = 's3a://'
 
 
 def lookup_s3error(error):
