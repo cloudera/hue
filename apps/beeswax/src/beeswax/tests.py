@@ -1218,20 +1218,20 @@ for x in sys.stdin:
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
-    resp = self.client.get('/metastore/tables/?format=json')
+    resp = self.client.get('/metastore/tables/%s?format=json' % self.db_name)
     data = json.loads(resp.content)
     assert_true('sample_08' in data['table_names'])
     assert_true('sample_07' in data['table_names'])
     assert_true('customers' in data['table_names'])
 
-    # Sample tables contain data (examples are installed in default DB)
-    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'sample_07'}))
+    # Sample tables contain data (examples are installed in db_name DB)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'sample_07'}))
     data = json.loads(resp.content)
     assert_true(data['rows'], data)
-    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'sample_08'}))
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'sample_08'}))
     data = json.loads(resp.content)
     assert_true(data['rows'], data)
-    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'customers'}))
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'customers'}))
 
     if USE_NEW_EDITOR.get():
       # New queries exist
