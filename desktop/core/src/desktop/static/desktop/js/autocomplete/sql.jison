@@ -4264,11 +4264,11 @@ var popQueryState = function (subQuery) {
 }
 
 var isHive = function () {
-  return parser.yy.dialect === 'hive';
+  return parser.yy.activeDialect === 'hive';
 }
 
 var isImpala = function () {
-  return parser.yy.dialect === 'impala';
+  return parser.yy.activeDialect === 'impala';
 }
 
 var mergeSuggestKeywords = function() {
@@ -4770,11 +4770,11 @@ var suggestNumbers = function (numbers) {
 var suggestDdlAndDmlKeywords = function () {
   var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE'];
 
-  if (parser.yy.dialect == 'hive') {
+  if (isHive()) {
     keywords = keywords.concat(['ANALYZE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK']);
   }
 
-  if (parser.yy.dialect == 'impala') {
+  if (isImpala()) {
     keywords = keywords.concat(['COMPUTE', 'INVALIDATE', 'LOAD', 'REFRESH']);
   }
 
@@ -4930,11 +4930,7 @@ var lexerModified = false;
  * Main parser function
  */
 parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, debug) {
-  if (dialect === 'generic') {
-    dialect = undefined;
-  }
   parser.yy.sqlFunctions = sqlFunctions;
-  parser.yy.activeDialect = dialect;
   parser.yy.result = { locations: [] };
   parser.yy.lowerCase = false;
   parser.yy.locations = [];
@@ -4956,6 +4952,8 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
     afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
   }
 
+  parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
+
   // Hack to set the inital state of the lexer without first having to hit a token
   // has to be done as the first token found can be dependant on dialect
   if (!lexerModified && typeof dialect !== 'undefined') {
@@ -4970,7 +4968,6 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
   }
 
   var result;
-  parser.yy.dialect = dialect;
   try {
     // Add |CURSOR| or |PARTIAL_CURSOR| to represent the different cursor states in the lexer
     result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /.*\s+$/.test(beforeCursor) ? ' \u2020 ' : '\u2021') + afterCursor);
@@ -5021,7 +5018,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
     result.error.expected.forEach(function (expected) {
       var match = expected.match(/\<([a-z]+)\>(.*)/);
       if (match !== null) {
-        if (typeof parser.yy.dialect !== 'undefined' && parser.yy.dialect === match[1]) {
+        if (typeof parser.yy.activeDialect !== 'undefined' && parser.yy.activeDialect === match[1]) {
           actualExpected[("'" + match[2])] = true;
         }
       } else if (expected.indexOf('CURSOR') == - 1) {
