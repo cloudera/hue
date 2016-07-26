@@ -48,6 +48,7 @@ class RdbmsApi(Api):
     query_server = dbms.get_query_server_config(server=self.interpreter)
     db = dbms.get(self.user, query_server)
 
+    db.use(snippet['database'])
     table = db.execute_statement(snippet['statement'])  # TODO: execute statement stub in Rdbms
 
     data = list(table.rows())
@@ -166,6 +167,7 @@ class Assist():
     return self.db.get_databases()
 
   def get_tables(self, database, table_names=[]):
+    self.db.use(database)
     return self.db.get_tables(database, table_names)
 
   def get_columns(self, database, table):
