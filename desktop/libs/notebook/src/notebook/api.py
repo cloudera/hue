@@ -269,6 +269,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = db.progress(snippet, full_log) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
+  response['isFullLogs'] = snippet.get('interface') == 'oozie'
   response['status'] = 0
 
   return JsonResponse(response)

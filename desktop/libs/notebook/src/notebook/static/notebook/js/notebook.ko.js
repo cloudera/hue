@@ -1135,7 +1135,8 @@
             var logs = data.logs.split("\n");
             self.result.logLines += logs.length;
             var oldLogs = self.result.logs();
-            if (oldLogs === "") {
+            if (data.logs && (
+                oldLogs === "" || (self.wasBatchExecuted() && data.logs.indexOf('Unable to locate') == -1) || data.isFullLogs)) {
               self.result.logs(data.logs);
             } else {
               self.result.logs(oldLogs + "\n" + data.logs);
