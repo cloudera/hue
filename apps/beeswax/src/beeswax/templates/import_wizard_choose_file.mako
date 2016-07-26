@@ -150,19 +150,16 @@ ${ assist.assistPanel() }
                         )}
                         <span  class="help-inline">${unicode(file_form["path"].errors) | n}</span>
                     <span class="help-block">
-                    ${_('The HDFS path to the file on which to base this new table definition. It can be compressed (gzip) or not.')}
+                    ${_('The path to the file(s) on which to base this new table definition. It can be compressed (gzip) or not.')}
                     </span>
                     </div>
                 </div>
                 <div class="control-group">
-                  ${comps.bootstrapLabel(file_form["do_import"])}
+                  ${comps.bootstrapLabel(file_form["load_data"])}
                   <div class="controls">
-                    ${comps.field(file_form["do_import"], render_default=True)}
+                    ${comps.field(file_form["load_data"], render_default=True)}
                     <span class="help-block">
-                    ${_('Check this box to import the data in this file after creating the table definition. Leave it unchecked to define an empty table.')}
-                    <div id="fileWillBeMoved" class="alert">
-                        <strong>${_('Warning:')}</strong> ${_('The selected file is going to be moved during the import.')}
-                    </div>
+                    ${_('Select whether table data should be imported, external or empty.')}
                   </span>
                   </div>
                 </div>
