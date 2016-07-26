@@ -22,6 +22,7 @@ import logging
 
 from django.http import Http404
 from django.utils.translation import ugettext as _
+from django.utils.html import escape
 
 from desktop.lib.django_util import JsonResponse
 from desktop.context_processors import get_app_name
@@ -136,7 +137,7 @@ def execute_query(request, design_id=None):
 
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
-  
+
   app_name = get_app_name(request)
   query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
   design = safe_get_design(request, query_type, design_id)
@@ -181,7 +182,7 @@ def explain_query(request):
 
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
-  
+
   app_name = get_app_name(request)
   query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
 
@@ -304,7 +305,7 @@ def results_to_dict(results):
   data = {}
   rows = []
   for row in results.rows():
-    rows.append(dict(zip(results.columns, row)))
+    rows.append(dict(zip(results.columns, [escape(r) if isinstance(r, (str, unicode)) else r for r in row])))
   data['rows'] = rows
   data['start_row'] = results.start_row
   data['has_more'] = results.has_more
@@ -332,7 +333,7 @@ def get_query_form(request, design_id=None):
 
   if not query_server:
     raise RuntimeError(_("Server specified doesn't exist."))
-  
+
   db = dbms.get(request.user, query_server)
   databases = [(database, database) for database in db.get_databases()]
 

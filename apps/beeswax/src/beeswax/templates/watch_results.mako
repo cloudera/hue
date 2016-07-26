@@ -187,7 +187,7 @@ ${layout.menubar(section='query')}
                     % if item is None:
                       NULL
                     % else:
-                      ${ smart_unicode(item, errors='ignore') }
+                      ${ smart_unicode(item, errors='ignore') | u }
                     % endif
                   </td>
                 % endfor
