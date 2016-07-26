@@ -467,6 +467,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
               "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
           },
           "statement": "%(statement)s",
+          "statement_raw": "%(statement)s",
           "type": "hive",
           "properties": {
               "files": [],
@@ -499,6 +500,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                 "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
             },
             "statement": "%(statement)s",
+            "statement_raw": "%(statement)s",
             "type": "hive",
             "properties": {
                 "files": [],
@@ -529,6 +531,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
               "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
           },
           "statement": "%(statement)s",
+          "statement_raw": "%(statement)s",
           "type": "hive",
           "properties": {
               "files": [],
@@ -567,6 +570,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
               "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
           },
           "statement": "%(statement)s",
+          "statement_raw": "%(statement)s",
           "type": "hive",
           "properties": {
               "files": [],

@@ -102,19 +102,25 @@ def close_session(request):
 def execute(request):
   response = {'status': -1}
   result = None
+  history = None
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  is_query = notebook['type'].startswith('query-')
 
   try:
     try:
+      if is_query:
+        history = _historify(notebook, request.user)
+        notebook = Notebook(document=history).get_data()
+
       response['handle'] = get_api(request, snippet).execute(notebook, snippet)
 
       # Retrieve and remove the result from the handle
       if response['handle'].get('sync'):
         result = response['handle'].pop('result')
     finally:
-      if notebook['type'].startswith('query-'):
+      if is_query:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
         if 'handle' in response: # No failure
           _snippet['result']['handle'] = response['handle']
@@ -124,7 +130,8 @@ def execute(request):
         else:
           _snippet['status'] = 'failed'
 
-        history = _historify(notebook, request.user)
+        history.update_data(notebook)
+        history.save()
 
         response['history_id'] = history.id
         response['history_uuid'] = history.uuid
