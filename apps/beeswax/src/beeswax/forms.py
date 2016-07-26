@@ -329,9 +329,9 @@ class CreateByImportFileForm(forms.Form):
     return _clean_tablename(self.db, self.cleaned_data['name'])
 
   def clean_path(self):
-    path = self.cleaned_data['path'].lower()
-    if path.startswith(S3_ROOT):
-      path = path.replace(S3_ROOT, S3A_ROOT)
+    path = self.cleaned_data['path']
+    if path.lower().startswith(S3_ROOT):
+      path = path.lower().replace(S3_ROOT, S3A_ROOT)
     if not path.endswith('/'):
       path = '%s/' % path
     return path
