@@ -27,7 +27,7 @@ import six
 import StringIO
 import tablib
 
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse
 from django.utils.encoding import smart_str
 from desktop.lib import i18n
 
@@ -119,20 +119,22 @@ def make_response(generator, format, name, encoding=None):
   """
   if format == 'csv':
     content_type = 'application/csv'
+    resp = StreamingHttpResponse(generator, content_type=content_type)
+    try:
+      del resp['Content-Length']
+    except KeyError:
+      pass
   elif format == 'xls':
-    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     format = 'xlsx'
+    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    resp = HttpResponse(next(generator), content_type=content_type)
+
   elif format == 'json':
     content_type = 'application/json'
+    resp = HttpResponse(next(generator), content_type=content_type)
   else:
     raise Exception("Unknown format: %s" % format)
 
-  resp = StreamingHttpResponse(generator, content_type=content_type)
   resp['Content-Disposition'] = 'attachment; filename=%s.%s' % (name, format)
-
-  try:
-    del resp['Content-Length']
-  except KeyError:
-    pass
 
   return resp
