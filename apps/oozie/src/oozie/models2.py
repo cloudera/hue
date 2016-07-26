@@ -2927,7 +2927,7 @@ class WorkflowBuilder():
           u'description': u'',
           u'wf1_id': None,
           u'sla_enabled': False,
-          u'deployment_dir': u'/user/hue/oozie/workspaces/hue-oozie-1459474214.27',
+          u'deployment_dir': Job.get_workspace(user),
           u'schema_version': u'uri:oozie:workflow:0.5',
           u'sla': [
               {u'key': u'enabled', u'value': False},
