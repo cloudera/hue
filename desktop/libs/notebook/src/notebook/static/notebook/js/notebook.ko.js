@@ -1765,8 +1765,12 @@
     };
 
 
-    self.viewSchedulerId = ko.observable('0000025-160525025600562-oozie-oozi-C');
+    self.viewSchedulerId = ko.observable(typeof notebook.viewSchedulerId != "undefined" && notebook.viewSchedulerId != null ? notebook.viewSchedulerId : '');
+    self.viewSchedulerId.subscribe(function(newVal) {
+      self.save();
+    });
     self.loadingScheduler = ko.observable(false);
+    self.viewSchedulerInfo = ko.observable();
     self.viewScheduler = function() {
       if (typeof vm.RunningCoordinatorModel !== 'undefined') {
         logGA('schedule/view');
@@ -1775,6 +1779,7 @@
           format: 'json'
         }, function (data) {
           self.schedulerViewerViewModel(new vm.RunningCoordinatorModel(data.actions));
+          self.viewSchedulerInfo(ko.mapping.fromJS(data));
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
         }).always(function () {

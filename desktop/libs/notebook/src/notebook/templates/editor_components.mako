@@ -993,7 +993,7 @@ ${ hueIcons.symbols() }
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
       <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Jobs')}</a></li>
+      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Instances')}</a></li>
       % endif
     </ul>
 
@@ -1053,17 +1053,20 @@ ${ hueIcons.symbols() }
 
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
-        <!-- ko if: $root.selectedNotebook().isSaved() -->
-          <a data-bind="click: showSubmitPopup">Submit</a></br>
-          <a class="pointer" data-bind="click: function(){ $('a[href=\'#scheduledJobsTab\']').click(); }">${_('View')}</a>
 
+        <!-- ko if: isSaved() -->
+          ${ _('Query was changed and needs to be saved.') }
+          <a data-bind="click: showSubmitPopup">${ _('Start') }</a></br>
+          </br>
           <div id="schedulerEditor">
+            <div id="schedulerEditor"></div>
           </div>
         <!-- /ko -->
 
-        <!-- ko ifnot: $root.selectedNotebook().isSaved() -->
-          ${ _('Document needs to be saved first.') }
+        <!-- ko ifnot: isSaved() -->
+          ${ _('Query needs to be saved first.') }
         <!-- /ko -->
+
       <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -1073,13 +1076,18 @@ ${ hueIcons.symbols() }
       <!-- ko if: $root.selectedNotebook() -->
       <!-- ko with: $root.selectedNotebook() -->
       <!-- ko if: $root.selectedNotebook().isSaved() -->
-        <input type="text" data-bind="value: viewSchedulerId" /> <a class="pointer" data-bind="click: viewScheduler">load</a>
+        <a class="pointer" data-bind="click: viewScheduler">Refresh</a>
 
         <!-- ko if: loadingScheduler -->
         <div style="padding: 20px">
           <i class="fa fa-spinner fa-spin muted"></i>
         </div>
         <!-- /ko -->
+
+        <!-- ko if: viewSchedulerInfo -->
+        <span data-bind="text: viewSchedulerInfo().data"></span>
+        <!-- /ko -->
+
         <!-- ko with: schedulerViewerViewModel -->
         <div id="schedulerViewer">
           <table class="table table-striped table-condensed margin-top-10">
@@ -3279,9 +3287,11 @@ ${ hueIcons.symbols() }
       });
 
       huePubSub.subscribe('submit.popup.return', function (data) {
-        console.log('Job id', data.job_id);
+        viewModel.selectedNotebook().viewSchedulerId(data.job_id);
         $.jHueNotify.info('${_('Coordinator submitted.')}');
         $('.submit-modal').modal('hide');
+
+        $('a[href=\'#scheduledJobsTab\']').click();
       });
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
