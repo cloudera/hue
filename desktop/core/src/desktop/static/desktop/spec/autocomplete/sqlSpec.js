@@ -515,7 +515,7 @@ define([
         expect(actual).toEqual([{ name: 't' }, { name: 'testMap' }]);
       });
 
-      it('should expand without map reference', function () {
+      it('should not expand without map reference', function () {
         var tablePrimaries = [
           { alias: 't1', identifierChain: [{ name: 'databaseTwo' }, { name: 'testTable1' }] },
           { alias: 't2', identifierChain: [{ name: 'testTable2' }] }
@@ -525,7 +525,7 @@ define([
 
         var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
-        expect(actual).toEqual([{ name: 'databaseTwo' }, { name: 'testTable1' }]);
+        expect(actual).toEqual([{ name: 't1' }]);
       });
     });
   });

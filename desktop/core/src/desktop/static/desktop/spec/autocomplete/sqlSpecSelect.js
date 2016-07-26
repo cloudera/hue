@@ -4470,6 +4470,20 @@ define([
         });
       });
 
+      it('should suggest columns for "SELECT b.| FROM dbOne.foo f JOIN dbOne.bar b"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT b.',
+          afterCursor: ' FROM dbOne.foo f JOIN dbOne.bar b',
+          hasLocations: true,
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*'],
+            suggestColumns: { table: 'bar', database: 'dbOne' }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM database_two.testTable1 t1 JOIN testTable2 t2 ON t1.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT t1.testTableColumn1, t2.testTableColumn3 FROM database_two.testTable1 t1 JOIN testTable2 t2 ON t1.',
