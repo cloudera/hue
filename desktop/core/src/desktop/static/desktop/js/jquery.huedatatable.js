@@ -65,7 +65,7 @@
             html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
           }
           appendable.html(html);
-          if (aoColumns.length < 500) {
+          if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
             $t.data('plugin_jHueTableExtender').drawFirstColumn();
           }
         }
@@ -76,7 +76,7 @@
               html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
             }
             appendable.html(appendable.html() + html);
-            if (aoColumns.length < 500) {
+            if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
               $t.data('plugin_jHueTableExtender').drawFirstColumn();
             }
           }
@@ -98,7 +98,7 @@
           appendable.children().eq(i).html(html);
         }
 
-        if (aoColumns.length < 500) {
+        if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
           $t.data('plugin_jHueTableExtender').drawHeader();
           $t.data('plugin_jHueTableExtender').drawLockedRows();
         }
