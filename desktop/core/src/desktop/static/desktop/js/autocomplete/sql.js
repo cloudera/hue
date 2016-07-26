@@ -501,11 +501,6 @@ case 532:
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
-case 534:
-
-     console.log(1);
-   
-break;
 case 535:
 
      if ($$[$0-1].cursorAtStart) {
@@ -2268,7 +2263,7 @@ var prepareNewStatement = function () {
     parser.yy.errors.push(error);
     return message;
   };
-}
+};
 
 var popQueryState = function (subQuery) {
   linkTablePrimaries();
@@ -2290,15 +2285,15 @@ var popQueryState = function (subQuery) {
 
   parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
   parser.yy.locations = parser.yy.locationsStack.pop();
-}
+};
 
 var isHive = function () {
   return parser.yy.activeDialect === 'hive';
-}
+};
 
 var isImpala = function () {
   return parser.yy.activeDialect === 'impala';
-}
+};
 
 var mergeSuggestKeywords = function() {
   var result = [];
@@ -2311,7 +2306,7 @@ var mergeSuggestKeywords = function() {
     return { suggestKeywords: result };
   }
   return {};
-}
+};
 
 var suggestValueExpressionKeywords = function (valueExpression, extras) {
   var expressionKeywords = getValueExpressionKeywords(valueExpression, extras)
@@ -2324,7 +2319,7 @@ var suggestValueExpressionKeywords = function (valueExpression, extras) {
   } else {
     addColRefIfExists(valueExpression);
   }
-}
+};
 
 var getValueExpressionKeywords = function (valueExpression, extras) {
   var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
@@ -2359,7 +2354,7 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
     keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
   }
   return { suggestKeywords: keywords };
-}
+};
 
 var suggestTypeKeywords = function () {
   if (isHive()) {
@@ -2369,13 +2364,13 @@ var suggestTypeKeywords = function () {
   } else {
     suggestKeywords(['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR']);
   }
-}
+};
 
 var addColRefIfExists = function (valueExpression) {
   if (valueExpression.columnReference) {
     parser.yy.result.colRef = { identifierChain: valueExpression.columnReference };
   }
-}
+};
 
 var valueExpressionSuggest = function (oppositeValueExpression) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
@@ -2387,7 +2382,7 @@ var valueExpressionSuggest = function (oppositeValueExpression) {
   if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
     applyTypeToSuggestions(['NUMBER']);
   }
-}
+};
 
 var applyTypeToSuggestions = function (types) {
   if (types[0] === 'BOOLEAN') {
@@ -2399,7 +2394,7 @@ var applyTypeToSuggestions = function (types) {
   if (parser.yy.result.suggestColumns) {
     parser.yy.result.suggestColumns.types = types;
   }
-}
+};
 
 var findCaseType = function (whenThenList) {
   var types = {};
@@ -2412,12 +2407,12 @@ var findCaseType = function (whenThenList) {
     return { types: [Object.keys(types)[0]] };
   }
   return { types: [ 'T' ] };
-}
+};
 
 findReturnTypes = function (funcToken) {
   var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
   return parser.yy.sqlFunctions.getReturnTypes(parser.yy.activeDialect, funcName);
-}
+};
 
 var applyArgumentTypesToSuggestions = function (funcToken, position) {
   var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
@@ -2431,7 +2426,7 @@ var applyArgumentTypesToSuggestions = function (funcToken, position) {
   } else {
     applyTypeToSuggestions(foundArguments);
   }
-}
+};
 
 var commitLocations = function () {
   var i = parser.yy.locations.length;
@@ -2440,8 +2435,11 @@ var commitLocations = function () {
     expandIdentifierChain(location);
     // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
     // In this testArray would be marked a type table so we need to switch it to column.
-    if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
+    if (location.type === 'table' && location.table && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
       location.type = 'column';
+    }
+    if (location.type === 'table' && typeof location.table === 'undefined') {
+      parser.yy.locations.splice(i, 1);
     }
     if (location.type === 'column' && (typeof location.table === 'undefined' || typeof location.identifierChain === 'undefined')) {
       parser.yy.locations.splice(i, 1);
@@ -2500,7 +2498,7 @@ var prioritizeSuggestions = function () {
   } else {
     delete parser.yy.result.subQueries;
   }
-}
+};
 
 /**
  * Impala supports referencing maps and arrays in the the table reference list i.e.
@@ -2520,35 +2518,44 @@ var prioritizeSuggestions = function () {
  *
  * [ { name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' } ]
  */
-parser.expandImpalaIdentifierChain = function (tablePrimaries, originalIdentifierChain) {
-  var identifierChain = originalIdentifierChain.concat(); // Clone in case it's called multiple times.
-  if (typeof identifierChain === 'undefined' || identifierChain.length === 0) {
+parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) {
+  var expandedChain = identifierChain.concat(); // Clone in case it's called multiple times.
+  if (typeof expandedChain === 'undefined' || expandedChain.length === 0) {
     return identifierChain;
   }
-  var firstIdentifier = identifierChain[0].name;
 
-  var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
-    return tablePrimary.alias === firstIdentifier;
-  });
+  var expand = function (identifier, expandedChain) {
+    var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
+      return tablePrimary.alias === identifier;
+    });
 
-  if (foundPrimary.length === 1 && foundPrimary[0].identifierChain) {
-    var firstPart = foundPrimary[0].identifierChain.concat();
-    var secondPart = identifierChain.slice(1);
-    var lastFromFirst = firstPart.pop();
-    if (typeof identifierChain[0].keySet !== 'undefined') {
-      firstPart.push({
-        name: lastFromFirst.name,
-        keySet: identifierChain[0].keySet
+    if (foundPrimary.length === 1 && foundPrimary[0].identifierChain) {
+      var parentPrimary = tablePrimaries.filter(function (tablePrimary) {
+        return tablePrimary.alias === foundPrimary[0].identifierChain[0].name;
       });
-    } else {
-      firstPart.push({
-        name: lastFromFirst.name
-      });
+      if (parentPrimary.length === 1) {
+        var keySet = expandedChain[0].keySet;
+        var secondPart = expandedChain.slice(1);
+        var firstPart = [];
+        // Clone to make sure we don't add keySet to the primaries
+        foundPrimary[0].identifierChain.forEach(function (identifier) {
+          firstPart.push({ name: identifier.name });
+        });
+        if (keySet && firstPart.length > 0) {
+          firstPart[firstPart.length - 1].keySet = true;
+        }
+
+        var result = firstPart.concat(secondPart);
+        if (result.length > 0) {
+          return expand(firstPart[0].name, result);
+        } else {
+          return result;
+        }
+      }
     }
-    return firstPart.concat(secondPart);
-  }
-
-  return identifierChain;
+    return expandedChain;
+  };
+  return expand(expandedChain[0].name, expandedChain);
 };
 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
@@ -2649,15 +2656,21 @@ var expandIdentifierChain = function (wrapper, isColumnSuggestion) {
 
     var dbAndTable = false;
     if (foundTable.length === 0) {
-      foundTable = tablePrimaries.filter(function (tablePrimary) {
-        if (tablePrimary.identifierChain && identifierChain[0].name === tablePrimary.identifierChain[0].name) {
-          if (identifierChain.length > 1 && tablePrimary.identifierChain.length > 1) {
-            dbAndTable = identifierChain[1].name === tablePrimary.identifierChain[1].name;
-          }
-          return true;
-        }
-        return false;
-      });
+      // Give priority to the ones that match both DB and table
+      if (identifierChain.length > 1) {
+        foundTable = tablePrimaries.filter(function (tablePrimary) {
+          return tablePrimary.identifierChain && tablePrimary.identifierChain.length > 1 &&
+              tablePrimary.identifierChain[0].name === identifierChain[0].name &&
+              tablePrimary.identifierChain[1].name === identifierChain[1].name;
+        });
+        dbAndTable = foundTable.length > 0;
+      }
+      if (foundTable.length == 0) {
+        foundTable = tablePrimaries.filter(function (tablePrimary) {
+          return tablePrimary.identifierChain && tablePrimary.identifierChain.length > 0 &&
+              tablePrimary.identifierChain[0].name === identifierChain[0].name;
+        });
+      }
     }
 
     if (foundTable.length === 1) {
@@ -2687,7 +2700,7 @@ var expandIdentifierChain = function (wrapper, isColumnSuggestion) {
     }
   }
   wrapper.linked = true;
-}
+};
 
 var suggestTablePrimariesAsIdentifiers = function () {
   if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
@@ -2707,7 +2720,7 @@ var suggestTablePrimariesAsIdentifiers = function () {
   if (parser.yy.result.suggestIdentifiers.length === 0) {
     delete parser.yy.result.suggestIdentifiers;
   }
-}
+};
 
 var suggestLateralViewAliasesAsIdentifiers = function () {
   if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
@@ -2759,7 +2772,7 @@ var linkTablePrimaries = function () {
   if (typeof parser.yy.result.suggestKeyValues !== 'undefined' && !parser.yy.result.suggestKeyValues.linked) {
     expandIdentifierChain(parser.yy.result.suggestKeyValues);
   }
-}
+};
 
 var getSubQuery = function (cols) {
   var columns = [];
@@ -2783,18 +2796,18 @@ var getSubQuery = function (cols) {
   return {
     columns: columns
   };
-}
+};
 
 var addTablePrimary = function (ref) {
   if (typeof parser.yy.latestTablePrimaries === 'undefined') {
     parser.yy.latestTablePrimaries = [];
   }
   parser.yy.latestTablePrimaries.push(ref);
-}
+};
 
 var suggestNumbers = function (numbers) {
   parser.yy.result.suggestNumbers = numbers;
-}
+};
 
 var suggestDdlAndDmlKeywords = function () {
   var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE'];
@@ -2808,7 +2821,7 @@ var suggestDdlAndDmlKeywords = function () {
   }
 
   suggestKeywords(keywords);
-}
+};
 
 var checkForSelectListKeywords = function (selectList) {
   if (selectList.length === 0) {
@@ -2845,15 +2858,15 @@ var checkForKeywords = function (expression) {
       addColRefIfExists(expression);
     }
   }
-}
+};
 
 var suggestKeywords = function (keywords) {
   parser.yy.result.suggestKeywords = keywords.sort();
-}
+};
 
 var suggestColRefKeywords = function (colRefKeywords) {
   parser.yy.result.suggestColRefKeywords = colRefKeywords;
-}
+};
 
 var suggestTablesOrColumns = function (identifier) {
   if (typeof parser.yy.latestTablePrimaries == 'undefined') {
@@ -2868,15 +2881,15 @@ var suggestTablesOrColumns = function (identifier) {
   } else {
     suggestTables({ database: identifier });
   }
-}
+};
 
 var suggestFunctions = function (details) {
   parser.yy.result.suggestFunctions = details || {};
-}
+};
 
 var suggestAggregateFunctions = function () {
   parser.yy.result.suggestAggregateFunctions = true;
-}
+};
 
 var suggestColumns = function (details) {
   if (typeof details === 'undefined') {
@@ -2885,15 +2898,15 @@ var suggestColumns = function (details) {
     details.identifierChain = [];
   }
   parser.yy.result.suggestColumns = details;
-}
+};
 
 var suggestKeyValues = function (details) {
   parser.yy.result.suggestKeyValues = details || {};
-}
+};
 
 var suggestTables = function (details) {
   parser.yy.result.suggestTables = details || {};
-}
+};
 
 var adjustLocationForCursor = function (location) {
    // columns are 0-based and lines not, so add 1 to cols
@@ -2923,31 +2936,31 @@ var addFunctionLocation = function (location, functionName) {
     last_column: location.last_column - 1
   }
   parser.yy.locations.push({ type: 'function', location: adjustLocationForCursor(adjustedLocation), function: functionName.toLowerCase() });
-}
+};
 
 var addDatabaseLocation = function (location, database) {
   parser.yy.locations.push({ type: 'database', location: adjustLocationForCursor(location), database: database });
-}
+};
 
 var addTableLocation = function (location, identifierChain) {
   parser.yy.locations.push({ type: 'table', location: adjustLocationForCursor(location), identifierChain: identifierChain });
-}
+};
 
 var addColumnLocation = function (location, identifierChain) {
   parser.yy.locations.push({ type: 'column', location: adjustLocationForCursor(location), identifierChain: identifierChain });
-}
+};
 
 var suggestDatabases = function (details) {
   parser.yy.result.suggestDatabases = details || {};
-}
+};
 
 var suggestHdfs = function (details) {
   parser.yy.result.suggestHdfs = details || {};
-}
+};
 
 var suggestValues = function (details) {
   parser.yy.result.suggestValues = true;
-}
+};
 
 var determineCase = function (text) {
   parser.yy.lowerCase = text.toLowerCase() === text;
@@ -3067,7 +3080,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
   }
 
   return result;
-}
+};
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
