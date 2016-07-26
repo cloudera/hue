@@ -16,7 +16,7 @@
 # limitations under the License.
 
 echo "Generating parser..."
-npm install jison -g
+# npm install jison -g
 jison ../../desktop/core/src/desktop/static/desktop/js/autocomplete/sql.jison -m amd
 cat license.txt sql.js > ../../desktop/core/src/desktop/static/desktop/js/autocomplete/sql.js
 rm sql.js

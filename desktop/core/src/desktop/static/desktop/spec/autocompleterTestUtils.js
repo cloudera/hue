@@ -41,8 +41,14 @@ define([
       toEqualDefinition : function() {
         return {
           compare: function(actualResponse, testDefinition) {
-            if (testDefinition.ignoreErrors) {
-              delete actualResponse.error;
+            if (actualResponse.errors) {
+              var allRecoverable = true;
+              actualResponse.errors.forEach(function (error) {
+                allRecoverable = allRecoverable && error.recoverable;
+              });
+              if (allRecoverable) {
+                delete actualResponse.errors;
+              }
             }
             if (testDefinition.hasLocations) {
               if (actualResponse.locations.length === 0) {

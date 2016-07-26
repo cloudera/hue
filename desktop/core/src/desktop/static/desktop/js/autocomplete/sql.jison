@@ -516,11 +516,6 @@ HiveOrImpalaCreate
  | '<impala>CREATE'
  ;
 
-HiveOrImpalaCurrent
- : '<hive>CURRENT'
- | '<impala>CURRENT'
- ;
-
 HiveOrImpalaData
  : '<hive>DATA'
  | '<impala>DATA'
@@ -561,16 +556,6 @@ HiveOrImpalaLocation
 HiveOrImpalaRightSquareBracket
  : '<hive>]'
  | '<impala>]'
- ;
-
-HiveOrImpalaRole
- : '<hive>ROLE'
- | '<impala>ROLE'
- ;
-
-HiveOrImpalaRoles
- : '<hive>ROLES'
- | '<impala>ROLES'
  ;
 
 HiveOrImpalaTables
@@ -824,11 +809,6 @@ LocalOrSchemaQualifiedName
 LocalOrSchemaQualifiedName_EDIT
  : RegularOrBackTickedSchemaQualifiedName_EDIT
  | RegularOrBackTickedSchemaQualifiedName_EDIT RegularOrBacktickedIdentifier
- ;
-
-ColumnReferenceList
- : ColumnReference
- | ColumnReferenceList ',' ColumnReference
  ;
 
 ColumnReference
@@ -1189,13 +1169,6 @@ ColumnDefinition_EDIT
    }
  ;
 
-ColumnDefinitionError
- : /* empty, on error we should still suggest the keywords */
-   {
-     suggestTypeKeywords();
-   }
- ;
-
 HdfsLocation
  : HiveOrImpalaLocation HdfsPath
  ;
@@ -1488,6 +1461,10 @@ QuerySpecification_EDIT
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct SelectList_EDIT error TableExpression
+   {
+     console.log(1);
+   }
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
      if ($3.cursorAtStart) {
@@ -1522,6 +1499,8 @@ QuerySpecification_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct error TableExpression
  | 'SELECT' OptionalAllOrDistinct error TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct SelectList error TableExpression        // Causes conflict but solves issue
+ | 'SELECT' OptionalAllOrDistinct SelectList error TableExpression_EDIT   // with SELECT a, b, cos(| c AS d
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
      checkForSelectListKeywords($3);
@@ -1691,7 +1670,7 @@ OptionalGroupByClause_EDIT
 
 GroupByColumnList
  : DerivedColumnOrUnsignedInteger
- | GroupByColumnList, DerivedColumnOrUnsignedInteger
+ | GroupByColumnList ',' DerivedColumnOrUnsignedInteger
  ;
 
 GroupByColumnList_EDIT
@@ -1918,6 +1897,7 @@ ValueExpression
  | 'CASE' ValueExpression CaseRightPart  -> $3
  ;
 
+// CASE
 ValueExpression_EDIT
  : 'CASE' CaseRightPart_EDIT                         -> $2
  | 'CASE' 'CURSOR' EndOrError
@@ -2119,7 +2099,18 @@ CaseWhenThenListPartTwo_EDIT
 
 ValueExpression_EDIT
  : NonParenthesizedValueExpressionPrimary_EDIT
- | 'NOT' ValueExpression_EDIT                           -> { types: [ 'BOOLEAN' ] }
+ | 'EXISTS' TableSubQuery_EDIT                               -> { types: [ 'BOOLEAN' ] }
+ | '(' ValueExpression_EDIT RightParenthesisOrError          -> $2
+ | '(' AnyCursor RightParenthesisOrError
+   {
+     valueExpressionSuggest();
+     $$ = { types: ['T'] };
+   }
+ ;
+
+// UNARY
+ValueExpression_EDIT
+ : 'NOT' ValueExpression_EDIT                           -> { types: [ 'BOOLEAN' ] }
  | 'NOT' 'CURSOR'
    {
      suggestFunctions();
@@ -2152,8 +2143,31 @@ ValueExpression_EDIT
      suggestColumns({ types: [ 'NUMBER' ] });
      $$ = { types: [ 'NUMBER' ] };
    }
- | 'EXISTS' TableSubQuery_EDIT                               -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'NOT' 'LIKE' ValueExpression         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' 'NOT' 'CURSOR'
+    {
+      suggestKeywords(['NULL']);
+      $$ = { types: [ 'BOOLEAN' ] };
+    }
+ | ValueExpression 'IS' 'CURSOR'
+   {
+     suggestKeywords(['NOT NULL', 'NULL']);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' 'CURSOR' 'NULL'
+   {
+     suggestKeywords(['NOT']);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'NOT' 'CURSOR'
+   {
+     suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ ;
+
+// LIKE, RLIKE, REGEXP
+ValueExpression_EDIT
+ : ValueExpression_EDIT 'NOT' 'LIKE' ValueExpression         -> { types: [ 'BOOLEAN' ] }
  | ValueExpression_EDIT 'LIKE' ValueExpression               -> { types: [ 'BOOLEAN' ] }
  | ValueExpression_EDIT 'RLIKE' ValueExpression              -> { types: [ 'BOOLEAN' ] }
  | ValueExpression_EDIT 'REGEXP' ValueExpression             -> { types: [ 'BOOLEAN' ] }
@@ -2161,11 +2175,29 @@ ValueExpression_EDIT
  | ValueExpression 'LIKE' ValueExpression_EDIT               -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'RLIKE' ValueExpression_EDIT              -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'REGEXP' ValueExpression_EDIT             -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'NOT' 'LIKE' PartialBacktickedOrCursor
+ | 'CURSOR' 'NOT' 'LIKE' ValueExpression
    {
-     suggestFunctions({ types: [ 'STRING' ] });
-     suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'STRING' ]);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'LIKE' ValueExpression
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'STRING' ]);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'RLIKE' ValueExpression
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'STRING' ]);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'REGEXP' ValueExpression
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'STRING' ]);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'LIKE' PartialBacktickedOrCursor
    {
@@ -2185,34 +2217,9 @@ ValueExpression_EDIT
      suggestColumns({ types: [ 'STRING' ] });
      $$ = { types: ['BOOLEAN'] }
    }
- | '(' ValueExpression_EDIT RightParenthesisOrError          -> $2
- | '(' AnyCursor RightParenthesisOrError
-   {
-     valueExpressionSuggest();
-     $$ = { types: ['T'] };
-   }
- | ValueExpression 'IS' 'NOT' 'CURSOR'
-   {
-     suggestKeywords(['NULL']);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | ValueExpression 'IS' 'CURSOR'
-   {
-     suggestKeywords(['NOT NULL', 'NULL']);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | ValueExpression 'IS' 'CURSOR' 'NULL'
-   {
-     suggestKeywords(['NOT']);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | ValueExpression 'NOT' 'CURSOR'
-   {
-     suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
  ;
 
+// IN
 ValueExpression_EDIT
  : ValueExpression 'NOT' 'IN' ValueExpressionInSecondPart_EDIT
    {
@@ -2248,6 +2255,7 @@ ValueExpressionInSecondPart_EDIT
  | '(' AnyCursor RightParenthesisOrError                -> { inValueEdit: true, cursorAtStart: true }
  ;
 
+// BETWEEN
 ValueExpression_EDIT
  : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
    {
@@ -2325,45 +2333,30 @@ ValueExpression_EDIT
    }
  ;
 
+// COMPARISON
 ValueExpression_EDIT
- : ValueExpression '=' ValueExpression_EDIT
+ : 'CURSOR' '=' ValueExpression
    {
-     applyTypeToSuggestions($1.types);
-     addColRefIfExists($1);
+     valueExpressionSuggest($3);
+     applyTypeToSuggestions($3.types);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression
+   {
+     valueExpressionSuggest($3);
+     applyTypeToSuggestions($3.types);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression_EDIT '=' ValueExpression
+   {
+     applyTypeToSuggestions($3.types);
+     addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
+ | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
    {
-     applyTypeToSuggestions($1.types);
-     addColRefIfExists($1);
-     $$ = { types: [ 'BOOLEAN' ] }
-   }
- | ValueExpression '-' ValueExpression_EDIT
-   {
-     applyTypeToSuggestions(['NUMBER']);
-     addColRefIfExists($1);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | ValueExpression '*' ValueExpression_EDIT
-   {
-     applyTypeToSuggestions(['NUMBER']);
-     addColRefIfExists($1);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
-   {
-     applyTypeToSuggestions(['NUMBER']);
-     addColRefIfExists($1);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | ValueExpression 'OR' ValueExpression_EDIT
-   {
-     addColRefIfExists($1);
-     $$ = { types: [ 'BOOLEAN' ] }
-   }
- | ValueExpression 'AND' ValueExpression_EDIT
-   {
-     addColRefIfExists($1);
+     applyTypeToSuggestions($3.types);
+     addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression '=' PartialBacktickedOrAnyCursor
@@ -2378,48 +2371,33 @@ ValueExpression_EDIT
      applyTypeToSuggestions($1.types);
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | ValueExpression '-' PartialBacktickedOrAnyCursor
+ | ValueExpression '=' ValueExpression_EDIT
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['NUMBER']);
-     $$ = { types: [ 'NUMBER' ] };
+     applyTypeToSuggestions($1.types);
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
    }
- | ValueExpression '*' PartialBacktickedOrAnyCursor
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['NUMBER']);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | ValueExpression 'ARITHMETIC_OPERATOR' PartialBacktickedOrAnyCursor
-   {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['NUMBER']);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | ValueExpression 'OR' PartialBacktickedOrAnyCursor
-   {
-     valueExpressionSuggest();
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | ValueExpression 'AND' PartialBacktickedOrAnyCursor
-   {
-     valueExpressionSuggest();
-     $$ = { types: [ 'BOOLEAN' ] };
+     applyTypeToSuggestions($1.types);
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
    }
  ;
 
+// ARITHMETIC
 ValueExpression_EDIT
- : ValueExpression_EDIT '=' ValueExpression
+ : 'CURSOR' '*' ValueExpression
    {
-     applyTypeToSuggestions($3.types);
-     addColRefIfExists($3);
-     $$ = { types: [ 'BOOLEAN' ] }
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'NUMBER' ]);
+     $$ = { types: [ 'NUMBER' ] };
    }
- | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
+ | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression
    {
-     applyTypeToSuggestions($3.types);
-     addColRefIfExists($3);
-     $$ = { types: [ 'BOOLEAN' ] }
+     valueExpressionSuggest();
+     applyTypeToSuggestions([ 'NUMBER' ]);
+     $$ = { types: [ 'NUMBER' ] };
    }
  | ValueExpression_EDIT '-' ValueExpression
    {
@@ -2439,49 +2417,85 @@ ValueExpression_EDIT
      addColRefIfExists($3);
      $$ = { types: [ 'NUMBER' ] }
    }
+ | ValueExpression '-' PartialBacktickedOrAnyCursor
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression '*' PartialBacktickedOrAnyCursor
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'ARITHMETIC_OPERATOR' PartialBacktickedOrAnyCursor
+   {
+     valueExpressionSuggest();
+     applyTypeToSuggestions(['NUMBER']);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression '-' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression '*' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
+   {
+     applyTypeToSuggestions(['NUMBER']);
+     addColRefIfExists($1);
+     $$ = { types: [ 'NUMBER' ] };
+   }
+ ;
+
+// AND or OR
+ValueExpression_EDIT
+ : 'CURSOR' 'OR' ValueExpression
+   {
+     valueExpressionSuggest();
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  | ValueExpression_EDIT 'OR' ValueExpression
    {
-     addColRefIfExists($3);
+     addColRefIfExists();
      $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | ValueExpression 'OR' PartialBacktickedOrAnyCursor
+   {
+     valueExpressionSuggest();
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'OR' ValueExpression_EDIT
+   {
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
+   }
+ | 'CURSOR' 'AND' ValueExpression
+   {
+     valueExpressionSuggest();
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression_EDIT 'AND' ValueExpression
    {
      addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
- | 'CURSOR' '=' ValueExpression
+ | ValueExpression 'AND' PartialBacktickedOrAnyCursor
    {
-     valueExpressionSuggest($3);
-     applyTypeToSuggestions($3.types);
+     valueExpressionSuggest();
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression
+ | ValueExpression 'AND' ValueExpression_EDIT
    {
-     valueExpressionSuggest($3);
-     applyTypeToSuggestions($3.types);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | 'CURSOR' '*' ValueExpression
-   {
-     valueExpressionSuggest($3);
-     applyTypeToSuggestions([ 'NUMBER' ]);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression
-   {
-     valueExpressionSuggest($3);
-     applyTypeToSuggestions([ 'NUMBER' ]);
-     $$ = { types: [ 'NUMBER' ] };
-   }
- | 'CURSOR' 'OR' ValueExpression
-   {
-     valueExpressionSuggest($3);
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | 'CURSOR' 'AND' ValueExpression
-   {
-     valueExpressionSuggest($3);
-     $$ = { types: [ 'BOOLEAN' ] };
+     addColRefIfExists($1);
+     $$ = { types: [ 'BOOLEAN' ] }
    }
  ;
 
@@ -3155,35 +3169,6 @@ OptionalLateralViews
 
 OptionalLateralViews_EDIT
  : OptionalLateralViews LateralView_EDIT OptionalLateralViews
- ;
-
-// TODO: '<hive>[pos]explode' '(' 'CURSOR' possible?
-UserDefinedTableGeneratingFunction
- : '<hive>EXPLODE(' DerivedColumnChain ')'
-   {
-     addColumnLocation(@2, $2);
-     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
-   }
- | '<hive>POSEXPLODE(' DerivedColumnChain ')'
-   {
-     addColumnLocation(@2, $2);
-     $$ = { function: $1.substring(0, $1.length - 1), expression: $2 }
-   }
- ;
-
-UserDefinedTableGeneratingFunction_EDIT
- : '<hive>EXPLODE(' DerivedColumnChain_EDIT error
-   {
-     suggestColumns($2);
-   }
- | '<hive>POSEXPLODE(' PartialBacktickedOrPartialCursor error
-   {
-     suggestColumns();
-   }
- ;
-
-GroupingOperation
- : 'GROUPING' '(' ColumnReferenceList ')'
  ;
 
 UserDefinedFunction
@@ -4118,7 +4103,6 @@ UpdateStatement
 
 UpdateStatement_EDIT
  : 'UPDATE' TargetTable_EDIT 'SET' SetClauseList OptionalWhereClause
-   }
  | 'UPDATE' TargetTable 'SET' SetClauseList_EDIT OptionalWhereClause
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_EDIT
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause 'CURSOR'
@@ -4236,7 +4220,7 @@ var prepareNewStatement = function () {
   parser.yy.subQueries = [];
 
   parser.parseError = function (message, error) {
-    parser.yy.result.error = error;
+    parser.yy.errors.push(error);
     return message;
   };
 }
@@ -4936,6 +4920,7 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
   parser.yy.locations = [];
   parser.yy.allLocations = [];
   parser.yy.subQueries = [];
+  parser.yy.errors = [];
 
   delete parser.yy.cursorFound;
   delete parser.yy.partialCursor;
@@ -4956,13 +4941,14 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
 
   // Hack to set the inital state of the lexer without first having to hit a token
   // has to be done as the first token found can be dependant on dialect
-  if (!lexerModified && typeof dialect !== 'undefined') {
+  if (!lexerModified) {
     var originalSetInput = parser.lexer.setInput;
-    parser.lexer.setInput = function (input) {
-      var lexer = originalSetInput.bind(parser.lexer)(input);
+    parser.lexer.setInput = function (input, yy) {
+      var lexer = originalSetInput.bind(parser.lexer)(input, yy);
       if (typeof parser.yy.activeDialect !== 'undefined') {
         lexer.begin(parser.yy.activeDialect);
       }
+      return lexer;
     }
     lexerModified = true;
   }
@@ -4980,10 +4966,13 @@ parser.parseSql = function(beforeCursor, afterCursor, dialect, sqlFunctions, deb
       console.log(err);
       console.error(err.stack);
     }
-    if (parser.yy.result.error && !parser.yy.result.error.recoverable) {
-      console.log(parser.yy.result.error);
-    }
     result = parser.yy.result;
+  }
+  if (parser.yy.errors.length > 0) {
+    parser.yy.result.errors = parser.yy.errors;
+    if (debug) {
+      console.log(parser.yy.errors);
+    }
   }
   linkTablePrimaries();
   commitLocations();
