@@ -632,20 +632,8 @@ table.display td.center {
   padding-left: 4px!important;
 }
 
-@keyframes barberpole {
-  from { background-position: 0 0; }
-  to   { background-position: 60px 30px; }
-}
-
 .table-huedatatable td.stripe {
-  background: repeating-linear-gradient(
-      -55deg,
-      #FFF,
-      #FFF 10px,
-      #f9f9f9 10px,
-      #f9f9f9 20px
-    );
-  animation: barberpole 0.5s linear infinite;
+  background: url('../art/stripedbackground.png');
 }
 
 
