@@ -131,7 +131,7 @@ from metadata.conf import has_navigator
     }
 
     .assist-tables {
-      margin-left: 3px;
+      margin-left: 0;
     }
 
     .assist-tables a {
