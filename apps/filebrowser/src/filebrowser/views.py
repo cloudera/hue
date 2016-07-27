@@ -25,7 +25,7 @@ import posixpath
 import re
 import shutil
 import stat as stat_module
-import urllib2
+import urllib
 
 from datetime import datetime
 
@@ -164,7 +164,7 @@ def view(request, path):
             return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path)))
 
     try:
-        decoded_path = urllib2.unquote(path).decode('utf8')
+        decoded_path = urllib.unquote(path)
         if path != decoded_path:
           path = decoded_path
         stats = request.fs.stats(path)
