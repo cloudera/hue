@@ -73,6 +73,9 @@ def coerce_positive_integer(integer):
 
   return integer
 
+def is_https_enabled():
+  """Hue is configured for HTTPS."""
+  return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
 HTTP_HOST = Config(
   key="http_host",
@@ -196,7 +199,7 @@ SECURE_SSL_REDIRECT = Config(
   key="secure_ssl_redirect",
   help=_('If all non-SSL requests should be permanently redirected to SSL.'),
   type=coerce_bool,
-  default=False)
+  dynamic_default=is_https_enabled)
 
 SECURE_SSL_HOST = Config(
   key="secure_redirect_host",
@@ -386,8 +389,17 @@ ALLOWED_HOSTS = Config(
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
 
-def is_https_enabled():
-  return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
+def default_secure_cookie():
+  """Enable secure cookies if HTTPS is enabled."""
+  return is_https_enabled()
+
+def default_ssl_cacerts():
+  """Path to default Certificate Authority certificates"""
+  return SSL_CACERTS.get()
+
+def default_ssl_validate():
+  """Choose whether Hue should validate certificates received from the server."""
+  return SSL_VALIDATE.get()
 
 #
 # Email (SMTP) settings
@@ -413,22 +425,6 @@ def default_database_options():
     return {'timeout': 30}
   else:
     return {}
-
-
-def default_secure_cookie():
-  """Enable secure cookies if HTTPS is enabled."""
-  return is_https_enabled()
-
-
-def default_ssl_cacerts():
-  """Path to default Certificate Authority certificates"""
-  return SSL_CACERTS.get()
-
-
-def default_ssl_validate():
-  """Choose whether Hue should validate certificates received from the server."""
-  return SSL_VALIDATE.get()
-
 
 def get_deprecated_login_lock_out_by_combination_browser_user_agent():
   """Return value of deprecated LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP config"""
