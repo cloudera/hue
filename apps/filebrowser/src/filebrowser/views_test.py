@@ -389,7 +389,6 @@ class TestFileBrowserWithHadoop(object):
     orig_paths = [
       u'greek-Ελληνικά',
       u'chinese-漢語',
-      'listdir%20.,<>~`!@$%^&()_-+="',
     ]
 
     prefix = home + '/test-filebrowser/'
