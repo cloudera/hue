@@ -265,18 +265,21 @@
     }
 
     $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerCell").remove();
-    var clonedCell = $(plugin.element).clone();
+    var clonedCell = $('<table>').attr('class', $(plugin.element).attr('class'));
+    clonedCell.removeClass(plugin.options.classToRemove);
     clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedCell.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
-    clonedCell.find("thead>tr th:not(:eq(0))").remove();
-    clonedCell.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
-    clonedCell.find("thead>tr th:eq(0)").click(function () {
+    var clonedCellTHead = $('<thead>');
+    clonedCellTHead.appendTo(clonedCell);
+    var clonedCellTH = originalTh.clone();
+    clonedCellTH.appendTo(clonedCellTHead);
+    clonedCellTH.width(originalTh.width()).css("background-color", "#FFFFFF");
+    clonedCellTH.click(function () {
       originalTh.click();
-      clonedCell.find("thead>tr th").attr("class", "sorting");
-      $(this).attr("class", originalTh.attr("class"));
     });
+    $('<tbody>').appendTo(clonedCell)
 
     var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth());
+
     clonedCell.appendTo(clonedCellContainer);
 
     var clonedCellVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").addClass("jHueTableExtenderClonedContainerCell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
@@ -285,20 +288,26 @@
     clonedCellContainer.appendTo(clonedCellVisibleContainer);
 
     $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainerColumn").remove();
-    var clonedTable = $(plugin.element).clone();
+    var clonedTable = $('<table>').attr('class', $(plugin.element).attr('class')).html('<thead></thead><tbody></tbody>');
+    clonedTable.removeClass(plugin.options.classToRemove);
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove);
-    clonedTable.find("thead>tr th:not(:eq(0))").remove();
-    clonedTable.find("tbody>tr").each(function () {
-      $(this).find("td:not(:eq(0))").remove();
-      if (plugin.options.lockSelectedRow) {
-        var cell = $(this).find('td:eq(0)');
+    $(plugin.element).find("thead>tr th:eq(0)").clone().appendTo(clonedTable.find('thead'));
+    var clonedTBody = clonedTable.find('tbody');
+    var clones = $(plugin.element).find("tbody>tr td:nth-child(1)").clone();
+    var h = '';
+    clones.each(function(){
+      h+= '<tr><td>' + $(this).html() +'</td></tr>';
+    });
+    clonedTBody.html(h);
+    if (plugin.options.lockSelectedRow) {
+      clonedTBody.find('td').each(function(){
+        var cell = $(this);
         cell.attr('title', plugin.options.labels.LOCK).addClass('lockable pointer').on('click', function(){
           drawLockedRow(plugin, $(this).text()*1);
         });
         $('<i>').addClass('fa fa-lock muted').prependTo(cell);
-      }
-    });
+      });
+    }
     clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
 
     var clonedTableContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height($pluginElement.parent().get(0).scrollHeight);
@@ -332,7 +341,6 @@
     });
 
     clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop()) + "px");
-
 
     function positionClones() {
       var pos = plugin.options.stickToTopPosition;

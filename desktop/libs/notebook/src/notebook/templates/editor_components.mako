@@ -2241,18 +2241,16 @@ ${ hueIcons.symbols() }
 
     if (vm.editorMode()) {
       $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-      if (!snippet.result.hasManyColumns()) {
-        $(el).jHueTableExtender({
-          fixedHeader: true,
-          fixedFirstColumn: true,
-          lockSelectedRow: true,
-          includeNavigator: false,
-          mainScrollable: '.right-panel',
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "fixed"
-        });
-      }
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        lockSelectedRow: true,
+        includeNavigator: false,
+        mainScrollable: '.right-panel',
+        stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
+        parentId: 'snippet_' + snippet.id(),
+        clonedContainerPosition: "fixed"
+      });
       $(el).jHueHorizontalScrollbar();
     }
     else {
@@ -2766,7 +2764,7 @@ ${ hueIcons.symbols() }
           return;
         }
         viewModel.selectedNotebook().snippets().forEach(function (snippet) {
-          if (snippet.result.meta().length > 0 && !snippet.result.hasManyColumns()) {
+          if (snippet.result.meta().length > 0) {
             var _el = $("#snippet_" + snippet.id()).find(".resultTable");
             if (!viewModel.editorMode()) {
               _el.jHueTableExtender({

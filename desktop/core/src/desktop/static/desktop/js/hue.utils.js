@@ -322,6 +322,7 @@ var hueDebugTimer = (function () {
       times.push(initialTime);
       if (enableConsole){
         withConsole = true;
+        console.log('Start', initialTime);
       }
     },
     mark: function (label) {
