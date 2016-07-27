@@ -263,19 +263,22 @@ ${ assist.assistPanel() }
         e.preventDefault();
         var _destination = $(this).attr("data-filechooser-destination");
         var initialLoadValue = $('#id_load_data').val();
+        function handleChoice(filePath){
+          $("input[name='" + _destination + "']").val(filePath);
+          $("#chooseFile").modal("hide");
+          if (filePath.toLowerCase().indexOf('s3') === 0){
+            $('#id_load_data').val('EXTERNAL').trigger('change').find('option[value="IMPORT"]').attr('disabled', 'disabled');
+          }
+          else {
+            $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
+          }
+        }
         $("#filechooser").jHueFileChooser({
           initialPath: $("input[name='" + _destination + "']").val(),
-          onFileChoose: function (filePath) {
-            $("input[name='" + _destination + "']").val(filePath);
-            $("#chooseFile").modal("hide");
-            if (filePath.toLowerCase().indexOf('s3://') === 0){
-              $('#id_load_data').val('EXTERNAL').trigger('change').find('option[value="IMPORT"]').attr('disabled', 'disabled');
-            }
-            else {
-              $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
-            }
-          },
-          createFolder: $('#id_load_data').val() === 'EXTERNAL'
+          onFileChoose: handleChoice,
+          onFolderChoose: handleChoice,
+          createFolder: $('#id_load_data').val() === 'EXTERNAL',
+          selectFolder: $('#id_load_data').val() === 'EXTERNAL'
         });
         $("#chooseFile").modal("show");
       });

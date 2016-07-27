@@ -298,7 +298,7 @@
           }
           _createFolderBtn.appendTo(_actions);
           _showActions = true;
-          var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("well form-inline");
+          var _createFolderDetails = $("<form>").css({"margin-top": "10px", "position": "fixed"}).addClass("form-inline");
           _createFolderDetails.hide();
           var _folderName = $("<input>").attr("type", "text").attr("placeholder", _parent.options.labels.FOLDER_NAME).appendTo(_createFolderDetails);
           $("<span> </span>").appendTo(_createFolderDetails);
