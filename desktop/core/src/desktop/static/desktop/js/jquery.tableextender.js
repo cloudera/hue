@@ -335,9 +335,13 @@
 
 
     function positionClones() {
-      if (plugin.options.stickToTopPosition > -1) {
-        if ($pluginElement.offset().top < plugin.options.stickToTopPosition) {
-          clonedCellVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
+      var pos = plugin.options.stickToTopPosition;
+      if (typeof pos === 'function'){
+        pos = pos();
+      }
+      if (pos > -1) {
+        if ($pluginElement.offset().top < pos) {
+          clonedCellVisibleContainer.css("top", pos + "px");
         }
         else {
           clonedCellVisibleContainer.css("top", $pluginElement.offset().top + "px");
@@ -443,9 +447,13 @@
     });
 
     function positionClones() {
-      if (plugin.options.stickToTopPosition > -1) {
-        if ($pluginElement.offset().top < plugin.options.stickToTopPosition) {
-          clonedTableVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
+      var pos = plugin.options.stickToTopPosition;
+      if (typeof pos === 'function'){
+        pos = pos();
+      }
+      if (pos > -1) {
+        if ($pluginElement.offset().top < pos) {
+          clonedTableVisibleContainer.css("top", pos + "px");
         } else {
           clonedTableVisibleContainer.css("top", $pluginElement.offset().top + "px");
         }
