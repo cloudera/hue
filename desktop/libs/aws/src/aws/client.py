@@ -19,11 +19,18 @@ import boto
 import boto.s3
 
 
+HTTP_SOCKET_TIMEOUT_S = 60
+
+
 class Client(object):
-  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, region=None):
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, region=None, timeout=HTTP_SOCKET_TIMEOUT_S):
     self._access_key_id = aws_access_key_id
     self._secret_access_key = aws_secret_access_key
     self._region = region
+    self._timeout = timeout
+
+    boto.config.add_section('Boto')
+    boto.config.set('Boto', 'http_socket_timeout', str(self._timeout))
 
   @classmethod
   def from_config(cls, conf):
