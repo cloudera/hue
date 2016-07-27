@@ -320,7 +320,7 @@ except ImportError, e:
     </form>
 
     <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
+      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Get resultset') }">
         <i class="fa fa-fw fa-download"></i>
       </a>
       <ul class="dropdown-menu less-padding">
