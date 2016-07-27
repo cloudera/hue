@@ -1854,10 +1854,10 @@ for x in sys.stdin:
     _make_query(self.client, "USE %s" % self.db_name, wait=True) # We need this until Hive 1.2
 
     try:
-      # No stats
+      # Retrieve stats before analyze
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
       stats = json.loads(resp.content)['stats']
-      assert_equal('COLUMN_STATS_ACCURATE', stats[0]['data_type'], resp.content)
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows' and stat['comment'] == '0']), resp.content)
 
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
       stats = json.loads(resp.content)['stats']
@@ -1885,11 +1885,10 @@ for x in sys.stdin:
       response = wait_for_query_to_finish(self.client, response, max=120.0)
       assert_true(response, response)
 
-      # Retrieve stats
+      # Retrieve stats after analyze
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
       stats = json.loads(resp.content)['stats']
-      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows']), resp.content)
-      assert_true(any([stat for stat in stats if stat['comment'] == '256']), resp.content)
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows' and stat['comment'] == '256']), resp.content)
 
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
       stats = json.loads(resp.content)['stats']
