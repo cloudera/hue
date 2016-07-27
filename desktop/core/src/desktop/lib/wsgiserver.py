@@ -1523,7 +1523,9 @@ class CherryPyWSGIServer(object):
     nodelay = True
     
     ConnectionClass = HTTPConnection
-    environ = {}
+    environ = {
+        "SERVER_SOFTWARE": os.getenv('SERVER_SOFTWARE')
+    }
     
     # Paths to certificate and private key files
     ssl_certificate = None
