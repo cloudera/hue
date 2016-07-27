@@ -467,6 +467,8 @@ SKIP_SOUTH_TESTS = True
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
+if not os.getenv('SERVER_SOFTWARE'):
+  os.environ['SERVER_SOFTWARE'] = 'apache'
 
 # If Hue is configured to use a CACERTS truststore, make sure that the
 # REQUESTS_CA_BUNDLE is set so that we can use it when we make external requests.
