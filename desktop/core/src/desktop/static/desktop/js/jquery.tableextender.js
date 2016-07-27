@@ -383,11 +383,19 @@
 
     if (typeof skipCreation === 'undefined') {
       var mainScrollable = plugin.options.mainScrollable;
+
       $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").remove();
-      var clonedTable = $pluginElement.clone();
+      var clonedTable = $('<table>').attr('class', $(plugin.element).attr('class'));
+      clonedTable.removeClass(plugin.options.classToRemove);
       clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-      clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
+      var clonedTableTHead = $('<thead>');
+      clonedTableTHead.appendTo(clonedTable);
+      var clonedTableTR = $pluginElement.find('thead>tr').clone();
+      clonedTableTR.appendTo(clonedTableTHead);
+      $('<tbody>').appendTo(clonedTable)
+
       clonedTable.find("thead>tr th").wrapInner('<span></span>');
+
       $pluginElement.find("thead>tr th").each(function (i) {
         var originalTh = $(this);
         clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
@@ -396,6 +404,7 @@
           $(this).attr("class", originalTh.attr("class"));
         });
       });
+
       var clonedTableContainer = $("<div>").width($pluginElement.outerWidth());
       clonedTable.appendTo(clonedTableContainer);
 
