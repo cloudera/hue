@@ -185,7 +185,7 @@ class TestIntegrationWithHBase:
     if not is_live_cluster():
       raise SkipTest('HUE-2910: Skipping because test is not reentrant')
 
-    resp = self.client.post('/hbase/api/getTableList/Cluster')
-    content = json.loads(resp.content)
-
-    assert_true('data' in content, content)
+    for cluster in HbaseApi(self.user).getClusters():
+      resp = self.client.post('/hbase/api/getTableList/' + cluster['name'])
+      content = json.loads(resp.content)
+      assert_true('data' in content, content)
