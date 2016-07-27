@@ -595,7 +595,11 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
 
   def test_explain(self):
-    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+    # Hive 2 with Tez set hive.explain.user to true by default, but this test is expecting output when this setting
+    # is set to false.
+    snippet_json = json.loads(self.snippet_json)
+    snippet_json['properties']['settings'].append({"key": "hive.explain.user", "value": "false"})
+    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': json.dumps(snippet_json)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
