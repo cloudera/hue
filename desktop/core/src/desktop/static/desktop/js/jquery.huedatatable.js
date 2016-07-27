@@ -50,7 +50,7 @@
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
 
         var rowHeight = 29;
-        var invisibleOffset = aoColumns.length < 500 ? 10 : 1;
+        var invisibleOffset = aoColumns.length < 100 ? 10 : 1;
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
         var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
 
@@ -65,7 +65,7 @@
             html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
           }
           appendable.html(html);
-          if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
+          if ($t.data('plugin_jHueTableExtender')) {
             $t.data('plugin_jHueTableExtender').drawFirstColumn();
           }
         }
@@ -76,7 +76,7 @@
               html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
             }
             appendable.html(appendable.html() + html);
-            if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
+            if ($t.data('plugin_jHueTableExtender')) {
               $t.data('plugin_jHueTableExtender').drawFirstColumn();
             }
           }
@@ -98,7 +98,7 @@
           appendable.children().eq(i).html(html);
         }
 
-        if (aoColumns.length < 500 && $t.data('plugin_jHueTableExtender')) {
+        if ($t.data('plugin_jHueTableExtender')) {
           $t.data('plugin_jHueTableExtender').drawHeader();
           $t.data('plugin_jHueTableExtender').drawLockedRows();
         }
