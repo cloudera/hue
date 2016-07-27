@@ -1611,7 +1611,7 @@ ${ hueIcons.symbols() }
         <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
         <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllColumns($element, $data); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
         <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
-        (<span class="meta-title pointer" data-bind="click: toggleResultSettings, text: result.filteredMeta().length - 1"></span>)
+        (<span class="meta-title pointer" data-bind="click: toggleResultSettings, text: Math.max(0, result.filteredMeta().length - 1)"></span>)
       </li>
     </ul>
     <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
@@ -1913,7 +1913,7 @@ ${ hueIcons.symbols() }
     </div>
 
     <div class="dropdown">
-      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }">
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" title="${ _('Charts') }">
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
         <i class="hcha fa-fw hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
         <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
@@ -1960,7 +1960,9 @@ ${ hueIcons.symbols() }
     </div>
 
     <div>
-      <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }"><i class="fa fa-fw fa-cog"></i></a>
+      <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
+        <i class="fa fa-fw fa-cog"></i>
+      </a>
     </div>
 
     <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
