@@ -2248,13 +2248,14 @@ ${ hueIcons.symbols() }
           lockSelectedRow: true,
           includeNavigator: false,
           mainScrollable: '.right-panel',
-          stickToTopPosition: vm.isPlayerMode() ? 1 : 73,
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "fixed"
         });
       }
       $(el).jHueHorizontalScrollbar();
-    } else {
+    }
+    else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
         maxHeight: DATATABLES_MAX_HEIGHT,
         heightAfterCorrection: 0,
@@ -2778,6 +2779,9 @@ ${ hueIcons.symbols() }
                 clonedContainerPosition: "absolute"
               });
             }
+            else {
+              $('.right-panel').trigger('scroll');
+            }
           }
         });
       }
@@ -3031,6 +3035,7 @@ ${ hueIcons.symbols() }
           } else {
             $(".main-content").css("top", "1px");
           }
+          redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
           viewModel.isLeftPanelVisible(wasAssistVisible);
