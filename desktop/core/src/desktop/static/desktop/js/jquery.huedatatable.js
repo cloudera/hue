@@ -99,9 +99,10 @@
         }
 
         if ($t.data('plugin_jHueTableExtender')) {
-          $t.data('plugin_jHueTableExtender').drawHeader();
+          $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
           $t.data('plugin_jHueTableExtender').drawLockedRows();
         }
+
         $t.data('fnDraws', $t.data('fnDraws') + 1);
         if ($t.data('oInit')['fnDrawCallback']) {
           $t.data('oInit')['fnDrawCallback']();

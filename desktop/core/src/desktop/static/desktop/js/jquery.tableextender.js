@@ -84,8 +84,8 @@
     }
   };
 
-  Plugin.prototype.drawHeader = function () {
-    drawHeader(this);
+  Plugin.prototype.drawHeader = function (skipCreation) {
+    drawHeader(this, skipCreation);
   }
 
   Plugin.prototype.drawFirstColumn = function () {
@@ -375,108 +375,117 @@
   }
 
 
-  function drawHeader(plugin) {
+  function drawHeader(plugin, skipCreation) {
     var $pluginElement = $(plugin.element);
     if (!$pluginElement.attr("id") && plugin.options.parentId) {
       $pluginElement.attr("id", "eT" + plugin.options.parentId);
     }
-    var mainScrollable = plugin.options.mainScrollable;
-    $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").remove();
-    var clonedTable = $pluginElement.clone();
-    clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
-    clonedTable.find("thead>tr th").wrapInner('<span></span>');
-    $pluginElement.find("thead>tr th").each(function (i) {
-      var originalTh = $(this);
-      clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
-        originalTh.click();
-        clonedTable.find("thead>tr th").attr("class", "sorting");
-        $(this).attr("class", originalTh.attr("class"));
+
+    if (typeof skipCreation === 'undefined') {
+      var mainScrollable = plugin.options.mainScrollable;
+      $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").remove();
+      var clonedTable = $pluginElement.clone();
+      clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
+      clonedTable.removeAttr("id").removeClass(plugin.options.classToRemove).find("tbody").empty();
+      clonedTable.find("thead>tr th").wrapInner('<span></span>');
+      $pluginElement.find("thead>tr th").each(function (i) {
+        var originalTh = $(this);
+        clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
+          originalTh.click();
+          clonedTable.find("thead>tr th").attr("class", "sorting");
+          $(this).attr("class", originalTh.attr("class"));
+        });
       });
-    });
-    var clonedTableContainer = $("<div>").width($pluginElement.outerWidth());
-    clonedTable.appendTo(clonedTableContainer);
+      var clonedTableContainer = $("<div>").width($pluginElement.outerWidth());
+      clonedTable.appendTo(clonedTableContainer);
 
-    var topPosition;
-    if (plugin.options.clonedContainerPosition == 'absolute') {
-      topPosition = $pluginElement.parent().position().top - $(mainScrollable).scrollTop();
-    }
-    else {
-      topPosition = $pluginElement.parent().offset().top - $(mainScrollable).scrollTop();
-    }
-    var clonedTableVisibleContainer = $("<div>").attr("id", $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($pluginElement.parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
-    clonedTableVisibleContainer.css("position", plugin.options.clonedContainerPosition || "fixed");
+      var topPosition;
+      if (plugin.options.clonedContainerPosition == 'absolute') {
+        topPosition = $pluginElement.parent().position().top - $(mainScrollable).scrollTop();
+      }
+      else {
+        topPosition = $pluginElement.parent().offset().top - $(mainScrollable).scrollTop();
+      }
+      var clonedTableVisibleContainer = $("<div>").attr("id", $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($pluginElement.parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
+      clonedTableVisibleContainer.css("position", plugin.options.clonedContainerPosition || "fixed");
 
-    clonedTableContainer.appendTo(clonedTableVisibleContainer);
-    clonedTableVisibleContainer.prependTo($pluginElement.parent());
+      clonedTableContainer.appendTo(clonedTableVisibleContainer);
+      clonedTableVisibleContainer.prependTo($pluginElement.parent());
 
 
-    function throttledHeaderPadding() {
-      var firstCellWidth = clonedTable.find("thead>tr th:eq(0)").outerWidth();
-      clonedTable.find("thead>tr th").each(function () {
-        var leftPosition = $(this).position().left - firstCellWidth;
-        if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
-          if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
-            $(this).find('span').css('paddingLeft', -leftPosition);
+      function throttledHeaderPadding() {
+        var firstCellWidth = clonedTable.find("thead>tr th:eq(0)").outerWidth();
+        clonedTable.find("thead>tr th").each(function () {
+          var leftPosition = $(this).position().left - firstCellWidth;
+          if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
+            if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
+              $(this).find('span').css('paddingLeft', -leftPosition);
+            }
           }
-        }
-        else {
-          $(this).find('span').css('paddingLeft', 0);
-        }
-      });
-    }
-
-    var scrollTimeout = -1;
-    $pluginElement.parent().scroll(function () {
-      var scrollLeft = $(this).scrollLeft();
-      clonedTableVisibleContainer.scrollLeft(scrollLeft);
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
-    });
-
-    clonedTableVisibleContainer.scrollLeft($pluginElement.parent().scrollLeft());
-
-    $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
-
-    window.clearInterval($pluginElement.data('header_interval'));
-    var headerInt = window.setInterval(function () {
-      if ($pluginElement.parent().width() != $pluginElement.parent().data("w")) {
-        clonedTableVisibleContainer.width($pluginElement.parent().width());
-        $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
-        $pluginElement.find("thead>tr th").each(function (i) {
-          clonedTable.find("thead>tr th:eq(" + i + ")").width($(this).width()).css("background-color", "#FFFFFF");
+          else {
+            $(this).find('span').css('paddingLeft', 0);
+          }
         });
       }
-    }, 250);
-    $pluginElement.data('header_interval', headerInt);
 
-    $pluginElement.parent().resize(function () {
-      clonedTableVisibleContainer.width($(this).width());
-    });
+      var scrollTimeout = -1;
+      $pluginElement.parent().scroll(function () {
+        var scrollLeft = $(this).scrollLeft();
+        clonedTableVisibleContainer.scrollLeft(scrollLeft);
+        window.clearTimeout(scrollTimeout);
+        scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+      });
 
-    function positionClones() {
-      var pos = plugin.options.stickToTopPosition;
-      if (typeof pos === 'function'){
-        pos = pos();
-      }
-      if (pos > -1) {
-        if ($pluginElement.offset().top < pos) {
-          clonedTableVisibleContainer.css("top", pos + "px");
-        } else {
-          clonedTableVisibleContainer.css("top", $pluginElement.offset().top + "px");
+      clonedTableVisibleContainer.scrollLeft($pluginElement.parent().scrollLeft());
+
+      $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
+
+      window.clearInterval($pluginElement.data('header_interval'));
+      var headerInt = window.setInterval(function () {
+        if ($pluginElement.parent().width() != $pluginElement.parent().data("w")) {
+          clonedTableVisibleContainer.width($pluginElement.parent().width());
+          $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
+          $pluginElement.find("thead>tr th").each(function (i) {
+            clonedTable.find("thead>tr th:eq(" + i + ")").width($(this).width()).css("background-color", "#FFFFFF");
+          });
         }
-      } else {
-        if (plugin.options.clonedContainerPosition == 'absolute') {
-          clonedTableVisibleContainer.css("top", ($pluginElement.parent().position().top) + "px");
+      }, 250);
+      $pluginElement.data('header_interval', headerInt);
+
+      $pluginElement.parent().resize(function () {
+        clonedTableVisibleContainer.width($(this).width());
+      });
+
+      function positionClones() {
+        var pos = plugin.options.stickToTopPosition;
+        if (typeof pos === 'function') {
+          pos = pos();
+        }
+        if (pos > -1) {
+          if ($pluginElement.offset().top < pos) {
+            clonedTableVisibleContainer.css("top", pos + "px");
+          } else {
+            clonedTableVisibleContainer.css("top", $pluginElement.offset().top + "px");
+          }
         } else {
-          clonedTableVisibleContainer.css("top", ($pluginElement.parent().offset().top) + "px");
+          if (plugin.options.clonedContainerPosition == 'absolute') {
+            clonedTableVisibleContainer.css("top", ($pluginElement.parent().position().top) + "px");
+          } else {
+            clonedTableVisibleContainer.css("top", ($pluginElement.parent().offset().top) + "px");
+          }
         }
       }
+
+      positionClones();
+
+      $(mainScrollable).on('scroll', positionClones);
     }
-
-    positionClones();
-
-    $(mainScrollable).on('scroll', positionClones);
+    else {
+      $pluginElement.find("thead>tr th").each(function (i) {
+        var originalTh = $(this);
+        $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").find("thead>tr th:eq(" + i + ")").width(originalTh.width());
+      });
+    }
   }
 
   function getSelection() {
