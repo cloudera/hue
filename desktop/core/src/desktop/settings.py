@@ -343,6 +343,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = desktop.conf.SESSION.EXPIRE_AT_BROWSER_CLOSE.g
 # HTTP only
 SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 
+CSRF_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
+
 # django-nose test specifics
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware
