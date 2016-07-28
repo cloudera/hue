@@ -166,15 +166,15 @@ def execute_and_watch(request):
 def delete(request):
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
+  ctr = 0
   for notebook in notebooks:
     doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
     doc = doc2.doc.get()
     doc.can_write_or_exception(request.user)
+    doc2.trash()
+    ctr += 1
 
-    doc.delete()
-    doc2.delete()
-
-  return JsonResponse({})
+  return JsonResponse({'status': 0, 'message': _('Trashed %d notebook(s)') % ctr})
 
 
 @check_document_access_permission()
