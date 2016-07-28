@@ -1673,7 +1673,7 @@ ${ hueIcons.symbols() }
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th class="sorting" data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }"></th>
+                  <th class="sorting" data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : ''}"></th>
                 </tr>
                 </thead>
                 <tbody>

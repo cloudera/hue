@@ -42,11 +42,24 @@
 
     self.fnDraw = function (force) {
       if (!self.isDrawing) {
+
         self.isDrawing = true;
         var $t = self.$table;
         var aoColumns = self.$table.data('aoColumns');
         var data = self.$table.data('data');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
+        var startCol = -1;
+        var endCol = -1;
+        $t.find("thead>tr th").each(function(i){
+          if ($(this).position().left > 0 && startCol == -1){
+            startCol = i;
+          }
+          if ($(this).position().left < $t.parent().width() + 10){
+            endCol = i;
+          }
+        });
+        startCol = Math.max(1, startCol - 1);
+        endCol = Math.min(aoColumns.length, endCol + 1);
 
         var rowHeight = 29;
         var invisibleOffset = aoColumns.length < 100 ? 10 : 1;
@@ -58,75 +71,66 @@
         var startRow = $t.offset().top - 73 < 0 ? Math.max(Math.floor(Math.abs($t.offset().top - 73) / rowHeight) - invisibleOffset, 0) : 0;
         var endRow = startRow + visibleRows + invisibleOffset;
 
-        if ($t.data('fnDraws') == 0) {
-          var html = '';
-          for (var i = 0; i < data.length; i++) {
-            html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
-          }
-          appendable.html(html);
-          if ($t.data('plugin_jHueTableExtender')) {
-            $t.data('plugin_jHueTableExtender').drawFirstColumn();
-          }
-        }
-        else {
-          if (force) {
-            var html = '';
-            for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
-              html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+        if (endRow != $t.data('endRow') || (endRow == $t.data('endRow') && endCol > $t.data('endCol')) || force) {
+            $t.data('endCol', endCol);
+            $t.data('endRow', endRow);
+
+            if ($t.data('fnDraws') == 0) {
+              var html = '';
+              for (var i = 0; i < data.length; i++) {
+                html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+              }
+              appendable.html(html);
+              if ($t.data('plugin_jHueTableExtender')) {
+                $t.data('plugin_jHueTableExtender').drawFirstColumn();
+              }
             }
-            appendable.html(appendable.html() + html);
+            else {
+              if (force) {
+                var html = '';
+                for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
+                  html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                }
+                appendable.html(appendable.html() + html);
+                if ($t.data('plugin_jHueTableExtender')) {
+                  $t.data('plugin_jHueTableExtender').drawFirstColumn();
+                }
+              }
+            }
+
+            for (var i = 0; i < data.length; i++) {
+              var html = '';
+              if (i >= startRow && i <= endRow) {
+                var row = data[i];
+                if (row) {
+
+                  for (var j = 0; j < endCol; j++) {
+                    html += '<td>' + row[j] + '</td>';
+                  }
+
+                  if (endCol < aoColumns.length) {
+                    html += '<td colspan="' + (aoColumns.length - endCol) + '" class="stripe"></td>';
+                  }
+                }
+              }
+              else {
+                html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
+              }
+              appendable.children().eq(i).html(html);
+            }
+
             if ($t.data('plugin_jHueTableExtender')) {
-              $t.data('plugin_jHueTableExtender').drawFirstColumn();
+              $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
+              $t.data('plugin_jHueTableExtender').drawLockedRows();
             }
-          }
-        }
 
-        var startCol = -1;
-        var endCol = -1;
-        $t.find("thead>tr th").each(function(i){
-          if ($(this).position().left > 0 && startCol == -1){
-            startCol = i;
-          }
-          if ($(this).position().left < $t.parent().width() + 10){
-            endCol = i;
-          }
-        });
-
-        startCol = Math.max(1, startCol - 1);
-        endCol = Math.min(aoColumns.length, endCol + 1);
-
-        for (var i = 0; i < data.length; i++) {
-          var html = '';
-          if (i >= startRow && i <= endRow) {
-            var row = data[i];
-            if (row) {
-
-              for (var j = 0; j < endCol; j++) {
-                html += '<td>' + row[j] + '</td>';
-              }
-
-              if (endCol < aoColumns.length){
-                html += '<td colspan="' + (aoColumns.length - endCol) + '" class="stripe"></td>';
-              }
+            $t.data('fnDraws', $t.data('fnDraws') + 1);
+            if ($t.data('oInit')['fnDrawCallback']) {
+              $t.data('oInit')['fnDrawCallback']();
             }
+
+            $t.trigger('headerpadding');
           }
-          else {
-            html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
-          }
-          appendable.children().eq(i).html(html);
-        }
-
-        if ($t.data('plugin_jHueTableExtender')) {
-          $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
-          $t.data('plugin_jHueTableExtender').drawLockedRows();
-        }
-
-        $t.data('fnDraws', $t.data('fnDraws') + 1);
-        if ($t.data('oInit')['fnDrawCallback']) {
-          $t.data('oInit')['fnDrawCallback']();
-        }
-
-        $t.trigger('headerpadding');
 
         self.isDrawing = false;
       }
