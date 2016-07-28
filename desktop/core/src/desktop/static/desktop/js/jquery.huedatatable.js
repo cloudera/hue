@@ -41,7 +41,6 @@
     self.isDrawing = false;
 
     self.fnDraw = function (force) {
-
       if (!self.isDrawing) {
         self.isDrawing = true;
         var $t = self.$table;
@@ -82,13 +81,32 @@
           }
         }
 
+        var startCol = -1;
+        var endCol = -1;
+        $t.find("thead>tr th").each(function(i){
+          if ($(this).position().left > 0 && startCol == -1){
+            startCol = i;
+          }
+          if ($(this).position().left < $t.parent().width() + 10){
+            endCol = i;
+          }
+        });
+
+        startCol = Math.max(1, startCol - 1);
+        endCol = Math.min(aoColumns.length, endCol + 1);
+
         for (var i = 0; i < data.length; i++) {
           var html = '';
           if (i >= startRow && i <= endRow) {
             var row = data[i];
             if (row) {
-              for (var j = 0; j < aoColumns.length; j++) {
+
+              for (var j = 0; j < endCol; j++) {
                 html += '<td>' + row[j] + '</td>';
+              }
+
+              if (endCol < aoColumns.length){
+                html += '<td colspan="' + (aoColumns.length - endCol) + '" class="stripe"></td>';
               }
             }
           }
@@ -107,6 +125,8 @@
         if ($t.data('oInit')['fnDrawCallback']) {
           $t.data('oInit')['fnDrawCallback']();
         }
+
+        $t.trigger('headerpadding');
 
         self.isDrawing = false;
       }

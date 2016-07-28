@@ -1673,7 +1673,7 @@ ${ hueIcons.symbols() }
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th class="sorting" data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {'width': ($index() == 0 ? '1%' : ''), title: $data.type }"></th>
+                  <th class="sorting" data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -2362,7 +2362,7 @@ ${ hueIcons.symbols() }
       _t.parent().animate({
         scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
       }, 300, function(){
-        _t.parent().trigger('scroll_update');
+        _t.parent().trigger('scroll');
       });
     }
   }

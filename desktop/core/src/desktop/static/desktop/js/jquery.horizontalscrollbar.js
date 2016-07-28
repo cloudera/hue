@@ -49,6 +49,7 @@
           containment: 'parent',
           drag: function (e, ui) {
             $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left / (scrollbarRail.width() - $(this).width())))
+            $(el).parents('.dataTables_wrapper').trigger('scroll');
           }
         });
         $(el).parents('.dataTables_wrapper').bind('mousewheel', function (e) {
@@ -60,6 +61,7 @@
             e.stopPropagation();
             e.stopImmediatePropagation();
             scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
+            $(el).parents('.dataTables_wrapper').trigger('scroll');
             e.preventDefault();
           }
         });

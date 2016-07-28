@@ -398,6 +398,7 @@
 
       $pluginElement.find("thead>tr th").each(function (i) {
         var originalTh = $(this);
+        originalTh.removeAttr("data-bind");
         clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
           originalTh.click();
           clonedTable.find("thead>tr th").attr("class", "sorting");
@@ -442,6 +443,10 @@
         var scrollLeft = $(this).scrollLeft();
         clonedTableVisibleContainer.scrollLeft(scrollLeft);
         window.clearTimeout(scrollTimeout);
+        scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+      });
+
+      $pluginElement.bind('headerpadding', function () {
         scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
       });
 
