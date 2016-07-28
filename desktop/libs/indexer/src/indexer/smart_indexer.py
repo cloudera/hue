@@ -23,7 +23,7 @@ from liboozie.oozie_api import get_oozie
 from oozie.models2 import Job
 from liboozie.submission2 import Submission
 
-from indexer.fields import Field, FIELD_TYPES
+from indexer.fields import Field, FIELD_TYPES, get_field_type
 from indexer.operations import get_checked_args
 from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
@@ -144,10 +144,10 @@ class Indexer(object):
     return base_name
 
   @staticmethod
-  def _get_regex_for_type(type_):
-    matches = filter(lambda field_type: field_type.name == type_, FIELD_TYPES)
+  def _get_regex_for_type(type_name):
+    field_type = get_field_type(type_name)
 
-    return matches[0].regex.replace('\\', '\\\\')
+    return field_type.regex.replace('\\', '\\\\')
 
   def generate_morphline_config(self, collection_name, data, uuid_name="__uuid"):
     """
