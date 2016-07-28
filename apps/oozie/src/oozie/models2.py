@@ -2030,6 +2030,112 @@ class HiveDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
+class JavaDocumentAction(Action):
+  TYPE = 'java-document'
+  FIELDS = {
+     'uuid': {
+          'name': 'uuid',
+          'label': _('Java program'),
+          'value': '',
+          'help_text': _('Select a saved Java program you want to schedule.'),
+          'type': 'hive'
+     },
+     'jar_path': {
+          'name': 'jar_path',
+          'label': _('Jar name'),
+          'value': '',
+          'help_text': _('Path to the jar on HDFS.'),
+          'type': ''
+     },
+     'main_class': {
+          'name': 'main_class',
+          'label': _('Main class'),
+          'value': '',
+          'help_text': _('Java class. e.g. org.apache.hadoop.examples.Grep'),
+          'type': 'text'
+     },
+     'arguments': {
+          'name': 'arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('Arguments of the main method. The value of each arg element is considered a single argument '
+                         'and they are passed to the main method in the same order.'),
+          'type': ''
+     },
+     'java_opts': {
+          'name': 'java_opts',
+          'label': _('Java options'),
+          'value': [],
+          'help_text': _('Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b'),
+          'type': ''
+     },
+     'capture_output': {
+          'name': 'capture_output',
+          'label': _('Capture output'),
+          'value': False,
+          'help_text': _('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                         'command output must be in Java Properties file format and it must not exceed 2KB. '
+                         'From within the workflow definition, the output of an %(program)s action node is accessible '
+                         'via the String action:output(String node, String key) function') % {'program': TYPE.title()},
+          'type': ''
+     },
+     # Common
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Files put in the running directory.'),
+          'type': ''
+     },
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production'),
+          'type': ''
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.'),
+          'type': ''
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': [],
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -2061,7 +2167,8 @@ NODES = {
   'decision-widget': DecisionNode,
   'spark-widget': SparkAction,
   'generic-widget': GenericAction,
-  'hive-document-widget': HiveDocumentAction
+  'hive-document-widget': HiveDocumentAction,
+  'java-document-widget': JavaDocumentAction
 }
 
 
@@ -2813,27 +2920,122 @@ class WorkflowBuilder():
   """
 
   def create_workflow(self, document, user, name=None, managed=False):
-    parameters = self.get_document_parameters(document)
 
     if name is None:
-      name = _('Schedule of ') + document.name
+      name = _('Schedule of ') + document.name or document.type
 
-    workflow_doc = self.create_hive_document_workflow(name, document.uuid, parameters, user, managed=managed)
+    if document.type == 'java':
+      node = self.get_java_document_node(document, name, document.uuid)
+    else:
+      node = self.get_hive_document_node(document, name, document.uuid, user)
+
+    workflow_doc = self.get_workflow(node, name, document.uuid, user, managed=managed)
     workflow_doc.dependencies.add(document)
 
     return workflow_doc
 
-  def get_document_parameters(self, document):
-    notebook = Notebook(document=document)
-    parameters = find_dollar_braced_variables(notebook.get_str())
 
-    return [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
-
-  def create_hive_document_workflow(self, name, doc_uuid, parameters, user, managed=False):
+  def get_hive_document_node(self, document, name, doc_uuid, parameters, user):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
 
+    notebook = Notebook(document=document)
+    parameters = find_dollar_braced_variables(notebook.get_str())
+    parameters = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
+
+    return {
+        u'name': u'doc-1',
+        u'actionParametersUI': [],
+        u'properties': {
+            u'files': [],
+            u'job_xml': u'',
+            u'uuid': doc_uuid,
+            u'parameters': parameters,
+            u'retry_interval': [],
+            u'retry_max': [],
+            u'job_properties': [],
+            u'sla': [
+                {u'key': u'enabled', u'value': False},
+                {u'key': u'nominal-time', u'value': u'${nominal_time}'},
+                {u'key': u'should-start', u'value': u''},
+                {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
+                {u'key': u'max-duration', u'value': u''},
+                {u'key': u'alert-events', u'value': u''},
+                {u'key': u'alert-contact', u'value': u''},
+                {u'key': u'notification-msg', u'value': u''},
+                {u'key': u'upstream-apps', u'value': u''},
+                ],
+            u'archives': [],
+            u'prepares': [],
+            u'credentials': credentials,
+            u'password': u'',
+            u'jdbc_url': u'',
+            },
+        u'actionParametersFetched': False,
+        u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
+        u'type': u'hive-document-widget',
+        u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
+                      {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
+                      }],
+        u'actionParameters': [],
+    }
+
+  def get_java_document_node(self, document, node, name, doc_uuid, parameters):
+    credentials = []
+
+    java_class = 'org.apache.solr.hadoop.MapReduceIndexerTool'
+    arguments = [
+        {"value": "--morphline-file"},
+        {"value": "morphline.conf"},
+        {"value": "--output-dir"},
+        {"value": "${nameNode}${outputDir}"},
+        {"value": "--log4j"},
+        {"value": "log4j.properties"},
+        {"value": "--verbose"},
+        {"value": "--go-live"},
+        {"value": "--zk-host"},
+        {"value": "${zkHost}"},
+        {"value": "--collection"},
+        {"value": "${collectionName}"},
+        {"value": "${nameNode}${filePath}"}
+    ]
+    files = [
+        {"value": "morphline.conf#morphline.conf"},
+        {"value": "log4j.properties#log4j.properties"},
+    ]
+
+    return {
+         "id":"0aec471d-2b7c-d93d-b22c-2110fd17ea2c",
+         "name":"doc-1",
+         "type":"java-widget",
+         "properties":{
+              "files": files,
+              "job_xml":[],
+              "jar_path":"jar",
+              "java_opts":[],
+              "retry_max":[],
+              "retry_interval":[],
+              "job_properties":[],
+              "capture_output": False,
+              "main_class": java_class,
+              "arguments": arguments,
+              "prepares":[],
+              "credentials": credentials,
+              "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "archives":[]
+          },
+          "children":[
+              {"to":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+              {"error":"17c9c895-5a16-7443-bb81-f34b30b21548"}],
+          "actionParameters":[],
+          "actionParametersFetched": False
+    }
+    
+    
+
+  def get_workflow(self, name, doc_uuid, user, managed=False):    
+    
     data = json.dumps({'workflow': {
       u'name': name,
       u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5'
@@ -2886,42 +3088,9 @@ class WorkflowBuilder():
           u'type': u'kill-widget',
           u'children': [],
           u'actionParameters': [],
-          }, {
-          u'name': u'hive-0aec',
-          u'actionParametersUI': [],
-          u'properties': {
-              u'files': [],
-              u'job_xml': u'',
-              u'uuid': doc_uuid,
-              u'parameters': parameters,
-              u'retry_interval': [],
-              u'retry_max': [],
-              u'job_properties': [],
-              u'sla': [
-                  {u'key': u'enabled', u'value': False},
-                  {u'key': u'nominal-time', u'value': u'${nominal_time}'},
-                  {u'key': u'should-start', u'value': u''},
-                  {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
-                  {u'key': u'max-duration', u'value': u''},
-                  {u'key': u'alert-events', u'value': u''},
-                  {u'key': u'alert-contact', u'value': u''},
-                  {u'key': u'notification-msg', u'value': u''},
-                  {u'key': u'upstream-apps', u'value': u''},
-                  ],
-              u'archives': [],
-              u'prepares': [],
-              u'credentials': credentials,
-              u'password': u'',
-              u'jdbc_url': u'',
-              },
-          u'actionParametersFetched': False,
-          u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
-          u'type': u'hive-document-widget',
-          u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
-                        {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
-                        }],
-          u'actionParameters': [],
-          }],
+          },
+            node 
+          ],
       u'properties': {
           u'job_xml': u'',
           u'description': u'',
@@ -2948,216 +3117,12 @@ class WorkflowBuilder():
       u'nodeNamesMapping': {
           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': u'End',
           u'3f107997-04cc-8733-60a9-a4bb62cebffc': u'Start',
-          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'hive-0aec',
+          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'doc-1',
           u'17c9c895-5a16-7443-bb81-f34b30b21548': u'Kill',
           },
       u'uuid': u'433922e5-e616-dfe0-1cba-7fe744c9305c',
-      }, 'layout': [{
-      u'oozieRows': [{
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Hive',
-              u'widgetType': u'hive-document-widget',
-              u'oozieMovable': True,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
-              u'size': 12,
-              }],
-          u'id': u'32e1ea1a-812b-6878-9719-ff7b8407bf46',
-          u'columns': [],
-          }],
-      u'rows': [{
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Start',
-              u'widgetType': u'start-widget',
-              u'oozieMovable': False,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
-              u'size': 12,
-              }],
-          u'id': u'798dc16a-d366-6305-d2b3-2d5a6f6c4f4b',
-          u'columns': [],
-          }, {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Hive',
-              u'widgetType': u'hive-document-widget',
-              u'oozieMovable': True,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
-              u'size': 12,
-              }],
-          u'id': u'32e1ea1a-812b-6878-9719-ff7b8407bf46',
-          u'columns': [],
-          }, {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'End',
-              u'widgetType': u'end-widget',
-              u'oozieMovable': False,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
-              u'size': 12,
-              }],
-          u'id': u'f2cf152d-8c82-2f4f-5d67-2e18c99e59c4',
-          u'columns': [],
-          }, {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Kill',
-              u'widgetType': u'kill-widget',
-              u'oozieMovable': True,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
-              u'size': 12,
-              }],
-          u'id': u'01afcf1b-fa7a-e093-b613-ce52c5531a04',
-          u'columns': [],
-          }],
-      u'oozieEndRow': {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'End',
-              u'widgetType': u'end-widget',
-              u'oozieMovable': False,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
-              u'size': 12,
-              }],
-          u'id': u'f2cf152d-8c82-2f4f-5d67-2e18c99e59c4',
-          u'columns': [],
-          },
-      u'oozieKillRow': {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Kill',
-              u'widgetType': u'kill-widget',
-              u'oozieMovable': True,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
-              u'size': 12,
-              }],
-          u'id': u'01afcf1b-fa7a-e093-b613-ce52c5531a04',
-          u'columns': [],
-          },
-      u'enableOozieDropOnAfter': True,
-      u'oozieStartRow': {
-          u'enableOozieDropOnBefore': True,
-          u'enableOozieDropOnSide': True,
-          u'enableOozieDrop': False,
-          u'widgets': [{
-              u'status': u'',
-              u'logsURL': u'',
-              u'name': u'Start',
-              u'widgetType': u'start-widget',
-              u'oozieMovable': False,
-              u'ooziePropertiesExpanded': False,
-              u'externalIdUrl': u'',
-              u'properties': {},
-              u'isLoading': True,
-              u'offset': 0,
-              u'actionURL': u'',
-              u'progress': 0,
-              u'klass': u'card card-widget span12',
-              u'oozieExpanded': False,
-              u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
-              u'size': 12,
-              }],
-          u'id': u'798dc16a-d366-6305-d2b3-2d5a6f6c4f4b',
-          u'columns': [],
-          },
-      u'klass': u'card card-home card-column span12',
-      u'enableOozieDropOnBefore': True,
-      u'drops': [u'temp'],
-      u'id': u'672ff75a-d841-72c3-c616-c9d45ec97649',
-      u'size': 12,
-      }]}
-    )
+      }
+    })
 
     workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
