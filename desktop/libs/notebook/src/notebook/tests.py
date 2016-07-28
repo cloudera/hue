@@ -28,7 +28,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2
 
 from notebook.api import _historify
-from notebook.connectors.base import QueryError
+from notebook.connectors.base import Notebook, QueryError
 from notebook.decorators import api_error_handler
 
 
@@ -179,6 +179,46 @@ class TestNotebookApi(object):
     assert_false(Document2.objects.filter(type='query-hive', is_history=True).exists())
     assert_true(Document2.objects.filter(type='query-hive', is_history=False).exists())
     assert_true(Document2.objects.filter(type='query-impala', is_history=True).exists())
+
+
+  def test_delete_notebook(self):
+    trash_notebook_json = """
+        {
+          "selectedSnippet": "hive",
+          "showHistory": false,
+          "description": "Test Hive Query",
+          "name": "Test Hive Query",
+          "sessions": [
+              {
+                  "type": "hive",
+                  "properties": [],
+                  "id": null
+              }
+          ],
+          "type": "query-hive",
+          "id": null,
+          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default","statement":"select * from web_logs","statement_raw":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{}}],
+          "uuid": "8a20da5f-b69c-4843-b17d-dea5c74c41d1"
+      }
+      """
+
+    # Assert that the notebook is first saved
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': trash_notebook_json})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+
+    # Test that deleting it moves it to the user's Trash folder
+    notebook_doc = Document2.objects.get(id=data['id'])
+    trash_notebooks = [Notebook(notebook_doc).get_data()]
+    response = self.client.post(reverse('notebook:delete'), {'notebooks': json.dumps(trash_notebooks)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('Trashed 1 notebook(s)', data['message'], data)
+
+    response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
+    data = json.loads(response.content)
+    trash_uuids = [doc['uuid'] for doc in data['children']]
+    assert_true(notebook_doc.uuid in trash_uuids, data)
 
 
   def test_query_error_encoding(self):
