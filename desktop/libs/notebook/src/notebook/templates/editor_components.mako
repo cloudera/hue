@@ -2311,6 +2311,9 @@ ${ hueIcons.symbols() }
         if (snippet.isResultSettingsVisible()) {
           var snippetEl = $("#snippet_" + snippet.id());
           var topCoord = vm.isPlayerMode() ? 1 : 73;
+          snippetEl.find(".snippet-grid-settings").css({
+            "height": Math.ceil($(window).height() - Math.max($('.result-settings').offset().top, topCoord)) + 'px'
+          });
           if ($("#snippet_" + snippet.id()).find(".dataTables_wrapper").offset().top < topCoord) {
             var margin = (snippetEl.find(".dataTables_wrapper").offset().top - topCoord) * -1;
             snippetEl.find('.result-settings').css('marginTop', margin);
@@ -3211,7 +3214,7 @@ ${ hueIcons.symbols() }
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
           var topCoord = viewModel.isPlayerMode() ? 1 : 73;
           $("#snippet_" + snippet.id()).find(".snippet-grid-settings").css({
-            "height": Math.ceil($(window).height() - topCoord) + 'px'
+            "height": Math.ceil($(window).height() - Math.max($('.result-settings').length > 0 ? $('.result-settings').offset().top : 0, topCoord)) + 'px'
           });
         } else {
           _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
