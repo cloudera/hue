@@ -193,7 +193,12 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   key="secure_content_security_policy",
   help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
   type=str,
-  default="img-src 'self' www.google-analytics.com; connect-src 'self'; child-src 'none'; object-src 'none'")
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net *.mathjax.org data:;"+
+          "img-src 'self' *.google-analytics.com *.doubleclick.net data:;"+
+          "style-src 'self' 'unsafe-inline';"+
+          "connect-src 'self';"+
+          "child-src 'none';"+
+          "object-src 'none'")
 
 SECURE_SSL_REDIRECT = Config(
   key="secure_ssl_redirect",
