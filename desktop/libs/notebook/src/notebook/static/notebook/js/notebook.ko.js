@@ -177,7 +177,12 @@
       properties['files'] = [];
     }
 
-    if (snippetType == 'jar') {
+    if (snippetType == 'java') {
+      properties['archives'] = [];
+      properties['files'] = [];
+    }
+
+    if (snippetType == 'jar' || snippetType == 'java') {
       properties['app_jar'] = '';
       properties['class'] = '';
       properties['arguments'] = [];

@@ -1395,10 +1395,10 @@ ${ hueIcons.symbols() }
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'jar', 'java', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['java', 'jar', 'py'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
               <!-- ko template: 'snippet-settings' --><!-- /ko -->
@@ -1412,7 +1412,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
           <!-- ko ifnot: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'java', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
           <!-- /ko -->
 
           <div class="clearfix"></div>
@@ -1757,7 +1757,7 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="executable-snippet-body">
   <div style="padding:10px;">
     <form class="form-horizontal">
-      <!-- ko if: type() == 'jar' -->
+      <!-- ko if: type() == 'jar' || type() == 'java' -->
       <div class="control-group">
         <label class="control-label">${_('Path')}</label>
         <div class="controls">
@@ -2708,6 +2708,9 @@ ${ hueIcons.symbols() }
           aceMode: 'ace/mode/mysql',
           snippetIcon: 'fa-database',
           sqlDialect: true
+        },
+        java : {
+          snippetIcon: 'fa-file-archive-o '
         },
         py : {
           snippetIcon: 'fa-file-code-o'

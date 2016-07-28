@@ -410,7 +410,7 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_i
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
-    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
+    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
   })
 
 def commonshare():

@@ -395,7 +395,7 @@ def list_oozie_workflow(request, job_id):
     'parameters': dict((var, val) for var, val in parameters.iteritems() if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path'),
     'has_job_edition_permission': has_job_edition_permission,
     'workflow_graph': workflow_graph,
-    'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML) if workflow_data else '',
+    'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML) if workflow_data.get('layout') else '',
     'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML) if workflow_data else '',
     'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML) if credentials else '',
     'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),

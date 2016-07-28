@@ -115,6 +115,13 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaDocumentAction());}}}"
+         title="${_('Saved Java program')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
+    </div>
+
     <div class="toolbar-label">${ _('ACTIONS') }</div>
 
     <div data-bind="css: { 'draggable-widget': true },
