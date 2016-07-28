@@ -149,7 +149,7 @@
     }
 
     if (parseResult.suggestHdfs) {
-      deferrals.push(self.addHdfs(parseResult, completions));
+      deferrals.push(self.addHdfs(parseResult, editor, completions));
     }
 
     if (parseResult.suggestTables) {
@@ -384,7 +384,7 @@
     return databasesDeferred;
   };
 
-  SqlAutocompleter2.prototype.addHdfs = function (parseResult, completions) {
+  SqlAutocompleter2.prototype.addHdfs = function (parseResult, editor, completions) {
     var self = this;
     var hdfsDeferred = $.Deferred();
     var parts = parseResult.suggestHdfs.path.split('/');

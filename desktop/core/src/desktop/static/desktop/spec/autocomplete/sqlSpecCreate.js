@@ -53,109 +53,173 @@ define([
       });
     });
 
-    it('should suggest keywords for "CREATE DATABASE |"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE DATABASE ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['IF NOT EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE DATABASE IF |"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE DATABASE IF ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['NOT EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE SCHEMA |"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE SCHEMA ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['IF NOT EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE DATABASE | bla;"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE DATABASE ',
-        afterCursor: ' bla;',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['IF NOT EXISTS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE TABLE foo (id |"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
-        }
-      });
-    });
-
-    it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
-      assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
-        }
-      });
-    });
-
-    describe('Impala specific', function () {
-      it('should suggest keywords for "CREATE DATABASE foo |"', function () {
-        assertAutoComplete({
-          beforeCursor: 'CREATE DATABASE foo ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['COMMENT', 'LOCATION']
-          }
-        });
-      });
-    });
-
     describe('Hive specific', function () {
-      it ('should suggest keywords for "CREATE |"', function () {
+      it('should suggest keywords for "CREATE |"', function () {
         assertAutoComplete({
           beforeCursor: 'CREATE ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'EXTERNAL', 'SCHEMA', 'TABLE']
+            suggestKeywords: ['DATABASE', 'EXTERNAL TABLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY TABLE']
+          }
+        });
+      });
+    });
+
+    describe('Impala specific', function () {
+      it('should suggest keywords for "CREATE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DATABASE', 'EXTERNAL TABLE', 'SCHEMA', 'TABLE']
+          }
+        });
+      });
+    });
+
+    describe('CREATE DATABASE', function () {
+      it('should suggest keywords for "CREATE DATABASE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
           }
         });
       });
 
-      it ('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int) |"', function () {
+      it('should suggest keywords for "CREATE DATABASE IF |"', function () {
         assertAutoComplete({
-          beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) ',
+          beforeCursor: 'CREATE DATABASE IF ',
           afterCursor: '',
-          dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['LOCATION']
+            suggestKeywords: ['NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE SCHEMA |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE SCHEMA ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE DATABASE | bla;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE DATABASE ',
+          afterCursor: ' bla;',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest keywords for "CREATE DATABASE foo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'LOCATION']
+            }
+          });
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should suggest keywords for "CREATE DATABASE foo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LOCATION', 'WITH DBPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH DBPROPERTIES']
+            }
+          });
+        });
+      })
+    });
+
+    describe('CREATE TABLE', function () {
+      it('should suggest keywords for "CREATE TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE TABLE IF |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE IF ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE TABLE IF NOT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE IF NOT ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+
+      it('should handle for "CREATE TABLE foo (id INT);|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE TABLE foo (id INT);',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
           }
         });
       });
@@ -164,47 +228,1053 @@ define([
         assertAutoComplete({
           beforeCursor: 'CREATE TABLE foo (id ',
           afterCursor: '',
-          dialect: 'hive',
+          containsKeywords: ['BOOLEAN'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'STRING', 'TIMESTAMP', 'TINYINT', 'VARCHAR']
+            lowerCase: false
           }
         });
       });
 
-      it('should suggest keywords for "CREATE DATABASE foo |"', function () {
+      it('should suggest keywords for "CREATE TABLE foo (id INT, some FLOAT, bar |"', function () {
         assertAutoComplete({
-          beforeCursor: 'CREATE DATABASE foo ',
+          beforeCursor: 'CREATE TABLE foo (id INT, some FLOAT, bar ',
           afterCursor: '',
-          dialect: 'hive',
+          containsKeywords: ['BOOLEAN'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']
+            lowerCase: false
           }
         });
       });
 
-      it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' |"', function () {
-        assertAutoComplete({
-          beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['LOCATION', 'WITH DBPROPERTIES']
-          }
+      describe('Impala specific', function () {
+        it('should suggest keywords for "CREATE EXTERNAL |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TABLE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LIKE', 'LIKE PARQUET']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE TABLE boo LIKE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo LIKE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true },
+              suggestKeywords: ['PARQUET']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE TABLE boo LIKE dbOne.|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo LIKE dbOne.',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: { database: 'dbOne' }
+            }
+          });
+        });
+
+        it('should suggest hdfs for "CREATE TABLE boo LIKE PARQUET \'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo LIKE PARQUET \'',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestHdfs: { path: ''}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) LOCATION \'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo LOCATION \'',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestHdfs: { path: ''}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo LIKE PARQUET \'/blabla/\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo LIKE PARQUET \'/blabla/\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['COMMENT', 'CACHED IN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) LOCATION \'/baa\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'CACHED IN', 'TBLPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) WITH |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) WITH ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SERDEPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT |, boo) AS SELECT * FROM baa;"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT ',
+            afterCursor: ', boo) AS SELECT * FROM baa;',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED AS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AVRO', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FORMAT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DELIMITED']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['AS', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY' ],
+            doestNotContainKeywords: ['ROW FORMAT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TERMINATED BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['AS', 'LINES TERMINATED BY' ],
+            doestNotContainKeywords: ['FIELDS TERMINATED BY', 'ROW FORMAT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' LINES TERMINATED BY \'c\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' LINES TERMINATED BY \'c\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['AS' ],
+            doestNotContainKeywords: ['FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'ROW FORMAT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED LINES TERMINATED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED LINES TERMINATED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED LINES TERMINATED BY \'z\' STORED AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED LINES TERMINATED BY \'z\' STORED AS ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['PARQUET'],
+            doesNotContainKeywords: ['ORC'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CACHED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CACHED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... CACHED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT) ' +
+            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
+            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'CACHED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE ... TABLE ... LIKE PARQUET ... PARTITIONED BY ... ROW FORMAT ... CACHED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
+            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
+            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'CACHED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IN']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARQUET'],
+              suggestTables: {},
+              suggestDatabases: {
+                appendDot: true
+              }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo.baa COMMENT \'Table comment...\' STORED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo.baa COMMENT \'Table comment...\' STORED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE ... TABLE ... ROW FORMAT ... CACHED IN ... AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE dbOne.tableName ' +
+            'COMMENT \'Table comment...\' ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
+            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'CACHED IN \'boo\' AS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SELECT']
+            }
+          });
         });
       });
 
-      it('should suggest keywords for "CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' |"', function () {
-        assertAutoComplete({
-          beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['WITH DBPROPERTIES']
-          }
+      describe('Hive specific', function () {
+        it('should suggest keywords for "CREATE EXTERNAL |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TABLE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TEMPORARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXTERNAL TABLE', 'TABLE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TEMPORARY EXTERNAL |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TABLE']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE TEMPORARY TABLE foo.boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY TABLE foo.boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LIKE']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE TABLE boo LIKE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo LIKE dbOne.',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: { database: 'dbOne' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['COMMENT', 'CLUSTERED BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int) COMMENT \'boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) COMMENT \'boo\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['PARTITIONED BY', 'CLUSTERED BY'],
+            doesNotContainKeywords: ['COMMENT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int) PARTITIONED BY (boo INT) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int) PARTITIONED BY (boo INT) ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['CLUSTERED BY', 'SKEWED BY'],
+            doesNotContainKeywords: ['COMMENT', 'PARTITIONED BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) INTO 10 BUCKETS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) INTO 10 BUCKETS ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SKEWED BY'],
+            doesNotContainKeywords: ['CLUSTERED BY', 'PARTITIONED BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) LOCATION \'/baa\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'TBLPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['INTO', 'SORTED BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) SORTED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) SORTED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) SORTED BY (a |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) SORTED BY (a ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ASC', 'DESC']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) SORTED BY (a ASC, b |, c)"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) SORTED BY (a ASC, b ',
+            afterCursor: ', c)',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ASC', 'DESC']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) SORTED BY (a ASC, b DESC, c) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) SORTED BY (a ASC, b DESC, c) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['INTO']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) INTO 10 |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) INTO 10 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BUCKETS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CLUSTERED (a, b, c) SORTED BY (a ASC, b DESC, c) INTO 10 |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CLUSTERED BY (a, b, c) SORTED BY (a ASC, b DESC, c) INTO 10 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BUCKETS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) SKEWED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) SKEWED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) SKEWED BY (a, b, c) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) SKEWED BY (a, b, c) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ON']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) SKEWED BY (a, b, c) ON ((1,2), (2,3)) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) SKEWED BY (a, b, c) ON ((1,2), (2,3)) ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['STORED AS DIRECTORIES'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED AS ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AVRO', 'INPUTFORMAT', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FORMAT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DELIMITED', 'SERDE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEYS TERMINATED BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' NULL DEFINED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' NULL DEFINED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['STORED AS'],
+            doesNotContainKeywords: ['STORED BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' STORED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' STORED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' STORED AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED MAP KEYS TERMINATED BY \'a\' STORED AS ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['ORC'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED BY \'handler\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED BY \'handler\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['WITH SERDEPROPERTIES'],
+            doesNotContainKeywords: ['STORED BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED BY \'handler\' WITH |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) STORED BY \'handler\' WITH ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SERDEPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.foo (id INT COMMENT \'an int\', baa ARRAY<BIGINT>) COMMENT \'a table\' ' +
+              'PARTITIONED BY (boo DOUBLE, baa INT) ' +
+              'CLUSTERED BY (boo, baa) SORTED BY (boo ASC, baa) INTO 10 BUCKETS ' +
+              'SKEWED BY (a, b, c) ON ((\'val1\', \'val2\'), (1, 2, 3)) STORED AS DIRECTORIES ' +
+              'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'b\' ESCAPED BY \'o\' COLLECTION ITEMS TERMINATED BY \'d\' ' +
+              'MAP KEYS TERMINATED BY \'a\' LINES TERMINATED BY \'a\' NULL DEFINED AS \'o\' ' +
+              'STORED AS ORC LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SELECT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE boo PARTITIONED BY ... STORED BY \'storage.handler\' WITH SERDEPROPERTIES ... AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo PARTITIONED BY (boo DOUBLE, baa INT) STORED BY \'storage.handler\' ' +
+              'WITH SERDEPROPERTIES (\'foo.bar\' = \'booo\', \'bar.foo\' = \'bla\') ' +
+              'LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SELECT']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.boo LIKE | LOCATION \'/some/loc\';"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.boo LIKE ',
+            afterCursor: ' LOCATION \'/some/loc\';',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo(id |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo(id ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla ARRAY<INT>, boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla ARRAY<INT>, boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla ARRAY<|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla ARRAY<',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla MAP<|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla MAP<',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            doesNotContainKeywords: ['MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla MAP<STRING, STRING>, boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla MAP<STRING, STRING>, boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should not suggest keywords for "CREATE TABLE boo (baa STRUCT<foo:INT, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE boo (baa STRUCT<foo:INT, ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id INT, bla MAP<|, boo BIGINT, bla INT"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id INT, bla MAP<',
+            afterCursor: ', boo BIGINT, bla INT)',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            doesNotContainKeywords: ['MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id INT, bla MAP<|>, boo BIGINT, bla INT"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id INT, bla MAP<',
+            afterCursor: '>, boo BIGINT, bla INT)',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            doesNotContainKeywords: ['MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla STRUCT<foo:|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla STRUCT<foo:',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla MAP<BIGINT, STRUCT<foo:ARRAY<|, bla DOUBLE"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla MAP<BIGINT, STRUCT<foo:ARRAY<',
+            afterCursor: ', bla DOUBLE',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla MAP<BIGINT, STRUCT<boo: INT, foo:STRUCT<blo:DOUBLE |, bla:DOUBLE>"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla MAP<BIGINT, STRUCT<boo: INT, foo:STRUCT<blo:DOUBLE ',
+            afterCursor: ', bla:DOUBLE>',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla MAP<|, STRUCT<boo: INT, foo:STRUCT<blo:DOUBLE, doo:VARCHAR, bla:DOUBLE>"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla MAP<',
+            afterCursor: ', STRUCT<boo: INT, foo:STRUCT<blo:DOUBLE, doo:VARCHAR, bla:DOUBLE>',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            doesNotContainKeywords: ['MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id INT, ba STRUCT<boo:INT COMMENT \'Some Comment\', bla:BIGINT>, bla MAP<INT,|>, boo BIGINT, bla INT"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id INT, ba STRUCT<boo:INT COMMENT \'Some Comment\', bla:BIGINT>, bla MAP<INT,',
+            afterCursor: '>, boo BIGINT, bla INT)',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id UNIONTYPE<INT, BIGINT, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id UNIONTYPE<INT, BIGINT, ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TEMPORARY EXTERNAL TABLE foo (id UNIONTYPE<,,,STRUCT<boo:|>,BIGINT"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE foo (id UNIONTYPE<,,,STRUCT<boo:',
+            afterCursor: '>,BIGINT',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (bla ARRAY<MAP<|>>"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla ARRAY<MAP<',
+            afterCursor: '>>',
+            dialect: 'hive',
+            containsKeywords: ['BIGINT'],
+            doesNotContainKeywords: ['MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
         });
       });
     });
