@@ -39,16 +39,16 @@ class FieldType():
     return pattern.match(field)
 
 class Field(object):
-  def __init__(self, name, field_type, operations=[]):
+  def __init__(self, name, field_type_name, operations=None):
     self.name = name
-    self.field_type = field_type
+    self.field_type_name = field_type_name
     self.keep = True
-    self.operations = operations
+    self.operations = operations if operations else []
     self.required = False
 
   def to_dict(self):
     return {'name': self.name,
-    'type': self.field_type,
+    'type': self.field_type_name,
     'keep': self.keep,
     'operations': [operation.to_dict() for operation in self.operations],
     'required': self.required}
@@ -60,6 +60,9 @@ FIELD_TYPES = [
   FieldType('long', "^(?:[+-]?(?:[0-9]+))?$"),
   FieldType('date', "^([0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+(\\.[0-9]*)?Z)?$")
 ]
+
+def get_field_type(type_name):
+  return [file_type for file_type in FIELD_TYPES if file_type.name == type_name][0]
 
 def guess_field_type_from_samples(samples):
   guesses = [_guess_field_type(sample) for sample in samples]

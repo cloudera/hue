@@ -30,11 +30,21 @@ class Operator():
   def args(self):
     return self._args
 
+  def _get_default_output_fields(self):
+    return []
+
   def to_dict(self):
     return {
       "name": self._name,
       "args": [arg.to_dict() for arg in self._args],
       "outputType": self._output_type
+    }
+
+  def get_default_operation(self):
+    return {
+      "type": self._name,
+      "settings": dict([arg.get_default_arg_pair() for arg in self._args]),
+      "fields": self._get_default_output_fields()
     }
 
 OPERATORS = [
@@ -106,11 +116,11 @@ OPERATORS = [
   ),
 ]
 
-def _get_operator(operation_name):
+def get_operator(operation_name):
   return [operation for operation in OPERATORS if operation.name == operation_name][0]
 
 def get_checked_args(operation):
-  operation_args = _get_operator(operation["type"]).args
+  operation_args = get_operator(operation["type"]).args
 
   kept_args = [arg for arg in operation_args if operation['settings'][arg.name]]
 

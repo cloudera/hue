@@ -24,8 +24,9 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
-
+from indexer.operations import get_operator
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
+from indexer.fields import Field, get_field_type
 
 LOG = logging.getLogger(__name__)
 
@@ -40,6 +41,17 @@ def _test_fixed_type_format_generate_morphline(format_):
 
   assert_true(isinstance(morphline, basestring))
 
+def _test_generate_field_operation_morphline(operation_format):
+  fields = IndexerTest.simpleCSVFields[:]
+  fields[0]['operations'].append(operation_format)
+
+  indexer = Indexer("test", None)
+  morphline =indexer.generate_morphline_config("test_collection", {
+      "columns": fields,
+      "format": IndexerTest.simpleCSVFormat
+    })
+
+  assert_true(isinstance(morphline, basestring))
 
 class IndexerTest():
   simpleCSVString = """id,Rating,Location,Name,Time
@@ -155,6 +167,68 @@ class IndexerTest():
 
   def test_generate_hue_log_morphline(self):
     _test_fixed_type_format_generate_morphline(HueLogFormat)
+
+  def test_generate_split_operation_morphline(self):
+    split_dict = get_operator('split').get_default_operation()
+
+    split_dict['fields'] = [
+        Field("test_field_1", "string").to_dict(),
+        Field("test_field_2", "string").to_dict()
+      ]
+
+    _test_generate_field_operation_morphline(split_dict)
+
+  def test_generate_extract_uri_components_operation_morphline(self):
+    extract_uri_dict = get_operator('extract_uri_components').get_default_operation()
+
+    extract_uri_dict['fields'] = [
+        Field("test_field_1", "string").to_dict(),
+        Field("test_field_2", "string").to_dict()
+      ]
+
+    _test_generate_field_operation_morphline(extract_uri_dict)
+
+  def test_generate_grok_operation_morphline(self):
+    grok_dict = get_operator('grok').get_default_operation()
+
+    grok_dict['fields'] = [
+        Field("test_field_1", "string").to_dict(),
+        Field("test_field_2", "string").to_dict()
+      ]
+
+    _test_generate_field_operation_morphline(grok_dict)
+
+  def test_generate_convert_date_morphline(self):
+    convert_date_dict = get_operator('convert_date').get_default_operation()
+
+    _test_generate_field_operation_morphline(convert_date_dict)
+
+  def test_generate_geo_ip_morphline(self):
+    geo_ip_dict = get_operator('geo_ip').get_default_operation()
+
+    geo_ip_dict['fields'] = [
+        Field("test_field_1", "string").to_dict(),
+        Field("test_field_2", "string").to_dict()
+      ]
+
+    _test_generate_field_operation_morphline(geo_ip_dict)
+
+  def test_generate_translate_morphline(self):
+    translate_dict = get_operator('translate').get_default_operation()
+
+    translate_dict['fields'] = [
+      Field("test_field_1", "string").to_dict(),
+      Field("test_field_2", "string").to_dict()
+    ]
+
+    translate_dict['settings']['mapping'].append({"key":"key","value":"value"})
+
+    _test_generate_field_operation_morphline(translate_dict)
+
+  def test_generate_find_replace_morphline(self):
+    find_replace_dict = get_operator('find_replace').get_default_operation()
+
+    _test_generate_field_operation_morphline(find_replace_dict)
 
   def test_end_to_end(self):
     if not is_live_cluster():

@@ -17,6 +17,8 @@ from django.utils.translation import ugettext as _
 
 class Argument():
   _type = None
+  _default_value = None
+
   def __init__(self, name, description=None):
     self._name = name
     self._description = _(description if description else name)
@@ -29,14 +31,28 @@ class Argument():
   def type(self):
     return self._type
 
+  @property
+  def default_value(self):
+    return self._default_value
+
+
   def to_dict(self):
     return {"name": self._name, "type": self._type, "description": self._description}
 
+  def get_default_arg_pair(self):
+    return (self.name, self.default_value)
+
 class TextArgument(Argument):
   _type = "text"
+  _default_value = ""
 
 class CheckboxArgument(Argument):
   _type = "checkbox"
+  _default_value = False
 
 class MappingArgument(Argument):
   _type = "mapping"
+
+  @property
+  def default_value(self):
+    return []
