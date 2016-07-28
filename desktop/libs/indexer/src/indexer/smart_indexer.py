@@ -149,7 +149,7 @@ class Indexer(object):
 
     return matches[0].regex.replace('\\', '\\\\')
 
-  def generate_morphline_config(self, collection_name, data, uuid_name):
+  def generate_morphline_config(self, collection_name, data, uuid_name="__uuid"):
     """
     Input:
     data: {
@@ -175,8 +175,8 @@ class Indexer(object):
       "format_settings": data['format'],
       "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,
-      "grok_dictionaries_location" : grok_dicts_loc if self.fs.exists(grok_dicts_loc) else None,
-      "geolite_db_location" : geolite_loc if self.fs.exists(geolite_loc) else None,
+      "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
+      "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
       "zk_host": zkensemble()
     }
 
