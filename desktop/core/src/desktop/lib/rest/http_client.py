@@ -119,7 +119,8 @@ class HttpClient(object):
       self._session.headers.update(headers)
     return self._session.headers.copy()
 
-  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True, files=None):
+  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
+              files=None, clear_cookies=False):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -130,6 +131,7 @@ class HttpClient(object):
     @param allow_redirects: requests should automatically resolve redirects.
     @param urlencode: percent encode paths.
     @param files: for posting Multipart-Encoded files
+    @param clear_cookies: flag to force clear any cookies set in the current session
 
     @return: The result of urllib2.urlopen()
     """
@@ -142,15 +144,23 @@ class HttpClient(object):
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
         data = None
 
-    request_kwargs = {'allow_redirects': allow_redirects}
+    request_kwargs = {}
+
+    if not allow_redirects:
+      request_kwargs['allow_redirects'] = False
     if headers:
       request_kwargs['headers'] = headers
     if data:
       request_kwargs['data'] = data
     if files:
       request_kwargs['files'] = files
+
+    if clear_cookies:
+      self._session.cookies.clear()
+
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
+
       if resp.status_code >= 300:
         resp.raise_for_status()
         raise exceptions.HTTPError(response=resp)
