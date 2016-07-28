@@ -28,9 +28,9 @@ LOG = logging.getLogger(__name__)
 def get_format_types():
   return [
     CSVFormat,
-    HueFormat,
+    HueLogFormat,
     ApacheCombinedFormat,
-    RubyLog
+    RubyLogFormat
   ]
 
 def _get_format_mapping():
@@ -101,7 +101,6 @@ class FileFormat(object):
       "args": [arg.to_dict() for arg in cls.get_arguments()],
       "description": cls.get_description(),
       "isCustomizable": cls.is_customizable(),
-      "parse_type": cls.get_parse_type()
     }
 
   @classmethod
@@ -120,7 +119,7 @@ class FileFormat(object):
     return []
 
   def get_format(self):
-    return {"type": self.get_name(), "parse_type": self.get_parse_type()}
+    return {"type": self.get_name()}
 
   def get_fields(self):
     obj = {}
@@ -155,7 +154,7 @@ class GrokkedFormat(FileFormat):
 
     return format_
 
-class HueFormat(GrokkedFormat):
+class HueLogFormat(GrokkedFormat):
   _name = "hue"
   _description = _("Hue Log File")
   _customizable = False
@@ -209,7 +208,7 @@ class ApacheCombinedFormat(GrokLineFormat):
   def fields(self):
     return self._fields
 
-class RubyLog(GrokLineFormat):
+class RubyLogFormat(GrokLineFormat):
   _name = "ruby_log"
   _description = _("Ruby Log")
   _customizable = False

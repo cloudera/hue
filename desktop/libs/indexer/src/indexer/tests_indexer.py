@@ -16,7 +16,7 @@
 import StringIO
 import logging
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 from nose.plugins.skip import SkipTest
 
 from hadoop import cluster
@@ -25,7 +25,21 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
 
+from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
+
 LOG = logging.getLogger(__name__)
+
+def _test_fixed_type_format_generate_morphline(format_):
+  indexer = Indexer("test", None)
+  format_instance = format_()
+
+  morphline = indexer.generate_morphline_config("test_collection", {
+      "columns": [field.to_dict() for field in format_instance.fields],
+      "format": format_instance.get_format()
+    })
+
+  assert_true(isinstance(morphline, basestring))
+
 
 class IndexerTest():
   simpleCSVString = """id,Rating,Location,Name,Time
@@ -33,12 +47,52 @@ class IndexerTest():
 2,4,San Mateo,Cafe,11:30am
 3,3,Berkeley,Sauls,2:30pm
 """
+  simpleCSVFields = [
+    {
+      "name": "id",
+      "type": "long",
+      "operations": [],
+      "keep": True,
+      "required": False
+    },
+    {
+      "name": "Rating",
+      "type": "long",
+      "operations": [],
+      "keep": True,
+      "required": False
+    },
+    {
+      "name": "Location",
+      "type": "string",
+      "operations": [],
+      "keep": True,
+      "required": False
+    },
+    {
+      "name": "Name",
+      "type": "string",
+      "operations": [],
+      "keep": True,
+      "required": False
+    },
+    {
+      "name": "Time",
+      "type": "string",
+      "operations": [],
+      "keep": True,
+      "required": False
+    }
+  ]
+  simpleCSVFormat = {
+    'type': 'csv',
+    'fieldSeparator': ',',
+    'recordSeparator': '\n',
+    'hasHeader': True,
+    'quoteChar': '"'
+  }
 
-  def setup(self):
-    if not is_live_cluster():
-      raise SkipTest()
-
-  def test_guess_format(self):
+  def test_guess_csv_format(self):
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
     indexer = Indexer("test", None)
 
@@ -46,33 +100,12 @@ class IndexerTest():
 
     fields = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     # test format
-    assert_equal('csv', guessed_format['type'])
-    assert_equal(',', guessed_format['fieldSeparator'])
-    assert_equal('\n', guessed_format['recordSeparator'])
+    expected_format = self.simpleCSVFormat
+
+    assert_equal(expected_format, guessed_format)
 
     # test fields
-    expected_fields = [
-      {
-        "name": "id",
-        "type": "long"
-      },
-      {
-        "name": "Rating",
-        "type": "long"
-      },
-      {
-        "name": "Location",
-        "type": "string"
-      },
-      {
-        "name": "Name",
-        "type": "string"
-      },
-      {
-        "name": "Time",
-        "type": "string"
-      }
-    ]
+    expected_fields = self.simpleCSVFields
 
     for expected, actual in zip(expected_fields, fields):
       for key in ("name", "type"):
@@ -105,7 +138,28 @@ class IndexerTest():
     fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     assert_equal(fields, [])
 
+  def test_generate_csv_morphline(self):
+    indexer = Indexer("test", None)
+    morphline =indexer.generate_morphline_config("test_collection", {
+        "columns": self.simpleCSVFields,
+        "format": self.simpleCSVFormat
+      })
+
+    assert_true(isinstance(morphline, basestring))
+
+  def test_generate_apache_combined_morphline(self):
+    _test_fixed_type_format_generate_morphline(ApacheCombinedFormat)
+
+  def test_generate_ruby_logs_morphline(self):
+    _test_fixed_type_format_generate_morphline(RubyLogFormat)
+
+  def test_generate_hue_log_morphline(self):
+    _test_fixed_type_format_generate_morphline(HueLogFormat)
+
   def test_end_to_end(self):
+    if not is_live_cluster():
+      raise SkipTest()
+
     fs = cluster.get_hdfs()
     collection_name = "test_collection"
     indexer = Indexer("test", fs)
