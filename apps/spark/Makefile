@@ -23,36 +23,3 @@ endif
 APP_NAME = spark
 include $(ROOT)/Makefile.sdk
 
-SPARK_ROOT := $(realpath .)
-JAVA_LIB = $(SPARK_ROOT)/java-lib
-
-LIVY_VERSION = 0.2.0-SNAPSHOT
-LIVY_DIR = $(SPARK_ROOT)/java
-LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
-LIVY_ASSEMBLY_JAR = livy-assembly-$(LIVY_VERSION).jar
-LIVY_JAR = $(JAVA_LIB)/livy-assembly.jar
-
-HAVE_JAVA_SRC = $(wildcard $(LIVY_DIR))
-
-compile: $(LIVY_JAR)
-
-ifneq (,$(wildcard $(LIVY_DIR)))
-$(LIVY_JAR): $(shell find $(LIVY_DIR) -type f)
-	mkdir -p $(JAVA_LIB)
-	@echo "--- Building Desktop spark"
-	cd $(LIVY_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
-	cp $(LIVY_TARGET_DIR)/$(LIVY_ASSEMBLY_JAR) $(LIVY_JAR)
-
-clean::
-	rm -Rf $(JAVA_LIB)
-	cd $(LIVY_DIR) && mvn clean $(MAVEN_OPTIONS) || :
-else
-$(LIVY_JAR):
-	$(error Cannot build spark jars without source)
-endif
-
-BDIST_EXCLUDES += \
-	--exclude=java
-
-SDIST_EXCLUDES += \
-	--exclude=java-lib
