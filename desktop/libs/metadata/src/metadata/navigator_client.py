@@ -29,7 +29,7 @@ from metadata.conf import NAVIGATOR
 
 
 LOG = logging.getLogger(__name__)
-VERSION = 'v3'
+VERSION = 'v9'
 
 
 def get_filesystem_host():

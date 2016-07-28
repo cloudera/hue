@@ -162,7 +162,7 @@ def query_complexity(request):
 
 @require_POST
 @error_handler
-def simiar_queries(request):
+def similar_queries(request):
   response = {'status': -1}
 
   source_platform = request.POST.get('sourcePlatform')
