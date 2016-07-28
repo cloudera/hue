@@ -31,20 +31,6 @@
                 </a>
               </li>              
             </ul>
-            % if is_navigator_enabled:
-            <div class="pull-right">
-              <a class="pointer" data-bind="click: function() { navigatorEnabled(! navigatorEnabled()); }">
-                <i class="fa" data-bind="css: {'fa-toggle-off': ! navigatorEnabled(), 'fa-toggle-on': navigatorEnabled() }" style="margin-top:15px"></i> ${ _('Enhance Nav') }
-              </a>
-            </div>
-            % endif
-            % if is_optimizer_enabled:
-            <div class="pull-right">
-              <a class="pointer" data-bind="click: function() { optimizerEnabled(! optimizerEnabled()); }">
-                <i class="fa" data-bind="css: {'fa-toggle-off': ! optimizerEnabled(), 'fa-toggle-on': optimizerEnabled() }" style="margin-top:15px"></i> ${ _('Enhance Opt') }
-              </a>
-            </div>
-            % endif
           </div>
         </div>
       </div>
