@@ -92,11 +92,6 @@ module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
             topmenu.appendChild(element);
         });
         
-        var el = topmenu.appendChild(document.createElement('div'));
-        var version = require("../../ace").version;
-        el.style.padding = "1em";
-        el.textContent = "Ace version " + version;
-        
         return topmenu;
     }
     /**
@@ -252,8 +247,17 @@ module.exports.generateSettingsMenu = function generateSettingsMenu (editor) {
     // gather the set functions
     getSetFunctions(editor).forEach(function(setObj) {
         // populate the elements array with good stuff.
-        handleSet(setObj);
+        if (!editor.enabledMenuOptions || editor.enabledMenuOptions[setObj.functionName]) {
+            handleSet(setObj);
+        }
     });
+
+    if (editor.customMenuOptions) {
+        getSetFunctions(editor.customMenuOptions).forEach(function(setObj) {
+            // populate the elements array with good stuff.
+            handleSet(setObj);
+        });
+    }
     // sort the menu entries in the elements list so people can find
     // the settings in alphabetical order.
     cleanupElementsList();
