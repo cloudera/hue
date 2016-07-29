@@ -746,6 +746,16 @@ class Node():
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
+    if self.data['type'] == 'java-document':
+      #notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+      notebook = Notebook(document=Document2.objects.get(uuid=self.data['properties']['uuid']))
+      properties = notebook.get_data()['snippets'][0]['properties']
+
+      self.data['properties']['main_class'] = properties['class']
+      self.data['properties']['app_jar'] = properties['app_jar'] # Not used here
+      self.data['properties']['files'] = [{'value': f['path']} for f in properties['files']]
+      self.data['properties']['arguments'] = [{'value': prop} for prop in properties['arguments']]
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -2915,9 +2925,9 @@ class WorkflowBuilder():
       name = _('Schedule of ') + document.name or document.type
 
     if document.type == 'query-java':
-      node = self.get_java_document_node(document, name, document.uuid)
+      node = self.get_java_document_node(document, name)
     else:
-      node = self.get_hive_document_node(document, name, document.uuid, user)
+      node = self.get_hive_document_node(document, name, user)
 
     workflow_doc = self.get_workflow(node, name, document.uuid, user, managed=managed)
     workflow_doc.dependencies.add(document)
@@ -2925,7 +2935,7 @@ class WorkflowBuilder():
     return workflow_doc
 
 
-  def get_hive_document_node(self, document, name, doc_uuid, parameters, user):
+  def get_hive_document_node(self, document, name, parameters, user):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
@@ -2940,7 +2950,7 @@ class WorkflowBuilder():
         u'properties': {
             u'files': [],
             u'job_xml': u'',
-            u'uuid': doc_uuid,
+            u'uuid': document.uuid,
             u'parameters': parameters,
             u'retry_interval': [],
             u'retry_max': [],
@@ -2971,37 +2981,16 @@ class WorkflowBuilder():
         u'actionParameters': [],
     }
 
-  def get_java_document_node(self, document, name, doc_uuid):
+  def get_java_document_node(self, document, name):
     credentials = []
-
-    # To pick up from props
-    java_class = 'org.apache.solr.hadoop.MapReduceIndexerTool'
-    arguments = [
-        {"value": "--morphline-file"},
-        {"value": "morphline.conf"},
-        {"value": "--output-dir"},
-        {"value": "${nameNode}${outputDir}"},
-        {"value": "--log4j"},
-        {"value": "log4j.properties"},
-        {"value": "--verbose"},
-        {"value": "--go-live"},
-        {"value": "--zk-host"},
-        {"value": "${zkHost}"},
-        {"value": "--collection"},
-        {"value": "${collectionName}"},
-        {"value": "${nameNode}${filePath}"}
-    ]
-    files = [
-        {"value": "morphline.conf#morphline.conf"},
-        {"value": "log4j.properties#log4j.properties"},
-    ]
 
     return {
          "id":"0aec471d-2b7c-d93d-b22c-2110fd17ea2c",
          "name":"doc-1",
          "type":"java-document-widget",
          "properties":{
-              "files": files,
+#               "files": files,
+              u'uuid': document.uuid,
               "job_xml":[],
               "jar_path": "",
               "java_opts":[],
@@ -3009,8 +2998,8 @@ class WorkflowBuilder():
               "retry_interval":[],
               "job_properties":[],
               "capture_output": False,
-              "main_class": java_class,
-              "arguments": arguments,
+#               "main_class": java_class,
+#               "arguments": arguments,
               "prepares":[],
               "credentials": credentials,
               "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],

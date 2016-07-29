@@ -200,7 +200,16 @@ class Submission(object):
 
           self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_str())
         elif action.data['type'] == 'java-document':
-          print action.data['properties']
+          from notebook.models import Notebook
+          notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+          properties = notebook.get_data()['snippets'][0]['properties']
+    
+          if properties.get('app_jar'):          
+            LOG.debug("Adding to oozie.libpath %s" % properties['app_jar'])
+            paths = [properties['app_jar']]
+            if self.properties.get('oozie.libpath'):
+              paths.append(self.properties['oozie.libpath'])
+            self.properties['oozie.libpath'] = ','.join(paths)
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)

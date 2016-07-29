@@ -999,7 +999,7 @@
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
-      } else if (! self.isSqlDialect() && notebook.snippets()[notebook.snippets().length - 1] == self) {
+      } else if (! vm.editorMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
         notebook.newSnippet();
       }
     };
