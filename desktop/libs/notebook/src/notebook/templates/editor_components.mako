@@ -1621,7 +1621,7 @@ ${ hueIcons.symbols() }
     <ul class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
       <li data-bind="visible: name != ''">
         <input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" />
-        <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
+        <a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: '${ _ko('Click to scroll to data') }'}"><span data-bind="text: $data.name"></span> <span data-bind="text: $data.type" class="muted margin-left-20"></span></a>
       </li>
     </ul>
   </div>
