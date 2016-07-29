@@ -687,6 +687,10 @@
     };
 
     self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
+    self.isReady = ko.computed(function() {
+      return ((self.type() != 'jar' && self.type() != 'java') && self.statement() !== '') ||
+        ((self.type() == 'jar' || self.type() == 'java') && (self.properties().app_jar() != '' && self.properties().class() != ''));
+    });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
     self.executingBlockingOperation = null; // A ExecuteStatement()
@@ -707,7 +711,7 @@
 
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || self.statement() == '') {
+      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
 
