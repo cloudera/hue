@@ -276,10 +276,10 @@ ${ workflow.render() }
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
-          <!-- ko if: type() == 'hive' -->
-          <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
-          <!-- ko if: $root.getHiveQueryById(value()) -->
-            <!-- ko with: $root.getHiveQueryById(value()) -->
+          <!-- ko if: type() == 'hive' || type() == 'java' -->
+          <select data-bind="options: type() == 'java' ? $root.javaQueries() : $root.hiveQueries(), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
+          <!-- ko if: $root.getDocumentById(type(), value()) -->
+            <!-- ko with: $root.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>

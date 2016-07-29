@@ -106,7 +106,7 @@ def execute(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  is_query = notebook['type'].startswith('query-')
+  is_query = notebook['type'].startswith('query-') or snippet['type'] == 'java'
 
   try:
     try:
