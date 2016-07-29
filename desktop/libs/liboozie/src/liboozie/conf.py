@@ -50,6 +50,13 @@ SSL_CERT_CA_VERIFY=Config(
   dynamic_default=default_ssl_validate,
   type=coerce_bool)
 
+USE_LIBPATH_FOR_JARS = Config(
+  key="use_libpath_for_jars",
+  help=_t("Whether Hue append jar paths to the oozie.libpath instead of copying them into the workspace."
+          " This makes submissions faster and less prone to HDFS permission errors"),
+  default=True,
+  type=coerce_bool)
+
 
 def get_oozie_status(user):
   from liboozie.oozie_api import get_oozie

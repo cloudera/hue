@@ -32,7 +32,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from oozie.utils import convert_to_server_timezone
 
 from liboozie.oozie_api import get_oozie
-from liboozie.conf import REMOTE_DEPLOYMENT_DIR
+from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
 
 
@@ -323,18 +323,27 @@ class Submission(object):
           if not jar_path.startswith(lib_path): # If not already in lib
             files.append(jar_path)
 
-    # Copy the jar files to the workspace lib
-    if files:
-      for jar_file in files:
-        LOG.debug("Updating %s" % jar_file)
-        jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
-        # Refresh if needed
-        if self.fs.exists(jar_lib_path) and self.fs.exists(jar_file):
-          stat_src = self.fs.stats(jar_file)
-          stat_dest = self.fs.stats(jar_lib_path)
-          if stat_src.fileId != stat_dest.fileId:
-            self.fs.remove(jar_lib_path, skip_trash=True)
-        self.fs.copyfile(jar_file, jar_lib_path)
+    if USE_LIBPATH_FOR_JARS.get():
+      # Add the jar files to the oozie.libpath
+      if files:
+        files = list(set(files))
+        LOG.debug("Adding to oozie.libpath %s" % files)
+        if self.properties.get('oozie.libpath'):
+          files.append(self.properties['oozie.libpath'])
+        self.properties['oozie.libpath'] = ','.join(files)
+    else:
+      # Copy the jar files to the workspace lib
+      if files:
+        for jar_file in files:
+          LOG.debug("Updating %s" % jar_file)
+          jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
+          # Refresh if needed
+          if self.fs.exists(jar_lib_path) and self.fs.exists(jar_file):
+            stat_src = self.fs.stats(jar_file)
+            stat_dest = self.fs.stats(jar_lib_path)
+            if stat_src.fileId != stat_dest.fileId:
+              self.fs.remove(jar_lib_path, skip_trash=True)
+          self.fs.copyfile(jar_file, jar_lib_path)
 
   def _do_as(self, username, fn, *args, **kwargs):
     prev_user = self.fs.user
