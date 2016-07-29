@@ -1611,7 +1611,7 @@ ${ hueIcons.symbols() }
         <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
         <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllColumns($element, $data); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
         <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
-        (<span class="meta-title pointer" data-bind="click: toggleResultSettings, text: Math.max(0, result.filteredMeta().length - 1)"></span>)
+        (<span class="meta-title pointer" data-bind="click: toggleResultSettings, text: result.filteredMeta().length"></span>)
       </li>
     </ul>
     <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
@@ -2354,19 +2354,20 @@ ${ hueIcons.symbols() }
     dt.fnSetColumnVis(index, linkElement.checked);
   }
 
-  function scrollToColumn(linkElement) {
+  function scrollToColumn(linkElement, index) {
     var _t = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
-    var _text = $.trim($(linkElement).text().split("(")[0]);
+    var _text = $.trim($(linkElement).text().split(" ")[0]);
     var _col = _t.find("th").filter(function () {
       return $.trim($(this).text()) == _text;
     });
     _t.find(".columnSelected").removeClass("columnSelected");
-    var _colSel = _t.find("tr td:nth-child(" + (_col.index() + 1) + ")");
+    var _colSel = _t.find("tr th:nth-child(" + (_col.index() + 1) + ")");
     if (_colSel.length > 0) {
       _colSel.addClass("columnSelected");
       _t.parent().animate({
         scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
       }, 300, function(){
+        _t.data('scrollToCol', _col.index());
         _t.parent().trigger('scroll');
       });
     }

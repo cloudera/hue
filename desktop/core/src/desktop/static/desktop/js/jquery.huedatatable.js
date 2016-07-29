@@ -54,7 +54,7 @@
           if ($(this).position().left > 0 && startCol == -1){
             startCol = i;
           }
-          if ($(this).position().left < $t.parent().width() + 10){
+          if ($(this).position().left < $t.parent().width() + $t.parent().position().left){
             endCol = i;
           }
         });
@@ -119,18 +119,28 @@
               appendable.children().eq(i).html(html);
             }
 
+            if ($t.data('scrollToCol')){
+              var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+              $t.parent().animate({
+                scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+              }, 300);
+              colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+              colSel.addClass("columnSelected");
+              $t.data('scrollToCol', null);
+            }
+
             if ($t.data('plugin_jHueTableExtender')) {
               $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
               $t.data('plugin_jHueTableExtender').drawLockedRows();
             }
 
-            $t.data('fnDraws', $t.data('fnDraws') + 1);
-            if ($t.data('oInit')['fnDrawCallback']) {
-              $t.data('oInit')['fnDrawCallback']();
-            }
-
-            $t.trigger('headerpadding');
           }
+          $t.data('fnDraws', $t.data('fnDraws') + 1);
+          if ($t.data('oInit')['fnDrawCallback']) {
+            $t.data('oInit')['fnDrawCallback']();
+          }
+
+          $t.trigger('headerpadding');
 
         self.isDrawing = false;
       }
