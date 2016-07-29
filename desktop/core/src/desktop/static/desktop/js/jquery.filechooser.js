@@ -30,6 +30,7 @@
       uploadFile: true,
       selectFolder: false,
       suppressErrors: false,
+      displayOnlyFolders: false,
       showExtraHome: false,
       extraHomeProperties: {},
       filterExtensions: "",
@@ -245,8 +246,8 @@
             var _f = $("<li>");
             var _flink = $("<a>");
 
-            _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
             if (file.type == "dir") {
+              _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
               if (file.path.toLowerCase().indexOf('s3://') == 0 && file.path.substr(5).indexOf('/') == -1) {
                 $("<i class='fa fa-cloud'></i>").prependTo(_flink);
               }
@@ -258,7 +259,8 @@
                 _parent.navigateTo(file.path);
               });
             }
-            if (file.type == "file") {
+            if (file.type == "file" && !_parent.options.displayOnlyFolders) {
+              _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
               $("<i class='fa fa-file-o'></i>").prependTo(_flink);
               _f.click(function () {
                 _parent.options.onFileChoose(file.path);

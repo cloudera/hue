@@ -278,7 +278,8 @@ ${ assist.assistPanel() }
           onFileChoose: handleChoice,
           onFolderChoose: handleChoice,
           createFolder: $('#id_load_data').val() === 'EXTERNAL',
-          selectFolder: $('#id_load_data').val() === 'EXTERNAL'
+          selectFolder: $('#id_load_data').val() === 'EXTERNAL',
+          displayOnlyFolders: $('#id_load_data').val() === 'EXTERNAL'
         });
         $("#chooseFile").modal("show");
       });
