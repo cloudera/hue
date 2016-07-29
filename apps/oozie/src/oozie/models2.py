@@ -797,7 +797,11 @@ class Node():
     _upgrade_older_node(self.data)
 
   def get_template_name(self):
-    return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
+    node_type = self.data['type']
+    if self.data['type'] == JavaDocumentAction.TYPE:
+      node_type = JavaAction.TYPE
+        
+    return 'editor2/gen/workflow-%s.xml.mako' % node_type
 
   def find_parameters(self):
     return find_parameters(self) + (find_parameters(self, ['sla']) if self.sla_enabled else [])
@@ -2038,21 +2042,7 @@ class JavaDocumentAction(Action):
           'label': _('Java program'),
           'value': '',
           'help_text': _('Select a saved Java program you want to schedule.'),
-          'type': 'hive'
-     },
-     'jar_path': {
-          'name': 'jar_path',
-          'label': _('Jar name'),
-          'value': '',
-          'help_text': _('Path to the jar on HDFS.'),
-          'type': ''
-     },
-     'main_class': {
-          'name': 'main_class',
-          'label': _('Main class'),
-          'value': '',
-          'help_text': _('Java class. e.g. org.apache.hadoop.examples.Grep'),
-          'type': 'text'
+          'type': 'java'
      },
      'arguments': {
           'name': 'arguments',
@@ -2924,7 +2914,7 @@ class WorkflowBuilder():
     if name is None:
       name = _('Schedule of ') + document.name or document.type
 
-    if document.type == 'java':
+    if document.type == 'query-java':
       node = self.get_java_document_node(document, name, document.uuid)
     else:
       node = self.get_hive_document_node(document, name, document.uuid, user)
@@ -2981,9 +2971,10 @@ class WorkflowBuilder():
         u'actionParameters': [],
     }
 
-  def get_java_document_node(self, document, node, name, doc_uuid, parameters):
+  def get_java_document_node(self, document, name, doc_uuid):
     credentials = []
 
+    # To pick up from props
     java_class = 'org.apache.solr.hadoop.MapReduceIndexerTool'
     arguments = [
         {"value": "--morphline-file"},
@@ -3008,11 +2999,11 @@ class WorkflowBuilder():
     return {
          "id":"0aec471d-2b7c-d93d-b22c-2110fd17ea2c",
          "name":"doc-1",
-         "type":"java-widget",
+         "type":"java-document-widget",
          "properties":{
               "files": files,
               "job_xml":[],
-              "jar_path":"jar",
+              "jar_path": "",
               "java_opts":[],
               "retry_max":[],
               "retry_interval":[],
@@ -3034,8 +3025,11 @@ class WorkflowBuilder():
     
     
 
-  def get_workflow(self, name, doc_uuid, user, managed=False):    
-    
+  def get_workflow(self, node, name, doc_uuid, user, managed=False):    
+    parameters = [{u'name': u'oozie.use.system.libpath', u'value': True}]
+    parameters.append({u'name': u'oozie.libpath', u'value': '/tmp/smart_indexer_lib'})
+
+
     data = json.dumps({'workflow': {
       u'name': name,
       u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5'
@@ -3110,8 +3104,7 @@ class WorkflowBuilder():
               {u'key': u'upstream-apps', u'value': u''},
               ],
           u'show_arrows': True,
-          u'parameters': [{u'name': u'oozie.use.system.libpath',
-                          u'value': True}],
+          u'parameters': parameters,
           u'properties': [],
           },
       u'nodeNamesMapping': {

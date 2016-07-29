@@ -293,11 +293,15 @@ ${ hueIcons.symbols() }
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
               <!-- /ko -->
+              <!-- ko if: editorType() == 'java' -->
+                <i class="fa fa-file-code-o app-icon" style="vertical-align: middle"></i>
+                Java
+              <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms'].indexOf(editorType()) == -1 -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
               <!-- /ko -->
@@ -1405,7 +1409,7 @@ ${ hueIcons.symbols() }
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode(), name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && type() != 'java', name: 'snippet-code-resizer' } --><!-- /ko -->
           <!-- ko if: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: 'query-tabs' --><!-- /ko -->
@@ -1761,13 +1765,13 @@ ${ hueIcons.symbols() }
       <div class="control-group">
         <label class="control-label">${_('Path')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().app_jar, valueUpdate:'afterkeydown', filechooser: properties().app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
+          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().app_jar, valueUpdate: 'afterkeydown', filechooser: properties().app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
         </div>
       </div>
       <div class="control-group">
         <label class="control-label">${_('Class')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge" data-bind="value: properties().class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
+          <input type="text" class="input-xxlarge" data-bind="value: properties().class, valueUpdate: 'afterkeydown'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
         </div>
       </div>
       <!-- /ko -->
@@ -1775,7 +1779,7 @@ ${ hueIcons.symbols() }
       <div class="control-group">
         <label class="control-label">${_('Path')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge" data-bind="value: properties().py_file, valueUpdate:'afterkeydown', filechooser: properties().py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/>
+          <input type="text" class="input-xxlarge" data-bind="value: properties().py_file, valueUpdate: 'afterkeydown', filechooser: properties().py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/>
         </div>
       </div>
       <!-- /ko -->

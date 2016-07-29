@@ -76,7 +76,7 @@ def search_documents(request):
     page=<n>           - Controls pagination. Defaults to 1.
     limit=<n>          - Controls limit per page. Defaults to all.
     type=<type>        - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc).
-                         Defaults to all.
+                         Defaults to all. Can appear multiple times.
     sort=<key>         - Sort by the attribute <key>, which is one of: "name", "type", "owner", "last_modified"
                          Accepts the form "-last_modified", which sorts in descending order.
                          Defaults to "-last_modified".
