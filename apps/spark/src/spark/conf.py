@@ -39,6 +39,10 @@ LIVY_SERVER_PORT = Config(
   help=_t("Port of the Livy Server."),
   default="8998")
 
+LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this should match the current Spark mode
+   key="livy_server_session_kind",
+   help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
+   default="yarn")
 
 # Spark SQL
 SQL_SERVER_HOST = Config(
