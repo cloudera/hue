@@ -2598,9 +2598,7 @@
       editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
 
       var editorOptions = {
-        enableBasicAutocompletion: true,
         enableSnippets: true,
-        enableLiveAutocompletion: true,
         showGutter: false,
         showLineNumbers: false,
         showPrintMargin: false,
@@ -2609,7 +2607,43 @@
         maxLines: 25
       };
 
+      editor.enabledMenuOptions = {
+        setShowInvisibles: true,
+        setTabSize: true,
+        setShowGutter: true
+      };
+
+      editor.customMenuOptions = {
+        setEnableAutocompleter: function (enabled) {
+          editor.setOption('enableBasicAutocompletion', enabled);
+          snippet.getApiHelper().setInTotalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
+          if (enabled && $('#setEnableLiveAutocompletion:checked').length === 0) {
+            $('#setEnableLiveAutocompletion').trigger('click');
+          } else if (!enabled && $('#setEnableLiveAutocompletion:checked').length !== 0) {
+            $('#setEnableLiveAutocompletion').trigger('click');
+          }
+        },
+        getEnableAutocompleter: function () {
+          return editor.getOption('enableBasicAutocompletion');
+        },
+        setEnableLiveAutocompletion: function (enabled) {
+          editor.setOption('enableLiveAutocompletion', enabled);
+          snippet.getApiHelper().setInTotalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
+          if (enabled && $('#setEnableAutocompleter:checked').length === 0) {
+            $('#setEnableAutocompleter').trigger('click');
+          }
+        },
+        getEnableLiveAutocompletion: function () {
+          return editor.getOption('enableLiveAutocompletion');
+        }
+      };
+
       $.extend(editorOptions, aceOptions);
+
+      editorOptions['enableBasicAutocompletion'] = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'enableBasicAutocompletion', true);
+      if (editorOptions['enableBasicAutocompletion']) {
+        editorOptions['enableLiveAutocompletion'] = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'enableLiveAutocompletion', true);
+      }
 
       editor.setOptions(editorOptions);
 
@@ -2619,6 +2653,18 @@
         editor.completer = new AceAutocomplete();
       }
       editor.completer.exactMatch = ! snippet.isSqlDialect();
+
+      var initAutocompleters = function () {
+        if (editor.completers) {
+          editor.completers.length = 0;
+          if(! options.useNewAutocompleter) {
+            editor.completers.push(langTools.snippetCompleter);
+            editor.completers.push(langTools.textCompleter);
+            editor.completers.push(langTools.keyWordCompleter);
+          }
+          editor.completers.push(snippet.autocompleter);
+        }
+      };
 
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
@@ -3066,18 +3112,13 @@
         }
       });
 
+      var autocompleteTemporarilyDisabled = false;
       editor.commands.on("afterExec", function (e) {
-        if (e.command.name === "insertstring") {
-          var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && (e.args == "." || e.args == " ")) || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
-          if(e.args.toLowerCase().indexOf("? from ") == 0) {
-            if (e.args[e.args.length - 1] !== '.') {
-              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
-              editor.removeTextBeforeCursor(1);
-            }
-            triggerAutocomplete = true;
-          }
-
-          if (triggerAutocomplete) {
+        if (editor.getOption('enableLiveAutocompletion') && e.command.name === "insertstring") {
+          var questionMarkMatch = editor.getTextBeforeCursor().match(/select \? from \S+[^.]$/i);
+          if (questionMarkMatch) {
+            editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
+            editor.removeTextBeforeCursor(1);
             window.setTimeout(function () {
               editor.execCommand("startAutocomplete");
             }, 1);
@@ -3085,11 +3126,14 @@
         }
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
         // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
-        if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
+        if (editor.session.getMode().$id === "ace/mode/pig" && e.args) {
           var textBefore = editor.getTextBeforeCursor();
           if ((e.args == "'" && textBefore.toUpperCase().indexOf("LOAD ") > -1 && textBefore.toUpperCase().indexOf("LOAD ") == textBefore.toUpperCase().length - 5)
               || textBefore.toUpperCase().indexOf("LOAD '") > -1 && textBefore.toUpperCase().indexOf("LOAD '") == textBefore.toUpperCase().length - 6) {
-            editor.disableAutocomplete();
+            if (editor.getOption('enableBasicAutocompletion')) {
+              editor.disableAutocomplete();
+              autocompleteTemporarilyDisabled = true;
+            }
             var btn = editor.showFileButton();
             btn.on("click", function (ie) {
               ie.preventDefault();
@@ -3103,7 +3147,10 @@
                 onFileChoose: function (filePath) {
                   editor.session.insert(editor.getCursorPosition(), filePath + "'");
                   editor.hideFileButton();
-                  editor.enableAutocomplete();
+                  if (autocompleteTemporarilyDisabled) {
+                    editor.enableAutocomplete();
+                    autocompleteTemporarilyDisabled = false;
+                  }
                   $(".ace-filechooser").hide();
                 },
                 selectFolder: false,
@@ -3111,14 +3158,19 @@
               });
               $(".ace-filechooser").css({ "top": $(ie.currentTarget).position().top, "left": $(ie.currentTarget).position().left}).show();
             });
-          }
-          else {
+          } else {
             editor.hideFileButton();
-            editor.enableAutocomplete();
+            if (autocompleteTemporarilyDisabled) {
+              editor.enableAutocomplete();
+              autocompleteTemporarilyDisabled = false;
+            }
           }
           if (e.args != "'" && textBefore.toUpperCase().indexOf("LOAD '") > -1 && textBefore.toUpperCase().indexOf("LOAD '") == textBefore.toUpperCase().length - 6) {
             editor.hideFileButton();
-            editor.enableAutocomplete();
+            if (autocompleteTemporarilyDisabled) {
+              editor.enableAutocomplete();
+              autocompleteTemporarilyDisabled = false;
+            }
           }
         }
       });
