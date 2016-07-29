@@ -29,6 +29,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase
 
+from liboozie.conf import USE_LIBPATH_FOR_JARS
 from liboozie.submission2 import Submission
 
 
@@ -102,39 +103,48 @@ def test_copy_files():
     deployment_dir = deployment_dir + '/lib'
     external_deployment_dir = external_deployment_dir + '/lib'
 
-    list_dir_workspace = cluster.fs.listdir(deployment_dir)
-    list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
-
-    # All destinations there
-    assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf5.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf6.jar'), list_dir_workspace)
-
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf5.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf6.jar'), list_dir_deployement)
-
-    stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
-    stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
-    stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
-    stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
-    stats_udf5 = cluster.fs.stats(deployment_dir + '/udf5.jar')
-    stats_udf6 = cluster.fs.stats(deployment_dir + '/udf6.jar')
-
-    submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>", {'prop1': 'val1'})
-
-    assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
-    assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
-    assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
-    assert_equal(stats_udf4['fileId'], cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId'])
-    assert_not_equal(stats_udf5['fileId'], cluster.fs.stats(deployment_dir + '/udf5.jar')['fileId'])
-    assert_equal(stats_udf6['fileId'], cluster.fs.stats(deployment_dir + '/udf6.jar')['fileId'])
+    if USE_LIBPATH_FOR_JARS.get():
+      assert_true(jar_1 in submission.properties['oozie.libpath'])
+      assert_true(jar_2 in submission.properties['oozie.libpath'])
+      assert_true(jar_3 in submission.properties['oozie.libpath'])
+      assert_true(jar_4 in submission.properties['oozie.libpath'])
+      print deployment_dir + '/' + jar_5
+      assert_true((deployment_dir + '/' + jar_5) in submission.properties['oozie.libpath'], submission.properties['oozie.libpath'])
+      assert_true((deployment_dir + '/' + jar_6) in submission.properties['oozie.libpath'], submission.properties['oozie.libpath'])
+    else:
+      list_dir_workspace = cluster.fs.listdir(deployment_dir)
+      list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
+  
+      # All destinations there
+      assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
+      assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
+      assert_true(cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace)
+      assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
+      assert_true(cluster.fs.exists(deployment_dir + '/udf5.jar'), list_dir_workspace)
+      assert_true(cluster.fs.exists(deployment_dir + '/udf6.jar'), list_dir_workspace)
+  
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf5.jar'), list_dir_deployement)
+      assert_true(cluster.fs.exists(external_deployment_dir + '/udf6.jar'), list_dir_deployement)
+  
+      stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
+      stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
+      stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
+      stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
+      stats_udf5 = cluster.fs.stats(deployment_dir + '/udf5.jar')
+      stats_udf6 = cluster.fs.stats(deployment_dir + '/udf6.jar')
+  
+      submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>", {'prop1': 'val1'})
+  
+      assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
+      assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
+      assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
+      assert_equal(stats_udf4['fileId'], cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId'])
+      assert_not_equal(stats_udf5['fileId'], cluster.fs.stats(deployment_dir + '/udf5.jar')['fileId'])
+      assert_equal(stats_udf6['fileId'], cluster.fs.stats(deployment_dir + '/udf6.jar')['fileId'])
 
     # Test _create_file()
     submission._create_file(deployment_dir, 'test.txt', data='Test data')
