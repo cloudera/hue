@@ -15,15 +15,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# FIXME: This could be replaced with hooking into the `AppConfig.ready()`
-# signal in Django 1.7:
-#
-# https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
-#
-# For now though we have to load in the monkey patches here because we know
-# this file has been loaded after `desktop.settings` has been loaded.
-import spark.monkey_patches
-
-
 urlpatterns = ()
