@@ -1836,8 +1836,8 @@ ${ hueIcons.symbols() }
         <i class="fa fa-fw fa-send"></i>
       </a>
       <!-- /ko -->
-      <!-- ko if: type() != 'hive' || !wasBatchExecuted() -->
-      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }, style: {'padding-left': type() == 'hive' ? '2px' : '0' }">
+      <!-- ko if: type() != 'hive' || ! wasBatchExecuted() -->
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': type() == 'hive' ? '2px' : '0' }">
         <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : type() !== 'hive' }"></i>
       </a>
       <!-- /ko -->
