@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.argument import TextArgument, CheckboxArgument
+from indexer.operations import get_operator
 
 LOG = logging.getLogger(__name__)
 
@@ -161,13 +162,27 @@ class HueLogFormat(GrokkedFormat):
   _extensions = ["log"]
 
   def __init__(self):
+    geo_ip_operation = get_operator("geo_ip").get_default_operation()
+
+    geo_ip_operation['settings']["/country/names/en"] = True
+    geo_ip_operation['settings']["/city/names/en"] = True
+    geo_ip_operation['settings']["/location/latitude"] = True
+    geo_ip_operation['settings']["/location/longitude"] = True
+
+    geo_ip_operation['fields'] += [
+      Field("country", "string").to_dict(),
+      Field("city", "string").to_dict(),
+      Field("latitude", "double").to_dict(),
+      Field("longitude", "double").to_dict()
+    ]
+
     self._fields = [
       Field("date", "date"),
       Field("component", "string"),
       Field("log_level", "string"),
       Field("details", "string"),
       Field("message", "text_en"),
-      Field("ip", "string"),
+      Field("ip", "string", [geo_ip_operation]),
       Field("user", "string"),
       Field("http_method", "string"),
       Field("path", "string"),
