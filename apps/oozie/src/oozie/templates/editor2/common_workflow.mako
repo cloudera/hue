@@ -1035,7 +1035,7 @@
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
         <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.javaQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
+          <select data-bind="options: $root.javaQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Java program name...')}'}"></select>
           <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
@@ -1059,14 +1059,26 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
-          <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
-          <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
+          <h6>
+            <a class="pointer" data-bind="click: function(){ properties.java_opts.push({'value': ''}); }">
+              <span data-bind="text: $root.workflow_properties.java_opts.label"></span> <i class="fa fa-plus"></i>
+            </a>
+          </h6>
+          <ul class="unstyled" data-bind="foreach: properties.java_opts">
+            <li>
+              <input type="text" data-bind="value: value, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" class="input-xlarge"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.java_opts.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+
+          <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
+          <input type="checkbox" data-bind="checked: properties.capture_output" />
           <br/>
-          <span data-bind="text: $root.workflow_properties.password.label"></span>
-          <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+
           <span data-bind="template: { name: 'common-action-properties' }"></span>
-          <br/>
           <br/>
         </div>
 

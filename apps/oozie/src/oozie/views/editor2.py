@@ -219,11 +219,11 @@ def save_workflow(request):
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
   # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
-  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive']))
+  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive', 'query-java']))
 
   dependencies = \
       [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
-      [node['properties']['uuid'] for node in workflow['nodes'] if node['type'] == 'hive-document-widget']
+      [node['properties']['uuid'] for node in workflow['nodes'] if 'document-widget' in node['type']]
   if dependencies:
     dependency_docs = Document2.objects.filter(uuid__in=dependencies)
     workflow_doc.dependencies.add(*dependency_docs)

@@ -549,7 +549,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.getDocumentById = function (type, uuid) {
     var _query = null;
-    if (type == 'java') {
+    if (type.indexOf('java') != -1) {
       data = self.javaQueries();
     } else {
       data = self.hiveQueries();
