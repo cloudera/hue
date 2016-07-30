@@ -2935,7 +2935,7 @@ class WorkflowBuilder():
     return workflow_doc
 
 
-  def get_hive_document_node(self, document, name, parameters, user):
+  def get_hive_document_node(self, document, name, user):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
