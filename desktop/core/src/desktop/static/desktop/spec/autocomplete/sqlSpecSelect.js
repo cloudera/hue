@@ -216,6 +216,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 32}, table: 'testTableA'}
@@ -250,6 +251,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 27}, table: 'testTableA'}
@@ -268,6 +270,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 2, last_line: 2, first_column: 6, last_column: 16}, table: 'testTableA'}
@@ -286,6 +289,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 28}, table: 'testTableA'}
@@ -304,6 +308,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 23, last_column: 33}, table: 'testTableA'}
@@ -355,6 +360,7 @@ define([
             suggestColumns: { table: 'testTableA' },
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             locations: [
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'foo' }], table: 'testTableA'},
@@ -584,6 +590,7 @@ define([
               prependFrom: true
             },
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestDatabases: {
               prependQuestionMark: true,
@@ -602,6 +609,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -624,6 +632,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -689,6 +698,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
@@ -704,6 +714,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testWHERE' }
           }
@@ -719,6 +730,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testON' }
           }
@@ -734,6 +746,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'transactions' }
           }
@@ -749,6 +762,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
@@ -764,6 +778,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testTable', database: 'database_two' }
           }
@@ -778,6 +793,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'test table', database: 'database one' },
             locations: [
@@ -798,6 +814,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'ttaSum.', type: 'sub-query' }, { name: 'ttb.', type: 'alias' }],
             subQueries: [{
@@ -817,6 +834,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
@@ -832,6 +850,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
@@ -847,6 +866,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: {table: 'tableA'}
           }
@@ -918,6 +938,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
@@ -932,6 +953,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { table: 'testTable' },
             locations: [
@@ -959,6 +981,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: {table: '${some_variable}'}
           }
@@ -989,6 +1012,441 @@ define([
             suggestFunctions: { types: ['NUMBER']},
             suggestColumns: { types: ['NUMBER'], table: 'testTable'}
           }
+        });
+      });
+    });
+
+    describe('Window and analytic functions', function () {
+      it('should handle "SELECT row_number() OVER (PARTITION BY a) FROM testTable;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a) FROM testTable;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest analytical functions for "SELECT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: '',
+          containsKeywords: ['*'],
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions:true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestTables: { prependQuestionMark: true, prependFrom: true },
+            suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot: true}
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() ',
+          afterCursor: '',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() ',
+          afterCursor: ' FROM testTable',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() |, b, c FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() ',
+          afterCursor: ', b, c FROM testTable',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT count(DISTINCT a) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT count(DISTINCT a) ',
+          afterCursor: '',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { prependFrom: true} ,
+            suggestDatabases: { prependFrom: true, appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT count(DISTINCT a) | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT count(DISTINCT a) ',
+          afterCursor: ' FROM testTable',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT count(DISTINCT a) |, b, c FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT count(DISTINCT a) ',
+          afterCursor: ', b, c FROM testTable',
+          containsKeywords: ['OVER'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (| FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER ( ',
+          afterCursor: ' FROM testTable',
+          containsKeywords: ['PARTITION BY'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION ',
+          afterCursor: ' FROM testTable',
+          containsKeywords: ['BY'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a, b ORDER | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a, b ORDER ',
+          afterCursor: ' FROM testTable',
+          containsKeywords: ['BY'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT row_number() OVER (ORDER BY | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
+          afterCursor: ' FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT row_number() OVER (ORDER BY |) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
+          afterCursor: ') FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT row_number() OVER (ORDER BY foo |) FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (ORDER BY a ',
+          afterCursor: ') FROM testTable',
+          hasLocations: true,
+          containsKeywords: ['ASC', 'DESC'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT row_number() OVER (PARTITION BY | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY ',
+          afterCursor: ' FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT row_number() OVER (PARTITION BY a, | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a, ',
+          afterCursor: ' FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ',
+          afterCursor: '',
+          containsKeywords: ['ASC', 'ROWS BETWEEN', 'RANGE BETWEEN'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BETWEEN']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CURRENT ROW', 'UNBOUNDED PRECEDING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PRECEDING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PRECEDING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ROW']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AND']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AND']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AND']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ROW']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FOLLOWING']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND 1 |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND 1 ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FOLLOWING']
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should suggest keywords for "SELECT count(id) OVER w FROM customers |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT row_number() OVER w FROM customers ',
+            afterCursor: '',
+            hasLocations: true,
+            dialect: 'hive',
+            containsKeywords: ['WINDOW'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT row_number() OVER w FROM customers WINDOW w ',
+            afterCursor: '',
+            hasLocations: true,
+            dialect: 'hive',
+            containsKeywords: ['AS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w AS (|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT row_number() OVER w FROM customers WINDOW w AS (',
+            afterCursor: '',
+            hasLocations: true,
+            dialect: 'hive',
+            containsKeywords: ['ORDER BY', 'PARTITION BY'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
         });
       });
     });
@@ -2093,7 +2551,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
           }
         });
       });
@@ -2106,7 +2564,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
           }
         });
       });
@@ -2145,7 +2603,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
           }
         });
       });
@@ -2380,6 +2838,7 @@ define([
                 table: 'testTable'
               },
               suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }],
               locations: [
@@ -2401,6 +2860,7 @@ define([
               lowerCase: false,
               suggestFunctions: {},
               suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
               suggestColumns: {
                 table: 'testTable'
               },
@@ -2473,6 +2933,7 @@ define([
                 table: 'testTable'
               },
               suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testKey', type: 'alias' }, { name: 'testValue', type: 'alias' }]
             }
@@ -2653,6 +3114,7 @@ define([
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
               suggestColumns: {
@@ -2841,6 +3303,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
@@ -3988,7 +4451,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
+              suggestKeywords: ['<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY', 'WINDOW']
             }
           });
         });
@@ -4084,6 +4547,7 @@ define([
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['*']
           }
@@ -4099,6 +4563,7 @@ define([
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['*']
           }
@@ -4114,6 +4579,7 @@ define([
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestColumns: { table: 'testTable' },
             suggestKeywords: ['*', 'ALL', 'DISTINCT']
           }
@@ -4220,6 +4686,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestAnalyticFunctions: true,
               suggestColumns: { table: 'testTable' }
             }
           });
@@ -4232,6 +4699,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestAnalyticFunctions: true,
               suggestColumns: { database: 'database_two', table: 'testTable' }
             }
           });
@@ -4257,6 +4725,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestAnalyticFunctions: true,
               suggestColumns: { database: 'database_two', table: 'testTable' }
             }
           });
@@ -4269,6 +4738,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestAnalyticFunctions: true,
               suggestColumns: { database: 'database_two', table: 'testTable' }
             }
           });
@@ -5366,6 +5836,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -5393,6 +5864,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -5443,6 +5915,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -5483,6 +5956,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tt.', type: 'alias'}, { name: 'bar.', type: 'sub-query'}],
             locations: [
@@ -5510,6 +5984,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'bar' },
             subQueries: [{
@@ -5534,6 +6009,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'bar' },
             subQueries: [{
@@ -5619,6 +6095,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -5642,6 +6119,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestIdentifiers: [{ name: 'subQueryOne.', type: 'sub-query'}, { name: 'tAlias.', type: 'alias'}, { name: 'tableThree.', type: 'table'}, { name: 'subQueryTwo.', type: 'sub-query'}],
             subQueries: [{
@@ -5664,6 +6142,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: {
               table: 'tableOne'
@@ -5681,6 +6160,7 @@ define([
             lowerCase:false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'subQueryTwo'},
             subQueries: [{
@@ -5705,6 +6185,7 @@ define([
             lowerCase:false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'subQueryThree'},
             subQueries: [{
@@ -5733,6 +6214,7 @@ define([
             lowerCase:false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'subQueryTwo'},
             subQueries: [{
@@ -5757,6 +6239,7 @@ define([
             lowerCase:false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { subQuery: 'subQueryOne'},
             subQueries: [{

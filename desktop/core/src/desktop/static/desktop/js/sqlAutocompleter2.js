@@ -91,14 +91,14 @@
       if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
         $.when.apply($, colRefDeferral).done(function () {
           if (colRef !== null) {
-            sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, completions);
+            sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           } else {
-            sqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, completions);
+            sqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           }
           suggestFunctionsDeferral.resolve();
         });
       } else {
-        sqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, completions);
+        sqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
         suggestFunctionsDeferral.resolve();
       }
       deferrals.push(suggestFunctionsDeferral);

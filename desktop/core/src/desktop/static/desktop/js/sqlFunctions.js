@@ -2073,6 +2073,115 @@
     }
   };
 
+  var ANALYTIC_FUNCTIONS = {
+    hive: {
+      cume_dist: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T', multiple: true, optional: true }]],
+        signature: 'cume_dist()',
+        description: ''
+      },
+      dense_rank: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'dense_rank() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. The output sequence produces duplicate integers for duplicate values of the ORDER BY expressions.'
+      },
+      first_value: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}]],
+        signature: 'first_value(expr) OVER([partition_by_clause] order_by_clause [window_clause])',
+        description: 'Returns the expression value from the first row in the window. The return value is NULL if the input expression is NULL.'
+      },
+      lag: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'INT', optional: true}], [{type: 'T', optional: true}]],
+        signature: 'lag(expr [, offset] [, default]) OVER ([partition_by_clause] order_by_clause)',
+        description: 'This function returns the value of an expression using column values from a preceding row. You specify an integer offset, which designates a row position some number of rows previous to the current row. Any column references in the expression argument refer to column values from that prior row.'
+      },
+      last_value: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}]],
+        signature: 'last_value(expr) OVER([partition_by_clause] order_by_clause [window_clause])',
+        description: 'Returns the expression value from the last row in the window. The return value is NULL if the input expression is NULL.'
+      },
+      lead: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'INT', optional: true}], [{type: 'T', optional: true}]],
+        signature: 'lead(expr [, offset] [, default]) OVER ([partition_by_clause] order_by_clause)',
+        description: 'This function returns the value of an expression using column values from a following row. You specify an integer offset, which designates a row position some number of rows after to the current row. Any column references in the expression argument refer to column values from that later row.'
+      },
+      ntile: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T', multiple: true, optional: true }]],
+        signature: 'ntile()',
+        description: ''
+      },
+      percent_rank: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T', multiple: true, optional: true }]],
+        signature: 'percent_rank()',
+        description: ''
+      },
+      rank: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'rank() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. The output sequence produces duplicate integers for duplicate values of the ORDER BY expressions. After generating duplicate output values for the "tied" input values, the function increments the sequence by the number of tied values.'
+      },
+      row_number: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'row_number() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. Starts the sequence over for each group produced by the PARTITIONED BY clause. The output sequence includes different values for duplicate input values. Therefore, the sequence never contains any duplicates or gaps, regardless of duplicate input values.'
+      }
+    },
+    impala: {
+      dense_rank: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'dense_rank() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. The output sequence produces duplicate integers for duplicate values of the ORDER BY expressions.'
+      },
+      first_value: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}]],
+        signature: 'first_value(expr) OVER([partition_by_clause] order_by_clause [window_clause])',
+        description: 'Returns the expression value from the first row in the window. The return value is NULL if the input expression is NULL.'
+      },
+      lag: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'INT', optional: true}], [{type: 'T', optional: true}]],
+        signature: 'lag(expr [, offset] [, default]) OVER ([partition_by_clause] order_by_clause)',
+        description: 'This function returns the value of an expression using column values from a preceding row. You specify an integer offset, which designates a row position some number of rows previous to the current row. Any column references in the expression argument refer to column values from that prior row.'
+      },
+      last_value: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}]],
+        signature: 'last_value(expr) OVER([partition_by_clause] order_by_clause [window_clause])',
+        description: 'Returns the expression value from the last row in the window. The return value is NULL if the input expression is NULL.'
+      },
+      lead: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'INT', optional: true}], [{type: 'T', optional: true}]],
+        signature: 'lead(expr [, offset] [, default]) OVER ([partition_by_clause] order_by_clause)',
+        description: 'This function returns the value of an expression using column values from a following row. You specify an integer offset, which designates a row position some number of rows after to the current row. Any column references in the expression argument refer to column values from that later row.'
+      },
+      rank: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'rank() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. The output sequence produces duplicate integers for duplicate values of the ORDER BY expressions. After generating duplicate output values for the "tied" input values, the function increments the sequence by the number of tied values.'
+      },
+      row_number: {
+        returnTypes: ['INT'],
+        arguments: [],
+        signature: 'row_number() OVER([partition_by_clause] order_by_clause)',
+        description: 'Returns an ascending sequence of integers, starting with 1. Starts the sequence over for each group produced by the PARTITIONED BY clause. The output sequence includes different values for duplicate input values. Therefore, the sequence never contains any duplicates or gaps, regardless of duplicate input values.'
+      }
+    }
+  };
+
   var typeImplicitConversion = {
     hive: {
       BOOLEAN: {
@@ -2224,7 +2333,7 @@
     }
   };
 
-  var suggestFunctions = function (dialect, returnTypes, includeAggregate, completions) {
+  var suggestFunctions = function (dialect, returnTypes, includeAggregate, includeAnalytic, completions) {
     var functionsToSuggest = {};
     addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
@@ -2237,6 +2346,9 @@
     addFunctions(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     if (includeAggregate) {
       addFunctions(AGGREGATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+    }
+    if (includeAnalytic) {
+      addFunctions(ANALYTIC_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     }
     Object.keys(functionsToSuggest).forEach(function (name) {
       completions.push({

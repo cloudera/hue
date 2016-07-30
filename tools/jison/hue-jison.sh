@@ -15,9 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+echo "Make sure you install jison first (npm install jison -g)"
+echo ""
+echo "Note: There's supposed to be one conflict when generating for token 'error' (reduce by rule: QuerySpecification_EDIT -> SELECT OptionalAllOrDistinct SelectList_EDIT)"
+echo ""
 echo "Generating parser..."
-# npm install jison -g
-jison ../../desktop/core/src/desktop/static/desktop/js/autocomplete/sql.jison -m amd
-cat license.txt sql.js > ../../desktop/core/src/desktop/static/desktop/js/autocomplete/sql.js
+
+pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
+echo "%%" > sql_end.jison
+
+# For quick version of select and no support for value expressions (i.e. a = b or a IN (1, 2, 3))
+# With this some select tests will fail
+# cat sql_main.jison sql_end.jison ../sql_support.js > sql.jison
+
+# For quick version of select with create only and no support for value expressions (i.e. a = b or a IN (1, 2, 3))
+# With this all create tests will pass
+# cat sql_main.jison sql_create.jison sql_end.jison ../sql_support.js > sql.jison
+
+cat sql_main.jison sql_valueExpression.jison sql_create.jison sql_show.jison sql_update.jison sql_use.jison sql_end.jison ../sql_support.js > sql.jison
+
+jison sql.jison sql.jisonlex -m amd
+cat license.txt sql.js > ../sql.js
 rm sql.js
+rm sql_end.jison
+popd
 echo "Done!"
