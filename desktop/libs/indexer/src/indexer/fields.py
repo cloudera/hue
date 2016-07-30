@@ -50,7 +50,7 @@ class Field(object):
     return {'name': self.name,
     'type': self.field_type_name,
     'keep': self.keep,
-    'operations': [operation.to_dict() for operation in self.operations],
+    'operations': self.operations,
     'required': self.required}
 
 FIELD_TYPES = [
