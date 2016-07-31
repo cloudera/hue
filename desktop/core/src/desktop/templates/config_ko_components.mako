@@ -39,6 +39,7 @@ from desktop.views import _ko
       margin: 4px 10px;
       float:left;
       text-align: right;
+      cursor: default;
     }
 
     .config-controls {
@@ -391,7 +392,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="property-hdfs-file">
     <div class="input-append">
-      <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
+      <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
     </div>
   </script>
 
@@ -673,7 +674,7 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+          <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>

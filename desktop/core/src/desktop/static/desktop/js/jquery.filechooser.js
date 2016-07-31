@@ -83,7 +83,20 @@
 
   Plugin.prototype.setOptions = function (options) {
     var self = this;
-    self.options = $.extend({}, defaults, options);
+    if (typeof jHueFileChooserGlobals != 'undefined') {
+      var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
+      extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
+      self.options = $.extend({}, extendedDefaults, options);
+      if (options != null) {
+        self.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
+      }
+    }
+    else {
+      self.options = $.extend({}, defaults, options);
+      if (options != null) {
+        self.options.labels = $.extend({}, defaults.labels, options.labels);
+      }
+    }
 
     var initialPath = $.trim(self.options.initialPath);
     if (initialPath && initialPath.toLowerCase().indexOf('s3') > -1 && $(self.element).data('fs').indexOf('s3') > -1) {
