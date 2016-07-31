@@ -308,7 +308,7 @@ def list_oozie_workflow(request, job_id):
   if oozie_parent:
     oozie_parent = check_job_access_permission(request, oozie_parent)
 
-  workflow_data = None
+  workflow_data = {}
   credentials = None
   doc = None
   hue_workflow = None
@@ -334,7 +334,8 @@ def list_oozie_workflow(request, job_id):
         doc = Document2.objects.get(type='oozie-workflow2', **wid)
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
-      else:
+
+      if not workflow_data.get('layout'):
         try:
           workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
         except Exception, e:
@@ -343,6 +344,7 @@ def list_oozie_workflow(request, job_id):
       credentials = Credentials()
     except:
       LOG.exception("Error generating full page for running workflow %s" % job_id)
+    print workflow_data
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
@@ -395,8 +397,8 @@ def list_oozie_workflow(request, job_id):
     'parameters': dict((var, val) for var, val in parameters.iteritems() if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path'),
     'has_job_edition_permission': has_job_edition_permission,
     'workflow_graph': workflow_graph,
-    'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML) if workflow_data.get('layout') else '',
-    'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML) if workflow_data else '',
+    'layout_json': json.dumps(workflow_data.get('layout', ''), cls=JSONEncoderForHTML),
+    'workflow_json': json.dumps(workflow_data.get('workflow', ''), cls=JSONEncoderForHTML),
     'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML) if credentials else '',
     'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
     'doc_uuid': doc.uuid if doc else '',
