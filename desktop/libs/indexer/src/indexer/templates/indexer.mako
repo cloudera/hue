@@ -123,7 +123,7 @@ ${ assist.assistPanel() }
       <div class="controls">
         <input type="text" class="form-control" id = "collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
         <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === true">${ _('Collection name available') }</span>
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('This collection already exists') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('Note: This collection already exists. Previous schema will be used') }</span>
         <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
       </div>
     </div>
@@ -179,7 +179,7 @@ ${ assist.assistPanel() }
 
         <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">${_('Index File!')}</a>
 
-        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Collection needs a unique name')}</h4>
+        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Will try to add to existing collection')}</h4>
         <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('Collection needs a name')}</h4>
 
 
@@ -489,7 +489,7 @@ ${ assist.assistPanel() }
     self.readyToIndex = ko.computed(function () {
       var validFields = self.fileFormat().columns().length
 
-      return self.isNameAvailable() && validFields;
+      return self.fileFormat().name().length > 0 && validFields;
     });
 
     self.fileFormat().format.subscribe(function () {
