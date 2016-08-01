@@ -1502,10 +1502,10 @@ ${ hueIcons.symbols() }
       <ul class="table-drop-menu hue-context-menu">
         <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
         <li class="divider"></li>
-        <li class="editor-drop-select"><a href="javascript:void(0);">${ _('SELECT FROM ') } <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-insert"><a href="javascript:void(0);">${ _('INSERT INTO') } <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-update"><a href="javascript:void(0);">${ _('UPDATE') } <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-delete"><a href="javascript:void(0);">${ _('DELETE FROM') } <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-select"><a href="javascript:void(0);">SELECT FROM <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-insert"><a href="javascript:void(0);">INSERT INTO <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-update"><a href="javascript:void(0);">UPDATE <span class="editor-drop-identifier"></span>...</a></li>
+        <li class="editor-drop-delete"><a href="javascript:void(0);">DELETE FROM <span class="editor-drop-identifier"></span>...</a></li>
       </ul>
     </div>
     <div class="clearfix"></div>
