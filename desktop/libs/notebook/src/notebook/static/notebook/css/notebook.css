@@ -1209,3 +1209,36 @@ pre {
   margin-right: 2px;
   margin-top: 10px;
 }
+
+.nav-header-like {
+  padding: 9px 18px;
+  margin-top: 1px;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #338BB8;
+  text-overflow: ellipsis;
+  text-shadow: none;
+  background-color: #fff;
+  border-left: 2px solid transparent;
+  -webkit-transition: border .218s;
+  -moz-transition: border .218s;
+  -o-transition: border .218s;
+  transition: border .218s;
+  text-transform: uppercase;
+}
+
+.mCSB_scrollTools.mCSB_scrollTools_horizontal .mCSB_dragger .mCSB_dragger_bar {
+  height: 9px!important;
+  margin: 0!important;
+  margin-top: 3px!important;
+}
+
+.mCSB_scrollTools.mCSB_scrollTools_horizontal {
+  margin: 0!important;
+}
+
+.mCSB_scrollTools.mCSB_scrollTools_vertical .mCSB_dragger .mCSB_dragger_bar {
+  width: 6px!important;
+  margin-left: 10px!important;
+}
