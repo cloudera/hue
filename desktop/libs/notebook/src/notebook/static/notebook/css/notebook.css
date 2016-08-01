@@ -1190,3 +1190,22 @@ pre {
 .warning {
   color: #fdae6b;
 }
+
+#ace_settingsmenu {
+  width: 350px;
+}
+
+#ace_settingsmenu label {
+  display: inline-block;
+  height: 31px;
+  line-height: 31px;
+}
+
+#ace_settingsmenu input {
+  margin-bottom: 0;
+}
+
+#ace_settingsmenu input[type='checkbox'] {
+  margin-right: 2px;
+  margin-top: 10px;
+}
