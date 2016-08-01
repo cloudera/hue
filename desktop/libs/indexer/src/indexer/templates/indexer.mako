@@ -202,6 +202,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="field-template">
   <div>
+    <span>${_('Unique')}</span><input type="checkbox" data-bind="checked: unique">
     <span>${_('Keep')}</span><input type="checkbox" data-bind="checked: keep">
     <span>${_('Required')}</span><input type="checkbox" data-bind="checked: required">
     <input type="text" data-bind="value: name"></input> - <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
@@ -309,13 +310,11 @@ ${ assist.assistPanel() }
   }
 
   var createDefaultField = function () {
-    return {
-      name: ko.observable(getNewFieldName()),
-      type: ko.observable("string"),
-      keep: ko.observable(true),
-      required: ko.observable(true),
-      operations: ko.observableArray([])
-    }
+    var defaultField = ${default_field_type | n};
+
+    defaultField.name = getNewFieldName();
+
+    return defaultField;
   };
 
   var Operation = function (type) {

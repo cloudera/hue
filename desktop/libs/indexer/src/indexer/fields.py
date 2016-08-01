@@ -39,16 +39,18 @@ class FieldType():
     return pattern.match(field)
 
 class Field(object):
-  def __init__(self, name, field_type_name, operations=None):
+  def __init__(self, name="new_field", field_type_name="string", operations=None):
     self.name = name
     self.field_type_name = field_type_name
     self.keep = True
     self.operations = operations if operations else []
     self.required = False
+    self.unique = False
 
   def to_dict(self):
     return {'name': self.name,
     'type': self.field_type_name,
+    'unique': self.unique,
     'keep': self.keep,
     'operations': self.operations,
     'required': self.required}

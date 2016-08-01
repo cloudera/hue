@@ -24,7 +24,7 @@ from desktop.lib.django_util import JsonResponse, render
 
 from indexer.controller2 import IndexController
 from indexer.management.commands import indexer_setup
-from indexer.fields import FIELD_TYPES
+from indexer.fields import FIELD_TYPES, Field
 from indexer.operations import OPERATORS
 from indexer.file_format import get_format_types
 
@@ -57,7 +57,8 @@ def indexer(request):
       'indexes_json': json.dumps(indexes),
       'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
-      'file_types_json' : json.dumps([format_.format_info() for format_ in get_format_types()])
+      'file_types_json' : json.dumps([format_.format_info() for format_ in get_format_types()]),
+      'default_field_type' : json.dumps(Field().to_dict())
   })
 
 def install_examples(request, is_redirect=False):
