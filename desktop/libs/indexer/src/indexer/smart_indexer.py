@@ -196,4 +196,3 @@ class Indexer(object):
     morphline = lookup.get_template("morphline_template.conf").render(**properties)
 
     return morphline
-
