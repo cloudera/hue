@@ -88,9 +88,12 @@ def index_file(request):
   _convert_format(file_format["format"], inverse = True)
   collection_name = file_format["name"]
   indexer = Indexer(request.user, request.fs)
-  unique_field = indexer.get_uuid_name(file_format)
-  schema_fields = [{"name": unique_field, "type": "string"}] + \
-    indexer.get_kept_field_list(file_format['columns'])
+  unique_field = indexer.get_unique_field(file_format)
+  is_unique_generated = indexer.is_unique_generated(file_format)
+
+  schema_fields = indexer.get_kept_field_list(file_format['columns'])
+  if is_unique_generated:
+    schema_fields += [{"name": unique_field, "type": "string"}]
 
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
 

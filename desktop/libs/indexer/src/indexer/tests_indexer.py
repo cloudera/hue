@@ -254,12 +254,16 @@ class IndexerTest():
     format_['format'] = file_type_format
 
     # find a field name available to use for the record's uuid
-    unique_field = indexer.get_uuid_name(format_)
+    unique_field = indexer.get_unique_field(format_)
+    is_unique_generated = indexer.is_unique_generated(format_)
 
     # generate morphline
     morphline = indexer.generate_morphline_config(collection_name, format_, unique_field)
 
-    schema_fields = [{"name": unique_field, "type": "string"}] + indexer.get_kept_field_list(format_['columns'])
+    schema_fields = indexer.get_kept_field_list(format_['columns'])
+    if is_unique_generated:
+      schema_fields += [{"name": unique_field, "type": "string"}]
+
 
     # create the collection from the specified fields
     collection_manager = CollectionManagerController("test")

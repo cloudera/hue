@@ -133,15 +133,25 @@ class Indexer(object):
   def get_kept_field_list(self, field_data):
     return [field for field in self.get_field_list(field_data) if field['keep']]
 
-  def get_uuid_name(self, format_):
-    base_name = "_uuid"
+  def get_unique_field(self, format_):
+    # check for a unique field
+    unique_fields = [column['name'] for column in format_['columns'] if column['unique']]
 
-    field_names = set([column['name'] for column in format_['columns']])
+    if unique_fields:
+      return unique_fields[0]
+    else:
+      base_name = "_uuid"
+      field_names = set([column['name'] for column in format_['columns']])
 
-    while base_name in field_names:
-      base_name = '_' + base_name
+      while base_name in field_names:
+        base_name = '_' + base_name
 
-    return base_name
+      return base_name
+
+  def is_unique_generated(self, format_):
+    unique_fields = [column['name'] for column in format_['columns'] if column['unique']]
+
+    return len(unique_fields) == 0
 
   @staticmethod
   def _get_regex_for_type(type_name):
@@ -149,7 +159,7 @@ class Indexer(object):
 
     return field_type.regex.replace('\\', '\\\\')
 
-  def generate_morphline_config(self, collection_name, data, uuid_name="__uuid"):
+  def generate_morphline_config(self, collection_name, data, uuid_name=None):
     """
     Input:
     data: {
