@@ -40,12 +40,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1623,25 +1625,40 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="snippet-grid-settings">
-  <div class="snippet-grid-settings" style="overflow:auto">
-    <ul class="nav nav-list" style="border: none; background-color: #FFF">
-      <li class="nav-header" title="${_('Hide columns')}" style="margin-left: -2px">
-        <span class="inactive-action pull-right" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
-        <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllColumns($element, $data); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
-        <span class="meta-title pointer" data-bind="click: toggleResultSettings">${_('columns')}</span>
-        (<span class="meta-title pointer" data-bind="click: toggleResultSettings, text: result.filteredMeta().length"></span>)
-      </li>
-    </ul>
-    <input class="meta-filter" type="text" data-bind="visible: result.isMetaFilterVisible, blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/>
-    <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
-      ${ _('No results found') }
-    </div>
-    <ul class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
-      <li data-bind="visible: name != ''">
-        <input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" />
-        <a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: '${ _ko('Click to scroll to data') }'}"><span data-bind="text: $data.name"></span> <span data-bind="text: $data.type" class="muted margin-left-20"></span></a>
-      </li>
-    </ul>
+  <div class="snippet-grid-settings" style="overflow: auto">
+    <table class="table table-condensed margin-top-10">
+      <thead>
+        <tr>
+          <th width="16">
+            <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllColumns($element, $data); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
+          </th>
+          <th colspan="2" class="nav-header-like">
+            <span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, attr: {title: result.filteredMeta().length }">${_('columns')}</span>
+            (<span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, text: result.filteredMeta().length"></span>)
+            <span class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
+          </th>
+        </tr>
+        <tr data-bind="visible: result.isMetaFilterVisible">
+          <td colspan="3"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/></td>
+        </tr>
+      </thead>
+      <tbody class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
+        <tr data-bind="visible: name != ''">
+          <td><input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" /></td>
+          <td><a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: '${ _ko('Click to scroll to data') }'}"><span data-bind="text: $data.name"></span></a></td>
+          <td><span data-bind="text: $data.type" class="muted margin-left-20"></span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">
+            <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
+              ${ _('No results found') }
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 </script>
 
@@ -2326,18 +2343,25 @@ ${ hueIcons.symbols() }
       scrollElement = $('.right-panel');
     }
 
+    var resultFollowTimeout = -1;
     scrollElement.on('scroll', function () {
       if (vm.editorMode()) {
         if (snippet.isResultSettingsVisible()) {
-          var snippetEl = $("#snippet_" + snippet.id());
-          var topCoord = vm.isPlayerMode() ? 1 : 73;
-          snippetEl.find(".snippet-grid-settings").css({
-            "height": Math.ceil($(window).height() - Math.max($('.result-settings').offset().top, topCoord)) + 'px'
-          });
-          if ($("#snippet_" + snippet.id()).find(".dataTables_wrapper").offset().top < topCoord) {
-            var margin = (snippetEl.find(".dataTables_wrapper").offset().top - topCoord) * -1;
-            snippetEl.find('.result-settings').css('marginTop', margin);
-          }
+          window.clearTimeout(resultFollowTimeout);
+          resultFollowTimeout = window.setTimeout(function(){
+            var snippetEl = $('#snippet_' + snippet.id());
+            var topCoord = vm.isPlayerMode() ? 1 : 73;
+            snippetEl.find('.snippet-grid-settings').css({
+              "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
+            });
+            var margin = Math.max(((snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1), 0);
+            snippetEl.find('.result-settings').animate({
+              'marginTop': margin
+            });
+            snippetEl.find('.snippet-actions').animate({
+              'marginTop': margin + 25
+            });
+          }, 100);
         }
       }
       if (!vm.editorMode() || (vm.editorMode() && snippet.currentQueryTab() === 'queryResults')) {
@@ -3200,8 +3224,12 @@ ${ hueIcons.symbols() }
 
       $(document).on("toggleResultSettings", function (e, snippet) {
         window.setTimeout(function () {
-          $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
+          $('#snippet_' + snippet.id()).find('.chart').trigger("forceUpdate");
           redrawFixedHeaders();
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('update');
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+            scrollInertia: 0
+          });
         }, 10)
       });
 
@@ -3281,6 +3309,12 @@ ${ hueIcons.symbols() }
           _dtElement.animate({opacity: '1'}, 50);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
+        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true }, scrollInertia: 0});
+        window.setTimeout(function(){
+          $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+            scrollInertia: 0
+          });
+        }, 200)
       });
 
       $(document).on("renderDataError", function (e, options) {

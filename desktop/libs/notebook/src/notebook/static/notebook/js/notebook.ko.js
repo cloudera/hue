@@ -80,7 +80,7 @@
         if (typeof item.originalIndex === 'undefined') {
           item.originalIndex = i;
         }
-        return item.name.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1 || item.type.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1;
+        return item.name !== '' && (item.name.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1 || item.type.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1);
       });
     });
 
