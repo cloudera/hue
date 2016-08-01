@@ -914,8 +914,11 @@ var HiveViewModel = function (initial) {
   }, self);
 
   self.selectAllRoles = function () {
-    self.allRolesSelected(! self.allRolesSelected());
+    self.allRolesSelected(!self.allRolesSelected());
     ko.utils.arrayForEach(self.roles(), function (role) {
+      role.selected(false);
+    });
+    ko.utils.arrayForEach(self.filteredRoles(), function (role) {
       role.selected(self.allRolesSelected());
     });
     return true;
