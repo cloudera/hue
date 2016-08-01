@@ -76,6 +76,11 @@ class NavigatorApi(object):
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
     entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'OPERATION')
 
+    sources = filters.get('sources', [])
+
+    if 'hive' in sources or 'impala' in sources:
+      entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD')
+
     try:
       params = self.__params
 
