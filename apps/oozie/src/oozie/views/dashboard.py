@@ -344,7 +344,6 @@ def list_oozie_workflow(request, job_id):
       credentials = Credentials()
     except:
       LOG.exception("Error generating full page for running workflow %s" % job_id)
-    print workflow_data
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 

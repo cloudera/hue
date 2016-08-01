@@ -54,7 +54,7 @@ USE_LIBPATH_FOR_JARS = Config(
   key="use_libpath_for_jars",
   help=_t("Whether Hue append jar paths to the oozie.libpath instead of copying them into the workspace."
           " This makes submissions faster and less prone to HDFS permission errors"),
-  default=True,
+  default=False,
   type=coerce_bool)
 
 

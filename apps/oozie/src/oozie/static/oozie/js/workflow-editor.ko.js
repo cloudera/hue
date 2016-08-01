@@ -1273,7 +1273,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
   self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
-  self.draggableJavaDocumentAction = ko.observable(bareWidgetBuilder("Java", "java-document-widget"));  
+  self.draggableJavaDocumentAction = ko.observable(bareWidgetBuilder("Java", "java-document-widget"));
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 

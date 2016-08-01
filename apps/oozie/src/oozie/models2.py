@@ -218,6 +218,7 @@ class Workflow(Job):
 
   def __init__(self, data=None, document=None, workflow=None, user=None):
     self.document = document
+    self.user = user
 
     if document is not None:
       self.data = document.data
@@ -373,7 +374,7 @@ class Workflow(Job):
   @property
   def nodes(self):
     _data = self.get_data()
-    return [Node(node) for node in _data['workflow']['nodes']]
+    return [Node(node, self.user) for node in _data['workflow']['nodes']]
 
   def find_parameters(self):
     params = set()
@@ -431,11 +432,10 @@ class Workflow(Job):
     data = self.get_data()
     nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if
                                                                    node.name == 'End']  # End at the end
-    node_mapping = dict([(node.id, node) for node in nodes])
-
+    node_mapping = dict([(node.id, node) for node in nodes]) 
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict(
-      [(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
+      [(workflow.uuid, Workflow(document=workflow, user=self.user)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
 
     xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
       'wf': self,
@@ -723,8 +723,9 @@ def _create_graph_adjaceny_list(nodes):
 
 
 class Node():
-  def __init__(self, data):
+  def __init__(self, data, user=None):
     self.data = data
+    self.user = user
 
     self._augment_data()
 
@@ -746,9 +747,8 @@ class Node():
                  % (len(links), len(self.data['children']), links, self.data['children']))
         self.data['children'] = links
 
-    if self.data['type'] == 'java-document':
-      #notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
-      notebook = Notebook(document=Document2.objects.get(uuid=self.data['properties']['uuid']))
+    if self.data['type'] == JavaDocumentAction.TYPE:
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
       properties = notebook.get_data()['snippets'][0]['properties']
 
       self.data['properties']['main_class'] = properties['class']
@@ -810,7 +810,7 @@ class Node():
     node_type = self.data['type']
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
-        
+
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
 
   def find_parameters(self):
@@ -835,6 +835,7 @@ def _upgrade_older_node(node):
 
   if node['type'] == 'spark-widget' and 'files' not in node['properties']:
     node['properties']['files'] = []
+
 
 class Action(object):
 
@@ -2989,8 +2990,7 @@ class WorkflowBuilder():
          "name":"doc-1",
          "type":"java-document-widget",
          "properties":{
-#               "files": files,
-              u'uuid': document.uuid,
+              u'uuid': document.uuid, # files, main_class, arguments comes from there
               "job_xml":[],
               "jar_path": "",
               "java_opts":[],
@@ -2998,8 +2998,6 @@ class WorkflowBuilder():
               "retry_interval":[],
               "job_properties":[],
               "capture_output": False,
-#               "main_class": java_class,
-#               "arguments": arguments,
               "prepares":[],
               "credentials": credentials,
               "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
@@ -3011,13 +3009,11 @@ class WorkflowBuilder():
           "actionParameters":[],
           "actionParametersFetched": False
     }
-    
-    
 
-  def get_workflow(self, node, name, doc_uuid, user, managed=False):    
-    parameters = [{u'name': u'oozie.use.system.libpath', u'value': True}]
-    parameters.append({u'name': u'oozie.libpath', u'value': '/tmp/smart_indexer_lib'})
 
+
+  def get_workflow(self, node, name, doc_uuid, user, managed=False):
+    parameters = []
 
     data = json.dumps({'workflow': {
       u'name': name,
@@ -3072,7 +3068,7 @@ class WorkflowBuilder():
           u'children': [],
           u'actionParameters': [],
           },
-            node 
+            node
           ],
       u'properties': {
           u'job_xml': u'',
