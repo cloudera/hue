@@ -1203,40 +1203,6 @@ from metadata.conf import has_navigator
           }
         });
 
-        self.performSearch = function () {
-          if (self.searchInput() === lastQuery) {
-            return;
-          }
-          if (self.searching()) {
-            window.setTimeout(function() {
-              self.performSearch();
-            }, 100);
-          }
-          lastQuery = self.searchInput();
-          self.searching(true);
-          $.post('/metadata/api/navigator/search_entities?query_s=' + self.searchInput() )
-              .done(function (data) {
-                console.log(data);
-                data.entities.forEach(function (entity) {
-                  if (entity.type === 'DATABASE') {
-                    entity.link = '/metastore/tables/' + entity.originalName;
-                  } else if (entity.type === 'TABLE') {
-                    entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
-                  } else if (entity.type === 'SOURCE') {
-                    entity.link = entity.sourceUrl;
-                  } else if (entity.type === 'OPERATION_EXECUTION') {
-                    entity.link = '/jobbrowser/jobs/' + entity.jobID;
-                  } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
-                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
-                  } else {
-                    entity.link = '#';
-                  }
-                });
-                self.searchResult(data.entities);
-                self.searching(false);
-              })
-        };
-
         self.onlySql = true; // params.onlySql; - Only show SQL until Hue 4
         self.loading = ko.observable(false);
 
@@ -1290,6 +1256,42 @@ from metadata.conf import has_navigator
         if (self.availablePanels.length == 1) {
           self.availablePanels[0].visible(true);
         }
+
+        self.performSearch = function () {
+          if (self.searchInput() === lastQuery) {
+            return;
+          }
+          if (self.searching()) {
+            window.setTimeout(function() {
+              self.performSearch();
+            }, 100);
+          }
+          lastQuery = self.searchInput();
+          self.searching(true);
+          $.post('/metadata/api/navigator/search_entities', {
+              query_s: self.searchInput(),
+              sources: ko.mapping.toJSON($.map(self.availablePanels[0].panelData.sources(), function(source) { return source.sourceType; })) // type empty for some reason, using name
+          })
+          .done(function (data) {
+            data.entities.forEach(function (entity) {
+              if (entity.type === 'DATABASE') {
+                entity.link = '/metastore/tables/' + entity.originalName;
+              } else if (entity.type === 'TABLE') {
+                entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
+              } else if (entity.type === 'SOURCE') {
+                entity.link = entity.sourceUrl;
+              } else if (entity.type === 'OPERATION_EXECUTION') {
+                entity.link = '/jobbrowser/jobs/' + entity.jobID;
+              } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
+                entity.link = '/filebrowser/#' + entity.fileSystemPath;
+              } else {
+                entity.link = '#';
+              }
+            });
+            self.searchResult(data.entities);
+            self.searching(false);
+          })
+        };
 
         self.visiblePanels = ko.pureComputed(function () {
           var result = $.grep(self.availablePanels, function (panel) {
