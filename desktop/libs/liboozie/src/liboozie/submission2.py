@@ -203,8 +203,8 @@ class Submission(object):
           from notebook.models import Notebook
           notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
           properties = notebook.get_data()['snippets'][0]['properties']
-    
-          if properties.get('app_jar'):          
+
+          if properties.get('app_jar'):
             LOG.debug("Adding to oozie.libpath %s" % properties['app_jar'])
             paths = [properties['app_jar']]
             if self.properties.get('oozie.libpath'):
