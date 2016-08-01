@@ -1452,7 +1452,7 @@
           var resized = false;
           if (ace().session.getLength() > editorHeight) {
             if (ace().session.getLength() < maxAutoLines) {
-              $target.height((ace().session.getLength() + 1) * 16);
+              $target.height(ace().session.getLength() * 16);
             }
             else {
               $target.height(maxAutoLines * 16); // height of maxAutoLines
@@ -1461,6 +1461,10 @@
           }
           else if (ace().session.getLength() > 8) {
             $target.height((ace().session.getLength()) * 16);
+            resized = true;
+          }
+          else {
+            $target.height(8 * 16);
             resized = true;
           }
           if (resized) {
@@ -3225,6 +3229,7 @@
             editor.scrollToLine(range.start.row, true, true, function () {});
           }
         }
+        editor._emit('change')
       }
     }
   };
