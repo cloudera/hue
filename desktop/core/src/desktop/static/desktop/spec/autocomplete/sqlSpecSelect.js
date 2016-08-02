@@ -381,9 +381,9 @@ define([
             suggestKeywords: ['*'],
             locations: [
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 20}, identifierChain: [{ name: 'a'}], table: 'testTableB'},
-              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25}, function: 'cos'},
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 24}, function: 'cos'},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 54}, identifierChain: [{ name: 'bla'}], table: 'testTableA'},
-              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 56, last_column: 59}, function: 'cos'},
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 56, last_column: 58}, function: 'cos'},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 68, last_column: 78}, table: 'testTableA'},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 84, last_column: 94}, table: 'testTableB'}
             ]
@@ -416,7 +416,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'function', location:{ first_line: 1, last_line: 1, first_column: 8, last_column: 13}, function: 'count'},
+              {type: 'function', location:{ first_line: 1, last_line: 1, first_column: 8, last_column: 12}, function: 'count'},
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 31}, table: 'testTable'}
             ]
           }
@@ -432,16 +432,16 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 21 }, function: 'round' },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 20 }, function: 'round' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 51, last_column: 64 }, identifierChain: [{ name: 'cat'}], database: 'tstDb1', table: 'b1' },
-              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 72, last_column: 75 }, function: 'sum' },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 72, last_column: 74 }, function: 'sum' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 76, last_column: 91 }, identifierChain: [{ name: 'price' }],database: 'tstDb1', table: 'b1' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 94, last_column: 102 }, identifierChain: [{ name: 'qua' }], table: 'tran' },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 121, last_column: 123 }, database: 'tstDb1', table: 'b1' },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 139, last_column: 143 }, table: 'tran' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 149, last_column: 158 }, identifierChain: [{ name: 'b_id'}], table: 'tran' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 161, last_column: 173 }, identifierChain: [{ name: 'id'}], database: 'tstDb1', table: 'b1' },
-              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 178, last_column: 182 }, function: 'year' },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 178, last_column: 181 }, function: 'year' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 183, last_column: 194 }, identifierChain: [{ name: 'tran_d' }], table: 'tran' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 234, last_column: 235 }, identifierChain: [{ name: 'cat' }], database: 'tstDb1', table: 'b1' }
             ]
@@ -558,7 +558,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'function', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16 }, function: 'cos'},
+              {type: 'function', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 15 }, function: 'cos'},
               {type: 'column', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 22 }, identifierChain: [{ name: 'a'}], database: 'db1', table: 'foo'},
               {type: 'column', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 33 }, identifierChain: [{ name: 'boo'}], table: 'bar'},
               {type: 'column', location: { first_line: 2, last_line: 2, first_column: 7, last_column: 12 }, identifierChain: [{ name: 'b'}], table: 'bar'},
@@ -2843,7 +2843,7 @@ define([
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }],
               locations: [
                 {type: 'table', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, table: 'testTable' },
-                {type: 'function', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 44 }, function: 'explode'},
+                {type: 'function', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 43 }, function: 'explode'},
                 {type: 'column', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 54 }, identifierChain: [{ name: 'testArray' }], table: 'testTable'}
               ]
             }
@@ -2993,9 +2993,9 @@ define([
               locations: [
                 { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], table: 'testTable2'},
                 { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, table: 'testTable2'},
-                { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 23 }, function: 'explode'},
+                { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 22 }, function: 'explode'},
                 { type: 'column', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayA'}], table: 'testTable2'},
-                { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 23 }, function: 'explode'},
+                { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 22 }, function: 'explode'},
                 { type: 'column', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testArrayB'}] ,table: 'testTable2'}
               ]
             }

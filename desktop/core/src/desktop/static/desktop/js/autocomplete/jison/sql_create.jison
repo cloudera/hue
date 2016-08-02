@@ -280,18 +280,12 @@ TableDefinitionRightPart_EDIT
    }
  ;
 
-// Hack as no space is required between table name and '(' which would be read as UDF(
-// can be dropped if switched to LR(*)
 TableIdentifierAndOptionalColumnSpecification
  : SchemaQualifiedTableIdentifier OptionalColumnSpecificationsOrLike  -> $2
- | 'UDF(' DropLastLocation ColumnSpecificationList ')'
- | RegularOrBacktickedIdentifier AnyDot 'UDF(' DropLastLocation ColumnSpecificationList ')'
  ;
 
 TableIdentifierAndOptionalColumnSpecification_EDIT
  : SchemaQualifiedTableIdentifier OptionalColumnSpecificationsOrLike_EDIT
- | 'UDF(' DropLastLocation ColumnSpecificationList_EDIT RightParenthesisOrError
- | RegularOrBacktickedIdentifier AnyDot 'UDF(' DropLastLocation ColumnSpecificationList_EDIT RightParenthesisOrError
  ;
 
 DropLastLocation
