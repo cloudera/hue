@@ -2346,25 +2346,27 @@ ${ hueIcons.symbols() }
     var resultFollowTimeout = -1;
     scrollElement.on('scroll', function () {
       if (vm.editorMode()) {
-        if (snippet.isResultSettingsVisible()) {
+        var snippetEl = $('#snippet_' + snippet.id());
+        if (snippetEl.find('.dataTables_wrapper').length > 0 && snippet.showGrid()) {
           window.clearTimeout(resultFollowTimeout);
-          resultFollowTimeout = window.setTimeout(function(){
-            var snippetEl = $('#snippet_' + snippet.id());
+          resultFollowTimeout = window.setTimeout(function () {
             var topCoord = vm.isPlayerMode() ? 1 : 73;
-            snippetEl.find('.snippet-grid-settings').css({
-              "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
-            });
             var margin = Math.max(((snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1), 0);
-            snippetEl.find('.result-settings').animate({
-              'marginTop': margin
-            });
+            if (snippet.isResultSettingsVisible()) {
+              snippetEl.find('.snippet-grid-settings').css({
+                "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
+              });
+              snippetEl.find('.result-settings').animate({
+                'marginTop': margin
+              });
+            }
             snippetEl.find('.snippet-actions').animate({
               'marginTop': margin + 25
             });
           }, 100);
         }
       }
-      if (!vm.editorMode() || (vm.editorMode() && snippet.currentQueryTab() === 'queryResults')) {
+      if (!vm.editorMode() || (vm.editorMode() && snippet.currentQueryTab() === 'queryResults' && snippet.showGrid())) {
         var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
         window.clearTimeout(_scrollTimeout);
         scrollElement.data("scrollPosition", scrollElement.scrollTop());
@@ -3278,7 +3280,12 @@ ${ hueIcons.symbols() }
           "height": (_dtElement.height() - 30) + "px",
           "line-height": (_dtElement.height() - 30) + "px"
         });
-
+        $('#snippet_' + snippet.id()).find('.result-settings').animate({
+          'marginTop': 0
+        });
+        $('#snippet_' + snippet.id()).find('.snippet-actions').animate({
+          'marginTop': 0
+        });
       }
 
       $(document).on("renderData", function (e, options) {
@@ -3379,6 +3386,12 @@ ${ hueIcons.symbols() }
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet);
           forceChartDraws();
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true }, scrollInertia: 0});
+          window.setTimeout(function(){
+            $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+              scrollInertia: 0
+            });
+          }, 200)
         }, 50);
       });
 
