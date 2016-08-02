@@ -52,12 +52,13 @@ def escape_rows(rows, nulls_only=False):
 
 
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
-                  files=None, functions=None, settings=None, is_saved=False, database='default'):
+                  files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None):
 
   from notebook.connectors.hiveserver2 import HS2Api
 
   editor = Notebook()
-  extra_snippet_properties = {}
+  if snippet_properties is None:
+    snippet_properties = {}
 
   if editor_type == 'hive':
     sessions_properties = HS2Api.get_properties(editor_type)
@@ -75,29 +76,6 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
       _update_property_value(sessions_properties, 'files', files)
   elif editor_type == 'java':
     sessions_properties = [] # Java options
-    extra_snippet_properties =  {
-      u'files': [
-          {u'path': u'/user/romain/tmp/log4j.properties', u'type': u'file'},
-          {u'path': u'/user/hue/oozie/workspaces/hue-oozie-1469837046.14/morphline.conf', u'type': u'file'}
-      ],
-      u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
-      u'app_jar': u'/tmp/smart_indexer_lib',
-      u'arguments': [
-          u'--morphline-file',
-          u'morphline.conf',
-          u'--output-dir',
-          u'${nameNode}/tmp/editor',
-          u'--log4j',
-          u'log4j.properties',
-          u'--go-live',
-          u'--zk-host',
-          u'localhost:2181/solr',
-          u'--collection',
-          u'earthquakes',
-          u'${nameNode}/user/romain/2.5_month.csv',
-      ],
-      u'archives': [],
-    }
 
   data = {
     'name': name,
@@ -133,11 +111,11 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     ]
   }
 
-  if extra_snippet_properties:
-    data['snippets'][0]['properties'].update(extra_snippet_properties)
+  if snippet_properties:
+    data['snippets'][0]['properties'].update(snippet_properties)
 
   editor.data = json.dumps(data)
-  
+
   return editor
 
 

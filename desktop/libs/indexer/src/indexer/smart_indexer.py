@@ -13,87 +13,90 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
-import os
-import logging
 
+import logging
+import os
+
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 from mako.template import Template
 
-from liboozie.oozie_api import get_oozie
-from oozie.models2 import Job
-from liboozie.submission2 import Submission
+from collections import deque
+from notebook.api import _save_notebook
+from notebook.models import make_notebook
+from oozie.views.editor2 import _submit_workflow
+from oozie.models2 import Job, WorkflowBuilder, Workflow
 
-from indexer.fields import Field, FIELD_TYPES, get_field_type
+from indexer.fields import get_field_type
 from indexer.operations import get_checked_args
 from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.conf import zkensemble
 
-from collections import deque
 
 LOG = logging.getLogger(__name__)
 
-class Indexer(object):
-  def __init__(self, username, fs):
-    self.fs = fs
-    self.username = username
 
-  # TODO: This oozie job code shouldn't be in the indexer. What's a better spot for it?
+class Indexer(object):
+
+  def __init__(self, username, fs=None, jt=None):
+    self.fs = fs
+    self.jt = jt
+    self.username = username
+    self.user = User.objects.get(username=username)
+
   def _upload_workspace(self, morphline):
     hdfs_workspace_path = Job.get_workspace(self.username)
     hdfs_morphline_path = os.path.join(hdfs_workspace_path, "morphline.conf")
-    hdfs_workflow_path = os.path.join(hdfs_workspace_path, "workflow.xml")
     hdfs_log4j_properties_path = os.path.join(hdfs_workspace_path, "log4j.properties")
 
-    workflow_template_path = os.path.join(CONFIG_INDEXING_TEMPLATES_PATH.get(), "workflow.xml")
     log4j_template_path = os.path.join(CONFIG_INDEXING_TEMPLATES_PATH.get(), "log4j.properties")
 
-    # create workspace on hdfs
+    # Create workspace on hdfs
     self.fs.do_as_user(self.username, self.fs.mkdir, hdfs_workspace_path)
 
     self.fs.do_as_user(self.username, self.fs.create, hdfs_morphline_path, data=morphline)
-    self.fs.do_as_user(self.username, self.fs.create, hdfs_workflow_path, data=open(workflow_template_path).read())
     self.fs.do_as_user(self.username, self.fs.create, hdfs_log4j_properties_path, data=open(log4j_template_path).read())
 
     return hdfs_workspace_path
 
-  def _schedule_oozie_job(self, workspace_path, collection_name, input_path):
-    oozie = get_oozie(self.username)
-
-    properties = {
-      "dryrun": "False",
-      "zkHost":  zkensemble(),
-      # these libs can be installed from here:
-      # https://drive.google.com/a/cloudera.com/folderview?id=0B1gZoK8Ae1xXc0sxSkpENWJ3WUU&usp=sharing
-      "oozie.libpath": CONFIG_INDEXER_LIBS_PATH.get(),
-      "security_enabled": "False",
-      "collectionName": collection_name,
-      "filePath": input_path,
-      "outputDir": "/user/%s/indexer" % self.username,
-      "workspacePath": workspace_path,
-      'oozie.wf.application.path': "${nameNode}%s" % workspace_path,
-      'user.name': self.username
-    }
-
-    submission = Submission(self.username, fs=self.fs, properties=properties)
-    job_id = submission.run(workspace_path)
-
-    return job_id
-
   def run_morphline(self, collection_name, morphline, input_path):
     workspace_path = self._upload_workspace(morphline)
 
-    notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')
+    snippet_properties =  {
+      u'files': [
+          {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
+          {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
+      ],
+      u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
+      u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
+      u'arguments': [
+          u'--morphline-file',
+          u'morphline.conf',
+          u'--output-dir',
+          u'${nameNode}/user/%s/indexer' % self.username,
+          u'--log4j',
+          u'log4j.properties',
+          u'--go-live',
+          u'--zk-host',
+          zkensemble(),
+          u'--collection',
+          collection_name,
+          u'${nameNode}%s' % input_path,
+      ],
+      u'archives': [],
+    }
 
-    # Create a managed workflow from the notebook doc
+    notebook = make_notebook(name='Indexer', editor_type='java', snippet_properties=snippet_properties).get_data()
+    notebook_doc, created = _save_notebook(notebook, self.user)
+
     workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name)
     workflow = Workflow(document=workflow_doc, user=self.user)
 
-    # Submit workflow
     job_id = _submit_workflow(user=self.user, fs=self.fs, jt=self.jt, workflow=workflow, mapping=None)
 
-    job_id = self._schedule_oozie_job(workspace_path, collection_name, input_path)
     return job_id
 
   def guess_format(self, data):
