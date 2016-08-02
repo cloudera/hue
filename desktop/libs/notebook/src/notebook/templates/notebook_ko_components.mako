@@ -412,13 +412,30 @@ except ImportError, e:
 
     <div id="downloadProgressModal" class="modal hide fade">
       <div class="modal-header">
-        <h3>${_('Your download is being prepared...')}</h3>
+        <!-- ko if: isDownloading -->
+        <h3>${_('Your download is being prepared')}</h3>
+        <!-- /ko -->
+        <!-- ko if: downloadTruncated -->
+        <h3>${_('Your downloaded results have been truncated')}</h3>
+        <!-- /ko -->
       </div>
       <div class="modal-body" style="padding: 4px">
+        <!-- ko if: isDownloading -->
         ${ _('Please wait, it might take a while...') } <i class="fa fa-spinner fa-spin"></i>
+        <!-- /ko -->
+        <!-- ko if: downloadTruncated -->
+        ${ _('The number of resulting rows was too big to be downloaded and the resulting file has been truncated to') }
+        <strong data-bind="text: downloadCounter"></strong>
+        ${ _('rows.') }
+        <!-- /ko -->
       </div>
       <div class="modal-footer">
+        <!-- ko if: isDownloading -->
         <button data-bind="click: cancelDownload" class="btn btn-danger disable-feedback">${_('Cancel Download')}</button>
+        <!-- /ko -->
+        <!-- ko if: downloadTruncated -->
+        <button class="btn disable-feedback" data-dismiss="modal">${_('Close')}</button>
+        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -442,6 +459,8 @@ except ImportError, e:
         self.saveOverwrite = ko.observable(true);
 
         self.isDownloading = ko.observable(false);
+        self.downloadTruncated = ko.observable(false);
+        self.downloadCounter = ko.observable(0);
 
         self.trySaveResults = function() {
           self.saveResults();
@@ -492,19 +511,36 @@ except ImportError, e:
         self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
 
         self.isDownloading(true);
+        self.downloadTruncated(false);
+        self.downloadCounter(0);
 
         var timesChecked = 0;
         var checkDownloadInterval = -1;
-        checkDownloadInterval = window.setInterval(function(){
-          if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined'){
-            if (timesChecked == 10){
+        checkDownloadInterval = window.setInterval(function () {
+          if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined') {
+            if (timesChecked == 10) {
               $('#downloadProgressModal').modal('show');
             }
           }
           else {
             window.clearInterval(checkDownloadInterval);
-            self.isDownloading(false);
-            $('#downloadProgressModal').modal('hide');
+            try {
+              var cookieContent = $.cookie('download-' + self.snippet.id());
+              var result = JSON.parse(cookieContent.substr(1, cookieContent.length - 2).replace(/\\"/g, '"').replace(/\\054/g, ','));
+              self.downloadTruncated(result.truncated);
+              self.downloadCounter(result.row_counter);
+              self.isDownloading(false);
+              if (self.downloadTruncated()) {
+                $('#downloadProgressModal').modal('show');
+              }
+              else {
+                $('#downloadProgressModal').modal('hide');
+              }
+            }
+            catch (e) {
+              self.isDownloading(false);
+              $('#downloadProgressModal').modal('hide');
+            }
           }
           timesChecked++;
         }, 500);
