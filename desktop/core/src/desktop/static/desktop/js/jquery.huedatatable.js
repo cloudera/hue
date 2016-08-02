@@ -103,9 +103,8 @@
               if (i >= startRow && i <= endRow) {
                 var row = data[i];
                 if (row) {
-
                   for (var j = 0; j < endCol; j++) {
-                    html += '<td>' + row[j] + '</td>';
+                    html += '<td ' + (!aoColumns[j].bVisible ? 'style="display: none"' : '') +'>' + row[j] + '</td>';
                   }
 
                   if (endCol < aoColumns.length) {
