@@ -2386,16 +2386,26 @@ ${ hueIcons.symbols() }
   }
 
   function toggleAllColumns(linkElement, snippet) {
-    var dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").hueDataTable();
-    $(linkElement).parents(".snippet").find('.filtered-meta li input').each(function (idx, item) {
-      dt.fnSetColumnVis(idx, linkElement.checked, false);
+    var $t = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
+    var dt = $t.hueDataTable();
+    $(linkElement).parents(".snippet").find('.filtered-meta td input').each(function (idx, item) {
+      dt.fnSetColumnVis(idx + 1, linkElement.checked, false);
     });
     dt.fnDraw();
+    if ($t.data('plugin_jHueTableExtender')) {
+      $t.data('plugin_jHueTableExtender').drawHeader();
+      $t.data('plugin_jHueTableExtender').drawLockedRows();
+    }
   }
 
   function toggleColumn(linkElement, index, snippet) {
-    var dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").hueDataTable();
+    var $t = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
+    var dt = $t.hueDataTable();
     dt.fnSetColumnVis(index, linkElement.checked);
+    if ($t.data('plugin_jHueTableExtender')) {
+      $t.data('plugin_jHueTableExtender').drawHeader();
+      $t.data('plugin_jHueTableExtender').drawLockedRows();
+    }
   }
 
   function scrollToColumn(linkElement, index) {
