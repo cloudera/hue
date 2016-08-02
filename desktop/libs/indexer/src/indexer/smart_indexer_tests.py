@@ -13,12 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.from nose.tools import assert_equal
+
 import StringIO
 import logging
 
 from nose.tools import assert_equal, assert_true
 from nose.plugins.skip import SkipTest
 
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
 
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
@@ -43,19 +46,20 @@ def _test_fixed_type_format_generate_morphline(format_):
   assert_true(isinstance(morphline, basestring))
 
 def _test_generate_field_operation_morphline(operation_format):
-  fields = IndexerTest.simpleCSVFields[:]
+  fields = TestIndexer.simpleCSVFields[:]
   fields[0]['operations'].append(operation_format)
 
   indexer = Indexer("test")
   morphline =indexer.generate_morphline_config("test_collection", {
       "columns": fields,
-      "format": IndexerTest.simpleCSVFormat
+      "format": TestIndexer.simpleCSVFormat
     })
 
   assert_true(isinstance(morphline, basestring))
 
 
-class IndexerTest():
+class TestIndexer():
+
   simpleCSVString = """id,Rating,Location,Name,Time
 1,5,San Francisco,Good Restaurant,8:30pm
 2,4,San Mateo,Cafe,11:30am
@@ -106,8 +110,13 @@ class IndexerTest():
     'quoteChar': '"'
   }
 
+  def setUp(self):
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "indexer")
+    add_to_group("test")
+
   def test_guess_csv_format(self):
-    stream = StringIO.StringIO(IndexerTest.simpleCSVString)
+    stream = StringIO.StringIO(TestIndexer.simpleCSVString)
     indexer = Indexer("test")
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -127,7 +136,7 @@ class IndexerTest():
 
   def test_guess_format_invalid_csv_format(self):
     indexer = Indexer("test")
-    stream = StringIO.StringIO(IndexerTest.simpleCSVString)
+    stream = StringIO.StringIO(TestIndexer.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -243,7 +252,7 @@ class IndexerTest():
     input_loc = "/tmp/test.csv"
 
     # upload the test file to hdfs
-    fs.create(input_loc, data=IndexerTest.simpleCSVString, overwrite=True)
+    fs.create(input_loc, data=TestIndexer.simpleCSVString, overwrite=True)
 
     # open a filestream for the file on hdfs
     stream = fs.open(input_loc)

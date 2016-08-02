@@ -320,7 +320,7 @@ def _save_notebook(notebook, user):
   notebook_doc.description = notebook_doc1.description = notebook['description']
   notebook_doc.save()
   notebook_doc1.save()
-  
+
   return notebook_doc, save_as
 
 @require_POST
