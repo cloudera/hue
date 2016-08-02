@@ -38,6 +38,41 @@
       }
     }
 
+    self.fnSortColumn = function (obj, way) {
+      var $t = self.$table;
+      var data = self.$table.data('data');
+
+      var idx = obj.originalIndex;
+      if (way === 0){
+        idx = 0;
+      }
+
+      if (way === -1 || way === 0){
+        data.sort(function (a, b) {
+          if (a[idx] > b[idx]) {
+            return 1;
+          }
+          if (a[idx] < b[idx]) {
+            return -1;
+          }
+          return 0;
+        });
+      }
+      else {
+        data.sort(function (a, b) {
+          if (a[idx] > b[idx]) {
+            return -1;
+          }
+          if (a[idx] < b[idx]) {
+            return 1;
+          }
+          return 0;
+        });
+      }
+
+      self.fnDraw(true);
+    }
+
     self.isDrawing = false;
 
     self.fnDraw = function (force) {
@@ -133,6 +168,10 @@
               $t.data('plugin_jHueTableExtender').drawLockedRows();
             }
 
+            if (force) {
+              $t.data('plugin_jHueTableExtender').drawFirstColumn();
+            }
+
           }
           $t.data('fnDraws', $t.data('fnDraws') + 1);
           if ($t.data('oInit')['fnDrawCallback']) {
@@ -205,6 +244,23 @@
       self.$table.data('aoColumns', []);
       self.$table.data('fnDraws', 0);
       self.$table.wrap('<div class="dataTables_wrapper"></div>');
+
+      self.$table.bind('sort', function (e, obj) {
+        self.$table.find('thead tr th:not(:eq(' + obj.originalIndex + '))').removeClass('sorting_desc').removeClass('sorting_asc');
+        var $cell = self.$table.find('thead tr th:eq(' + obj.originalIndex + ')');
+        if ($cell.hasClass('sorting_desc')) {
+          $cell.removeClass('sorting_desc');
+          self.fnSortColumn(obj, 0);
+        }
+        else if ($cell.hasClass('sorting_asc')) {
+          $cell.removeClass('sorting_asc').addClass('sorting_desc');
+          self.fnSortColumn(obj, 1);
+        }
+        else {
+          $cell.addClass('sorting_asc');
+          self.fnSortColumn(obj, -1);
+        }
+      });
 
       if (typeof oInit !== 'undefined') {
         self.$table.data('oInit', oInit);
