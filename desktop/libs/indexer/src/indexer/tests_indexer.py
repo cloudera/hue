@@ -19,19 +19,20 @@ import logging
 from nose.tools import assert_equal, assert_true
 from nose.plugins.skip import SkipTest
 
-from hadoop import cluster
-from hadoop.pseudo_hdfs4 import is_live_cluster
+from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
 
-from indexer.smart_indexer import Indexer
+from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
+from indexer.fields import Field
 from indexer.controller import CollectionManagerController
 from indexer.operations import get_operator
-from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
-from indexer.fields import Field, get_field_type
+from indexer.smart_indexer import Indexer
+
 
 LOG = logging.getLogger(__name__)
 
+
 def _test_fixed_type_format_generate_morphline(format_):
-  indexer = Indexer("test", None)
+  indexer = Indexer("test")
   format_instance = format_()
 
   morphline = indexer.generate_morphline_config("test_collection", {
@@ -45,13 +46,14 @@ def _test_generate_field_operation_morphline(operation_format):
   fields = IndexerTest.simpleCSVFields[:]
   fields[0]['operations'].append(operation_format)
 
-  indexer = Indexer("test", None)
+  indexer = Indexer("test")
   morphline =indexer.generate_morphline_config("test_collection", {
       "columns": fields,
       "format": IndexerTest.simpleCSVFormat
     })
 
   assert_true(isinstance(morphline, basestring))
+
 
 class IndexerTest():
   simpleCSVString = """id,Rating,Location,Name,Time
@@ -106,7 +108,7 @@ class IndexerTest():
 
   def test_guess_csv_format(self):
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
-    indexer = Indexer("test", None)
+    indexer = Indexer("test")
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -124,7 +126,7 @@ class IndexerTest():
         assert_equal(expected[key], actual[key])
 
   def test_guess_format_invalid_csv_format(self):
-    indexer = Indexer("test", None)
+    indexer = Indexer("test")
     stream = StringIO.StringIO(IndexerTest.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -151,7 +153,7 @@ class IndexerTest():
     assert_equal(fields, [])
 
   def test_generate_csv_morphline(self):
-    indexer = Indexer("test", None)
+    indexer = Indexer("test")
     morphline =indexer.generate_morphline_config("test_collection", {
         "columns": self.simpleCSVFields,
         "format": self.simpleCSVFormat
@@ -234,9 +236,10 @@ class IndexerTest():
     if not is_live_cluster():
       raise SkipTest()
 
-    fs = cluster.get_hdfs()
+    cluster = shared_cluster()
+    fs = cluster.fs
     collection_name = "test_collection"
-    indexer = Indexer("test", fs)
+    indexer = Indexer("test", fs=fs, jt=cluster.jt)
     input_loc = "/tmp/test.csv"
 
     # upload the test file to hdfs
