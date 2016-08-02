@@ -57,29 +57,56 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
   from notebook.connectors.hiveserver2 import HS2Api
 
   editor = Notebook()
-
-  properties = HS2Api.get_properties(editor_type)
+  extra_snippet_properties = {}
 
   if editor_type == 'hive':
+    sessions_properties = HS2Api.get_properties(editor_type)
     if files is not None:
-      _update_property_value(properties, 'files', files)
+      _update_property_value(sessions_properties, 'files', files)
 
     if functions is not None:
-      _update_property_value(properties, 'functions', functions)
+      _update_property_value(sessions_properties, 'functions', functions)
 
     if settings is not None:
-      _update_property_value(properties, 'settings', settings)
+      _update_property_value(sessions_properties, 'settings', settings)
   elif editor_type == 'impala':
+    sessions_properties = HS2Api.get_properties(editor_type)
     if settings is not None:
-      _update_property_value(properties, 'files', files)
+      _update_property_value(sessions_properties, 'files', files)
+  elif editor_type == 'java':
+    sessions_properties = [] # Java options
+    extra_snippet_properties =  {
+      u'files': [
+          {u'path': u'/user/romain/tmp/log4j.properties', u'type': u'file'},
+          {u'path': u'/user/hue/oozie/workspaces/hue-oozie-1469837046.14/morphline.conf', u'type': u'file'}
+      ],
+      u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
+      u'app_jar': u'/tmp/smart_indexer_lib',
+      u'arguments': [
+          u'--morphline-file',
+          u'morphline.conf',
+          u'--output-dir',
+          u'${nameNode}/tmp/editor',
+          u'--log4j',
+          u'log4j.properties',
+          u'--go-live',
+          u'--zk-host',
+          u'localhost:2181/solr',
+          u'--collection',
+          u'earthquakes',
+          u'${nameNode}/user/romain/2.5_month.csv',
+      ],
+      u'archives': [],
+    }
 
-  editor.data = json.dumps({
+  data = {
     'name': name,
+    'uuid': str(uuid.uuid4()),
     'description': description,
     'sessions': [
       {
          'type': editor_type,
-         'properties': properties,
+         'properties': sessions_properties,
          'id': None
       }
     ],
@@ -104,7 +131,12 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          'result': {}
       }
     ]
-  })
+  }
+
+  if extra_snippet_properties:
+    data['snippets'][0]['properties'].update(extra_snippet_properties)
+
+  editor.data = json.dumps(data)
   
   return editor
 

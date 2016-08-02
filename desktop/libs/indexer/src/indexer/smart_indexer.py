@@ -84,6 +84,15 @@ class Indexer(object):
   def run_morphline(self, collection_name, morphline, input_path):
     workspace_path = self._upload_workspace(morphline)
 
+    notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')
+
+    # Create a managed workflow from the notebook doc
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name)
+    workflow = Workflow(document=workflow_doc, user=self.user)
+
+    # Submit workflow
+    job_id = _submit_workflow(user=self.user, fs=self.fs, jt=self.jt, workflow=workflow, mapping=None)
+
     job_id = self._schedule_oozie_job(workspace_path, collection_name, input_path)
     return job_id
 

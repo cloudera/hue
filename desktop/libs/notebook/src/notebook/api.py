@@ -281,29 +281,23 @@ def get_logs(request):
 
   return JsonResponse(response)
 
-
-@require_POST
-@check_document_modify_permission()
-def save_notebook(request):
-  response = {'status': -1}
-
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+def _save_notebook(notebook, user):
   notebook_type = notebook.get('type', 'notebook')
   save_as = True
 
   if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
-    notebook_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['parentSavedQueryUuid'])
+    notebook_doc = Document2.objects.get_by_uuid(user=user, uuid=notebook['parentSavedQueryUuid'])
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
-    notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=request.user)
+    notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
     save_as = False
 
     if notebook.get('directoryUuid'):
-      notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=request.user, uuid=notebook.get('directoryUuid'), perm_type='write')
+      notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=user, uuid=notebook.get('directoryUuid'), perm_type='write')
     else:
-      notebook_doc.parent_directory = Document2.objects.get_home_directory(request.user)
+      notebook_doc.parent_directory = Document2.objects.get_home_directory(user)
 
   notebook['isSaved'] = True
   notebook['isHistory'] = False
@@ -326,6 +320,17 @@ def save_notebook(request):
   notebook_doc.description = notebook_doc1.description = notebook['description']
   notebook_doc.save()
   notebook_doc1.save()
+  
+  return notebook_doc, save_as
+
+@require_POST
+@check_document_modify_permission()
+def save_notebook(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+
+  notebook_doc, save_as = _save_notebook(notebook, request.user)
 
   response['status'] = 0
   response['save_as'] = save_as
