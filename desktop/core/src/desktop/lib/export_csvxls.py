@@ -131,7 +131,7 @@ def make_response(generator, format, name, encoding=None):
 
   elif format == 'json':
     content_type = 'application/json'
-    resp = HttpResponse(next(generator), content_type=content_type)
+    resp = HttpResponse(generator, content_type=content_type)
   else:
     raise Exception("Unknown format: %s" % format)
 
