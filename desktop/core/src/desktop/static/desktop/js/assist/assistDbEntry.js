@@ -55,6 +55,8 @@
     self.editingSearch = ko.observable(false);
     self.sourceType = self.assistDbSource.sourceType;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
+    self.highlight = ko.observable(false);
+    self.highlightParent = ko.observable(false);
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -147,7 +149,40 @@
     self.assistDbSource.triggerRefresh();
   };
 
-  AssistDbEntry.prototype.loadEntries = function() {
+  AssistDbEntry.prototype.highlightInside = function (path) {
+    var self = this;
+
+    var searchEntry = function () {
+      var foundEntry;
+      $.each(self.entries(), function (idx, entry) {
+        if (entry.definition.name === path[0]) {
+          foundEntry = entry;
+          entry.open(true);
+          return false;
+        }
+      });
+      if (foundEntry) {
+        if (path.length > 1) {
+          foundEntry.highlightParent(true);
+          huePubSub.publish('assist.db.scrollToHighlight');
+          window.setTimeout(function () {
+            foundEntry.highlightInside(path.slice(1));
+          }, 0);
+        } else {
+          foundEntry.highlight(true);
+          huePubSub.publish('assist.db.scrollToHighlight');
+        }
+      }
+    };
+
+    if (self.entries().length == 0) {
+      self.loadEntries(searchEntry);
+    } else {
+      searchEntry();
+    }
+  };
+
+  AssistDbEntry.prototype.loadEntries = function(callback) {
     var self = this;
     if (!self.expandable || self.loading()) {
       return;
@@ -254,6 +289,9 @@
       });
 
       self.entries(newEntries);
+      if (typeof callback === 'function') {
+        callback();
+      }
     };
 
     var errorCallback = function () {
