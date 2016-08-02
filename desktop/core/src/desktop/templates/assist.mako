@@ -262,6 +262,18 @@ from metadata.conf import has_navigator
       display: table-row;
     }
 
+    .highlightable {
+      -webkit-transition: all .5s linear;
+      -moz-transition: all .5s linear;
+      -o-transition: all .5s linear;
+      transition: all .5s linear;
+    }
+
+    .highlight {
+      color: #338BB8 !important;
+      padding-left: 8px;
+    }
+
     .assist-details-header {
       display: table-cell;
       width: 95px;
@@ -426,7 +438,7 @@ from metadata.conf import has_navigator
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, apiHelper: assistDbSource.apiHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'table': tableName, 'database': databaseName} }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName"></span></a>
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'table': tableName, 'database': databaseName} }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span></a>
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
@@ -448,7 +460,7 @@ from metadata.conf import has_navigator
           <!-- ko if: definition.isView -->
             <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span data-bind="css: {'query-builder-menu': definition.isColumn}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
+          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: expandable -->
@@ -456,7 +468,7 @@ from metadata.conf import has_navigator
           <!-- ko if: definition.isView -->
           <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span data-bind="css: {'query-builder-menu': definition.isColumn}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
+          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
         </span>
         <!-- /ko -->
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
@@ -499,15 +511,18 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-db-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
-      <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-       <!-- ko with: selectedSource -->
-       <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-       <!-- ko with: selectedDatabase -->
-       <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
-       <!-- /ko -->
-       <!-- /ko -->
+        <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+        <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+        <!-- ko with: selectedSource -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+        <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
       </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
     </div>
   </script>
 
@@ -744,7 +759,7 @@ from metadata.conf import has_navigator
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
         <li class="assist-table" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data) }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span data-bind="text: definition.name"></span></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data) }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: definition.name, css: { 'highlight': highlight() }"></span></a>
         </li>
       </ul>
     </div>
@@ -809,7 +824,6 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <!-- ko if: (searchInput() === '' && !searchHasFocus()) || ! navigatorEnabled() -->
     <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, apiHelper: apiHelper, noFixedHeights: onlySql }">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
@@ -819,83 +833,82 @@ from metadata.conf import has_navigator
       <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       <!-- /ko -->
     </div>
-    <!-- /ko -->
-    <!-- ko if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled()-->
-    <div style="position:relative; height: 100%; overflow: hidden">
-      <div class="assist-flex-panel">
-        <div style="flex: 1"></div>
-        <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
-        <div class="assist-flex-fill" style="overflow-x: none; overflow-y: scroll; outline: none;">
-          <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
-          <!-- ko if: !searching() -->
-          <!-- ko foreach: searchResult -->
-          <div class="result-entry">
-            <div class="icon-col">
-              <!-- ko if: type === 'FILE' -->
-              <i class="fa fa-fw fa-file-o valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'DIRECTORY' -->
-              <i class="fa fa-fw fa-folder-o valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'TABLE' -->
-              <i class="fa fa-fw fa-table valign-middle"></i>
-              <!-- /ko -->              
-              <!-- ko if: type === 'DATABASE' -->
-              <i class="fa fa-fw fa-database valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'SOURCE' -->
-              <i class="fa fa-fw fa-server valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'SUB_OPERATION' -->
-              <i class="fa fa-fw fa-code-fork valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'FIELD' -->
-              <i class="fa fa-fw fa-columns valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'OPERATION_EXECUTION' -->
-              <i class="fa fa-fw fa-cog valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'OPERATION' -->
-              <i class="fa fa-fw fa-cogs valign-middle"></i>
-              <!-- /ko -->
-              <!-- ko if: type === 'PARTITION' -->
-              <i class="fa fa-fw fa-th valign-middle"></i>
-              <!-- /ko -->
-            </div>
-            <div class="doc-col">
-              <a data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
-              <!-- ko if: type === 'DATABASE' -->
-              <div class="doc-desc" data-bind="text: originalDescription"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'TABLE' -->
-              <div class="doc-desc" data-bind="text: originalDescription"></div>
-              <div class="doc-desc" data-bind="text: parentPath"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'FIELD' -->
-              <div class="doc-desc" data-bind="text: originalDescription"></div>
-              <div class="doc-desc" data-bind="text: parentPath"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'PARTITION' -->
-              <div class="doc-desc" data-bind="text: originalDescription"></div>
-              <div class="doc-desc" data-bind="text: parentPath"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'SUB_OPERATION' -->
-              <div class="doc-desc" data-bind="text: metaClassName"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'SOURCE' -->
-              <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
-              <!-- /ko -->
-              <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
-              <div class="doc-desc" data-bind="text: parentPath"></div>
-              <!-- /ko -->
-            </div>
-          </div>
+  </script>
+
+  <script type="text/html" id="nav-search-result">
+    <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;">
+      <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko if: !searching() -->
+      <!-- ko foreach: searchResult -->
+      <div class="result-entry">
+        <div class="icon-col">
+          <!-- ko if: type === 'FILE' -->
+          <i class="fa fa-fw fa-file-o valign-middle"></i>
           <!-- /ko -->
+          <!-- ko if: type === 'DIRECTORY' -->
+          <i class="fa fa-fw fa-folder-o valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'TABLE' -->
+          <i class="fa fa-fw fa-table valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'DATABASE' -->
+          <i class="fa fa-fw fa-database valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'SOURCE' -->
+          <i class="fa fa-fw fa-server valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'SUB_OPERATION' -->
+          <i class="fa fa-fw fa-code-fork valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'FIELD' -->
+          <i class="fa fa-fw fa-columns valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'OPERATION_EXECUTION' -->
+          <i class="fa fa-fw fa-cog valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'OPERATION' -->
+          <i class="fa fa-fw fa-cogs valign-middle"></i>
+          <!-- /ko -->
+          <!-- ko if: type === 'PARTITION' -->
+          <i class="fa fa-fw fa-th valign-middle"></i>
+          <!-- /ko -->
+        </div>
+        <div class="doc-col">
+          <!-- ko if: typeof click !== 'undefined' -->
+          <a class="pointer" data-bind="click: click, text: originalName" target="_blank" ></a>
+          <!-- /ko -->
+          <!-- ko if: typeof click === 'undefined' -->
+          <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+          <!-- /ko -->
+          <!-- ko if: type === 'DATABASE' -->
+          <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'TABLE' -->
+          <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <div class="doc-desc" data-bind="text: parentPath"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'FIELD' -->
+          <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <div class="doc-desc" data-bind="text: parentPath"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'PARTITION' -->
+          <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <div class="doc-desc" data-bind="text: parentPath"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'SUB_OPERATION' -->
+          <div class="doc-desc" data-bind="text: metaClassName"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'SOURCE' -->
+          <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
+          <!-- /ko -->
+          <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
+          <div class="doc-desc" data-bind="text: parentPath"></div>
           <!-- /ko -->
         </div>
       </div>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -988,7 +1001,6 @@ from metadata.conf import has_navigator
        * @param {Object} options.navigationSettings - enable/disable the links
        * @param {boolean} options.navigationSettings.openItem
        * @param {boolean} options.navigationSettings.showStats
-
        * @constructor
        **/
       function AssistDbPanel (options) {
@@ -1007,6 +1019,27 @@ from metadata.conf import has_navigator
             navigationSettings: options.navigationSettings
           });
           self.sources.push(sourceIndex[sourceType.type]);
+        });
+
+        huePubSub.subscribe('assist.db.highlight', function (location) {
+          var foundSource;
+          $.each(self.sources(), function (idx, source) {
+            if (source.sourceType === location.sourceType) {
+              foundSource = source;
+              return false;
+            }
+          });
+          if (foundSource) {
+            if (foundSource.hasEntries()) {
+              self.selectedSource(foundSource);
+              foundSource.highlightInside(location.path);
+            } else {
+              foundSource.initDatabases(function () {
+                self.selectedSource(foundSource);
+                foundSource.highlightInside(location.path);
+              });
+            }
+          }
         });
 
         self.selectedSource = ko.observable(null);
@@ -1052,7 +1085,7 @@ from metadata.conf import has_navigator
         huePubSub.publish("assist.db.panel.ready");
 
         self.selectedSource.subscribe(function (newSource) {
-          if (newSource) {
+          if (newSource && newSource.databases().length === 0) {
             newSource.initDatabases();
             self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
           } else {
@@ -1276,16 +1309,34 @@ from metadata.conf import has_navigator
           }
           lastQuery = self.searchInput();
           self.searching(true);
+
+          var showInAssist = function (entry) {
+            self.searchInput('');
+            self.searchHasFocus(false);
+            var path = entry.parentPath.split('/').concat([entry.originalName]).splice(1);
+            window.setTimeout(function () {
+              huePubSub.publish('assist.db.highlight', { sourceType: entry.sourceType.toLowerCase(), path: path });
+            }, 200); // For animation effect
+          };
+
           $.post('/metadata/api/navigator/search_entities', {
-              query_s: self.searchInput(),
-              sources: ko.mapping.toJSON($.map(self.availablePanels[0].panelData.sources(), function(source) { return source.sourceType; })) // type empty for some reason, using name
+            query_s: self.searchInput(),
+            sources: ko.mapping.toJSON($.map(self.availablePanels[0].panelData.sources(), function(source) { return source.sourceType; })) // type empty for some reason, using name
           })
           .done(function (data) {
             data.entities.forEach(function (entity) {
               if (entity.type === 'DATABASE') {
-                entity.link = '/metastore/tables/' + entity.originalName;
+                entity.click = function () {
+                  showInAssist(entity);
+                }
               } else if (entity.type === 'TABLE') {
-                entity.link = '/metastore/table' + entity.parentPath + '/' + entity.originalName;
+                entity.click = function () {
+                  showInAssist(entity);
+                }
+              } else if (entity.type === 'FIELD') {
+                entity.click = function () {
+                  showInAssist(entity);
+                }
               } else if (entity.type === 'SOURCE') {
                 entity.link = entity.sourceUrl;
               } else if (entity.type === 'OPERATION_EXECUTION') {
@@ -1300,6 +1351,7 @@ from metadata.conf import has_navigator
             self.searching(false);
           })
         };
+
 
         self.visiblePanels = ko.pureComputed(function () {
           var result = $.grep(self.availablePanels, function (panel) {

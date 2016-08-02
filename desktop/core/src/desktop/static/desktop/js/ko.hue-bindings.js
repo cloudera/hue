@@ -3435,7 +3435,7 @@
             return false;
           }
         });
-      }
+      };
 
       if ($parentFVOwnerElement.data('disposalFunction')) {
         $parentFVOwnerElement.data('disposalFunction')();
@@ -3476,6 +3476,40 @@
       if (endIndex > (allEntries.length - 1)) {
         endIndex = allEntries.length - 1;
       }
+
+      var huePubSubs = [];
+
+      var scrollToIndex = function (idx, offset) {
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        if (! lastKnownHeights) {
+          return;
+        }
+        var top = 0;
+        for (var i = 0; i < idx; i++) {
+          top += lastKnownHeights[i];
+        }
+        $container.scrollTop(top + offset);
+      };
+
+      huePubSubs.push(huePubSub.subscribe('assist.db.scrollToHighlight', function () {
+        var foundIndex;
+        $.each(allEntries, function (idx, entry) {
+          if ((typeof entry.highlight !== 'undefined' && entry.highlight() || (typeof entry.highlightParent !== 'undefined' && entry.highlightParent()))) {
+            foundIndex = idx;
+            window.setTimeout(function () {
+              entry.highlight(false);
+              entry.highlightParent(false);
+            }, 500); // 500 for animation effect
+            return false;
+          }
+        });
+        if (foundIndex) {
+          var offset = depth > 0 ? $container.scrollTop() : 0;
+          window.setTimeout(function () {
+            scrollToIndex(foundIndex, offset);
+          }, 0);
+        }
+      }));
 
       var childBindingContext = bindingContext.createChildContext(
           bindingContext.$rawData,
@@ -3573,14 +3607,14 @@
 
       var updateHeightsInterval = window.setInterval(updateLastKnownHeights, 600);
 
-      huePubSub.subscribe('foreach.visible.update.heights', function (targetId) {
+      huePubSubs.push(huePubSub.subscribe('foreach.visible.update.heights', function (targetId) {
         if (targetId === id) {
           clearInterval(updateHeightsInterval);
           updateLastKnownHeights();
           huePubSub.publish('foreach.visible.update.heights', parentId);
           updateHeightsInterval = window.setInterval(updateLastKnownHeights, 600);
         }
-      });
+      }));
 
       updateLastKnownHeights();
 
@@ -3689,7 +3723,7 @@
         if (startIndex > incrementLimit && Math.abs(lastScrollTop - $container.scrollTop()) < (incrementLimit * options.minHeight)) {
           return;
         }
-        lastScrollTop = $container.scrollTop();;
+        lastScrollTop = $container.scrollTop();
         setStartAndEndFromScrollTop();
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
@@ -3698,13 +3732,13 @@
         }
       };
 
-      huePubSub.subscribe('foreach.visible.update', function (callerId) {
+      huePubSubs.push(huePubSub.subscribe('foreach.visible.update', function (callerId) {
         if (callerId === id && endIndex > 0) {
           setStartAndEndFromScrollTop();
           clearTimeout(renderThrottle);
           renderThrottle = setTimeout(render, 0);
         }
-      });
+      }));
 
       $container.bind('scroll', onScroll);
 
@@ -3712,6 +3746,9 @@
         setTimeout(function () {
           huePubSub.publish('foreach.visible.update.heights', parentId);
         }, 0);
+        huePubSubs.forEach(function (pubSub) {
+          pubSub.remove();
+        });
         $container.unbind('scroll', onScroll);
         clearInterval(updateCountInterval);
         clearInterval(updateHeightsInterval);

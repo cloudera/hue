@@ -19,7 +19,7 @@ define([
   describe('sqlFunctions.js', function () {
     it('should suggest only BOOLEAN functions when return type is set to BOOLEAN for Hive', function () {
       var completions = [];
-      sqlFunctions.suggestFunctions('hive', ['BOOLEAN'], undefined, completions);
+      sqlFunctions.suggestFunctions('hive', ['BOOLEAN'], undefined, undefined, completions);
 
       expect(completions.length).not.toEqual(0);
 
@@ -32,7 +32,7 @@ define([
 
     it('should suggest only STRING functions when return type is set to STRING for Hive', function () {
       var completions = [];
-      sqlFunctions.suggestFunctions('hive', ['STRING'], undefined, completions);
+      sqlFunctions.suggestFunctions('hive', ['STRING'], undefined, undefined, completions);
 
       expect(completions.length).not.toEqual(0);
 
@@ -45,7 +45,7 @@ define([
 
     it('should suggest only NUMBER functions when return type is set to NUMBER for Hive', function () {
       var completions = [];
-      sqlFunctions.suggestFunctions('hive', ['NUMBER'], undefined, completions);
+      sqlFunctions.suggestFunctions('hive', ['NUMBER'], undefined, undefined, completions);
 
       expect(completions.length).not.toEqual(0);
 
@@ -64,7 +64,7 @@ define([
 
     it('should suggest only NUMBER functions when return type is set to NUMBER for Impala', function () {
       var completions = [];
-      sqlFunctions.suggestFunctions('impala', ['NUMBER'], undefined, completions);
+      sqlFunctions.suggestFunctions('impala', ['NUMBER'], undefined, undefined, completions);
 
       expect(completions.length).not.toEqual(0);
 
