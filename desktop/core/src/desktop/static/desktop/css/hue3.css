@@ -600,6 +600,14 @@ table.display td.center {
   *border-collapse: collapsed;
 }
 
+.sorting {
+  cursor: pointer;
+  background: url('../art/datatables/sort_both.png') no-repeat center right;
+  border-top: 3px solid #FFFFFF !important;
+  padding-right: 20px !important;
+  vertical-align: middle!important;
+}
+
 .sorting_asc {
   cursor: pointer;
   background: url('../art/datatables/sort_asc.png') no-repeat center right;
@@ -616,30 +624,13 @@ table.display td.center {
   vertical-align: middle!important;
 }
 
-.sorting {
-  cursor: pointer;
-  background: url('../art/datatables/sort_both.png') no-repeat center right;
-  border-top: 3px solid #FFFFFF !important;
-  padding-right: 20px !important;
-  vertical-align: middle!important;
-}
-
 .table-huedatatable {
   margin-bottom: 0!important;
-}
-
-.table-huedatatable th.sorting {
-  cursor: default;
-  background: none;
-  border-top: none;
-  padding-right: 4px!important;
-  padding-left: 4px!important;
 }
 
 .table-huedatatable td.stripe {
   background: url('../art/stripedbackground.png');
 }
-
 
 .sorting_disabled {
   vertical-align: middle!important;

@@ -497,7 +497,7 @@
     else {
       $pluginElement.find("thead>tr th").each(function (i) {
         var originalTh = $(this);
-        $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").find("thead>tr th:eq(" + i + ")").width(originalTh.width());
+        $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").find("thead>tr th:eq(" + i + ")").width(originalTh.width()).attr('class', originalTh.attr('class'));
       });
     }
   }
