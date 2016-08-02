@@ -76,6 +76,8 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
       _update_property_value(sessions_properties, 'files', files)
   elif editor_type == 'java':
     sessions_properties = [] # Java options
+  else:
+    sessions_properties = []
 
   data = {
     'name': name,

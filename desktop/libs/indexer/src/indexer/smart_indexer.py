@@ -45,7 +45,7 @@ class Indexer(object):
     self.fs = fs
     self.jt = jt
     self.username = username
-    self.user = User.objects.get(username=username)
+    self.user = User.objects.get(username=username) # To clean
 
   def _upload_workspace(self, morphline):
     hdfs_workspace_path = Job.get_workspace(self.username)

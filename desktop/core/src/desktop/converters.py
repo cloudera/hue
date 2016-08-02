@@ -68,7 +68,7 @@ class DocumentConverter(object):
             doc2.is_history = False
 
           self.imported_docs.append(doc2)
-    except ImportError, e:
+    except ImportError:
       LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
 
     # Convert SQL Query history documents
