@@ -76,14 +76,24 @@ class OozieApi(Api):
 
 
   def check_status(self, notebook, snippet):
-    response = {}
+    response = {'status': 'running'}
+
     job_id = snippet['result']['handle']['id']
     oozie_job = check_job_access_permission(self.request, job_id)
 
-    if oozie_job.status in ('KILLED', 'FAILED'):
+    if oozie_job.is_running():
+      return response
+    elif oozie_job.status in ('KILLED', 'FAILED'):
       raise QueryError(_('Job was %s') % oozie_job.status)
-
-    response['status'] = 'running' if oozie_job.is_running() else 'available'
+    else:
+      # Check if job results are actually available, since YARN takes a while to move logs to JHS,
+      log_output = self.get_log(notebook, snippet)
+      if log_output:
+        results = self._get_results(log_output, snippet['type'])
+        if results:
+          response['status'] = 'available'
+      else:
+        response['status'] = 'failed'
 
     return response
 
@@ -152,28 +162,26 @@ class OozieApi(Api):
 
   def _get_log_output(self, oozie_workflow):
     log_output = ''
-
     q = QueryDict(self.request.GET, mutable=True)
     q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
     self.request.GET = q
 
-    logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
+    attempts = 0
+    max_attempts = 10
+    logs_found = False
+    while not logs_found and attempts < max_attempts:
+      logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
                                                                  log_start_pattern=self.LOG_START_PATTERN,
                                                                  log_end_pattern=self.LOG_END_PATTERN)
-
-    if len(logs) > 0:
-      log_output = logs.values()[0]
-      if log_output.startswith('Unable to locate'):
-        LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
-        time.sleep(5.0)
-        logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
-                                                                   log_start_pattern=self.LOG_START_PATTERN,
-                                                                   log_end_pattern=self.LOG_END_PATTERN)
-        if len(logs) > 0:
-          log_output = logs.values()[0]
+      if len(logs) > 0:
+        log_output = logs.values()[0]
+        if log_output.startswith('Unable to locate'):
+          LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
+          time.sleep(2.0)
+        else:
+          logs_found = True
 
     return log_output
-
 
 
   def _get_results(self, log_output, action_type):
