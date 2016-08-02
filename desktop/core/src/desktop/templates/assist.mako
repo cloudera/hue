@@ -871,6 +871,14 @@ from metadata.conf import has_navigator
               <div class="doc-desc" data-bind="text: originalDescription"></div>
               <div class="doc-desc" data-bind="text: parentPath"></div>
               <!-- /ko -->
+              <!-- ko if: type === 'FIELD' -->
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
+              <!-- ko if: type === 'PARTITION' -->
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
+              <div class="doc-desc" data-bind="text: parentPath"></div>
+              <!-- /ko -->
               <!-- ko if: type === 'SUB_OPERATION' -->
               <div class="doc-desc" data-bind="text: metaClassName"></div>
               <!-- /ko -->
