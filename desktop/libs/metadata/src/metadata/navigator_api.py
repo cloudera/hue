@@ -64,9 +64,11 @@ def search_entities(request):
   response = {'status': -1}
 
   api = NavigatorApi()
-  query_s = request.GET.get('query_s')
-  offset = request.GET.get('offset', 0)
-  limit = request.GET.get('limit', 100)
+  
+  query_s = request.POST.get('query_s')
+  offset = request.POST.get('offset', 0)
+  limit = request.POST.get('limit', 100)
+  sources = json.loads(request.POST.get('sources')) or []
 
   query_s = query_s.strip()
 
