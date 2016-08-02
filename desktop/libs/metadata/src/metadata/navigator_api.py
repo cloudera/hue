@@ -71,7 +71,7 @@ def search_entities(request):
 
   query_s = query_s.strip()
 
-  entities = api.search_entities(query_s, sources=sources)
+  entities = api.search_entities(query_s, limit=limit, offset=offset, sources=sources)
 
   response = {
     'entities': entities,
