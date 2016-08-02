@@ -67,7 +67,7 @@ def search_entities(request):
   query_s = request.POST.get('query_s')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 100)
-  sources = json.loads(request.POST.get('sources'), [])
+  sources = json.loads(request.POST.get('sources')) or []
 
   query_s = query_s.strip()
 
