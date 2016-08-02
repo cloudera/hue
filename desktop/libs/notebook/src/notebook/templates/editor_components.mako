@@ -1639,13 +1639,14 @@ ${ hueIcons.symbols() }
           </th>
         </tr>
         <tr data-bind="visible: result.isMetaFilterVisible">
-          <td colspan="3"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="margin-bottom: 10px"/></td>
+          <td colspan="2"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" /></td>
+          <td>&nbsp;</td>
         </tr>
       </thead>
       <tbody class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
         <tr data-bind="visible: name != ''">
           <td><input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" /></td>
-          <td><a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: '${ _ko('Click to scroll to data') }'}"><span data-bind="text: $data.name"></span></a></td>
+          <td><a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: $data.name + ' - ' + $data.type}"><span data-bind="text: $data.name"></span></a></td>
           <td><span data-bind="text: $data.type" class="muted margin-left-20"></span></td>
         </tr>
       </tbody>
@@ -1698,12 +1699,12 @@ ${ hueIcons.symbols() }
 
       <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 260px;">
         <div>
-          <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;">
+          <div data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;">
             <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
             <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
             <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
           </div>
-          <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
+          <div data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
             <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
               <table class="table table-condensed table-striped resultTable">
                 <thead>
@@ -3326,7 +3327,7 @@ ${ hueIcons.symbols() }
           _dtElement.animate({opacity: '1'}, 50);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
-        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true }, scrollInertia: 0});
+        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 1 }, scrollInertia: 0});
         window.setTimeout(function(){
           $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
             scrollInertia: 0
@@ -3396,7 +3397,7 @@ ${ hueIcons.symbols() }
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet);
           forceChartDraws();
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true }, scrollInertia: 0});
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 1 }, scrollInertia: 0});
           window.setTimeout(function(){
             $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
               scrollInertia: 0
