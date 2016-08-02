@@ -179,14 +179,12 @@ var findCaseType = function (whenThenList) {
   return {types: ['T']};
 };
 
-findReturnTypes = function (funcToken) {
-  var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
-  return parser.yy.sqlFunctions.getReturnTypes(parser.yy.activeDialect, funcName);
+findReturnTypes = function (functionName) {
+  return parser.yy.sqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
 };
 
-var applyArgumentTypesToSuggestions = function (funcToken, position) {
-  var funcName = funcToken.substring(0, funcToken.length - 1).toLowerCase();
-  var foundArguments = parser.yy.sqlFunctions.getArgumentTypes(parser.yy.activeDialect, funcName, position);
+var applyArgumentTypesToSuggestions = function (functionName, position) {
+  var foundArguments = parser.yy.sqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
   if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
     delete parser.yy.result.suggestColumns;
     delete parser.yy.result.suggestKeyValues;

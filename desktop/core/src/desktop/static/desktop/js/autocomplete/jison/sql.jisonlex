@@ -252,45 +252,45 @@
 'ROLE'                                     { return 'ROLE'; }
 
 // --- UDFs ---
-'AVG('                                     { addFunctionLocation(yylloc, 'avg'); return 'AVG('; }
-'CAST('                                    { addFunctionLocation(yylloc, 'cast'); return 'CAST('; }
-'COUNT('                                   { addFunctionLocation(yylloc, 'count'); return 'COUNT('; }
-'MAX('                                     { addFunctionLocation(yylloc, 'max'); return 'MAX('; }
-'MIN('                                     { addFunctionLocation(yylloc, 'min'); return 'MIN('; }
-'STDDEV_POP('                              { addFunctionLocation(yylloc, 'stddev_pop'); return 'STDDEV_POP('; }
-'STDDEV_SAMP('                             { addFunctionLocation(yylloc, 'stddev_samp'); return 'STDDEV_SAMP('; }
-'SUM('                                     { addFunctionLocation(yylloc, 'sum'); return 'SUM('; }
-'VARIANCE('                                { addFunctionLocation(yylloc, 'variance'); return 'VARIANCE('; }
-'VAR_POP('                                 { addFunctionLocation(yylloc, 'var_pop'); return 'VAR_POP('; }
-'VAR_SAMP('                                { addFunctionLocation(yylloc, 'var_samp'); return 'VAR_SAMP('; }
-<hive>'COLLECT_SET('                       { addFunctionLocation(yylloc, 'collect_set'); return '<hive>COLLECT_SET('; }
-<hive>'COLLECT_LIST('                      { addFunctionLocation(yylloc, 'collect_list'); return '<hive>COLLECT_LIST('; }
-<hive>'CORR('                              { addFunctionLocation(yylloc, 'corr'); return '<hive>CORR('; }
-<hive>'COVAR_POP('                         { addFunctionLocation(yylloc, 'covar_pop'); return '<hive>COVAR_POP('; }
-<hive>'COVAR_SAMP('                        { addFunctionLocation(yylloc, 'covar_samp'); return '<hive>COVAR_SAMP('; }
-<hive>'HISTOGRAM_NUMERIC('                 { addFunctionLocation(yylloc, 'histogram_numeric'); return '<hive>HISTOGRAM_NUMERIC('; }
-<hive>'NTILE('                             { addFunctionLocation(yylloc, 'ntile'); return '<hive>NTILE('; }
-<hive>'PERCENTILE('                        { addFunctionLocation(yylloc, 'percentile'); return '<hive>PERCENTILE('; }
-<hive>'PERCENTILE_APPROX('                 { addFunctionLocation(yylloc, 'percentile_approx'); return '<hive>PERCENTILE_APPROX('; }
-<impala>'APPX_MEDIAN('                     { addFunctionLocation(yylloc, 'appx_median'); return '<impala>APPX_MEDIAN('; }
-<impala>'EXTRACT('                         { addFunctionLocation(yylloc, 'extract'); return '<impala>EXTRACT('; }
-<impala>'GROUP_CONCAT('                    { addFunctionLocation(yylloc, 'group_concat'); return '<impala>GROUP_CONCAT('; }
-<impala>'STDDEV('                          { addFunctionLocation(yylloc, 'stddev'); return '<impala>STDDEV('; }
-<impala>'VARIANCE_POP('                    { addFunctionLocation(yylloc, 'variance_pop'); return '<impala>VARIANCE_POP('; }
-<impala>'VARIANCE_SAMP('                   { addFunctionLocation(yylloc, 'variance_samp'); return '<impala>VARIANCE_SAMP('; }
+'AVG'                                     { addFunctionLocation(yylloc, 'avg'); return 'AVG'; }
+'CAST'                                    { addFunctionLocation(yylloc, 'cast'); return 'CAST'; }
+'COUNT'                                   { addFunctionLocation(yylloc, 'count'); return 'COUNT'; }
+'MAX'                                     { addFunctionLocation(yylloc, 'max'); return 'MAX'; }
+'MIN'                                     { addFunctionLocation(yylloc, 'min'); return 'MIN'; }
+'STDDEV_POP'                              { addFunctionLocation(yylloc, 'stddev_pop'); return 'STDDEV_POP'; }
+'STDDEV_SAMP'                             { addFunctionLocation(yylloc, 'stddev_samp'); return 'STDDEV_SAMP'; }
+'SUM'                                     { addFunctionLocation(yylloc, 'sum'); return 'SUM'; }
+'VARIANCE'                                { addFunctionLocation(yylloc, 'variance'); return 'VARIANCE'; }
+'VAR_POP'                                 { addFunctionLocation(yylloc, 'var_pop'); return 'VAR_POP'; }
+'VAR_SAMP'                                { addFunctionLocation(yylloc, 'var_samp'); return 'VAR_SAMP'; }
+<hive>'COLLECT_SET'                       { addFunctionLocation(yylloc, 'collect_set'); return '<hive>COLLECT_SET'; }
+<hive>'COLLECT_LIST'                      { addFunctionLocation(yylloc, 'collect_list'); return '<hive>COLLECT_LIST'; }
+<hive>'CORR'                              { addFunctionLocation(yylloc, 'corr'); return '<hive>CORR'; }
+<hive>'COVAR_POP'                         { addFunctionLocation(yylloc, 'covar_pop'); return '<hive>COVAR_POP'; }
+<hive>'COVAR_SAMP'                        { addFunctionLocation(yylloc, 'covar_samp'); return '<hive>COVAR_SAMP'; }
+<hive>'HISTOGRAM_NUMERIC'                 { addFunctionLocation(yylloc, 'histogram_numeric'); return '<hive>HISTOGRAM_NUMERIC'; }
+<hive>'NTILE'                             { addFunctionLocation(yylloc, 'ntile'); return '<hive>NTILE'; }
+<hive>'PERCENTILE'                        { addFunctionLocation(yylloc, 'percentile'); return '<hive>PERCENTILE'; }
+<hive>'PERCENTILE_APPROX'                 { addFunctionLocation(yylloc, 'percentile_approx'); return '<hive>PERCENTILE_APPROX'; }
+<impala>'APPX_MEDIAN'                     { addFunctionLocation(yylloc, 'appx_median'); return '<impala>APPX_MEDIAN'; }
+<impala>'EXTRACT'                         { addFunctionLocation(yylloc, 'extract'); return '<impala>EXTRACT'; }
+<impala>'GROUP_CONCAT'                    { addFunctionLocation(yylloc, 'group_concat'); return '<impala>GROUP_CONCAT'; }
+<impala>'STDDEV'                          { addFunctionLocation(yylloc, 'stddev'); return '<impala>STDDEV'; }
+<impala>'VARIANCE_POP'                    { addFunctionLocation(yylloc, 'variance_pop'); return '<impala>VARIANCE_POP'; }
+<impala>'VARIANCE_SAMP'                   { addFunctionLocation(yylloc, 'variance_samp'); return '<impala>VARIANCE_SAMP'; }
 
 // Analytical functions
-'DENSE_RANK('                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'FIRST_VALUE('                             { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'LAG('                                     { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'LAST_VALUE('                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'LEAD('                                    { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'RANK('                                    { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-'ROW_NUMBER('                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-<hive>'CUME_DIST('                         { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
-<hive>'PERCENT_RANK('                      { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC('; }
+'DENSE_RANK'                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'FIRST_VALUE'                             { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'LAG'                                     { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'LAST_VALUE'                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'LEAD'                                    { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'RANK'                                    { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'ROW_NUMBER'                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+<hive>'CUME_DIST'                         { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+<hive>'PERCENT_RANK'                      { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
 
-[A-Za-z][A-Za-z0-9_]*\(                    { addFunctionLocation(yylloc, yytext.substring(0, yytext.length - 1)); return 'UDF('; }
+// [A-Za-z][A-Za-z0-9_]*\(                    { addFunctionLocation(yylloc, yytext.substring(0, yytext.length - 1)); return 'UDF('; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
