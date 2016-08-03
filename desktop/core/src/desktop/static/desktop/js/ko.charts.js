@@ -651,6 +651,9 @@
             if (_scope != "world" && _scope != "usa" && _scope != "europe" && _place.indexOf(".") == -1) {
               _place = HueGeo.getISOAlpha2(_scope) + "." + _place;
             }
+            if ((_scope == "world" || _scope == "europe") && _place.length == 2) {
+              _place = HueGeo.getISOAlpha3(_place);
+            }
             _mapdata[_place] = {
               fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item).idx : (Math.ceil(item.value / _chunk) - 1)),
               id: _place,
@@ -675,6 +678,9 @@
           if (_place != null) {
             if (_scope != "world" && _scope != "usa" && _scope != "europe" && _place.indexOf(".") == -1) {
               _place = HueGeo.getISOAlpha2(_scope) + "." + _place;
+            }
+            if ((_scope == "world" || _scope == "europe") && _place.length == 2) {
+              _place = HueGeo.getISOAlpha3(_place);
             }
             _mapdata[_place] = {
               fillKey: "selected",
