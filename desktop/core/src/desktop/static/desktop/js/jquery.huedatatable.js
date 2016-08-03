@@ -43,11 +43,11 @@
       var data = self.$table.data('data');
 
       var idx = obj.originalIndex;
-      if (way === 0){
+      if (way === 0) {
         idx = 0;
       }
 
-      if (way === -1 || way === 0){
+      if (way === -1 || way === 0) {
         data.sort(function (a, b) {
           if (a[idx] > b[idx]) {
             return 1;
@@ -73,6 +73,109 @@
       self.fnDraw(true);
     }
 
+    self.fnShowSearch = function () {
+      if ($('.hue-datatable-search').length == 0) {
+        var search = $('<div>').css({
+          'position': 'fixed',
+          'bottom': '20px',
+          'right': '70px'
+        }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
+        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-times"></i>');
+
+        search.find('.fa-times').on('click', function () {
+          search.hide();
+        });
+
+        search.find('.fa-chevron-down').on('click', function () {
+          self.fnScrollToNextResult();
+        });
+
+        search.find('.fa-chevron-up').on('click', function () {
+          self.fnScrollToPreviousResult();
+        });
+
+        search.find('input').jHueDelayedInput(function () {
+          self.fnSearch(search.find('input').val());
+        }, 300);
+
+        search.find('input').focus();
+      }
+      else {
+        $('.hue-datatable-search').show();
+        $('.hue-datatable-search').find('input').focus();
+      }
+    }
+
+    self.fnSearch = function (what) {
+      $('.hue-datatable-search').find('.fa-chevron-down').addClass('muted');
+      $('.hue-datatable-search').find('.fa-chevron-up').addClass('muted');
+      var coords = [];
+      var $t = self.$table;
+      $t.data('searchCoords', []);
+      $t.data('searchCoordHighlighted', 0);
+      var data = self.$table.data('data');
+      data.forEach(function (row, rowIdx) {
+        row.forEach(function (fld, fldIdx) {
+          if ((fld + "").replace(/\&nbsp;/, ' ').toLowerCase().indexOf(what.toLowerCase()) > -1) {
+            coords.push({
+              row: rowIdx,
+              col: fldIdx
+            });
+          }
+        });
+      });
+      $t.data('searchCoords', coords);
+      if (coords.length > 0) {
+        if ($('.hue-datatable-search').find('input').val() !== '') {
+          $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted');
+          $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted');
+        }
+        self.fnScrollTo(coords[0].row, coords[0].col);
+      }
+    };
+
+    self.fnScrollToPreviousResult = function () {
+      var $t = self.$table;
+      if ($t.data('searchCoords').length > 0) {
+        var high = $t.data('searchCoordHighlighted');
+        high = high == 0 ? $t.data('searchCoords').length - 1 : high - 1;
+        $t.data('searchCoordHighlighted', high);
+        self.fnScrollTo($t.data('searchCoords')[high].row, $t.data('searchCoords')[high].col);
+      }
+    }
+
+    self.fnScrollToNextResult = function () {
+      var $t = self.$table;
+      if ($t.data('searchCoords').length > 0) {
+        var high = $t.data('searchCoordHighlighted');
+        high = high == $t.data('searchCoords').length - 1 ? 0 : high + 1;
+        $t.data('searchCoordHighlighted', high);
+        self.fnScrollTo($t.data('searchCoords')[high].row, $t.data('searchCoords')[high].col);
+      }
+    }
+
+    self.fnScrollTo = function (row, col) {
+      var $t = self.$table;
+      var colSel = $t.find("tr th:nth-child(" + (col + 1) + ")");
+      $t.parent().animate({
+        scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+      }, 300);
+      try {
+        $t.parents($t.data('oInit')['scrollable']).animate({
+          scrollTop: $t.find('tbody tr').find('td:eq(0)').filter(function () {
+            return $(this).text() == row
+          }).position().top + 73
+        });
+      }
+      catch (e) {
+      }
+
+      colSel = $t.find("tr td:nth-child(" + (col + 1) + ")");
+      $t.data('scrollToCol', col);
+      $t.data('scrollToRow', row);
+      $t.parent().trigger('scroll');
+    }
+
     self.isDrawing = false;
 
     self.fnDraw = function (force) {
@@ -85,11 +188,11 @@
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
         var startCol = -1;
         var endCol = -1;
-        $t.find("thead>tr th").each(function(i){
-          if ($(this).position().left > 0 && startCol == -1){
+        $t.find("thead>tr th").each(function (i) {
+          if ($(this).position().left > 0 && startCol == -1) {
             startCol = i;
           }
-          if ($(this).position().left < $t.parent().width() + $t.parent().position().left){
+          if ($(this).position().left < $t.parent().width() + $t.parent().position().left) {
             endCol = i;
           }
         });
@@ -107,78 +210,84 @@
         var endRow = startRow + visibleRows + invisibleOffset;
 
         if (endRow != $t.data('endRow') || (endRow == $t.data('endRow') && endCol > $t.data('endCol')) || force) {
-            $t.data('endCol', endCol);
-            $t.data('endRow', endRow);
+          $t.data('endCol', endCol);
+          $t.data('endRow', endRow);
 
-            if ($t.data('fnDraws') == 0) {
+          if ($t.data('fnDraws') == 0) {
+            var html = '';
+            for (var i = 0; i < data.length; i++) {
+              html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+            }
+            appendable.html(html);
+            if ($t.data('plugin_jHueTableExtender')) {
+              $t.data('plugin_jHueTableExtender').drawFirstColumn();
+            }
+          }
+          else {
+            if (force) {
               var html = '';
-              for (var i = 0; i < data.length; i++) {
+              for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
                 html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
-              appendable.html(html);
+              appendable.html(appendable.html() + html);
               if ($t.data('plugin_jHueTableExtender')) {
                 $t.data('plugin_jHueTableExtender').drawFirstColumn();
               }
             }
+          }
+
+          for (var i = 0; i < data.length; i++) {
+            var html = '';
+            if (i >= startRow && i <= endRow) {
+              var row = data[i];
+              if (row) {
+                for (var j = 0; j < endCol; j++) {
+                  html += '<td ' + (!aoColumns[j].bVisible ? 'style="display: none"' : '') + '>' + row[j] + '</td>';
+                }
+
+                if (endCol < aoColumns.length) {
+                  html += '<td colspan="' + (aoColumns.length - endCol) + '" class="stripe"></td>';
+                }
+              }
+            }
             else {
-              if (force) {
-                var html = '';
-                for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
-                  html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
-                }
-                appendable.html(appendable.html() + html);
-                if ($t.data('plugin_jHueTableExtender')) {
-                  $t.data('plugin_jHueTableExtender').drawFirstColumn();
-                }
-              }
+              html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
             }
+            appendable.children().eq(i).html(html);
+          }
 
-            for (var i = 0; i < data.length; i++) {
-              var html = '';
-              if (i >= startRow && i <= endRow) {
-                var row = data[i];
-                if (row) {
-                  for (var j = 0; j < endCol; j++) {
-                    html += '<td ' + (!aoColumns[j].bVisible ? 'style="display: none"' : '') +'>' + row[j] + '</td>';
-                  }
-
-                  if (endCol < aoColumns.length) {
-                    html += '<td colspan="' + (aoColumns.length - endCol) + '" class="stripe"></td>';
-                  }
-                }
-              }
-              else {
-                html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
-              }
-              appendable.children().eq(i).html(html);
-            }
-
-            if ($t.data('scrollToCol')){
-              var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
-              $t.parent().animate({
-                scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
-              }, 300);
-              colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+          if ($t.data('scrollToCol')) {
+            var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+            $t.parent().animate({
+              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+            }, 300);
+            colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+            if ($t.data('scrollToRow') == null) {
               colSel.addClass("columnSelected");
-              $t.data('scrollToCol', null);
             }
-
-            if ($t.data('plugin_jHueTableExtender')) {
-              $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
-              $t.data('plugin_jHueTableExtender').drawLockedRows();
+            else {
+              $t.find("tr:nth-child(" + ($t.data('scrollToRow') + 1) + ") td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").addClass('columnSelected');
+              $t.data('scrollToRow', null);
             }
-
-            if (force) {
-              $t.data('plugin_jHueTableExtender').drawFirstColumn();
-            }
-
-          }
-          $t.data('fnDraws', $t.data('fnDraws') + 1);
-          if ($t.data('oInit')['fnDrawCallback']) {
-            $t.data('oInit')['fnDrawCallback']();
+            $t.data('scrollToCol', null);
           }
 
-          $t.trigger('headerpadding');
+          if ($t.data('plugin_jHueTableExtender')) {
+            $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
+            $t.data('plugin_jHueTableExtender').drawLockedRows();
+          }
+
+          if (force) {
+            $t.data('plugin_jHueTableExtender').drawFirstColumn();
+          }
+
+        }
+        $t.data('fnDraws', $t.data('fnDraws') + 1);
+        if ($t.data('oInit')['fnDrawCallback']) {
+          $t.data('oInit')['fnDrawCallback']();
+        }
+
+        $t.trigger('headerpadding');
 
         self.isDrawing = false;
       }
@@ -235,6 +344,7 @@
 
     return self.each(function () {
       self.$table = $(this);
+      $('.hue-datatable-search').remove();
       var parent = self.$table.parent();
       if (parent.hasClass('dataTables_wrapper')) {
         return;

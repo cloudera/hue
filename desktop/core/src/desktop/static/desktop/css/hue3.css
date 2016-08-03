@@ -1257,6 +1257,12 @@ a#advanced-btn:hover {
   filter: alpha(opacity=85);
 }
 
+.hueAnchor input {
+  min-height: 19px!important;
+  height: 19px!important;
+  margin: 0;
+}
+
 #jHueScrollUpAnchor {
   bottom: 20px;
   right: 20px;
