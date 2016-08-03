@@ -464,9 +464,9 @@ class HiveFormat(CSVFormat):
     "BIGINT_TYPE": "long",
     "FLOAT_TYPE": "double",
     "DOUBLE_TYPE": "double",
-    "STRING_TYPE":"string",
+    "STRING_TYPE": "string",
     "TIMESTAMP_TYPE": "date",
-    "BINARY_TYPE": "long",
+    "BINARY_TYPE": "string",
     "DECIMAL_TYPE": "double",
     "DATE_TYPE": "date",
   }
