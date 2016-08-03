@@ -359,10 +359,22 @@ from django.utils.translation import ugettext as _
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
         <h3>${_('Create Directory')}</h3>
+        <!-- /ko -->
+        <!-- ko if: isS3() && isS3Root() -->
+        <h3>${_('Create Bucket')}</h3>
+        <!-- /ko -->
       </div>
       <div class="modal-body">
-        <label>${_('Directory Name')} <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+        <label>
+          <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
+          ${_('Directory Name')}
+          <!-- /ko -->
+          <!-- ko if: isS3() && isS3Root() -->
+          ${_('Bucket Name')}
+          <!-- /ko -->
+          <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
         <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
       </div>
       <div class="modal-footer">
