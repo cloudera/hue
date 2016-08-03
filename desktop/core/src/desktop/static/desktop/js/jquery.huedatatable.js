@@ -78,7 +78,8 @@
         var search = $('<div>').css({
           'position': 'fixed',
           'bottom': '20px',
-          'right': '70px'
+          'right': '70px',
+          'opacity': 0.85
         }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
         search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-times"></i>');
 
