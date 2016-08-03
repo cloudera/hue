@@ -42,7 +42,7 @@ def test_from_bucket():
   eq_('boo', s.name)
   eq_('s3://boo', s.path)
   eq_(0, s.size)
-  eq_(0, s.atime)
+  eq_(None, s.atime)
 
 
 def test_from_key():
@@ -68,7 +68,7 @@ def test_for_s3_root():
   eq_('S3', s.name)
   eq_('s3://', s.path)
   eq_(0, s.size)
-  eq_(0, s.atime)
+  eq_(None, s.atime)
 
 
 class FakeBucket(object):
