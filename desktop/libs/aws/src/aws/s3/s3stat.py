@@ -68,7 +68,7 @@ class S3Stat(object):
 
   @classmethod
   def from_bucket(cls, bucket):
-    return cls(bucket.name, 's3://%s' % bucket.name, True, 0, 0)
+    return cls(bucket.name, 's3://%s' % bucket.name, True, 0, None)
 
   @classmethod
   def from_key(cls, key, is_dir=False):
@@ -92,7 +92,7 @@ class S3Stat(object):
 
   @classmethod
   def for_s3_root(cls):
-    return cls('S3', 's3://', True, 0, 0)
+    return cls('S3', 's3://', True, 0, None)
 
   def to_json_dict(self):
     """
