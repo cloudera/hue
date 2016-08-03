@@ -264,7 +264,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="arg-mapping">
-  <!-- ko foreach: argVal-->
+  <!-- ko foreach: value-->
     <div>
       <input type="text" data-bind="value: key, attr: {placeholder: 'key'}">
       <input type="text" data-bind="value: value, attr: {placeholder: 'value'}">
@@ -340,7 +340,7 @@ ${ assist.assistPanel() }
       });
 
       for (var i = 0; i < operation.args.length; i++) {
-        argVal = createArgumentValue(operation.args[i]);
+        var argVal = createArgumentValue(operation.args[i]);
 
         if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
           argVal.subscribe(function (newVal) {
@@ -385,6 +385,20 @@ ${ assist.assistPanel() }
       });
 
       self.settings(constructSettings(self.type()));
+    }
+
+    self.load = function(data){
+      self.numExpectedFields(data.numExpectedFields);
+
+      var newSettings = constructSettings(data.type);
+      for(var key in data.settings){
+        newSettings[key] = ko.mapping.fromJS(data.settings[key]);
+      }
+      self.settings(newSettings);
+
+      data.fields.forEach(function(field){
+        self.fields.push(loadField(field));
+      });
     }
 
     self.type = ko.observable(type);
@@ -474,7 +488,6 @@ ${ assist.assistPanel() }
     self.showCreate = ko.observable(false);
 
     self.fileFormat = ko.observable(new File_Format(vm));
-
     self.sample = ko.observableArray();
 
     self.jobId = ko.observable(null);
@@ -493,7 +506,6 @@ ${ assist.assistPanel() }
     });
 
     self.fileFormat().format.subscribe(function () {
-      self.guessFieldTypes();
       for (var i = 0; i < self.fileTypes.length; i++) {
         if (self.fileTypes[i].name == self.fileFormat().format().type()) {
           self.fileType(self.fileTypes[i]);
@@ -515,6 +527,7 @@ ${ assist.assistPanel() }
       }, function (resp) {
         var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
         self.fileFormat().format(newFormat);
+        self.guessFieldTypes();
 
         self.fileFormat().show(true);
 
@@ -571,7 +584,36 @@ ${ assist.assistPanel() }
     self.addOperation = function (field) {
       field.operations.push(new Operation("split"));
     }
+
+    self.load = function(state){
+      self.fileFormat().name(state.name);
+      self.fileFormat().show(state.show);
+      self.fileFormat().path(state.path);
+      self.fileFormat().columns.removeAll();
+      if (state.format && 'type' in state.format){
+        koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
+        self.fileFormat().format(koFormat);
+      }
+      if (state.columns) state.columns.forEach(function(currCol){
+        self.fileFormat().columns.push(loadField(currCol));
+      });
+    }
   };
+
+  var loadField = function(currField){
+    var koField = ko.mapping.fromJS(currField);
+
+    koField.operations.removeAll();
+
+    currField.operations.forEach(function(operationData){
+      var operation = new Operation(operationData.type);
+      operation.load(operationData);
+
+      koField.operations.push(operation);
+    });
+
+    return koField;
+  }
 
   var Editor = function (options) {
     var self = this;
