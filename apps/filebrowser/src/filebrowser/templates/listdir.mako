@@ -129,13 +129,13 @@ ${ fb_components.menubar() }
           </div>
           % endif
           <div class="btn-group" style="vertical-align: middle">
-            <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
+            <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
               <i class="fa fa-plus-circle"></i> ${_('New')}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu pull-right" style="top: auto">
-              <li><a href="#" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
-              <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> ${_('Directory')}</a></li>
+              <li data-bind="visible: !isS3() || isS3() && !isS3Root()"><a href="#" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
+              <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> <span data-bind="visible: !isS3() || isS3() && !isS3Root()">${_('Directory')}</span><span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span></a></li>
             </ul>
           </div>
         </div>
