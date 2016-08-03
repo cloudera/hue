@@ -287,9 +287,7 @@ class CSVFormat(FileFormat):
 
   @classmethod
   def _guess_from_file_stream(cls, file_stream):
-    file_stream.seek(0)
-    sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
-    file_stream.seek(0)
+    sample = cls._get_sample(file_stream)
 
     try:
       dialect, has_header = cls._guess_dialect(sample)
@@ -309,10 +307,16 @@ class CSVFormat(FileFormat):
     })
 
   @classmethod
-  def _from_format(cls, file_stream, format_):
+  def _get_sample(cls, file_stream):
     file_stream.seek(0)
     sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
     file_stream.seek(0)
+
+    return sample
+
+  @classmethod
+  def _from_format(cls, file_stream, format_):
+    sample = cls._get_sample(file_stream)
 
     delimiter = format_["fieldSeparator"].encode('utf-8')
     line_terminator = format_["recordSeparator"].encode('utf-8')
@@ -333,7 +337,7 @@ class CSVFormat(FileFormat):
     else:
       return cls._guess_from_file_stream(file_stream)
 
-  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample=""):
+  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
     self._delimiter = delimiter
     self._line_terminator = line_terminator
     self._quote_char = quote_char
@@ -346,7 +350,7 @@ class CSVFormat(FileFormat):
 
     self._num_columns = self._guess_num_columns(self._sample_rows)
 
-    self._fields = self._guess_fields(sample)
+    self._fields = fields if fields else self._guess_fields(sample)
 
     super(CSVFormat, self).__init__()
 
@@ -450,3 +454,40 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
+class HiveFormat(CSVFormat):
+  FIELD_TYPE_TRANSLATE = {
+    "BOOLEAN_TYPE": "string",
+    "TINYINT_TYPE": "long",
+    "SMALLINT_TYPE": "long",
+    "INT_TYPE": "long",
+    "BIGINT_TYPE": "long",
+    "FLOAT_TYPE": "double",
+    "DOUBLE_TYPE": "double",
+    "STRING_TYPE":"string",
+    "TIMESTAMP_TYPE": "date",
+    "BINARY_TYPE": "long",
+    "DECIMAL_TYPE": "double",
+    "DATE_TYPE": "date",
+  }
+
+  @classmethod
+  def get_instance(cls, file_stream, format_):
+    sample = cls._get_sample(file_stream)
+
+    fields = []
+
+    for field in format_["fields"]:
+      fields.append(Field(
+        name=field["name"],
+        field_type_name=cls.FIELD_TYPE_TRANSLATE.get(field['type'], 'string')
+        ))
+
+    return cls(**{
+      "delimiter":',',
+      "line_terminator": '\n',
+      "quote_char": '"',
+      "has_header": False,
+      "sample": sample,
+      "fields": format_["fields"]
+    })
