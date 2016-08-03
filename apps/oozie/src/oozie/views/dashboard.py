@@ -671,6 +671,7 @@ def sync_coord_workflow(request, job_id):
 
       # Deploy WF XML
       submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=properties)
+      submission.deploy(deployment_dir=wf_application_path)
       submission._create_file(wf_application_path, hue_wf.XML_FILE_NAME, hue_wf.to_xml(mapping=properties), do_as=True)
 
       # Deploy Coordinator XML

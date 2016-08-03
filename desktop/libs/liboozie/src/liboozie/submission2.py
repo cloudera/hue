@@ -170,9 +170,10 @@ class Submission(object):
     return self.oozie_id
 
 
-  def deploy(self):
+  def deploy(self, deployment_dir=None):
     try:
-      deployment_dir = self._create_deployment_dir()
+      if not deployment_dir:
+        deployment_dir = self._create_deployment_dir()
     except Exception, ex:
       msg = _("Failed to create deployment directory: %s" % ex)
       LOG.exception(msg)
