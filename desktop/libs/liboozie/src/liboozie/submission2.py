@@ -127,6 +127,9 @@ class Submission(object):
     if 'oozie.coord.application.path' in self.properties:
       self.properties.pop('oozie.coord.application.path')
 
+    if 'oozie.bundle.application.path' in self.properties:
+      self.properties.pop('oozie.bundle.application.path')
+
     if fail_nodes:
       self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
     elif not skip_nodes:
