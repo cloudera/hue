@@ -537,7 +537,7 @@ for x in sys.stdin:
     response = _make_query(c, CREATE_TABLE, database=self.db_name)
     wait_for_query_to_finish(c, response)
 
-    response = _make_query(c, "SELECT SUM(foo) FROM `%(db)s`.`test_explain`" % {'db': self.db_name}, submission_type="Explain") # Need to prefix database in Explain
+    response = _make_query(c, "SELECT SUM(foo) FROM `%(db)s`.`test_explain`" % {'db': self.db_name}, settings=[('hive.explain.user', 'false')], submission_type="Explain") # Need to prefix database in Explain
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
     assert_true('STAGE PLANS:' in explanation, explanation)
@@ -548,7 +548,7 @@ for x in sys.stdin:
       raise SkipTest('HUE-2884: Skipping test because we cannot guarantee live cluster supports utf8')
 
     query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
-    response = _make_query(self.client, query, submission_type="Explain")
+    response = _make_query(self.client, query, settings=[('hive.explain.user', 'false')], submission_type="Explain")
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
     assert_true('STAGE PLANS:' in explanation, explanation)
