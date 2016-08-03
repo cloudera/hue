@@ -516,6 +516,8 @@ ${ assist.assistPanel() }
       if (self.fileFormat().format().type) {
         self.fileFormat().format().type.subscribe(function (newType) {
           self.fileFormat().format(new FileType(newType));
+          self.fileFormat().columns.removeAll();
+          self.guessFieldTypes();
         });
       }
     });
