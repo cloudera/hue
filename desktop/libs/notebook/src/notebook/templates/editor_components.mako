@@ -1993,7 +1993,7 @@ ${ hueIcons.symbols() }
         <i class="fa fa-fw fa-chevron-left"></i>
         <!-- /ko -->
         <!-- ko ifnot: isResultSettingsVisible() -->
-        <i class="fa fa-fw fa-chevron-right"></i>
+        <i class="fa fa-fw fa-columns"></i>
         <!-- /ko -->
       </a>
     </div>
