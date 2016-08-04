@@ -1026,6 +1026,8 @@ def rename(request):
         if "/" not in dest_path:
             src_dir = os.path.dirname(src_path)
             dest_path = request.fs.join(src_dir, dest_path)
+        if request.fs.exists(dest_path):
+          raise PopupException(_('The destination path "%s" already exists.') % dest_path)
         request.fs.rename(src_path, dest_path)
 
     return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
