@@ -204,18 +204,11 @@ def _import_workspace(fs, user, job):
   job.import_workspace(fs, source_workspace_dir, user)
 
 
-@check_editor_access_permission
-@check_document_modify_permission()
-def save_workflow(request):
-  response = {'status': -1}
-
-  workflow = json.loads(request.POST.get('workflow', '{}'))
-  layout = json.loads(request.POST.get('layout', '{}'))
-
+def _save_workflow(workflow, layout, user, fs=None):
   if workflow.get('id'):
     workflow_doc = Document2.objects.get(id=workflow['id'])
   else:
-    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=request.user, description=workflow['properties']['description'])
+    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=user, description=workflow['properties']['description'])
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
   # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
@@ -228,12 +221,11 @@ def save_workflow(request):
     dependency_docs = Document2.objects.filter(uuid__in=dependencies)
     workflow_doc.dependencies.add(*dependency_docs)
 
-  if workflow['properties'].get('imported'): # We save and old format workflow to the latest
+  if workflow['properties'].get('imported'): # We convert from and old workflow format (3.8 <) to the latest
     workflow['properties']['imported'] = False
-    workflow_instance = Workflow(workflow=workflow, user=request.user)
-    _import_workspace(request.fs, request.user, workflow_instance)
+    workflow_instance = Workflow(workflow=workflow, user=user)
+    _import_workspace(fs, user, workflow_instance)
     workflow['properties']['deployment_dir'] = workflow_instance.deployment_dir
-    response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
@@ -242,6 +234,23 @@ def save_workflow(request):
   workflow_doc.description = workflow_doc1.description = workflow['properties']['description']
   workflow_doc.save()
   workflow_doc1.save()
+
+
+@check_editor_access_permission
+@check_document_modify_permission()
+def save_workflow(request):
+  response = {'status': -1}
+
+  workflow = json.loads(request.POST.get('workflow', '{}'))
+  layout = json.loads(request.POST.get('layout', '{}'))
+
+  is_imported = workflow['properties'].get('imported')
+
+  workflow_doc = _save_workflow(workflow, layout, request.user)
+
+  # For old workflow import
+  if is_imported:
+    response['url'] = reverse('oozie:edit_workflow') + '?workflow=' + str(workflow_doc.id)
 
   response['status'] = 0
   response['id'] = workflow_doc.id

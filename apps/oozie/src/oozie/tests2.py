@@ -33,8 +33,10 @@ from desktop.models import DefaultConfiguration, Document, Document2
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
-    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
+    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
+from notebook.models import make_notebook
+from notebook.api import _save_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -432,8 +434,7 @@ LIMIT $limit"""))
 
       # other user can access document
       response = self.client_not_me.get(reverse('oozie:edit_workflow'), {'workflow': wf_doc.uuid})
-      assert_false('Document does not exist or you don&#39;t have the permission to access it.' in response.content,
-                   response.content)
+      assert_false('Document does not exist or you don&#39;t have the permission to access it.' in response.content, response.content)
     finally:
       wf_doc.delete()
 
@@ -955,3 +956,38 @@ class TestExternalWorkflowGraph(object):
     assert_true(len(workflow_data['workflow']['nodes']) == 4)
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'spark-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
+
+
+class TestModelAPI(OozieMockBase):
+
+  def setUp(self):
+    super(TestModelAPI, self).setUp()
+    self.wf = Workflow()
+
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True,
+                                               is_superuser=False)
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+
+  def test_gen_workflow_from_document(self):
+    notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
+    notebook_doc = _save_notebook(notebook, self.user)
+
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True)
+    
+    workflow = Workflow(document=workflow_doc, user=self.user)
+
+    _data = workflow.get_data()
+    assert_equal(len(_data['nodes']), 4)
+
+
+  def test_gen_workflow_from_documents(self):
+    notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
+    notebook_doc = _save_notebook(notebook, self.user)
+
+    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook_doc], user=self.user, managed=True)
+    
+    workflow = Workflow(document=workflow_doc, user=self.user)
+
+    _data = workflow.get_data()
+    assert_equal(len(_data['nodes']), 5)

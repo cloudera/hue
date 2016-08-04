@@ -48,6 +48,7 @@ from notebook.models import Notebook
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
+# from oozie.views.editor2 import _save_workflow
 
 
 LOG = logging.getLogger(__name__)
@@ -2916,22 +2917,29 @@ class History(object):
 
 class WorkflowBuilder():
   """
-  Focus on building nodes, not the UI layout (should be graphed automatically in dashboard).
-  Only support Hive document currently, but then will have Pig, PySpark, MapReduce...
+  Building a workflow that has saved Documents for nodes (e.g Saved Hive query, saved Pig script...).
   """
 
-  def create_workflow(self, document, user, name=None, managed=False):
+  def create_workflow(self, user, document=None, documents=None, name=None, managed=False):
+    nodes = []
+    if documents is None:
+      documents = [document]
 
     if name is None:
-      name = _('Schedule of ') + document.name or document.type
+      name = _('Schedule of ') + ','.join([document.name or document.type for document in documents])
 
-    if document.type == 'query-java':
-      node = self.get_java_document_node(document, name)
-    else:
-      node = self.get_hive_document_node(document, name, user)
+    for document in documents:     
+      if document.type == 'query-java':
+        node = self.get_java_document_node(document, name)
+      else:
+        node = self.get_hive_document_node(document, name, user)
+  
+      nodes.append(node)
 
-    workflow_doc = self.get_workflow(node, name, document.uuid, user, managed=managed)
-    workflow_doc.dependencies.add(document)
+    workflow_doc = self.get_workflow(nodes, name, document.uuid, user, managed=managed)
+    
+    for document in documents:
+      workflow_doc.dependencies.add(document)
 
     return workflow_doc
 
@@ -2946,7 +2954,9 @@ class WorkflowBuilder():
     parameters = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
 
     return {
-        u'name': u'doc-1',
+        u'name': u'doc-hive-%s' % document.uuid[:4],
+        u'id': str(uuid.uuid4()),
+        u'type': u'hive-document-widget',        
         u'actionParametersUI': [],
         u'properties': {
             u'files': [],
@@ -2966,7 +2976,7 @@ class WorkflowBuilder():
                 {u'key': u'alert-contact', u'value': u''},
                 {u'key': u'notification-msg', u'value': u''},
                 {u'key': u'upstream-apps', u'value': u''},
-                ],
+            ],
             u'archives': [],
             u'prepares': [],
             u'credentials': credentials,
@@ -2974,11 +2984,10 @@ class WorkflowBuilder():
             u'jdbc_url': u'',
             },
         u'actionParametersFetched': False,
-        u'id': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c',
-        u'type': u'hive-document-widget',
-        u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
-                      {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
-                      }],
+        u'children': [
+            {u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
+            {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
+        }],
         u'actionParameters': [],
     }
 
@@ -2986,11 +2995,11 @@ class WorkflowBuilder():
     credentials = []
 
     return {
-         "id":"0aec471d-2b7c-d93d-b22c-2110fd17ea2c",
-         "name":"doc-1",
-         "type":"java-document-widget",
-         "properties":{
-              u'uuid': document.uuid, # files, main_class, arguments comes from there
+        "id": str(uuid.uuid4()),
+        'name': u'doc-hive-%s' % document.uuid[:4],
+        "type":"java-document-widget",
+        "properties":{
+              u'uuid': document.uuid, # Files, main_class, arguments comes from there
               "job_xml":[],
               "jar_path": "",
               "java_opts":[],
@@ -3002,48 +3011,52 @@ class WorkflowBuilder():
               "credentials": credentials,
               "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
               "archives":[]
-          },
-          "children":[
-              {"to":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
-              {"error":"17c9c895-5a16-7443-bb81-f34b30b21548"}],
-          "actionParameters":[],
-          "actionParametersFetched": False
+        },
+        "children":[
+            {"to":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+            {"error":"17c9c895-5a16-7443-bb81-f34b30b21548"}
+        ],
+        "actionParameters":[],
+        "actionParametersFetched": False
     }
 
 
 
-  def get_workflow(self, node, name, doc_uuid, user, managed=False):
+  def get_workflow(self, nodes, name, doc_uuid, user, managed=False):
     parameters = []
 
-    data = json.dumps({'workflow': {
+    data = {
+      'workflow': {
       u'name': name,
-      u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5'
-                    , u'uri:oozie:workflow:0.5'],
-      u'isDirty': False,
-      u'movedNode': None,
-      u'linkMapping': {
-          u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': [],
-          u'3f107997-04cc-8733-60a9-a4bb62cebffc': [u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
-                  ],
-          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': [u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
-                  ],
-          u'17c9c895-5a16-7443-bb81-f34b30b21548': [],
-          },
-      u'nodeIds': [u'3f107997-04cc-8733-60a9-a4bb62cebffc',
-                   u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
-                   u'17c9c895-5a16-7443-bb81-f34b30b21548',
-                   u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'],
-      u'id': 47,
+#       u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5', u'uri:oozie:workflow:0.5'],
+#       u'isDirty': False,
+#       u'movedNode': None,
+#       u'linkMapping': {
+#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': [],
+#           u'3f107997-04cc-8733-60a9-a4bb62cebffc': [
+#               u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
+#           ],
+#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': [
+#               u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
+#           ],
+#           u'17c9c895-5a16-7443-bb81-f34b30b21548': [],
+#       },
+#       u'nodeIds': [
+#           u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
+#           u'17c9c895-5a16-7443-bb81-f34b30b21548',
+#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
+#       ],
+#       u'id': 47,
       u'nodes': [{
           u'name': u'Start',
           u'properties': {},
           u'actionParametersFetched': False,
           u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
           u'type': u'start-widget',
-          u'children': [{u'to': u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
-                        }],
+          u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}],
           u'actionParameters': [],
-          }, {
+        }, {
           u'name': u'End',
           u'properties': {},
           u'actionParametersFetched': False,
@@ -3051,7 +3064,7 @@ class WorkflowBuilder():
           u'type': u'end-widget',
           u'children': [],
           u'actionParameters': [],
-          }, {
+        }, {
           u'name': u'Kill',
           u'properties': {
               u'body': u'',
@@ -3067,9 +3080,8 @@ class WorkflowBuilder():
           u'type': u'kill-widget',
           u'children': [],
           u'actionParameters': [],
-          },
-            node
-          ],
+        }
+      ],
       u'properties': {
           u'job_xml': u'',
           u'description': u'',
@@ -3092,16 +3104,29 @@ class WorkflowBuilder():
           u'parameters': parameters,
           u'properties': [],
           },
-      u'nodeNamesMapping': {
-          u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': u'End',
-          u'3f107997-04cc-8733-60a9-a4bb62cebffc': u'Start',
-          u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'doc-1',
-          u'17c9c895-5a16-7443-bb81-f34b30b21548': u'Kill',
-          },
-      u'uuid': u'433922e5-e616-dfe0-1cba-7fe744c9305c',
+#       u'nodeNamesMapping': {
+#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': u'End',
+#           u'3f107997-04cc-8733-60a9-a4bb62cebffc': u'Start',
+#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'doc-1',
+#           u'17c9c895-5a16-7443-bb81-f34b30b21548': u'Kill',
+#           },
+      u'uuid': str(uuid.uuid4()),
       }
-    })
+    }
 
+    _prev_node = data['workflow']['nodes'][0]
+
+    for node in nodes:
+      data['workflow']['nodes'].append(node)
+
+      _prev_node['children'][0]['to'] = node['id'] # We link nodes
+      _prev_node = node
+
+    data = json.dumps(data)
+    
+#     workflow_doc = _save_workflow(workflow, layout, user, fs)
+# is_managed
+    
     workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
