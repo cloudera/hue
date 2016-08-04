@@ -19,7 +19,6 @@ import json
 import logging
 
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -43,7 +42,8 @@ from oozie.decorators import check_document_access_permission, check_document_mo
 from oozie.forms import ParameterForm
 from oozie.models import Workflow as OldWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
-    find_dollar_variables, find_dollar_braced_variables, WorkflowBuilder
+    find_dollar_variables, find_dollar_braced_variables, WorkflowBuilder,\
+  _import_workspace, _save_workflow
 from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
 
@@ -194,46 +194,6 @@ def copy_workflow(request):
   request.info(_('Workflows copied.') if len(jobs) > 1 else _('Workflow copied.'))
 
   return JsonResponse(response)
-
-
-def _import_workspace(fs, user, job):
-  source_workspace_dir = job.deployment_dir
-
-  job.set_workspace(user)
-  job.check_workspace(fs, user)
-  job.import_workspace(fs, source_workspace_dir, user)
-
-
-def _save_workflow(workflow, layout, user, fs=None):
-  if workflow.get('id'):
-    workflow_doc = Document2.objects.get(id=workflow['id'])
-  else:
-    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=user, description=workflow['properties']['description'])
-    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
-
-  # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
-  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive', 'query-java']))
-
-  dependencies = \
-      [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
-      [node['properties']['uuid'] for node in workflow['nodes'] if 'document-widget' in node['type']]
-  if dependencies:
-    dependency_docs = Document2.objects.filter(uuid__in=dependencies)
-    workflow_doc.dependencies.add(*dependency_docs)
-
-  if workflow['properties'].get('imported'): # We convert from and old workflow format (3.8 <) to the latest
-    workflow['properties']['imported'] = False
-    workflow_instance = Workflow(workflow=workflow, user=user)
-    _import_workspace(fs, user, workflow_instance)
-    workflow['properties']['deployment_dir'] = workflow_instance.deployment_dir
-
-  workflow_doc.update_data({'workflow': workflow})
-  workflow_doc.update_data({'layout': layout})
-  workflow_doc1 = workflow_doc.doc.get()
-  workflow_doc.name = workflow_doc1.name = workflow['name']
-  workflow_doc.description = workflow_doc1.description = workflow['properties']['description']
-  workflow_doc.save()
-  workflow_doc1.save()
 
 
 @check_editor_access_permission
