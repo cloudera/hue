@@ -81,7 +81,7 @@
           'right': '70px',
           'opacity': 0.85
         }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
-        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-times"></i>');
+        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times"></i>');
 
         search.find('.fa-times').on('click', function () {
           search.hide();
@@ -108,30 +108,40 @@
     }
 
     self.fnSearch = function (what) {
-      $('.hue-datatable-search').find('.fa-chevron-down').addClass('muted');
-      $('.hue-datatable-search').find('.fa-chevron-up').addClass('muted');
-      var coords = [];
       var $t = self.$table;
-      $t.data('searchCoords', []);
-      $t.data('searchCoordHighlighted', 0);
-      var data = self.$table.data('data');
-      data.forEach(function (row, rowIdx) {
-        row.forEach(function (fld, fldIdx) {
-          if ((fld + "").replace(/\&nbsp;/, ' ').toLowerCase().indexOf(what.toLowerCase()) > -1) {
-            coords.push({
-              row: rowIdx,
-              col: fldIdx
-            });
-          }
+      $t.find('.columnSelected').removeClass('columnSelected');
+      $t.data('scrollToCol', null);
+      $t.data('scrollToRow', null);
+
+      if (what !== '') {
+        $('.hue-datatable-search').find('span').text('');
+        $('.hue-datatable-search').find('.fa-chevron-down').addClass('muted');
+        $('.hue-datatable-search').find('.fa-chevron-up').addClass('muted');
+        var coords = [];
+        $t.data('searchCoords', []);
+        $t.data('searchCoordHighlighted', 0);
+        var data = self.$table.data('data');
+        data.forEach(function (row, rowIdx) {
+          row.forEach(function (fld, fldIdx) {
+            if ((fld + "").replace(/\&nbsp;/, ' ').toLowerCase().indexOf(what.toLowerCase()) > -1) {
+              coords.push({
+                row: rowIdx,
+                col: fldIdx
+              });
+            }
+          });
         });
-      });
-      $t.data('searchCoords', coords);
-      if (coords.length > 0) {
-        if ($('.hue-datatable-search').find('input').val() !== '') {
-          $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted');
-          $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted');
+        $t.data('searchCoords', coords);
+        if (coords.length > 0) {
+          if ($('.hue-datatable-search').find('input').val() !== '') {
+            $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted');
+            $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted');
+          }
+          self.fnScrollTo(coords[0].row, coords[0].col);
         }
-        self.fnScrollTo(coords[0].row, coords[0].col);
+        else {
+          $('.hue-datatable-search').find('span').text($t.data('oInit')['i18n'].NO_RESULTS);
+        }
       }
     };
 
@@ -157,6 +167,7 @@
 
     self.fnScrollTo = function (row, col) {
       var $t = self.$table;
+      $('.hue-datatable-search').find('span').text(($t.data('searchCoordHighlighted') + 1) + ' ' + $t.data('oInit')['i18n'].OF + ' ' + $t.data('searchCoords').length);
       var colSel = $t.find("tr th:nth-child(" + (col + 1) + ")");
       $t.parent().animate({
         scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
