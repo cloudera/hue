@@ -92,13 +92,13 @@
     drawFirstColumn(this);
   }
 
-  Plugin.prototype.drawLockedRows = function () {
+  Plugin.prototype.drawLockedRows = function (force) {
     var _this = this;
     var $pluginElement = $(_this.element);
     if ($pluginElement.data('lockedRows')) {
       var locks = $pluginElement.data('lockedRows');
       Object.keys(locks).forEach(function (idx) {
-        drawLockedRow(_this, idx.substr(1));
+        drawLockedRow(_this, idx.substr(1), force);
       });
     }
   }
@@ -205,7 +205,7 @@
     });
   };
 
-  function drawLockedRow(plugin, rowNo) {
+  function drawLockedRow(plugin, rowNo, force) {
     var $pluginElement = $(plugin.element);
     var lockedRows = $pluginElement.data('lockedRows') || {};
     var $header = $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer");
@@ -214,7 +214,7 @@
     $headerCounter.addClass('locked');
 
     function unlock($el) {
-      $header.find('tr.ht-visible-row-'+(($el.text()*1)-1)).remove();
+      $header.find('tr.ht-visible-row-' + (($el.text() * 1) - 1)).remove();
       delete lockedRows['r' + $el.text()]
       $el.parent().remove();
       if ($header.find('tbody tr').length == 0) {
@@ -223,16 +223,19 @@
       }
     }
 
-    if (Object.keys(lockedRows).indexOf('r' + rowNo) === -1) {
-      var $clone = $pluginElement.find('tr td:first-child').filter(function() {
-        return $(this).text() === rowNo+'';
+    if (Object.keys(lockedRows).indexOf('r' + rowNo) === -1 || force) {
+      if (force) {
+        unlock(lockedRows['r' + rowNo].cell.find('td'));
+      }
+      var $clone = $pluginElement.find('tr td:first-child').filter(function () {
+        return $(this).text() === rowNo + '';
       }).closest('tr').clone();
       $clone.addClass('locked');
       $clone.appendTo($header.find('tbody'));
       $pluginElement.data('lockedRows', lockedRows);
       var $newTr = $('<tr>');
       $newTr.addClass('locked').html('<td class="pointer unlockable" title="' + plugin.options.labels.UNLOCK + '"><i class="fa fa-unlock muted"></i>' + rowNo + '</td>').appendTo($headerCounter.find('tbody'));
-      $newTr.find('td').on('click', function(){
+      $newTr.find('td').on('click', function () {
         unlock($(this));
       });
       lockedRows['r' + rowNo] = {
@@ -243,7 +246,7 @@
     else {
       lockedRows['r' + rowNo].row.appendTo($header.find('tbody'));
       lockedRows['r' + rowNo].cell.appendTo($headerCounter.find('tbody'));
-      lockedRows['r' + rowNo].cell.find('td').on('click', function(){
+      lockedRows['r' + rowNo].cell.find('td').on('click', function () {
         unlock($(this));
       });
     }

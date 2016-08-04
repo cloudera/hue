@@ -25,7 +25,7 @@
     self.$table = null;
 
     self.fnSetColumnVis = function (index, visible) {
-      var aoColumns = this.$table.data('aoColumns');
+      var aoColumns = self.$table.data('aoColumns');
       var change = aoColumns[index].bVisible !== visible;
       aoColumns[index].bVisible = visible;
       if (!change) {
@@ -36,6 +36,7 @@
       } else {
         self.$table.find('tr').find('td:eq(' + index + '),th:eq(' + index + ')').show();
       }
+      self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
     }
 
     self.fnSortColumn = function (obj, way) {
