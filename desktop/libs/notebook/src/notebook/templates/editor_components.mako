@@ -2841,6 +2841,9 @@ ${ hueIcons.symbols() }
             }
             else {
               $('.right-panel').trigger('scroll');
+              if (_el.data('plugin_jHueTableExtender')) {
+                _el.data('plugin_jHueTableExtender').drawHeader();
+              }
             }
           }
         });

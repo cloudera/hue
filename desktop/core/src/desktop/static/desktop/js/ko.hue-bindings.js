@@ -3272,7 +3272,10 @@
             editor.scrollToLine(range.start.row, true, true, function () {});
           }
         }
-        editor._emit('change')
+        try {
+          editor._emit('change')
+        }
+        catch (e){}
       }
     }
   };
