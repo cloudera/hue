@@ -601,8 +601,14 @@ ${ dashboard.layout_skeleton() }
         </div>
 
         <div>
-          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList())}, css: { 'blue' : $root.collection.template.showFieldList() }"><i
-              class="fa fa-cog fa-fw"></i></a>
+          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList())}, css: { 'blue' : $root.collection.template.showFieldList() }">
+            <!-- ko if: $root.collection.template.showFieldList() -->
+              <i class="fa fa-fw fa-chevron-left"></i>
+            <!-- /ko -->
+            <!-- ko ifnot: $root.collection.template.showFieldList() -->
+              <i class="fa fa-fw fa-chevron-right"></i>
+            <!-- /ko -->
+          </a>
         </div>
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
