@@ -1664,14 +1664,6 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
-<script type="text/html" id="snippet-settings-toggle">
-  <div style="position:absolute;right:0;top:0;margin-top:130px;" data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="hover-actions toggle-result-settings show-result-settings">
-    <a class="inactive-action pointer" title="${_('Hide settings')}" data-bind="visible: isResultSettingsVisible">
-      <i class="fa fa-chevron-left"></i>
-    </a>
-  </div>
-</script>
-
 <script type="text/html" id="snippet-explain">
   <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
 </script>
@@ -1700,10 +1692,9 @@ ${ hueIcons.symbols() }
 
       <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 260px;">
         <div>
-          <div data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;">
+          <div data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;white-space: nowrap;">
             <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
             <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
-            <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
           </div>
           <div data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
             <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
@@ -1998,7 +1989,12 @@ ${ hueIcons.symbols() }
 
     <div>
       <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
-        <i class="fa fa-fw fa-cog"></i>
+        <!-- ko if: isResultSettingsVisible() -->
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <!-- /ko -->
+        <!-- ko ifnot: isResultSettingsVisible() -->
+        <i class="fa fa-fw fa-chevron-right"></i>
+        <!-- /ko -->
       </a>
     </div>
 
