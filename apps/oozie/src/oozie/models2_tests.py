@@ -18,6 +18,7 @@
 
 import json
 import logging
+import re
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -964,33 +965,35 @@ class TestModelAPI(OozieMockBase):
     super(TestModelAPI, self).setUp()
     self.wf = Workflow()
 
-    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True,
-                                               is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="not_perm_user")
 
 
   def test_gen_workflow_from_document(self):
     notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
-    notebook_doc = _save_notebook(notebook, self.user)
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
 
     workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True)
-    
+
     workflow = Workflow(document=workflow_doc, user=self.user)
 
     _data = workflow.get_data()
-    assert_equal(len(_data['nodes']), 4)
+    assert_equal(len(_data['workflow']['nodes']), 4)
 
 
   def test_gen_workflow_from_documents(self):
     notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
-    notebook_doc = _save_notebook(notebook, self.user)
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
 
     notebook2 = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
-    notebook2_doc = _save_notebook(notebook2, self.user)
+    notebook2_doc, save_as = _save_notebook(notebook2.get_data(), self.user)
 
-    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook_doc2], user=self.user, managed=True)
-    
+    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook2_doc], user=self.user, managed=True)
+
     workflow = Workflow(document=workflow_doc, user=self.user)
 
     _data = workflow.get_data()
-    assert_equal(len(_data['nodes']), 5)
+
+    assert_equal(len(_data['workflow']['nodes']), 5)
+    assert_equal(len(re.findall('<ok to="doc-hive-', workflow.to_xml())), 1, workflow.to_xml())
+    assert_equal(len(re.findall('<action name="doc-hive->', workflow.to_xml())), 2, workflow.to_xml())
