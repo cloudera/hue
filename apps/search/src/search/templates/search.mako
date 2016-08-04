@@ -606,7 +606,7 @@ ${ dashboard.layout_skeleton() }
               <i class="fa fa-fw fa-chevron-left"></i>
             <!-- /ko -->
             <!-- ko ifnot: $root.collection.template.showFieldList() -->
-              <i class="fa fa-fw fa-chevron-right"></i>
+              <i class="fa fa-fw fa-columns"></i>
             <!-- /ko -->
           </a>
         </div>
