@@ -2979,9 +2979,7 @@ class WorkflowBuilder():
       nodes.append(node)
 
     workflow_doc = self.get_workflow(nodes, name, document.uuid, user, managed=managed)
-
-    for document in documents:
-      workflow_doc.dependencies.add(document)
+    workflow_doc.dependencies.add(*documents)
 
     return workflow_doc
 
@@ -3135,15 +3133,8 @@ class WorkflowBuilder():
       _prev_node['children'][0]['to'] = node['id'] # We link nodes
       _prev_node = node
 
-#     data = json.dumps(data)
-
-
-    workflow_doc = _save_workflow(data['workflow'], {}, user,) # # from oozie.views.editor2 import _save_workflow
+    workflow_doc = _save_workflow(data['workflow'], {}, user)
     workflow_doc.is_managed = managed
     workflow_doc.save()
-# is_managed
-
-#     workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
-#     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
     return workflow_doc
