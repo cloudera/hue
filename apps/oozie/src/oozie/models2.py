@@ -26,6 +26,7 @@ from dateutil.parser import parse
 from string import Template
 
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
@@ -48,7 +49,6 @@ from notebook.models import Notebook
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
-# from oozie.views.editor2 import _save_workflow
 
 
 LOG = logging.getLogger(__name__)
@@ -433,7 +433,7 @@ class Workflow(Job):
     data = self.get_data()
     nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if
                                                                    node.name == 'End']  # End at the end
-    node_mapping = dict([(node.id, node) for node in nodes]) 
+    node_mapping = dict([(node.id, node) for node in nodes])
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict(
       [(workflow.uuid, Workflow(document=workflow, user=self.user)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
@@ -2915,6 +2915,48 @@ class History(object):
       pass
 
 
+def _import_workspace(fs, user, job):
+  source_workspace_dir = job.deployment_dir
+
+  job.set_workspace(user)
+  job.check_workspace(fs, user)
+  job.import_workspace(fs, source_workspace_dir, user)
+
+
+def _save_workflow(workflow, layout, user, fs=None):
+  if workflow.get('id'):
+    workflow_doc = Document2.objects.get(id=workflow['id'])
+  else:
+    workflow_doc = Document2.objects.create(name=workflow['name'], uuid=workflow['uuid'], type='oozie-workflow2', owner=user, description=workflow['properties']['description'])
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
+  # Excludes all the sub-workflow and Hive dependencies. Contains list of history and coordinator dependencies.
+  workflow_doc.dependencies = workflow_doc.dependencies.exclude(Q(is_history=False) & Q(type__in=['oozie-workflow2', 'query-hive', 'query-java']))
+
+  dependencies = \
+      [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
+      [node['properties']['uuid'] for node in workflow['nodes'] if 'document-widget' in node['type']]
+  if dependencies:
+    dependency_docs = Document2.objects.filter(uuid__in=dependencies)
+    workflow_doc.dependencies.add(*dependency_docs)
+
+  if workflow['properties'].get('imported'): # We convert from and old workflow format (3.8 <) to the latest
+    workflow['properties']['imported'] = False
+    workflow_instance = Workflow(workflow=workflow, user=user)
+    _import_workspace(fs, user, workflow_instance)
+    workflow['properties']['deployment_dir'] = workflow_instance.deployment_dir
+
+  workflow_doc.update_data({'workflow': workflow})
+  workflow_doc.update_data({'layout': layout})
+  workflow_doc1 = workflow_doc.doc.get()
+  workflow_doc.name = workflow_doc1.name = workflow['name']
+  workflow_doc.description = workflow_doc1.description = workflow['properties']['description']
+  workflow_doc.save()
+  workflow_doc1.save()
+
+  return workflow_doc
+
+
 class WorkflowBuilder():
   """
   Building a workflow that has saved Documents for nodes (e.g Saved Hive query, saved Pig script...).
@@ -2928,16 +2970,16 @@ class WorkflowBuilder():
     if name is None:
       name = _('Schedule of ') + ','.join([document.name or document.type for document in documents])
 
-    for document in documents:     
+    for document in documents:
       if document.type == 'query-java':
         node = self.get_java_document_node(document, name)
       else:
         node = self.get_hive_document_node(document, name, user)
-  
+
       nodes.append(node)
 
     workflow_doc = self.get_workflow(nodes, name, document.uuid, user, managed=managed)
-    
+
     for document in documents:
       workflow_doc.dependencies.add(document)
 
@@ -2956,8 +2998,7 @@ class WorkflowBuilder():
     return {
         u'name': u'doc-hive-%s' % document.uuid[:4],
         u'id': str(uuid.uuid4()),
-        u'type': u'hive-document-widget',        
-        u'actionParametersUI': [],
+        u'type': u'hive-document-widget',
         u'properties': {
             u'files': [],
             u'job_xml': u'',
@@ -2982,8 +3023,7 @@ class WorkflowBuilder():
             u'credentials': credentials,
             u'password': u'',
             u'jdbc_url': u'',
-            },
-        u'actionParametersFetched': False,
+        },
         u'children': [
             {u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
             {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
@@ -3028,26 +3068,6 @@ class WorkflowBuilder():
     data = {
       'workflow': {
       u'name': name,
-#       u'versions': [u'uri:oozie:workflow:0.4', u'uri:oozie:workflow:0.4.5', u'uri:oozie:workflow:0.5'],
-#       u'isDirty': False,
-#       u'movedNode': None,
-#       u'linkMapping': {
-#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': [],
-#           u'3f107997-04cc-8733-60a9-a4bb62cebffc': [
-#               u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
-#           ],
-#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': [
-#               u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'
-#           ],
-#           u'17c9c895-5a16-7443-bb81-f34b30b21548': [],
-#       },
-#       u'nodeIds': [
-#           u'3f107997-04cc-8733-60a9-a4bb62cebffc',
-#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
-#           u'17c9c895-5a16-7443-bb81-f34b30b21548',
-#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c'
-#       ],
-#       u'id': 47,
       u'nodes': [{
           u'name': u'Start',
           u'properties': {},
@@ -3071,8 +3091,7 @@ class WorkflowBuilder():
               u'cc': u'',
               u'to': u'',
               u'enableMail': False,
-              u'message': u'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'
-                  ,
+              u'message': u'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]',
               u'subject': u'',
               },
           u'actionParametersFetched': False,
@@ -3104,12 +3123,6 @@ class WorkflowBuilder():
           u'parameters': parameters,
           u'properties': [],
           },
-#       u'nodeNamesMapping': {
-#           u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a': u'End',
-#           u'3f107997-04cc-8733-60a9-a4bb62cebffc': u'Start',
-#           u'0aec471d-2b7c-d93d-b22c-2110fd17ea2c': u'doc-1',
-#           u'17c9c895-5a16-7443-bb81-f34b30b21548': u'Kill',
-#           },
       u'uuid': str(uuid.uuid4()),
       }
     }
@@ -3122,12 +3135,15 @@ class WorkflowBuilder():
       _prev_node['children'][0]['to'] = node['id'] # We link nodes
       _prev_node = node
 
-    data = json.dumps(data)
-    
-#     workflow_doc = _save_workflow(workflow, layout, user, fs)
+#     data = json.dumps(data)
+
+
+    workflow_doc = _save_workflow(data['workflow'], {}, user,) # # from oozie.views.editor2 import _save_workflow
+    workflow_doc.is_managed = managed
+    workflow_doc.save()
 # is_managed
-    
-    workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
-    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
+#     workflow_doc = Document2.objects.create(name=name, type='oozie-workflow2', owner=user, data=data, is_managed=managed)
+#     Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
 
     return workflow_doc

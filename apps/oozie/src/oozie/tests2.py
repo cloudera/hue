@@ -985,7 +985,10 @@ class TestModelAPI(OozieMockBase):
     notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
     notebook_doc = _save_notebook(notebook, self.user)
 
-    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook_doc], user=self.user, managed=True)
+    notebook2 = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
+    notebook2_doc = _save_notebook(notebook2, self.user)
+
+    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook_doc2], user=self.user, managed=True)
     
     workflow = Workflow(document=workflow_doc, user=self.user)
 
