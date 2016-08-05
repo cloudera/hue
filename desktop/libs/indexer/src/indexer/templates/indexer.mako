@@ -121,6 +121,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="create-index-wizard">
   <div data-bind="visible: createWizard.show">
+    <!-- ko if: currentStep() == 1 -->
     <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
@@ -165,11 +166,14 @@ ${ assist.assistPanel() }
         ${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
       </h3>
       <div data-bind="with: createWizard.fileFormat().format">
-
         <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
       </div>
+    </div>
+    <!-- /ko -->
+
 
         <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
+          <!-- ko if: currentStep() == 2 -->
           <h3>${_('Fields')}</h3>
           <!-- ko if: createWizard.isGuessingFieldTypes -->
             <i class="fa fa-spinner fa-spin"></i>
@@ -177,7 +181,9 @@ ${ assist.assistPanel() }
           <div data-bind="foreach: createWizard.fileFormat().columns">
             <div data-bind="template: { name:'field-template',data:$data}"></div>
           </div>
+          <!-- /ko -->
 
+          <!-- ko if: currentStep() == 3 -->
           <h3>${_('Preview')}</h3>
           <!-- ko if: createWizard.isGuessingFieldTypes -->
             <i class="fa fa-spinner fa-spin"></i>
@@ -203,11 +209,21 @@ ${ assist.assistPanel() }
               </tbody>
             </table>
           </div>
+          <!-- /ko -->
         <!-- /ko -->
 
-        <br><hr><br>
 
+      <!-- ko if: previousStepVisible -->
+        <a class="btn" data-bind="click: previousStep">${ _('Previous') }</a>
+      <!-- /ko -->
+
+      <!-- ko if: nextStepVisible -->
+        <a class="btn" data-bind="click: nextStep">${ _('Next') }</a>
+      <!-- /ko -->
+
+      <!-- ko if: currentStep() == 3 -->
         <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">${_('Index File!')}</a>
+      <!-- /ko -->
 
         <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Will try to add to existing collection')}</h4>
         <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('Collection needs a name')}</h4>
@@ -217,9 +233,7 @@ ${ assist.assistPanel() }
           ${_('View Indexing Status')}
         </a>
 
-      </div>
 
-    <br/>
   </div>
 </script>
 
@@ -595,13 +609,11 @@ ${ assist.assistPanel() }
           var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
           self.fileFormat().format(newFormat);
           self.guessFieldTypes();
-
           self.fileFormat().show(true);
-
           viewModel.isLoading(false);
+          viewModel.wizardEnabled(true);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
-
           viewModel.isLoading(false);
         });
       }
@@ -684,13 +696,33 @@ ${ assist.assistPanel() }
       return koField;
     }
 
-    var Editor = function (options) {
+    var IndexerViewModel = function (options) {
       var self = this;
 
       self.apiHelper = ApiHelper.getInstance(options);
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
+      // wizard related
+      self.wizardEnabled = ko.observable(false);
+      self.currentStep = ko.observable(1);
+      self.previousStepVisible = ko.pureComputed(function(){
+        return self.currentStep() > 1;
+      });
+      self.nextStepVisible = ko.pureComputed(function(){
+        return self.currentStep() < 3 && self.wizardEnabled();
+      });
+      self.nextStep = function () {
+        if (self.nextStepVisible()){
+          self.currentStep(self.currentStep()+1);
+        }
+      }
+      self.previousStep = function () {
+        if (self.previousStepVisible()){
+          self.currentStep(self.currentStep()-1);
+        }
+      }
 
       self.collections = ${ indexes_json | n }.
       filter(function (index) {
@@ -719,7 +751,7 @@ ${ assist.assistPanel() }
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         }
       }
-      viewModel = new Editor(options);
+      viewModel = new IndexerViewModel(options);
       ko.applyBindings(viewModel);
     });
   });
