@@ -557,6 +557,12 @@ ${ assist.assistPanel() }
 
       // Table
       self.table = ko.observable('');
+      self.tableName = ko.computed(function() {
+        return self.table().indexOf('.') > 0 ? self.table().split('.', 1)[1] : self.table();
+      });
+      self.databaseName = ko.computed(function() {
+        return self.table().indexOf('.') > 0 ? self.table().split('.', 1)[0] : 'default';
+      });
 
       // Queries
       self.query = ko.observable('');

@@ -20,14 +20,17 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from beeswax.server import dbms
 from desktop.lib.django_util import JsonResponse
+from notebook.connectors.base import get_api
 
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
-from notebook.connectors.base import get_api
 from indexer.file_format import HiveFormat
 
+
 LOG = logging.getLogger(__name__)
+
 
 def _escape_white_space_characters(s, inverse = False):
   MAPPINGS = {
@@ -64,7 +67,8 @@ def guess_format(request):
       })
     _convert_format(format_)
   elif file_format['inputFormat'] == 'table':
-    #TODO get table
+    #TODO get table file format
+    # if not CSV?
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"}
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"} # \t --> CTRL+A
@@ -73,7 +77,7 @@ def guess_format(request):
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
-  
+
   if file_format['inputFormat'] == 'file':
     indexer = Indexer(request.user, request.fs)
     stream = request.fs.open(file_format["path"])
@@ -87,13 +91,7 @@ def guess_field_types(request):
       "format": file_format['format']
     })
   elif file_format['inputFormat'] == 'table':
-    if '.' in file_format["table"]:
-      database, table = file_format["table"].lsplit('.', 1)
-    else:
-      database = 'default'
-      table = file_format["table"]
-
-    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=database, table=table)
+    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
 
     format_ = {
         "sample": sample['rows'][:4],
@@ -129,7 +127,9 @@ def index_file(request):
     collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
 
   if file_format['inputFormat'] == 'table':
-    input_path = '/user/hive/warehouse/sample_07' #TODO get table
+    db = dbms.get(request.user)
+    table_metadata = db.get_table(database=file_format['databaseName'], table=file_format['tableName'])
+    input_path = table_metadata.hdfs_link
   else:
     input_path = file_format["path"]
 
