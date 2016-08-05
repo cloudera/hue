@@ -147,7 +147,7 @@ ${ assist.assistPanel() }
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
           <input type="text" data-bind="value: createWizard.fileFormat().table">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessTableFormat">${_('Select')}</a>
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
 
@@ -155,7 +155,7 @@ ${ assist.assistPanel() }
         <label for="path" class="control-label">${ _('Query') }</label>
         <div class="controls">
           <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessHiveQueryFormat">${_('Select')}</a>
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
     </div>
@@ -622,12 +622,6 @@ ${ assist.assistPanel() }
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
         });
-      };
-
-      self.guessTableFormat = function () {
-      };
-
-      self.guessHiveQueryFormat = function () {
       };
 
       self.isGuessingFieldTypes = ko.observable(false);
