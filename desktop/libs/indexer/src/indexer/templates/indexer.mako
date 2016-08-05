@@ -168,7 +168,7 @@ ${ assist.assistPanel() }
             3
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Index it') }</div>
+        <div class="caption">${ _('Index it!') }</div>
       </li>
     </ol>
 
