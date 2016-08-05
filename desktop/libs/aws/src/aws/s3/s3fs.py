@@ -76,6 +76,24 @@ class S3FileSystem(object):
         raise e
     return bucket
 
+  def _delete_bucket(self, name):
+    try:
+      # Verify that bucket exists and user has permissions to access it
+      bucket = self._get_bucket(name)
+      # delete keys from bucket first
+      for key in bucket.list():
+        key.delete()
+      self._s3_connection.delete_bucket(name)
+      # Remove bucket from bucket cache
+      self._bucket_cache.pop(name)
+      LOG.info('Successfully deleted bucket name "%s" and all its contents.' % name)
+    except S3ResponseError, e:
+      if e.status == 403:
+        raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
+          'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
+      else:
+        raise S3FileSystemException(e.message)
+
   def _get_key(self, path, validate=True):
     bucket_name, key_name = s3.parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
@@ -221,27 +239,27 @@ class S3FileSystem(object):
 
     bucket_name, key_name = s3.parse_uri(path)[:2]
     if bucket_name and not key_name:
-      raise NotImplementedError(_('Deleting a bucket is not implemented for S3'))
-
-    key = self._get_key(path, validate=False)
-
-    if key.exists():
-      to_delete = iter([key])
+      self._delete_bucket(bucket_name)
     else:
-      to_delete = iter([])
+      key = self._get_key(path, validate=False)
 
-    if self.isdir(path):
-      # add `/` to prevent removing of `s3://b/a_new` trying to remove `s3://b/a`
-      prefix = self._append_separator(key.name)
-      keys = key.bucket.list(prefix=prefix)
-      to_delete = itertools.chain(keys, to_delete)
-    result = key.bucket.delete_keys(to_delete)
-    if result.errors:
-      msg = "%d errors occurred during deleting '%s':\n%s" % (
-        len(result.errors),
-        '\n'.join(map(repr, result.errors)))
-      LOG.error(msg)
-      raise S3FileSystemException(msg)
+      if key.exists():
+        to_delete = iter([key])
+      else:
+        to_delete = iter([])
+
+      if self.isdir(path):
+        # add `/` to prevent removing of `s3://b/a_new` trying to remove `s3://b/a`
+        prefix = self._append_separator(key.name)
+        keys = key.bucket.list(prefix=prefix)
+        to_delete = itertools.chain(keys, to_delete)
+      result = key.bucket.delete_keys(to_delete)
+      if result.errors:
+        msg = "%d errors occurred during deleting '%s':\n%s" % (
+          len(result.errors),
+          '\n'.join(map(repr, result.errors)))
+        LOG.error(msg)
+        raise S3FileSystemException(msg)
 
   @translate_s3_error
   def remove(self, path, skip_trash=True):
