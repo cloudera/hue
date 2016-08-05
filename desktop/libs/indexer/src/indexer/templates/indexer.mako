@@ -190,34 +190,36 @@ ${ assist.assistPanel() }
       </div>
     </div>
 
-    <div class="control-group">
-      <label for="collectionType" class="control-label">${ _('Type') }</label>
-      <div class="controls">
-        <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
+    <div data-bind="visible: createWizard.fileFormat().name().length > 0">
+      <div class="control-group">
+        <label for="collectionType" class="control-label">${ _('Type') }</label>
+        <div class="controls">
+          <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
+        </div>
       </div>
-    </div>
 
-    <div class="control-group"  data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
-      <label for="path" class="control-label">${ _('Path') }</label>
-      <div class="controls">
-        <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
-        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+      <div class="control-group"  data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
+        <label for="path" class="control-label">${ _('Path') }</label>
+        <div class="controls">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+        </div>
       </div>
-    </div>
 
-    <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
-      <label for="path" class="control-label">${ _('Table') }</label>
-      <div class="controls">
-        <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
-        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+      <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
+        <label for="path" class="control-label">${ _('Table') }</label>
+        <div class="controls">
+          <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+        </div>
       </div>
-    </div>
 
-    <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
-      <label for="path" class="control-label">${ _('Query') }</label>
-      <div class="controls">
-        <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
-        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+      <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
+        <label for="path" class="control-label">${ _('Query') }</label>
+        <div class="controls">
+          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+        </div>
       </div>
     </div>
 
@@ -518,7 +520,7 @@ ${ assist.assistPanel() }
       var init = function () {
         self.type = ko.observable(typeName);
 
-        var types = viewModel.createWizard.fileTypes
+        var types = viewModel.createWizard.fileTypes;
 
         for (var i = 0; i < types.length; i++) {
           if (types[i].name == typeName) {
@@ -574,10 +576,10 @@ ${ assist.assistPanel() }
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
-        return self.table().indexOf('.') > 0 ? self.table().split('.', 1)[1] : self.table();
+        return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[1] : self.table();
       });
       self.databaseName = ko.computed(function() {
-        return self.table().indexOf('.') > 0 ? self.table().split('.', 1)[0] : 'default';
+        return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[0] : 'default';
       });
 
       // Queries
