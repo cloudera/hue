@@ -146,16 +146,16 @@ ${ assist.assistPanel() }
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+          <input type="text" data-bind="value: createWizard.fileFormat().table">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessTableFormat">${_('Select')}</a>
         </div>
       </div>
 
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
         <label for="path" class="control-label">${ _('Query') }</label>
         <div class="controls">
-          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', filechooserOptions: { skipInitialPathIfEmpty: true }"></select>
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessHiveQueryFormat">${_('Select')}</a>
         </div>
       </div>
     </div>
@@ -505,10 +505,6 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable('');
-      self.show = ko.observable(false);
-
-      self.inputFormat = ko.observable('file');
-      self.inputFormats = ko.observableArray(['file', 'table', 'query']);
 
       self.inputFormat = ko.observable('file');
       self.inputFormat.subscribe(function(val) {
@@ -546,6 +542,16 @@ ${ assist.assistPanel() }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
+
+      self.show = ko.computed(function() {
+        if (self.inputFormat() == 'file') {
+          return self.path().length > 0 && self.columns().length > 0;
+        } else if (self.inputFormat() == 'table') {
+          return self.table().length > 0;
+        } else if (self.inputFormat() == 'query') {
+          return self.query().length > 0;
+        }
+      });
     };
 
     var CreateWizard = function (vm) {
@@ -609,18 +615,26 @@ ${ assist.assistPanel() }
           var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
           self.fileFormat().format(newFormat);
           self.guessFieldTypes();
-          self.fileFormat().show(true);
+
           viewModel.isLoading(false);
           viewModel.wizardEnabled(true);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
         });
-      }
+      };
+
+      self.guessTableFormat = function () {
+      };
+
+      self.guessHiveQueryFormat = function () {
+      };
 
       self.isGuessingFieldTypes = ko.observable(false);
       self.guessFieldTypes = function () {
-        if (guessFieldTypesXhr) guessFieldTypesXhr.abort();
+        if (guessFieldTypesXhr) {
+          guessFieldTypesXhr.abort();
+        }
         self.isGuessingFieldTypes(true);
         guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }", {
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
