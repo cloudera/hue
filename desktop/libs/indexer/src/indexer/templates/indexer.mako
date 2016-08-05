@@ -127,7 +127,7 @@ ${ assist.assistPanel() }
   <div data-bind="visible: createWizard.show">
 
     <ol class="list-inline text-center step-indicator">
-      <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }">
+      <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
         <div class="step">
           <!-- ko if: currentStep() == 1 -->
             <!-- ko if: createWizard.isGuessingFormat -->
@@ -143,7 +143,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="caption">${ _('Pick it') }</div>
       </li>
-      <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }">
+      <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
         <div class="step">
           <!-- ko if: currentStep() < 3 -->
             <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -159,7 +159,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="caption">${ _('Tweak it') }</div>
       </li>
-      <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3 }">
+      <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3 }, click: function() { currentStep(3) }">
         <div class="step">
           <!-- ko if: createWizard.isIndexing -->
             <span class="fa fa-spinner fa-spin"></span>
@@ -172,42 +172,47 @@ ${ assist.assistPanel() }
       </li>
     </ol>
 
+    <form class="form-horizontal">
+
     <!-- ko if: currentStep() == 1 -->
     <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
-        <input type="text" class="form-control" id = "collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === true">${ _('Creating a new collection') }</span>
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('Adding data to this existing collection') }</span>
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
+        <input type="text" class="form-control" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
+        <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('Creating a new collection') }</span>
+        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Adding data to this existing collection') }</span>
+        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
       </div>
     </div>
 
-    <div class="control-group" data-bind="visible: createWizard.fileFormat().name().length > 0">
-      <select data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
-
-      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
-        <label for="path" class="control-label">${ _('Path') }</label>
-        <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
-        </div>
+    <div class="control-group">
+      <label for="collectionType" class="control-label">${ _('Type') }</label>
+      <div class="controls">
+        <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
       </div>
+    </div>
 
-      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
-        <label for="path" class="control-label">${ _('Table') }</label>
-        <div class="controls">
-          <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
-        </div>
+    <div class="control-group"  data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
+      <label for="path" class="control-label">${ _('Path') }</label>
+      <div class="controls">
+        <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
       </div>
+    </div>
 
-      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
-        <label for="path" class="control-label">${ _('Query') }</label>
-        <div class="controls">
-          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
-        </div>
+    <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
+      <label for="path" class="control-label">${ _('Table') }</label>
+      <div class="controls">
+        <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
+        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+      </div>
+    </div>
+
+    <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
+      <label for="path" class="control-label">${ _('Query') }</label>
+      <div class="controls">
+        <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
+        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
       </div>
     </div>
 
@@ -276,16 +281,14 @@ ${ assist.assistPanel() }
         <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">${_('Index File!')}</a>
       <!-- /ko -->
 
-        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Will try to add to existing collection')}</h4>
-        <h4 class="error" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('Collection needs a name')}</h4>
+      <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+        ${_('View Indexing Status')}
+      </a>
 
-
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-          ${_('View Indexing Status')}
-        </a>
-
+    </form>
 
   </div>
+
 </script>
 
 <script type="text/html" id="format-settings">
@@ -596,7 +599,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'table') {
           return self.table().length > 0;
         } else if (self.inputFormat() == 'query') {
-          return self.query().length > 0;
+          return self.query() && self.query().length > 0;
         }
       });
     };
