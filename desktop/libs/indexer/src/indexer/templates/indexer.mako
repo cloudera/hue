@@ -98,8 +98,10 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
 
-        <div class="right-panel" style="padding: 10px">
+        <div class="right-panel">
+          <div style="margin: 10px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
+          </div>
         </div>
       </div>
     </div>
