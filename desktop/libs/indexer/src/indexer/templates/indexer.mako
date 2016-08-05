@@ -127,7 +127,12 @@ ${ assist.assistPanel() }
       <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }">
         <div class="step">
           <!-- ko if: currentStep() == 1 -->
-          1
+            <!-- ko if: createWizard.isGuessingFormat -->
+              <span class="fa fa-spinner fa-spin"></span>
+            <!-- /ko -->
+            <!-- ko ifnot: createWizard.isGuessingFormat -->
+              1
+            <!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: currentStep() == 1 -->
           <span class="fa fa-check"></span>
@@ -138,7 +143,12 @@ ${ assist.assistPanel() }
       <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }">
         <div class="step">
           <!-- ko if: currentStep() < 3 -->
-          2
+            <!-- ko if: createWizard.isGuessingFieldTypes -->
+              <span class="fa fa-spinner fa-spin"></span>
+            <!-- /ko -->
+            <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
+              2
+            <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: currentStep() == 3 -->
           <span class="fa fa-check"></span>
@@ -147,7 +157,14 @@ ${ assist.assistPanel() }
         <div class="caption">${ _('Tweak it') }</div>
       </li>
       <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3 }">
-        <div class="step">3</div>
+        <div class="step">
+          <!-- ko if: createWizard.isIndexing -->
+            <span class="fa fa-spinner fa-spin"></span>
+          <!-- /ko -->
+          <!-- ko ifnot: createWizard.isIndexing -->
+            3
+          <!-- /ko -->
+        </div>
         <div class="caption">${ _('Index it') }</div>
       </li>
     </ol>
@@ -350,32 +367,22 @@ ${ assist.assistPanel() }
   <br>
 </script>
 
-<div class="hueOverlay" data-bind="visible: isLoading">
-  <!--[if lte IE 9]>
-    <img src="${ static('desktop/art/spinner-big.gif') }" />
-  <![endif]-->
-  <!--[if !IE]> -->
-    <i class="fa fa-spinner fa-spin"></i>
-  <!-- <![endif]-->
-</div>
-
-
 <script type="text/javascript" charset="utf-8">
 
   require([
     "knockout",
     "ko.charts",
     "desktop/js/apiHelper",
+    "notebook/js/notebook.ko",
     "assistPanel",
     "tableStats",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
     "ko.hue-bindings"
-  ], function (ko, charts, ApiHelper) {
+  ], function (ko, charts, ApiHelper, EditorViewModel) {
 
     ko.options.deferUpdates = true;
-
 
     var fieldNum = 0;
 
@@ -451,7 +458,7 @@ ${ assist.assistPanel() }
             self.fields(self.fields().slice(0, numExpectedFields));
           }
           else if (numExpectedFields > self.fields().length) {
-            difference = numExpectedFields - self.fields().length;
+            var difference = numExpectedFields - self.fields().length;
 
             for (var i = 0; i < difference; i++) {
               self.fields.push(createDefaultField());
@@ -638,8 +645,9 @@ ${ assist.assistPanel() }
         }
       });
 
+      self.isGuessingFormat = ko.observable(false);
       self.guessFormat = function () {
-        viewModel.isLoading(true);
+        self.isGuessingFormat(true);
         $.post("${ url('indexer:guess_format') }", {
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
         }, function (resp) {
@@ -647,7 +655,7 @@ ${ assist.assistPanel() }
           self.fileFormat().format(newFormat);
           self.guessFieldTypes();
 
-          viewModel.isLoading(false);
+          self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
@@ -675,15 +683,17 @@ ${ assist.assistPanel() }
           self.isGuessingFieldTypes(false);
           viewModel.isLoading(false);
         });
-        ;
       };
 
+      self.isIndexing = ko.observable(false);
       self.indexFile = function () {
         if (!self.readyToIndex()) return;
 
         self.indexingStarted(true);
 
         viewModel.isLoading(true);
+
+        self.isIndexing(true);
 
         $.post("${ url('indexer:index_file') }", {
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
