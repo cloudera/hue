@@ -137,7 +137,7 @@ ${ assist.assistPanel() }
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
         <label for="path" class="control-label">${ _('Path') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
         </div>
       </div>
@@ -145,7 +145,7 @@ ${ assist.assistPanel() }
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
         </div>
       </div>
@@ -153,7 +153,7 @@ ${ assist.assistPanel() }
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
         <label for="path" class="control-label">${ _('Query') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
@@ -171,11 +171,17 @@ ${ assist.assistPanel() }
 
         <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
           <h3>${_('Fields')}</h3>
+          <!-- ko if: createWizard.isGuessingFieldTypes -->
+            <i class="fa fa-spinner fa-spin"></i>
+          <!-- /ko -->
           <div data-bind="foreach: createWizard.fileFormat().columns">
             <div data-bind="template: { name:'field-template',data:$data}"></div>
           </div>
 
           <h3>${_('Preview')}</h3>
+          <!-- ko if: createWizard.isGuessingFieldTypes -->
+            <i class="fa fa-spinner fa-spin"></i>
+          <!-- /ko -->
           <div style="overflow: auto">
             <table style="margin:auto;text-align:left">
               <thead>
@@ -326,356 +332,358 @@ ${ assist.assistPanel() }
     ko.options.deferUpdates = true;
 
 
-  var fieldNum = 0;
+    var fieldNum = 0;
 
-  var getNewFieldName = function () {
-    fieldNum++;
-    return "new_field_" + fieldNum
-  }
-
-  var createDefaultField = function () {
-    var defaultField = ${default_field_type | n};
-
-    defaultField.name = getNewFieldName();
-
-    return defaultField;
-  };
-
-  var Operation = function (type) {
-    var self = this;
-
-    var createArgumentValue = function (arg) {
-      if (arg.type == "mapping") {
-        return ko.observableArray([]);
-      }
-      else if (arg.type == "checkbox") {
-        return ko.observable(false);
-      }
-      else {
-        return ko.observable("");
-      }
+    var getNewFieldName = function () {
+      fieldNum++;
+      return "new_field_" + fieldNum
     }
 
-    var constructSettings = function (type) {
-      var settings = {};
+    var createDefaultField = function () {
+      var defaultField = ${default_field_type | n};
 
-      var operation = viewModel.createWizard.operationTypes.find(function (currOperation) {
-        return currOperation.name == type;
-      });
+      defaultField.name = getNewFieldName();
 
-      for (var i = 0; i < operation.args.length; i++) {
-        var argVal = createArgumentValue(operation.args[i]);
+      return defaultField;
+    };
 
-        if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
-          argVal.subscribe(function (newVal) {
-            if (newVal) {
-              self.fields.push(createDefaultField());
-            }
-            else {
-              self.fields.pop();
-            }
-          });
+    var Operation = function (type) {
+      var self = this;
+
+      var createArgumentValue = function (arg) {
+        if (arg.type == "mapping") {
+          return ko.observableArray([]);
         }
-
-        settings[operation.args[i].name] = argVal;
+        else if (arg.type == "checkbox") {
+          return ko.observable(false);
+        }
+        else {
+          return ko.observable("");
+        }
       }
 
-      settings.getArguments = function () {
-        return operation.args
+      var constructSettings = function (type) {
+        var settings = {};
+
+        var operation = viewModel.createWizard.operationTypes.find(function (currOperation) {
+          return currOperation.name == type;
+        });
+
+        for (var i = 0; i < operation.args.length; i++) {
+          var argVal = createArgumentValue(operation.args[i]);
+
+          if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
+            argVal.subscribe(function (newVal) {
+              if (newVal) {
+                self.fields.push(createDefaultField());
+              }
+              else {
+                self.fields.pop();
+              }
+            });
+          }
+
+          settings[operation.args[i].name] = argVal;
+        }
+
+        settings.getArguments = function () {
+          return operation.args
+        };
+
+        settings.outputType = function () {
+          return operation.outputType;
+        }
+
+        return settings;
       };
 
-      settings.outputType = function () {
-        return operation.outputType;
+      var init = function () {
+        self.fields([]);
+        self.numExpectedFields(0);
+
+        self.numExpectedFields.subscribe(function (numExpectedFields) {
+          if (numExpectedFields < self.fields().length) {
+            self.fields(self.fields().slice(0, numExpectedFields));
+          }
+          else if (numExpectedFields > self.fields().length) {
+            difference = numExpectedFields - self.fields().length;
+
+            for (var i = 0; i < difference; i++) {
+              self.fields.push(createDefaultField());
+            }
+          }
+        });
+
+        self.settings(constructSettings(self.type()));
       }
 
-      return settings;
-    };
+      self.load = function (data) {
+        self.numExpectedFields(data.numExpectedFields);
 
-    var init = function () {
-      self.fields([]);
-      self.numExpectedFields(0);
-
-      self.numExpectedFields.subscribe(function (numExpectedFields) {
-        if (numExpectedFields < self.fields().length) {
-          self.fields(self.fields().slice(0, numExpectedFields));
+        var newSettings = constructSettings(data.type);
+        for (var key in data.settings) {
+          newSettings[key] = ko.mapping.fromJS(data.settings[key]);
         }
-        else if (numExpectedFields > self.fields().length) {
-          difference = numExpectedFields - self.fields().length;
+        self.settings(newSettings);
 
-          for (var i = 0; i < difference; i++) {
-            self.fields.push(createDefaultField());
+        data.fields.forEach(function (field) {
+          self.fields.push(loadField(field));
+        });
+      }
+
+      self.type = ko.observable(type);
+      self.fields = ko.observableArray();
+      self.numExpectedFields = ko.observable();
+      self.settings = ko.observable();
+
+      init();
+
+      self.type.subscribe(function (newType) {
+        init();
+      });
+    }
+
+    var FileType = function (typeName, args) {
+      var self = this;
+      var type;
+
+      var init = function () {
+        self.type = ko.observable(typeName);
+
+        var types = viewModel.createWizard.fileTypes
+
+        for (var i = 0; i < types.length; i++) {
+          if (types[i].name == typeName) {
+            type = types[i];
+            break;
           }
         }
-      });
 
-      self.settings(constructSettings(self.type()));
-    }
+        for (var i = 0; i < type.args.length; i++) {
+          self[type.args[i].name] = ko.observable();
+        }
 
-    self.load = function(data){
-      self.numExpectedFields(data.numExpectedFields);
+        if (args) loadFromObj(args);
 
-      var newSettings = constructSettings(data.type);
-      for(var key in data.settings){
-        newSettings[key] = ko.mapping.fromJS(data.settings[key]);
+        for (var i = 0; i < type.args.length; i++) {
+          self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
+        }
       }
-      self.settings(newSettings);
 
-      data.fields.forEach(function(field){
-        self.fields.push(loadField(field));
-      });
-    }
+      var loadFromObj = function (args) {
+        for (var attr in args) {
+          self[attr] = ko.mapping.fromJS(args[attr]);
+        }
+      }
 
-    self.type = ko.observable(type);
-    self.fields = ko.observableArray();
-    self.numExpectedFields = ko.observable();
-    self.settings = ko.observable();
+      self.getArguments = function () {
+        return type.args;
+      }
 
-    init();
+      self.isCustomizable = function () {
+        return type.isCustomizable;
+      }
 
-    self.type.subscribe(function (newType) {
       init();
-    });
-  }
-
-  var FileType = function (typeName, args) {
-    var self = this;
-    var type;
-
-    var init = function () {
-      self.type = ko.observable(typeName);
-
-      var types = viewModel.createWizard.fileTypes
-
-      for (var i = 0; i < types.length; i++) {
-        if (types[i].name == typeName) {
-          type = types[i];
-          break;
-        }
-      }
-
-      for (var i = 0; i < type.args.length; i++) {
-        self[type.args[i].name] = ko.observable();
-      }
-
-      if (args) loadFromObj(args);
-
-      for (var i = 0; i < type.args.length; i++) {
-        self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
-      }
     }
 
-    var loadFromObj = function (args) {
-      for (var attr in args) {
-        self[attr] = ko.mapping.fromJS(args[attr]);
-      }
-    }
 
-    self.getArguments = function () {
-      return type.args;
-    }
+    var IndexerFormat = function (vm) {
+      var self = this;
 
-    self.isCustomizable = function () {
-      return type.isCustomizable;
-    }
+      self.name = ko.observable('');
+      self.show = ko.observable(false);
 
-    init();
-  }
+      self.inputFormat = ko.observable('file');
+      self.inputFormats = ko.observableArray(['file', 'table', 'query']);
 
+      self.path = ko.observable('');
+      self.table = ko.observable('');
 
-  var IndexerFormat = function (vm) {
-    var self = this;
-
-    self.name = ko.observable('');
-    self.show = ko.observable(false);
-
-    self.inputFormat = ko.observable('file');
-    self.inputFormats = ko.observableArray(['file', 'table', 'query']);
-
-    self.path = ko.observable('');
-    self.table = ko.observable('');
-
-    self.format = ko.observable();
-    self.columns = ko.observableArray();
-  };
-
-
-  var CreateWizard = function (vm) {
-    var self = this;
-    var guessFieldTypesXhr;
-
-    self.fileType = ko.observable();
-    self.fileType.subscribe(function (newType) {
-      if (self.fileFormat().format()) self.fileFormat().format().type(newType.name);
-    });
-
-    self.operationTypes = ${operators_json | n};
-
-    self.fieldTypes = ${fields_json | n};
-    self.fileTypes = ${file_types_json | n};
-
-
-    self.show = ko.observable(true);
-    self.showCreate = ko.observable(false);
-
-    self.fileFormat = ko.observable(new IndexerFormat(vm));
-    self.sample = ko.observableArray();
-
-    self.jobId = ko.observable(null);
-
-    self.indexingStarted = ko.observable(false);
-
-    self.isNameAvailable = ko.computed(function () {
-      var name = self.fileFormat().name();
-      return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
-    });
-
-    self.readyToIndex = ko.computed(function () {
-      var validFields = self.fileFormat().columns().length;
-
-      return self.fileFormat().name().length > 0 && validFields;
-    });
-
-    self.fileFormat().format.subscribe(function () {
-      for (var i = 0; i < self.fileTypes.length; i++) {
-        if (self.fileTypes[i].name == self.fileFormat().format().type()) {
-          self.fileType(self.fileTypes[i]);
-          break;
-        }
-      }
-
-      if (self.fileFormat().format().type) {
-        self.fileFormat().format().type.subscribe(function (newType) {
-          self.fileFormat().format(new FileType(newType));
-          self.fileFormat().columns.removeAll();
-          self.guessFieldTypes();
-        });
-      }
-    });
-
-    self.guessFormat = function () {
-      viewModel.isLoading(true);
-      $.post("${ url('indexer:guess_format') }", {
-        "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function (resp) {
-        var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
-        self.fileFormat().format(newFormat);
-        self.guessFieldTypes();
-
-        self.fileFormat().show(true);
-
-        viewModel.isLoading(false);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-
-        viewModel.isLoading(false);
-      });
-    }
-
-    self.guessFieldTypes = function () {
-      if (guessFieldTypesXhr) guessFieldTypesXhr.abort();
-      guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }", {
-        "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function (resp) {
-        resp.columns.forEach(function (entry, i, arr) {
-          arr[i] = ko.mapping.fromJS(entry);
-        });
-        self.fileFormat().columns(resp.columns);
-
-        self.sample(resp.sample);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-
-        viewModel.isLoading(false);
-      });
-      ;
+      self.format = ko.observable();
+      self.columns = ko.observableArray();
     };
 
-    self.indexFile = function () {
-      if (!self.readyToIndex()) return;
 
-      self.indexingStarted(true);
+    var CreateWizard = function (vm) {
+      var self = this;
+      var guessFieldTypesXhr;
 
-      viewModel.isLoading(true);
-
-      $.post("${ url('indexer:index_file') }", {
-        "fileFormat": ko.mapping.toJSON(self.fileFormat)
-      }, function (resp) {
-        self.showCreate(true);
-        self.jobId(resp.jobId);
-        viewModel.isLoading(false);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-        viewModel.isLoading(false);
+      self.fileType = ko.observable();
+      self.fileType.subscribe(function (newType) {
+        if (self.fileFormat().format()) self.fileFormat().format().type(newType.name);
       });
-    }
 
-    self.removeOperation = function (operation, operationList) {
-      operationList.remove(operation);
-    }
+      self.operationTypes = ${operators_json | n};
 
-    self.addOperation = function (field) {
-      field.operations.push(new Operation("split"));
-    }
+      self.fieldTypes = ${fields_json | n};
+      self.fileTypes = ${file_types_json | n};
 
-    self.load = function(state){
-      self.fileFormat().name(state.name);
-      self.fileFormat().show(state.show);
-      self.fileFormat().path(state.path);
-      self.fileFormat().columns.removeAll();
-      if (state.format && 'type' in state.format){
-        koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
-        self.fileFormat().format(koFormat);
+
+      self.show = ko.observable(true);
+      self.showCreate = ko.observable(false);
+
+      self.fileFormat = ko.observable(new IndexerFormat(vm));
+      self.sample = ko.observableArray();
+
+      self.jobId = ko.observable(null);
+
+      self.indexingStarted = ko.observable(false);
+
+      self.isNameAvailable = ko.computed(function () {
+        var name = self.fileFormat().name();
+        return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
+      });
+
+      self.readyToIndex = ko.computed(function () {
+        var validFields = self.fileFormat().columns().length;
+
+        return self.fileFormat().name().length > 0 && validFields;
+      });
+
+      self.fileFormat().format.subscribe(function () {
+        for (var i = 0; i < self.fileTypes.length; i++) {
+          if (self.fileTypes[i].name == self.fileFormat().format().type()) {
+            self.fileType(self.fileTypes[i]);
+            break;
+          }
+        }
+
+        if (self.fileFormat().format().type) {
+          self.fileFormat().format().type.subscribe(function (newType) {
+            self.fileFormat().format(new FileType(newType));
+            self.fileFormat().columns.removeAll();
+            self.guessFieldTypes();
+          });
+        }
+      });
+
+      self.guessFormat = function () {
+        viewModel.isLoading(true);
+        $.post("${ url('indexer:guess_format') }", {
+          "fileFormat": ko.mapping.toJSON(self.fileFormat)
+        }, function (resp) {
+          var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
+          self.fileFormat().format(newFormat);
+          self.guessFieldTypes();
+
+          self.fileFormat().show(true);
+
+          viewModel.isLoading(false);
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+
+          viewModel.isLoading(false);
+        });
       }
-      if (state.columns) state.columns.forEach(function(currCol){
-        self.fileFormat().columns.push(loadField(currCol));
+
+      self.isGuessingFieldTypes = ko.observable(false);
+      self.guessFieldTypes = function () {
+        if (guessFieldTypesXhr) guessFieldTypesXhr.abort();
+        self.isGuessingFieldTypes(true);
+        guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }", {
+          "fileFormat": ko.mapping.toJSON(self.fileFormat)
+        }, function (resp) {
+          resp.columns.forEach(function (entry, i, arr) {
+            arr[i] = ko.mapping.fromJS(entry);
+          });
+          self.fileFormat().columns(resp.columns);
+          self.isGuessingFieldTypes(false);
+          self.sample(resp.sample);
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+          self.isGuessingFieldTypes(false);
+          viewModel.isLoading(false);
+        });
+        ;
+      };
+
+      self.indexFile = function () {
+        if (!self.readyToIndex()) return;
+
+        self.indexingStarted(true);
+
+        viewModel.isLoading(true);
+
+        $.post("${ url('indexer:index_file') }", {
+          "fileFormat": ko.mapping.toJSON(self.fileFormat)
+        }, function (resp) {
+          self.showCreate(true);
+          self.jobId(resp.jobId);
+          viewModel.isLoading(false);
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+          viewModel.isLoading(false);
+        });
+      }
+
+      self.removeOperation = function (operation, operationList) {
+        operationList.remove(operation);
+      }
+
+      self.addOperation = function (field) {
+        field.operations.push(new Operation("split"));
+      }
+
+      self.load = function (state) {
+        self.fileFormat().name(state.name);
+        self.fileFormat().show(state.show);
+        self.fileFormat().path(state.path);
+        self.fileFormat().columns.removeAll();
+        if (state.format && 'type' in state.format) {
+          koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
+          self.fileFormat().format(koFormat);
+        }
+        if (state.columns) state.columns.forEach(function (currCol) {
+          self.fileFormat().columns.push(loadField(currCol));
+        });
+      }
+    };
+
+    var loadField = function (currField) {
+      var koField = ko.mapping.fromJS(currField);
+
+      koField.operations.removeAll();
+
+      currField.operations.forEach(function (operationData) {
+        var operation = new Operation(operationData.type);
+        operation.load(operationData);
+
+        koField.operations.push(operation);
       });
+
+      return koField;
     }
-  };
 
-  var loadField = function(currField){
-    var koField = ko.mapping.fromJS(currField);
+    var Editor = function (options) {
+      var self = this;
 
-    koField.operations.removeAll();
+      self.apiHelper = ApiHelper.getInstance(options);
+      self.assistAvailable = ko.observable(true);
+      self.isLeftPanelVisible = ko.observable();
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-    currField.operations.forEach(function(operationData){
-      var operation = new Operation(operationData.type);
-      operation.load(operationData);
-
-      koField.operations.push(operation);
-    });
-
-    return koField;
-  }
-
-  var Editor = function (options) {
-    var self = this;
-
-    self.apiHelper = ApiHelper.getInstance(options);
-    self.assistAvailable = ko.observable(true);
-    self.isLeftPanelVisible = ko.observable();
-    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
-
-    self.collections = ${ indexes_json | n }.
-    filter(function (index) {
-      return index.type == 'collection';
-    });
-
-    self.createWizard = new CreateWizard(self);
-    self.isLoading = ko.observable(false);
-
-    self.collectionNameAvailable = function (name) {
-      var matchingCollections = self.collections.filter(function (collection) {
-        return collection.name == name;
+      self.collections = ${ indexes_json | n }.
+      filter(function (index) {
+        return index.type == 'collection';
       });
 
-      return matchingCollections.length == 0;
-    }
-  };
+      self.createWizard = new CreateWizard(self);
+      self.isLoading = ko.observable(false);
 
-  var viewModel;
+      self.collectionNameAvailable = function (name) {
+        var matchingCollections = self.collections.filter(function (collection) {
+          return collection.name == name;
+        });
 
-  $(document).ready(function () {
-    var options = {
+        return matchingCollections.length == 0;
+      }
+    };
+
+    var viewModel;
+
+    $(document).ready(function () {
+      var options = {
         user: '${ user.username }',
         i18n: {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
