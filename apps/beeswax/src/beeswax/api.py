@@ -645,6 +645,7 @@ def _get_sample_data(db, database, table, column):
 
     response['status'] = 0
     response['headers'] = sample_data.cols()
+    response['full_headers'] = sample_data.full_cols()
     response['rows'] = sample
   else:
     response['message'] = _('Failed to get sample data.')

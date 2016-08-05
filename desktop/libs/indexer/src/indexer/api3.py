@@ -24,8 +24,8 @@ from desktop.lib.django_util import JsonResponse
 
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
-from notebook.api import get_sample_data
 from notebook.connectors.base import get_api
+from indexer.file_format import HiveFormat
 
 LOG = logging.getLogger(__name__)
 
@@ -80,19 +80,27 @@ def guess_field_types(request):
     _convert_format(file_format["format"], inverse=True)
 
     format_ = indexer.guess_field_types({
-      "file":{
-        "stream":stream,
-        "name":file_format['path']
+      "file": {
+        "stream": stream,
+        "name": file_format['path']
         },
-      "format":file_format['format']
+      "format": file_format['format']
     })
   elif file_format['inputFormat'] == 'table':
-    # TODO get type metadata
-    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database='default', table='sample_07')
+    if '.' in file_format["table"]:
+      database, table = file_format["table"].lsplit('.', 1)
+    else:
+      database = 'default'
+      table = file_format["table"]
+
+    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=database, table=table)
+
     format_ = {
         "sample": sample['rows'][:4],
         "columns": [
-            {"operations": [], "name": col, "required": False, "keep": True, "unique": False, "type": "string"} for col in sample['headers']
+            {"operations": [], "name": col['name'], "required": False, "keep": True, "unique": False,
+             "type": HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')
+         } for col in sample['full_headers']
         ]
     }
   elif file_format['inputFormat'] == 'query':
