@@ -45,6 +45,7 @@ from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
 
+from aws.s3.s3fs import S3FileSystemException
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
@@ -984,6 +985,9 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
+            except S3FileSystemException, e:
+              msg = _("S3 filesystem exception.")
+              raise PopupException(msg, detail=e)
             except NotImplementedError, e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)

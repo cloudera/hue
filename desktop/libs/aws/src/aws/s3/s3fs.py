@@ -40,6 +40,10 @@ DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 LOG = logging.getLogger(__name__)
 
 
+class S3FileSystemException(Exception):
+  pass
+
+
 class S3FileSystem(object):
   def __init__(self, s3_connection):
     self._s3_connection = s3_connection
@@ -62,7 +66,10 @@ class S3FileSystem(object):
     try:
       bucket = self._get_bucket(name)
     except S3ResponseError, e:
-      if e.status == 404:
+      if e.status == 403:
+        raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
+          'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
+      elif e.status == 404:
         bucket = self._s3_connection.create_bucket(name)
         self._bucket_cache[name] = bucket
       else:
@@ -234,7 +241,7 @@ class S3FileSystem(object):
         len(result.errors),
         '\n'.join(map(repr, result.errors)))
       LOG.error(msg)
-      raise IOError(msg)
+      raise S3FileSystemException(msg)
 
   @translate_s3_error
   def remove(self, path, skip_trash=True):
