@@ -14,21 +14,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import json
 import logging
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.exceptions_renderable import PopupException
-from libsolr.api import SolrApi
-from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.controller2 import IndexController
-from indexer.utils import get_default_fields
-from hadoop import cluster
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
+from notebook.api import get_sample_data
+from notebook.connectors.base import get_api
 
 LOG = logging.getLogger(__name__)
 
@@ -56,37 +53,54 @@ def _convert_format(format_dict, inverse=False):
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
-  indexer = Indexer(request.user, request.fs)
-  stream = request.fs.open(file_format["path"])
-  format_ = indexer.guess_format({
-    "file":{
-      "stream":stream,
-      "name":file_format['path']
-      }
-    })
-  _convert_format(format_)
+  if file_format['inputFormat'] == 'file':
+    indexer = Indexer(request.user, request.fs)
+    stream = request.fs.open(file_format["path"])
+    format_ = indexer.guess_format({
+      "file":{
+        "stream": stream,
+        "name": file_format['path']
+        }
+      })
+    _convert_format(format_)
+  elif file_format['inputFormat'] == 'table' or file_format['inputFormat'] == 'query':
+    print 'get table format'
+    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": True, "fieldSeparator": ","}
 
   return JsonResponse(format_)
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
-  indexer = Indexer(request.user, request.fs)
-  stream = request.fs.open(file_format["path"])
-  _convert_format(file_format["format"], inverse = True)
-  format_ = indexer.guess_field_types({
-    "file":{
-      "stream":stream,
-      "name":file_format['path']
-      },
-    "format":file_format['format']
+  
+  if file_format['inputFormat'] == 'file':
+    indexer = Indexer(request.user, request.fs)
+    stream = request.fs.open(file_format["path"])
+    _convert_format(file_format["format"], inverse=True)
+
+    format_ = indexer.guess_field_types({
+      "file":{
+        "stream":stream,
+        "name":file_format['path']
+        },
+      "format":file_format['format']
     })
+  elif file_format['inputFormat'] == 'table':
+    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database='default', table='sample_07')
+    format_ = {
+        "sample": sample['rows'][:4],
+        "columns": [
+            {"operations": [], "name": col, "required": False, "keep": True, "unique": False, "type": "string"}
+            for col in sample['headers']
+        ]
+    }
 
   return JsonResponse(format_)
 
 def index_file(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
-  _convert_format(file_format["format"], inverse = True)
+  _convert_format(file_format["format"], inverse=True)
   collection_name = file_format["name"]
+
   indexer = Indexer(request.user, request.fs)
   unique_field = indexer.get_unique_field(file_format)
   is_unique_generated = indexer.is_unique_generated(file_format)
