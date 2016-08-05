@@ -977,6 +977,9 @@ class ResultCompatible:
   def cols(self):
     return [col.name for col in self.data_table.cols()]
 
+  def full_cols(self):
+    return [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in self.data_table.cols()]
+
 
 class PartitionKeyCompatible:
 

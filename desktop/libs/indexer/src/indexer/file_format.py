@@ -463,6 +463,7 @@ class CSVFormat(FileFormat):
 
     return fields
 
+
 class HiveFormat(CSVFormat):
   FIELD_TYPE_TRANSLATE = {
     "BOOLEAN_TYPE": "string",
@@ -489,7 +490,7 @@ class HiveFormat(CSVFormat):
       fields.append(Field(
         name=field["name"],
         field_type_name=cls.FIELD_TYPE_TRANSLATE.get(field['type'], 'string')
-        ))
+      ))
 
     return cls(**{
       "delimiter":',',
