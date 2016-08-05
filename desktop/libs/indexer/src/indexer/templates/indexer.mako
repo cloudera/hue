@@ -19,6 +19,7 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="tableStats" file="/table_stats.mako" />
@@ -122,23 +123,44 @@ ${ assist.assistPanel() }
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
         <input type="text" class="form-control" id = "collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === true">${ _('Collection name available') }</span>
-        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('Note: This collection already exists. Previous schema will be used') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === true">${ _('Creating a new collection') }</span>
+        <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length > 0">${_('Adding data to this existing collection') }</span>
         <span class="help-block" data-bind="visible: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
       </div>
     </div>
 
     <div class="control-group" data-bind="visible: createWizard.fileFormat().name().length > 0">
-      <label for="path" class="control-label">${ _('Path') }</label>
-      <div class="controls">
-        <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
-        <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+      <select data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
+
+      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
+        <label for="path" class="control-label">${ _('Path') }</label>
+        <div class="controls">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+        </div>
+      </div>
+      
+      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
+        <label for="path" class="control-label">${ _('Table') }</label>
+        <div class="controls">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
+        </div>
+      </div>
+      
+      <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
+        <label for="path" class="control-label">${ _('Query') }</label>
+        <div class="controls">
+          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
+          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
+        </div>
       </div>
     </div>
 
 
     <div data-bind="visible: createWizard.fileFormat().show">
-      <h3>${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
+      <h3>
+        ${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
       </h3>
       <div data-bind="with: createWizard.fileFormat().format">
 
@@ -457,16 +479,23 @@ ${ assist.assistPanel() }
     init();
   }
 
+
   var IndexerFormat = function (vm) {
     var self = this;
 
     self.name = ko.observable('');
     self.show = ko.observable(false);
 
+    self.inputFormat = ko.observable('file');
+    self.inputFormats = ko.observableArray(['file', 'table', 'query']);
+
     self.path = ko.observable('');
+    self.table = ko.observable('');
+
     self.format = ko.observable();
     self.columns = ko.observableArray();
   };
+
 
   var CreateWizard = function (vm) {
     var self = this;
@@ -499,7 +528,7 @@ ${ assist.assistPanel() }
     });
 
     self.readyToIndex = ko.computed(function () {
-      var validFields = self.fileFormat().columns().length
+      var validFields = self.fileFormat().columns().length;
 
       return self.fileFormat().name().length > 0 && validFields;
     });
@@ -628,7 +657,6 @@ ${ assist.assistPanel() }
     filter(function (index) {
       return index.type == 'collection';
     });
-    ;
 
     self.createWizard = new CreateWizard(self);
     self.isLoading = ko.observable(false);
@@ -640,13 +668,12 @@ ${ assist.assistPanel() }
 
       return matchingCollections.length == 0;
     }
-
   };
 
-    var viewModel;
+  var viewModel;
 
-    $(document).ready(function () {
-      var options = {
+  $(document).ready(function () {
+    var options = {
         user: '${ user.username }',
         i18n: {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
@@ -658,6 +685,5 @@ ${ assist.assistPanel() }
     });
   });
 </script>
-
 
 ${ commonfooter(request, messages) | n,unicode }
