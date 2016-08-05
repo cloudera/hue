@@ -2599,3 +2599,8 @@ body {
 *::-ms-clear {
   display: none;
 }
+
+input[type='password']::-ms-reveal {
+  display: none;
+}
+
