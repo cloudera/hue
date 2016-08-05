@@ -23,10 +23,9 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 
 from collections import deque
-from notebook.api import _save_notebook
-from notebook.models import make_notebook
-from oozie.views.editor2 import _submit_workflow
-from oozie.models2 import Job, WorkflowBuilder, Workflow
+from notebook.api import _save_notebook, _execute_notebook
+from notebook.models import make_notebook, make_notebook2
+from oozie.models2 import Job
 
 from indexer.fields import get_field_type
 from indexer.operations import get_checked_args
@@ -62,42 +61,41 @@ class Indexer(object):
 
     return hdfs_workspace_path
 
-  def run_morphline(self, collection_name, morphline, input_path):
+  def run_morphline(self, request, collection_name, morphline, input_path):
     workspace_path = self._upload_workspace(morphline)
 
     snippet_properties =  {
-      u'files': [
-          {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
-          {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
-      ],
-      u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
-      u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
-      u'arguments': [
-          u'--morphline-file',
-          u'morphline.conf',
-          u'--output-dir',
-          u'${nameNode}/user/%s/indexer' % self.username,
-          u'--log4j',
-          u'log4j.properties',
-          u'--go-live',
-          u'--zk-host',
-          zkensemble(),
-          u'--collection',
-          collection_name,
-          input_path,
-      ],
-      u'archives': [],
+       u'files': [
+           {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
+           {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
+       ],
+       u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
+       u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
+       u'arguments': [
+           u'--morphline-file',
+           u'morphline.conf',
+           u'--output-dir',
+           u'${nameNode}/user/%s/indexer' % self.username,
+           u'--log4j',
+           u'log4j.properties',
+           u'--go-live',
+           u'--zk-host',
+           zkensemble(),
+           u'--collection',
+           collection_name,
+           input_path,
+       ],
+       u'archives': [],
     }
 
-    notebook = make_notebook(name='Indexer', editor_type='java', snippet_properties=snippet_properties).get_data()
+    notebook = make_notebook(name='Indexer', editor_type='java', snippet_properties=snippet_properties, status='running').get_data()
     notebook_doc, created = _save_notebook(notebook, self.user)
 
-    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % notebook_doc.name)
-    workflow = Workflow(document=workflow_doc, user=self.user)
+    snippet = {'wasBatchExecuted': True, 'id': notebook['snippets'][0]['id'], 'statement': ''}
 
-    job_id = _submit_workflow(user=self.user, fs=self.fs, jt=self.jt, workflow=workflow, mapping=None)
+    job_handle = _execute_notebook(request, notebook, snippet)
 
-    return job_id
+    return job_handle
 
   def guess_format(self, data):
     """
