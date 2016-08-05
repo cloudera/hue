@@ -141,7 +141,7 @@ ${ assist.assistPanel() }
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
         </div>
       </div>
-      
+
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
@@ -149,11 +149,11 @@ ${ assist.assistPanel() }
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
         </div>
       </div>
-      
+
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
         <label for="path" class="control-label">${ _('Query') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', filechooserOptions: { skipInitialPathIfEmpty: true }"></select>
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
@@ -487,7 +487,6 @@ ${ assist.assistPanel() }
       init();
     }
 
-
     var IndexerFormat = function (vm) {
       var self = this;
 
@@ -497,13 +496,43 @@ ${ assist.assistPanel() }
       self.inputFormat = ko.observable('file');
       self.inputFormats = ko.observableArray(['file', 'table', 'query']);
 
+      self.inputFormat = ko.observable('file');
+      self.inputFormat.subscribe(function(val) {
+        if (val == 'query') {
+          self.getDocuments();
+        }
+      });
+      self.inputFormats = ko.observableArray(['file', 'table', 'query']);
+
+      // File
       self.path = ko.observable('');
+
+      // Table
       self.table = ko.observable('');
+
+      // Queries
+      self.query = ko.observable('');
+      self.queries = ko.observableArray([]);
+      self.getDocuments = function() {
+        $.get('/desktop/api2/docs/', {
+          type: 'query-hive',
+          include_trashed: false,
+          sort: '-last_modified',
+          limit: 100
+        }, function(data) {
+          if (data && data.documents) {
+            var queries = [];
+            $.each(data.documents, function(index, query) {
+              queries.push(ko.mapping.fromJS(query));
+            });
+            self.queries(queries);
+          }
+        });
+      };
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
     };
-
 
     var CreateWizard = function (vm) {
       var self = this;
