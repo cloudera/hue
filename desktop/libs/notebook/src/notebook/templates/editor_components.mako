@@ -1695,8 +1695,9 @@ ${ hueIcons.symbols() }
           <div data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;white-space: nowrap;">
             <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
             <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
+            <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
           </div>
-          <div data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
+          <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
             <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
               <table class="table table-condensed table-striped resultTable">
                 <thead>
@@ -3249,6 +3250,12 @@ ${ hueIcons.symbols() }
           $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
             scrollInertia: 0
           });
+          if (snippet.isResultSettingsVisible()){
+            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .span3').data('newWidth') - 2.127659574468085) + '%');
+          }
+          else {
+            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width('100%');
+          }
         }, 10)
       });
 
@@ -3314,6 +3321,35 @@ ${ hueIcons.symbols() }
               options.snippet.result.meta.notifySubscribers();
               $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
               _dt = createDatatable(_el, options.snippet, viewModel);
+
+              var span3Width = 23.404255319148934;
+              var span9Width = 74.46808510638297;
+              var initialPosition = 0;
+
+              try {
+                $("#snippet_" + options.snippet.id()).find('.resize-bar').draggable('destroy');
+                $("#snippet_" + options.snippet.id()).find('.table-results .span3').width(span3Width + '%').data('newWidth', span3Width);
+                $("#snippet_" + options.snippet.id()).find('.table-results .span9').width(span9Width + '%').data('newWidth', span9Width);
+                $("#snippet_" + options.snippet.id()).find('.resize-bar').css('left', '');
+              }
+              catch (e){}
+
+              $("#snippet_" + options.snippet.id()).find('.resize-bar').draggable({
+                axis: "x",
+                containment: $("#snippet_" + options.snippet.id()).find('.table-results'),
+                create: function (event, ui) {
+                  initialPosition = $("#snippet_" + options.snippet.id()).find('.resize-bar').position().left;
+                  $("#snippet_" + options.snippet.id()).find('.table-results .span3').data('newWidth', span3Width);
+                },
+                drag: function (event, ui) {
+                  ui.position.left = Math.max(150, ui.position.left);
+                  var newSpan3Width = ui.position.left * span3Width / initialPosition;
+                  var newSpan9Width = 100 - newSpan3Width - 2.127659574468085;
+                  $("#snippet_" + options.snippet.id()).find('.table-results .span3').width(newSpan3Width + '%').data('newWidth', newSpan3Width);
+                  $("#snippet_" + options.snippet.id()).find('.table-results .span9').width(newSpan9Width + '%').data('newWidth', newSpan9Width);
+                }
+              });
+
             }
             else {
               _dt = _el.hueDataTable();
