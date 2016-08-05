@@ -578,6 +578,14 @@ var suggestNumbers = function (numbers) {
   parser.yy.result.suggestNumbers = numbers;
 };
 
+var suggestFileFormats = function () {
+  if (isHive()) {
+    suggestKeywords(['AVRO', 'INPUTFORMAT', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
+  } else {
+    suggestKeywords(['AVRO', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
+  }
+};
+
 var suggestDdlAndDmlKeywords = function () {
   var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE'];
 

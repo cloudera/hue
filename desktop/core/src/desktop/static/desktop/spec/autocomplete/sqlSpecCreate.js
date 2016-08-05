@@ -48,7 +48,7 @@ define([
         dialect: 'generic',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DATABASE', 'SCHEMA', 'TABLE']
+          suggestKeywords: ['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']
         }
       });
     });
@@ -61,7 +61,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'EXTERNAL TABLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY TABLE']
+            suggestKeywords: ['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY TABLE', 'VIEW']
           }
         });
       });
@@ -75,7 +75,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'EXTERNAL TABLE', 'SCHEMA', 'TABLE']
+            suggestKeywords: ['AGGREGATE FUNCTION', 'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']
           }
         });
       });
@@ -381,10 +381,10 @@ define([
           });
         });
 
-        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT |, boo) AS SELECT * FROM baa;"', function () {
+        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT |, boo INT) AS SELECT * FROM baa;"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT ',
-            afterCursor: ', boo) AS SELECT * FROM baa;',
+            afterCursor: ', boo INT) AS SELECT * FROM baa;',
             dialect: 'impala',
             hasLocations: true,
             expectedResult: {
@@ -642,7 +642,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['EXTERNAL TABLE', 'TABLE']
+              suggestKeywords: ['EXTERNAL TABLE', 'FUNCTION', 'TABLE']
             }
           });
         });
@@ -934,6 +934,18 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['DELIMITED', 'SERDE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) ROW FORMAT DELIMITED |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) ROW FORMAT DELIMITED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'COLLECTION ITEMS TERMINATED BY', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'LOCATION', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS', 'STORED AS', 'TBLPROPERTIES']
             }
           });
         });
@@ -1275,6 +1287,988 @@ define([
               lowerCase: false
             }
           });
+        });
+      });
+    });
+
+    describe('CREATE VIEW', function () {
+      it('should handle "CREATE VIEW foo AS SELECT a, | FROM tableOne"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW foo AS SELECT a, ',
+          afterCursor: ' FROM tableOne',
+          hasLocations:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { table: 'tableOne' },
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS'],
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW | boo AS select * from baa;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW ',
+          afterCursor: ' boo AS SELECT * FROM baa;',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW IF |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW IF ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW IF NOT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW IF NOT ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW boo AS |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW boo AS ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE VIEW IF NOT EXISTS boo AS |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE VIEW IF NOT EXISTS boo AS ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should handle "CREATE VIEW IF NOT EXISTS db.foo (baa COMMENT \'foo bar\', ble) COMMENT \'baa\' TBLPROPERTIES ("boo.baa"="buu") AS SELECT a, | FROM tableOne"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE VIEW IF NOT EXISTS db.foo (baa COMMENT \'foo bar\', ble) COMMENT \'baa\' TBLPROPERTIES ("boo.baa"="buu") AS SELECT a, ',
+            afterCursor: ' FROM tableOne',
+            dialect: 'hive',
+            hasLocations:true,
+            expectedResult: {
+              lowerCase: false,
+              suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
+              suggestFunctions: {},
+              suggestColumns: { table: 'tableOne' },
+              suggestKeywords: ['*']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE VIEW IF NOT EXISTS boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE VIEW IF NOT EXISTS boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'COMMENT', 'TBLPROPERTIES']
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest keywords for "CREATE VIEW IF NOT EXISTS boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE VIEW IF NOT EXISTS boo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+      });
+    });
+
+    describe('CREATE ROLE', function () {
+      it('should handle "CREATE ROLE boo; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE ROLE boo; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+    });
+
+    describe('CREATE FUNCTION', function () {
+      describe('Hive specific', function () {
+        it('should handle "CREATE TEMPORARY FUNCTION baaa AS \'boo.baa\'; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY FUNCTION baaa AS \'boo.baa\'; ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE FUNCTION boo.baaa AS \'boo.baa\' USING JAR \'boo.jar\', FILE \'booo\', ARCHIVE \'baa\'; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baaa AS \'boo.baa\' USING JAR \'boo.jar\', FILE \'booo\', ARCHIVE \'baa\'; ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo.baa |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baa ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo.baa AS \'baa.boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baa AS \'baa.boo\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['USING']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo.baa AS \'baa.boo\' USING |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baa AS \'baa.boo\' USING ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ARCHIVE', 'FILE', 'JAR']
+            }
+          });
+        });
+
+        xit('should suggest hdfs for "CREATE FUNCTION boo.baa AS \'baa.boo\' USING FILE \'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baa AS \'baa.boo\' USING FILE \'',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestHdfs: { path: '' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo.baa AS \'baa.boo\' USING FILE \'boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo.baa AS \'baa.boo\' USING FILE \'boo\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ARCHIVE', 'FILE', 'JAR']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TEMPORARY FUNCTION boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY FUNCTION boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS']
+            }
+          });
+        });
+
+        it('should not suggest keywords for "CREATE TEMPORARY FUNCTION boo AS \'boo.baa\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY FUNCTION boo AS \'boo.baa\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should handle "CREATE FUNCTION foo.boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' SYMBOL=\'baaa\'; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' SYMBOL=\'baaa\'; ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE AGGREGATE FUNCTION baa.boo(INT, DOUBLE) RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' ' +
+            'MERGE_FN=\'cos\' PREPARE_FN=\'cos\' CLOSE_FN=\'cos\' SERIALIZE_FN=\'cos\' FINALIZE_FN=\'cos\'; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'cos\' PREPARE_FN=\'cos\' CLOSE_FN=\'cos\' SERIALIZE_FN=\'cos\' FINALIZE_FN=\'cos\'; ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FUNCTION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IF NOT EXISTS'],
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION IF |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION IF ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NOT EXISTS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION IF NOT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION IF NOT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXISTS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo(|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo(',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['RETURNS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS INT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LOCATION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['INIT_FN', 'UPDATE_FN']
+            }
+          });
+        });
+
+        it('should suggest functions for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestAnalyticFunctions: true,
+              suggestAggregateFunctions: true,
+              suggestFunctions: {}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['UPDATE_FN']
+            }
+          });
+        });
+
+        it('should suggest functions for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestAnalyticFunctions: true,
+              suggestAggregateFunctions: true,
+              suggestFunctions: {}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['MERGE_FN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'tan\' ' +
+            'PREPARE_FN=\'boo\' SERIALIZE_FN=\'baa\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'tan\' PREPARE_FN=\'boo\' SERIALIZE_FN=\'baa\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FINALIZE_FN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IF NOT EXISTS'],
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION IF |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION IF ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NOT EXISTS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION IF NOT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION IF NOT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXISTS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            doesNotContainKeywords: ['ARRAY<>', '...'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['...']
+            }
+          });
+        });
+
+        it('should not suggest keywords for "CREATE FUNCTION boo(INT |, BOOLEAN"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT ',
+            afterCursor: ', BOOLEAN',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION  boo(INT, BOOLEAN, ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            doesNotContainKeywords: ['ARRAY<>', '...'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN, STRING |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION  boo(INT, BOOLEAN, STRING ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['...']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['RETURNS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN) RETURNS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['LOCATION']
+            }
+          });
+        });
+
+        it('should suggest hdfs for "CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestHdfs: { path: '' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['SYMBOL']
+            }
+          });
+        });
+      });
+    });
+
+    describe('CREATE INDEX', function () {
+      it('should handle "CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'COMPACT\' WITH DEFERRED REBUILD IDXPROPERTIES ("boo.baa"="ble", "blaa"=1) IN TABLE dbTwo.tblTwo ROW FORMAT DELIMITED STORED AS PARQUET LOCATION \'/baa/boo\' TBLPROPERTIES ("bla"=1) COMMENT \"booo\"; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'COMPACT\' WITH DEFERRED REBUILD IDXPROPERTIES ' +
+          '("boo.baa"="ble", "blaa"=1) IN TABLE dbTwo.tblTwo ROW FORMAT DELIMITED STORED AS PARQUET LOCATION \'/baa/boo\' ' +
+          'TBLPROPERTIES ("bla"=1) COMMENT \"booo\"; ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'boo.baa.bitmap\'; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'boo.baa.bitmap\'; ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla  |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ON TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest tables for "CREATE INDEX bla ON TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest columns for "CREATE INDEX bla ON TABLE foo.bar (|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { database: 'foo', table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest columns for "CREATE INDEX bla ON TABLE foo.bar (a, b, c, |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (a, b, c, ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { database: 'foo', table: 'bar' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BIT|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BIT',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT', 'IDXPROPERTIES', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES', 'WITH DEFERRED REBUILD']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DEFERRED REBUILD']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['REBUILD']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED REBUILD |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED REBUILD ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT', 'IDXPROPERTIES', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IDXPROPERTIES ("baa"="boo") |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IDXPROPERTIES ("baa"="boo") ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest tables for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE boo |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE boo ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FORMAT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DELIMITED', 'SERDE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['MAP KEYS TERMINATED BY', 'NULL DEFINED AS', 'LOCATION', 'TBLPROPERTIES', 'COMMENT'],
+          doesNotContainKeywords: ['AS'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED NULL |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED NULL ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DEFINED AS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' STORED |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' STORED ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AS', 'BY']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED AS |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED AS ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['ORC', 'PARQUET'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest hdfs for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'/baa\' |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'/baa\' ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT', 'TBLPROPERTIES']
+          }
+        });
+      });
+
+      it('should suggest keywords for "CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' TBLPROPERTIES ("baa"="boo") |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' TBLPROPERTIES ("baa"="boo") ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['COMMENT']
+          }
         });
       });
     });

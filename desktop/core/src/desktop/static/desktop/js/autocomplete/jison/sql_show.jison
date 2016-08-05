@@ -353,11 +353,11 @@ ShowLocksStatement
    {
      addTablePrimary($3);
    }
- | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName 'PARTITION' '(' PartitionSpecList ')'
+ | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec
    {
      addTablePrimary($3);
    }
- | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName 'PARTITION' '(' PartitionSpecList ')' '<hive>EXTENDED'
+ | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec '<hive>EXTENDED'
    {
      addTablePrimary($3);
    }
@@ -380,13 +380,13 @@ ShowLocksStatement_EDIT
       suggestKeywords(['EXTENDED', 'PARTITION']);
     }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>EXTENDED'
- | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT 'PARTITION' '(' PartitionSpecList ')'
- | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName 'PARTITION' '(' PartitionSpecList ')' 'CURSOR'
+ | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec
+ | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec 'CURSOR'
    {
      addTablePrimary($3);
      suggestKeywords(['EXTENDED']);
    }
- | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT 'PARTITION' '(' PartitionSpecList ')' '<hive>EXTENDED'
+ | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec '<hive>EXTENDED'
  | AnyShow '<hive>LOCKS' DatabaseOrSchema 'CURSOR'
    {
      suggestDatabases();
@@ -398,7 +398,7 @@ ShowPartitionsStatement
    {
      addTablePrimary($3);
    }
- | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName 'PARTITION' PartitionSpecList
+ | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName PartitionSpec
    {
      addTablePrimary($3);
    }
@@ -422,7 +422,7 @@ ShowPartitionsStatement_EDIT
      addTablePrimary($3);
      suggestKeywords(['PARTITION']);
    }
- | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT 'PARTITION' PartitionSpecList
+ | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec
  | AnyShow '<impala>PARTITIONS' 'CURSOR'
    {
      suggestTables();
@@ -476,7 +476,7 @@ ShowRolesStatement
 
 ShowTableStatement
  : AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue
- | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue 'PARTITION' PartitionSpecList
+ | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue PartitionSpec
  ;
 
 ShowTableStatement_EDIT
@@ -509,12 +509,12 @@ ShowTableStatement_EDIT
     {
       suggestKeywords(['PARTITION']);
     }
- | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue 'PARTITION' PartitionSpecList
- | AnyShow '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue 'PARTITION' PartitionSpecList
+ | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue PartitionSpec
+ | AnyShow '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue PartitionSpec
    {
      suggestKeywords(['EXTENDED']);
    }
- | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue 'PARTITION' PartitionSpecList
+ | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue PartitionSpec
    {
      suggestKeywords(['LIKE']);
    }
