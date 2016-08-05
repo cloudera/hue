@@ -90,7 +90,7 @@ ${ fb_components.menubar() }
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           <!-- ko if: $root.isS3 -->
-          <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0 && (!isS3() || (isS3() && !isS3Root())), click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
+          <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
           <!-- /ko -->
           <!-- ko ifnot: $root.isS3 -->
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
