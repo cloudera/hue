@@ -33,6 +33,7 @@ ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -121,6 +122,36 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="create-index-wizard">
   <div data-bind="visible: createWizard.show">
+
+    <ol class="list-inline text-center step-indicator">
+      <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }">
+        <div class="step">
+          <!-- ko if: currentStep() == 1 -->
+          1
+          <!-- /ko -->
+          <!-- ko ifnot: currentStep() == 1 -->
+          <span class="fa fa-check"></span>
+          <!-- /ko -->
+        </div>
+        <div class="caption">${ _('Pick it') }</div>
+      </li>
+      <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }">
+        <div class="step">
+          <!-- ko if: currentStep() < 3 -->
+          2
+          <!-- /ko -->
+          <!-- ko if: currentStep() == 3 -->
+          <span class="fa fa-check"></span>
+          <!-- /ko -->
+        </div>
+        <div class="caption">${ _('Tweak it') }</div>
+      </li>
+      <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3 }">
+        <div class="step">3</div>
+        <div class="caption">${ _('Index it') }</div>
+      </li>
+    </ol>
+
     <!-- ko if: currentStep() == 1 -->
     <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
