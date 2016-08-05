@@ -103,7 +103,13 @@ from django.utils.translation import ugettext as _
       <h3>${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
+      <!-- ko if: isS3() && isS3Root() -->
+      <p>${_('Are you sure you want to delete these buckets?')}</p>
+      <p class="muted">${_('Deleting a bucket will delete all of its contents and release the bucket name to be reserved by others.')}</p>
+      <!-- /ko -->
+      <!-- ko ifnot: isS3() && isS3Root() -->
       <p>${_('Are you sure you want to delete these files?')}</p>
+      <!-- /ko -->
     </div>
     <div class="modal-footer">
       <form id="deleteForm" action="/filebrowser/rmtree" method="POST" enctype="multipart/form-data" class="form-stacked">
