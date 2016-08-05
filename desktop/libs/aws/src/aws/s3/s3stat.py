@@ -86,7 +86,7 @@ class S3Stat(object):
       s3_date = key.last_modified
     elif hasattr(key, 'date') and key.date is not None:
       s3_date = key.date
-    mtime = s3datetime_to_timestamp(s3_date) if s3_date else 0
+    mtime = s3datetime_to_timestamp(s3_date) if s3_date else None
 
     return cls(name, path, is_dir, size, mtime)
 
