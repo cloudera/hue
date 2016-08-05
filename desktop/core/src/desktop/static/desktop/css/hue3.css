@@ -2795,3 +2795,6 @@ body {
     display: inline;
 }
 
+input[type='password']::-ms-reveal {
+  display: none;
+}
