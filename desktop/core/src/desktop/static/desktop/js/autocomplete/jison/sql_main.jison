@@ -29,41 +29,66 @@
 %%
 
 NonReservedKeyword
- : '<hive>AVRO'
+ : '<hive>ADD'
+ | '<hive>AVRO'
+ | '<hive>AFTER'
+ | '<hive>ARCHIVE'
  | '<hive>BUCKETS'
+ | '<hive>CASCADE'
+ | '<hive>CHANGE'
  | '<hive>CLUSTERED'
  | '<hive>COLLECTION'
  | '<hive>COLUMNS'
  | '<hive>COMMENT'
+ | '<hive>COMPACT'
  | '<hive>COMPACTIONS'
+ | '<hive>CONCATENATE'
  | '<hive>DATA'
  | '<hive>DATABASES'
+ | '<hive>DEFERRED'
  | '<hive>DEFINED'
  | '<hive>DELIMITED'
+ | '<hive>DISABLE'
+ | '<hive>ENABLE'
  | '<hive>ESCAPED'
+ | '<hive>EXCHANGE'
  | '<hive>FIELDS'
+ | '<hive>FILE'
+ | '<hive>FILEFORMAT'
+ | '<hive>FIRST'
  | '<hive>FORMAT'
  | '<hive>FUNCTIONS'
  | '<hive>INPATH'
  | '<hive>INPUTFORMAT'
+ | '<hive>JAR'
+ | '<hive>IDXPROPERTIES'
  | '<hive>ITEMS'
  | '<hive>KEYS'
  | '<hive>LINES'
  | '<hive>LOAD'
  | '<hive>LOCATION'
  | '<hive>LOCKS'
+ | '<hive>NO_DROP'
+ | '<hive>OFFLINE'
  | '<hive>ORC'
  | '<hive>OUTPUTFORMAT'
  | '<hive>PARQUET'
  | '<hive>PARTITIONED'
  | '<hive>PARTITIONS'
+ | '<hive>PURGE'
  | '<hive>RCFILE'
+ | '<hive>REBUILD'
+ | '<hive>RECOVER'
+ | '<hive>RENAME'
+ | '<hive>REPLACE'
+ | '<hive>RESTRICT'
  | '<hive>ROLE'
  | '<hive>ROLES'
  | '<hive>SCHEMAS'
  | '<hive>SEQUENCEFILE'
  | '<hive>SERDE'
  | '<hive>SERDEPROPERTIES'
+ | '<hive>SHOW'
  | '<hive>SKEWED'
  | '<hive>SORTED'
  | '<hive>STORED'
@@ -75,25 +100,33 @@ NonReservedKeyword
  | '<hive>TERMINATED'
  | '<hive>TEXTFILE'
  | '<hive>TINYINT'
+ | '<hive>TOUCH'
  | '<hive>TRANSACTIONS'
+ | '<hive>UNARCHIVE'
  | '<hive>UNIONTYPE'
  | '<hive>USE'
  | '<hive>VIEW'
-// | '<hive>ASC'      // These cause conflicts, we need separate lexer state for DESCRIBE and SHOW then it should be fine
+// | '<hive>ASC'      // These cause conflicts, we could use a separate lexer state for DESCRIBE, ALTER and SHOW
 // | '<hive>DESC'
 // | '<hive>FORMATTED'
+// | '<hive>FUNCTION'
 // | '<hive>INDEX'
 // | '<hive>INDEXES'
 // | '<hive>LIMIT'
 // | '<hive>SCHEMA'
-// | '<hive>SHOW'
- | '<impala>ANALYTIC'
+ ;
+
+NonReservedKeyword
+ : '<impala>ANALYTIC'
  | '<impala>ANTI'
  | '<impala>CURRENT'
  | '<impala>GRANT'
  | '<impala>ROLE'
  | '<impala>ROLES'
- | 'ROLE'
+ ;
+
+NonReservedKeyword
+ : 'ROLE'
  ;
 
 RegularIdentifier
@@ -138,8 +171,8 @@ ErrorStatement
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ALL' | '<hive>ARRAY' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKETS' | '<hive>AS' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>CONF' | '<hive>CROSS' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DELIMITED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' | '<hive>STORED_AS_DIRECTORIES' | '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>LIMIT' | '<hive>KEYS' | '<hive>LINES' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>ORC' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
- | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>REAL' | '<impala>SCHEMAS' | '<impala>STATS' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>BROADCAST' | '<impala>.' | '<impala>[' | '<impala>]'
+ : '<hive>ALL' | '<hive>ARRAY' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKETS' | '<hive>AS' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>CONF' | '<hive>CROSS' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' | '<hive>STORED_AS_DIRECTORIES' | '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>LIMIT' | '<hive>KEYS' | '<hive>LINES' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>ORC' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
+ | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
  | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'GROUPING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
  | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>HISTOGRAM_NUMERIC' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX'
@@ -167,12 +200,10 @@ SqlStatement_EDIT
 
 DataDefinition
  : DescribeStatement
- | DropStatement
  ;
 
 DataDefinition_EDIT
  : DescribeStatement_EDIT
- | DropStatement_EDIT
  ;
 
 DataManipulation
@@ -189,6 +220,16 @@ DataManipulation_EDIT
 AggregateOrAnalytic
  : '<impala>AGGREGATE'
  | '<impala>ANALYTIC'
+ ;
+
+Commas
+ : ','
+ | Commas ','
+ ;
+
+AnyAs
+ : 'AS'
+ | '<hive>AS'
  ;
 
 AnyCreate
@@ -211,6 +252,17 @@ AnyDot
 AnyFromOrIn
  : 'FROM'
  | 'IN'
+ ;
+
+AnyGroup
+ : 'GROUP'
+ | '<hive>GROUP'
+ | '<impala>GROUP'
+ ;
+
+AnyPartition
+ : 'PARTITION'
+ | '<hive>PARTITION'
  ;
 
 AnyTable
@@ -262,9 +314,24 @@ HiveOrImpalaDatabasesOrSchemas
  | '<impala>SCHEMAS'
  ;
 
+HiveOrImpalaEscaped
+ : '<hive>ESCAPED'
+ | '<impala>ESCAPED'
+ ;
+
 HiveOrImpalaExternal
  : '<hive>EXTERNAL'
  | '<impala>EXTERNAL'
+ ;
+
+HiveOrImpalaFields
+ : '<hive>FIELDS'
+ | '<impala>FIELDS'
+ ;
+
+HiveOrImpalaFormat
+ : '<hive>FORMAT'
+ | '<impala>FORMAT'
  ;
 
 HiveOrImpalaLoad
@@ -282,6 +349,11 @@ HiveOrImpalaLeftSquareBracket
  | '<impala>['
  ;
 
+HiveOrImpalaLines
+ : '<hive>LINES'
+ | '<impala>LINES'
+ ;
+
 HiveOrImpalaLocation
  : '<hive>LOCATION'
  | '<impala>LOCATION'
@@ -292,9 +364,29 @@ HiveOrImpalaRightSquareBracket
  | '<impala>]'
  ;
 
+HiveOrImpalaPartitioned
+ : '<hive>PARTITIONED'
+ | '<impala>PARTITIONED'
+ ;
+
+HiveOrImpalaStored
+ : '<hive>STORED'
+ | '<impala>STORED'
+ ;
+
 HiveOrImpalaTables
  : '<hive>TABLES'
  | '<impala>TABLES'
+ ;
+
+HiveOrImpalaTblproperties
+ : '<hive>TBLPROPERTIES'
+ | '<impala>TBLPROPERTIES'
+ ;
+
+HiveOrImpalaTerminated
+ : '<hive>TERMINATED'
+ | '<impala>TERMINATED'
  ;
 
 HiveRoleOrUser
@@ -307,20 +399,24 @@ SingleQuotedValue
  | 'SINGLE_QUOTE' 'SINGLE_QUOTE'          -> ''
  ;
 
+SingleQuotedValue_EDIT
+ : 'SINGLE_QUOTE' 'PARTIAL_VALUE'
+ ;
+
+
 DoubleQuotedValue
  : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'  -> $2
  | 'DOUBLE_QUOTE' 'DOUBLE_QUOTE'          -> ''
  ;
 
-AnyAs
- : 'AS'
- | '<hive>AS'
+QuotedValue
+ : SingleQuotedValue
+ | DoubleQuotedValue
  ;
 
-AnyGroup
- : 'GROUP'
- | '<hive>GROUP'
- | '<impala>GROUP'
+QuotedValue_EDIT
+ : SingleQuotedValue_EDIT
+ | DoubleQuotedValue_EDIT
  ;
 
 OptionalAggregateOrAnalytic
@@ -337,6 +433,12 @@ OptionalExtendedOrFormatted
  :
  | '<hive>EXTENDED'
  | '<hive>FORMATTED'
+ ;
+
+OptionalExternal
+ :
+ | '<hive>EXTERNAL'
+ | '<impala>EXTERNAL'
  ;
 
 OptionalFormatted
@@ -373,6 +475,11 @@ OptionalHiveCascadeOrRestrict
  :
  | '<hive>CASCADE'
  | '<hive>RESTRICT'
+ ;
+
+OptionalHiveTemporary
+ :
+ | '<hive>TEMPORARY'
  ;
 
 OptionalIfExists
@@ -415,6 +522,23 @@ OptionalInDatabase
  | 'IN' DatabaseIdentifier_EDIT
  ;
 
+OptionalPartitionSpec
+ :
+ | PartitionSpec
+ ;
+
+OptionalPartitionSpec_EDIT
+ : PartitionSpec_EDIT
+ ;
+
+PartitionSpec
+ : AnyPartition '(' PartitionSpecList ')'
+ ;
+
+PartitionSpec_EDIT
+ : AnyPartition '(' PartitionSpecList_EDIT RightParenthesisOrError
+ ;
+
 ConfigurationName
  : RegularIdentifier
  | 'CURSOR'
@@ -444,6 +568,48 @@ PartialBacktickedIdentifier
 RightParenthesisOrError
  : ')'
  | error
+ ;
+
+ParenthesizedColumnList
+ : '(' ColumnList ')'
+ ;
+
+ParenthesizedColumnList_EDIT
+ : '(' ColumnList_EDIT RightParenthesisOrError
+ | '(' AnyCursor RightParenthesisOrError
+   {
+     suggestColumns();
+   }
+ ;
+
+ColumnList
+ : ColumnIdentifier
+ | ColumnList ',' ColumnIdentifier
+ ;
+
+ColumnList_EDIT
+ : ColumnIdentifier_EDIT
+ | ColumnList ',' AnyCursor
+   {
+     suggestColumns();
+   }
+ | ColumnList ',' ColumnIdentifier_EDIT
+ | ColumnIdentifier_EDIT ',' ColumnList
+ | ColumnList ',' ColumnIdentifier_EDIT ',' ColumnList
+ | ColumnList ',' AnyCursor ',' ColumnList
+   {
+     suggestColumns();
+   }
+ ;
+
+
+ParenthesizedSimpleValueList
+ : '(' SimpleValueList ')'
+ ;
+
+SimpleValueList
+ : UnsignedValueSpecification
+ | SimpleValueList ',' UnsignedValueSpecification
  ;
 
 SchemaQualifiedTableIdentifier
@@ -490,12 +656,36 @@ DatabaseIdentifier_EDIT
  ;
 
 PartitionSpecList
- : PartitionSpec
- | PartitionSpecList ',' PartitionSpec
+ : PartitionExpression
+ | PartitionSpecList ',' PartitionExpression
  ;
 
-PartitionSpec
- : RegularOrBacktickedIdentifier '=' SingleQuotedValue
+PartitionSpecList_EDIT
+ : PartitionExpression_EDIT
+ | PartitionSpecList ',' PartitionExpression_EDIT
+ | PartitionExpression_EDIT ',' PartitionSpecList
+ | PartitionSpecList ',' PartitionExpression_EDIT ',' PartitionSpecList
+ ;
+
+PartitionExpression
+ : ColumnIdentifier '=' ValueExpression
+ | ColumnIdentifier // Hive allows partial partition specs in some cases
+ ;
+
+PartitionExpression_EDIT
+ : ColumnIdentifier '=' ValueExpression_EDIT
+ | ColumnIdentifier '=' AnyCursor
+   {
+     valueExpressionSuggest();
+   }
+ | PartialBacktickedIdentifier '=' ValueExpression
+   {
+     suggestColumns();
+   }
+ | AnyCursor
+   {
+     suggestColumns();
+   }
  ;
 
 RegularOrBacktickedIdentifier
@@ -816,91 +1006,6 @@ ImpalaDescribeStatement_EDIT
      suggestTables();
      suggestDatabases({ appendDot: true });
      $$ = { cursorOrPartialIdentifier: true };
-   }
- ;
-
-// ===================================== DROP Statement =====================================
-
-DropStatement
- : DropDatabaseStatement
- | DropTableStatement
- ;
-
-DropStatement_EDIT
- : 'DROP' 'CURSOR'
-   {
-     if (isHive()) {
-       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
-     } else {
-       suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-     }
-   }
- | DropDatabaseStatement_EDIT
- | DropTableStatement_EDIT
- ;
-
-DropDatabaseStatement
- : 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
- ;
-
-DropDatabaseStatement_EDIT
- : 'DROP' DatabaseOrSchema OptionalIfExists
- | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT
- | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR'
-   {
-     if (!$3) {
-       suggestKeywords(['IF EXISTS']);
-     }
-     suggestDatabases();
-   }
- | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     if (isHive()) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
-     }
-   }
- | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
- | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR' RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
-   {
-     if (!$3) {
-       suggestKeywords(['IF EXISTS']);
-     }
-   }
- ;
-
-DropTableStatement
- : 'DROP' AnyTable OptionalIfExists TablePrimary
- ;
-
-DropTableStatement_EDIT
- : 'DROP' AnyTable OptionalIfExists_EDIT
- | 'DROP' AnyTable OptionalIfExists 'CURSOR'
-   {
-     if (!$3) {
-       suggestKeywords(['IF EXISTS']);
-     }
-     suggestTables();
-     suggestDatabases({
-       appendDot: true
-     });
-   }
- | 'DROP' AnyTable OptionalIfExists TablePrimary_EDIT
-   {
-     if ($4.identifierChain && $4.identifierChain.length === 1) {
-       suggestTablesOrColumns($4.identifierChain[0].name);
-     } else if ($4.identifierChain && $4.identifierChain.length === 0) {
-       suggestTables();
-       suggestDatabases({ appendDot: true });
-     }
-   }
- | 'DROP' AnyTable OptionalIfExists_EDIT TablePrimary
- | 'DROP' AnyTable OptionalIfExists TablePrimary 'CURSOR'
-   {
-     if (isHive()) {
-       suggestKeywords(['PURGE']);
-     }
    }
  ;
 
@@ -2160,19 +2265,19 @@ WindowExpression_EDIT
 
 OptionalPartitionBy
  :
- | 'PARTITION' 'BY' ValueExpressionList
+ | AnyPartition 'BY' ValueExpressionList
  ;
 
 OptionalPartitionBy_EDIT
- : 'PARTITION' 'CURSOR'
+ : AnyPartition 'CURSOR'
    {
      suggestKeywords(['BY']);
    }
- | 'PARTITION' 'BY' 'CURSOR'
+ | AnyPartition 'BY' 'CURSOR'
    {
      valueExpressionSuggest();
    }
- | 'PARTITION' 'BY' ValueExpressionList_EDIT
+ | AnyPartition 'BY' ValueExpressionList_EDIT
  ;
 
 OptionalOrderByAndWindow
@@ -2201,7 +2306,7 @@ OptionalOrderByAndWindow_EDIT
 
 OptionalWindowSpec
  :
- | RowsOrRange 'BETWEEN' PopBetweenState OptionalCurrentOrPreceding OptionalAndFollowing
+ | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
  ;
 
 OptionalWindowSpec_EDIT
@@ -2209,7 +2314,7 @@ OptionalWindowSpec_EDIT
    {
      suggestKeywords(['BETWEEN']);
    }
- | RowsOrRange 'BETWEEN' PopBetweenState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
+ | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
      if (!$4 && !$5) {
        suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
@@ -2217,14 +2322,21 @@ OptionalWindowSpec_EDIT
        suggestKeywords(['AND']);
      }
    }
- | RowsOrRange 'BETWEEN' PopBetweenState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
- | RowsOrRange 'BETWEEN' PopBetweenState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
+ | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
+ | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
  ;
 
-PopBetweenState
+PopLexerState
  :
   {
     lexer.popState();
+  }
+ ;
+
+PushHdfsLexerState
+ :
+  {
+    lexer.begin('hdfs');
   }
  ;
 
