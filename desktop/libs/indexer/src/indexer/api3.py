@@ -141,6 +141,5 @@ def index_file(request):
   else:
     input_path = file_format["path"]
 
-  job_id = indexer.run_morphline(collection_name, morphline, input_path) #TODO if query generate insert
-
-  return JsonResponse({"jobId": job_id})
+  job_handle = indexer.run_morphline(request, collection_name, morphline, input_path) #TODO if query generate insert
+  return JsonResponse(job_handle)

@@ -96,16 +96,11 @@ def close_session(request):
   return JsonResponse(response)
 
 
-@require_POST
-@check_document_access_permission()
-@api_error_handler
-def execute(request):
+def _execute_notebook(request, notebook, snippet):
   response = {'status': -1}
   result = None
   history = None
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
   is_query = notebook['type'].startswith('query-') or snippet['type'] == 'java'
 
   try:
@@ -152,6 +147,17 @@ def execute(request):
     response['result']['data'] = escape_rows(result['data'])
 
   response['status'] = 0
+
+  return response
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def execute(request):
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  response = _execute_notebook(request, notebook, snippet)
 
   return JsonResponse(response)
 

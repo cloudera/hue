@@ -121,6 +121,10 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
   return editor
 
 
+def make_notebook2(name='Browse', description='', is_saved=False, snippets=None):
+  pass
+
+
 def import_saved_beeswax_query(bquery):
   design = bquery.get_design()
 

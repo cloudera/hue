@@ -301,7 +301,6 @@ ${ assist.assistPanel() }
       </div>
     <!-- /ko -->
 
-
     <!-- ko if: previousStepVisible -->
       <a class="btn" data-bind="click: previousStep">${ _('Previous') }</a>
     <!-- /ko -->
@@ -318,14 +317,15 @@ ${ assist.assistPanel() }
 
     <div data-bind="visible: createWizard.jobId">
       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-        ${_('View Indexing Status')}
+        ${_('Oozie Status')}
+      </a>
+      <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+        ${_('View indexing status')}
       </a>
 
       ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
     </div>
-
   </div>
-
 </script>
 
 <script type="text/html" id="format-settings">
@@ -336,7 +336,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="field-template">
   <label>${ _('Name') }
-    <input type="text" class="input-small" placeholder="${ _('Field name') }" data-bind="value: name">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
   <label>${ _('Type') }
     <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
@@ -679,7 +679,8 @@ ${ assist.assistPanel() }
       self.fileFormat = ko.observable(new IndexerFormat(vm));
       self.sample = ko.observableArray();
 
-      self.jobId = ko.observable(null);
+      self.jobId = ko.observable();
+      self.editorId = ko.observable();
 
       self.indexingStarted = ko.observable(false);
 
@@ -756,20 +757,21 @@ ${ assist.assistPanel() }
         if (!self.readyToIndex()) return;
 
         self.indexingStarted(true);
-
         viewModel.isLoading(true);
-
         self.isIndexing(true);
 
         $.post("${ url('indexer:index_file') }", {
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
         }, function (resp) {
           self.showCreate(true);
-          self.jobId(resp.jobId);
+          self.jobId(resp.handle.id);
+          self.editorId(resp.history_id);
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
+          self.indexingStarted(false);
+          self.isIndexing(false);
         });
       }
 
