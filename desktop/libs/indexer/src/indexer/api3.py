@@ -63,9 +63,11 @@ def guess_format(request):
         }
       })
     _convert_format(format_)
-  elif file_format['inputFormat'] == 'table' or file_format['inputFormat'] == 'query':
-    print 'get table format'
-    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": True, "fieldSeparator": ","}
+  elif file_format['inputFormat'] == 'table':
+    #TODO get table
+    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"}
+  elif file_format['inputFormat'] == 'query':
+    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"} # \t --> CTRL+A
 
   return JsonResponse(format_)
 
@@ -85,14 +87,17 @@ def guess_field_types(request):
       "format":file_format['format']
     })
   elif file_format['inputFormat'] == 'table':
+    # TODO get type metadata
     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database='default', table='sample_07')
     format_ = {
         "sample": sample['rows'][:4],
         "columns": [
-            {"operations": [], "name": col, "required": False, "keep": True, "unique": False, "type": "string"}
-            for col in sample['headers']
+            {"operations": [], "name": col, "required": False, "keep": True, "unique": False, "type": "string"} for col in sample['headers']
         ]
     }
+  elif file_format['inputFormat'] == 'query':
+    #TODO get schema from explain query
+    pass
 
   return JsonResponse(format_)
 
@@ -115,6 +120,11 @@ def index_file(request):
   if not collection_manager.collection_exists(collection_name):
     collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
 
-  job_id = indexer.run_morphline(collection_name, morphline, file_format["path"])
+  if file_format['inputFormat'] == 'table':
+    input_path = '/user/hive/warehouse/sample_07' #TODO get table
+  else:
+    input_path = file_format["path"]
+
+  job_id = indexer.run_morphline(collection_name, morphline, input_path) #TODO if query generate insert
 
   return JsonResponse({"jobId": job_id})
