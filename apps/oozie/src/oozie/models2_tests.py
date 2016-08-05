@@ -996,4 +996,4 @@ class TestModelAPI(OozieMockBase):
 
     assert_equal(len(_data['workflow']['nodes']), 5)
     assert_equal(len(re.findall('<ok to="doc-hive-', workflow.to_xml())), 1, workflow.to_xml())
-    assert_equal(len(re.findall('<action name="doc-hive->', workflow.to_xml())), 2, workflow.to_xml())
+    assert_equal(len(re.findall('<action name="doc-hive-', workflow.to_xml())), 2, workflow.to_xml())

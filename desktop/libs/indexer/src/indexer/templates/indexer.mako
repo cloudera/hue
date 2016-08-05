@@ -208,20 +208,20 @@ ${ assist.assistPanel() }
       </div>
     </div>
 
-
-    <div data-bind="visible: createWizard.fileFormat().show">
-      <h3>
-        ${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
-      </h3>
-      <div data-bind="with: createWizard.fileFormat().format">
-        <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
-      </div>
-    </div>
     <!-- /ko -->
 
 
-        <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
-          <!-- ko if: currentStep() == 2 -->
+      <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
+        <!-- ko if: currentStep() == 2 -->
+          <div data-bind="visible: createWizard.fileFormat().show">
+            <h3>
+              ${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
+            </h3>
+            <div data-bind="with: createWizard.fileFormat().format">
+              <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+            </div>
+          </div>
+
           <h3>${_('Fields')}</h3>
           <!-- ko if: createWizard.isGuessingFieldTypes -->
             <i class="fa fa-spinner fa-spin"></i>
@@ -257,8 +257,8 @@ ${ assist.assistPanel() }
               </tbody>
             </table>
           </div>
-          <!-- /ko -->
         <!-- /ko -->
+      <!-- /ko -->
 
 
       <!-- ko if: previousStepVisible -->
