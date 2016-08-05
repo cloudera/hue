@@ -180,8 +180,13 @@ ${ assist.assistPanel() }
       <div class="controls">
         <input type="text" class="form-control" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
         <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('Creating a new collection') }</span>
-        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">${_('Adding data to this existing collection') }</span>
-        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">${_('This collection needs a name') }</span>
+        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
+          ${_('Adding data to this existing collection') }
+          <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+        </span>
+        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">
+          ${_('This collection needs a name') }
+        </span>
       </div>
     </div>
 
@@ -278,13 +283,18 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 3 -->
-        <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">${_('Index File!')}</a>
+        <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">
+          ${_('Index File!')}
+        </a>
       <!-- /ko -->
 
-      <a href="javascript:void(0)" class="btn btn-success" data-bind="visible: createWizard.jobId, attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-        ${_('View Indexing Status')}
-      </a>
+      <div data-bind="visible: createWizard.jobId">
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+          ${_('View Indexing Status')}
+        </a>
 
+        ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+      </div>
     </form>
 
   </div>
