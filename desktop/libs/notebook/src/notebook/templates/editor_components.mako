@@ -2342,8 +2342,12 @@ ${ hueIcons.symbols() }
       scrollElement = $('.right-panel');
     }
 
+    if (scrollElement.data('scrollFnDtCreation')) {
+      scrollElement.off('scroll', scrollElement.data('scrollFnDtCreation'));
+    }
+
     var resultFollowTimeout = -1;
-    scrollElement.on('scroll', function () {
+    var dataScroll = function () {
       if (vm.editorMode()) {
         var snippetEl = $('#snippet_' + snippet.id());
         if (snippetEl.find('.dataTables_wrapper').length > 0 && snippet.showGrid()) {
@@ -2379,7 +2383,9 @@ ${ hueIcons.symbols() }
           }
         }, 100);
       }
-    });
+    }
+    scrollElement.data('scrollFnDtCreation', dataScroll);
+    scrollElement.on('scroll', dataScroll);
 
     return _dt;
   }
@@ -2857,16 +2863,26 @@ ${ hueIcons.symbols() }
     };
 
     var splitDraggableTimeout = -1;
-    huePubSub.subscribe('split.draggable.position', function(){
+    huePubSub.subscribe('split.draggable.position', function () {
       window.clearTimeout(splitDraggableTimeout);
-      splitDraggableTimeout = window.setTimeout(function(){
+      splitDraggableTimeout = window.setTimeout(function () {
         redrawFixedHeaders(100);
       }, 200);
     });
 
-    huePubSub.subscribe('redraw.fixed.headers', function(){
+    huePubSub.subscribe('redraw.fixed.headers', function () {
       hideFixedHeaders();
       redrawFixedHeaders(200);
+    });
+
+    huePubSub.subscribe('detach.scrolls', function (snippet) {
+      var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
+      if (viewModel.editorMode()) {
+        scrollElement = $('.right-panel');
+      }
+      if (scrollElement.data('scrollFnDt')) {
+        scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
+      }
     });
 
     window.redrawFixedHeaders = redrawFixedHeaders;

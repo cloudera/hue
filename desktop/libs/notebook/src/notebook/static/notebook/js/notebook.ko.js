@@ -2027,6 +2027,7 @@
       var notebook = new Notebook(self, notebook);
 
       if (notebook.snippets().length > 0) {
+        huePubSub.publish('detach.scrolls', notebook.snippets()[0]);
         notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
         if (currentQueries != null) {
           notebook.snippets()[0].queries(currentQueries);
@@ -2100,6 +2101,7 @@
         self.loadNotebook(data.notebook);
         if (self.editorMode()) {
           self.selectedNotebook().newSnippet();
+          huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
           if (window.location.getParameter('new') == '') {
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');

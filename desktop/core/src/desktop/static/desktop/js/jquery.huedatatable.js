@@ -390,10 +390,12 @@
         var drawTimeout = -1;
         if (self.$table.data('oInit')['scrollable'] && !self.$table.data('isScrollAttached')) {
           self.$table.data('isScrollAttached', true);
-          self.$table.parents(oInit['scrollable']).on('scroll', function () {
+          var scrollFn = function(){
             window.clearTimeout(drawTimeout);
             drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns').length, 500)));
-          });
+          }
+          self.$table.parents(oInit['scrollable']).data('scrollFnDt', scrollFn);
+          self.$table.parents(oInit['scrollable']).on('scroll', scrollFn);
         }
       }
       self.$table.addClass('table-huedatatable');
