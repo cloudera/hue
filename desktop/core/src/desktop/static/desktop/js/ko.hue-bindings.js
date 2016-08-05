@@ -2253,6 +2253,7 @@
         self.jHueGenericAutocomplete({
           showOnFocus: true,
           home: "/",
+          skipColumns: allBindingsAccessor().skipColumns || false,
           onPathChange: function (path) {
             setPathFromAutocomplete(path);
           },

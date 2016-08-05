@@ -49,6 +49,9 @@ ${ assist.assistPanel() }
   }
 </style>
 
+<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
@@ -194,7 +197,7 @@ ${ assist.assistPanel() }
       <div data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
-          <input type="text" data-bind="value: createWizard.fileFormat().table">
+          <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
