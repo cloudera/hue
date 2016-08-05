@@ -225,6 +225,8 @@ ${ assist.assistPanel() }
 
     <!-- /ko -->
 
+    </form>
+
 
       <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
         <!-- ko if: currentStep() == 2 -->
@@ -241,9 +243,9 @@ ${ assist.assistPanel() }
           <!-- ko if: createWizard.isGuessingFieldTypes -->
             <i class="fa fa-spinner fa-spin"></i>
           <!-- /ko -->
-          <div data-bind="foreach: createWizard.fileFormat().columns">
-            <div data-bind="template: { name:'field-template',data:$data}"></div>
-          </div>
+          <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
+            <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10"></div>
+          </form>
           <!-- /ko -->
 
           <!-- ko if: currentStep() == 3 -->
@@ -297,7 +299,6 @@ ${ assist.assistPanel() }
 
         ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
       </div>
-    </form>
 
   </div>
 
@@ -311,58 +312,46 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="field-template">
-  <div>
-    <span>${_('Unique')}</span><input type="checkbox" data-bind="checked: unique">
-    <span>${_('Keep')}</span><input type="checkbox" data-bind="checked: keep">
-    <span>${_('Required')}</span><input type="checkbox" data-bind="checked: required">
-    <input type="text" data-bind="value: name"></input> - <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
-    <button class="btn" data-bind="click: $root.createWizard.addOperation">${_('Add Operation')}</button>
-  </div>
+  <label>${ _('Name') }
+    <input type="text" class="input-small" placeholder="${ _('Field name') }" data-bind="value: name">
+  </label>
+  <label>${ _('Type') }
+    <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
+  </label>
+  <label class="checkbox">
+    <input type="checkbox" data-bind="checked: unique"> ${_('Unique')}
+  </label>
+  <label class="checkbox">
+    <input type="checkbox" data-bind="checked: keep"> ${_('Keep in index')}
+  </label>
+  <label class="checkbox">
+    <input type="checkbox" data-bind="checked: required"> ${_('Required')}
+  </label>
+  <button class="btn" data-bind="click: $root.createWizard.addOperation">${_('Add Operation')}</button>
   <div data-bind="foreach: operations">
     <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
   </div>
 </script>
 
 <script type="text/html" id="operation-template">
-  <div><select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
-  <!-- ko template: "args-template" --><!-- /ko -->
+  <div class="margin-left-10">
+    <select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
+    <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <input type="number" data-bind="value: operation.numExpectedFields">
     <!-- /ko -->
     <button class="btn" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}">${_('remove')}</button>
-    <div style="padding-left:50px" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name:'field-template',data:$data}"></div>
+    <div class="margin-left-20" data-bind="foreach: operation.fields">
+      <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10"></div>
     </div>
-
   </div>
-</script>
-
-<script type="text/html" id="field-preview-header-template">
-
-  <th data-bind="visible: keep, text: name" style="padding-right:60px"></th>
-  <!-- ko foreach: operations -->
-    <!--ko foreach: fields -->
-      <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-    <!-- /ko -->
-  <!--/ko -->
-</script>
-
-
-<script type="text/html" id="output-generated-field-data-template">
-  <!-- ko foreach: operations -->
-    <!--ko foreach: fields -->
-      <td data-bind="visible: keep">[[${_('generated')}]]</td>
-      <!-- ko template: 'output-generated-field-data-template' --><!-- /ko -->
-    <!-- /ko -->
-  <!--/ko -->
 </script>
 
 <script type="text/html" id="args-template">
   <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
-    <h4 data-bind="text: description"></h4>
+    <strong data-bind="text: description"></strong>
     <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
-
 </script>
 
 <script type="text/html" id="arg-text">
@@ -384,6 +373,25 @@ ${ assist.assistPanel() }
   <button class="btn" data-bind="click: function(){value.push({key: ko.observable(''), value: ko.observable('')})}">${_('Add Pair')}</button>
   <br>
 </script>
+
+<script type="text/html" id="field-preview-header-template">
+  <th data-bind="visible: keep, text: name" style="padding-right:60px"></th>
+  <!-- ko foreach: operations -->
+    <!--ko foreach: fields -->
+      <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+    <!-- /ko -->
+  <!--/ko -->
+</script>
+
+<script type="text/html" id="output-generated-field-data-template">
+  <!-- ko foreach: operations -->
+    <!--ko foreach: fields -->
+      <td data-bind="visible: keep">[[${_('generated')}]]</td>
+      <!-- ko template: 'output-generated-field-data-template' --><!-- /ko -->
+    <!-- /ko -->
+  <!--/ko -->
+</script>
+
 
 <script type="text/javascript" charset="utf-8">
 
@@ -410,9 +418,9 @@ ${ assist.assistPanel() }
     }
 
     var createDefaultField = function () {
-      var defaultField = ${default_field_type | n};
+      var defaultField = ko.mapping.fromJS(${default_field_type | n});
 
-      defaultField.name = getNewFieldName();
+      defaultField.name = ko.observable(getNewFieldName());
 
       return defaultField;
     };
