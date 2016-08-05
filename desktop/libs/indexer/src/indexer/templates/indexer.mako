@@ -252,77 +252,77 @@ ${ assist.assistPanel() }
     </form>
 
 
-      <!-- ko if: createWizard.fileFormat().format() && createWizard.fileFormat().format().isCustomizable() -->
-        <!-- ko if: currentStep() == 2 -->
-          <div data-bind="visible: createWizard.fileFormat().show">
-            <h3>
-              ${_('File Type')}: <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select>
-            </h3>
-            <div data-bind="with: createWizard.fileFormat().format">
-              <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
-            </div>
-          </div>
+    <!-- ko if: currentStep() == 2 -->
+    <form class="form-inline">
+      <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
+    </form>
+    <!-- /ko -->
 
-          <h3>${_('Fields')}</h3>
-          <!-- ko if: createWizard.isGuessingFieldTypes -->
-            <i class="fa fa-spinner fa-spin"></i>
-          <!-- /ko -->
-          <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
-            <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
-          </form>
-          <!-- /ko -->
 
-          <!-- ko if: currentStep() == 3 -->
-          <h3>${_('Preview')}</h3>
-          <!-- ko if: createWizard.isGuessingFieldTypes -->
-            <i class="fa fa-spinner fa-spin"></i>
-          <!-- /ko -->
-          <div style="overflow: auto">
-            <table style="margin:auto;text-align:left">
-              <thead>
-                <tr data-bind="foreach: createWizard.fileFormat().columns">
-                  <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-                </tr>
-              </thead>
-              <tbody data-bind="foreach: createWizard.sample">
-                <tr data-bind="foreach: $data">
-                  <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
-                    <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
-                    </td>
+    <!-- ko if: currentStep() == 2 -->
+      <div data-bind="with: createWizard.fileFormat().format, visible: createWizard.fileFormat().show">
+        <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+      </div>
 
-                    <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
-                      <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
-                    <!-- /ko -->
-                  <!-- /ko -->
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        <!-- /ko -->
+      <h3>${_('Fields')}</h3>
+      <!-- ko if: createWizard.isGuessingFieldTypes -->
+        <i class="fa fa-spinner fa-spin"></i>
       <!-- /ko -->
-
-
-      <!-- ko if: previousStepVisible -->
-        <a class="btn" data-bind="click: previousStep">${ _('Previous') }</a>
-      <!-- /ko -->
-
-      <!-- ko if: nextStepVisible -->
-        <a class="btn" data-bind="click: nextStep">${ _('Next') }</a>
+      <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
+        <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
+      </form>
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 3 -->
-        <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">
-          ${_('Index File!')}
-        </a>
+      <h3>${_('Preview')}</h3>
+      <!-- ko if: createWizard.isGuessingFieldTypes -->
+        <i class="fa fa-spinner fa-spin"></i>
       <!-- /ko -->
+      <div style="overflow: auto">
+        <table style="margin:auto;text-align:left">
+          <thead>
+            <tr data-bind="foreach: createWizard.fileFormat().columns">
+              <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: createWizard.sample">
+            <tr data-bind="foreach: $data">
+              <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
+                <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
+                </td>
 
-      <div data-bind="visible: createWizard.jobId">
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-          ${_('View Indexing Status')}
-        </a>
-
-        ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+                <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
+                  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+                <!-- /ko -->
+              <!-- /ko -->
+            </tr>
+          </tbody>
+        </table>
       </div>
+    <!-- /ko -->
+
+
+    <!-- ko if: previousStepVisible -->
+      <a class="btn" data-bind="click: previousStep">${ _('Previous') }</a>
+    <!-- /ko -->
+
+    <!-- ko if: nextStepVisible -->
+      <a class="btn" data-bind="click: nextStep">${ _('Next') }</a>
+    <!-- /ko -->
+
+    <!-- ko if: currentStep() == 3 -->
+      <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">
+        ${_('Index File!')}
+      </a>
+    <!-- /ko -->
+
+    <div data-bind="visible: createWizard.jobId">
+      <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+        ${_('View Indexing Status')}
+      </a>
+
+      ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+    </div>
 
   </div>
 
@@ -330,7 +330,6 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="format-settings">
   <!-- ko foreach: {data: getArguments(), as: 'argument'} -->
-    <h4 data-bind="text: argument.description"></h4>
     <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 </script>
@@ -380,17 +379,22 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="args-template">
   <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
-    <strong data-bind="text: description"></strong>
     <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="arg-text">
-  <input type="text" data-bind="attr: {placeholder: description}, value: value">
+  <label>
+    <span data-bind="text: description"></span>
+    <input type="text" data-bind="attr: {placeholder: description}, value: value">
+  </label>
 </script>
 
 <script type="text/html" id="arg-checkbox">
-  <input type="checkbox" data-bind="checked: value">
+  <label>
+    <input type="checkbox" data-bind="checked: value">
+    <span data-bind="text: description"></span>
+  </label>
 </script>
 
 <script type="text/html" id="arg-mapping">
@@ -522,7 +526,6 @@ ${ assist.assistPanel() }
             }
           }
         });
-
         self.settings(constructSettings(self.type()));
       }
 
@@ -784,7 +787,7 @@ ${ assist.assistPanel() }
         self.fileFormat().path(state.path);
         self.fileFormat().columns.removeAll();
         if (state.format && 'type' in state.format) {
-          koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
+          var koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
           self.fileFormat().format(koFormat);
         }
         if (state.columns) state.columns.forEach(function (currCol) {
