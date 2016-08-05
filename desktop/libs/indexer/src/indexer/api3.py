@@ -74,6 +74,8 @@ def guess_format(request):
     storage = dict([(delim['data_type'], delim['comment']) for delim in table_metadata.storage_details])
     if table_metadata.details['properties']['format'] == 'text':
       format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage['serialization.format']}
+    elif table_metadata.details['properties']['format'] == 'parquet':
+      format_ = {"type": "parquet", "hasHeader": False,}
     else:
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
