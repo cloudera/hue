@@ -147,6 +147,12 @@ class HiveServerTable(Table):
     return rows[col_row_index:][:end_cols_index]
 
   @property
+  def storage_details(self):
+    rows = self.properties
+    col_row_index = map(itemgetter('col_name'), rows).index('Storage Desc Params:') + 1
+    return rows[col_row_index:][:col_row_index + 2]
+
+  @property
   def has_complex(self):
     has_complex = False
     complex_types = ["struct", "array", "map", "uniontype"]
@@ -168,15 +174,15 @@ class HiveServerTable(Table):
     if self._details is None:
       props = dict([(stat['col_name'], stat['data_type']) for stat in self.properties if stat['col_name'] != 'Table Parameters:'])
       serde = props.get('SerDe Library:', '')
-      
+
       self._details = {
           'stats': dict([(stat['data_type'], stat['comment']) for stat in self.stats]),
           'properties': {
             'owner': props.get('Owner:'),
             'create_time': props.get('CreateTime:'),
             'compressed': props.get('Compressed:', 'No') != 'No',
-            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1])
-        } 
+            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1]),
+        }
       }
 
     return self._details

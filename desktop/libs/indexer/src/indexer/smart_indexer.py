@@ -84,7 +84,7 @@ class Indexer(object):
           zkensemble(),
           u'--collection',
           collection_name,
-          u'${nameNode}%s' % input_path,
+          input_path,
       ],
       u'archives': [],
     }

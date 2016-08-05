@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from beeswax.server import dbms
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from notebook.connectors.base import get_api
 
 from indexer.smart_indexer import Indexer
@@ -34,10 +35,10 @@ LOG = logging.getLogger(__name__)
 
 def _escape_white_space_characters(s, inverse = False):
   MAPPINGS = {
-    "\n":"\\n",
-    "\t":"\\t",
-    "\r":"\\r",
-    " ":"\\s"
+    "\n": "\\n",
+    "\t": "\\t",
+    "\r": "\\r",
+    " ": "\\s"
   }
 
   to = 1 if inverse else 0
@@ -67,9 +68,14 @@ def guess_format(request):
       })
     _convert_format(format_)
   elif file_format['inputFormat'] == 'table':
-    #TODO get table file format
-    # if not CSV?
-    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"}
+    db = dbms.get(request.user)
+    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+
+    storage = dict([(delim['data_type'], delim['comment']) for delim in table_metadata.storage_details])
+    if table_metadata.details['properties']['format'] == 'text':
+      format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage['serialization.format']}
+    else:
+      raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"} # \t --> CTRL+A
 
@@ -128,8 +134,8 @@ def index_file(request):
 
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
-    table_metadata = db.get_table(database=file_format['databaseName'], table=file_format['tableName'])
-    input_path = table_metadata.hdfs_link
+    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+    input_path = table_metadata.path_location
   else:
     input_path = file_format["path"]
 
