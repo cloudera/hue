@@ -118,7 +118,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="create-index-wizard">
   <div data-bind="visible: createWizard.show">
-    <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false, success: createWizard.isNameAvailable()}">
+    <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0, success: createWizard.isNameAvailable()}">
       <label for="collectionName" class="control-label">${ _('Name') }</label>
       <div class="controls">
         <input type="text" class="form-control" id = "collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
@@ -128,7 +128,7 @@ ${ assist.assistPanel() }
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group" data-bind="visible: createWizard.fileFormat().name().length > 0">
       <label for="path" class="control-label">${ _('Path') }</label>
       <div class="controls">
         <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path">
@@ -457,9 +457,8 @@ ${ assist.assistPanel() }
     init();
   }
 
-  var File_Format = function (vm) {
+  var IndexerFormat = function (vm) {
     var self = this;
-
 
     self.name = ko.observable('');
     self.show = ko.observable(false);
@@ -487,7 +486,7 @@ ${ assist.assistPanel() }
     self.show = ko.observable(true);
     self.showCreate = ko.observable(false);
 
-    self.fileFormat = ko.observable(new File_Format(vm));
+    self.fileFormat = ko.observable(new IndexerFormat(vm));
     self.sample = ko.observableArray();
 
     self.jobId = ko.observable(null);
