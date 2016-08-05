@@ -31,7 +31,8 @@ def get_format_types():
     CSVFormat,
     HueLogFormat,
     ApacheCombinedFormat,
-    RubyLogFormat
+    RubyLogFormat,
+    SyslogFormat
   ]
 
 def _get_format_mapping():
@@ -141,6 +142,7 @@ class FileFormat(object):
 
 class GrokkedFormat(FileFormat):
   _grok = None
+  _customizable = False
 
   @classmethod
   def get_grok(cls):
@@ -155,10 +157,13 @@ class GrokkedFormat(FileFormat):
 
     return format_
 
+  @property
+  def fields(self):
+    return self._fields
+
 class HueLogFormat(GrokkedFormat):
   _name = "hue"
   _description = _("Hue Log File")
-  _customizable = False
   _extensions = ["log"]
 
   def __init__(self):
@@ -189,17 +194,12 @@ class HueLogFormat(GrokkedFormat):
       Field("protocol", "string")
     ]
 
-  @property
-  def fields(self):
-    return self._fields
-
 class GrokLineFormat(GrokkedFormat):
   _parse_type = "grok_line"
 
 class ApacheCombinedFormat(GrokLineFormat):
   _name = "combined_apache"
   _description = _("Combined Apache Log File")
-  _customizable = False
   _extensions = ["log"]
   _grok = "%{COMBINEDAPACHELOG}"
 
@@ -219,14 +219,9 @@ class ApacheCombinedFormat(GrokLineFormat):
       Field("field_line", "text_en")
     ]
 
-  @property
-  def fields(self):
-    return self._fields
-
 class RubyLogFormat(GrokLineFormat):
   _name = "ruby_log"
   _description = _("Ruby Log")
-  _customizable = False
   _extensions = ["log"]
   _grok = "%{RUBY_LOGGER}"
 
@@ -240,9 +235,22 @@ class RubyLogFormat(GrokLineFormat):
       Field("field_line", "text_en")
     ]
 
-  @property
-  def fields(self):
-    return self._fields
+class SyslogFormat(GrokLineFormat):
+  _name = "syslog"
+  _description = _("Syslog")
+  _grok = "%{SYSLOGLINE}"
+
+  def __init__(self):
+    self._fields = [
+      Field("timestamp", "string"),
+      Field("timestamp8601", "string"),
+      Field("facility", "string"),
+      Field("priority", "string"),
+      Field("logsource", "string"),
+      Field("program", "string"),
+      Field("pid", "string"),
+      Field("message", "text_en"),
+    ]
 
 class CSVFormat(FileFormat):
   _name = "csv"
