@@ -47,6 +47,30 @@ ${ assist.assistPanel() }
     margin-bottom: 0!important;
     border-right: none!important;
   }
+
+  .form-inline input[type='text'], .form-inline select {
+    margin-right: 10px;
+    margin-left: 3px;
+  }
+
+  .form-inline input[type='checkbox'] {
+    margin-left: 10px!important;
+    margin-right: 4px!important;
+  }
+
+  .field {
+    padding: 4px;
+    padding-left: 10px;
+    border-left: 4px solid #DBE8F1;
+  }
+
+  .operation {
+    border-left: 4px solid #EEE;
+    padding-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
 </style>
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
@@ -244,7 +268,7 @@ ${ assist.assistPanel() }
             <i class="fa fa-spinner fa-spin"></i>
           <!-- /ko -->
           <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
-            <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10"></div>
+            <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
           </form>
           <!-- /ko -->
 
@@ -327,22 +351,29 @@ ${ assist.assistPanel() }
   <label class="checkbox">
     <input type="checkbox" data-bind="checked: required"> ${_('Required')}
   </label>
-  <button class="btn" data-bind="click: $root.createWizard.addOperation">${_('Add Operation')}</button>
+  <!-- ko if: operations().length == 0 -->
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Operation')}</a>
+  <!-- /ko -->
   <div data-bind="foreach: operations">
     <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
   </div>
+  <!-- ko if: operations().length > 0 -->
+  <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Operation to')} <span data-bind="text: name"></span></a>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="operation-template">
-  <div class="margin-left-10">
+  <div class="operation">
     <select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
-      <input type="number" data-bind="value: operation.numExpectedFields">
+      <label> ${ _('Number of expected fields') }
+      <input type="number" class="input-mini" data-bind="value: operation.numExpectedFields">
+      </label>
     <!-- /ko -->
-    <button class="btn" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}">${_('remove')}</button>
+    <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10"></div>
+      <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
     </div>
   </div>
 </script>
