@@ -1712,7 +1712,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
-  self.showFieldAnalysis = function() {
+  self.showFieldAnalysis = function(vm, e) {
     if (self.fieldAnalysesName()) {
       var analyse = self.getFieldAnalysis();
 
@@ -1722,7 +1722,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
 
       analyse.update();
-      $(document).trigger("shownAnalysis");
+      $(document).trigger("shownAnalysis", e);
     }
   }
 
