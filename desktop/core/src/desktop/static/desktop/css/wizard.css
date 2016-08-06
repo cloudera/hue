@@ -67,13 +67,13 @@
   color: #0F9D56;
 }
 
-.step-indicator .incomplete .step {
-  border-color: #ff3b30;
-  color: #ff3b30;
+.step-indicator .error .step {
+  border-color: #d6616b;
+  color: #d6616b;
 }
 
-.step-indicator .incomplete .caption {
-  color: #ff3b30;
+.step-indicator .error .caption {
+  color: #d6616b;
 }
 
 .step-indicator .active.complete .step {

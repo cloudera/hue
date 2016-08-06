@@ -71,6 +71,10 @@ ${ assist.assistPanel() }
     margin-bottom: 5px;
     margin-left: 10px;
   }
+
+  .right-panel {
+    overflow-x: hidden;
+  }
 </style>
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
@@ -186,13 +190,21 @@ ${ assist.assistPanel() }
         </div>
         <div class="caption">${ _('Tweak it') }</div>
       </li>
-      <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3 }, click: function() { currentStep(3) }">
+      <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3, 'error': createWizard.indexingError, 'complete': createWizard.indexingSuccess }, click: function() { currentStep(3) }">
         <div class="step">
           <!-- ko if: createWizard.isIndexing -->
             <span class="fa fa-spinner fa-spin"></span>
           <!-- /ko -->
           <!-- ko ifnot: createWizard.isIndexing -->
+            <!-- ko if: !createWizard.indexingError() && !createWizard.indexingSuccess() -->
             3
+            <!-- /ko -->
+            <!-- ko if: createWizard.indexingError -->
+              <span class="fa fa-exclamation-triangle"></span>
+            <!-- /ko -->
+            <!-- ko if: createWizard.indexingSuccess -->
+              <span class="fa fa-check"></span>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
         <div class="caption">${ _('Index it!') }</div>
@@ -318,12 +330,12 @@ ${ assist.assistPanel() }
     <!-- /ko -->
 
     <div data-bind="visible: createWizard.jobId">
-      <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-        ${_('Oozie Status')}
-      </a>
-      <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-        ${_('View indexing status')}
-      </a>
+##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+##         ${_('Oozie Status')}
+##       </a>
+##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+##         ${_('View indexing status')}
+##       </a>
 
       ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
     </div>
@@ -427,6 +439,20 @@ ${ assist.assistPanel() }
       <!-- ko template: 'output-generated-field-data-template' --><!-- /ko -->
     <!-- /ko -->
   <!--/ko -->
+</script>
+
+<script type="text/html" id="notebook-progress">
+  <!-- ko with: selectedNotebook  -->
+    <!-- ko foreach: snippets  -->
+      <div class="progress-snippet progress active" data-bind="css: {
+        'progress-starting': progress() == 0 && status() == 'running',
+        'progress-warning': progress() > 0 && progress() < 100,
+        'progress-success': progress() == 100,
+        'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%; height: 4px">
+        <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
+      </div>
+    <!-- /ko -->
+  <!-- /ko -->
 </script>
 
 
@@ -757,6 +783,8 @@ ${ assist.assistPanel() }
       };
 
       self.isIndexing = ko.observable(false);
+      self.indexingError = ko.observable(false);
+      self.indexingSuccess = ko.observable(false);
       self.indexFile = function () {
         if (!self.readyToIndex()) return;
 
@@ -770,6 +798,7 @@ ${ assist.assistPanel() }
           self.showCreate(true);
           self.jobId(resp.handle.id);
           self.editorId(resp.history_id);
+          $('#notebook').html($('#notebook-progress').html());
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
             user: '${ user.username }',
             userId: ${ user.id },
@@ -782,7 +811,20 @@ ${ assist.assistPanel() }
           });
           ko.cleanNode($("#notebook")[0]);
           ko.applyBindings(self.editorVM, $("#notebook")[0]);
-          self.editorVM.openNotebook(resp.history_uuid);
+          self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
+            self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
+              if (val == 100){
+                self.isIndexing(false);
+                self.indexingSuccess(true);
+              }
+            });
+            self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
+              if (val == 'failed'){
+                self.isIndexing(false);
+                self.indexingError(true);
+              }
+            });
+          });
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
