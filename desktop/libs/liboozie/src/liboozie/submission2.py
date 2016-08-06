@@ -203,10 +203,13 @@ class Submission(object):
           notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
 
           self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_str())
-        elif action.data['type'] == 'java-document':
-          from notebook.models import Notebook
-          notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
-          properties = notebook.get_data()['snippets'][0]['properties']
+        elif action.data['type'] == 'java-document' or action.data['type'] == 'java':
+          if action.data['type'] == 'java-document':
+            from notebook.models import Notebook
+            notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+            properties = notebook.get_data()['snippets'][0]['properties']
+          else:
+            properties = action.data['properties']
 
           if properties.get('app_jar'):
             LOG.debug("Adding to oozie.libpath %s" % properties['app_jar'])

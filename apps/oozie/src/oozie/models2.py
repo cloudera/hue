@@ -2962,10 +2962,9 @@ class WorkflowBuilder():
   Building a workflow that has saved Documents for nodes (e.g Saved Hive query, saved Pig script...).
   """
 
-  def create_workflow(self, user, document=None, documents=None, name=None, managed=False):
+  def create_workflow(self, user, document=None, name=None, managed=False):
     nodes = []
-    if documents is None:
-      documents = [document]
+    documents = [document]
 
     if name is None:
       name = _('Schedule of ') + ','.join([document.name or document.type for document in documents])
@@ -2980,6 +2979,28 @@ class WorkflowBuilder():
 
     workflow_doc = self.get_workflow(nodes, name, document.uuid, user, managed=managed)
     workflow_doc.dependencies.add(*documents)
+
+    return workflow_doc
+
+
+  def create_notebook_workflow(self, user, notebook=None, name=None, managed=False):
+    nodes = []
+
+    if name is None:
+      name = _('Schedule of ') + ','.join([snippet['name'] or snippet['type'] for snippet in notebook['snippets']])
+
+    for snippet in notebook['snippets']:
+      print snippet
+      if snippet['type'] == 'java':
+        node = self.get_java_snippet_node(snippet)
+      elif snippet['type'] == 'java':
+        node = self.get_hive_document_node(snippet, user)
+      else:
+        raise PopupException(_('Snippet type %(type)s is not supported in batch execution.') % snippet)
+
+      nodes.append(node)
+
+    workflow_doc = self.get_workflow(nodes, name, notebook['uuid'], user, managed=managed) # TODO optionally save
 
     return workflow_doc
 
@@ -3000,7 +3021,7 @@ class WorkflowBuilder():
         u'properties': {
             u'files': [],
             u'job_xml': u'',
-            u'uuid': document.uuid,
+            u'uuid': document.uuid, # + snippet uuid
             u'parameters': parameters,
             u'retry_interval': [],
             u'retry_max': [],
@@ -3024,41 +3045,60 @@ class WorkflowBuilder():
         },
         u'children': [
             {u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
-            {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'
-        }],
+            {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'}
+        ],
         u'actionParameters': [],
     }
 
-  def get_java_document_node(self, document, name):
-    credentials = []
+  def _get_java_node(self, node_id, credentials=None, is_document_node=False):
+    if credentials is None:
+      credentials = []
 
     return {
-        "id": str(uuid.uuid4()),
-        'name': u'doc-hive-%s' % document.uuid[:4],
-        "type":"java-document-widget",
+        "id": node_id,
+        'name': 'doc-hive-%s' % node_id[:4],
+        "type": "java-document-widget" if is_document_node else "java-widget",
         "properties":{
-              u'uuid': document.uuid, # Files, main_class, arguments comes from there
-              "job_xml":[],
+              "job_xml": [],
               "jar_path": "",
-              "java_opts":[],
-              "retry_max":[],
-              "retry_interval":[],
-              "job_properties":[],
+              "java_opts": [],
+              "retry_max": [],
+              "retry_interval": [],
+              "job_properties": [],
               "capture_output": False,
-              "prepares":[],
+              "prepares": [],
               "credentials": credentials,
               "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
-              "archives":[]
+              "archives": []
         },
-        "children":[
-            {"to":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
-            {"error":"17c9c895-5a16-7443-bb81-f34b30b21548"}
+        "children": [
+            {"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+            {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}
         ],
-        "actionParameters":[],
+        "actionParameters": [],
         "actionParametersFetched": False
     }
 
+  def get_java_snippet_node(self, snippet):
+    credentials = []
 
+    node_id = snippet.get('id') or str(uuid.uuid4())
+
+    node = self._get_java_node(node_id, credentials)
+    node['properties']['main_class'] = snippet['properties']['class']
+    node['properties']['app_jar'] = snippet['properties']['app_jar'] # Not used, submission add it to oozie.libpath instead
+    node['properties']['files'] = [{'value': f['path']} for f in snippet['properties']['files']]
+    node['properties']['arguments'] = [{'value': f} for f in snippet['properties']['arguments']]
+
+    return node
+
+  def get_java_document_node(self, document):
+    credentials = []
+
+    node = self._get_java_node(document.uuid, credentials, is_document_node=True)
+    node['uuid'] = document.uuid
+
+    return node
 
   def get_workflow(self, nodes, name, doc_uuid, user, managed=False):
     parameters = []

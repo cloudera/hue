@@ -23,8 +23,8 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 
 from collections import deque
-from notebook.api import _save_notebook, _execute_notebook
-from notebook.models import make_notebook, make_notebook2
+from notebook.api import _execute_notebook
+from notebook.models import make_notebook2
 from oozie.models2 import Job
 
 from indexer.fields import get_field_type
@@ -64,69 +64,40 @@ class Indexer(object):
   def run_morphline(self, request, collection_name, morphline, input_path):
     workspace_path = self._upload_workspace(morphline)
 
-#     snippets = [
-#       {
-#         u'type': u'java',
-#         u'files': [
-#             {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
-#             {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
-#         ],
-#         u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
-#         u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
-#         u'arguments': [
-#             u'--morphline-file',
-#             u'morphline.conf',
-#             u'--output-dir',
-#             u'${nameNode}/user/%s/indexer' % self.username,
-#             u'--log4j',
-#             u'log4j.properties',
-#             u'--go-live',
-#             u'--zk-host',
-#             zkensemble(),
-#             u'--collection',
-#             collection_name,
-#             input_path,
-#         ],
-#         u'archives': [],
-#       }
-#     ]
-#
-#     # managed notebook
-#     notebook = make_notebook2(name='Indexer job for %s' % collection_name, snippets=snippets).get_data()
-#     notebook_doc, created = _save_notebook(notebook, self.user)
-#
-#     snippet = {'wasBatchExecuted': True}
+    snippets = [
+      {
+        u'type': u'java',
+        u'status': u'running',
+        u'properties':  {
+          u'files': [
+              {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
+              {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
+          ],
+          u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
+          u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
+          u'arguments': [
+              u'--morphline-file',
+              u'morphline.conf',
+              u'--output-dir',
+              u'${nameNode}/user/%s/indexer' % self.username,
+              u'--log4j',
+              u'log4j.properties',
+              u'--go-live',
+              u'--zk-host',
+              zkensemble(),
+              u'--collection',
+              collection_name,
+              input_path,
+          ],
+          u'archives': [],
+        }
+      }
+    ]
 
-    snippet_properties =  {
-       u'files': [
-           {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
-           {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
-       ],
-       u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
-       u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
-       u'arguments': [
-           u'--morphline-file',
-           u'morphline.conf',
-           u'--output-dir',
-           u'${nameNode}/user/%s/indexer' % self.username,
-           u'--log4j',
-           u'log4j.properties',
-           u'--go-live',
-           u'--zk-host',
-           zkensemble(),
-           u'--collection',
-           collection_name,
-           input_path,
-       ],
-       u'archives': [],
-    }
+    notebook = make_notebook2(name='Indexer job for %s' % collection_name, snippets=snippets).get_data()
+    snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook['snippets'][0]['id'], 'statement': ''}
 
-    notebook = make_notebook(name='Indexer', editor_type='java', snippet_properties=snippet_properties, status='running').get_data()
-    notebook_doc, created = _save_notebook(notebook, self.user)
-
-    snippet = {'wasBatchExecuted': True, 'id': notebook['snippets'][0]['id'], 'statement': ''}
-
-    job_handle = _execute_notebook(request, notebook, snippet)
+    job_handle = _execute_notebook(request, notebook, snippet) # To set as managed
 
     return job_handle
 
@@ -220,11 +191,11 @@ class Indexer(object):
     grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
 
     properties = {
-      "collection_name":collection_name,
-      "fields":self.get_field_list(data['columns']),
+      "collection_name": collection_name,
+      "fields": self.get_field_list(data['columns']),
       "num_base_fields": len(data['columns']),
       "uuid_name" : uuid_name,
-      "get_regex":Indexer._get_regex_for_type,
+      "get_regex": Indexer._get_regex_for_type,
       "format_settings": data['format'],
       "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,

@@ -145,11 +145,10 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
 
     _snippets.append(snippet)
 
-  print _snippets
-
   data = {
     'name': name,
     'uuid': str(uuid.uuid4()),
+    'type': 'notebook',
     'description': description,
     'sessions': [
       {
@@ -169,7 +168,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
          'statement_raw': _snippet.get('statement', ''),
          'statement': _snippet.get('statement', ''),
          'type': _snippet.get('type'),
-         'properties': _snippet.properties,
+         'properties': _snippet['properties'],
          'name': name,
          'database': _snippet.get('database'),
          'result': {}
