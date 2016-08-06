@@ -664,7 +664,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
@@ -1753,7 +1753,7 @@ ${ dashboard.layout_skeleton() }
       <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
       <li><a href="#analysis-stats" role="tab" data-toggle="tab" data-bind="click: function() { section('stats'); }">${ _('Stats') }</a></li>
     </ul>
-    <div class="tab-content">
+    <div class="tab-content" style="max-height: 370px; height: 370px">
       <div class="tab-pane active" id="analysis-terms" data-bind="with: terms">
         <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
           <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -2834,9 +2834,19 @@ $(document).ready(function () {
     }
   });
 
-  $(document).on("shownAnalysis", function(){
-    var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName().toLowerCase();}).parent();
-    $("#fieldAnalysis").show().css("top", _fieldElement.position().top - $("#fieldAnalysis").outerHeight()/2 + _fieldElement.outerHeight()/2).css("left", _fieldElement.position().left + _fieldElement.outerWidth());
+  $(document).on("shownAnalysis", function (e, originalEvent) {
+    var _fieldElement = $(".field-selector").filter(function () {
+      return $(this).text().toLowerCase() === viewModel.fieldAnalysesName().toLowerCase();
+    }).parent();
+    if (originalEvent.pageX == null && originalEvent.clientX != null) {
+      var doc = document.documentElement, body = document.body;
+      originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
+      originalEvent.pageY = originalEvent.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0);
+    }
+    $("#fieldAnalysis").show().css({
+      top: Math.max(0, originalEvent.pageY - $("#fieldAnalysis").outerHeight() / 2),
+      left: originalEvent.pageX
+    })
   });
 
   % if is_owner:
