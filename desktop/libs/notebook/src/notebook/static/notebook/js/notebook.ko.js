@@ -2075,7 +2075,7 @@
       huePubSub.publish('check.job.browser');
     };
 
-    self.openNotebook = function (uuid, queryTab) {
+    self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
@@ -2086,7 +2086,12 @@
           data.data.can_write = data.user_perms.can_write;
           var notebook = data.data;
           self.loadNotebook(notebook, queryTab);
-          hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+          if (typeof skipUrlChange === 'undefined'){
+            hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+          }
+          if (typeof callback !== 'undefined'){
+            callback();
+          }
         }
         else {
           $(document).trigger("error", data.message);
