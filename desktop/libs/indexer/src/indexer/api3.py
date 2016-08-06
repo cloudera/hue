@@ -93,8 +93,8 @@ def guess_field_types(request):
 
     format_ = indexer.guess_field_types({
       "file": {
-        "stream": stream,
-        "name": file_format['path']
+          "stream": stream,
+          "name": file_format['path']
         },
       "format": file_format['format']
     })
@@ -111,8 +111,9 @@ def guess_field_types(request):
         ]
     }
   elif file_format['inputFormat'] == 'query':
-    #TODO get schema from explain query
-    pass
+    # TODO get schema from explain query, which is not possible
+    # Only support select * for now and would require a workflow that generates the morphline on the fly based on a temporary CTAS
+    format_ = {u'sample': [[u'00-0000', u'All Occupations', 134354250, 40690], [u'11-0000', u'Management occupations', 6003930, 96150], [u'11-1011', u'Chief executives', 299160, 151370], [u'11-1021', u'General and operations managers', 1655410, 103780]], u'columns': [{u'operations': [], u'name': u'code', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'description', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'total_emp', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'salary', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}]}
 
   return JsonResponse(format_)
 
@@ -139,8 +140,8 @@ def index_file(request):
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     input_path = table_metadata.path_location
-  else:
-    input_path = file_format["path"]
+  elif file_format['inputFormat'] == 'file':
+    input_path = '${nameNode}%s' % file_format["path"]
 
-  job_handle = indexer.run_morphline(request, collection_name, morphline, input_path) #TODO if query generate insert
+  job_handle = indexer.run_morphline(request, collection_name, morphline, input_path)
   return JsonResponse(job_handle)

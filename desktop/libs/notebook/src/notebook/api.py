@@ -101,11 +101,11 @@ def _execute_notebook(request, notebook, snippet):
   result = None
   history = None
 
-  is_query = notebook['type'].startswith('query-') or snippet['type'] == 'java'
+  historify = notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')
 
   try:
     try:
-      if is_query:
+      if historify:
         history = _historify(notebook, request.user)
         notebook = Notebook(document=history).get_data()
 
@@ -115,7 +115,7 @@ def _execute_notebook(request, notebook, snippet):
       if response['handle'].get('sync'):
         result = response['handle'].pop('result')
     finally:
-      if is_query:
+      if historify:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
         if 'handle' in response: # No failure
           _snippet['result']['handle'] = response['handle']

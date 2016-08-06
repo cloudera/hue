@@ -183,7 +183,7 @@ ${ assist.assistPanel() }
 
     <ol class="list-inline text-center step-indicator">
       <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
-        <div class="step">
+        <div class="step" title="${ _('Go to Step 1') }">
           <!-- ko if: currentStep() == 1 -->
             <!-- ko if: createWizard.isGuessingFormat -->
               <span class="fa fa-spinner fa-spin"></span>
@@ -199,7 +199,7 @@ ${ assist.assistPanel() }
         <div class="caption">${ _('Pick it') }</div>
       </li>
       <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
-        <div class="step">
+        <div class="step" title="${ _('Go to Step 2') }">
           <!-- ko if: currentStep() < 3 -->
             <!-- ko if: createWizard.isGuessingFieldTypes -->
               <span class="fa fa-spinner fa-spin"></span>
@@ -215,7 +215,7 @@ ${ assist.assistPanel() }
         <div class="caption">${ _('Tweak it') }</div>
       </li>
       <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3, 'error': createWizard.indexingError, 'complete': createWizard.indexingSuccess }, click: function() { currentStep(3) }">
-        <div class="step">
+        <div class="step" title="${ _('Go to Step 3') }">
           <!-- ko if: createWizard.isIndexing -->
             <span class="fa fa-spinner fa-spin"></span>
           <!-- /ko -->
