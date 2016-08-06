@@ -64,6 +64,39 @@ class Indexer(object):
   def run_morphline(self, request, collection_name, morphline, input_path):
     workspace_path = self._upload_workspace(morphline)
 
+#     snippets = [
+#       {
+#         u'type': u'java',
+#         u'files': [
+#             {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
+#             {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
+#         ],
+#         u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
+#         u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
+#         u'arguments': [
+#             u'--morphline-file',
+#             u'morphline.conf',
+#             u'--output-dir',
+#             u'${nameNode}/user/%s/indexer' % self.username,
+#             u'--log4j',
+#             u'log4j.properties',
+#             u'--go-live',
+#             u'--zk-host',
+#             zkensemble(),
+#             u'--collection',
+#             collection_name,
+#             input_path,
+#         ],
+#         u'archives': [],
+#       }
+#     ]
+#
+#     # managed notebook
+#     notebook = make_notebook2(name='Indexer job for %s' % collection_name, snippets=snippets).get_data()
+#     notebook_doc, created = _save_notebook(notebook, self.user)
+#
+#     snippet = {'wasBatchExecuted': True}
+
     snippet_properties =  {
        u'files': [
            {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
