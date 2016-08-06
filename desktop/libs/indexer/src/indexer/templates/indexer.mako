@@ -130,6 +130,9 @@ ${ assist.assistPanel() }
           <div style="margin: 10px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
+
+          <div id="notebook"></div>
+
         </div>
       </div>
     </div>
@@ -680,6 +683,7 @@ ${ assist.assistPanel() }
 
       self.jobId = ko.observable();
       self.editorId = ko.observable();
+      self.editorVM = null;
 
       self.indexingStarted = ko.observable(false);
 
@@ -766,6 +770,19 @@ ${ assist.assistPanel() }
           self.showCreate(true);
           self.jobId(resp.handle.id);
           self.editorId(resp.history_id);
+          self.editorVM = new EditorViewModel(resp.history_uuid, '', {
+            user: '${ user.username }',
+            userId: ${ user.id },
+            languages: [{name: "Java SQL", type: "java"}],
+            snippetViewSettings: {
+              java : {
+                snippetIcon: 'fa-file-archive-o '
+              }
+            }
+          });
+          ko.cleanNode($("#notebook")[0]);
+          ko.applyBindings(self.editorVM, $("#notebook")[0]);
+          self.editorVM.openNotebook(resp.history_uuid);
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);

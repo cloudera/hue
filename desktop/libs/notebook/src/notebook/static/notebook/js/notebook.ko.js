@@ -1892,15 +1892,17 @@
 
     self.sqlSourceTypes = [];
 
-    $.each(options.languages, function (idx, language) {
-      var viewSettings = options.snippetViewSettings[language.type];
-      if (viewSettings && viewSettings.sqlDialect) {
-        self.sqlSourceTypes.push({
-          type: language.type,
-          name: language.name
-        })
-      }
-    });
+    if (options.languages && options.snippetViewSettings) {
+      $.each(options.languages, function (idx, language) {
+        var viewSettings = options.snippetViewSettings[language.type];
+        if (viewSettings && viewSettings.sqlDialect) {
+          self.sqlSourceTypes.push({
+            type: language.type,
+            name: language.name
+          })
+        }
+      });
+    }
 
     if (self.sqlSourceTypes.length > 0) {
       self.activeSqlSourceType = self.sqlSourceTypes[0].type;
