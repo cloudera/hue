@@ -253,15 +253,14 @@ ${ assist.assistPanel() }
 
 
     <!-- ko if: currentStep() == 2 -->
-    <form class="form-inline">
-      <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
-    </form>
-    <!-- /ko -->
+      <form class="form-inline">
+        <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
+      </form>
 
-
-    <!-- ko if: currentStep() == 2 -->
       <div data-bind="with: createWizard.fileFormat().format, visible: createWizard.fileFormat().show">
-        <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+        <form class="form-inline">
+          <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+        </form>
       </div>
 
       <h3>${_('Fields')}</h3>
@@ -271,7 +270,7 @@ ${ assist.assistPanel() }
       <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
         <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
       </form>
-      <!-- /ko -->
+    <!-- /ko -->
 
       <!-- ko if: currentStep() == 3 -->
       <h3>${_('Preview')}</h3>
@@ -311,7 +310,7 @@ ${ assist.assistPanel() }
 
     <!-- ko if: currentStep() == 3 -->
       <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">
-        ${_('Index File!')}
+        ${_('Launch indexing!')}
       </a>
     <!-- /ko -->
 
@@ -724,6 +723,7 @@ ${ assist.assistPanel() }
 
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
+          viewModel.currentStep(2);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
