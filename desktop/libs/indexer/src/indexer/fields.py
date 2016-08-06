@@ -39,13 +39,14 @@ class FieldType():
     return pattern.match(field)
 
 class Field(object):
-  def __init__(self, name="new_field", field_type_name="string", operations=None):
+  def __init__(self, name="new_field", field_type_name="string", operations=None, multi_valued=False):
     self.name = name
     self.field_type_name = field_type_name
     self.keep = True
     self.operations = operations if operations else []
     self.required = False
     self.unique = False
+    self.multi_valued = multi_valued
 
   def to_dict(self):
     return {'name': self.name,
@@ -53,7 +54,8 @@ class Field(object):
     'unique': self.unique,
     'keep': self.keep,
     'operations': self.operations,
-    'required': self.required}
+    'required': self.required,
+    'multiValued': self.multi_valued}
 
 FIELD_TYPES = [
   FieldType('text_en', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{101,}$"),

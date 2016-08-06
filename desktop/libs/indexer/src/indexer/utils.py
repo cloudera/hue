@@ -41,13 +41,14 @@ from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYP
 
 LOG = logging.getLogger(__name__)
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
-FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" />'
+FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'
 DEFAULT_FIELD = {
   'name': None,
   'type': 'text',
   'indexed': 'true',
   'stored': 'true',
-  'required': 'true'
+  'required': 'true',
+  'multiValued': 'false'
 }
 
 
