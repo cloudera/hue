@@ -62,9 +62,12 @@ class OozieApi(Api):
 
     notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')
 
-    # Create a managed workflow from the notebook doc
-    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % (notebook_doc.name or notebook_doc.type))
-    workflow = Workflow(document=workflow_doc, user=self.user)
+    if notebook_doc.type == 'notebook':
+      pass
+    else:
+      # Create a managed workflow from the notebook doc
+      workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % (notebook_doc.name or notebook_doc.type))
+      workflow = Workflow(document=workflow_doc, user=self.user)
 
     # Submit workflow
     job_id = _submit_workflow(user=self.user, fs=self.fs, jt=self.jt, workflow=workflow, mapping=None)

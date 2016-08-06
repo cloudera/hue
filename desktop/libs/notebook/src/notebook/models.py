@@ -122,7 +122,64 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
 
 
 def make_notebook2(name='Browse', description='', is_saved=False, snippets=None):
-  pass
+
+  from notebook.connectors.hiveserver2 import HS2Api
+
+  editor = Notebook()
+
+  _snippets = []
+
+  for snippet in snippets:
+    default_properties = {
+        'files': [],
+        'functions': [],
+        'settings': []
+    }
+
+    if snippet['type'] == 'hive':
+      pass
+    elif snippet['type'] == 'impala':
+      pass
+    elif snippet['type'] == 'java':
+      pass
+
+    _snippets.append(snippet)
+
+  print _snippets
+
+  data = {
+    'name': name,
+    'uuid': str(uuid.uuid4()),
+    'description': description,
+    'sessions': [
+      {
+         'type': _snippet['type'],
+         'properties': HS2Api.get_properties(snippet['type']),
+         'id': None
+      } for _snippet in _snippets # Non unique types currently
+    ],
+    'selectedSnippet': _snippets[0]['type'],
+    'type': 'notebook',
+    'showHistory': False,
+    'isSaved': is_saved,
+    'snippets': [
+      {
+         'status': _snippet.get('status', 'ready'),
+         'id': str(uuid.uuid4()),
+         'statement_raw': _snippet.get('statement', ''),
+         'statement': _snippet.get('statement', ''),
+         'type': _snippet.get('type'),
+         'properties': _snippet.properties,
+         'name': name,
+         'database': _snippet.get('database'),
+         'result': {}
+      } for _snippet in _snippets
+    ]
+  }
+
+  editor.data = json.dumps(data)
+
+  return editor
 
 
 def import_saved_beeswax_query(bquery):
