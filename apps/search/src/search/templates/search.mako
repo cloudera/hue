@@ -675,12 +675,6 @@ ${ dashboard.layout_skeleton() }
       <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
         <span data-bind="template: {name: 'grid-chart-settings', data: $root.collection.template.chartSettings}"></span>
       </div>
-
-      <div style="position: absolute; margin-left: 208px; top: 0px; margin-top: 130px;" data-bind="visible: $root.collection.template.showFieldList()">
-        <a class="inactive-action pointer" title="${_('Hide settings')}" data-bind="click: function() { $root.collection.template.showFieldList(false) }">
-          <i class="fa fa-chevron-left"></i>
-        </a>
-      </div>
     </span>
 
       <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults() || !$root.response().response">
