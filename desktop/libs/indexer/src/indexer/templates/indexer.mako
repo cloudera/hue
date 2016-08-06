@@ -362,13 +362,10 @@ ${ assist.assistPanel() }
         </button>
       <!-- /ko -->
 
-      <span data-bind="visible: createWizard.jobId">
-  ##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-  ##         ${_('Oozie Status')}
-  ##       </a>
-  ##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-  ##         ${_('View indexing status')}
-  ##       </a>
+      <span data-bind="visible: createWizard.editorId">
+       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+         ${_('View indexing status')}
+       </a>
 
         ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
       </span>
@@ -757,7 +754,6 @@ ${ assist.assistPanel() }
       self.fileFormat = ko.observable(new IndexerFormat(vm));
       self.sample = ko.observableArray();
 
-      self.jobId = ko.observable();
       self.editorId = ko.observable();
       self.editorVM = null;
 
@@ -847,7 +843,6 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
         }, function (resp) {
           self.showCreate(true);
-          self.jobId(resp.handle.id);
           self.editorId(resp.history_id);
           $('#notebook').html($('#notebook-progress').html());
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
