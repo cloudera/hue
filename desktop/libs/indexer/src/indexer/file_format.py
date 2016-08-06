@@ -32,8 +32,12 @@ def get_format_types():
     HueLogFormat,
     ApacheCombinedFormat,
     RubyLogFormat,
-    SyslogFormat
+    SyslogFormat,
+    ParquetTableFormat
   ]
+
+def get_file_indexable_format_types():
+  return [format_ for format_ in get_format_types() if format_.is_file_indexable]
 
 def _get_format_mapping():
   return dict([(format_.get_name(), format_) for format_ in get_format_types()])
@@ -67,6 +71,11 @@ class FileFormat(object):
   _args = []
   _extensions = []
   _parse_type = None
+  _file_indexable = True
+
+  @classmethod
+  def is_file_indexable(cls):
+    return cls._file_indexable
 
   @classmethod
   def get_extensions(cls):
@@ -251,6 +260,10 @@ class SyslogFormat(GrokLineFormat):
       Field("pid", "string"),
       Field("message", "text_en"),
     ]
+
+class ParquetTableFormat(FileFormat):
+  _name = "parquet"
+
 
 class CSVFormat(FileFormat):
   _name = "csv"
@@ -463,7 +476,6 @@ class CSVFormat(FileFormat):
 
     return fields
 
-
 class HiveFormat(CSVFormat):
   FIELD_TYPE_TRANSLATE = {
     "BOOLEAN_TYPE": "string",
@@ -490,7 +502,7 @@ class HiveFormat(CSVFormat):
       fields.append(Field(
         name=field["name"],
         field_type_name=cls.FIELD_TYPE_TRANSLATE.get(field['type'], 'string')
-      ))
+        ))
 
     return cls(**{
       "delimiter":',',
