@@ -33,7 +33,7 @@ def get_format_types():
     ApacheCombinedFormat,
     RubyLogFormat,
     SyslogFormat,
-    ParquetTableFormat
+    ParquetFormat
   ]
 
 def get_file_indexable_format_types():
@@ -261,8 +261,10 @@ class SyslogFormat(GrokLineFormat):
       Field("message", "text_en"),
     ]
 
-class ParquetTableFormat(FileFormat):
+
+class ParquetFormat(FileFormat):
   _name = "parquet"
+  _description = _("Parquet Table")
 
 
 class CSVFormat(FileFormat):
