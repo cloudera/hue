@@ -100,13 +100,15 @@ def guess_field_types(request):
     })
   elif file_format['inputFormat'] == 'table':
     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
+    db = dbms.get(request.user)
+    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
 
     format_ = {
         "sample": sample['rows'][:4],
         "columns": [
-            {"operations": [], "name": col['name'], "required": False, "keep": True, "unique": False,
-             "type": HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')
-         } for col in sample['full_headers']
+            {"operations": [], "name": col.name, "required": False, "keep": True, "unique": False,
+             "type": HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
+         } for col in table_metadata.cols
         ]
     }
   elif file_format['inputFormat'] == 'query':
