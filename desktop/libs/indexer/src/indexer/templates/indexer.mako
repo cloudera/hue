@@ -740,7 +740,7 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
         }, function (resp) {
           resp.columns.forEach(function (entry, i, arr) {
-            arr[i] = ko.mapping.fromJS(entry);
+            arr[i] = loadField(entry);
           });
           self.fileFormat().columns(resp.columns);
           self.isGuessingFieldTypes(false);
