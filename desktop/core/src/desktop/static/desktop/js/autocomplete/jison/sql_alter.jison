@@ -55,12 +55,12 @@ AlterTable_EDIT
    {
      if (isHive()) {
        if (!$3) {
-         suggestKeywords(['COLUMNS', 'IF NOT EXISTS', 'PARTITION']);
+         suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
        } else {
          suggestKeywords(['PARTITION']);
        }
      } else if (isImpala()) {
-       suggestKeywords(['COLUMNS', 'PARTITION']);
+       suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      }
    }
  | AlterTableLeftSide AnyReplace 'CURSOR'
@@ -76,7 +76,9 @@ AlterTable_EDIT
        if (!$5 && !$6) {
          suggestKeywords(['LOCATION', 'PARTITION']);
        } else if ($6 && $6.suggestKeywords) {
-         suggestKeywords($6.suggestKeywords.concat(['PARTITION']));
+         var keywords = createWeightedKeywords($6.suggestKeywords, 2);
+         keywords.push({ value: 'PARTITION', weight: 1 });
+         suggestKeywords(keywords);
        } else {
          suggestKeywords(['PARTITION']);
        }
@@ -244,9 +246,11 @@ OptionalPartitionOperations_EDIT
    {
      if (isHive() && !$5 && !$6) {
        if ($4.suggestKeywords) {
-         suggestKeywords($4.suggestKeywords.concat(['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']));
+         var keywords = createWeightedKeywords($4.suggestKeywords, 3);
+         keywords = keywords.concat([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
+         suggestKeywords(keywords);
        } else {
-         suggestKeywords(['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']);
+         suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
        }
      } else if (isHive() && $5 && !$6) {
        suggestKeywords(['CASCADE', 'RESTRICT']);
@@ -347,7 +351,7 @@ DropOperations
  : 'DROP' 'CURSOR'
    {
      if (isHive()) {
-       suggestKeywords(['PARTITION', 'IF EXISTS']);
+       suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
      } else if (isImpala()) {
        suggestKeywords(['COLUMN', 'PARTITION']);
        suggestColumns();
@@ -446,7 +450,6 @@ OptionalHiveFirstOrAfter_EDIT
  | HiveAfterOrFirst ColumnIdentifier_EDIT
  ;
 
-
 OptionalHiveColumn
  :
  | '<hive>COLUMN'
@@ -471,7 +474,6 @@ HiveOrImpalaSerdeproperties
  : '<hive>SERDEPROPERTIES'
  | '<impala>SERDEPROPERTIES'
  ;
-
 
 HiveArchiveOrUnArchive
  : '<hive>ARCHIVE'
@@ -597,7 +599,6 @@ OptionalStoredAsDirectories_EDIT
      suggestKeywords(['DIRECTORIES']);
    }
  ;
-
 
 OptionalCascadeOrRestrict
  :

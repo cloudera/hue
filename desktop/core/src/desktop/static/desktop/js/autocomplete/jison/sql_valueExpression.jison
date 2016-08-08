@@ -626,18 +626,18 @@ CaseRightPart_EDIT
  | CaseWhenThenList 'CURSOR' ValueExpression EndOrError
    {
      if ($4.toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($1, ['END', 'ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($1, [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($1, ['ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($1, [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      $$ = findCaseType($1);
    }
  | CaseWhenThenList 'CURSOR' EndOrError
    {
      if ($3.toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($1, ['END', 'ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($1, [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($1, ['ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($1, [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      $$ = findCaseType($1);
    }

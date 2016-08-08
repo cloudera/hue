@@ -41,6 +41,14 @@ define([
       toEqualDefinition : function() {
         return {
           compare: function(actualResponse, testDefinition) {
+            if (actualResponse.suggestKeywords) {
+              var weightFreeKeywords = [];
+              actualResponse.suggestKeywords.forEach(function (keyword) {
+                weightFreeKeywords.push(keyword.value);
+              });
+              actualResponse.suggestKeywords = weightFreeKeywords;
+            }
+
             if (actualResponse.errors) {
               var allRecoverable = true;
               actualResponse.errors.forEach(function (error) {

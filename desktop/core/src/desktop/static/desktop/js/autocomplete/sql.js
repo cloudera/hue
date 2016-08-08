@@ -435,28 +435,28 @@ case 661:
      if (!$$[$0-2]) {
        var keywords = [];
        if (typeof $$[$0-3].hasJoinCondition !== 'undefined' && ! $$[$0-3].hasJoinCondition) {
-         keywords.push('ON');
+         keywords.push({ value: 'ON', weight: 8 });
          if (isImpala()) {
-           keywords.push('USING');
+           keywords.push({ value: 'USING', weight: 8 });
          }
        }
        if (isHive()) {
          if ($$[$0] && $$[$0].joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']);
          } else {
-           keywords = keywords.concat(['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']);
+           keywords = keywords.concat([{ value: 'LATERAL VIEW', weight: 1 }, { value: 'CROSS JOIN', weight: 1 }, { value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'WHERE', weight: 6 }, { value: 'GROUP BY', weight: 5 }, { value: 'WINDOW', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        } else if (isImpala()) {
          if ($$[$0] && $$[$0].joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT ANTI', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT', 'RIGHT OUTER', 'RIGHT SEMI']);
          } else {
-           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']);
+           keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }, { value: 'WHERE', weight: 5 }, { value: 'GROUP BY', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        } else {
          if ($$[$0] && $$[$0].joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
          } else {
-           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+           keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'WHERE', weight: 5 }, { value: 'GROUP BY', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        }
        if ($$[$0-3].suggestKeywords) {
@@ -486,24 +486,24 @@ case 668:
 
      if ($$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        if (isHive()) {
-         this.$ = getValueExpressionKeywords($$[$0-4], ['GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT']);
+         this.$ = getValueExpressionKeywords($$[$0-4], [{ value: 'GROUP BY', weight: 4 }, { value: 'WINDOW', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }]);
        } else {
-         this.$ = getValueExpressionKeywords($$[$0-4], ['GROUP BY', 'ORDER BY', 'LIMIT']);
+         this.$ = getValueExpressionKeywords($$[$0-4], [{ value: 'GROUP BY', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }]);
        }
        if ($$[$0-4].columnReference) {
          this.$.columnReference = $$[$0-4].columnReference
        }
      } else if ($$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        if (isHive()) {
-         this.$ = { suggestKeywords: ['WINDOW', 'ORDER BY', 'LIMIT'] };
+         this.$ = { suggestKeywords: [{ value: 'WINDOW', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
        } else {
-         this.$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
+         this.$ = { suggestKeywords: [{ value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
        }
      } else if ($$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
+       this.$ = { suggestKeywords: [{ value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
      } else if ($$[$0-1] && !$$[$0]) {
        if ($$[$0-1].suggestKeywords) {
-         this.$ = { suggestKeywords: $$[$0-1].suggestKeywords.concat(['LIMIT']) };
+         this.$ = { suggestKeywords: $$[$0-1].suggestKeywords.concat([{ value: 'LIMIT', weight: -2 }]) };
        } else {
          this.$ = { suggestKeywords: ['LIMIT'] };
        }
@@ -1295,7 +1295,7 @@ case 1050:
 break;
 case 1059:
 
-     suggestKeywords(['PARTITION BY', 'ORDER BY']);
+     suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
    
 break;
 case 1068:
@@ -1308,7 +1308,7 @@ case 1069:
 
       if (!$$[$0-1]) {
         if ($$[$0-2].suggestKeywords) {
-          suggestKeywords($$[$0-2].suggestKeywords.concat(['RANGE BETWEEN', 'ROWS BETWEEN']));
+          suggestKeywords(createWeightedKeywords($$[$0-2].suggestKeywords, 2).concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]));
         } else {
           suggestKeywords(['RANGE BETWEEN', 'ROWS BETWEEN']);
         }
@@ -1381,13 +1381,13 @@ case 1104: case 1105: case 1195:
 break;
 case 1109:
 
-     suggestValueExpressionKeywords($$[$0-3], ['AS']);
+     suggestValueExpressionKeywords($$[$0-3], [{ value: 'AS', weight: 2 }]);
      this.$ =  { types: [ $$[$0-1].toUpperCase() ] };
    
 break;
 case 1110:
 
-     suggestValueExpressionKeywords($$[$0-2], ['AS']);
+     suggestValueExpressionKeywords($$[$0-2], [{ value: 'AS', weight: 2 }]);
      this.$ = { types: [ 'T' ] };
    
 break;
@@ -1633,9 +1633,9 @@ break;
 case 1191:
 
      if ($$[$0].toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($$[$0-3], ['END', 'ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($$[$0-3], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($$[$0-3], ['ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($$[$0-3], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      this.$ = findCaseType($$[$0-3]);
    
@@ -1643,9 +1643,9 @@ break;
 case 1192:
 
      if ($$[$0].toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($$[$0-2], ['END', 'ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($$[$0-2], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($$[$0-2], ['ELSE', 'WHEN']);
+       suggestValueExpressionKeywords($$[$0-2], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      this.$ = findCaseType($$[$0-2]);
    
@@ -1749,12 +1749,12 @@ case 1243:
 
      if (isHive()) {
        if (!$$[$0-1]) {
-         suggestKeywords(['COLUMNS', 'IF NOT EXISTS', 'PARTITION']);
+         suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
        } else {
          suggestKeywords(['PARTITION']);
        }
      } else if (isImpala()) {
-       suggestKeywords(['COLUMNS', 'PARTITION']);
+       suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      }
    
 break;
@@ -1769,7 +1769,9 @@ case 1248:
        if (!$$[$0-2] && !$$[$0-1]) {
          suggestKeywords(['LOCATION', 'PARTITION']);
        } else if ($$[$0-1] && $$[$0-1].suggestKeywords) {
-         suggestKeywords($$[$0-1].suggestKeywords.concat(['PARTITION']));
+         var keywords = createWeightedKeywords($$[$0-1].suggestKeywords, 2);
+         keywords.push({ value: 'PARTITION', weight: 1 });
+         suggestKeywords(keywords);
        } else {
          suggestKeywords(['PARTITION']);
        }
@@ -1887,9 +1889,11 @@ case 1306:
 
      if (isHive() && !$$[$0-2] && !$$[$0-1]) {
        if ($$[$0-3].suggestKeywords) {
-         suggestKeywords($$[$0-3].suggestKeywords.concat(['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']));
+         var keywords = createWeightedKeywords($$[$0-3].suggestKeywords, 3);
+         keywords = keywords.concat([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
+         suggestKeywords(keywords);
        } else {
-         suggestKeywords(['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']);
+         suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
        }
      } else if (isHive() && $$[$0-2] && !$$[$0-1]) {
        suggestKeywords(['CASCADE', 'RESTRICT']);
@@ -1928,7 +1932,7 @@ break;
 case 1337:
 
      if (isHive()) {
-       suggestKeywords(['PARTITION', 'IF EXISTS']);
+       suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
      } else if (isImpala()) {
        suggestKeywords(['COLUMN', 'PARTITION']);
        suggestColumns();
@@ -2060,47 +2064,47 @@ case 1486:
      // TODO: Don't always sort the keywords as order is important
      var keywords = [];
      if (!$$[$0-10] && !$$[$0-9] && !$$[$0-8] && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       keywords.push('LIKE');
+       keywords.push({ value: 'LIKE', weight: 1 });
        if (isImpala()) {
-         keywords.push('LIKE PARQUET');
+         keywords.push({ value: 'LIKE PARQUET', weight: 1 });
        }
      } else {
-       keywords.push('AS');
        if (!$$[$0-9] && !$$[$0-8] && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('COMMENT');
+         keywords.push({ value: 'COMMENT', weight: 10 });
        }
        if (!$$[$0-8] && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('PARTITIONED BY');
+         keywords.push({ value: 'PARTITIONED BY', weight: 9 });
        }
        if (isImpala() && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('WITH SERDEPROPERTIES');
+         keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 8 });
        }
        if (isHive() && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('CLUSTERED BY');
+         keywords.push({ value: 'CLUSTERED BY', weight: 7 });
        }
        if (isHive() && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('SKEWED BY');
+         keywords.push({ value: 'SKEWED BY', weight: 6 });
        } else if (isHive() && $$[$0-5] && $$[$0-5].suggestKeywords && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords = keywords.concat($$[$0-5].suggestKeywords); // Get the last optional from SKEWED BY
+         keywords = keywords.concat(createWeightedKeywords($$[$0-5].suggestKeywords, 6)); // Get the last optional from SKEWED BY
        }
        if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('ROW FORMAT');
-         keywords.push('STORED AS');
+         keywords.push({ value: 'ROW FORMAT', weight: 5 });
+         keywords.push({ value: 'STORED AS', weight: 5 });
          if (isHive()) {
-          keywords.push('STORED BY');
+           keywords.push({ value: 'STORED BY', weight: 5 });
          }
        } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords = keywords.concat($$[$0-4].suggestKeywords);
+         keywords = keywords.concat(createWeightedKeywords($$[$0-4].suggestKeywords, 5));
        }
        if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords.push('LOCATION');
+         keywords.push({ value: 'LOCATION', weight: 4 });
        }
        if (!$$[$0-2] && !$$[$0-1]) {
-         keywords.push('TBLPROPERTIES');
+         keywords.push({ value: 'TBLPROPERTIES', weight: 3 });
        }
        if (isImpala() && !$$[$0-1]) {
-         keywords.push('CACHED IN');
+         keywords.push({ value: 'CACHED IN', weight: 2 });
        }
+       keywords.push({ value: 'AS', weight: 1 });
      }
 
      if (keywords.length > 0) {
@@ -2152,7 +2156,7 @@ break;
 case 1580:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['INTO', 'SORTED BY']);
+       suggestKeywords([{ value: 'INTO', weight: 1 }, { value: 'SORTED BY', weight: 2 }]);
      } else {
        suggestKeywords(['INTO']);
      }
@@ -2207,35 +2211,35 @@ break;
 case 1640:
 
      if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['COLLECTION ITEMS TERMINATED BY', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       this.$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 5 }, { value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]};
      } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: $$[$0-4].suggestKeywords.concat(['COLLECTION ITEMS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS']) };
+       this.$ = { suggestKeywords: createWeightedKeywords($$[$0-4].suggestKeywords, 5).concat([{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]) };
      } else if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['COLLECTION ITEMS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       this.$ = { suggestKeywords: [{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       this.$ = { suggestKeywords: [{ value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['LINES TERMINATED BY', 'NULL DEFINED AS'] };
+       this.$ = { suggestKeywords: [{ value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$$[$0]) {
-       this.$ = { suggestKeywords: ['NULL DEFINED AS'] };
+       this.$ = { suggestKeywords: [{ value: 'NULL DEFINED AS', weight: 1 }] };
      }
    
 break;
 case 1641:
 
      if (!$$[$0]) {
-       this.$ = { suggestKeywords: ['WITH SERDEPROPERTIES'] };
+       this.$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
      }
    
 break;
 case 1647:
 
      if (!$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: ['FIELDS TERMINATED BY', 'LINES TERMINATED BY'] };
+       this.$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 2 }, { value: 'LINES TERMINATED BY', weight: 1 }] };
      } else if ($$[$0-1] && $$[$0-1].suggestKeywords && !$$[$0]) {
-       this.$ = { suggestKeywords: $$[$0-1].suggestKeywords.concat(['LINES TERMINATED BY']) };
+       this.$ = { suggestKeywords: createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat(['LINES TERMINATED BY']) };
      } else if (!$$[$0]) {
-       this.$ = { suggestKeywords: ['LINES TERMINATED BY'] };
+       this.$ = { suggestKeywords: [{ value: 'LINES TERMINATED BY', weight: 1 }] };
      }
    
 break;
@@ -2295,11 +2299,11 @@ break;
 case 1699:
 
      if (isHive() && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['AS', 'COMMENT', 'TBLPROPERTIES']);
+       suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
      } else if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['AS', 'TBLPROPERTIES']);
+       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
      } else {
-       suggestKeywords(['AS']);
+       suggestKeywords([{value: 'AS', weight: 1 }]);
      }
    
 break;
@@ -2335,9 +2339,9 @@ break;
 case 1734:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['INIT_FN', 'UPDATE_FN']);
+       suggestKeywords([{value: 'INIT_FN', weight: 2 }, {value: 'UPDATE_FN', weight: 1 }]);
      } else {
-       suggestKeywords(['UPDATE_FN']);
+       suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
      }
    
 break;
@@ -2349,13 +2353,13 @@ break;
 case 1736:
 
      if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['CLOSE_FN', 'FINALIZE_FN', 'PREPARE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'PREPARE_FN', weight: 4 }, {value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['CLOSE_FN', 'FINALIZE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['FINALIZE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['FINALIZE_FN']);
+       suggestKeywords([{value: 'FINALIZE_FN', weight: 1 }]);
      }
    
 break;
@@ -2398,21 +2402,21 @@ break;
 case 1829:
 
      if (!$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['WITH DEFERRED REBUILD', 'IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'WITH DEFERRED REBUILD', weight: 7 }, { value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords($$[$0-4].suggestKeywords.concat(['LOCATION', 'TBLPROPERTIES', 'COMMENT']));
+       suggestKeywords(createWeightedKeywords($$[$0-4].suggestKeywords, 4).concat([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]));
      } else if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-1]) {
-       suggestKeywords(['COMMENT']);
+       suggestKeywords([{ value: 'COMMENT', weight: 1 }]);
      }
    
 break;
@@ -2586,7 +2590,7 @@ break;
 case 1943:
 
      if (!$$[$0-2]) {
-       suggestKeywords(['IN', 'LIKE']);
+       suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
      } else {
        suggestKeywords(['LIKE']);
      }
@@ -3199,7 +3203,7 @@ var prioritizeSuggestions = function () {
       delete parser.yy.result.colRef;
       if (typeof parser.yy.result.suggestColRefKeywords !== 'undefined') {
         Object.keys(parser.yy.result.suggestColRefKeywords).forEach(function (type) {
-          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(parser.yy.result.suggestColRefKeywords[type]);
+          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(createWeightedKeywords(parser.yy.result.suggestColRefKeywords[type], -1));
         });
         delete parser.yy.result.suggestColRefKeywords;
       }
@@ -3607,14 +3611,41 @@ var checkForKeywords = function (expression) {
       suggestKeywords(expression.suggestKeywords);
     }
     if (expression.suggestColRefKeywords) {
-      suggestColRefKeywords(expression.suggestColRefKeywords)
+      suggestColRefKeywords(expression.suggestColRefKeywords);
       addColRefIfExists(expression);
     }
   }
 };
 
+var createWeightedKeywords = function (keywords, weight) {
+  var result = [];
+  keywords.forEach(function (keyword) {
+    if (typeof keyword.weight !== 'undefined') {
+      keyword.weight = weight + (keyword.weight / 10);
+      result.push(keyword);
+    } else {
+      result.push({value: keyword, weight: weight });
+    }
+  });
+  return result;
+};
+
 var suggestKeywords = function (keywords) {
-  parser.yy.result.suggestKeywords = keywords.sort();
+  var weightedKeywords = [];
+  keywords.forEach(function (keyword) {
+    if (typeof keyword.weight !== 'undefined') {
+      weightedKeywords.push(keyword);
+    } else {
+      weightedKeywords.push({ value: keyword, weight: -1 })
+    }
+  });
+  weightedKeywords.sort(function (a, b) {
+    if (a.weight !== b.weight) {
+      return b.weight - a.weight;
+    }
+    return a.value.localeCompare(b.value);
+  });
+  parser.yy.result.suggestKeywords = weightedKeywords;
 };
 
 var suggestColRefKeywords = function (colRefKeywords) {

@@ -130,7 +130,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['COLUMNS', 'IF NOT EXISTS', 'PARTITION']
+              suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'PARTITION']
             }
           });
         });
@@ -339,7 +339,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AFTER', 'CASCADE', 'COMMENT', 'FIRST', 'RESTRICT']
+              suggestKeywords: ['COMMENT', 'AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
             }
           });
         });
@@ -352,7 +352,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']
+              suggestKeywords: ['AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
             }
           });
         });
@@ -456,7 +456,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['INTO', 'SORTED BY']
+              suggestKeywords: ['SORTED BY', 'INTO']
             }
           });
         });
@@ -825,7 +825,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AFTER', 'CASCADE', 'COMMENT', 'FIRST', 'RESTRICT']
+              suggestKeywords: ['COMMENT', 'AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
             }
           });
         });
@@ -838,7 +838,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AFTER', 'CASCADE', 'FIRST', 'RESTRICT']
+              suggestKeywords: ['AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
             }
           });
         });

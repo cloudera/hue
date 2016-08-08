@@ -1169,28 +1169,28 @@ TableExpression_EDIT
      if (!$2) {
        var keywords = [];
        if (typeof $1.hasJoinCondition !== 'undefined' && ! $1.hasJoinCondition) {
-         keywords.push('ON');
+         keywords.push({ value: 'ON', weight: 8 });
          if (isImpala()) {
-           keywords.push('USING');
+           keywords.push({ value: 'USING', weight: 8 });
          }
        }
        if (isHive()) {
          if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']);
          } else {
-           keywords = keywords.concat(['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']);
+           keywords = keywords.concat([{ value: 'LATERAL VIEW', weight: 1 }, { value: 'CROSS JOIN', weight: 1 }, { value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'WHERE', weight: 6 }, { value: 'GROUP BY', weight: 5 }, { value: 'WINDOW', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        } else if (isImpala()) {
          if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT ANTI', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT', 'RIGHT OUTER', 'RIGHT SEMI']);
          } else {
-           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE']);
+           keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }, { value: 'WHERE', weight: 5 }, { value: 'GROUP BY', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        } else {
          if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
            keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
          } else {
-           keywords = keywords.concat(['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']);
+           keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'WHERE', weight: 5 }, { value: 'GROUP BY', weight: 4 }, { value: 'ORDER BY', weight: 3 }, { value: 'LIMIT', weight: 2 }]);
          }
        }
        if ($1.suggestKeywords) {
@@ -1232,24 +1232,24 @@ OptionalSelectConditions
    {
      if ($1 && !$2 && !$3 && !$4 && !$5) {
        if (isHive()) {
-         $$ = getValueExpressionKeywords($1, ['GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT']);
+         $$ = getValueExpressionKeywords($1, [{ value: 'GROUP BY', weight: 4 }, { value: 'WINDOW', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }]);
        } else {
-         $$ = getValueExpressionKeywords($1, ['GROUP BY', 'ORDER BY', 'LIMIT']);
+         $$ = getValueExpressionKeywords($1, [{ value: 'GROUP BY', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }]);
        }
        if ($1.columnReference) {
          $$.columnReference = $1.columnReference
        }
      } else if ($2 && !$3 && !$4 && !$5) {
        if (isHive()) {
-         $$ = { suggestKeywords: ['WINDOW', 'ORDER BY', 'LIMIT'] };
+         $$ = { suggestKeywords: [{ value: 'WINDOW', weight: 3 }, { value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
        } else {
-         $$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
+         $$ = { suggestKeywords: [{ value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
        }
      } else if ($3 && !$4 && !$5) {
-       $$ = { suggestKeywords: ['ORDER BY', 'LIMIT'] };
+       $$ = { suggestKeywords: [{ value: 'ORDER BY', weight: 2 }, { value: 'LIMIT', weight: 1 }] };
      } else if ($4 && !$5) {
        if ($4.suggestKeywords) {
-         $$ = { suggestKeywords: $4.suggestKeywords.concat(['LIMIT']) };
+         $$ = { suggestKeywords: $4.suggestKeywords.concat([{ value: 'LIMIT', weight: -2 }]) };
        } else {
          $$ = { suggestKeywords: ['LIMIT'] };
        }
@@ -1337,7 +1337,7 @@ OrderByClause
  ;
 
 OrderByClause_EDIT
- :'ORDER' 'BY' OrderByColumnList_EDIT
+ : 'ORDER' 'BY' OrderByColumnList_EDIT
  | 'ORDER' 'CURSOR'
    {
      suggestKeywords(['BY']);
@@ -2258,7 +2258,7 @@ WindowExpression_EDIT
  : '(' OptionalPartitionBy_EDIT  RightParenthesisOrError
  | '(' AnyCursor RightParenthesisOrError
    {
-     suggestKeywords(['PARTITION BY', 'ORDER BY']);
+     suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
    }
  | '(' OptionalPartitionBy OptionalOrderByAndWindow_EDIT RightParenthesisOrError
  ;
@@ -2295,7 +2295,7 @@ OptionalOrderByAndWindow_EDIT
     {
       if (!$2) {
         if ($1.suggestKeywords) {
-          suggestKeywords($1.suggestKeywords.concat(['RANGE BETWEEN', 'ROWS BETWEEN']));
+          suggestKeywords(createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]));
         } else {
           suggestKeywords(['RANGE BETWEEN', 'ROWS BETWEEN']);
         }
@@ -2434,12 +2434,12 @@ CastFunction_EDIT
  | 'CAST' '(' ValueExpression_EDIT RightParenthesisOrError                      -> { types: [ 'T' ] }
  | 'CAST' '(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3, ['AS']);
+     suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
      $$ =  { types: [ $5.toUpperCase() ] };
    }
  | 'CAST' '(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3, ['AS']);
+     suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
      $$ = { types: [ 'T' ] };
    }
  | 'CAST' '(' ValueExpression AnyAs 'CURSOR' RightParenthesisOrError

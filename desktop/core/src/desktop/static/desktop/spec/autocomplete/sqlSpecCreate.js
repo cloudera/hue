@@ -340,7 +340,7 @@ define([
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS', 'CACHED IN', 'TBLPROPERTIES']
+              suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'AS']
             }
           });
         });
@@ -753,7 +753,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS', 'TBLPROPERTIES']
+              suggestKeywords: ['TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -777,7 +777,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['INTO', 'SORTED BY']
+              suggestKeywords: ['SORTED BY', 'INTO']
             }
           });
         });
@@ -945,7 +945,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS', 'COLLECTION ITEMS TERMINATED BY', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'LOCATION', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS', 'STORED AS', 'TBLPROPERTIES']
+              suggestKeywords: ['FIELDS TERMINATED BY', 'COLLECTION ITEMS TERMINATED BY', 'MAP KEYS TERMINATED BY', 'LINES TERMINATED BY', 'NULL DEFINED AS', 'STORED AS', 'LOCATION', 'TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -1401,7 +1401,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AS', 'COMMENT', 'TBLPROPERTIES']
+              suggestKeywords: ['COMMENT', 'TBLPROPERTIES', 'AS']
             }
           });
         });
@@ -2044,7 +2044,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COMMENT', 'IDXPROPERTIES', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES', 'WITH DEFERRED REBUILD']
+            suggestKeywords: ['WITH DEFERRED REBUILD', 'IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
           }
         });
       });
@@ -2083,7 +2083,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COMMENT', 'IDXPROPERTIES', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+            suggestKeywords: ['IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
           }
         });
       });
@@ -2096,7 +2096,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COMMENT', 'IN TABLE', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+            suggestKeywords: ['IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
           }
         });
       });
@@ -2136,7 +2136,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COMMENT', 'LOCATION', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'TBLPROPERTIES']
+            suggestKeywords: ['ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
           }
         });
       });
@@ -2254,7 +2254,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COMMENT', 'TBLPROPERTIES']
+            suggestKeywords: ['TBLPROPERTIES', 'COMMENT']
           }
         });
       });
