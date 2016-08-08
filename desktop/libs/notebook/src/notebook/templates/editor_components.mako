@@ -2422,11 +2422,13 @@ ${ hueIcons.symbols() }
     _t.find(".columnSelected").removeClass("columnSelected");
     var _colSel = _t.find("tr th:nth-child(" + (_col.index() + 1) + ")");
     if (_colSel.length > 0) {
-      _colSel.addClass("columnSelected");
+      _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
       _t.parent().animate({
         scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
       }, 300, function(){
         _t.data('scrollToCol', _col.index());
+        _t.data('scrollToRow', null);
+        _t.data('scrollAnimate', true);
         _t.parent().trigger('scroll');
       });
     }
