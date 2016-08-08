@@ -186,6 +186,7 @@
       colSel = $t.find("tr td:nth-child(" + (col + 1) + ")");
       $t.data('scrollToCol', col);
       $t.data('scrollToRow', row);
+      $t.data('scrollAnimate', true);
       $t.parent().trigger('scroll');
     }
 
@@ -271,18 +272,19 @@
 
           if ($t.data('scrollToCol')) {
             var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
-            $t.parent().animate({
-              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
-            }, 300);
             colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+            if ($t.data('scrollAnimate')) {
+              $t.parent().animate({
+                scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+              }, 300);
+              $t.data('scrollAnimate', null);
+            }
             if ($t.data('scrollToRow') == null) {
               colSel.addClass("columnSelected");
             }
             else {
               $t.find("tr:nth-child(" + ($t.data('scrollToRow') + 1) + ") td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").addClass('columnSelected');
-              $t.data('scrollToRow', null);
             }
-            $t.data('scrollToCol', null);
           }
 
           if ($t.data('plugin_jHueTableExtender')) {
