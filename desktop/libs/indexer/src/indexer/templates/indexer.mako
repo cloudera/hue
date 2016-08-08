@@ -345,9 +345,9 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 1 && createWizard.fileFormat().name().length > 0 -->
-      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'file', enable: createWizard.fileFormat().path() !== '' && !createWizard.isGuessingFormat()">${_('Guess File Format')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i> </button>
-      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'table', enable: createWizard.fileFormat().table() !== '' && !createWizard.isGuessingFormat()">${_('Process Table')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i></button>
-      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'query', enable: createWizard.fileFormat().query() !== '' && !createWizard.isGuessingFormat()">${_('Process Query')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i></button>
+      <button class="btn" data-bind="click: createWizard.guessFormat, enable: createWizard.fileFormat().show">
+        ${_('Select fields')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i>
+      </button>
       <!-- /ko -->
 
       <!-- ko if: currentStep() > 1 -->
