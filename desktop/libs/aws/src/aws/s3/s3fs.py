@@ -393,5 +393,17 @@ class S3FileSystem(object):
     new_data = data or ''
     key.set_contents_from_string(current_data + new_data, replace=True)
 
+  @translate_s3_error
+  def check_access(self, path, permission='READ'):
+    permission = permission.upper()
+    bucket_name, key_name = s3.parse_uri(path)[:2]
+    bucket = self._get_bucket(bucket_name)
+    acp = bucket.get_acl()
+    for grant in acp.acl.grants:
+      if grant.permission == permission or grant.permission == 'FULL_CONTROL':
+        # TODO: Check grant.uri for user list too
+        return True
+    return False
+
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation

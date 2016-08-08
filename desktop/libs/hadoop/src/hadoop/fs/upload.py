@@ -30,9 +30,11 @@ import logging
 import time
 
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
+from django.utils.translation import ugettext as _
 
 import hadoop.cluster
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.fs.exceptions import WebHdfsException
 
 
 LOG = logging.getLogger(__name__)
@@ -61,11 +63,18 @@ class HDFStemporaryUploadedFile(object):
 
     # Don't want to handle this upload if we don't have an HDFS
     if not self._fs:
-      raise HDFSerror("No HDFS found")
+      raise HDFSerror(_("No HDFS found"))
 
     # We want to set the user to be the user doing the upload
     self._fs.setuser(request.user.username)
     self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
+
+    # Check access permissions before attempting upload
+    try:
+      self._fs.check_access(destination, 'rw-')
+    except WebHdfsException, e:
+      LOG.exception(e)
+      raise HDFSerror(_('User %s does not have permissions to write to path "%s".') % (request.user.username, destination))
 
     if self._fs.exists(self._path):
       self._fs._delete(self._path)

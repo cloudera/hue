@@ -26,6 +26,7 @@ import StringIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload
+from django.utils.translation import ugettext as _
 
 from aws import get_s3fs
 from aws.s3 import parse_uri
@@ -58,6 +59,10 @@ class S3FileUploadHandler(FileUploadHandler):
     self._part_num = 1
 
     if self._is_s3_upload():
+      # Check access permissions before attempting upload
+      if not self._fs.check_access(self.destination, permission='WRITE'):
+        raise S3FileUploadError(_('Insufficient permissions to write to S3 path "%s".') % self.destination)
+
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
       # Verify that the path exists
       self._fs._stats(self.destination)
@@ -112,7 +117,7 @@ class S3FileUploadHandler(FileUploadHandler):
       fs = get_s3fs()
 
     if not fs:
-      raise S3FileUploadError("No S3 filesystem found.")
+      raise S3FileUploadError(_("No S3 filesystem found."))
 
     return fs
 

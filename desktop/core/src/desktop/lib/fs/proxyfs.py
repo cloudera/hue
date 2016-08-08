@@ -213,3 +213,6 @@ class ProxyFS(object):
 
   def upload(self, file, path, *args, **kwargs):
     self._get_fs(path).upload(file, path, *args, **kwargs)
+
+  def check_access(self, path, *args, **kwargs):
+    self._get_fs(path).check_access(path, *args, **kwargs)
