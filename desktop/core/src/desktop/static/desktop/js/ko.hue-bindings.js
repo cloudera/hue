@@ -1594,6 +1594,7 @@
         stop: function () {
           $.totalStorage(options.appName + "_left_panel_width", leftPanelWidth);
           window.setTimeout(positionPanels, 100);
+          huePubSub.publish('split.panel.resized');
         }
       });
 
