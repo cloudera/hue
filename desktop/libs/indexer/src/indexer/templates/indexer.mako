@@ -114,6 +114,7 @@ ${ assist.assistPanel() }
               name: 'assist-panel',
               params: {
                 user: '${user.username}',
+                onlySql: false,
                 sql: {
                   sourceTypes: [{
                     name: 'hive',
@@ -124,7 +125,7 @@ ${ assist.assistPanel() }
                     showStats: true
                   }
                 },
-                visibleAssistPanels: ['sql']
+                visibleAssistPanels: ['sql', 'hdfs', 'documents']
               }
             }"></div>
         </div>
@@ -240,7 +241,7 @@ ${ assist.assistPanel() }
       <div class="control-group"  data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
         <label for="path" class="control-label">${ _('Path') }</label>
         <div class="controls">
-          <input type="text" class="form-control path" data-bind="filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+          <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
         </div>
       </div>
@@ -248,7 +249,7 @@ ${ assist.assistPanel() }
       <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
         <label for="path" class="control-label">${ _('Table') }</label>
         <div class="controls">
-          <input type="text" data-bind="hivechooser: createWizard.fileFormat().table, skipColumns: true">
+          <input type="text" data-bind="value: createWizard.fileFormat().table, hivechooser: createWizard.fileFormat().table, skipColumns: true">
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
@@ -256,7 +257,7 @@ ${ assist.assistPanel() }
       <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
         <label for="path" class="control-label">${ _('Query') }</label>
         <div class="controls">
-          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name'"></select>
+          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', optionsAfterRender: createWizard.fileFormat().selectQuery"></select>
           <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
         </div>
       </div>
@@ -640,6 +641,8 @@ ${ assist.assistPanel() }
       });
       self.inputFormats = ko.observableArray(['file', 'table', 'query']);
 
+      self.draggedQuery = ko.observable();
+
       // File
       self.path = ko.observable('');
 
@@ -671,6 +674,18 @@ ${ assist.assistPanel() }
           }
         });
       };
+
+      var waitForRendered = -1;
+      self.selectQuery = function () {
+        window.clearTimeout(waitForRendered);
+        waitForRendered = window.setTimeout(function(){
+          if (self.draggedQuery()){
+            self.query(ko.utils.arrayFilter(self.queries(), function(q) {
+              return q.id() === self.draggedQuery();
+            })[0]);
+          }
+        }, 50);
+      }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
@@ -929,6 +944,48 @@ ${ assist.assistPanel() }
       }
       viewModel = new IndexerViewModel(options);
       ko.applyBindings(viewModel);
+
+      var draggableMeta = {};
+      huePubSub.subscribe('draggable.text.meta', function (meta) {
+        draggableMeta = meta;
+      });
+
+      $('.right-panel').droppable({
+        accept: ".draggableText",
+        drop: function (e, ui) {
+          var text = ui.helper.text();
+          var generatedName = 'idx';
+          switch (draggableMeta.type){
+            case 'sql':
+              if (draggableMeta.table !== ''){
+                generatedName += draggableMeta.table;
+                viewModel.createWizard.fileFormat().inputFormat('table');
+                viewModel.createWizard.fileFormat().table(draggableMeta.table);
+              }
+              break;
+            case 'hdfs':
+              generatedName += draggableMeta.definition.name;
+                viewModel.createWizard.fileFormat().inputFormat('file');
+                viewModel.createWizard.fileFormat().path(draggableMeta.definition.path);
+              break;
+            case 'document':
+              if (draggableMeta.definition.type === 'query-hive'){
+                generatedName += draggableMeta.definition.name;
+                viewModel.createWizard.fileFormat().inputFormat('query');
+                viewModel.createWizard.fileFormat().draggedQuery(draggableMeta.definition.id);
+              }
+              break;
+          }
+          if (generatedName !== 'idx' && viewModel.createWizard.fileFormat().name() === ''){
+            viewModel.createWizard.fileFormat().name(generatedName);
+          }
+          else {
+            if (draggableMeta.table !== ''){
+              viewModel.createWizard.fileFormat().selectQuery();
+            }
+          }
+        }
+      });
     });
   });
 </script>

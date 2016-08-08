@@ -438,7 +438,7 @@ from metadata.conf import has_navigator
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, apiHelper: assistDbSource.apiHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'table': tableName, 'database': databaseName} }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span></a>
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span></a>
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
@@ -460,7 +460,7 @@ from metadata.conf import has_navigator
           <!-- ko if: definition.isView -->
             <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
+          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: expandable -->
@@ -468,7 +468,7 @@ from metadata.conf import has_navigator
           <!-- ko if: definition.isView -->
           <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
-          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
+          <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
         </span>
         <!-- /ko -->
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
@@ -587,7 +587,7 @@ from metadata.conf import has_navigator
                   <!-- ko if: definition.type === 'file' -->
                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                   <!-- /ko -->
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
                 </a>
               </li>
             </ul>
@@ -657,7 +657,7 @@ from metadata.conf import has_navigator
                <!-- ko ifnot: isDirectory -->
                <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                <!-- /ko -->
-               <span data-bind="text: definition().name"></span>
+               <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
              </a>
            </li>
          </ul>
@@ -1244,7 +1244,7 @@ from metadata.conf import has_navigator
           }
         });
 
-        self.onlySql = true; // params.onlySql; - Only show SQL until Hue 4
+        self.onlySql = typeof params.onlySql !== 'undefined' ? params.onlySql : true;
         self.loading = ko.observable(false);
 
         self.availablePanels = [
