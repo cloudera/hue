@@ -28,7 +28,7 @@ from notebook.connectors.base import get_api
 from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
-
+from indexer.fields import Field
 
 LOG = logging.getLogger(__name__)
 
@@ -106,9 +106,8 @@ def guess_field_types(request):
     format_ = {
         "sample": sample['rows'][:4],
         "columns": [
-            {"operations": [], "name": col.name, "required": False, "keep": True, "unique": False,
-             "type": HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
-         } for col in table_metadata.cols
+            Field(col.name, HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')).to_dict()
+            for col in table_metadata.cols
         ]
     }
   elif file_format['inputFormat'] == 'query':
