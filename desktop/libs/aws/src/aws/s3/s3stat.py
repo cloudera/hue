@@ -68,16 +68,16 @@ class S3Stat(object):
 
   @classmethod
   def from_bucket(cls, bucket):
-    return cls(bucket.name, 's3://%s' % bucket.name, True, 0, None)
+    return cls(bucket.name, 's3a://%s' % bucket.name, True, 0, None)
 
   @classmethod
   def from_key(cls, key, is_dir=False):
     if key.name:
       name = posixpath.basename(key.name[:-1] if key.name[-1] == '/' else key.name)
-      path = 's3://%s/%s' % (key.bucket.name, key.name)
+      path = 's3a://%s/%s' % (key.bucket.name, key.name)
     else:
       name = ''
-      path = 's3://%s' % key.bucket.name
+      path = 's3a://%s' % key.bucket.name
 
     size = key.size or 0
 
@@ -92,7 +92,7 @@ class S3Stat(object):
 
   @classmethod
   def for_s3_root(cls):
-    return cls('S3', 's3://', True, 0, None)
+    return cls('S3A', 's3a://', True, 0, None)
 
   def to_json_dict(self):
     """

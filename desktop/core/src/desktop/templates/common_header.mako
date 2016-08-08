@@ -439,7 +439,7 @@ if USE_NEW_EDITOR.get():
             <li><a href="/${apps['filebrowser'].display_name}">
               <i class="fa fa-fw fa-file" style="vertical-align: middle"></i>${_('HDFS Browser')}</a>
             </li>
-            <li><a href="/${apps['filebrowser'].display_name}/view=S3://">
+            <li><a href="/${apps['filebrowser'].display_name}/view=S3A://">
               <i class="fa fa-fw fa-cloud" style="vertical-align: middle"></i>${_('S3 Browser')}</a>
             </li>
           </ul>
@@ -452,7 +452,7 @@ if USE_NEW_EDITOR.get():
       </li>
       <li class="hideMoreThan1380">
         % if is_s3_enabled():
-          <a title="${_('S3 Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3://">
+          <a title="${_('S3 Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
             <i class="fa fa-cloud"></i>
           </a>
         % endif

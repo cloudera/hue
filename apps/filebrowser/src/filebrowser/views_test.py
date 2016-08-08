@@ -1057,4 +1057,4 @@ def test_location_to_url():
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
-  assert_equal(prefix + 's3%3A//bucket/key', location_to_url('s3://bucket/key'))
+  assert_equal(prefix + 's3a%3A//bucket/key', location_to_url('s3a://bucket/key'))

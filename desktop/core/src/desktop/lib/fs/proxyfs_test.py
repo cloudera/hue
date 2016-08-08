@@ -30,10 +30,10 @@ def test_fs_selection():
     raise SkipTest("Skips until HUE-2947 is resolved")
 
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
 
-  proxy_fs.isdir('s3://bucket/key')
-  s3fs.isdir.assert_called_once_with('s3://bucket/key')
+  proxy_fs.isdir('s3a://bucket/key')
+  s3fs.isdir.assert_called_once_with('s3a://bucket/key')
   assert_false(hdfs.isdir.called)
 
   proxy_fs.isfile('hdfs://localhost:42/user/alice/file')
@@ -51,11 +51,11 @@ def test_fs_selection():
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs():
   s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
   f = proxy_fs._get_fs
 
-  eq_(f('s3://bucket'), s3fs)
-  eq_(f('S3://bucket/key'), s3fs)
+  eq_(f('s3a://bucket'), s3fs)
+  eq_(f('S3A://bucket/key'), s3fs)
   eq_(f('hdfs://path'), hdfs)
   eq_(f('/tmp'), hdfs)
 
@@ -69,14 +69,14 @@ def test_multi_fs_selection():
   except ImportError:
     raise SkipTest("Skips until HUE-2947 is resolved")
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
 
-  proxy_fs.copy('s3://bucket1/key', 's3://bucket2/key')
-  s3fs.copy.assert_called_once_with('s3://bucket1/key', 's3://bucket2/key')
+  proxy_fs.copy('s3a://bucket1/key', 's3a://bucket2/key')
+  s3fs.copy.assert_called_once_with('s3a://bucket1/key', 's3a://bucket2/key')
   assert_false(hdfs.copy.called)
 
-  proxy_fs.copyfile('s3://bucket/key', 'key2')
-  s3fs.copyfile.assert_called_once_with('s3://bucket/key', 'key2')
+  proxy_fs.copyfile('s3a://bucket/key', 'key2')
+  s3fs.copyfile.assert_called_once_with('s3a://bucket/key', 'key2')
   assert_false(hdfs.copyfile.called)
 
   proxy_fs.rename('/tmp/file', 'shmile')
@@ -84,17 +84,17 @@ def test_multi_fs_selection():
   assert_false(s3fs.rename.called)
 
   # Will be addressed in HUE-2934
-  assert_raises(NotImplementedError, proxy_fs.copy_remote_dir, 's3://bucket/key', '/tmp/dir')
+  assert_raises(NotImplementedError, proxy_fs.copy_remote_dir, 's3a://bucket/key', '/tmp/dir')
 
 
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs_pair():
   s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
   f = proxy_fs._get_fs_pair
 
-  eq_(f('s3://bucket1/key', 's3://bucket2/key'), (s3fs, s3fs))
-  eq_(f('s3://bucket/key', 'key2'), (s3fs, s3fs))
+  eq_(f('s3a://bucket1/key', 's3a://bucket2/key'), (s3fs, s3fs))
+  eq_(f('s3a://bucket/key', 'key2'), (s3fs, s3fs))
   eq_(f('/tmp/file', 'shmile'), (hdfs, hdfs))
 
   assert_raises(IOError, f, 'ftp://host', 'key2')
@@ -102,4 +102,4 @@ def test__get_fs_pair():
 
 
 def test_constructor_given_invalid_arguments():
-  assert_raises(ValueError, ProxyFS, {'s3': {}}, 'hdfs')
+  assert_raises(ValueError, ProxyFS, {'s3a': {}}, 'hdfs')

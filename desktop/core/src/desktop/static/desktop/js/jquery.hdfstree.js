@@ -286,7 +286,7 @@
 
     if (_this.options.isS3){
       _paths.shift();
-      _paths[0] = 's3://';
+      _paths[0] = 's3a://';
     }
 
     showHdfsLeaf({

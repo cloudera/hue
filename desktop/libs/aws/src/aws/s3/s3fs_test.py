@@ -95,10 +95,10 @@ class S3FSTest(S3TestBase):
     assert_true(self.fs.exists(dir_path))
     assert_true(self.fs.exists(file_path))
 
-    assert_true(self.fs.exists('s3://%s' % self.bucket_name))
-    assert_true(self.fs.exists('s3://'))
+    assert_true(self.fs.exists('s3a://%s' % self.bucket_name))
+    assert_true(self.fs.exists('s3a://'))
     fake_bucket = 'fake%s' % generate_id(8, string.ascii_lowercase + string.digits)
-    assert_false(self.fs.exists('s3://%s' % fake_bucket))
+    assert_false(self.fs.exists('s3a://%s' % fake_bucket))
 
 
   def test_stats(self):
@@ -106,13 +106,13 @@ class S3FSTest(S3TestBase):
     not_exists = self.get_test_path('does_not_exist')
     assert_raises(IOError, self.fs.stats, not_exists)
 
-    root_stat = self.fs.stats('s3://')
+    root_stat = self.fs.stats('s3a://')
     eq_(True, root_stat.isDir)
-    eq_('s3://', root_stat.path)
+    eq_('s3a://', root_stat.path)
 
-    bucket_stat = self.fs.stats('s3://%s' % self.bucket_name)
+    bucket_stat = self.fs.stats('s3a://%s' % self.bucket_name)
     eq_(True, bucket_stat.isDir)
-    eq_('s3://%s' % self.bucket_name, bucket_stat.path)
+    eq_('s3a://%s' % self.bucket_name, bucket_stat.path)
 
 
   def test_copyfile(self):
@@ -242,7 +242,7 @@ class S3FSTest(S3TestBase):
 
 
   def test_listing_buckets(self):
-    buckets = self.fs.listdir('s3://')
+    buckets = self.fs.listdir('s3a://')
     assert_true(len(buckets) > 0)
 
 
