@@ -362,6 +362,19 @@ ${ hueIcons.symbols() }
 
 <%def name="commonHTML()">
 
+<div id="detailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
+  <div class="modal-header">
+    <a data-dismiss="modal" class="pointer pull-right"><i class="fa fa-times"></i></a>
+    <h3>${_('Row details')}</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table table-striped table-condensed">
+
+    </table>
+  </div>
+</div>
+
+
 <div id="helpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
     <a data-dismiss="modal" class="pointer pull-right"><i class="fa fa-times"></i></a>
@@ -2884,6 +2897,26 @@ ${ hueIcons.symbols() }
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
       }
+    });
+
+    huePubSub.subscribe('table.row.dblclick', function(data){
+      var $el = $(data.table);
+
+      var $t = $('#detailsModal').find('table');
+      $t.html('');
+
+      var html = '';
+
+      $el.find('thead th').each(function (colIdx, col) {
+        if (colIdx > 0){
+          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + $el.data('data')[data.idx][colIdx] + '</td></tr>';
+        }
+      });
+
+      $t.html(html);
+
+      $('#detailsModal').modal('show');
+
     });
 
     window.redrawFixedHeaders = redrawFixedHeaders;
