@@ -492,6 +492,18 @@ class HiveFormat(CSVFormat):
     "BINARY_TYPE": "string",
     "DECIMAL_TYPE": "double",
     "DATE_TYPE": "date",
+    "boolean": "string",
+    "tinyint": "long",
+    "samllint": "long",
+    "int": "long",
+    "bigint": "long",
+    "float": "double",
+    "double": "double",
+    "string": "string",
+    "timestamp": "date",
+    "binary": "string",
+    "decimal": "double", # Won't match decimal(16,6)
+    "date": "date",
   }
 
   @classmethod
