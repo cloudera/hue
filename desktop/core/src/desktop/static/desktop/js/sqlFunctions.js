@@ -2354,7 +2354,7 @@
       completions.push({
         value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
         meta: functionsToSuggest[name].returnTypes.join('|'),
-        type: 'function',
+        weight: -2,
         docHTML: createDocHtml(functionsToSuggest[name])
       })
     });

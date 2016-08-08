@@ -173,7 +173,7 @@ case 572:
      suggestColumns({
        identifierChain: $$[$0-2]
      });
-     this.$ = { suggestKeywords: ['*'] };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
    
 break;
 case 573:
@@ -181,7 +181,7 @@ case 573:
      suggestColumns({
        identifierChain: $$[$0-4]
      });
-     this.$ = { suggestKeywords: ['*'] };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
    
 break;
 case 578:
@@ -329,9 +329,9 @@ case 640:
 
      if ($$[$0].cursorAtStart) {
        if ($$[$0-1]) {
-         suggestKeywords(['*']);
+         suggestKeywords([{ value: '*', weight: 1000 }]);
        } else {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        }
      } else {
        checkForSelectListKeywords($$[$0]);
@@ -346,13 +346,13 @@ break;
 case 641:
 
      if ($$[$0-1]) {
-       suggestKeywords(['*']);
+       suggestKeywords([{ value: '*', weight: 1000 }]);
        if ($$[$0-1] === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -366,9 +366,9 @@ case 644:
 
      if ($$[$0-1].cursorAtStart) {
        if ($$[$0-2]) {
-         suggestKeywords(['*']);
+         suggestKeywords([{ value: '*', weight: 1000 }]);
        } else {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        }
      } else {
        checkForKeywords($$[$0-1]);
@@ -383,13 +383,13 @@ break;
 case 645:
 
      if ($$[$0-2]) {
-       suggestKeywords(['*']);
+       suggestKeywords([{ value: '*', weight: 1000 }]);
        if ($$[$0-2] === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -978,7 +978,7 @@ case 902:
 
      suggestFunctions();
      suggestColumns();
-     this.$ = { suggestAggregateFunctions: true, suggestKeywords: ['*'] };
+     this.$ = { suggestAggregateFunctions: true, suggestKeywords: [{ value: '*', weight: 1000 }] };
    
 break;
 case 905:
@@ -991,7 +991,7 @@ case 907:
      // TODO: Only if there's no FROM
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-     this.$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestAggregateFunctions: true };
    
 break;
 case 908:
@@ -1408,9 +1408,9 @@ case 1116:
      suggestColumns();
      if (!$$[$0-2]) {
        if (isImpala()) {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        } else {
-         suggestKeywords(['*', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'DISTINCT']);
        }
      }
      this.$ = { types: findReturnTypes($$[$0-4]) };

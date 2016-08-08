@@ -37,6 +37,17 @@
     self.timeout = options.timeout;
   }
 
+  // Keyword weights come from the parser
+  var DEFAULT_WEIGHTS = {
+    COLUMN: 500,
+    SAMPLE: 400,
+    IDENTIFIER: 300,
+    TABLE: 200,
+    DATABASE: 100,
+    HDFS: 1,
+    COLREF_KEYWORD: -1
+  };
+
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
     var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions, false);
@@ -49,7 +60,6 @@
         completions.push({
           value: parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
           meta: 'keyword',
-          type: 'keyword',
           weight: keyword.weight
         });
       });
@@ -57,7 +67,7 @@
 
     if (parseResult.suggestIdentifiers) {
       parseResult.suggestIdentifiers.forEach(function (identifier) {
-        completions.push({value: identifier.name, meta: identifier.type, type: 'identifier'});
+        completions.push({value: identifier.name, meta: identifier.type, weight: DEFAULT_WEIGHTS.IDENTIFIER });
       });
     }
 
@@ -166,7 +176,7 @@
     if (columnReference.sample) {
       var isString = columnReference.type === "string";
       columnReference.sample.forEach(function (sample) {
-        completions.push({meta: 'value', value: isString ? "'" + sample + "'" : new String(sample), type: 'sample'})
+        completions.push({meta: 'value', value: isString ? "'" + sample + "'" : new String(sample), weight: DEFAULT_WEIGHTS.SAMPLE })
       });
     }
   };
@@ -179,7 +189,7 @@
           completions.push({
             value: parseResult.lowerCase ? keyword.toLowerCase() : keyword,
             meta: 'keyword',
-            type: 'keyword'
+            weight: DEFAULT_WEIGHTS.COLREF_KEYWORD
           });
         })
       }
@@ -246,7 +256,7 @@
           completions.push({
             value: prefix + self.backTickIfNeeded(tablesMeta.name),
             meta: tablesMeta.type.toLowerCase(),
-            type: 'table'
+            weight: DEFAULT_WEIGHTS.TABLE
           })
         });
         tableDeferred.resolve();
@@ -282,9 +292,9 @@
             // TODO: Potentially fetch column types for sub-queries, possible performance hit.
             var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
-              completions.push({value: self.backTickIfNeeded(column.alias), meta: type, type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.alias), meta: type, weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (column.identifierChain && column.identifierChain.length === 1) {
-              completions.push({value: self.backTickIfNeeded(column.identifierChain[0].name), meta: type, type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.identifierChain[0].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN})
             }
             addColumnsDeferred.resolve();
             return addColumnsDeferred;
@@ -304,51 +314,51 @@
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (column.type.indexOf('map') === 0) {
-              completions.push({value: self.backTickIfNeeded(column.name), meta: 'map', type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (column.type.indexOf('struct') === 0) {
-              completions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (column.type.indexOf('array') === 0) {
-              completions.push({value: self.backTickIfNeeded(column.name), meta: 'array', type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN})
             } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
                 sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              completions.push({value: self.backTickIfNeeded(column.name), meta: column.type, type: 'column'})
+              completions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN})
             }
           });
         } else if (data.columns) {
           data.columns.forEach(function (column) {
-            completions.push({value: self.backTickIfNeeded(column), meta: 'column', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(column), meta: 'column', weight: DEFAULT_WEIGHTS.COLUMN})
           });
         }
         if (data.type === 'map' && self.snippet.type() === 'impala') {
-          completions.push({value: 'key', meta: 'key', type: 'column'});
-          completions.push({value: 'value', meta: 'value', type: 'column'});
+          completions.push({value: 'key', meta: 'key', weight: DEFAULT_WEIGHTS.COLUMN});
+          completions.push({value: 'value', meta: 'value', weight: DEFAULT_WEIGHTS.COLUMN});
         }
         if (data.type === 'struct') {
           data.fields.forEach(function (field) {
-            completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', type: 'column'})
+            completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN})
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {
             if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
+              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN});
             }
           });
         } else if (data.type === 'array' && (data.item && data.item.fields)) {
           data.item.fields.forEach(function (field) {
             if ((field.type === 'array' || field.type === 'map')) {
               if (self.snippet.type() === 'hive') {
-                completions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, type: 'column'});
+                completions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN});
               } else {
-                completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
+                completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN});
               }
             } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, type: 'column'});
+              completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN});
             }
           });
         }
@@ -374,7 +384,7 @@
           completions.push({
             value: prefix + self.backTickIfNeeded(db) + (parseResult.suggestDatabases.appendDot ? '.' : ''),
             meta: 'database',
-            type: 'database'
+            weight: DEFAULT_WEIGHTS.DATABASE
           });
         });
         databasesDeferred.resolve();
@@ -403,7 +413,7 @@
               completions.push({
                 value: parseResult.suggestHdfs.path === '' ? '/' + file.name : file.name,
                 meta: file.type,
-                type: 'HDFS'
+                weight: DEFAULT_WEIGHTS.HDFS
               });
             }
           });
@@ -433,16 +443,6 @@
       editor.hideSpinner();
     }
     callback(completions);
-  };
-
-  var typeOrder = {
-    'column': 1,
-    'sample': 2,
-    'table': 3,
-    'database': 4,
-    'identifier': 5,
-    'keyword': 6,
-    'function': 7
   };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {

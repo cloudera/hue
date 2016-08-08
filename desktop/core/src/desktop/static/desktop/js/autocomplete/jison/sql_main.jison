@@ -779,14 +779,14 @@ BasicIdentifierChain_EDIT
      suggestColumns({
        identifierChain: $1
      });
-     $$ = { suggestKeywords: ['*'] };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
    }
  | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor AnyDot BasicIdentifierChain
    {
      suggestColumns({
        identifierChain: $1
      });
-     $$ = { suggestKeywords: ['*'] };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
    }
  ;
 
@@ -1049,9 +1049,9 @@ QuerySpecification_EDIT
    {
      if ($3.cursorAtStart) {
        if ($2) {
-         suggestKeywords(['*']);
+         suggestKeywords([{ value: '*', weight: 1000 }]);
        } else {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        }
      } else {
        checkForSelectListKeywords($3);
@@ -1065,13 +1065,13 @@ QuerySpecification_EDIT
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
      if ($2) {
-       suggestKeywords(['*']);
+       suggestKeywords([{ value: '*', weight: 1000 }]);
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -1086,9 +1086,9 @@ QuerySpecification_EDIT
    {
      if ($3.cursorAtStart) {
        if ($2) {
-         suggestKeywords(['*']);
+         suggestKeywords([{ value: '*', weight: 1000 }]);
        } else {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        }
      } else {
        checkForKeywords($3);
@@ -1102,13 +1102,13 @@ QuerySpecification_EDIT
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
      if ($2) {
-       suggestKeywords(['*']);
+       suggestKeywords([{ value: '*', weight: 1000 }]);
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords(['*', 'ALL', 'DISTINCT']);
+       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -1645,7 +1645,7 @@ SelectList_EDIT
    {
      suggestFunctions();
      suggestColumns();
-     $$ = { suggestAggregateFunctions: true, suggestKeywords: ['*'] };
+     $$ = { suggestAggregateFunctions: true, suggestKeywords: [{ value: '*', weight: 1000 }] };
    }
  | SelectList ',' SelectListPartTwo_EDIT                 -> $3
  | SelectList ',' SelectListPartTwo_EDIT ','             -> $3
@@ -1661,7 +1661,7 @@ SelectListPartTwo_EDIT
      // TODO: Only if there's no FROM
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-     $$ = { suggestKeywords: ['*'], suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestAggregateFunctions: true };
    }
  ;
 
@@ -2466,9 +2466,9 @@ CountFunction_EDIT
      suggestColumns();
      if (!$3) {
        if (isImpala()) {
-         suggestKeywords(['*', 'ALL', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
        } else {
-         suggestKeywords(['*', 'DISTINCT']);
+         suggestKeywords([{ value: '*', weight: 1000 }, 'DISTINCT']);
        }
      }
      $$ = { types: findReturnTypes($1) };
