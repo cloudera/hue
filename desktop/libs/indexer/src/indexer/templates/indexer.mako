@@ -34,6 +34,7 @@ ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
+
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -48,12 +49,17 @@ ${ assist.assistPanel() }
     border-right: none!important;
   }
 
-  .form-inline input[type='text'], .form-inline select {
+  .step1 label div {
+    width: 50px;
+    display: inline-block;
+  }
+
+  .step2.form-inline input[type='text'], .step2.form-inline select {
     margin-right: 10px;
     margin-left: 3px;
   }
 
-  .form-inline input[type='checkbox'] {
+  .step2.form-inline input[type='checkbox'] {
     margin-left: 10px!important;
     margin-right: 4px!important;
   }
@@ -75,6 +81,22 @@ ${ assist.assistPanel() }
   .right-panel {
     overflow-x: hidden;
   }
+
+  .fileChooserBtn {
+    margin-top: -2px;
+  }
+
+  .form-actions {
+    position: fixed;
+    bottom: 0;
+    margin: 0;
+  }
+
+  #notebook {
+    height: 5px;
+    margin-top: 10px;
+  }
+
 </style>
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
@@ -132,12 +154,9 @@ ${ assist.assistPanel() }
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
 
         <div class="right-panel">
-          <div style="margin: 10px">
+          <div style="margin: 10px; margin-bottom: 100px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
-
-          <div id="notebook"></div>
-
         </div>
       </div>
     </div>
@@ -212,133 +231,149 @@ ${ assist.assistPanel() }
       </li>
     </ol>
 
-    <form class="form-horizontal">
 
     <!-- ko if: currentStep() == 1 -->
-    <div class="control-group" data-bind="css: { error: createWizard.isNameAvailable() === false && createWizard.fileFormat().name().length == 0, success: createWizard.isNameAvailable()}">
-      <label for="collectionName" class="control-label">${ _('Name') }</label>
-      <div class="controls">
-        <input type="text" class="form-control" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'">
-        <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('Creating a new collection') }</span>
-        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
-          ${_('Adding data to this existing collection') }
-          <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
-        </span>
-        <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length == 0">
-          ${_('This collection needs a name') }
-        </span>
-      </div>
-    </div>
+    <div class="card step1">
+      <h3 class="card-heading simple">${_('Collection details')}</h3>
+      <div class="card-body">
 
-    <div data-bind="visible: createWizard.fileFormat().name().length > 0">
-      <div class="control-group">
-        <label for="collectionType" class="control-label">${ _('Type') }</label>
-        <div class="controls">
-          <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
-        </div>
-      </div>
-
-      <div class="control-group"  data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
-        <label for="path" class="control-label">${ _('Path') }</label>
-        <div class="controls">
-          <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Guess Format')}</a>
-        </div>
-      </div>
-
-      <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
-        <label for="path" class="control-label">${ _('Table') }</label>
-        <div class="controls">
-          <input type="text" data-bind="value: createWizard.fileFormat().table, hivechooser: createWizard.fileFormat().table, skipColumns: true">
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
-        </div>
-      </div>
-
-      <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
-        <label for="path" class="control-label">${ _('Query') }</label>
-        <div class="controls">
-          <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', optionsAfterRender: createWizard.fileFormat().selectQuery"></select>
-          <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.guessFormat">${_('Select')}</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- /ko -->
-
-    </form>
-
-
-    <!-- ko if: currentStep() == 2 -->
-      <form class="form-inline">
-        <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
-      </form>
-
-      <div data-bind="with: createWizard.fileFormat().format, visible: createWizard.fileFormat().show">
         <form class="form-inline">
-          <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+          <div class="control-group">
+            <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
+              <input type="text" class="form-control" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'" placeholder="${ _('Collection name') }">
+              <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('A new collection will be created') }</span>
+              <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
+              ${_('Adding data to this existing collection') }
+              <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+              </span>
+            </label>
+          </div>
+
+          <div data-bind="visible: createWizard.fileFormat().name().length > 0">
+            <div class="control-group">
+              <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
+                <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
+              </label>
+            </div>
+
+            <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
+              <label for="path" class="control-label"><div>${ _('Path') }</div>
+                <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+              </label>
+            </div>
+
+            <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
+              <label for="path" class="control-label"><div>${ _('Table') }</div>
+                <input type="text" data-bind="value: createWizard.fileFormat().table, hivechooser: createWizard.fileFormat().table, skipColumns: true">
+              </label>
+            </div>
+
+            <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'query'">
+              <label for="path" class="control-label"><div>${ _('Query') }</div>
+                <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', optionsAfterRender: createWizard.fileFormat().selectQuery"></select>
+              </label>
+            </div>
+          </div>
         </form>
       </div>
-
-      <h3>${_('Fields')}</h3>
-      <!-- ko if: createWizard.isGuessingFieldTypes -->
-        <i class="fa fa-spinner fa-spin"></i>
-      <!-- /ko -->
-      <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
-        <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
-      </form>
+    </div>
     <!-- /ko -->
 
-      <!-- ko if: currentStep() == 3 -->
-      <h3>${_('Preview')}</h3>
-      <!-- ko if: createWizard.isGuessingFieldTypes -->
-        <i class="fa fa-spinner fa-spin"></i>
-      <!-- /ko -->
-      <div style="overflow: auto">
-        <table style="margin:auto;text-align:left">
-          <thead>
-            <tr data-bind="foreach: createWizard.fileFormat().columns">
-              <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: createWizard.sample">
-            <tr data-bind="foreach: $data">
-              <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
-                <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
-                </td>
+    <!-- ko if: currentStep() == 2 -->
+    <div class="card step2">
+      <h3 class="card-heading simple">${_('Format')}</h3>
+      <div class="card-body">
+        <form class="form-inline">
+          <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
 
-                <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
-                  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
-                <!-- /ko -->
-              <!-- /ko -->
-            </tr>
-          </tbody>
-        </table>
+          <span data-bind="with: createWizard.fileFormat().format, visible: createWizard.fileFormat().show">
+            <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+          </span>
+        </form>
       </div>
-    <!-- /ko -->
+    </div>
 
-    <!-- ko if: previousStepVisible -->
-      <a class="btn" data-bind="click: previousStep">${ _('Previous') }</a>
-    <!-- /ko -->
-
-    <!-- ko if: nextStepVisible -->
-      <a class="btn" data-bind="click: nextStep">${ _('Next') }</a>
+    <div class="card step2">
+      <h3 class="card-heading simple">${_('Fields')}</h3>
+      <div class="card-body">
+        <!-- ko if: createWizard.isGuessingFieldTypes -->
+        <i class="fa fa-spinner fa-spin"></i>
+        <!-- /ko -->
+        <form class="form-inline" data-bind="foreach: createWizard.fileFormat().columns">
+          <div data-bind="template: { name:'field-template', data:$data}" class="margin-top-10 field"></div>
+        </form>
+      </div>
+    </div>
     <!-- /ko -->
 
     <!-- ko if: currentStep() == 3 -->
-      <a href="javascript:void(0)" class="btn" data-bind="visible: !createWizard.indexingStarted() , click: createWizard.indexFile, css: {disabled : !createWizard.readyToIndex()}">
-        ${_('Launch indexing!')}
-      </a>
+    <div class="card step3">
+      <h3 class="card-heading simple">${_('Preview')}</h3>
+      <div class="card-body">
+        <!-- ko if: createWizard.isGuessingFieldTypes -->
+        <i class="fa fa-spinner fa-spin"></i>
+        <!-- /ko -->
+        <div style="overflow: auto">
+          <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
+            <thead>
+            <tr data-bind="foreach: createWizard.fileFormat().columns">
+              <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: createWizard.sample">
+            <tr data-bind="foreach: $data">
+              <!-- ko if: $index() < $root.createWizard.fileFormat().columns().length -->
+              <td data-bind="visible: $root.createWizard.fileFormat().columns()[$index()].keep, text: $data">
+              </td>
+
+              <!-- ko with: $root.createWizard.fileFormat().columns()[$index()] -->
+                <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+              <!-- /ko -->
+              <!-- /ko -->
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- /ko -->
 
-    <div data-bind="visible: createWizard.jobId">
-##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-##         ${_('Oozie Status')}
-##       </a>
-##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-##         ${_('View indexing status')}
-##       </a>
+    <div class="form-actions">
+      <!-- ko if: previousStepVisible -->
+        <button class="btn" data-bind="click: previousStep">${ _('Previous') }</button>
+      <!-- /ko -->
 
-      ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+      <!-- ko if: currentStep() == 1 && createWizard.fileFormat().name().length > 0 -->
+      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'file', enable: createWizard.fileFormat().path() !== '' && !createWizard.isGuessingFormat()">${_('Guess File Format')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i> </button>
+      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'table', enable: createWizard.fileFormat().table() !== '' && !createWizard.isGuessingFormat()">${_('Process Table')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i></button>
+      <button class="btn" data-bind="click: createWizard.guessFormat, visible: createWizard.fileFormat().inputFormat() == 'query', enable: createWizard.fileFormat().query() !== '' && !createWizard.isGuessingFormat()">${_('Process Query')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i></button>
+      <!-- /ko -->
+
+      <!-- ko if: currentStep() > 1 -->
+      <!-- ko if: nextStepVisible -->
+        <button class="btn" data-bind="click: nextStep">${ _('Next') }</button>
+      <!-- /ko -->
+      <!-- /ko -->
+
+      <!-- ko if: currentStep() == 3 -->
+        <button href="javascript:void(0)" class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
+          ${_('Index it!')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
+        </button>
+      <!-- /ko -->
+
+      <span data-bind="visible: createWizard.jobId">
+  ##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+  ##         ${_('Oozie Status')}
+  ##       </a>
+  ##       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+  ##         ${_('View indexing status')}
+  ##       </a>
+
+        ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+      </span>
+
+      <div id="notebook"></div>
     </div>
   </div>
 </script>
@@ -401,7 +436,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-text">
   <label>
     <span data-bind="text: description"></span>
-    <input type="text" data-bind="attr: {placeholder: description}, value: value">
+    <input type="text" class="input-small" data-bind="attr: {placeholder: description}, value: value">
   </label>
 </script>
 
@@ -759,6 +794,7 @@ ${ assist.assistPanel() }
       self.isGuessingFormat = ko.observable(false);
       self.guessFormat = function () {
         self.isGuessingFormat(true);
+        self.fileFormat().columns([]);
         $.post("${ url('indexer:guess_format') }", {
           "fileFormat": ko.mapping.toJSON(self.fileFormat)
         }, function (resp) {
@@ -829,6 +865,7 @@ ${ assist.assistPanel() }
           self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
             self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
               if (val == 100){
+                self.indexingStarted(false);
                 self.isIndexing(false);
                 self.indexingSuccess(true);
               }
@@ -836,6 +873,7 @@ ${ assist.assistPanel() }
             self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
               if (val == 'failed'){
                 self.isIndexing(false);
+                self.indexingStarted(false);
                 self.indexingError(true);
               }
             });
@@ -950,6 +988,13 @@ ${ assist.assistPanel() }
         draggableMeta = meta;
       });
 
+      huePubSub.subscribe('split.panel.resized', function () {
+        $('.form-actions').width($('.right-panel').width() - 50);
+      });
+
+      $('.form-actions').width($('.right-panel').width() - 50);
+
+
       $('.right-panel').droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
@@ -986,6 +1031,7 @@ ${ assist.assistPanel() }
           }
         }
       });
+
     });
   });
 </script>
