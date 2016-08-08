@@ -566,6 +566,14 @@ class WebHdfs(Hdfs):
       return self._root.get(path, params)
 
 
+  def check_access(self, path, aclspec='rw-'):
+    path = Hdfs.normpath(path)
+    params = self._getparams()
+    params['op'] = 'CHECKACCESS'
+    params['fsaction'] = aclspec
+    return self._root.get(path, params)
+
+
   def copyfile(self, src, dst, skip_header=False):
     sb = self._stats(src)
     if sb is None:

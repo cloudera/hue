@@ -560,3 +560,16 @@ class WebhdfsTests(unittest.TestCase):
           self.cluster.fs.rmtree(dir)
         except Exception, ex:
           LOG.error('Failed to cleanup %s: %s' % (directory, ex))
+
+  def test_check_access(self):
+    # Set user to owner
+    self.cluster.fs.setuser('test')
+    assert_equals('', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+
+    # Set user to superuser
+    self.cluster.fs.setuser(self.cluster.superuser)
+    assert_equals('', self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+
+    # Set user to non-authorized, non-superuser user
+    self.cluster.fs.setuser('nonadmin')
+    assert_raises(WebHdfsException, self.cluster.fs.check_access, path='/user/test', aclspec='rw-')
