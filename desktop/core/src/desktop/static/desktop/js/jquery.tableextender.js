@@ -193,7 +193,7 @@
       drawFirstColumn(_this);
     }
 
-    $(document).on('click', '.dataTables_wrapper > table tbody tr', function () {
+    $(document).on('click dblclick', '.dataTables_wrapper > table tbody tr', function () {
       $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr.selected').removeClass('selected');
       if ($(this).hasClass('selected')) {
         $(this).removeClass('selected');
@@ -201,6 +201,11 @@
         $('.dataTables_wrapper > table tbody tr.selected').removeClass('selected');
         $(this).addClass('selected');
         $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr:eq('+($(this).index())+')').addClass('selected');
+      }
+    });
+    $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
+      if (huePubSub){
+        huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
       }
     });
   };
