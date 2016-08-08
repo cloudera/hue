@@ -255,7 +255,7 @@ ShowFunctionsStatement_EDIT
  | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'CURSOR' SingleQuoteValue
    {
      if (!$4) {
-       suggestKeywords(['IN', 'LIKE']);
+       suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
      } else {
        suggestKeywords(['LIKE']);
      }

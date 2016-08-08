@@ -102,7 +102,7 @@ define([
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE']
+          suggestKeywords: ['WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
         }
       });
     });
@@ -2551,7 +2551,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
+            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2564,7 +2564,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
+            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2603,7 +2603,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'WHERE', 'WINDOW']
+            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -3134,7 +3134,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['FULL JOIN', 'FULL OUTER JOIN', 'GROUP BY', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'LIMIT', 'ORDER BY', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'WHERE'],
+            suggestKeywords: ['WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
             locations: [
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25}, table: 'testTableA'},
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 41}, table: 'testTableB'}
@@ -4238,7 +4238,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
+            suggestKeywords: ['GROUP BY', 'ORDER BY', 'LIMIT', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4251,7 +4251,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY']
+            suggestKeywords: ['GROUP BY', 'ORDER BY', 'LIMIT', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4451,7 +4451,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'GROUP BY', 'IN', 'IS NOT NULL', 'IS NULL', 'LIMIT', 'NOT BETWEEN', 'NOT IN', 'OR', 'ORDER BY', 'WINDOW']
+              suggestKeywords: ['GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN',  'IN', 'IS NOT NULL', 'IS NULL',  'NOT BETWEEN', 'NOT IN', 'OR']
             }
           });
         });
@@ -4778,7 +4778,7 @@ define([
               hasLocations: true,
               expectedResult: {
                 lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
+                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
               }
             });
           });
@@ -4791,7 +4791,7 @@ define([
               hasLocations: true,
               expectedResult: {
                 lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
+                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
               }
             });
           });
@@ -4817,7 +4817,7 @@ define([
               hasLocations: true,
               expectedResult: {
                 lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'NULLS FIRST', 'NULLS LAST']
+                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
               }
             });
 

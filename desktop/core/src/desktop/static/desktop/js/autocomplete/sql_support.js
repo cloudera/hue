@@ -226,7 +226,7 @@ var prioritizeSuggestions = function () {
       delete parser.yy.result.colRef;
       if (typeof parser.yy.result.suggestColRefKeywords !== 'undefined') {
         Object.keys(parser.yy.result.suggestColRefKeywords).forEach(function (type) {
-          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(parser.yy.result.suggestColRefKeywords[type]);
+          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(createWeightedKeywords(parser.yy.result.suggestColRefKeywords[type], -1));
         });
         delete parser.yy.result.suggestColRefKeywords;
       }
@@ -634,14 +634,41 @@ var checkForKeywords = function (expression) {
       suggestKeywords(expression.suggestKeywords);
     }
     if (expression.suggestColRefKeywords) {
-      suggestColRefKeywords(expression.suggestColRefKeywords)
+      suggestColRefKeywords(expression.suggestColRefKeywords);
       addColRefIfExists(expression);
     }
   }
 };
 
+var createWeightedKeywords = function (keywords, weight) {
+  var result = [];
+  keywords.forEach(function (keyword) {
+    if (typeof keyword.weight !== 'undefined') {
+      keyword.weight = weight + (keyword.weight / 10);
+      result.push(keyword);
+    } else {
+      result.push({value: keyword, weight: weight });
+    }
+  });
+  return result;
+};
+
 var suggestKeywords = function (keywords) {
-  parser.yy.result.suggestKeywords = keywords.sort();
+  var weightedKeywords = [];
+  keywords.forEach(function (keyword) {
+    if (typeof keyword.weight !== 'undefined') {
+      weightedKeywords.push(keyword);
+    } else {
+      weightedKeywords.push({ value: keyword, weight: -1 })
+    }
+  });
+  weightedKeywords.sort(function (a, b) {
+    if (a.weight !== b.weight) {
+      return b.weight - a.weight;
+    }
+    return a.value.localeCompare(b.value);
+  });
+  parser.yy.result.suggestKeywords = weightedKeywords;
 };
 
 var suggestColRefKeywords = function (colRefKeywords) {

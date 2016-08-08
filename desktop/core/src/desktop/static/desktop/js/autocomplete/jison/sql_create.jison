@@ -239,47 +239,47 @@ TableDefinitionRightPart_EDIT
      // TODO: Don't always sort the keywords as order is important
      var keywords = [];
      if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-       keywords.push('LIKE');
+       keywords.push({ value: 'LIKE', weight: 1 });
        if (isImpala()) {
-         keywords.push('LIKE PARQUET');
+         keywords.push({ value: 'LIKE PARQUET', weight: 1 });
        }
      } else {
-       keywords.push('AS');
        if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push('COMMENT');
+         keywords.push({ value: 'COMMENT', weight: 10 });
        }
        if (!$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push('PARTITIONED BY');
+         keywords.push({ value: 'PARTITIONED BY', weight: 9 });
        }
        if (isImpala() && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push('WITH SERDEPROPERTIES');
+         keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 8 });
        }
        if (isHive() && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push('CLUSTERED BY');
+         keywords.push({ value: 'CLUSTERED BY', weight: 7 });
        }
        if (isHive() && !$6 && !$7 && !$8 && !$9 && !$10) {
-         keywords.push('SKEWED BY');
+         keywords.push({ value: 'SKEWED BY', weight: 6 });
        } else if (isHive() && $6 && $6.suggestKeywords && !$7 && !$8 && !$9 && !$10) {
-         keywords = keywords.concat($6.suggestKeywords); // Get the last optional from SKEWED BY
+         keywords = keywords.concat(createWeightedKeywords($6.suggestKeywords, 6)); // Get the last optional from SKEWED BY
        }
        if (!$7 && !$8 && !$9 && !$10) {
-         keywords.push('ROW FORMAT');
-         keywords.push('STORED AS');
+         keywords.push({ value: 'ROW FORMAT', weight: 5 });
+         keywords.push({ value: 'STORED AS', weight: 5 });
          if (isHive()) {
-          keywords.push('STORED BY');
+           keywords.push({ value: 'STORED BY', weight: 5 });
          }
        } else if ($7 && $7.suggestKeywords && !$8 && !$9 && !$10) {
-         keywords = keywords.concat($7.suggestKeywords);
+         keywords = keywords.concat(createWeightedKeywords($7.suggestKeywords, 5));
        }
        if (!$8 && !$9 && !$10) {
-         keywords.push('LOCATION');
+         keywords.push({ value: 'LOCATION', weight: 4 });
        }
        if (!$9 && !$10) {
-         keywords.push('TBLPROPERTIES');
+         keywords.push({ value: 'TBLPROPERTIES', weight: 3 });
        }
        if (isImpala() && !$10) {
-         keywords.push('CACHED IN');
+         keywords.push({ value: 'CACHED IN', weight: 2 });
        }
+       keywords.push({ value: 'AS', weight: 1 });
      }
 
      if (keywords.length > 0) {
@@ -559,7 +559,7 @@ HiveClusteredBy_EDIT
  | '<hive>CLUSTERED' 'BY' ParenthesizedColumnList OptionalHiveSortedBy 'CURSOR'
    {
      if (!$4) {
-       suggestKeywords(['INTO', 'SORTED BY']);
+       suggestKeywords([{ value: 'INTO', weight: 1 }, { value: 'SORTED BY', weight: 2 }]);
      } else {
        suggestKeywords(['INTO']);
      }
@@ -739,23 +739,23 @@ HiveRowFormat
    OptionalLinesTerminatedBy OptionalNullDefinedAs
    {
      if (!$2 && !$3 && !$4 && !$5 && !$6) {
-       $$ = { suggestKeywords: ['COLLECTION ITEMS TERMINATED BY', 'FIELDS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       $$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 5 }, { value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]};
      } else if ($2 && $2.suggestKeywords && !$3 && !$4 && !$5 && !$6) {
-       $$ = { suggestKeywords: $2.suggestKeywords.concat(['COLLECTION ITEMS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS']) };
+       $$ = { suggestKeywords: createWeightedKeywords($2.suggestKeywords, 5).concat([{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]) };
      } else if (!$3 && !$4 && !$5 && !$6) {
-       $$ = { suggestKeywords: ['COLLECTION ITEMS TERMINATED BY', 'LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       $$ = { suggestKeywords: [{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$4 && !$5 && !$6) {
-       $$ = { suggestKeywords: ['LINES TERMINATED BY', 'MAP KEYS TERMINATED BY', 'NULL DEFINED AS'] };
+       $$ = { suggestKeywords: [{ value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$5 && !$6) {
-       $$ = { suggestKeywords: ['LINES TERMINATED BY', 'NULL DEFINED AS'] };
+       $$ = { suggestKeywords: [{ value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$6) {
-       $$ = { suggestKeywords: ['NULL DEFINED AS'] };
+       $$ = { suggestKeywords: [{ value: 'NULL DEFINED AS', weight: 1 }] };
      }
    }
  | '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties
    {
      if (!$3) {
-       $$ = { suggestKeywords: ['WITH SERDEPROPERTIES'] };
+       $$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
      }
    }
  ;
@@ -777,11 +777,11 @@ ImpalaRowFormat
  : '<impala>DELIMITED' OptionalFieldsTerminatedBy OptionalLinesTerminatedBy
    {
      if (!$2 && !$3) {
-       $$ = { suggestKeywords: ['FIELDS TERMINATED BY', 'LINES TERMINATED BY'] };
+       $$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 2 }, { value: 'LINES TERMINATED BY', weight: 1 }] };
      } else if ($2 && $2.suggestKeywords && !$3) {
-       $$ = { suggestKeywords: $2.suggestKeywords.concat(['LINES TERMINATED BY']) };
+       $$ = { suggestKeywords: createWeightedKeywords($2.suggestKeywords, 2).concat(['LINES TERMINATED BY']) };
      } else if (!$3) {
-       $$ = { suggestKeywords: ['LINES TERMINATED BY'] };
+       $$ = { suggestKeywords: [{ value: 'LINES TERMINATED BY', weight: 1 }] };
      }
    }
  ;
@@ -981,11 +981,11 @@ ViewDefinition_EDIT
  | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties 'CURSOR'
    {
      if (isHive() && !$6 && !$7) {
-       suggestKeywords(['AS', 'COMMENT', 'TBLPROPERTIES']);
+       suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
      } else if (isHive() && !$7) {
-       suggestKeywords(['AS', 'TBLPROPERTIES']);
+       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
      } else {
-       suggestKeywords(['AS']);
+       suggestKeywords([{value: 'AS', weight: 1 }]);
      }
    }
  | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs 'CURSOR'
@@ -1093,9 +1093,9 @@ ImpalaAggregateFunctionDefinition
    HdfsLocation OptionalImpalaInitFn 'CURSOR'
    {
      if (!$9) {
-       suggestKeywords(['INIT_FN', 'UPDATE_FN']);
+       suggestKeywords([{value: 'INIT_FN', weight: 2 }, {value: 'UPDATE_FN', weight: 1 }]);
      } else {
-       suggestKeywords(['UPDATE_FN']);
+       suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
      }
    }
  | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
@@ -1107,13 +1107,13 @@ ImpalaAggregateFunctionDefinition
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn 'CURSOR'
    {
      if (!$12 && !$13 && !$14 && !$15) {
-       suggestKeywords(['CLOSE_FN', 'FINALIZE_FN', 'PREPARE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'PREPARE_FN', weight: 4 }, {value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($12 && !$13 && !$14 && !$15) {
-       suggestKeywords(['CLOSE_FN', 'FINALIZE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($13 && !$14 && !$15) {
-       suggestKeywords(['FINALIZE_FN', 'SERIALIZE_FN']);
+       suggestKeywords([{value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($14 && !$15) {
-       suggestKeywords(['FINALIZE_FN']);
+       suggestKeywords([{value: 'FINALIZE_FN', weight: 1 }]);
      }
    }
  | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
@@ -1422,26 +1422,25 @@ IndexDefinition_EDIT
    OptionalTblproperties OptionalComment 'CURSOR'
    {
      if (!$10 && !$11 && !$12 && !$13 && !$14 && !$15 && !$16) {
-       suggestKeywords(['WITH DEFERRED REBUILD', 'IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'WITH DEFERRED REBUILD', weight: 7 }, { value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$11 && !$12 && !$13 && !$14 && !$15 && !$16) {
-       suggestKeywords(['IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$12 && !$13 && !$14 && !$15 && !$16) {
-       suggestKeywords(['IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$13 && !$14 && !$15 && !$16) {
-       suggestKeywords(['ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if ($13 && $13.suggestKeywords && !$14 && !$15 && !$16) {
-       suggestKeywords($13.suggestKeywords.concat(['LOCATION', 'TBLPROPERTIES', 'COMMENT']));
+       suggestKeywords(createWeightedKeywords($13.suggestKeywords, 4).concat([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]));
      } else if (!$14 && !$15 && !$16) {
-       suggestKeywords(['LOCATION', 'TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$15 && !$16) {
-       suggestKeywords(['TBLPROPERTIES', 'COMMENT']);
+       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$16) {
-       suggestKeywords(['COMMENT']);
+       suggestKeywords([{ value: 'COMMENT', weight: 1 }]);
      }
    }
  ;
 
-// TODO: find index types https://cwiki.apache.org/confluence/display/Hive/IndexDev#IndexDev-CREATEINDEX
 IndexType
  : QuotedValue
  ;

@@ -47,9 +47,10 @@
     if (parseResult.suggestKeywords) {
       parseResult.suggestKeywords.forEach(function (keyword) {
         completions.push({
-          value: parseResult.lowerCase ? keyword.toLowerCase() : keyword,
+          value: parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
           meta: 'keyword',
-          type: 'keyword'
+          type: 'keyword',
+          weight: keyword.weight
         });
       });
     }
@@ -421,7 +422,6 @@
   SqlAutocompleter2.prototype.finalizeCompletions = function (completions, callback, editor) {
     var self = this;
     self.sortCompletions(completions);
-
     var currentScore = 1000;
     completions.forEach(function (completion) {
       completion.score = currentScore;
@@ -436,20 +436,23 @@
   };
 
   var typeOrder = {
-    'star': 1,
-    'column': 2,
-    'sample': 3,
-    'table': 4,
-    'database': 5,
-    'identifier': 6,
-    'keyword': 7,
-    'function': 8
+    'column': 1,
+    'sample': 2,
+    'table': 3,
+    'database': 4,
+    'identifier': 5,
+    'keyword': 6,
+    'function': 7
   };
 
   SqlAutocompleter2.prototype.sortCompletions = function (completions) {
     completions.sort(function (a, b) {
-      if (typeOrder[a.value === '*' ? 'star' : a.type] !== typeOrder[b.value === '*' ? 'star' : b.type]) {
-        return typeOrder[a.value == '*' ? 'star' : a.type] - typeOrder[b.value == '*' ? 'star' : b.type];
+      if (typeof a.weight !== 'undefined' && typeof b.weight !== 'undefined' && b.weight !== a.weight) {
+        return b.weight - a.weight;
+      } else if (typeof a.weight !== 'undefined' && typeof b.weight === 'undefined') {
+        return -1;
+      } else if (typeof b.weight !== 'undefined' && typeof a.weight === 'undefined') {
+        return 1;
       }
       return a.value.localeCompare(b.value);
     });
