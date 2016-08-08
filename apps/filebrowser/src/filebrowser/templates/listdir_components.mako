@@ -779,7 +779,7 @@ from django.utils.translation import ugettext as _
           mtime: file.mtime
         },
         isBucket: ko.pureComputed(function(){
-          return file.path.toLowerCase().indexOf('s3://') == 0 && file.path.substr(5).indexOf('/') == -1
+          return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1
         }),
         selected: ko.observable(false),
         highlighted: ko.observable(file.highlighted || false),
@@ -972,11 +972,11 @@ from django.utils.translation import ugettext as _
       });
 
       self.isS3 = ko.pureComputed(function () {
-        return self.currentPath().toLowerCase().indexOf('s3://') === 0;
+        return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
       self.isS3Root = ko.pureComputed(function () {
-        return self.isS3() && self.currentPath().toLowerCase() === 's3://';
+        return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1746,7 +1746,7 @@ from django.utils.translation import ugettext as _
               }
             }
           };
-          if (ops.path.toLowerCase() !== 's3://') {
+          if (ops.path.toLowerCase() !== 's3a://') {
             _dropzone = new Dropzone(document.body, options);
 
             _dropzone.on('queuecomplete', function () {

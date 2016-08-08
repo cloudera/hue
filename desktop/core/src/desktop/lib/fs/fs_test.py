@@ -24,11 +24,11 @@ from desktop.lib import fs
 def test_splitpath():
   s = fs.splitpath
 
-  eq_(s('s3://'), ['s3://'])
-  eq_(s('s3://bucket'), ['s3://', 'bucket'])
-  eq_(s('s3://bucket/key'), ['s3://', 'bucket', 'key'])
-  eq_(s('s3://bucket/key/'), ['s3://', 'bucket', 'key'])
-  eq_(s('s3://bucket/bar/foo'), ['s3://', 'bucket', 'bar', 'foo'])
+  eq_(s('s3a://'), ['s3a://'])
+  eq_(s('s3a://bucket'), ['s3a://', 'bucket'])
+  eq_(s('s3a://bucket/key'), ['s3a://', 'bucket', 'key'])
+  eq_(s('s3a://bucket/key/'), ['s3a://', 'bucket', 'key'])
+  eq_(s('s3a://bucket/bar/foo'), ['s3a://', 'bucket', 'bar', 'foo'])
 
   eq_(s('/'), ['/'])
   eq_(s('/dir'), ['/', 'dir'])

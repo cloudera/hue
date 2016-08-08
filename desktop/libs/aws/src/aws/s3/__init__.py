@@ -35,7 +35,7 @@ ERRNO_MAP = {
 }
 DEFAULT_ERRNO = errno.EINVAL
 
-S3_PATH_RE = re.compile('^/*[sS]3[a]?://([^/]+)(/(.*?([^/]+)?/?))?$')
+S3_PATH_RE = re.compile('^/*[sS]3[aA]?://([^/]+)(/(.*?([^/]+)?/?))?$')
 S3_ROOT = 's3://'
 S3A_ROOT = 's3a://'
 
@@ -73,19 +73,19 @@ def parse_uri(uri):
 
 def is_root(uri):
   """
-  Check if URI is S3 root (S3://)
+  Check if URI is S3 root (S3A://)
   """
-  return uri.lower() == S3_ROOT
+  return uri.lower() == S3A_ROOT
 
 
 def abspath(cd, uri):
   """
   Returns absolute URI, examples:
 
-  abspath('s3://bucket/key', key2') == 's3://bucket/key/key2'
-  abspath('s3://bucket/key', 's3://bucket2/key2') == 's3://bucket2/key2'
+  abspath('s3a://bucket/key', key2') == 's3a://bucket/key/key2'
+  abspath('s3a://bucket/key', 's3a://bucket2/key2') == 'sa://bucket2/key2'
   """
-  if cd.lower().startswith(S3_ROOT):
+  if cd.lower().startswith(S3A_ROOT):
     uri = join(cd, uri)
   else:
     uri = normpath(join(cd, uri))
@@ -100,19 +100,19 @@ def join(*comp_list):
       return '/' if is_root(uri) else uri
   joined = posixpath.join(*map(_prep, comp_list))
   if joined and joined[0] == '/':
-    joined = 's3:/%s' % joined
+    joined = 's3a:/%s' % joined
   return joined
 
 
 def normpath(path):
   """
-  Return normalized path but ignore leading S3_ROOT prefix if it exists
+  Return normalized path but ignore leading S3A_ROOT prefix if it exists
   """
-  if path.lower().startswith(S3_ROOT):
+  if path.lower().startswith(S3A_ROOT):
     if is_root(path):
       normalized = path
     else:
-      normalized = '%s%s' % (S3_ROOT, fs_normpath(path[len(S3_ROOT):]))
+      normalized = '%s%s' % (S3A_ROOT, fs_normpath(path[len(S3A_ROOT):]))
   else:
     normalized = fs_normpath(path)
   return normalized

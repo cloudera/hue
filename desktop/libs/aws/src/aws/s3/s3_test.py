@@ -24,38 +24,38 @@ from aws import s3
 def test_parse_uri():
   p = s3.parse_uri
 
-  eq_(('bucket', 'folder/key', 'key'), p('s3://bucket/folder/key'))
-  eq_(('bucket', 'folder/key/', 'key'), p('s3://bucket/folder/key/'))
-  eq_(('bucket', 'folder/key/', 'key'), p('S3://bucket/folder/key/'))
-  eq_(('bucket', '', ''), p('s3://bucket'))
-  eq_(('bucket', '', ''), p('s3://bucket/'))
+  eq_(('bucket', 'folder/key', 'key'), p('s3a://bucket/folder/key'))
+  eq_(('bucket', 'folder/key/', 'key'), p('s3a://bucket/folder/key/'))
+  eq_(('bucket', 'folder/key/', 'key'), p('S3A://bucket/folder/key/'))
+  eq_(('bucket', '', ''), p('s3a://bucket'))
+  eq_(('bucket', '', ''), p('s3a://bucket/'))
 
   assert_raises(ValueError, p, '/local/path')
   assert_raises(ValueError, p, 'ftp://ancient/archive')
-  assert_raises(ValueError, p, 's3:/missed/slash')
-  assert_raises(ValueError, p, 's3://')
+  assert_raises(ValueError, p, 's3a:/missed/slash')
+  assert_raises(ValueError, p, 's3a://')
 
 
 def test_join():
   j = s3.join
-  eq_("s3://b", j("s3://", "b"))
-  eq_("s3://b/f", j("s3://b", "f"))
-  eq_("s3://b/f1/f2", j("s3://b", "f1", "f2"))
-  eq_("s3://b/f1/f2/../f3", j("s3://b/f1/f2", "../f3"))
+  eq_("s3a://b", j("s3a://", "b"))
+  eq_("s3a://b/f", j("s3a://b", "f"))
+  eq_("s3a://b/f1/f2", j("s3a://b", "f1", "f2"))
+  eq_("s3a://b/f1/f2/../f3", j("s3a://b/f1/f2", "../f3"))
 
 
 def test_abspath():
   a = s3.abspath
-  eq_('s3://a/b/c/d', a('s3://a/b/c', 'd'))
-  eq_('s3://a/b/c/d', a('/a/b/c', 'd'))
+  eq_('s3a://a/b/c/d', a('s3a://a/b/c', 'd'))
+  eq_('s3a://a/b/c/d', a('/a/b/c', 'd'))
 
 
 def test_is_root():
   i = s3.is_root
-  eq_(True, i('s3://'))
-  eq_(True, i('S3://'))
-  eq_(False, i('s3:/'))
-  eq_(False, i('s3://bucket'))
+  eq_(True, i('s3a://'))
+  eq_(True, i('S3A://'))
+  eq_(False, i('s3a:/'))
+  eq_(False, i('s3a://bucket'))
   eq_(False, i('/local/path'))
 
 

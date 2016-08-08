@@ -69,7 +69,7 @@ class S3TestBase(unittest.TestCase):
 
   @classmethod
   def get_test_path(cls, path=None):
-    base_path = join('s3://', cls.bucket_name, cls.path_prefix)
+    base_path = join('s3a://', cls.bucket_name, cls.path_prefix)
     if path:
       return join(base_path, path)
     return base_path

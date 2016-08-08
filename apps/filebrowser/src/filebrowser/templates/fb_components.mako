@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
       <ul class="nav nav-pills hueBreadcrumbBar">
-        %if path.lower().find('s3://') != 0:
+        %if path.lower().find('s3a://') != 0:
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         %endif
         <li>

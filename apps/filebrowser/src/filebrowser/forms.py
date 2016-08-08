@@ -23,7 +23,7 @@ from django.contrib.auth.models import User, Group
 from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
 
-from aws.s3 import S3_ROOT, normpath as s3_normpath
+from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from desktop.lib import i18n
 from hadoop.fs import normpath
 from filebrowser.lib import rwx
@@ -62,7 +62,7 @@ class PathField(CharField):
 
   def clean(self, value):
     cleaned_path = CharField.clean(self, value)
-    if value.lower().startswith(S3_ROOT):
+    if value.lower().startswith(S3A_ROOT):
       cleaned_path = s3_normpath(cleaned_path)
     else:
       cleaned_path = normpath(cleaned_path)

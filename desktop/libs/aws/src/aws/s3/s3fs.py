@@ -31,7 +31,7 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.s3 import normpath, s3file, translate_s3_error, S3_ROOT
+from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
 
@@ -160,9 +160,9 @@ class S3FileSystem(object):
     if not s3.is_root(parent_dir):
       bucket_name, key_name, basename = s3.parse_uri(path)
       if not basename:  # bucket is top-level so return root
-        parent_dir = S3_ROOT
+        parent_dir = S3A_ROOT
       else:
-        bucket_path = '%s%s' % (S3_ROOT, bucket_name)
+        bucket_path = '%s%s' % (S3A_ROOT, bucket_name)
         key_path = '/'.join(key_name.split('/')[:-1])
         parent_dir = s3.abspath(bucket_path, key_path)
     return parent_dir
