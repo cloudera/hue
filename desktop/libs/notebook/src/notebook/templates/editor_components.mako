@@ -1640,8 +1640,7 @@ ${ hueIcons.symbols() }
           </th>
         </tr>
         <tr data-bind="visible: result.isMetaFilterVisible">
-          <td colspan="2"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" /></td>
-          <td>&nbsp;</td>
+          <td colspan="3"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" style="width: 277px" /></td>
         </tr>
       </thead>
       <tbody class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
@@ -3368,6 +3367,7 @@ ${ hueIcons.symbols() }
                   var newSpan9Width = 100 - newSpan3Width - 2.127659574468085;
                   $("#snippet_" + options.snippet.id()).find('.table-results .span3').width(newSpan3Width + '%').data('newWidth', newSpan3Width);
                   $("#snippet_" + options.snippet.id()).find('.table-results .span9').width(newSpan9Width + '%').data('newWidth', newSpan9Width);
+                  $("#snippet_" + options.snippet.id()).find('.meta-filter').width($("#snippet_" + options.snippet.id()).find('.table-results .span3').width() - 28)
                 }
               });
 
