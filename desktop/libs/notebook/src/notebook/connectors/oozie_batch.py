@@ -176,7 +176,7 @@ class OozieApi(Api):
       logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
                                                                  log_start_pattern=self.LOG_START_PATTERN,
                                                                  log_end_pattern=self.LOG_END_PATTERN)
-      if len(logs) > 0:
+      if logs:
         log_output = logs.values()[0]
         if log_output.startswith('Unable to locate'):
           LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
@@ -184,6 +184,7 @@ class OozieApi(Api):
         else:
           logs_found = True
 
+      attempts += 1
     return log_output
 
 
