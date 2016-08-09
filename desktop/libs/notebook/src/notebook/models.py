@@ -136,6 +136,9 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
         'settings': []
     }
 
+    default_properties.update(snippet['properties'])
+    snippet['properties'] = default_properties
+
     if snippet['type'] == 'hive':
       pass
     elif snippet['type'] == 'impala':

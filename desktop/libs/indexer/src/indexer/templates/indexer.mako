@@ -367,9 +367,12 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
-       <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-         ${_('View indexing status')}
-       </a>
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+          ${_('Oozie Status')}
+         </a>
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+          ${_('View indexing status')}
+        </a>
 
         ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
       </span>
@@ -759,6 +762,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
 
       self.editorId = ko.observable();
+      self.jobId = ko.observable();
       self.editorVM = null;
 
       self.indexingStarted = ko.observable(false);
@@ -848,6 +852,7 @@ ${ assist.assistPanel() }
         }, function (resp) {
           self.showCreate(true);
           self.editorId(resp.history_id);
+          self.jobId(resp.handle.id);
           $('#notebook').html($('#notebook-progress').html());
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
             user: '${ user.username }',

@@ -23,12 +23,14 @@ from django.utils.translation import ugettext as _
 from beeswax.server import dbms
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from notebook.connectors.base import get_api
+from desktop.models import Document2
+from notebook.connectors.base import get_api, Notebook
 
-from indexer.smart_indexer import Indexer
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
+from indexer.smart_indexer import Indexer
+
 
 LOG = logging.getLogger(__name__)
 
@@ -79,7 +81,7 @@ def guess_format(request):
     else:
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
-    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\t"} # \t --> CTRL+A
+    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
 
   return JsonResponse(format_)
 
@@ -110,19 +112,35 @@ def guess_field_types(request):
             for col in table_metadata.cols
         ]
     }
-  elif file_format['inputFormat'] == 'query':
+  elif file_format['inputFormat'] == 'query': # Only support open query history
     # TODO get schema from explain query, which is not possible
-    # Only support select * for now and would require a workflow that generates the morphline on the fly based on a temporary CTAS
-    format_ = {u'sample': [[u'00-0000', u'All Occupations', 134354250, 40690], [u'11-0000', u'Management occupations', 6003930, 96150], [u'11-1011', u'Chief executives', 299160, 151370], [u'11-1021', u'General and operations managers', 1655410, 103780]], u'columns': [{u'operations': [], u'name': u'code', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'description', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'total_emp', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}, {u'operations': [], u'name': u'salary', u'required': False, u'keep': True, u'unique': False, u'type': u'string'}]}
+    notebook = Notebook(document=Document2.objects.get(id=file_format['query'])).get_data()
+    snippet = notebook['snippets'][0]
+    sample = get_api(request, snippet).fetch_result(notebook, snippet, 4, start_over=True)
+
+    format_ = {
+        "sample": sample['rows'][:4],
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in sample.meta
+        ]
+    }
 
   return JsonResponse(format_)
+
 
 def index_file(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
   _convert_format(file_format["format"], inverse=True)
   collection_name = file_format["name"]
 
+  job_handle = _index(request, file_format, collection_name)
+  return JsonResponse(job_handle)
+
+
+def _index(request, file_format, collection_name, query=None):
   indexer = Indexer(request.user, request.fs)
+
   unique_field = indexer.get_unique_field(file_format)
   is_unique_generated = indexer.is_unique_generated(file_format)
 
@@ -142,6 +160,7 @@ def index_file(request):
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
+  else:
+    input_path = None
 
-  job_handle = indexer.run_morphline(request, collection_name, morphline, input_path)
-  return JsonResponse(job_handle)
+  return indexer.run_morphline(request, collection_name, morphline, input_path, query)

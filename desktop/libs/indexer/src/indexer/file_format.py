@@ -26,6 +26,7 @@ from indexer.operations import get_operator
 
 LOG = logging.getLogger(__name__)
 
+
 def get_format_types():
   return [
     CSVFormat,
@@ -280,10 +281,10 @@ class CSVFormat(FileFormat):
 
   @staticmethod
   def format_character(string):
-    string = string.replace('\\', '\\\\')
     string = string.replace('"', '\\"')
     string = string.replace('\t', '\\t')
     string = string.replace('\n', '\\n')
+    string = string.replace('\u0001', '\\u0001')
 
     return string
 

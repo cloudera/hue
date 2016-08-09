@@ -663,6 +663,12 @@ if USE_NEW_EDITOR.get():
                  % endif
                  % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
+                 <%!
+                 from indexer.conf import ENABLE_NEW_INDEXER
+                 %>
+                 % if ENABLE_NEW_INDEXER.get():
+                 <li><a href="${ url('indexer:indexer') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Index') }</a></li>
+                 % endif
                  % endif
                  <li class="divider"></li>
                % endif

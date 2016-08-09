@@ -414,7 +414,7 @@ class HS2Api(Api):
     return '/filebrowser/view=%s' % target_file
 
 
-  def export_data_as_table(self, notebook, snippet, destination):
+  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
@@ -432,7 +432,7 @@ class HS2Api(Api):
 
     db.use(query.database)
 
-    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, query.hql_query)
+    hql = 'CREATE %sTABLE `%s`.`%s` %sAS %s' % ('TEMPORARY ' if is_temporary else '', database, table, "LOCATION '%s' " % location if location else '', query.hql_query)
     success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
 
     return hql, success_url

@@ -26,6 +26,12 @@ try:
 except ImportError, e:
   LOG.warn("Hive app is not enabled")
   DOWNLOAD_CELL_LIMIT = None
+
+try:
+  from indexer.conf import ENABLE_NEW_INDEXER
+except ImportError, e:
+  LOG.warn("Indexer app is not enabled")
+  ENABLE_NEW_INDEXER = None
 %>
 
 <%def name="snippetDbSelection()">
@@ -401,6 +407,19 @@ except ImportError, e:
                 </div>
               </div>
             </div>
+            % if ENABLE_NEW_INDEXER and ENABLE_NEW_INDEXER.get():
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
+                  &nbsp;${ _('A search dashboard') }
+                </label>
+                <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
+                  <input data-bind="value: savePath" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Search index name')}">
+                </div>
+              </div>
+            </div>
+            % endif
           </fieldset>
         </form>
       </div>
