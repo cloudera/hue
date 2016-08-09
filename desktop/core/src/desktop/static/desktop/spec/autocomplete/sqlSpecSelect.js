@@ -102,7 +102,7 @@ define([
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+          suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
         }
       });
     });
@@ -2551,7 +2551,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2564,7 +2564,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2601,9 +2601,9 @@ define([
           afterCursor: '',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['WHERE', 'HAVING'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+            lowerCase: false
           }
         });
       });
@@ -3134,7 +3134,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
+            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
             locations: [
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25}, table: 'testTableA'},
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 41}, table: 'testTableB'}
@@ -4238,7 +4238,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['GROUP BY', 'ORDER BY', 'LIMIT', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4251,7 +4251,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['GROUP BY', 'ORDER BY', 'LIMIT', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4451,7 +4451,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['GROUP BY', 'WINDOW', 'ORDER BY', 'LIMIT', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN',  'IN', 'IS NOT NULL', 'IS NULL',  'NOT BETWEEN', 'NOT IN', 'OR']
+              suggestKeywords: ['GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN',  'IN', 'IS NOT NULL', 'IS NULL',  'NOT BETWEEN', 'NOT IN', 'OR']
             }
           });
         });
@@ -4666,268 +4666,6 @@ define([
         });
       });
 
-      describe('ORDER BY Clause', function () {
-        it('should suggest keywords for "SELECT * FROM testTable ORDER |"', function () {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTable ORDER ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['BY']
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM testTable ORDER BY |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTable ORDER BY ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestAnalyticFunctions: true,
-              suggestColumns: { table: 'testTable' }
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestAnalyticFunctions: true,
-              suggestColumns: { database: 'database_two', table: 'testTable' }
-            }
-          });
-        });
-
-        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
-            afterCursor: '',
-            dialect: 'generic',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['ASC', 'DESC', 'LIMIT']
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo, |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo, ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestAnalyticFunctions: true,
-              suggestColumns: { database: 'database_two', table: 'testTable' }
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo ASC, |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ASC, ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestAnalyticFunctions: true,
-              suggestColumns: { database: 'database_two', table: 'testTable' }
-            }
-          });
-        });
-
-        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-            afterCursor: '',
-            dialect: 'generic',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['ASC', 'DESC', 'LIMIT']
-            }
-          });
-        });
-
-        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-            afterCursor: ', bla',
-            containsKeywords: ['ASC', 'DESC'],
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false
-            }
-          });
-        });
-
-        describe('Impala specific', function () {
-          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', function() {
-            assertAutoComplete({
-              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
-              afterCursor: '',
-              dialect: 'impala',
-              hasLocations: true,
-              expectedResult: {
-                lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
-              }
-            });
-          });
-
-          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY 1 |"', function() {
-            assertAutoComplete({
-              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY 1 ',
-              afterCursor: '',
-              dialect: 'impala',
-              hasLocations: true,
-              expectedResult: {
-                lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
-              }
-            });
-          });
-
-          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo NULLS |"', function() {
-            assertAutoComplete({
-              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo NULLS ',
-              afterCursor: '',
-              dialect: 'impala',
-              hasLocations: true,
-              expectedResult: {
-                lowerCase: false,
-                suggestKeywords: ['FIRST', 'LAST']
-              }
-            });
-          });
-
-          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', function() {
-            assertAutoComplete({
-              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-              afterCursor: '',
-              dialect: 'impala',
-              hasLocations: true,
-              expectedResult: {
-                lowerCase: false,
-                suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT']
-              }
-            });
-
-            it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', function() {
-              assertAutoComplete({
-                beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-                afterCursor: ', bla',
-                dialect: 'impala',
-                containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
-                hasLocations: true,
-                expectedResult: {
-                  lowerCase: false
-                }
-              });
-            });
-
-            it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS |, bla"', function() {
-              assertAutoComplete({
-                beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS ',
-                afterCursor: ', bla',
-                dialect: 'impala',
-                containsKeywords: ['FIRST', 'LAST'],
-                hasLocations: true,
-                expectedResult: {
-                  lowerCase: false
-                }
-              });
-            });
-          });
-        });
-      });
-
-
-      describe('GROUP BY Clause', function () {
-        it('should suggest keywords for "SELECT * FROM testTable GROUP |"', function () {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTable GROUP ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['BY']
-            }
-          });
-        });
-
-        it('should suggest identifiers for "SELECT * FROM testTableA tta, testTableB GROUP BY |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY ',
-            afterCursor: '',
-            dialect: 'generic',
-            hasLocations: true,
-            expectedResult : {
-              lowerCase: false,
-              suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
-            }
-          });
-        });
-
-        it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
-            afterCursor: '',
-            dialect: 'generic',
-            hasLocations: true,
-            expectedResult : {
-              lowerCase: false,
-              suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
-            }
-          });
-        });
-
-        it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |, foo"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
-            afterCursor: ', foo',
-            dialect: 'generic',
-            hasLocations: true,
-            expectedResult : {
-              lowerCase: false,
-              suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM testTable GROUP BY |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM testTable GROUP BY ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestColumns: { table: 'testTable' }
-            }
-          });
-        });
-
-        it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY ',
-            afterCursor: '',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestColumns: { database: 'database_two', table: 'testTable' }
-            }
-          });
-        });
-      });
-
       it('should suggest columns for "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 t1 JOIN testTable2 t2 ON t1.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 t1 JOIN testTable2 t2 ON t1.',
@@ -5024,6 +4762,608 @@ define([
             lowerCase: false,
             suggestKeywords: ['*'],
             suggestColumns: { table: 'testTableB' }
+          }
+        });
+      });
+    });
+
+    describe('ORDER BY Clause', function () {
+      it('should suggest keywords for "SELECT * FROM testTable ORDER |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable ORDER ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BY']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM testTable ORDER BY |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable ORDER BY ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAnalyticFunctions: true,
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAnalyticFunctions: true,
+            suggestColumns: { database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo, ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAnalyticFunctions: true,
+            suggestColumns: { database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo ASC, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ASC, ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAnalyticFunctions: true,
+            suggestColumns: { database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+          afterCursor: ', bla',
+          containsKeywords: ['ASC', 'DESC'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 ',
+          afterCursor: '',
+          hasLocations: true,
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['UNION']
+          }
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY 1 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo NULLS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo NULLS ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FIRST', 'LAST']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
+            }
+          });
+
+          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', function() {
+            assertAutoComplete({
+              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+              afterCursor: ', bla',
+              dialect: 'impala',
+              containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
+              hasLocations: true,
+              expectedResult: {
+                lowerCase: false
+              }
+            });
+          });
+
+          it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS |, bla"', function() {
+            assertAutoComplete({
+              beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS ',
+              afterCursor: ', bla',
+              dialect: 'impala',
+              containsKeywords: ['FIRST', 'LAST'],
+              hasLocations: true,
+              expectedResult: {
+                lowerCase: false
+              }
+            });
+          });
+        });
+      });
+    });
+
+    describe('CLUSTER BY, DISTRIBUTE BY and SORT BY', function () {
+      describe('Hive specific', function () {
+        it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT'],
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC CLUSTER BY a |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC CLUSTER BY a ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['LIMIT'],
+            doesNotContainKeywords: ['DISTRIBUTE BY', 'SORT BY'],
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC DISTRIBUTE BY a |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC DISTRIBUTE BY a ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SORT BY', 'LIMIT'],
+            doesNotContainKeywords: ['CLUSTER BY', 'DISTRIBUTE BY'],
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC SORT BY a DESC |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC SORT BY a DESC ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['LIMIT'],
+            doesNotContainKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'NULLS FIRST', 'SORT BY'],
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+    });
+
+    describe('GROUP BY Clause', function () {
+      it('should suggest keywords for "SELECT * FROM testTable GROUP |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable GROUP ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BY']
+          }
+        });
+      });
+
+      it('should suggest identifiers for "SELECT * FROM testTableA tta, testTableB GROUP BY |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult : {
+            lowerCase: false,
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult : {
+            lowerCase: false,
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |, foo"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
+          afterCursor: ', foo',
+          dialect: 'generic',
+          hasLocations: true,
+          expectedResult : {
+            lowerCase: false,
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM testTable GROUP BY |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable GROUP BY ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+    });
+
+    describe('HAVING clause', function () {
+      describe('Hive specific', function () {
+        it('should suggest identifiers for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestAggregateFunctions: true,
+              suggestColumns: { table: 'testTable' }
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest identifiers for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestAggregateFunctions: true,
+              suggestColumns: { table: 'testTable' }
+            }
+          });
+        });
+      });
+    });
+
+    describe('OFFSET clause', function () {
+      describe('Impala specific', function () {
+        it('should handle "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa OFFSET 1;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa OFFSET 1; ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT 10 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT 10 ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['OFFSET'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+    });
+
+    describe('UNION clause', function () {
+      // TODO: Fix locations
+      xit('should handle "SELECT * FROM (SELECT x FROM few_ints UNION ALL SELECT x FROM few_ints) AS t1 ORDER BY x;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM (SELECT x FROM few_ints UNION ALL SELECT x FROM few_ints) AS t1 ORDER BY x;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT key FROM (SELECT key FROM src ORDER BY key LIMIT 10)subq1 UNION SELECT key FROM (SELECT key FROM src1 ORDER BY key LIMIT 10)subq2;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT key FROM (SELECT key FROM src ORDER BY key LIMIT 10)subq1 UNION SELECT key FROM (SELECT key FROM src1 ORDER BY key LIMIT 10)subq2;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT * FROM t1 UNION DISTINCT SELECT * FROM t2;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM t1 UNION DISTINCT SELECT * FROM t2;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT * FROM t1 UNION SELECT * FROM t2;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM t1 UNION SELECT * FROM t2;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM t1 UNION |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM t1 UNION ',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ALL', 'DISTINCT', 'SELECT']
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT * FROM t1 UNION ALL SELECT |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM t1 UNION ALL SELECT ',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+    });
+
+    describe('WITH clause', function () {
+      it('should handle "WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "WITH q1 AS (SELECT * FROM src WHERE something), q2 AS (SELECT * FROM src s2 WHERE something) SELECT * FROM q1 UNION ALL SELECT * FROM q2;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH q1 AS (SELECT * FROM src WHERE something), q2 AS (SELECT * FROM src s2 WHERE something) SELECT * FROM q1 UNION ALL SELECT * FROM q2;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "WITH t1 AS (SELECT 1) (WITH t2 AS (SELECT 2) SELECT * FROM t2) UNION ALL SELECT * FROM t1;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT 1) (WITH t2 AS (SELECT 2) SELECT * FROM t2) UNION ALL SELECT * FROM t1;',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "WITH t1 |', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['AS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "WITH t1 AS (|', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "WITH t1 AS (SELECT * FROM boo) |', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT * FROM boo) ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT |', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT ',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestTables: { prependQuestionMark: true, prependFrom: true },
+            suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot:true },
+            suggestCommonTableExpressions: [{ name: 't1', prependFrom: true, prependQuestionMark:true }]
+          }
+        });
+      });
+
+      it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT * FROM |', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT * FROM ',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { },
+            suggestDatabases: { appendDot: true },
+            suggestCommonTableExpressions: [{ name: 't1' }]
           }
         });
       });
@@ -5329,7 +5669,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'ON', 'RIGHT', 'RIGHT OUTER']
+            suggestKeywords: ['ON', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
           }
         });
       });

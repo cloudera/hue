@@ -1377,7 +1377,7 @@ define([
       });
 
       describe('Hive specific', function () {
-        it('should handle "CREATE VIEW IF NOT EXISTS db.foo (baa COMMENT \'foo bar\', ble) COMMENT \'baa\' TBLPROPERTIES ("boo.baa"="buu") AS SELECT a, | FROM tableOne"', function () {
+        it('should suggest columns for "CREATE VIEW IF NOT EXISTS db.foo (baa COMMENT \'foo bar\', ble) COMMENT \'baa\' TBLPROPERTIES ("boo.baa"="buu") AS SELECT a, | FROM tableOne"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE VIEW IF NOT EXISTS db.foo (baa COMMENT \'foo bar\', ble) COMMENT \'baa\' TBLPROPERTIES ("boo.baa"="buu") AS SELECT a, ',
             afterCursor: ' FROM tableOne',
@@ -1390,6 +1390,19 @@ define([
               suggestFunctions: {},
               suggestColumns: { table: 'tableOne' },
               suggestKeywords: ['*']
+            }
+          });
+        });
+
+        it('should handle "CREATE VIEW v1 AS WITH q1 AS ( SELECT key FROM src WHERE key = \'5\') SELECT * FROM q1;|', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE VIEW v1 AS WITH q1 AS ( SELECT key FROM src WHERE key = \'5\') SELECT * FROM q1;',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations:true,
+            containsKeywords: ['SELECT', 'WITH'],
+            expectedResult: {
+              lowerCase: false
             }
           });
         });

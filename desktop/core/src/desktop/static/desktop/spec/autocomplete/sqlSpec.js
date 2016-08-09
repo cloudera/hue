@@ -43,7 +43,7 @@ define([
       assertAutoComplete({
         beforeCursor: ';;',
         afterCursor: '',
-        containsKeywords: ['SELECT'],
+        containsKeywords: ['SELECT', 'WITH'],
         expectedResult: {
           lowerCase: false
         }
@@ -205,7 +205,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
-              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
       });
@@ -221,7 +221,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'EXPORT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
-              'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE']
+              'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
       });

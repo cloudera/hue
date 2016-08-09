@@ -49,7 +49,7 @@ define([
               actualResponse.suggestKeywords = weightFreeKeywords;
             }
 
-            if (actualResponse.errors) {
+            if (typeof testDefinition.noErrors === 'undefined' && actualResponse.errors) {
               var allRecoverable = true;
               actualResponse.errors.forEach(function (error) {
                 allRecoverable = allRecoverable && error.recoverable;

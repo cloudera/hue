@@ -17,7 +17,7 @@
 
 echo "Make sure you install jison first (npm install jison -g)"
 echo ""
-echo "Note: There's supposed to be one conflict when generating for token 'error' (reduce by rule: QuerySpecification_EDIT -> SELECT OptionalAllOrDistinct SelectList_EDIT)"
+echo "Note: There's supposed to be one conflict when generating for token 'error' (reduce by rule: SelectStatement_EDIT -> SELECT OptionalAllOrDistinct SelectList_EDIT)"
 echo ""
 echo "Generating parser..."
 
