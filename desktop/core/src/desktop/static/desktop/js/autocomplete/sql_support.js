@@ -19,6 +19,7 @@ var prepareNewStatement = function () {
   commitLocations();
 
   delete parser.yy.latestTablePrimaries;
+  delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
   parser.yy.subQueries = [];
 
@@ -26,6 +27,10 @@ var prepareNewStatement = function () {
     parser.yy.errors.push(error);
     return message;
   };
+};
+
+var addCommonTableExpressions = function (identifiers) {
+  parser.yy.latestCommonTableExpressions = identifiers;
 };
 
 var popQueryState = function (subQuery) {
@@ -263,6 +268,23 @@ var prioritizeSuggestions = function () {
     }
   } else {
     delete parser.yy.result.subQueries;
+  }
+
+  if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
+    var ctes = [];
+    parser.yy.latestCommonTableExpressions.forEach(function (identifier) {
+      var cte = { name: identifier };
+      if (parser.yy.result.suggestTables.prependFrom) {
+        cte.prependFrom = true
+      }
+      if (parser.yy.result.suggestTables.prependQuestionMark) {
+        cte.prependQuestionMark = true;
+      }
+      ctes.push(cte);
+    });
+    if (ctes.length > 0) {
+      parser.yy.result.suggestCommonTableExpressions = ctes;
+    }
   }
 };
 
@@ -587,7 +609,7 @@ var suggestFileFormats = function () {
 };
 
 var suggestDdlAndDmlKeywords = function () {
-  var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE'];
+  var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
 
   if (isHive()) {
     keywords = keywords.concat(['ANALYZE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RESET']);

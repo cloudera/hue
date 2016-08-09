@@ -58,6 +58,7 @@
 <hive>'BUCKETS'                            { return '<hive>BUCKETS'; }
 <hive>'CASCADE'                            { return '<hive>CASCADE'; }
 <hive>'CHANGE'                             { return '<hive>CHANGE'; }
+<hive>'CLUSTER'                            { return '<hive>CLUSTER'; }
 <hive>'CLUSTERED'                          { return '<hive>CLUSTERED'; }
 <hive>'COLLECTION'                         { return '<hive>COLLECTION'; }
 <hive>'COLUMNS'                            { return '<hive>COLUMNS'; }
@@ -72,6 +73,7 @@
 <hive>'DELIMITED'                          { return '<hive>DELIMITED'; }
 <hive>'DESC'                               { return '<hive>DESC'; }
 <hive>'DISABLE'                            { return '<hive>DISABLE'; }
+<hive>'DISTRIBUTE'                         { return '<hive>DISTRIBUTE'; }
 <hive>'ESCAPED'                            { return '<hive>ESCAPED'; }
 <hive>'ENABLE'                             { return '<hive>ENABLE'; }
 <hive>'EXCHANGE'                           { return '<hive>EXCHANGE'; }
@@ -120,6 +122,7 @@
 <hive>'SHOW'                               { determineCase(yytext); return '<hive>SHOW'; }
 <hive>'SKEWED'                             { return '<hive>SKEWED'; }
 <hive>'SKEWED LOCATION'                    { return '<hive>SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
+<hive>'SORT'                               { return '<hive>SORT'; }
 <hive>'SORTED'                             { return '<hive>SORTED'; }
 <hive>'STORED'                             { return '<hive>STORED'; }
 <hive>STORED[ \t\n]+AS[ \t\n]+DIRECTORIES  { return '<hive>STORED_AS_DIRECTORIES'; }
@@ -179,6 +182,7 @@
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
+<impala>'OFFSET'                           { return '<impala>OFFSET'; }
 <impala>'PARQUET'                          { return '<impala>PARQUET'; }
 <impala>'PARTITIONED'                      { return '<impala>PARTITIONED'; }
 <impala>'PARTITIONS'                       { return '<impala>PARTITIONS'; }
@@ -251,6 +255,7 @@
 'FULL'                                     { return 'FULL'; }
 'GROUP'                                    { return 'GROUP'; }
 'GROUPING'                                 { return 'GROUPING'; } // Not in Impala?
+'HAVING'                                   { return 'HAVING'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
 'INNER'                                    { return 'INNER'; }
@@ -291,11 +296,12 @@
 'UNBOUNDED'                                { return 'UNBOUNDED'; }
 'UPDATE'                                   { determineCase(yytext); return 'UPDATE'; }
 'USE'                                      { determineCase(yytext); return 'USE'; }
+'UNION'                                    { return 'UNION'; }
 'VIEW'                                     { return 'VIEW'; }
 'VARCHAR'                                  { return 'VARCHAR'; } // Not in Impala
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
-'WITH'                                     { return 'WITH'; }
+'WITH'                                     { determineCase(yytext); return 'WITH'; }
 
 // Non-reserved Keywords
 'OVER'                                     { return 'OVER'; }

@@ -39,9 +39,10 @@
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    COLUMN: 500,
-    SAMPLE: 400,
-    IDENTIFIER: 300,
+    COLUMN: 600,
+    SAMPLE: 500,
+    IDENTIFIER: 400,
+    CTE: 300,
     TABLE: 200,
     DATABASE: 100,
     HDFS: 1,
@@ -68,6 +69,16 @@
     if (parseResult.suggestIdentifiers) {
       parseResult.suggestIdentifiers.forEach(function (identifier) {
         completions.push({value: identifier.name, meta: identifier.type, weight: DEFAULT_WEIGHTS.IDENTIFIER });
+      });
+    }
+
+    if (parseResult.suggestCommonTableExpressions) {
+      parseResult.suggestCommonTableExpressions.forEach(function (expression) {
+        var prefix = expression.prependQuestionMark ? '? ' : '';
+        if (expression.prependFrom) {
+          prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
+        }
+        completions.push({value: prefix + expression.name, meta: 'CTE', weight: DEFAULT_WEIGHTS.CTE });
       });
     }
 
