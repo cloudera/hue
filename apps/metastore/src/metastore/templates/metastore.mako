@@ -44,6 +44,7 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">

@@ -214,7 +214,7 @@
         endCol = Math.min(aoColumns.length, endCol + 1);
 
         var rowHeight = 29;
-        var invisibleOffset = aoColumns.length < 100 ? 10 : 1;
+        var invisibleOffset = $t.data('oInit')['forceInvisible'] ? $t.data('oInit')['forceInvisible'] : (aoColumns.length < 100 ? 10 : 1);
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
         var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
 
