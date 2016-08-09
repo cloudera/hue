@@ -36,7 +36,7 @@ from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
     _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
-from notebook.models import make_notebook
+from notebook.models import make_notebook, make_notebook2
 from notebook.api import _save_notebook
 
 
@@ -981,19 +981,41 @@ class TestModelAPI(OozieMockBase):
     assert_equal(len(_data['workflow']['nodes']), 4)
 
 
-  def test_gen_workflow_from_documents(self):
-    notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
-    notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
+  def test_gen_workflow_from_notebook(self):
+    snippets = [
+      {
+         'status': 'running',
+         'statement_raw': 'SHOW TABLES',
+         'statement': 'SHOW TABLES',
+         'type': 'query-hive',
+         'properties': {
+         },
+         'database': 'default',
+      },
+      {
+        'type': 'java',
+        'status': 'running',
+        'properties':  {
+          'files': [],
+          'class': 'org.apache.solr.hadoop.MapReduceIndexerTool',
+          'app_jar': '/user/hue/app.jar',
+          'arguments': [
+              '--morphline-file',
+              'morphline.conf',
+          ],
+          'archives': [],
+        }
+      }
+    ]
 
-    notebook2 = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
-    notebook2_doc, save_as = _save_notebook(notebook2.get_data(), self.user)
-
-    workflow_doc = WorkflowBuilder().create_workflow(documents=[notebook_doc, notebook2_doc], user=self.user, managed=True)
-
+    notebook = make_notebook2(name='2 actions', snippets=snippets)
+    notebook_data = notebook.get_data()
+    workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook_data, user=self.user, managed=True)
     workflow = Workflow(document=workflow_doc, user=self.user)
 
     _data = workflow.get_data()
 
     assert_equal(len(_data['workflow']['nodes']), 5)
-    assert_equal(len(re.findall('<ok to="doc-hive-', workflow.to_xml())), 1, workflow.to_xml())
-    assert_equal(len(re.findall('<action name="doc-hive-', workflow.to_xml())), 2, workflow.to_xml())
+    assert_equal(len(re.findall('<ok to="java-', workflow.to_xml())), 1, workflow.to_xml())
+    assert_equal(len(re.findall('<action name="hive-', workflow.to_xml())), 1, workflow.to_xml())
+    assert_equal(len(re.findall('<action name="java-', workflow.to_xml())), 1, workflow.to_xml())

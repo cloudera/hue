@@ -198,11 +198,17 @@ class Submission(object):
 
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
-        elif action.data['type'] == 'hive-document':
-          from notebook.models import Notebook
-          notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+        elif action.data['type'] == 'hive-document' or action.data['type'] == 'hive2':
+          if action.data['type'] == 'hive-document' and action.data['properties'].get('uuid'):
+            from notebook.models import Notebook
+            notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+            statements = notebook.get_str()
+          else:
+            statements = action.data['properties'].get('statements')
 
-          self._create_file(deployment_dir, action.data['name'] + '.sql', notebook.get_str())
+          if statements is not None:
+            self._create_file(deployment_dir, action.data['name'] + '.sql', statements)
+
         elif action.data['type'] == 'java-document' or action.data['type'] == 'java':
           if action.data['type'] == 'java-document':
             from notebook.models import Notebook

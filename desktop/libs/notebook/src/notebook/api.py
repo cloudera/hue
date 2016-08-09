@@ -666,5 +666,9 @@ def export_result(request):
     notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
     response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
     response['status'] = 0
+  elif data_format == 'search-index':
+    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+    response['status'] = 0
 
   return JsonResponse(response)

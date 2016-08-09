@@ -2935,7 +2935,7 @@ def _save_workflow(workflow, layout, user, fs=None):
 
   dependencies = \
       [node['properties']['workflow'] for node in workflow['nodes'] if node['type'] == 'subworkflow-widget'] + \
-      [node['properties']['uuid'] for node in workflow['nodes'] if 'document-widget' in node['type']]
+      [node['properties']['uuid'] for node in workflow['nodes'] if 'document-widget' in node['type'] and node['properties'].get('uuid')]
   if dependencies:
     dependency_docs = Document2.objects.filter(uuid__in=dependencies)
     workflow_doc.dependencies.add(*dependency_docs)
@@ -2973,7 +2973,7 @@ class WorkflowBuilder():
       if document.type == 'query-java':
         node = self.get_java_document_node(document, name)
       else:
-        node = self.get_hive_document_node(document, name, user)
+        node = self.get_hive_document_node(document, user)
 
       nodes.append(node)
 
@@ -2990,11 +2990,10 @@ class WorkflowBuilder():
       name = _('Schedule of ') + ','.join([snippet['name'] or snippet['type'] for snippet in notebook['snippets']])
 
     for snippet in notebook['snippets']:
-      print snippet
       if snippet['type'] == 'java':
         node = self.get_java_snippet_node(snippet)
-      elif snippet['type'] == 'java':
-        node = self.get_hive_document_node(snippet, user)
+      elif snippet['type'] == 'query-hive':
+        node = self.get_hive_snippet_node(snippet, user)
       else:
         raise PopupException(_('Snippet type %(type)s is not supported in batch execution.') % snippet)
 
@@ -3004,25 +3003,24 @@ class WorkflowBuilder():
 
     return workflow_doc
 
+  def get_document_parameters(self, document):
+    notebook = Notebook(document=document)
+    parameters = find_dollar_braced_variables(notebook.get_str())
 
-  def get_hive_document_node(self, document, name, user):
+    return [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
+
+  def _get_hive_node(self, node_id, user, is_document_node=False):
     api = get_oozie(user)
 
     credentials = [HiveDocumentAction.DEFAULT_CREDENTIALS] if api.security_enabled else []
 
-    notebook = Notebook(document=document)
-    parameters = find_dollar_braced_variables(notebook.get_str())
-    parameters = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters]
-
     return {
-        u'name': u'doc-hive-%s' % document.uuid[:4],
-        u'id': str(uuid.uuid4()),
-        u'type': u'hive-document-widget',
+        u'id': node_id,
+        u'name': u'hive-%s' % node_id[:4],
+        u"type": u"hive-document-widget", # if is_document_node else u"hive2-widget",
         u'properties': {
             u'files': [],
             u'job_xml': u'',
-            u'uuid': document.uuid, # + snippet uuid
-            u'parameters': parameters,
             u'retry_interval': [],
             u'retry_max': [],
             u'job_properties': [],
@@ -3050,13 +3048,32 @@ class WorkflowBuilder():
         u'actionParameters': [],
     }
 
+  def get_hive_snippet_node(self, snippet, user):
+    node = self._get_hive_node(snippet['id'], user)
+
+    node['properties']['parameters'] = []
+    node['properties']['statements'] = 'USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'])
+    node['properties']['parameters'] = []
+
+    return node
+
+  def get_hive_document_node(self, document, user):
+    node = self._get_hive_node(document.uuid, user, is_document_node=True)
+
+    notebook = Notebook(document=document)
+    parameters = find_dollar_braced_variables(notebook.get_str())
+    node['parameters'] = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters] #Todo check if need properties
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
   def _get_java_node(self, node_id, credentials=None, is_document_node=False):
     if credentials is None:
       credentials = []
 
     return {
         "id": node_id,
-        'name': 'doc-hive-%s' % node_id[:4],
+        'name': 'java-%s' % node_id[:4],
         "type": "java-document-widget" if is_document_node else "java-widget",
         "properties":{
               "job_xml": [],
@@ -3082,7 +3099,7 @@ class WorkflowBuilder():
   def get_java_snippet_node(self, snippet):
     credentials = []
 
-    node_id = snippet.get('id') or str(uuid.uuid4())
+    node_id = snippet.get('id', str(uuid.uuid4()))
 
     node = self._get_java_node(node_id, credentials)
     node['properties']['main_class'] = snippet['properties']['class']
@@ -3104,7 +3121,7 @@ class WorkflowBuilder():
     parameters = []
 
     data = {
-      'workflow': {
+      u'workflow': {
       u'name': name,
       u'nodes': [{
           u'name': u'Start',

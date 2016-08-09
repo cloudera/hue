@@ -17,12 +17,15 @@
 import logging
 import os
 
+from collections import deque
+
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 from mako.template import Template
 
-from collections import deque
+
+from desktop.models import Document2
 from notebook.api import _execute_notebook
 from notebook.models import make_notebook2
 from oozie.models2 import Job
@@ -33,6 +36,8 @@ from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.conf import zkensemble
+
+from notebook.connectors.base import get_api
 
 
 LOG = logging.getLogger(__name__)
@@ -61,11 +66,41 @@ class Indexer(object):
 
     return hdfs_workspace_path
 
-  def run_morphline(self, request, collection_name, morphline, input_path):
+  def run_morphline(self, request, collection_name, morphline, input_path, query=None):
     workspace_path = self._upload_workspace(morphline)
 
-    snippets = [
-      {
+    snippets = []
+
+    if query:
+      from notebook.models import Notebook
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
+      notebook_data = notebook.get_data()
+      snippet = notebook_data['snippets'][0]
+
+      api = get_api(request, snippet)
+
+      destination = '__hue_%s' % notebook_data['uuid'][:4]
+      location = '/user/%s/__hue-%s' % (request.user,  notebook_data['uuid'][:4])
+      sql, success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
+
+      statement = sql
+      input_path = '${nameNode}%s' % location
+
+      snippets.append({
+         'status': 'running',
+         'statement_raw': statement,
+         'statement': statement,
+         'type': 'query-hive',
+         'properties': {
+#             'files': [] if files is None else files,
+#             'functions': [] if functions is None else functions,
+#             'settings': [] if settings is None else settings
+         },
+         'database': snippet['database'],
+      }
+    )
+
+    snippets.append({
         u'type': u'java',
         u'status': u'running',
         u'properties':  {
@@ -92,7 +127,7 @@ class Indexer(object):
           u'archives': [],
         }
       }
-    ]
+    )
 
     notebook = make_notebook2(name='Indexer job for %s' % collection_name, snippets=snippets).get_data()
     snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook['snippets'][0]['id'], 'statement': ''}
@@ -102,25 +137,6 @@ class Indexer(object):
     return job_handle
 
   def guess_format(self, data):
-    """
-    Input:
-    data: {'type': 'file', 'path': '/user/hue/logs.csv'}
-    Output:
-    {'format':
-      {
-        type: 'csv',
-        fieldSeparator : ",",
-        recordSeparator: '\n',
-        quoteChar : "\""
-      },
-      'columns':
-        [
-          {name: business_id, type: string},
-          {name: cool, type: integer},
-          {name: date, type: date}
-          ]
-    }
-    """
     file_format = get_file_format_instance(data['file'])
     return file_format.get_format()
 
@@ -174,19 +190,6 @@ class Indexer(object):
     return field_type.regex.replace('\\', '\\\\')
 
   def generate_morphline_config(self, collection_name, data, uuid_name=None):
-    """
-    Input:
-    data: {
-      'type': {'name': 'My New Collection!' format': 'csv', 'columns': [{'name': business_id, 'included': True', 'type': 'string'}, cool, date], fieldSeparator : ",", recordSeparator: '\n', quoteChar : "\""},
-      'transformation': [
-        'country_code': {'replace': {'FRA': 'FR, 'CAN': 'CA'..}}
-        'ip': {'geoIP': }
-      ]
-    }
-    Output:
-    Morphline content 'SOLR_LOCATOR : { ...}'
-    """
-
     geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
     grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
 

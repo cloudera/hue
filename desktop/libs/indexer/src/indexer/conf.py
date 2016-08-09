@@ -60,6 +60,13 @@ def zkensemble():
 
 
 
+ENABLE_NEW_INDEXER = Config(
+  key="enable_new_indexer",
+  help=_t("Flag to turn on the morphline based Solr indexer."),
+  type=bool,
+  default=False
+)
+
 # Unused
 BATCH_INDEXER_PATH = Config(
   key="batch_indexer_path",

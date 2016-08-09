@@ -18,7 +18,9 @@
 import json
 import logging
 
+from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_NEW_EDITOR
@@ -148,6 +150,29 @@ def execute_and_watch(request):
   elif action == 'insert_as_query':
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+  elif action == 'index_query':
+    sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+
+    sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
+
+    from indexer.api3 import _index # Will ve moved to the lib in next commit
+    from indexer.file_format import HiveFormat
+    from indexer.fields import Field
+
+    file_format = {
+        'name': 'col',
+        'inputFormat': 'query',
+        'format': {'quoteChar': '"', 'recordSeparator': '\n', 'type': 'csv', 'hasHeader': False, 'fieldSeparator': '\u0001'},
+        "sample": '',
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in sample['meta']
+        ]
+    }
+
+    job_handle = _index(request, file_format, destination, query=notebook['uuid'])
+    return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
   else:
     raise PopupException(_('Action %s is unknown') % action)
 
