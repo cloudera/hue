@@ -239,6 +239,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'><''p>>",
+      "bAutoWidth": false,
       "aoColumns":[
         { "bSortable":false },
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
@@ -270,6 +271,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'><''p>>",
+      "bAutoWidth": false,
       "aoColumns":[
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
