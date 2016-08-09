@@ -24,6 +24,8 @@
     defaults = {
       fixedHeader: false,
       fixedFirstColumn: false,
+      fixedFirstColumnTopMargin: 0,
+      headerSorting: true,
       lockSelectedRow: false,
       firstColumnTooltip: false,
       classToRemove: 'resultTable',
@@ -280,11 +282,14 @@
     clonedCellTHead.appendTo(clonedCell);
     var clonedCellTH = originalTh.clone();
     clonedCellTH.appendTo(clonedCellTHead);
-    clonedCellTH.width(originalTh.width()).css("background-color", "#FFFFFF");
+    clonedCellTH.width(originalTh.width()).css({
+      "background-color": "#FFFFFF",
+      "border-color": "transparent"
+    });
     clonedCellTH.click(function () {
       originalTh.click();
     });
-    $('<tbody>').appendTo(clonedCell)
+    $('<tbody>').appendTo(clonedCell);
 
     var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth());
 
@@ -345,10 +350,10 @@
     });
 
     $pluginElement.parent().scroll(function () {
-      clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop()) + "px");
+      clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop() + plugin.options.fixedFirstColumnTopMargin) + "px");
     });
 
-    clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop()) + "px");
+    clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop() + plugin.options.fixedFirstColumnTopMargin) + "px");
 
     function positionClones() {
       var pos = plugin.options.stickToTopPosition;
@@ -409,7 +414,9 @@
         originalTh.removeAttr("data-bind");
         clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
           originalTh.click();
-          clonedTable.find("thead>tr th").attr("class", "sorting");
+          if (plugin.options.headerSorting) {
+            clonedTable.find("thead>tr th").attr("class", "sorting");
+          }
           $(this).attr("class", originalTh.attr("class"));
         });
       });

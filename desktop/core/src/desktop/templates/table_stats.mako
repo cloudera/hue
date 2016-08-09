@@ -36,6 +36,10 @@ from desktop.views import _ko
       background-color: #FFF !important;
       border: none !important;
     }
+
+    .samples-table tr td {
+      white-space: nowrap;
+    }
   </style>
 
   <script type="text/html" id="table-stats">
@@ -124,7 +128,6 @@ from desktop.views import _ko
               <div class="alert">${ _('The selected table has no data.') }</div>
               <!-- /ko -->
               <!-- ko if: rows.length > 0 -->
-              <div class="dataTables_wrapper" style="max-height: 300px; overflow: auto">
               <table id="samples-table" class="samples-table table table-striped table-condensed">
                 <thead>
                 <tr>
@@ -135,17 +138,8 @@ from desktop.views import _ko
                 </tr>
                 </thead>
                 <tbody>
-                <!-- ko foreach: rows -->
-                <tr>
-                  <td data-bind="text: $index()+1"></td>
-                  <!-- ko foreach: $data -->
-                  <td style="white-space: pre;" data-bind="text: $data"></td>
-                  <!-- /ko -->
-                </tr>
-                <!-- /ko -->
                 </tbody>
               </table>
-              </div>
               <!-- /ko -->
               <!-- /ko -->
             </div>
@@ -231,9 +225,9 @@ from desktop.views import _ko
               } else {
                 lastOffset.top = newTop - 210;
               }
-              self.popoverArrowTop($popover.outerHeight() / 2 + (lastOffset.top < 0 ? lastOffset.top - 10 : 0));
+              self.popoverArrowTop($popover.outerHeight() / 2 + (lastOffset.top < 0 ? lastOffset.top - 10 : 0) + (lastOffset.top > $(window).height() - $popover.outerHeight() ? lastOffset.top - ($(window).height() - $popover.outerHeight()) : 0));
 
-              lastOffset.top = Math.max(lastOffset.top, 10);
+              lastOffset.top = Math.min(Math.max(lastOffset.top, 10), $(window).height() - $popover.outerHeight());
               self.popoverTop(lastOffset.top);
               self.popoverLeft(lastOffset.left);
               if (self.popoverArrowTop() < 80) {
@@ -285,23 +279,47 @@ from desktop.views import _ko
             ko.renderTemplate('stats-popover', self, {
               afterRender: function(renderedElement) {
 
-                huePubSub.subscribe('sample.rendered', function () {
+                huePubSub.subscribe('sample.rendered', function (data) {
                   window.setTimeout(function () {
-                    $('.samples-table').hueDataTable({
-                      "oLanguage": {
-                        "sEmptyTable": "${_('No data available')}",
-                        "sZeroRecords": "${_('No matching records')}"
+                    var $t = $('.samples-table');
+                    if ($t.parent().hasClass('dataTables_wrapper')) {
+                      if ($t.parent().data('scrollFnDt')) {
+                        $t.parent().off('scroll', $t.parent().data('scrollFnDt'));
                       }
+                      $t.unwrap();
+                      if ($t.children('tbody').length > 0) {
+                        $t.children('tbody').empty();
+                      }
+                      else {
+                        $t.children('tr').remove();
+                      }
+                      $t.data('isScrollAttached', null);
+                      $t.data('data', []);
+                    }
+                    var dt = $t.hueDataTable({
+                      i18n: {
+                        NO_RESULTS: "${_('No results found.')}",
+                        OF: "${_('of')}"
+                      },
+                      fnDrawCallback: function (oSettings) {
+                      },
+                      scrollable: '.dataTables_wrapper',
+                      forceInvisible: 10
                     });
-                    $('.samples-table').jHueTableExtender({
+
+                    $t.parents('.dataTables_wrapper').jHueTableScroller().height(350);
+                    $t.jHueTableExtender({
                       fixedHeader: true,
                       fixedFirstColumn: true,
+                      fixedFirstColumnTopMargin: -1,
+                      headerSorting: false,
                       includeNavigator: false,
                       parentId: 'sampleTab',
                       classToRemove: 'samples-table',
                       clonedContainerPosition: "absolute"
                     });
-                    $('.samples-table').parents('.dataTables_wrapper').niceScroll({
+
+                    $t.parents('.dataTables_wrapper').niceScroll({
                       cursorcolor: "#CCC",
                       cursorborder: "1px solid #CCC",
                       cursoropacitymin: 0,
@@ -311,6 +329,18 @@ from desktop.views import _ko
                       cursorminheight: 20,
                       horizrailenabled: true
                     });
+
+                    if (data && data.rows) {
+                      var _tempData = [];
+                      $.each(data.rows, function (index, row) {
+                        var _row = row.slice(0); // need to clone the array otherwise it messes with the caches
+                        _row.unshift(index + 1);
+                        _tempData.push(_row);
+                      });
+                      if (_tempData.length > 0) {
+                        dt.fnAddData(_tempData);
+                      }
+                    }
                   }, 0);
                 });
 
