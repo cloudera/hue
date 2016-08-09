@@ -262,16 +262,10 @@ ${ assist.assistPanel() }
       $(".fileChooserBtn").click(function (e) {
         e.preventDefault();
         var _destination = $(this).attr("data-filechooser-destination");
-        var initialLoadValue = $('#id_load_data').val();
         function handleChoice(filePath){
           $("input[name='" + _destination + "']").val(filePath);
           $("#chooseFile").modal("hide");
-          if (filePath.toLowerCase().indexOf('s3') === 0){
-            $('#id_load_data').val('EXTERNAL').trigger('change').find('option[value="IMPORT"]').attr('disabled', 'disabled');
-          }
-          else {
-            $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
-          }
+          $('.pathChooser').trigger('change');
         }
         $("#filechooser").jHueFileChooser({
           initialPath: $("input[name='" + _destination + "']").val(),
@@ -289,6 +283,15 @@ ${ assist.assistPanel() }
         }
         else {
           $("#fileWillBeMoved").hide();
+        }
+      });
+      $('.pathChooser').change(function () {
+        var initialLoadValue = $('#id_load_data').val();
+        if ($(this).val().toLowerCase().indexOf('s3') === 0) {
+          $('#id_load_data').val('EXTERNAL').trigger('change').find('option[value="IMPORT"]').attr('disabled', 'disabled');
+        }
+        else {
+          $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
         }
       });
       $("#step2").click(function (e) {
