@@ -392,12 +392,20 @@ def export_documents(request):
 
 @ensure_csrf_cookie
 def import_documents(request):
-  if request.FILES.get('documents'):
-    documents = request.FILES['documents'].read()
-  else:
-    documents = json.loads(request.POST.get('documents'))
+  try:
+    if request.FILES.get('documents'):
+      documents = request.FILES['documents'].read()
+    else:
+      documents = json.loads(request.POST.get('documents'))
 
-  documents = json.loads(documents)
+    documents = json.loads(documents)
+  except ValueError, e:
+    raise PopupException(_('Failed to import documents, the file does not contain valid JSON.'))
+
+  # Validate documents
+  if not _is_import_valid(documents):
+    raise PopupException(_('Failed to import documents, the file does not contain the expected JSON schema for Hue documents.'))
+
   docs = []
 
   uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
@@ -439,6 +447,18 @@ def import_documents(request):
     return redirect(request.POST.get('redirect'))
   else:
     return JsonResponse({'message': stdout.getvalue()})
+
+
+def _is_import_valid(documents):
+  """
+  Validates the JSON file to be imported for schema correctness
+  :param documents: object loaded from JSON file
+  :return: True if schema seems valid, False otherwise
+  """
+  return isinstance(documents, list) and \
+    all(isinstance(d, dict) for d in documents) and \
+    all(all(k in d for k in ('pk', 'model', 'fields')) for d in documents) and \
+    all(all(k in d['fields'] for k in ('uuid', 'owner')) for d in documents)
 
 
 def _get_dependencies(documents, deps_mode=True):
