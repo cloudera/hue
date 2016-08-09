@@ -219,6 +219,7 @@ def test_yarn_ssl_validate():
       ({'data': True}, {'data': True}, True),
       ]:
     resets = [
+      conf.YARN_CLUSTERS.set_for_testing({'default': {}}),
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
       conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(**conf_kwargs),
     ]
