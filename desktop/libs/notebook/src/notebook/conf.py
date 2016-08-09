@@ -99,21 +99,24 @@ ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
   type=bool,
-  dynamic_default=is_oozie_enabled
+  default=False
+#  dynamic_default=is_oozie_enabled
 )
 
 ENABLE_BATCH_EXECUTE = Config(
   key="enable_batch_execute",
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
   type=bool,
-  dynamic_default=is_oozie_enabled
+  default=False
+#  dynamic_default=is_oozie_enabled
 )
 
 ENABLE_JAVA_DOCUMENT = Config(
   key="enable_java_document",
   help=_t("Flag to enable the Java document in editor and workflow."),
   type=bool,
-  dynamic_default=is_oozie_enabled
+  default=False
+#  dynamic_default=is_oozie_enabled
 )
 
 
