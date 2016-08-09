@@ -299,7 +299,7 @@ test: java-test
 
 test-slow: java-test
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test all --with-xunit --with-cover
-	$(BLD_DIR_BIN)/coverage xml
+	$(BLD_DIR_BIN)/coverage xml -i
 
 start-dev:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue runserver_plus
