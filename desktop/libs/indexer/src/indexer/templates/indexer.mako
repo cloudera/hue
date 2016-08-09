@@ -724,7 +724,7 @@ ${ assist.assistPanel() }
 
       self.show = ko.computed(function() {
         if (self.inputFormat() == 'file') {
-          return self.path().length > 0 && self.columns().length > 0;
+          return self.path().length > 0;
         } else if (self.inputFormat() == 'table') {
           return self.table().length > 0;
         } else if (self.inputFormat() == 'query') {
