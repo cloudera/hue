@@ -98,6 +98,7 @@
 <hive>'LOAD'                               { determineCase(yytext); return '<hive>LOAD'; }
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
+<hive>'MSCK'                               { return '<hive>MSCK'; }
 <hive>'NO_DROP'                            { return '<hive>NO_DROP'; }
 <hive>'OFFLINE'                            { return '<hive>OFFLINE'; }
 <hive>'ORC'                                { return '<hive>ORC'; }
@@ -107,11 +108,13 @@
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
 <hive>'PURGE'                              { return '<hive>PURGE'; }
 <hive>'RCFILE'                             { return '<hive>RCFILE'; }
+<hive>'REBUILD'                            { return '<hive>REBUILD'; }
+<hive>'RELOAD'                             { determineCase(yytext); return '<hive>RELOAD'; }
+<hive>'REPAIR'                             { return '<hive>REPAIR'; }
 <hive>'RECOVER'                            { return '<hive>RECOVER'; }
 <hive>'RENAME'                             { return '<hive>RENAME'; }
 <hive>'REPLACE'                            { return '<hive>REPLACE'; }
 <hive>'RESTRICT'                           { return '<hive>RESTRICT'; }
-<hive>'REBUILD'                            { return '<hive>REBUILD'; }
 <hive>'ROLE'                               { return '<hive>ROLE'; }
 <hive>'ROLES'                              { return '<hive>ROLES'; }
 <hive>'SCHEMA'                             { return '<hive>SCHEMA'; }
@@ -294,6 +297,7 @@
 'TINYINT'                                  { return 'TINYINT'; }
 'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
+'TRUNCATE'                                 { determineCase(yytext); return 'TRUNCATE'; }
 'UNBOUNDED'                                { return 'UNBOUNDED'; }
 'UPDATE'                                   { determineCase(yytext); return 'UPDATE'; }
 'USE'                                      { determineCase(yytext); return 'USE'; }

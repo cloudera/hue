@@ -29,6 +29,7 @@ CreateStatement
  | RoleDefinition
  | FunctionDefinition
  | IndexDefinition
+ | MacroDefinition
  ;
 
 CreateStatement_EDIT
@@ -37,15 +38,16 @@ CreateStatement_EDIT
  | ViewDefinition_EDIT
  | FunctionDefinition_EDIT
  | IndexDefinition_EDIT
+ | MacroDefinition_EDIT
  | AnyCreate OptionalHiveTemporary OptionalExternal 'CURSOR'
    {
      if ($3) {
        suggestKeywords(['TABLE']);
      } else if (isHive()) {
        if ($2) {
-         suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'TABLE']);
+         suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
        } else {
-         suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY TABLE', 'VIEW']);
+         suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'VIEW']);
        }
      } else if (isImpala()) {
        suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
@@ -1513,4 +1515,52 @@ IndexColumnList_EDIT
  | IndexColumnList ',' AnyCursor
  | AnyCursor ',' IndexColumnList
  | IndexColumnList ',' AnyCursor ',' IndexColumnList
+ ;
+
+MacroDefinition
+ : AnyCreate '<hive>TEMPORARY' '<hive>MACRO' RegularIdentifier MacroArguments ValueExpression
+ ;
+
+MacroDefinition_EDIT
+ : AnyCreate '<hive>TEMPORARY' '<hive>MACRO' RegularIdentifier MacroArguments_EDIT
+ | AnyCreate '<hive>TEMPORARY' '<hive>MACRO' RegularIdentifier MacroArguments_EDIT ValueExpression
+ | AnyCreate '<hive>TEMPORARY' '<hive>MACRO' RegularIdentifier MacroArguments 'CURSOR'
+   {
+     suggestFunctions();
+   }
+ | AnyCreate '<hive>TEMPORARY' '<hive>MACRO' RegularIdentifier MacroArguments ValueExpression_EDIT
+ ;
+
+MacroArguments
+ : '(' ')'
+ | '(' MacroArgumentList ')'
+ ;
+
+MacroArguments_EDIT
+ : '(' MacroArgumentList_EDIT RightParenthesisOrError
+ ;
+
+
+MacroArgumentList
+ : MacroArgument
+ | MacroArgumentList ',' MacroArgument
+ ;
+
+MacroArgumentList_EDIT
+ : MacroArgument_EDIT
+ | MacroArgumentList ',' MacroArgument_EDIT
+ | MacroArgument_EDIT ',' MacroArgumentList
+ | MacroArgumentList ',' MacroArgument_EDIT ',' MacroArgumentList
+ ;
+
+MacroArgument
+ : RegularIdentifier ColumnDataType
+ ;
+
+MacroArgument_EDIT
+ : RegularIdentifier 'CURSOR'
+   {
+     suggestKeywords(getColumnDataTypeKeywords());
+   }
+ | RegularIdentifier ColumnDataType_EDIT
  ;
