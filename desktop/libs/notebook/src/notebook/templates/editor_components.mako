@@ -2405,9 +2405,7 @@ ${ hueIcons.symbols() }
   function toggleAllColumns(linkElement, snippet) {
     var $t = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
     var dt = $t.hueDataTable();
-    $(linkElement).parents(".snippet").find('.filtered-meta td input').each(function (idx, item) {
-      dt.fnSetColumnVis(idx + 1, linkElement.checked, false);
-    });
+    dt.fnToggleAllCols(linkElement.checked);
     dt.fnDraw();
     if ($t.data('plugin_jHueTableExtender')) {
       $t.data('plugin_jHueTableExtender').drawHeader();
