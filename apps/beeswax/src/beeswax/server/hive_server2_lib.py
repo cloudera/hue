@@ -906,7 +906,7 @@ class HiveServerClient:
         # Format partition key and values into Hive format: [key1=val1/key2=value2]
         for values in partition_values:
           zipped_parts = izip(partition_keys, values)
-          partitions_formatted.append(['/'.join(['%s=%s' % (part[0], part[1]) for part in zipped_parts])])
+          partitions_formatted.append(['/'.join(['%s=%s' % (str(part[0]), str(part[1])) for part in zipped_parts if all(part)])])
 
         partitions = [PartitionValueCompatible(partition, table) for partition in partitions_formatted]
       except Exception, e:
