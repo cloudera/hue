@@ -200,6 +200,7 @@ define([
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' WHERE id = ',
         afterCursor: '',
+        containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
           suggestFunctions: { types: ['COLREF'] },
@@ -225,6 +226,7 @@ define([
       assertAutoComplete({
         beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' WHERE id = 1 AND ',
         afterCursor: '',
+        containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},

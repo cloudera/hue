@@ -173,6 +173,7 @@
 <impala>'FUNCTIONS'                        { return '<impala>FUNCTIONS'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
+<impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
@@ -347,6 +348,7 @@
 <hive>'PERCENT_RANK'                       { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
+[0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
 [A-Za-z][A-Za-z0-9_]*                      { return 'REGULAR_IDENTIFIER'; }
 
@@ -412,7 +414,7 @@
 <backtickedValue>\`                        { this.popState(); return 'BACKTICK'; }
 
 \'                                         { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
-<singleQuotedValue>[^']+                   {
+<singleQuotedValue>(?:\\[']|[^'])+         {
                                              if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
                                                this.popState();
                                                return 'PARTIAL_VALUE';
@@ -422,7 +424,7 @@
 <singleQuotedValue>\'                      { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                         { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<doubleQuotedValue>[^"]+                   { return 'VALUE'; }
+<doubleQuotedValue>(?:\\["]|[^"])+         { return 'VALUE'; }
 <doubleQuotedValue>\"                      { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                                    { return 'EOF'; }

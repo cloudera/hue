@@ -56,7 +56,6 @@ define([
     
     it('should not backtick non-reserved keywords', function () {
       expect(hiveSubject.backTickIfNeeded('transactions')).toEqual('transactions');
-      expect(hiveSubject.backTickIfNeeded('sort')).toEqual('sort');
       expect(impalaSubject.backTickIfNeeded('role')).toEqual('role');
     });
 

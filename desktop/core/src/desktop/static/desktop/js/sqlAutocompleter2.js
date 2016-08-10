@@ -488,7 +488,7 @@
   };
 
   var extraHiveReservedKeywords = {
-    ASC: true, DESC: true, FORMATTED: true, FUNCTION: true, INDEX: true, INDEXES: true, LIMIT: true, SCHEMA: true
+    ASC: true, CLUSTER: true, DESC: true, DISTRIBUTE: true, FORMATTED: true, FUNCTION: true, INDEX: true, INDEXES: true, LIMIT: true, SCHEMA: true, SORT: true
   };
 
   var impalaReservedKeywords = {
