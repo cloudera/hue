@@ -708,6 +708,8 @@ def coerce_password_from_script(script):
   stdout, stderr = p.communicate()
 
   if p.returncode != 0:
+    if stderr:
+      LOG.error("Failed to read password from script:\n%s" % stderr)
     if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
       raise subprocess.CalledProcessError(p.returncode, script)
     else:
