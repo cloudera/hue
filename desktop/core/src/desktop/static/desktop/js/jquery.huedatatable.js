@@ -39,6 +39,22 @@
       self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
     }
 
+    self.fnToggleAllCols = function (visible) {
+      var aoColumns = self.$table.data('aoColumns');
+      aoColumns.forEach(function(col, idx){
+        if (idx > 0){
+          col.bVisible = visible;
+        }
+      });
+      if (!visible) {
+        self.$table.find('th, td').hide();
+        self.$table.find('tr').find('td:eq(0),th:eq(0)').show();
+      } else {
+        self.$table.find('th, td').show();
+      }
+      self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
+    }
+
     self.fnSortColumn = function (obj, way) {
       var $t = self.$table;
       var data = self.$table.data('data');
