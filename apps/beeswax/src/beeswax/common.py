@@ -73,14 +73,13 @@ def apply_natural_sort(collection, key=None):
   """
   Applies a natural sort (http://rosettacode.org/wiki/Natural_sorting) to a list or dictionary
   Dictionary types require a sort key to be specified
-  Adapted from http://blog.codinghorror.com/sorting-for-humans-natural-sort-order/
   """
-  convert = lambda text: int(text) if text.isdigit() else text
+  to_digit = lambda i: int(i) if i.isdigit() else i
 
   def tokenize_and_convert(item, key=None):
     if key:
       item = item[key]
-    return [ convert(c) for c in re.split('([0-9]+)', item) ]
+    return [to_digit(c) for c in re.split('([0-9]+)', item)]
 
   return sorted(collection, key=lambda i: tokenize_and_convert(i, key=key))
 
