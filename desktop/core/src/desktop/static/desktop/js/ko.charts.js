@@ -503,9 +503,11 @@
             });
 
             window.setTimeout(function(){
-              _map.addLayer(_clusterGroup);
-              if (! $("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
+              if (!$("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
                 _map.fitBounds(_clusterGroup.getBounds());
+              }
+              if ($(element).find('.leaflet-tile-pane').children().length > 0) {
+                _map.addLayer(_clusterGroup);
               }
               if (_options.onComplete != null) {
                 _options.onComplete();
