@@ -54,28 +54,26 @@ define([
     });
 
     describe('hive specific', function () {
-      it('should suggest keywords for "DROP |"', function() {
+      it('should suggest keywords for "DROP |"', function () {
         assertAutoComplete({
           beforeCursor: 'DROP ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']
+            suggestKeywords: ['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']
           }
         });
       });
-    });
 
-    describe('hive specific', function () {
-      it('should follow case for "drop |"', function() {
+      it('should follow case for "drop |"', function () {
         assertAutoComplete({
           beforeCursor: 'drop ',
           afterCursor: '',
           dialect: 'hive',
+          containsKeywords: ['DATABASE'],
           expectedResult: {
-            lowerCase: true,
-            suggestKeywords: ['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']
+            lowerCase: true
           }
         });
       });
@@ -95,7 +93,7 @@ define([
       });
     });
 
-    describe('drop database statements', function () {
+    describe('DROP DATABASE', function () {
       it('should suggest databases for "DROP DATABASE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP DATABASE ',
@@ -160,14 +158,79 @@ define([
       });
     });
 
-    describe('drop table statements', function () {
+    describe('DROP INDEX', function () {
+      it('should handle "DROP INDEX IF EXISTS baa ON baa.boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INDEX IF EXISTS baa ON baa.boo;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP INDEX |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INDEX ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP INDEX IF |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INDEX IF ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP INDEX baa |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INDEX baa ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ON']
+          }
+        });
+      });
+
+      it('should suggest tabls for "DROP INDEX baa ON |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INDEX baa ON ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+    });
+
+    describe('DROP TABLE', function () {
       it('should suggest tables for "DROP TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE ',
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {},
+            suggestTables: { onlyTables: true },
             suggestKeywords: ['IF EXISTS'],
             suggestDatabases: {
               appendDot: true
@@ -182,7 +245,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'db' }
+            suggestTables: { onlyTables: true, database: 'db' }
           }
         });
       });
@@ -204,7 +267,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {},
+            suggestTables: { onlyTables: true },
             suggestDatabases: {
               appendDot: true
             }
@@ -229,5 +292,230 @@ define([
         });
       });
     });
+
+    describe('DROP TEMPORARY MACRO', function () {
+      it('should handle "DROP TEMPORARY MACRO IF EXISTS boo;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY MACRO IF EXISTS boo;',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['TEMPORARY MACRO'],
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP TEMPORARY |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['MACRO']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP TEMPORARY MACRO |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY MACRO ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP TEMPORARY MACRO IF |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY MACRO IF ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+    });
+
+    describe('DROP VIEW', function () {
+      it('should handle "DROP VIEW boo;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP VIEW boo;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DROP VIEW IF EXISTS baa.boo;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP VIEW IF EXISTS baa.boo;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest views for "DROP VIEW |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP VIEW ',
+          afterCursor: '',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { onlyViews: true },
+            suggestDatabases: { appendDot:true },
+            suggestKeywords: ['IF EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP VIEW IF |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP VIEW IF ',
+          afterCursor: '',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+
+      it('should suggest views for "DROP VIEW boo.|', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP VIEW boo.',
+          afterCursor: '',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'boo', onlyViews: true }
+          }
+        });
+      });
+    });
+
+    describe('TRUNCATE TABLE', function () {
+      it('should handle "TRUNCATE TABLE baa.boo;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'TRUNCATE TABLE baa.boo;',
+          afterCursor: '',
+          dialect: 'generic',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "TRUNCATE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'truncate ',
+          afterCursor: '',
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest tables for "TRUNCATE TABLE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'TRUNCATE TABLE ',
+          afterCursor: '',
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should handle "TRUNCATE TABLE boo PARTITION (baa=1, boo = \'baa\'); |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE boo PARTITION (baa=1, boo = \'baa\'); ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "TRUNCATE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TABLE']
+            }
+          });
+        });
+
+        it('should suggest tables for "TRUNCATE TABLE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "TRUNCATE TABLE boo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+      });
+    })
   });
 });

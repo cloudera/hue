@@ -264,6 +264,10 @@
       databaseName: parseResult.suggestTables.database || database,
       successCallback: function (data) {
         data.tables_meta.forEach(function (tablesMeta) {
+          if (parseResult.suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
+              parseResult.suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
+            return;
+          }
           completions.push({
             value: prefix + self.backTickIfNeeded(tablesMeta.name),
             meta: tablesMeta.type.toLowerCase(),

@@ -30,7 +30,86 @@ define([
 
     var assertAutoComplete = testUtils.assertAutocomplete;
 
-    describe('ALTER TABLE statements', function () {
+    describe('ALTER INDEX', function () {
+      it('should handle "ALTER INDEX baa ON boo.ba PARTITION (bla=1) REBUILD;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER INDEX baa ON boo.ba PARTITION (bla=1) REBUILD;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER INDEX |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['INDEX'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER INDEX boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER INDEX boo ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ON']
+          }
+        });
+      });
+
+      it('should suggest tables for "ALTER INDEX boo ON |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER INDEX boo ON ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER INDEX boo ON bla |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER INDEX boo ON bla ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION', 'REBUILD']
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER INDEX boo ON bla PARTITION (baa = 1) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER INDEX boo ON bla PARTITION (baa = 1) ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['REBUILD']
+          }
+        });
+      });
+    });
+
+    describe('ALTER TABLE', function () {
       it('should suggest keywords for "ALTER |"', function() {
         assertAutoComplete({
           beforeCursor: 'ALTER ',
@@ -48,7 +127,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {},
+            suggestTables: { onlyTables: true },
             suggestDatabases: { appendDot: true }
           }
         });
@@ -60,7 +139,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'foo' }
+            suggestTables: { database: 'foo', onlyTables: true  }
           }
         });
       });
@@ -1566,5 +1645,292 @@ define([
         });
       });
     });
+
+    describe('ALTER VIEW', function () {
+      it('should handle "ALTER VIEW baa.boo AS SELECT * FROM bla;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW baa.boo AS SELECT * FROM bla;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER ',
+          afterCursor: '',
+          containsKeywords: ['VIEW'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest views for "ALTER VIEW |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { onlyViews: true },
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest views for "ALTER VIEW boo.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW boo.',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'boo', onlyViews: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER VIEW boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW boo ',
+          afterCursor: '',
+          hasLocations: true,
+          containsKeywords: ['AS'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER VIEW baa.boo AS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW baa.boo AS ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest databases for "ALTER VIEW baa.boo AS SELECT * FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER VIEW baa.boo AS SELECT * FROM ',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should handle "ALTER VIEW boo SET TBLPROPERTIES ("baa"=\'boo\');|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo SET TBLPROPERTIES ("baa"=\'boo\');',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            hasLocations: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW boo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'SET TBLPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW boo SET |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo SET ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TBLPROPERTIES']
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should suggest handle "ALTER VIEW bloo.boo RENAME TO baa.bla;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW bloo.boo RENAME TO baa.bla;',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            hasLocations: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW boo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AS', 'RENAME TO']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER VIEW boo RENAME |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo RENAME ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TO']
+            }
+          });
+        });
+
+        it('should suggest databases for "ALTER VIEW boo RENAME TO |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER VIEW boo RENAME TO ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+      });
+    });
+
+    describe('MSCK', function () {
+      it('should handle "MSCK REPAIR TABLE boo.baa;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'MSCK REPAIR TABLE boo.baa;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['MSCK'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "MSCK |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'MSCK ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['REPAIR TABLE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "MSCK REPAIR |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'MSCK REPAIR ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['TABLE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "MSCK REPAIR TABLE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'MSCK REPAIR TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { onlyTables: true },
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+    });
+
+    describe('RELOAD FUNCTION', function () {
+      it('should handle "RELOAD FUNCTION;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'RELOAD FUNCTION;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['RELOAD FUNCTION'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "reload |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'reload ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['FUNCTION']
+          }
+        });
+      });
+    })
   });
 });

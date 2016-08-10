@@ -23,14 +23,59 @@ DataDefinition_EDIT
  ;
 
 AlterStatement
- : AlterTable
+ : AlterIndex
+ | AlterTable
+ | AlterView
+ | Msck
+ | ReloadFunction
  ;
 
 AlterStatement_EDIT
- : AlterTable_EDIT
+ : AlterIndex_EDIT
+ | AlterTable_EDIT
+ | AlterView_EDIT
+ | Msck_EDIT
+ | ReloadFunction_EDIT
  | 'ALTER' 'CURSOR'
    {
-     suggestKeywords(['TABLE']);
+     if (isHive()) {
+       suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
+     } else {
+       suggestKeywords(['TABLE', 'VIEW']);
+     }
+   }
+ ;
+
+AlterIndex
+ : 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>REBUILD'
+   {
+     addTablePrimary($5);
+   }
+ ;
+
+AlterIndex_EDIT
+ : 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     suggestKeywords(['ON']);
+   }
+ | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
+ | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+   {
+     addTablePrimary($5);
+   }
+ | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+   {
+     addTablePrimary($5);
+     if (!$6) {
+       suggestKeywords(['PARTITION', 'REBUILD']);
+     } else {
+       suggestKeywords(['REBUILD']);
+     }
    }
  ;
 
@@ -400,9 +445,14 @@ AlterTableLeftSide
 
 AlterTableLeftSide_EDIT
  : 'ALTER' AnyTable SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyTables = true;
+     }
+   }
  | 'ALTER' AnyTable 'CURSOR'
    {
-     suggestTables();
+     suggestTables({ onlyTables: true });
      suggestDatabases({ appendDot: true });
    }
  ;
@@ -604,4 +654,106 @@ OptionalCascadeOrRestrict
  :
  | '<hive>CASCADE'
  | '<hive>RESTRICT'
+ ;
+
+AlterView
+ : AlterViewLeftSide 'SET' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ | AlterViewLeftSide AnyAs QuerySpecification
+ | AlterViewLeftSide '<impala>RENAME' 'TO' RegularOrBacktickedIdentifier
+ | AlterViewLeftSide '<impala>RENAME' 'TO' RegularOrBacktickedIdentifier '<impala>.' RegularOrBacktickedIdentifier
+ ;
+
+AlterView_EDIT
+ : AlterViewLeftSide_EDIT
+ | AlterViewLeftSide 'CURSOR'
+   {
+     if (isHive()) {
+       suggestKeywords(['AS', 'SET TBLPROPERTIES']);
+     } else if (isImpala()) {
+       suggestKeywords(['AS', 'RENAME TO']);
+     } else {
+       suggestKeywords(['AS']);
+     }
+   }
+ | AlterViewLeftSide 'SET' 'CURSOR'
+   {
+     if (isHive()) {
+       suggestKeywords(['TBLPROPERTIES']);
+     }
+   }
+ | AlterViewLeftSide AnyAs 'CURSOR'
+   {
+     suggestKeywords(['SELECT']);
+   }
+ | AlterViewLeftSide AnyAs QuerySpecification_EDIT
+ | AlterViewLeftSide '<impala>RENAME' 'CURSOR'
+   {
+     suggestKeywords(['TO']);
+   }
+ | AlterViewLeftSide '<impala>RENAME' 'TO' 'CURSOR'
+   {
+     suggestDatabases({ appendDot: true });
+   }
+ ;
+
+
+AlterViewLeftSide
+ : 'ALTER' AnyView SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
+ ;
+
+AlterViewLeftSide_EDIT
+ : 'ALTER' AnyView SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
+ | 'ALTER' AnyView 'CURSOR'
+   {
+     suggestTables({ onlyViews: true });
+     suggestDatabases({ appendDot: true });
+   }
+ ;
+
+Msck
+ : '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($4);
+   }
+ ;
+
+Msck_EDIT
+ : '<hive>MSCK' 'CURSOR'
+   {
+     suggestKeywords(['REPAIR TABLE']);
+   }
+ | '<hive>MSCK' '<hive>REPAIR' 'CURSOR'
+   {
+     suggestKeywords(['TABLE']);
+   }
+ | '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' 'CURSOR'
+   {
+     suggestTables({ onlyTables: true });
+     suggestDatabases({ appendDot: true });
+   }
+ | '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
+ ;
+
+ReloadFunction
+ : '<hive>RELOAD' '<hive>FUNCTION'
+ ;
+
+ReloadFunction_EDIT
+ : '<hive>RELOAD' 'CURSOR'
+   {
+     suggestKeywords(['FUNCTION']);
+   }
  ;

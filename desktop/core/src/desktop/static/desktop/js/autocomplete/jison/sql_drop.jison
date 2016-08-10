@@ -25,21 +25,29 @@ DataDefinition_EDIT
 DropStatement
  : DropDatabaseStatement
  | DropTableStatement
+ | DropIndexStatement
+ | DropMacroStatement
+ | DropViewStatement
+ | TruncateTableStatement
  ;
 
 DropStatement_EDIT
- : 'DROP' 'CURSOR'
+ : DropDatabaseStatement_EDIT
+ | DropTableStatement_EDIT
+ | DropIndexStatement_EDIT
+ | DropMacroStatement_EDIT
+ | DropViewStatement_EDIT
+ | TruncateTableStatement_EDIT
+ | 'DROP' 'CURSOR'
    {
      if (isHive()) {
-       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'MACRO', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
      } else if (isImpala()) {
        suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
      } else {
        suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
      }
    }
- | DropDatabaseStatement_EDIT
- | DropTableStatement_EDIT
  ;
 
 DropDatabaseStatement
@@ -72,7 +80,10 @@ DropDatabaseStatement_EDIT
  ;
 
 DropTableStatement
- : 'DROP' AnyTable OptionalIfExists TablePrimary
+ : 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($4);
+   }
  ;
 
 DropTableStatement_EDIT
@@ -82,25 +93,133 @@ DropTableStatement_EDIT
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
      }
-     suggestTables();
+     suggestTables({ onlyTables: true });
      suggestDatabases({
        appendDot: true
      });
    }
- | 'DROP' AnyTable OptionalIfExists TablePrimary_EDIT
+ | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
    {
-     if ($4.identifierChain && $4.identifierChain.length === 1) {
-       suggestTablesOrColumns($4.identifierChain[0].name);
-     } else if ($4.identifierChain && $4.identifierChain.length === 0) {
-       suggestTables();
-       suggestDatabases({ appendDot: true });
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyTables = true;
      }
    }
- | 'DROP' AnyTable OptionalIfExists_EDIT TablePrimary
- | 'DROP' AnyTable OptionalIfExists TablePrimary 'CURSOR'
+ | 'DROP' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+ | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
    {
+     addTablePrimary($4);
      if (isHive()) {
        suggestKeywords(['PURGE']);
      }
+   }
+ ;
+
+DropIndexStatement
+ : 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($6);
+   }
+ ;
+
+DropIndexStatement_EDIT
+ : 'DROP' '<hive>INDEX' OptionalIfExists 'CURSOR'
+   {
+     suggestKeywords(['IF EXISTS']);
+   }
+ | 'DROP' '<hive>INDEX' OptionalIfExists_EDIT
+ | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     suggestKeywords(['ON']);
+   }
+ | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
+ ;
+
+DropMacroStatement
+ : 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists RegularIdentifier
+ ;
+
+DropMacroStatement_EDIT
+ : 'DROP' '<hive>TEMPORARY' 'CURSOR'
+   {
+     suggestKeywords(['MACRO']);
+   }
+ | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists 'CURSOR'
+   {
+     if (!$4) {
+       suggestKeywords(['IF EXISTS']);
+     }
+   }
+ | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists_EDIT
+ ;
+
+DropViewStatement
+ : 'DROP' AnyView OptionalIfExists SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($4);
+   }
+ ;
+
+DropViewStatement_EDIT
+ : 'DROP' AnyView OptionalIfExists 'CURSOR'
+   {
+     if (!$3) {
+       suggestKeywords(['IF EXISTS']);
+     }
+     suggestTables({ onlyViews: true });
+     suggestDatabases({ appendDot: true });
+   }
+ | 'DROP' AnyView OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($5);
+     if (!$3) {
+       suggestKeywords(['IF EXISTS']);
+     }
+   }
+ | 'DROP' AnyView OptionalIfExists_EDIT
+ | 'DROP' AnyView OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($4);
+   }
+ | 'DROP' AnyView OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
+ ;
+
+TruncateTableStatement
+ : 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     addTablePrimary($3);
+   }
+ ;
+
+TruncateTableStatement_EDIT
+ : 'TRUNCATE' 'CURSOR'
+   {
+     suggestKeywords(['TABLE']);
+   }
+ | 'TRUNCATE' AnyTable 'CURSOR' OptionalPartitionSpec
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+   {
+     addTablePrimary($3);
+     if (isHive() && !$4) {
+       suggestKeywords(['PARTITION']);
+     }
+   }
+ | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+   {
+     addTablePrimary($3);
    }
  ;
