@@ -1007,6 +1007,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} + 1 = ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER']},
@@ -1208,6 +1209,7 @@ define([
           beforeCursor: 'SELECT row_number() OVER (PARTITION BY ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1221,6 +1223,7 @@ define([
           beforeCursor: 'SELECT row_number() OVER (PARTITION BY a, ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1488,6 +1491,7 @@ define([
           beforeCursor: 'SELECT COUNT(foo, ',
           afterCursor: ') FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1501,6 +1505,7 @@ define([
           beforeCursor: 'SELECT COUNT(foo, bl',
           afterCursor: ',bla) FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1526,6 +1531,7 @@ define([
           beforeCursor: 'SELECT COUNT(foo, bl = ',
           afterCursor: ',bla) FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -1541,6 +1547,7 @@ define([
           beforeCursor: 'SELECT CAST(',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {}
@@ -1553,6 +1560,7 @@ define([
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1566,6 +1574,7 @@ define([
           beforeCursor: 'SELECT CAST(bla',
           afterCursor: ' FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1579,6 +1588,7 @@ define([
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1592,6 +1602,7 @@ define([
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS INT FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1605,6 +1616,7 @@ define([
           beforeCursor: 'SELECT CAST(',
           afterCursor: ' AS STRING) FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1618,6 +1630,7 @@ define([
           beforeCursor: 'SELECT CAST(bla',
           afterCursor: ' AS STRING) FROM bar;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1706,6 +1719,7 @@ define([
           afterCursor: ' FROM bar;',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['TIMESTAMP'] },
@@ -1720,6 +1734,7 @@ define([
           afterCursor: ' FROM bar;',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -1734,6 +1749,7 @@ define([
           afterCursor: ') FROM bar;',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['TIMESTAMP'] },
@@ -1748,6 +1764,7 @@ define([
           afterCursor: ') FROM bar;',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -1872,6 +1889,7 @@ define([
             afterCursor: ') FROM testTable',
             dialect: binaryFunction.dialect,
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
@@ -1915,6 +1933,7 @@ define([
           beforeCursor: 'SELECT id, SUM(a * ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -1947,6 +1966,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN a = b AND ',
           afterCursor: ' THEN FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1962,6 +1982,7 @@ define([
           beforeCursor: 'SELECT CASE a = b AND ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -1989,6 +2010,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN a = b OR ',
           afterCursor: ' THEN boo FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2004,6 +2026,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN a = b OR c THEN boo OR ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2019,6 +2042,7 @@ define([
           beforeCursor: 'SELECT CASE a =',
           afterCursor: ' WHEN c THEN d END FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2037,6 +2061,7 @@ define([
           beforeCursor: 'SELECT CASE a =',
           afterCursor: ' WHEN c THEN d ELSE e END FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2069,6 +2094,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d=',
           afterCursor: ' ELSE FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2111,6 +2137,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ELSE ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2126,6 +2153,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN d ELSE e AND ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2141,6 +2169,7 @@ define([
           beforeCursor: 'SELECT CASE ELSE ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2202,6 +2231,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN THEN boo OR ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2349,6 +2379,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' THEN FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2364,6 +2395,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' = a FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2382,6 +2414,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN ab',
           afterCursor: ' THEN bla ELSE foo FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2397,6 +2430,7 @@ define([
           beforeCursor: 'SELECT CASE bla WHEN ab',
           afterCursor: ' THEN bla ELSE foo END FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2412,6 +2446,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2427,6 +2462,7 @@ define([
           beforeCursor: 'SELECT CASE a WHEN ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2442,6 +2478,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN a = ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -2486,6 +2523,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2501,6 +2539,7 @@ define([
           beforeCursor: 'SELECT CASE a = c WHEN c THEN ',
           afterCursor: ' g FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2516,6 +2555,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN THEN ',
           afterCursor: ' g FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2531,6 +2571,7 @@ define([
           beforeCursor: 'SELECT CASE WHEN THEN ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -2875,6 +2916,7 @@ define([
             afterCursor: '',
             dialect: 'hive',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['ARRAY', 'MAP' ] },
@@ -2909,6 +2951,7 @@ define([
             afterCursor: '',
             dialect: 'hive',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['ARRAY' ] },
@@ -3349,6 +3392,7 @@ define([
           afterCursor: '',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3364,6 +3408,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable t, t.testMap m WHERE m.field = ',
           afterCursor: '',
           dialect: 'impala',
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3434,7 +3479,183 @@ define([
       });
     });
 
+    describe('Dates', function () {
+      describe('Impala specific', function () {
+        it('should suggest keywords for "SELECT now() +|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT now() +',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT now() -|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT now() -',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT now() *|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT now() *',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            doesNotContainKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT \'1980-07-03\' +|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT  \'1980-07-03\' +',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT now() + INTERVAL 1 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT now() + INTERVAL 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DAYS', 'HOURS', 'MICROSECONDS', 'MILLISECONDS', 'MINUTES', 'MONTHS', 'NANOSECONDS', 'SECONDS', 'WEEKS', 'YEARS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT \'1999-01-01\' + INTERVAL 1 MONTH - |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT \'1999-01-01\' + INTERVAL 1 MONTH - ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT to_utc_timestamp(now() + |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT to_utc_timestamp(now() + ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['TIMESTAMP'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT date_sub(now(), |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT date_sub(now(), ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['INT'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT date_add(now(), |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT date_add(now(), ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['INTERVAL'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['INT'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT date_add(now(), INTERVAL 100 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT date_add(now(), INTERVAL 100 ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            containsKeywords: ['DAYS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+    });
+
     describe('Value Expression Completion', function() {
+      it('should suggest functions for "SELECT \'boo \\\' baa\' = |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT \'boo \\\' baa\' = ',
+          afterCursor: '',
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['STRING'] }
+          }
+        });
+      });
+
+      it('should suggest functions for "SELECT "boo \\" baa" = |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT "boo \\" baa" = ',
+          afterCursor: '',
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['STRING'] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.',
+          afterCursor: '',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { types: ['T'], table: 'tbl2' }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.',
@@ -3465,6 +3686,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE id =',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3506,6 +3728,7 @@ define([
           beforeCursor: 'SELECT 1 < ',
           afterCursor: ' FROM testTable WHERE id = 1;',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3519,6 +3742,7 @@ define([
           beforeCursor: 'select foo from tbl where ',
           afterCursor: ' % 2 = 0',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3532,6 +3756,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE -id = ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -3548,6 +3773,7 @@ define([
           afterCursor: '',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -3562,6 +3788,7 @@ define([
           afterCursor: '',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -3618,6 +3845,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -3632,6 +3860,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -3646,6 +3875,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -3660,6 +3890,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -3674,6 +3905,7 @@ define([
           afterCursor: ' b, c AS bla, d FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -3711,6 +3943,7 @@ define([
           beforeCursor: 'SELECT greatest(1, 2, a, 4, ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['T'] },
@@ -3724,6 +3957,7 @@ define([
           beforeCursor: 'SELECT greatest(1, ',
           afterCursor: ', a, 4) FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['T'] },
@@ -3738,6 +3972,7 @@ define([
           afterCursor: ') FROM testTable',
           hasLocations: true,
           dialect: 'hive',
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
@@ -3752,6 +3987,7 @@ define([
           afterCursor: ') FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['DOUBLE'] },
@@ -3790,6 +4026,7 @@ define([
           afterCursor: ') FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -3804,6 +4041,7 @@ define([
           afterCursor: ', 1, 2) FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'STRING' ] },
@@ -3819,6 +4057,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -3833,6 +4072,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
@@ -3847,10 +4087,26 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
             suggestColumns: { types: [ 'BIGINT' ], table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest typed columns for "SELECT CAST(18446744073709001000BD AS DECIMAL(38,0)) = | FROM testTable"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT CAST(18446744073709001000BD AS DECIMAL(38,0)) = ',
+          afterCursor: ' FROM testTable',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: [ 'DECIMAL' ] },
+            suggestColumns: { types: [ 'DECIMAL' ], table: 'testTable' }
           }
         });
       });
@@ -3861,6 +4117,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'BIGINT' ] },
@@ -3875,6 +4132,7 @@ define([
           afterCursor: ' FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'TIMESTAMP' ] },
@@ -3889,6 +4147,7 @@ define([
           afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
           dialect: 'impala',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: [ 'INT' ] },
@@ -3915,6 +4174,7 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' > id FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3930,6 +4190,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' = id',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3945,6 +4206,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d >= ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3960,6 +4222,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d < ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3975,6 +4238,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <= ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -3990,6 +4254,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <=> ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -4005,6 +4270,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d <> ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -4020,6 +4286,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d >= ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -4035,6 +4302,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d > ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -4050,6 +4318,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d != ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -4065,6 +4334,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d + 1 != ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4078,6 +4348,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE bla',
           afterCursor: ' + 1 != 3',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4091,6 +4362,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d + ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4104,6 +4376,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d - ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4117,6 +4390,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d * ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4130,6 +4404,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d / ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4143,6 +4418,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d % ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4156,6 +4432,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d | ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4169,6 +4446,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d & ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4182,6 +4460,7 @@ define([
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d ^ ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -4349,6 +4628,7 @@ define([
           beforeCursor: 'SELECT * FROM foo bla, bar WHERE id IS NULL AND ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -4362,6 +4642,7 @@ define([
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL && ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -4376,6 +4657,7 @@ define([
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL OR ',
           afterCursor: ' AND 1 + 1 > 1',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -4390,6 +4672,7 @@ define([
           beforeCursor: 'SELECT * FROM foo AS bla WHERE id IS NULL || ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -4443,6 +4726,32 @@ define([
       });
 
       describe('Hive specific', function () {
+        it('should suggest functions for "SELECT 100Y = |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 100Y = ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['CASE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
+        it('should suggest functions for "SELECT 100BD = |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 100BD = ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['CASE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['NUMBER'] }
+            }
+          });
+        });
+
         it('should suggest keywords for "SELECT bar FROM foo WHERE id = 1 |"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
@@ -4530,6 +4839,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE foo = \'bar\' AND ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -4605,6 +4915,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' = \'bar\' AND ',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['STRING'] },
@@ -4644,6 +4955,7 @@ define([
           beforeCursor: 'SELECT * FROM testTable WHERE a BETWEEN ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
@@ -5108,6 +5420,7 @@ define([
             afterCursor: '',
             dialect: 'hive',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -5125,6 +5438,7 @@ define([
             afterCursor: '',
             dialect: 'impala',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -5503,6 +5817,7 @@ define([
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -5516,6 +5831,7 @@ define([
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -5529,6 +5845,7 @@ define([
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -5541,6 +5858,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (',
           afterCursor: ' AND testTable1.testColumn1 = testTable2.testColumn3',
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
@@ -5585,6 +5903,7 @@ define([
           beforeCursor: 'select * from testTable1 join db.testTable2 on ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: true,
             suggestFunctions: {},
@@ -5598,6 +5917,7 @@ define([
           beforeCursor: 'select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['COLREF' ]},
@@ -5878,6 +6198,7 @@ define([
             afterCursor: ' AND t1.c1 = t2.c2',
             dialect: 'hive',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -6068,6 +6389,7 @@ define([
             afterCursor: ' AND t1.c1 = t2.c2',
             dialect: 'impala',
             hasLocations: true,
+            containsKeywords: ['CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -6158,6 +6480,7 @@ define([
           beforeCursor: 'select * from foo, bar where bar.bla in (\'a\', ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['COLREF'] },
@@ -6274,6 +6597,7 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE ',
           afterCursor: ' % 2 = 0',
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
@@ -6412,6 +6736,7 @@ define([
           afterCursor: ' FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar',
           hasLocations: true,
           dialect: 'generic',
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['T'] },

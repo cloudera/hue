@@ -620,6 +620,19 @@ define([
             }
           });
         });
+
+        it('should handle "create table four_k as select 4096 as x;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'create table four_k as select 4096 as x;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: true
+            }
+          });
+        });
       });
 
       describe('Hive specific', function () {

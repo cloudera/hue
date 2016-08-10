@@ -147,16 +147,23 @@ var addColRefIfExists = function (valueExpression) {
   }
 };
 
-var valueExpressionSuggest = function (oppositeValueExpression) {
+var valueExpressionSuggest = function (oppositeValueExpression, operator) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
     suggestValues();
     parser.yy.result.colRef = {identifierChain: oppositeValueExpression.columnReference};
   }
   suggestColumns();
   suggestFunctions();
+  var keywords = ['CASE'];
+  if (isHive() || typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
+    keywords = keywords.concat(['EXISTS', 'NOT']);
+  }
   if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
     applyTypeToSuggestions(['NUMBER']);
+  } else if (isImpala() && (typeof operator === 'undefined' || operator === '-' || operator === '+')) {
+    keywords.push('INTERVAL');
   }
+  suggestKeywords(keywords);
 };
 
 var applyTypeToSuggestions = function (types) {
@@ -196,6 +203,7 @@ var applyArgumentTypesToSuggestions = function (functionName, position) {
     delete parser.yy.result.suggestValues;
     delete parser.yy.result.suggestFunctions;
     delete parser.yy.result.suggestIdentifiers;
+    delete parser.yy.result.suggestKeywords;
   } else {
     applyTypeToSuggestions(foundArguments);
   }
