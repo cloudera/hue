@@ -248,19 +248,19 @@ class HiveServer2Dbms(object):
     return self.execute_and_watch(query, design=design)
 
 
-  def select_star_from(self, database, table):
+  def select_star_from(self, database, table, limit=10000):
     if table.partition_keys:  # Filter on max number of partitions for partitioned tables
-      hql = self._get_sample_partition_query(database, table, limit=10000) # Currently need a limit
+      hql = self._get_sample_partition_query(database, table, limit=limit) # Currently need a limit
     else:
-      hql = "SELECT * FROM `%s`.`%s`" % (database, table.name)
+      hql = "SELECT * FROM `%s`.`%s` LIMIT %d;" % (database, table.name, limit)
     return self.execute_statement(hql)
 
 
-  def get_select_star_query(self, database, table):
+  def get_select_star_query(self, database, table, limit=10000):
     if table.partition_keys:  # Filter on max number of partitions for partitioned tables
-      hql = self._get_sample_partition_query(database, table, limit=10000) # Currently need a limit
+      hql = self._get_sample_partition_query(database, table, limit=limit) # Currently need a limit
     else:
-      hql = "SELECT * FROM `%s`.`%s`" % (database, table.name)
+      hql = "SELECT * FROM `%s`.`%s` LIMIT %d;" % (database, table.name, limit)
     return hql
 
 
@@ -323,11 +323,11 @@ class HiveServer2Dbms(object):
       if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-        hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
+        hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
       else:
-        hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
+        hql = "SELECT * FROM `%s`.`%s` LIMIT %s;" % (database, table.name, limit)
     else:
-      hql = "SELECT %s FROM `%s`.`%s` LIMIT %s" % (column, database, table.name, limit)
+      hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
       # TODO: Add nested select support for HS2
 
     if hql:
