@@ -2377,16 +2377,20 @@
         }
       }
 
-      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal));
+      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal, allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.linkMarkup));
     }
   };
 
 
-  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon, isNestedModal) {
+  function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon, isNestedModal, linkMarkup) {
     var _btn;
     if (isAddon) {
       _btn = $("<span>").addClass("add-on muted pointer").text("..");
-    } else {
+    }
+    else if (linkMarkup) {
+      _btn = $("<a>").addClass("btn").addClass("fileChooserBtn").text("..");
+    }
+    else {
       _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..");
     }
     _btn.click(function (e) {

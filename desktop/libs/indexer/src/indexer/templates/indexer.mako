@@ -83,7 +83,11 @@ ${ assist.assistPanel() }
   }
 
   .fileChooserBtn {
-    margin-top: -2px;
+    height: 29px;
+  }
+
+  .form-control.path {
+    vertical-align: top;
   }
 
   .form-actions {
@@ -258,7 +262,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
               <label for="path" class="control-label"><div>${ _('Path') }</div>
-                <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { skipInitialPathIfEmpty: true }">
+                <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
               </label>
             </div>
 
