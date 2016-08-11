@@ -41,8 +41,8 @@
 
     self.fnToggleAllCols = function (visible) {
       var aoColumns = self.$table.data('aoColumns');
-      aoColumns.forEach(function(col, idx){
-        if (idx > 0){
+      aoColumns.forEach(function (col, idx) {
+        if (idx > 0) {
           col.bVisible = visible;
         }
       });
@@ -233,20 +233,26 @@
         var invisibleOffset = $t.data('oInit')['forceInvisible'] ? $t.data('oInit')['forceInvisible'] : (aoColumns.length < 100 ? 10 : 1);
         var scrollable = $t.parents($t.data('oInit')['scrollable']);
         var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
-
+        if ($t.data('oInit')['contained']) {
+          visibleRows = Math.ceil(scrollable.height() / rowHeight);
+        }
         visibleRows += invisibleOffset;
+        visibleRows = Math.max(visibleRows, 11);
 
         var startRow = $t.offset().top - 73 < 0 ? Math.max(Math.floor(Math.abs($t.offset().top - 73) / rowHeight) - invisibleOffset, 0) : 0;
+        if ($t.data('oInit')['contained']) {
+          startRow = Math.max(0, (Math.floor(Math.abs($t.position().top) / rowHeight)) - invisibleOffset);
+        }
         var endRow = startRow + visibleRows + invisibleOffset;
 
         if (endRow != $t.data('endRow') || (endRow == $t.data('endRow') && endCol > $t.data('endCol')) || force) {
           $t.data('endCol', endCol);
           $t.data('endRow', endRow);
 
-          if ($t.data('fnDraws') == 0) {
+          if ($t.data('fnDraws') === 0) {
             var html = '';
             for (var i = 0; i < data.length; i++) {
-              html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+              html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 29px"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
             }
             appendable.html(html);
             if ($t.data('plugin_jHueTableExtender')) {
@@ -408,7 +414,7 @@
         var drawTimeout = -1;
         if (self.$table.data('oInit')['scrollable'] && !self.$table.data('isScrollAttached')) {
           self.$table.data('isScrollAttached', true);
-          var scrollFn = function(){
+          var scrollFn = function () {
             window.clearTimeout(drawTimeout);
             drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns').length, 500)));
           }

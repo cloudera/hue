@@ -1720,20 +1720,22 @@
           document: self.uuid(),
           coordinator: self.coordinatorUuid()
         }, function (data) {
-          $("#schedulerEditor").html(data.layout);
-          self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+          if ($("#schedulerEditor").length > 0) {
+            $("#schedulerEditor").html(data.layout);
+            self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
 
-          ko.cleanNode($("#schedulerEditor")[0]);
-          ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+            ko.cleanNode($("#schedulerEditor")[0]);
+            ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
-          huePubSub.publish('render.jqcron');
+            huePubSub.publish('render.jqcron');
 
-          self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-          self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-          self.schedulerViewModel.isEditing(true);
+            self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+            self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+            self.schedulerViewModel.isEditing(true);
 
-          if (_action == 'new') {
-            self.saveScheduler();
+            if (_action == 'new') {
+              self.saveScheduler();
+            }
           }
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
@@ -2087,7 +2089,12 @@
           var notebook = data.data;
           self.loadNotebook(notebook, queryTab);
           if (typeof skipUrlChange === 'undefined'){
-            hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+            if (self.editorMode()) {
+              hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+            }
+            else {
+              hueUtils.changeURL('/notebook/notebook?notebook=' + data.document.id);
+            }
           }
           if (typeof callback !== 'undefined'){
             callback();
