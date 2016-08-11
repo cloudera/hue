@@ -967,7 +967,7 @@ ${ hueIcons.symbols() }
       }"></div>
   </div>
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll, with: selectedNotebook">
+  <div class="right-panel" data-bind="event: { scroll: function(){ var ls = $('.right-panel').data('lastScroll'); if (ls && ls != $('.right-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.right-panel').data('lastScroll', $('.right-panel').scrollTop()) } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -2856,6 +2856,7 @@ ${ hueIcons.symbols() }
               });
             }
             else {
+              $('.right-panel').data('lastScroll', $('.right-panel').scrollTop());
               $('.right-panel').trigger('scroll');
               if (_el.data('plugin_jHueTableExtender')) {
                 _el.data('plugin_jHueTableExtender').drawHeader();
