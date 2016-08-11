@@ -1450,9 +1450,7 @@ OptionalGroupByClause_EDIT
  : AnyGroup 'BY' GroupByColumnList_EDIT
  | AnyGroup 'BY' 'CURSOR'
    {
-     suggestColumns();
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     valueExpressionSuggest();
    }
  | AnyGroup 'CURSOR'
    {
@@ -1461,26 +1459,35 @@ OptionalGroupByClause_EDIT
  ;
 
 GroupByColumnList
- : DerivedColumnOrUnsignedInteger
- | GroupByColumnList ',' DerivedColumnOrUnsignedInteger
+ : ValueExpression
+ | GroupByColumnList ',' ValueExpression
  ;
 
 GroupByColumnList_EDIT
- : DerivedColumnOrUnsignedInteger_EDIT
- | 'CURSOR' DerivedColumnOrUnsignedInteger
+ : ValueExpression_EDIT
+ | 'CURSOR' ValueExpression
    {
-     suggestColumns();
+     valueExpressionSuggest();
    }
+ | 'CURSOR' ',' GroupByColumnList
+   {
+     valueExpressionSuggest();
+   }
+ | ValueExpression_EDIT ',' GroupByColumnList
  | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT
  | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT ','
  | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT ',' GroupByColumnList
  ;
 
 GroupByColumnListPartTwo_EDIT
- : DerivedColumnOrUnsignedInteger_EDIT
+ : ValueExpression_EDIT
+ | AnyCursor ValueExpression
+   {
+     valueExpressionSuggest();
+   }
  | AnyCursor
    {
-     suggestColumns();
+     valueExpressionSuggest();
    }
  ;
 
@@ -1514,7 +1521,7 @@ OrderByColumnList_EDIT
  : OrderByIdentifier_EDIT
  | 'CURSOR' OrderByIdentifier
    {
-     suggestColumns();
+     valueExpressionSuggest();
      suggestAnalyticFunctions();
    }
  | OrderByColumnList ',' OrderByIdentifier_EDIT
@@ -1523,26 +1530,17 @@ OrderByColumnList_EDIT
  ;
 
 OrderByIdentifier
- : DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast  -> mergeSuggestKeywords($2, $3)
+ : ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast  -> mergeSuggestKeywords($2, $3)
  ;
 
 OrderByIdentifier_EDIT
- : DerivedColumnOrUnsignedInteger_EDIT OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
- | DerivedColumnOrUnsignedInteger OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
+ : ValueExpression_EDIT OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
+ | ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
  | AnyCursor OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
-     suggestColumns();
+     valueExpressionSuggest();
      suggestAnalyticFunctions();
    }
- ;
-
-DerivedColumnOrUnsignedInteger
- : DerivedColumn_TWO
- | 'UNSIGNED_INTEGER'
- ;
-
-DerivedColumnOrUnsignedInteger_EDIT
- : DerivedColumn_EDIT_TWO
  ;
 
 OptionalAscOrDesc
