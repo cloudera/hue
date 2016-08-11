@@ -616,6 +616,18 @@ var suggestFileFormats = function () {
   }
 };
 
+var getKeywordsForOptionalsLR = function (optionals, keywords) {
+  var result = [];
+  for (var i = 0; i < optionals.length; i++) {
+    if (!optionals[i]) {
+      result.push(keywords[i]);
+    } else {
+      break;
+    }
+  }
+  return result;
+};
+
 var suggestDdlAndDmlKeywords = function () {
   var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
 
