@@ -19,7 +19,7 @@
 %x hdfs doubleQuotedValue singleQuotedValue backtickedValue
 %%
 
-[ \t\n]                                    { /* skip whitespace */ }
+\s                                         { /* skip whitespace */ }
 '--'.*                                     { /* skip comments */ }
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]        { /* skip comments */ }
 
