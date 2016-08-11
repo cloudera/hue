@@ -848,7 +848,7 @@ class TestFileBrowserWithHadoop(object):
                            dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
         response = json.loads(resp.content)
         assert_equal(-1, response['status'], response)
-        assert_true('Permission denied' in response['data'], response)
+        assert_true('User not_me does not have permissions' in response['data'], response)
       except AttributeError:
         # Seems like a Django bug.
         # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
