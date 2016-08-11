@@ -40,6 +40,7 @@
 <hive>'DESCRIBE'                           { determineCase(yytext); return '<hive>DESCRIBE'; }
 <hive>'EXTENDED'                           { return '<hive>EXTENDED'; }
 <hive>'EXTERNAL'                           { return '<hive>EXTERNAL'; }
+<hive>'FOR'                                { return '<hive>FOR'; }
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
@@ -52,10 +53,12 @@
 // Non-reserved Keywords
 <hive>'ADD'                                { return '<hive>ADD'; }
 <hive>'AFTER'                              { return '<hive>AFTER'; }
+<hive>'ANALYZE'                            { determineCase(yytext); return '<hive>ANALYZE'; }
 <hive>'ARCHIVE'                            { return '<hive>ARCHIVE'; }
 <hive>'ASC'                                { return '<hive>ASC'; }
 <hive>'AVRO'                               { return '<hive>AVRO'; }
 <hive>'BUCKETS'                            { return '<hive>BUCKETS'; }
+<hive>'CACHE'                              { return '<hive>CACHE'; }
 <hive>'CASCADE'                            { return '<hive>CASCADE'; }
 <hive>'CHANGE'                             { return '<hive>CHANGE'; }
 <hive>'CLUSTER'                            { return '<hive>CLUSTER'; }
@@ -65,6 +68,7 @@
 <hive>'COMMENT'                            { return '<hive>COMMENT'; }
 <hive>'COMPACT'                            { return '<hive>COMPACT'; }
 <hive>'COMPACTIONS'                        { return '<hive>COMPACTIONS'; }
+<hive>'COMPUTE'                            { return '<hive>COMPUTE'; }
 <hive>'CONCATENATE'                        { return '<hive>CONCATENATE'; }
 <hive>'DATA'                               { return '<hive>DATA'; }
 <hive>'DATABASES'                          { return '<hive>DATABASES'; }
@@ -98,7 +102,9 @@
 <hive>'LOAD'                               { determineCase(yytext); return '<hive>LOAD'; }
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
+<hive>'METADATA'                           { return '<hive>METADATA'; }
 <hive>'MSCK'                               { return '<hive>MSCK'; }
+<hive>'NOSCAN'                             { return '<hive>NOSCAN'; }
 <hive>'NO_DROP'                            { return '<hive>NO_DROP'; }
 <hive>'OFFLINE'                            { return '<hive>OFFLINE'; }
 <hive>'ORC'                                { return '<hive>ORC'; }
@@ -127,6 +133,7 @@
 <hive>'SKEWED LOCATION'                    { return '<hive>SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
 <hive>'SORT'                               { return '<hive>SORT'; }
 <hive>'SORTED'                             { return '<hive>SORTED'; }
+<hive>'STATISTICS'                         { return '<hive>STATISTICS'; }
 <hive>'STORED'                             { return '<hive>STORED'; }
 <hive>STORED[ \t\n]+AS[ \t\n]+DIRECTORIES  { return '<hive>STORED_AS_DIRECTORIES'; }
 <hive>'STRING'                             { return '<hive>STRING'; }
