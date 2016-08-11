@@ -195,11 +195,11 @@ def check_status(request):
       status = 'failed'
     if notebook['type'].startswith('query'):
       nb_doc = Document2.objects.get(id=notebook['id'])
-      nb_doc.can_write_or_exception(request.user)
-      nb = Notebook(document=nb_doc).get_data()
-      nb['snippets'][0]['status'] = status
-      nb_doc.update_data(nb)
-      nb_doc.save()
+      if nb_doc.can_write(request.user):
+        nb = Notebook(document=nb_doc).get_data()
+        nb['snippets'][0]['status'] = status
+        nb_doc.update_data(nb)
+        nb_doc.save()
 
   return JsonResponse(response)
 
