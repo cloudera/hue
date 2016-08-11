@@ -48,7 +48,7 @@ class RdbmsApi(Api):
     query_server = dbms.get_query_server_config(server=self.interpreter)
     db = dbms.get(self.user, query_server)
 
-    db.use(snippet['database'])
+    db.use(snippet['database']) # TODO: only do the use on the first statement in a multi query
     table = db.execute_statement(snippet['statement'])  # TODO: execute statement stub in Rdbms
 
     data = list(table.rows())

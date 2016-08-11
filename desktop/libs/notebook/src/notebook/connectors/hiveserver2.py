@@ -218,7 +218,8 @@ class HS2Api(Api):
     query = self._prepare_hql_query(snippet, statement['statement'], session)
 
     try:
-      db.use(query.database)
+      if statement.get('statement_id') == 0:
+        db.use(query.database)
       handle = db.client.query(query)
     except QueryServerException, ex:
       raise QueryError(ex.message, handle=statement)
