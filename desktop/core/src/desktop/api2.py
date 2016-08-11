@@ -17,8 +17,8 @@
 
 import logging
 import json
-import tempfile
 import StringIO
+import tempfile
 import zipfile
 
 from datetime import datetime
@@ -423,23 +423,26 @@ def import_documents(request):
 
     # If the doc contains any history dependencies, ignore them
     # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
-    deps_minus_history = [dep for dep in doc.get('dependencies', []) if len(dep) >= 3 and not dep[2]]
-    doc['dependencies'] = deps_minus_history
+    deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
+    doc['fields']['dependencies'] = deps_minus_history
 
     # Set last modified date to now
     doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
     docs.append(doc)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
-
   f.write(json.dumps(docs))
   f.flush()
 
   stdout = StringIO.StringIO()
   try:
-    management.call_command('loaddata', f.name, stdout=stdout)
+    management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
   except Exception, e:
-    return JsonResponse({'message': smart_str(e)})
+    stdout.seek(0)
+    LOG.error('Failed to run loaddata command in import_documents:\n %s' % stdout.read())
+    return JsonResponse({'status': -1, 'message': smart_str(e)})
+  finally:
+    stdout.close()
 
   Document.objects.sync()
 
