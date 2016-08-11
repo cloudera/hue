@@ -1908,6 +1908,7 @@ SelectList
 
 SelectList_EDIT
  : SelectSubList_EDIT
+ | SelectSubList_EDIT ',' SelectList
  | 'CURSOR' SelectList
    {
      suggestFunctions();
@@ -2442,38 +2443,61 @@ UserDefinedFunction_EDIT
  ;
 
 ArbitraryFunction
- : 'REGULAR_IDENTIFIER' '(' ')'
+ : RegularIdentifier ArbitraryFunctionRightPart
    {
      addFunctionLocation(@1, $1);
-     $$ = { types: findReturnTypes($1) }
+     if ($2.expression) {
+       $$ = { function: $1, expression: $2.expression, types: findReturnTypes($1) }
+     } else {
+       $$ = { function: $1, types: findReturnTypes($1) }
+     }
    }
- | 'REGULAR_IDENTIFIER' '(' ValueExpressionList ')'
+ | 'IF' ArbitraryFunctionRightPart
    {
      addFunctionLocation(@1, $1);
-     $$ = { function: $1, expression: $3, types: findReturnTypes($1) }
+     if ($2.expression) {
+       $$ = { function: $1, expression: $2.expression, types: findReturnTypes($1) }
+     } else {
+       $$ = { function: $1, types: findReturnTypes($1) }
+     }
    }
  ;
 
 ArbitraryFunction_EDIT
- : 'REGULAR_IDENTIFIER' '(' AnyCursor RightParenthesisOrError
+ : RegularIdentifier ArbitraryFunctionRightPart_EDIT
    {
      addFunctionLocation(@1, $1);
+     if ($2.position) {
+       applyArgumentTypesToSuggestions($1, $2.position);
+     }
+     $$ = { types: findReturnTypes($1) };
+   }
+ | 'IF' ArbitraryFunctionRightPart_EDIT
+   {
+     addFunctionLocation(@1, $1);
+     if ($2.position) {
+       applyArgumentTypesToSuggestions($1, $2.position);
+     }
+     $$ = { types: findReturnTypes($1) };
+   }
+ ;
+
+ArbitraryFunctionRightPart
+ : '(' ')'
+ | '(' ValueExpressionList ')'  -> { expression: $2 }
+ ;
+
+ArbitraryFunctionRightPart_EDIT
+ : '(' AnyCursor RightParenthesisOrError
+   {
      valueExpressionSuggest();
-     applyArgumentTypesToSuggestions($1, 1);
-     $$ = { types: findReturnTypes($1) };
+     $$ = { position: 1 }
    }
- | 'REGULAR_IDENTIFIER' '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
+ | '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     addFunctionLocation(@1, $1);
      suggestValueExpressionKeywords($3);
-     $$ = { types: findReturnTypes($1) };
    }
- | 'REGULAR_IDENTIFIER' '(' ValueExpressionList_EDIT RightParenthesisOrError
-   {
-     addFunctionLocation(@1, $1);
-     applyArgumentTypesToSuggestions($1, $3.position);
-     $$ = { types: findReturnTypes($1) };
-   }
+ | '(' ValueExpressionList_EDIT RightParenthesisOrError      -> $2
  ;
 
 AggregateFunction

@@ -58,6 +58,23 @@ define([
       });
     });
 
+    it('should suggest tables and databases for "SELECT *\\r\\n |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT *\r\n',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables:{
+            prependFrom:true
+          },
+          suggestDatabases:{
+            prependFrom:true,
+            appendDot:true
+          }
+        }
+      });
+    });
+
     it('should suggest keywords for "SELECT foo, bar |"', function() {
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar ',
@@ -422,6 +439,39 @@ define([
           }
         });
       });
+
+      it('should suggest columns "SELECT IF(baa, boo, bee) AS b, | FROM testTable;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT IF(baa, boo, bee) AS b, ',
+          afterCursor: ' FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestAnalyticFunctions: true,
+            suggestAggregateFunctions: true,
+            suggestColumns: { table: 'testTable'},
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
+      it('should suggest columns "SELECT IF(baa > 2, boo, bee) AS b, | FROM testTable;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT IF(baa > 2, boo, bee) AS b, ',
+          afterCursor: ' FROM testTable',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestAnalyticFunctions: true,
+            suggestAggregateFunctions: true,
+            suggestColumns: { table: 'testTable'},
+            suggestKeywords: ['*']
+          }
+        });
+      });
+
 
       it('should handle "SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60; |"', function () {
         assertAutoComplete({
@@ -5080,6 +5130,19 @@ define([
     });
 
     describe('ORDER BY Clause', function () {
+      xit('should suggest keywords for "SELECT * FROM testTable GROUP BY a | LIMIT 10"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable GROUP BY a ',
+          afterCursor: ' LIMIT 10',
+          hasLocations: true,
+          doesNotContainKeywords: ['LIMIT'],
+          containsKeywords: ['ORDER BY'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "SELECT * FROM testTable ORDER |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable ORDER ',
