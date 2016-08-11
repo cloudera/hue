@@ -235,7 +235,7 @@ body {
   z-index: 400;
   position: absolute;
   background-color: #338BB8;
-  color: #DBE8F1;
+  color: #C2CFD8;
   height: 54px;
   width: 54px;
   border-radius: 28px;
@@ -396,7 +396,7 @@ body {
 }
 
 .snippet-icon {
-  color: #d1d1d1;
+  color: #aaa;
   height: 16px;
   width: 16px;
   -webkit-transition: color 0.2s ease;
@@ -543,7 +543,7 @@ body {
   top: 2px;
   right: 4px;
   z-index: 1000;
-  color: #D1D1D1;
+  color: #aaa;
   font-size: 12px;
   -webkit-transition: margin-right 0.2s linear, color 0.5s ease;
   -moz-transition: margin-right 0.2s linear, color 0.5s ease;
@@ -731,7 +731,7 @@ h1.empty {
   padding-left: 5px;
   font-size: 13px !important;
   font-family: 'Ubuntu Mono', Monaco, Consolas, monospace !important;
-  color: #D1D1D1 !important;
+  color: #aaa !important;
   font-style: normal !important;
 }
 
@@ -879,7 +879,7 @@ table.airy tr td {
 }
 
 .snippet-side-btn {
-  color: #DBE8F1;
+  color: #C2CFD8;
   display: inline-block;
   line-height: 27px;
   height: 27px;
@@ -895,11 +895,11 @@ table.airy tr td {
 
 .snippet-side-btn.disabled {
   cursor: default !important;
-  color: #DBE8F1 !important;
+  color: #C2CFD8 !important;
 }
 
 .snippet-side-btn:focus {
-  color: #DBE8F1;
+  color: #C2CFD8;
 }
 
 .snippet-side-btn.active {
@@ -915,7 +915,7 @@ table.airy tr td {
 }
 
 .execution-timer {
-  color: #d1d1d1;
+  color: #aaa;
   font-size: 12px;
   font-weight: lighter;
 }
