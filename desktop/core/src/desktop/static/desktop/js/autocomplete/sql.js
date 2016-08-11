@@ -869,21 +869,15 @@ case 901: case 903: case 905: case 907:
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
-case 902:
+case 902: case 906:
 
-     addColRefIfExists();
+     addColRefIfExists($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 904: case 908:
 
      addColRefIfExists($$[$0-2]);
-     this.$ = { types: [ 'BOOLEAN' ] }
-   
-break;
-case 906:
-
-     addColRefIfExists($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;

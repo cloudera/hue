@@ -369,7 +369,7 @@ ValueExpression_EDIT
    }
  | ValueExpression_EDIT 'OR' ValueExpression
    {
-     addColRefIfExists();
+     addColRefIfExists($3);
      $$ = { types: [ 'BOOLEAN' ] }
    }
  | ValueExpression 'OR' PartialBacktickedOrAnyCursor

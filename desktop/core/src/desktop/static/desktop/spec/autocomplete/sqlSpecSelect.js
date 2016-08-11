@@ -3698,6 +3698,20 @@ define([
         });
       });
 
+      it('should suggest identifiers for "SELECT 1 = | OR false FROM tableOne boo, tableTwo baa;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT 1 = ',
+          afterCursor: ' OR false FROM tableOne boo, tableTwo baa;',
+          containsKeywords: ['CASE'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestIdentifiers: [{ name: 'boo.', type: 'alias'}, { name: 'baa.', type: 'alias'}]
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE id = atbl2.',
