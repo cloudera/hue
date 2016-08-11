@@ -2269,22 +2269,16 @@ ${ hueIcons.symbols() }
           $(el).jHueHorizontalScrollbar();
         }
         else {
-          $(el).parents(".dataTables_wrapper").jHueTableScroller({
-            maxHeight: DATATABLES_MAX_HEIGHT,
-            heightAfterCorrection: 0
-          });
-          $(el).jHueTableExtender({
-            fixedHeader: true,
-            fixedFirstColumn: true,
-            lockSelectedRow: true,
-            includeNavigator: false,
-            mainScrollable: '.right-panel',
-            parentId: 'snippet_' + snippet.id(),
-            clonedContainerPosition: "absolute"
-          });
+          if ($(el).data('fnDraws') === 1) {
+            $(el).parents(".dataTables_wrapper").jHueTableScroller({
+              maxHeight: DATATABLES_MAX_HEIGHT,
+              heightAfterCorrection: 0
+            });
+          }
         }
       },
-      scrollable: '.right-panel'
+      scrollable: vm.editorMode() ? '.right-panel' : '.dataTables_wrapper',
+      contained: !vm.editorMode()
     });
 
     if (vm.editorMode()) {
@@ -2302,10 +2296,14 @@ ${ hueIcons.symbols() }
       $(el).jHueHorizontalScrollbar();
     }
     else {
-      $(el).parents(".dataTables_wrapper").jHueTableScroller({
-        maxHeight: DATATABLES_MAX_HEIGHT,
-        heightAfterCorrection: 0,
-        enableNiceScroll: true
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        lockSelectedRow: true,
+        includeNavigator: false,
+        mainScrollable: '.right-panel',
+        parentId: 'snippet_' + snippet.id(),
+        clonedContainerPosition: "absolute"
       });
     }
 
