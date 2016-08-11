@@ -493,7 +493,7 @@ define([
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 161, last_column: 173 }, identifierChain: [{ name: 'id'}], database: 'tstDb1', table: 'b1' },
               { type: 'function', location: { first_line: 1, last_line: 1, first_column: 178, last_column: 181 }, function: 'year' },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 183, last_column: 194 }, identifierChain: [{ name: 'tran_d' }], table: 'tran' },
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 234, last_column: 235 }, identifierChain: [{ name: 'cat' }], database: 'tstDb1', table: 'b1' }
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 228, last_column: 241 }, identifierChain: [{ name: 'cat' }], database: 'tstDb1', table: 'b1' }
             ]
           }
         });
@@ -511,10 +511,10 @@ define([
             suggestIdentifiers: [{ name: 't3.', type: 'alias'}, { name: 't4.', type: 'alias'}],
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, table: 'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40},identifierChain: [{ name: 'a'}], table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 49, last_column: 50},identifierChain: [{ name: 'b'}], table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 55, last_column: 56},identifierChain: [{ name: 'c'}], table:'testTable'},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 66, last_column: 67},identifierChain: [{ name: 'd'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 41},identifierChain: [{ name: 'a'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 51},identifierChain: [{ name: 'b'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 53, last_column: 57},identifierChain: [{ name: 'c'}], table:'testTable'},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 64, last_column: 68},identifierChain: [{ name: 'd'}], table:'testTable'},
               { type: 'column', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 14},identifierChain: [{ name: 'bla'}], table:'testTable2'},
               { type: 'table', location: { first_line: 2, last_line: 2, first_column: 20, last_column: 30}, table: 'testTable2'},
               { type: 'table', location: { first_line: 3, last_line: 3, first_column: 15, last_column: 25}, table: 'testTable3'},
@@ -1223,8 +1223,10 @@ define([
           beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
           afterCursor: ' FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -1235,8 +1237,10 @@ define([
           beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
           afterCursor: ') FROM testTable',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -5160,8 +5164,10 @@ define([
           beforeCursor: 'SELECT * FROM testTable ORDER BY ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestColumns: { table: 'testTable' }
           }
@@ -5173,8 +5179,10 @@ define([
           beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestColumns: { database: 'database_two', table: 'testTable' }
           }
@@ -5194,13 +5202,45 @@ define([
         });
       });
 
+      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo + |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo + ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestColumns: { types: ['NUMBER'], database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo, |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo, ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
+            suggestAnalyticFunctions: true,
+            suggestColumns: { database: 'database_two', table: 'testTable' }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo + baa ASC, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo + baa ASC, ',
+          afterCursor: '',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestColumns: { database: 'database_two', table: 'testTable' }
           }
@@ -5212,8 +5252,10 @@ define([
           beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ASC, ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestColumns: { database: 'database_two', table: 'testTable' }
           }
@@ -5417,8 +5459,10 @@ define([
           afterCursor: '',
           dialect: 'generic',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult : {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
@@ -5430,21 +5474,40 @@ define([
           afterCursor: '',
           dialect: 'generic',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult : {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
 
-      it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |, foo"', function() {
+      it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla+|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla+',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult : {
+            lowerCase: false,
+            suggestFunctions: { types: ['NUMBER'] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla+foo, |, foo"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
           afterCursor: ', foo',
           dialect: 'generic',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult : {
             lowerCase: false,
+            suggestFunctions: {},
             suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
@@ -5455,8 +5518,10 @@ define([
           beforeCursor: 'SELECT * FROM testTable GROUP BY ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestColumns: { table: 'testTable' }
           }
         });
@@ -5467,8 +5532,10 @@ define([
           beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestFunctions: {},
             suggestColumns: { database: 'database_two', table: 'testTable' }
           }
         });
