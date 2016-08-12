@@ -1121,7 +1121,7 @@ class Document2(models.Model):
         url = '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
       else:
         url = reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
-    except NoReverseMatch, e:
+    except NoReverseMatch:
       LOG.warn('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
     return url
 
@@ -1178,9 +1178,9 @@ class Document2(models.Model):
 
   def validate(self):
     # Validate document name
-    invalid_chars = re.compile(r"[<>/{}[\]~`]");
-    if invalid_chars.search(self.name):
-      raise FilesystemException(_('Document %s contains an invalid character.') % self.name)
+    invalid_chars = re.findall(re.compile(r"[<>/{}[\]~`]"), self.name)
+    if invalid_chars:
+      raise FilesystemException(_('Document %s contains some special characters: %s') % (self.name, invalid_chars))
 
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in [Document2.HOME_DIR, Document2.TRASH_DIR] and self.type == 'directory' and \

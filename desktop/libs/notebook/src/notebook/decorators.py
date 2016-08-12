@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
-from desktop.models import Document2, Document
+from desktop.models import Document2, Document, FilesystemException
 
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout
 
@@ -91,6 +91,9 @@ def api_error_handler(func):
       response['message'] = e.message
     except OperationTimeout, e:
       response['status'] = -4
+    except FilesystemException, e:
+      response['status'] = 2
+      response['message'] = e.message
     except QueryError, e:
       LOG.exception('Error running %s' % func)
       response['status'] = 1
