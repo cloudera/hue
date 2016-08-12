@@ -135,7 +135,7 @@
 <hive>'SORTED'                             { return '<hive>SORTED'; }
 <hive>'STATISTICS'                         { return '<hive>STATISTICS'; }
 <hive>'STORED'                             { return '<hive>STORED'; }
-<hive>STORED[ \t\n]+AS[ \t\n]+DIRECTORIES  { return '<hive>STORED_AS_DIRECTORIES'; }
+<hive>STORED\s+AS\s+DIRECTORIES            { return '<hive>STORED_AS_DIRECTORIES'; }
 <hive>'STRING'                             { return '<hive>STRING'; }
 <hive>'STRUCT'                             { return '<hive>STRUCT'; }
 <hive>'TABLES'                             { return '<hive>TABLES'; }
@@ -187,7 +187,7 @@
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
-<impala>LIKE[ \t\n]+PARQUET                { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
+<impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
 <impala>'LINES'                            { return '<impala>LINES'; }
 <impala>'LOAD'                             { determineCase(yytext); return '<impala>LOAD'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }

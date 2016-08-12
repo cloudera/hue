@@ -1057,7 +1057,7 @@ ImpalaAggregateFunctionDefinition
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
  ;
 
-ImpalaAggregateFunctionDefinition
+ImpalaAggregateFunctionDefinition_EDIT
  : AnyCreate '<impala>AGGREGATE' 'CURSOR'
    {
      suggestKeywords(['FUNCTION']);
