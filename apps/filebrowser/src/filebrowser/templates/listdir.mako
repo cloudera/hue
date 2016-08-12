@@ -117,6 +117,10 @@ ${ fb_components.menubar() }
         <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fire"></i> ${_('Empty trash')}</button>
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           % if show_upload_button:
+          <!-- ko if: isS3 -->
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+          <!-- /ko -->
+          <!-- ko ifnot: isS3 -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
             <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
@@ -127,6 +131,7 @@ ${ fb_components.menubar() }
               <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="fa fa-gift"></i> ${_('Zip/Tgz/Bz2 file')}</a></li>
             </ul>
           </div>
+          <!-- /ko -->
           % endif
           <div class="btn-group" style="vertical-align: middle">
             <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
