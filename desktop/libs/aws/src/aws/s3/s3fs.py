@@ -16,13 +16,13 @@
 
 from __future__ import absolute_import
 
-import sys
-
 import errno
 import itertools
 import logging
 import os
 import posixpath
+import re
+import sys
 
 from boto.exception import S3ResponseError
 from boto.s3.key import Key
@@ -36,6 +36,8 @@ from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
+
+BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
 
@@ -73,7 +75,7 @@ class S3FileSystem(object):
         bucket = self._s3_connection.create_bucket(name)
         self._bucket_cache[name] = bucket
       else:
-        raise e
+        raise S3FileSystemException(e.message)
     return bucket
 
   def _delete_bucket(self, name):
@@ -276,6 +278,8 @@ class S3FileSystem(object):
     Actually it creates an empty object: s3://[bucket]/[path]/
     """
     bucket_name, key_name = s3.parse_uri(path)[:2]
+    if not BUCKET_NAME_PATTERN.match(bucket_name):
+      raise S3FileSystemException(_('Invalid bucket name: %s') % bucket_name)
     self._get_or_create_bucket(bucket_name)
     stats = self._stats(path)
     if stats:
