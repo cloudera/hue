@@ -1282,6 +1282,11 @@
       self.coordinatorUuid(self.dependentsCoordinator()[0].uuid());
     }
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
+    self.history.subscribe(function(val) {
+      if (self.id() == null && val.length == 0) {
+        self.snippets()[0].currentQueryTab('savedQueries');
+      }
+    });
     self.historyFilter = ko.observable('');
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: 300 });
