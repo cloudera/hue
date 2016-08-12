@@ -158,6 +158,175 @@ define([
       });
     });
 
+    describe('DROP FUNCTION', function () {
+      describe('Hive specific', function () {
+        it('should handle "DROP FUNCTION IF EXISTS baa;', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF EXISTS baa;',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['FUNCTION'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['IF EXISTS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should handle "DROP AGGREGATE FUNCTION IF EXISTS baa.boo(INT, STRING ...);', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP AGGREGATE FUNCTION IF EXISTS baa.boo(INT, STRING ...);',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['AGGREGATE FUNCTION', 'FUNCTION'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP AGGREGATE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP AGGREGATE ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['FUNCTION'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['IF EXISTS'],
+            expectedResult: {
+              lowerCase: false,
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP AGGREGATE FUNCTION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP AGGREGATE FUNCTION ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['IF EXISTS'],
+            expectedResult: {
+              lowerCase: false,
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION IF |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['EXISTS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest databases for "DROP FUNCTION IF EXISTS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF EXISTS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION IF EXISTS baa.boo(|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF EXISTS baa.boo(',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            doesNotContainKeywords: ['...'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION IF EXISTS baa.boo(INT |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF EXISTS baa.boo(INT ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['...'],
+            doesNotContainKeywords: ['INT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "DROP FUNCTION IF EXISTS baa.boo(INT, STRING, |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP FUNCTION IF EXISTS baa.boo(INT, STRING, ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT'],
+            doesNotContainKeywords: ['...'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      })
+    });
+
     describe('DROP INDEX', function () {
       it('should handle "DROP INDEX IF EXISTS baa ON baa.boo;|"', function() {
         assertAutoComplete({
