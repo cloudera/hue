@@ -312,6 +312,7 @@
     var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
       huePubSub.publish('redraw.fixed.headers');
+      huePubSub.publish('tab.switched', newValue);
       if (newValue === 'savedQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
         self.fetchQueries();
       }
