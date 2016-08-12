@@ -35,6 +35,7 @@
 <hive>'CONF'                               { return '<hive>CONF'; }
 <hive>'CREATE'                             { determineCase(yytext); return '<hive>CREATE'; }
 <hive>'CROSS'                              { return '<hive>CROSS'; }
+<hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
 <hive>'DATE'                               { return '<hive>DATE'; }
 <hive>'DESCRIBE'                           { determineCase(yytext); return '<hive>DESCRIBE'; }
@@ -43,9 +44,11 @@
 <hive>'FOR'                                { return '<hive>FOR'; }
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
+<hive>'GROUPING'                           { return '<hive>GROUPING'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
 <hive>'MAP'                                { return '<hive>MAP'; }
+<hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
 <hive>'USER'                               { return '<hive>USER'; }
 <hive>'USING'                              { return '<hive>USING'; }
@@ -128,6 +131,7 @@
 <hive>'SEQUENCEFILE'                       { return '<hive>SEQUENCEFILE'; }
 <hive>'SERDE'                              { return '<hive>SERDE'; }
 <hive>'SERDEPROPERTIES'                    { return '<hive>SERDEPROPERTIES'; }
+<hive>'SETS'                               { return '<hive>SETS'; }
 <hive>'SHOW'                               { determineCase(yytext); return '<hive>SHOW'; }
 <hive>'SKEWED'                             { return '<hive>SKEWED'; }
 <hive>'SKEWED LOCATION'                    { return '<hive>SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
@@ -265,7 +269,6 @@
 'FROM'                                     { return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
 'GROUP'                                    { return 'GROUP'; }
-'GROUPING'                                 { return 'GROUPING'; } // Not in Impala?
 'HAVING'                                   { return 'HAVING'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }

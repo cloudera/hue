@@ -20,7 +20,7 @@
 %left '=' '<' '>' 'COMPARISON_OPERATOR'
 %left '-' '*' 'ARITHMETIC_OPERATOR'
 
-%left ';'
+%left ';' ','
 %nonassoc 'CURSOR' 'PARTIAL_CURSOR'
 %nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
 
@@ -96,6 +96,7 @@ NonReservedKeyword
  | '<hive>SEQUENCEFILE'
  | '<hive>SERDE'
  | '<hive>SERDEPROPERTIES'
+ | '<hive>SETS'
  | '<hive>SHOW'
  | '<hive>SKEWED'
  | '<hive>SORTED'
@@ -199,9 +200,9 @@ SqlStatement_EDIT
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NOSCAN' | '<hive>ORC' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
+ : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NOSCAN' | '<hive>ORC' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
  | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
- | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'GROUPING' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
+ | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
  | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>HISTOGRAM_NUMERIC' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX'
  | '<impala>APPX_MEDIAN' | '<impala>EXTRACT' | '<impala>GROUP_CONCAT' | '<impala>STDDEV' | '<impala>VARIANCE_POP' | '<impala>VARIANCE_SAMP'
@@ -1288,9 +1289,8 @@ TableExpression
  ;
 
 TableExpression_EDIT
- : FromClause OptionalSelectConditions_EDIT
- | FromClause_EDIT OptionalSelectConditions
- | FromClause OptionalSelectConditions 'CURSOR' OptionalJoins
+ : FromClause_EDIT OptionalSelectConditions
+ | FromClause OptionalSelectConditions_EDIT OptionalJoins
    {
      // A couple of things are going on here:
      // - If there are no SelectConditions (WHERE, GROUP BY, etc.) we should suggest complete join options
@@ -1298,45 +1298,59 @@ TableExpression_EDIT
      //   different join types
      // - The FromClause could end with a valueExpression, in which case we should suggest keywords like '='
      //   or 'AND' based on type
-     // The reason for the join mess is because for "SELECT * FROM foo | JOIN bar" the parts surrounding the
-     // cursor are complete and not in _EDIT rules.
 
+     if (!$2) {
+       return;
+     }
      var keywords = [];
 
-     if ($4 && $4.joinType.toUpperCase() === 'JOIN') {
-       keywords = ['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER'];
-       if (isHive()) {
-         keywords = keywords.concat(['CROSS', 'LEFT SEMI']);
-       } else if (isImpala()) {
-         keywords = keywords.concat(['INNER', 'LEFT ANTI', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT SEMI']);
-       } else {
-         keywords.push('INNER');
-       }
-     } else {
-        if ($2 && $2.suggestKeywords) {
-          keywords = createWeightedKeywords($2.suggestKeywords, 2);
-        }
-        if ($2 && $2.suggestColRefKeywords) {
-          suggestColRefKeywords($2.suggestColRefKeywords);
-          addColRefIfExists($2);
-        }
-        keywords.push({ value: 'UNION', weight: 2.19 });
-     }
-
-     if ($2 && $2.empty) {
-       if (typeof $1.hasJoinCondition !== 'undefined' && ! $1.hasJoinCondition) {
+     if ($2.cursorAtStart) {
+       if ($1 && typeof $1.hasJoinCondition !== 'undefined' && !$1.hasJoinCondition) {
          keywords.push({ value: 'ON', weight: 3 });
          if (isImpala()) {
            keywords.push({ value: 'USING', weight: 3 });
          }
-       } else if ($1.suggestKeywords) {
-         keywords = keywords.concat(createWeightedKeywords($1.suggestKeywords, 3));
-       } else if ($1.types) {
-         suggestValueExpressionKeywords($1, keywords);
+       } else if ($1 && $1.suggestKeywords) {
+         keywords = createWeightedKeywords($1.suggestKeywords, 1);
+       } else if ($1 && $1.types) {
+         var veKeywords = getValueExpressionKeywords($1);
+         keywords = veKeywords.suggestKeywords;
+         if (veKeywords.suggestColRefKeywords) {
+           suggestColRefKeywords(veKeywords.suggestColRefKeywords);
+           addColRefIfExists($1);
+         }
+       }
+
+       if ($2.cursorAtEnd && $3 && $3.joinType.toUpperCase() === 'JOIN') {
+         keywords = keywords.concat(['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
+         if (isHive()) {
+           keywords = keywords.concat(['CROSS', 'LEFT SEMI']);
+         } else if (isImpala()) {
+           keywords = keywords.concat(['INNER', 'LEFT ANTI', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT SEMI']);
+         } else {
+           keywords.push('INNER');
+         }
+         suggestKeywords(keywords);
          return;
        }
      }
-     suggestKeywords(keywords);
+
+     if ($2.suggestColRefKeywords) {
+       suggestColRefKeywords($2.suggestColRefKeywords);
+       addColRefIfExists($2);
+     }
+
+     if ($2.suggestKeywords && $2.suggestKeywords.length) {
+       keywords = keywords.concat(createWeightedKeywords($2.suggestKeywords, 2));
+     }
+
+     if ($2.cursorAtEnd) {
+       keywords.push({ value: 'UNION', weight: 2.11 });
+     }
+
+     if (keywords.length > 0) {
+       suggestKeywords(keywords);
+     }
    }
  ;
 
@@ -1361,83 +1375,101 @@ FromClause_EDIT
 
 OptionalSelectConditions
  : OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
-   {
-     var keywords = [];
-
-     if (isImpala() && !$8) {
-       keywords.push({ value: 'OFFSET', weight: 2 });
-     }
-
-     if (!$7 && !$8) {
-       keywords.push({ value: 'LIMIT', weight: 3 });
-     }
-
-     if (isHive() && !$6 && !$7 && !$8) {
-       keywords = keywords.concat([{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }]);
-     } else if (isHive() && $6 && $6.suggestKeywords && !$7 && !$8) {
-       keywords = keywords.concat(createWeightedKeywords($6.suggestKeywords, 4));
-     }
-
-     if (!$5 && !$6 && !$7 && !$8) {
-       keywords.push({ value: 'ORDER BY', weight: 5 });
-     } else if ($5 && $5.suggestKeywords && !$6 && !$7) {
-       keywords = keywords.concat(createWeightedKeywords($5.suggestKeywords, 5));
-     }
-
-     if (isHive() && !$4 && !$5 && !$6 && !$7 && !$8) {
-       keywords.push({ value: 'WINDOW', weight: 6 });
-     }
-
-     if (!$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
-       keywords.push({ value: 'HAVING', weight: 7 });
-     }
-
-     if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
-       keywords.push({ value: 'GROUP BY', weight: 8 });
-     }
-
-     if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
-       keywords = keywords.concat([{ value: 'WHERE', weight: 9 }, { value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }]);
-       if (isHive()) {
-         keywords = keywords.concat([{ value: 'LATERAL VIEW', weight: 1 }, { value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
-       } else if (isImpala()) {
-         keywords = keywords.concat([{ value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }]);
-       } else {
-         keywords.push({ value: 'INNER JOIN', weight: 1 });
-       }
-     }
-
-     if ($1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
-       $$ = getValueExpressionKeywords($1, keywords);
-       if ($1.columnReference) {
-         $$.columnReference = $1.columnReference;
-       }
-     } else {
-       $$ = { suggestKeywords: keywords };
-     }
-     if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
-       $$.empty = true;
-     }
-   }
  ;
 
 OptionalSelectConditions_EDIT
- : OptionalWhereClause_EDIT OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause_EDIT OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause_EDIT
+ : WhereClause_EDIT OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause HavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
+ ;
+
+OptionalSelectConditions_EDIT
+ : 'CURSOR' OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$2, $3, $4, $5, $6, $7, $8, $9], [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, true, isHive(), true, isHive(), true, isImpala()]);
+
+     keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }]);
+     if (isHive()) {
+       keywords = keywords.concat([{ value: 'LATERAL VIEW', weight: 1 }, { value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
+     } else if (isImpala()) {
+       keywords = keywords.concat([{ value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }]);
+     } else {
+       keywords.push({ value: 'INNER JOIN', weight: 1 });
+     }
+     $$ = { suggestKeywords: keywords, cursorAtStart: true, cursorAtEnd: !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 };
+  }
+ | WhereClause 'CURSOR' OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$3, $4, $5, $6, $7, $8, $9], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]);
+     if ($1.suggestKeywords) {
+       keywords = createWeightedKeywords($1.suggestKeywords, 1);
+     }
+     $$ = getValueExpressionKeywords($1, keywords);
+     $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
+     if ($1.columnReference) {
+       $$.columnReference = $1.columnReference;
+     }
+   }
+ | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9], [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isHive(), true, isImpala()]);
+     if ($2.suggestKeywords) {
+       keywords = createWeightedKeywords($2.suggestKeywords, 8);
+     }
+     $$ = getValueExpressionKeywords($2, keywords);
+     if ($2.columnReference) {
+       $$.columnReference = $2.columnReference;
+     }
+     $$.cursorAtEnd = !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
+   }
+ | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$5, $6, $7, $8, $9], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isHive(), true, isImpala()]);
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$5 && !$6 && !$7 && !$8 && !$9 };
+   }
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$6, $7, $8, $9], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]);
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$6 && !$7 && !$8 && !$9 };
+   }
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$7, $8, $9], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]);
+     if ($5.suggestKeywords) {
+       keywords = keywords.concat(createWeightedKeywords($5.suggestKeywords, 5));
+     }
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$7 && !$8 && !$9 };
+   }
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy 'CURSOR' OptionalLimitClause OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$8, $9], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isImpala()]);
+     if ($6.suggestKeywords) {
+       keywords = keywords.concat(createWeightedKeywords($6.suggestKeywords, 4));
+     }
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$8 && !$9 };
+   }
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause 'CURSOR' OptionalOffsetClause
+   {
+     var keywords = getKeywordsForOptionalsLR([$9], [{ value: 'OFFSET', weight: 2 }], [isImpala()]);
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$9 };
+   }
  ;
 
 OptionalWhereClause
  :
- | 'WHERE' SearchCondition  -> $2
+ | WhereClause
  ;
 
-OptionalWhereClause_EDIT
+WhereClause
+ : 'WHERE' SearchCondition  -> $2
+ ;
+
+WhereClause_EDIT
  : 'WHERE' SearchCondition_EDIT
  | 'WHERE' 'CURSOR'
    {
@@ -1449,12 +1481,29 @@ OptionalWhereClause_EDIT
 
 OptionalGroupByClause
  :
- | AnyGroup 'BY' GroupByColumnList
+ | GroupByClause
  ;
 
-OptionalGroupByClause_EDIT
- : AnyGroup 'BY' GroupByColumnList_EDIT
- | AnyGroup 'BY' 'CURSOR'
+GroupByClause
+ : AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup
+   {
+     if (!$4) {
+       $$ = $3;
+       if (isHive()) {
+         if (!$$.suggestKeywords) {
+           $$.suggestKeywords = [];
+         }
+         $$.suggestKeywords.push('GROUPING SETS');
+         $$.suggestKeywords.push('WITH CUBE');
+         $$.suggestKeywords.push('WITH ROLLUP');
+       }
+     }
+   }
+ ;
+
+GroupByClause_EDIT
+ : AnyGroup 'BY' GroupByColumnList_EDIT OptionalHiveGroupingSetsCubeOrRollup
+ | AnyGroup 'BY' 'CURSOR' OptionalHiveGroupingSetsCubeOrRollup
    {
      valueExpressionSuggest();
    }
@@ -1462,11 +1511,64 @@ OptionalGroupByClause_EDIT
    {
      suggestKeywords(['BY']);
    }
+ | AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup_EDIT
+ ;
+
+OptionalHiveGroupingSetsCubeOrRollup
+ :
+ | HiveGroupingSets
+ | 'WITH' '<hive>CUBE'
+ | 'WITH' '<hive>ROLLUP'
+ ;
+
+OptionalHiveGroupingSetsCubeOrRollup_EDIT
+ : HiveGroupingSets_EDIT
+ | 'WITH' 'CURSOR'
+   {
+     if (isHive()) {
+       suggestKeywords(['CUBE', 'ROLLUP']);
+     }
+   }
+ ;
+
+HiveGroupingSets
+ : '<hive>GROUPING' '<hive>SETS' '(' ColumnGroupingSets ')'
+ ;
+
+HiveGroupingSets_EDIT
+ : '<hive>GROUPING' 'CURSOR'
+   {
+     suggestKeywords(['SETS']);
+   }
+ | '<hive>GROUPING' '<hive>SETS' '(' ColumnGroupingSets_EDIT RightParenthesisOrError
+ ;
+
+ColumnGroupingSets
+ :
+ | ColumnReference
+ | ColumnGroupingSets ',' ColumnGroupingSets
+ | '(' ColumnGroupingSets ')'
+ ;
+
+ColumnGroupingSets_EDIT
+ : ColumnGroupingSet_EDIT
+ | ColumnGroupingSet_EDIT ',' ColumnGroupingSets
+ | ColumnGroupingSets ',' ColumnGroupingSet_EDIT
+ | ColumnGroupingSets ',' ColumnGroupingSet_EDIT ',' ColumnGroupingSets
+ | '(' ColumnGroupingSets_EDIT RightParenthesisOrError
+ ;
+
+ColumnGroupingSet_EDIT
+ : AnyCursor
+   {
+     suggestColumns();
+   }
+ | ColumnReference_EDIT
  ;
 
 GroupByColumnList
  : ValueExpression
- | GroupByColumnList ',' ValueExpression
+ | GroupByColumnList ',' ValueExpression  -> $3
  ;
 
 GroupByColumnList_EDIT
@@ -1500,10 +1602,6 @@ GroupByColumnListPartTwo_EDIT
 OptionalOrderByClause
  :
  | OrderByClause
- ;
-
-OptionalOrderByClause_EDIT
- : OrderByClause_EDIT
  ;
 
 OrderByClause
@@ -1582,13 +1680,17 @@ OptionalImpalaNullsFirstOrLast_EDIT
 
 OptionalClusterOrDistributeBy
  :
- | ClusterByClause
+ | ClusterOrDistributeBy
+ ;
+
+ClusterOrDistributeBy
+ : ClusterByClause
  | DistributeByClause               -> { suggestKeywords: ['SORT BY'] }
  | DistributeByClause SortByClause
  | SortByClause
  ;
 
-OptionalClusterOrDistributeBy_EDIT
+ClusterOrDistributeBy_EDIT
  : ClusterByClause_EDIT
  | DistributeByClause_EDIT
  | DistributeByClause SortByClause_EDIT
@@ -1671,10 +1773,14 @@ AnyLimit
 
 OptionalLimitClause
  :
- | AnyLimit ValueExpression
+ | LimitClause
  ;
 
-OptionalLimitClause_EDIT
+LimitClause
+ : AnyLimit ValueExpression
+ ;
+
+LimitClause_EDIT
  : AnyLimit 'CURSOR'
    {
      valueExpressionSuggest();
@@ -1685,10 +1791,14 @@ OptionalLimitClause_EDIT
 
 OptionalOffsetClause
  :
- | '<impala>OFFSET' ValueExpression
+ | OffsetClause
  ;
 
-OptionalOffsetClause_EDIT
+OffsetClause
+ : '<impala>OFFSET' ValueExpression
+ ;
+
+OffsetClause_EDIT
  : '<impala>OFFSET' 'CURSOR'
    {
      valueExpressionSuggest();
@@ -2704,10 +2814,14 @@ IntegerOrUnbounded
 
 OptionalHavingClause
  :
- | 'HAVING' ValueExpression
+ | HavingClause
  ;
 
-OptionalHavingClause
+HavingClause
+ : 'HAVING' ValueExpression
+ ;
+
+HavingClause_EDIT
  : 'HAVING' 'CURSOR'
    {
      valueExpressionSuggest();
@@ -2721,10 +2835,14 @@ OptionalHavingClause
 
 OptionalWindowClause
  :
- | '<hive>WINDOW' RegularOrBacktickedIdentifier '<hive>AS' WindowExpression
+ | WindowClause
  ;
 
-OptionalWindowClause_EDIT
+WindowClause
+ : '<hive>WINDOW' RegularOrBacktickedIdentifier '<hive>AS' WindowExpression
+ ;
+
+WindowClause_EDIT
  : '<hive>WINDOW' RegularOrBacktickedIdentifier 'CURSOR'
    {
      suggestKeywords(['AS']);
