@@ -373,7 +373,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('In HDFS (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
+                  &nbsp;${ _('In store (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
                   <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
@@ -388,10 +388,10 @@ except ImportError, e:
               <div class="controls" data-bind="visible: snippet.type() == 'hive'">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('In HDFS (large file)') }
+                  &nbsp;${ _('In store (large result)') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
-                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="pathChooser margin-left-10">
+                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
                   <i class="fa fa-question-circle muted" title="${ _("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }"></i>
                 </div>
               </div>
@@ -415,7 +415,7 @@ except ImportError, e:
                   &nbsp;${ _('A search dashboard') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Search index name')}">
+                  <input data-bind="value: savePath" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
                 </div>
               </div>
             </div>
