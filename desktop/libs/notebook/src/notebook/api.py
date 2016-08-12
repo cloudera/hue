@@ -329,6 +329,7 @@ def _save_notebook(notebook, user):
 
   return notebook_doc, save_as
 
+@api_error_handler
 @require_POST
 @check_document_modify_permission()
 def save_notebook(request):
