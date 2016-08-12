@@ -32,7 +32,7 @@ def is_selected(section, matcher):
       % if show_label:
         <label class="control-label">${ field.label }
           % if field.help_text:
-          <sup title="${ field.help_text }" data-rel="tooltip"><i class="fa fa-question"></i></sup>
+          <i title="${ field.help_text }" data-rel="tooltip" class="fa fa-question-circle muted"></i>
           % endif
         </label>
       % endif
