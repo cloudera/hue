@@ -2886,6 +2886,12 @@ ${ hueIcons.symbols() }
       redrawFixedHeaders(200);
     });
 
+    huePubSub.subscribe('tab.switched', function (tab) {
+      if (tab !== 'queryResults') {
+        $('.hue-datatable-search').hide();
+      }
+    });
+
     huePubSub.subscribe('detach.scrolls', function (snippet) {
       var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
       if (viewModel.editorMode()) {
