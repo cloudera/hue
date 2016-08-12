@@ -5554,6 +5554,117 @@ define([
           }
         });
       });
+
+      describe('GROUPING SETS', function () {
+        it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH CUBE;"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH CUBE;',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH ROLLUP;"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH ROLLUP;',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b GROUPING SETS ( (a, b), a, b, ( ) );"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b GROUPING SETS ( (a, b), a, b, ( ) );',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            containsKeywords: ['GROUPING SETS', 'WITH CUBE', 'WITH ROLLUP', '<'],
+            containsColRefKeywords: true,
+            expectedResult: {
+              lowerCase: false,
+              colRef: { identifierChain: [{ name: 'b'}], database: 'database_two', table: 'testTable' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b WITH |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b WITH ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            containsKeywords: ['CUBE', 'ROLLUP'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            containsKeywords: ['SETS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS (|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS (',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { database: 'database_two', table: 'testTable' }
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS ((a, b), |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS ((a, b), ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { database: 'database_two', table: 'testTable' }
+            }
+          });
+        });
+      })
     });
 
     describe('HAVING clause', function () {

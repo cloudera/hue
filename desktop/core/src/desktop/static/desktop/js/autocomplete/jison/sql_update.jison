@@ -29,7 +29,7 @@ UpdateStatement
 UpdateStatement_EDIT
  : 'UPDATE' TargetTable_EDIT 'SET' SetClauseList OptionalWhereClause
  | 'UPDATE' TargetTable 'SET' SetClauseList_EDIT OptionalWhereClause
- | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause_EDIT
+ | 'UPDATE' TargetTable 'SET' SetClauseList WhereClause_EDIT
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause 'CURSOR'
    {
      if (!$5) {

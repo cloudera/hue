@@ -616,12 +616,17 @@ var suggestFileFormats = function () {
   }
 };
 
-var getKeywordsForOptionalsLR = function (optionals, keywords) {
+var getKeywordsForOptionalsLR = function (optionals, keywords, override) {
   var result = [];
+
   for (var i = 0; i < optionals.length; i++) {
-    if (!optionals[i]) {
-      result.push(keywords[i]);
-    } else {
+    if (!optionals[i] && (typeof override === 'undefined' || override[i])) {
+      if (keywords[i] instanceof Array) {
+        result = result.concat(keywords[i]);
+      } else {
+        result.push(keywords[i]);
+      }
+    } else if (optionals[i]) {
       break;
     }
   }
