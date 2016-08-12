@@ -114,7 +114,16 @@
 
         search.find('input').jHueDelayedInput(function () {
           self.fnSearch(search.find('input').val());
-        }, 300);
+        }, 300, true);
+
+        search.find('input').keydown(function(e){
+          if(e.keyCode == 13) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            search.find('.fa-chevron-down').trigger('click');
+          }
+        });
 
         search.find('input').focus();
       }

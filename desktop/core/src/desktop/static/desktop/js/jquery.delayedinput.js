@@ -24,7 +24,8 @@
   var pluginName = "jHueDelayedInput",
       defaults = {
         fn: null,
-        timeout: 300
+        timeout: 300,
+        skipOnEnter: false
       };
 
   function Plugin(element, options) {
@@ -43,17 +44,20 @@
     var _this = this;
     var _timeout = -1;
     if (_this.options.fn != null) {
-      $(_this.element).on("keyup", function () {
-        window.clearTimeout(_timeout);
-        _timeout = window.setTimeout(_this.options.fn, _this.options.timeout);
+      $(_this.element).on("keyup", function (e) {
+        if (!(_this.options.skipOnEnter && e.keyCode == 13)){
+          window.clearTimeout(_timeout);
+          _timeout = window.setTimeout(_this.options.fn, _this.options.timeout);
+        }
       });
     }
   };
 
-  $.fn[pluginName] = function (fn, timeout) {
+  $.fn[pluginName] = function (fn, timeout, skipOnEnter) {
     var _options = {
       fn: fn,
-      timeout: timeout
+      timeout: timeout,
+      skipOnEnter: typeof skipOnEnter !== 'undefined' && skipOnEnter
     }
     return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
