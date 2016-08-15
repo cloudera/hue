@@ -42,8 +42,8 @@ class Client(object):
       raise ValueError('Can\'t create AWS client, credential is not configured')
 
     return cls(
-      aws_access_key_id=conf.ACCESS_KEY_ID.get(),
-      aws_secret_access_key=conf.SECRET_ACCESS_KEY.get(),
+      aws_access_key_id=access_key_id,
+      aws_secret_access_key=secret_access_key,
       region=conf.REGION.get()
     )
 
