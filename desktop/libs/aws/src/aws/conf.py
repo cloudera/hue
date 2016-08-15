@@ -17,7 +17,27 @@ from __future__ import absolute_import
 
 from boto.regioninfo import get_regions
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from django.utils.translation import ugettext_lazy as _
+
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
+
+from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
+
+
+def get_default_access_key_id():
+  """
+  Attempt to set AWS access key ID from script, else core-site, else None
+  """
+  access_key_id_script = AWS_ACCOUNTS['default'].ACCESS_KEY_ID_SCRIPT.get()
+  return access_key_id_script or get_s3a_access_key()
+
+
+def get_default_secret_key():
+  """
+  Attempt to set AWS secret key from script, else core-site, else None
+  """
+  secret_access_key_script = AWS_ACCOUNTS['default'].SECRET_ACCESS_KEY_SCRIPT.get()
+  return secret_access_key_script or get_s3a_secret_key()
 
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
@@ -29,13 +49,27 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ACCESS_KEY_ID=Config(
         key='access_key_id',
         type=str,
-        private=True
+        private=True,
+        dynamic_default=get_default_access_key_id
       ),
+      ACCESS_KEY_ID_SCRIPT=Config(
+        key='access_key_id_script',
+        default=None,
+        private=True,
+        type=coerce_password_from_script,
+        help=_("Execute this script to produce the AWS access key ID.")),
       SECRET_ACCESS_KEY=Config(
         key='secret_access_key',
         type=str,
-        private=True
+        private=True,
+        dynamic_default=get_default_secret_key
       ),
+      SECRET_ACCESS_KEY_SCRIPT=Config(
+        key='secret_access_key_script',
+        default=None,
+        private=True,
+        type=coerce_password_from_script,
+        help=_("Execute this script to produce the AWS secret access key.")),
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
         help='Allow to use environment sources of credentials (environment variables, EC2 profile).',
         key='allow_environment_credentials',

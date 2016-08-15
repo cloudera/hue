@@ -26,7 +26,7 @@ import os.path
 import conf
 import confparse
 
-__all = ['get_conf', 'get_trash_interval']
+__all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
 LOG = logging.getLogger(__name__)
 
@@ -34,6 +34,8 @@ _CORE_SITE_PATH = None                  # Path to core-site.xml
 _CORE_SITE_DICT = None                  # A dictionary of name/value config options
 
 _CNF_TRASH_INTERVAL = 'fs.trash.interval'
+_CNF_S3A_ACCESS_KEY = 'fs.s3a.access.key'
+_CNF_S3A_SECRET_KEY = 'fs.s3a.secret.key'
 
 def reset():
   """Reset the cached conf"""
@@ -79,3 +81,17 @@ def get_trash_interval():
   Also indicates whether trash is enabled or not.
   """
   return get_conf().get(_CNF_TRASH_INTERVAL)
+
+def get_s3a_access_key():
+  """
+  Get S3A AWS access key ID
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_S3A_ACCESS_KEY)
+
+def get_s3a_secret_key():
+  """
+  Get S3A AWS secret key
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_S3A_SECRET_KEY)
