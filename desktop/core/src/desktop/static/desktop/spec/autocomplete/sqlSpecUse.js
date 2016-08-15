@@ -69,10 +69,10 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE database_two; \nselect ',
         afterCursor: '',
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
         expectedResult: {
           useDatabase: 'database_two',
           lowerCase: true,
-          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
           suggestAnalyticFunctions: true,
           suggestFunctions: {},
@@ -93,10 +93,10 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '',
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
           suggestAnalyticFunctions: true,
           suggestFunctions: {},
@@ -117,10 +117,10 @@ define([
       assertAutoComplete({
         beforeCursor: 'USE other_db; USE closest_db; \n\tSELECT ',
         afterCursor: '; USE some_other_db;',
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestKeywords: ['*', 'ALL', 'DISTINCT'],
           suggestAggregateFunctions: true,
           suggestAnalyticFunctions: true,
           suggestFunctions: {},

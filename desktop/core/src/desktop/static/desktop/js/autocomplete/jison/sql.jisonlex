@@ -48,6 +48,8 @@
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
 <hive>'MAP'                                { return '<hive>MAP'; }
+<hive>'OF'                                 { return '<hive>OF'; }
+<hive>'OUT'                                { return '<hive>OUT'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
 <hive>'USER'                               { return '<hive>USER'; }
@@ -60,6 +62,7 @@
 <hive>'ARCHIVE'                            { return '<hive>ARCHIVE'; }
 <hive>'ASC'                                { return '<hive>ASC'; }
 <hive>'AVRO'                               { return '<hive>AVRO'; }
+<hive>'BUCKET'                             { return '<hive>BUCKET'; }
 <hive>'BUCKETS'                            { return '<hive>BUCKETS'; }
 <hive>'CACHE'                              { return '<hive>CACHE'; }
 <hive>'CASCADE'                            { return '<hive>CASCADE'; }
@@ -143,6 +146,7 @@
 <hive>'STRING'                             { return '<hive>STRING'; }
 <hive>'STRUCT'                             { return '<hive>STRUCT'; }
 <hive>'TABLES'                             { return '<hive>TABLES'; }
+<hive>'TABLESAMPLE'                        { return '<hive>TABLESAMPLE'; }
 <hive>'TBLPROPERTIES'                      { return '<hive>TBLPROPERTIES'; }
 <hive>'TEMPORARY'                          { return '<hive>TEMPORARY'; }
 <hive>'TERMINATED'                         { return '<hive>TERMINATED'; }
@@ -213,6 +217,7 @@
 <impala>'SERIALIZE_FN'                     { return '<impala>SERIALIZE_FN'; }
 <impala>'STATS'                            { return '<impala>STATS'; }
 <impala>'STORED'                           { return '<impala>STORED'; }
+<impala>'STRAIGHT_JOIN'                    { return '<impala>STRAIGHT_JOIN'; }
 <impala>'SYMBOL'                           { return '<impala>SYMBOL'; }
 <impala>'TABLE'                            { return '<impala>TABLE'; }
 <impala>'TABLES'                           { return '<impala>TABLES'; }

@@ -39,7 +39,8 @@
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    COLUMN: 600,
+    COLUMN: 700,
+    VIRTUAL_COLUMN: 600,
     SAMPLE: 500,
     IDENTIFIER: 400,
     CTE: 300,
@@ -162,6 +163,10 @@
       } else {
         deferrals.push(self.addColumns(parseResult, editor, database, parseResult.suggestColumns.types || ['T'], completions));
         suggestColumnsDeferral.resolve();
+      }
+      if (typeof parseResult.suggestColumns.identifierChain === 'undefined' && self.snippet.type() === 'hive') {
+        completions.push({value: 'BLOCK__OFFSET__INSIDE__FILE', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
+        completions.push({value: 'INPUT__FILE__NAME', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
       }
       deferrals.push(suggestColumnsDeferral);
     }
