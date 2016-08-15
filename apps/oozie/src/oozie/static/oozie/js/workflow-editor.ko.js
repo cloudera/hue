@@ -275,6 +275,7 @@ var Workflow = function (vm, workflow) {
       },
       async: false
     });
+    logGA('new_node/' + widget.widgetType());
   };
 
   self.addNode = function (widget, copiedNode) {
@@ -377,6 +378,7 @@ var Workflow = function (vm, workflow) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
+    logGA('add_node');
   };
 
   self.removeNode = function (node_id) {
@@ -431,6 +433,7 @@ var Workflow = function (vm, workflow) {
     else {
       self.nodes.remove(node);
     }
+    logGA('remove_node');
   };
 
   self.moveNode = function (widget) {
@@ -1176,7 +1179,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.save = function () {
-    if (!self.isSaving()) {
+    if (! self.isSaving()) {
       self.isSaving(true);
       $(".jHueNotify").hide();
       $.post("/oozie/editor/workflow/save/", {
@@ -1205,6 +1208,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }).always(function () {
         self.isSaving(false);
       });
+    logGA('save');
     }
   };
 
@@ -1245,6 +1249,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.schedule = function () {
+    logGA('schedule');
     window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
 
@@ -1290,7 +1295,7 @@ function getOtherSubworkflows(vm, workflows) {
 
 function logGA(page) {
   if (typeof trackOnGA == 'function') {
-    trackOnGA('oozie/editor/workflow' + page);
+    trackOnGA('oozie/editor/workflow/' + page);
   }
 }
 
