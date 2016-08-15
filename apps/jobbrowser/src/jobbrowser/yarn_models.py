@@ -73,7 +73,7 @@ class Application(object):
       finishTime = int(time.time() * 1000)
     else:
       finishTime = self.finishedTime
-    if self.finishedTime == 0 or self.startedTime == 0:
+    if self.startedTime == 0:
       durationInMillis = None
     else:
       durationInMillis = finishTime - self.startedTime
