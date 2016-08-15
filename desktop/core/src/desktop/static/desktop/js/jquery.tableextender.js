@@ -221,7 +221,9 @@
     $headerCounter.addClass('locked');
 
     function unlock($el) {
-      $header.find('tr.ht-visible-row-' + (($el.text() * 1) - 1)).remove();
+      $header.find('tr td:first-child').filter(function () {
+        return $(this).text() === rowNo + '';
+      }).closest('tr').remove();
       delete lockedRows['r' + $el.text()]
       $el.parent().remove();
       if ($header.find('tbody tr').length == 0) {
@@ -234,9 +236,13 @@
       if (force) {
         unlock(lockedRows['r' + rowNo].cell.find('td'));
       }
-      var $clone = $pluginElement.find('tr td:first-child').filter(function () {
-        return $(this).text() === rowNo + '';
-      }).closest('tr').clone();
+      var $clone = $('<tr>');
+      var tHtml = '';
+      var aoColumns = $pluginElement.data('aoColumns');
+      $pluginElement.data('data')[rowNo - 1].forEach(function(col, idx){
+        tHtml += '<td ' + (aoColumns && !aoColumns[idx].bVisible ? 'style="display: none"' : '') + '>' + col + '</td>';
+      });
+      $clone.html(tHtml);
       $clone.addClass('locked');
       $clone.appendTo($header.find('tbody'));
       $pluginElement.data('lockedRows', lockedRows);

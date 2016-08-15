@@ -2860,6 +2860,7 @@ ${ hueIcons.symbols() }
               $('.right-panel').trigger('scroll');
               if (_el.data('plugin_jHueTableExtender')) {
                 _el.data('plugin_jHueTableExtender').drawHeader();
+                _el.data('plugin_jHueTableExtender').drawLockedRows();
               }
             }
           }
@@ -3344,7 +3345,6 @@ ${ hueIcons.symbols() }
       $(document).on("toggleResultSettings", function (e, snippet) {
         window.setTimeout(function () {
           $('#snippet_' + snippet.id()).find('.chart').trigger("forceUpdate");
-          redrawFixedHeaders();
           $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('update');
           $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
             scrollInertia: 0
@@ -3355,6 +3355,7 @@ ${ hueIcons.symbols() }
           else {
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width('100%');
           }
+          redrawFixedHeaders();
         }, 10)
       });
 
