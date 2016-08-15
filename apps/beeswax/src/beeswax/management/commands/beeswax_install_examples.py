@@ -316,6 +316,7 @@ class SampleQuery(object):
         notebook = import_saved_beeswax_query(query)
         data = notebook.get_data()
         data['isSaved'] = True
+        uuid = data.get('uuid')
         data = json.dumps(data)
 
         # Get or create sample user directories
@@ -327,6 +328,7 @@ class SampleQuery(object):
         )
 
         doc2 = Document2.objects.create(
+          uuid=uuid,
           owner=django_user,
           parent_directory=examples_dir,
           name=self.name,
