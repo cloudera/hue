@@ -437,19 +437,17 @@ def import_documents(request):
   stdout = StringIO.StringIO()
   try:
     management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
+    Document.objects.sync()
+
+    if request.POST.get('redirect'):
+      return redirect(request.POST.get('redirect'))
+    else:
+      return JsonResponse({'message': stdout.getvalue()})
   except Exception, e:
-    stdout.seek(0)
-    LOG.error('Failed to run loaddata command in import_documents:\n %s' % stdout.read())
+    LOG.error('Failed to run loaddata command in import_documents:\n %s' % stdout.getvalue())
     return JsonResponse({'status': -1, 'message': smart_str(e)})
   finally:
     stdout.close()
-
-  Document.objects.sync()
-
-  if request.POST.get('redirect'):
-    return redirect(request.POST.get('redirect'))
-  else:
-    return JsonResponse({'message': stdout.getvalue()})
 
 
 def _is_import_valid(documents):
