@@ -77,7 +77,6 @@ DatabaseDefinition_EDIT
      }
    }
  | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT RegularIdentifier
- | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals_EDIT error
  | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
  ;
 

@@ -169,7 +169,6 @@ Sql
 
 SqlStatements
  :
- | ErrorStatement
  | DataDefinition
  | DataManipulation
  | QuerySpecification
@@ -181,11 +180,6 @@ SqlStatements_EDIT
  | SqlStatement_EDIT ';' NewStatement SqlStatements
  | SqlStatements ';' NewStatement SqlStatement_EDIT
  | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
- ;
-
-ErrorStatement
- : error
- | NonStartingToken error // Having just ': error' does not work for some reason, jison bug?
  ;
 
 SqlStatement_EDIT
@@ -1191,7 +1185,6 @@ SelectStatement_EDIT
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
- | 'SELECT' OptionalAllOrDistinct SelectList_EDIT error TableExpression
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
      if ($3.cursorAtStart) {
@@ -1237,19 +1230,11 @@ SelectStatement_EDIT
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' OptionalAllOrDistinct error TableExpression
- | 'SELECT' OptionalAllOrDistinct error TableExpression_EDIT
- | 'SELECT' OptionalAllOrDistinct SelectList error TableExpression        // Causes conflict but solves issue
- | 'SELECT' OptionalAllOrDistinct SelectList error TableExpression_EDIT   // with SELECT a, b, cos(| c AS d
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
      checkForSelectListKeywords($3);
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' TableExpression
-   {
-     checkForSelectListKeywords($3);
-   }
- | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' error TableExpression
    {
      checkForSelectListKeywords($3);
    }
@@ -2043,6 +2028,17 @@ SelectList
 SelectList_EDIT
  : SelectSubList_EDIT
  | SelectSubList_EDIT ',' SelectList
+ | SelectList 'CURSOR' ',' SelectList
+   {
+     checkForSelectListKeywords($1);
+   }
+ | 'CURSOR' ',' SelectList
+   {
+     suggestFunctions();
+     suggestColumns();
+     suggestFunctions();
+     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
+   }
  | 'CURSOR' SelectList
    {
      suggestFunctions();
@@ -2239,10 +2235,6 @@ JoinTypes_EDIT
    {
      suggestKeywords(['JOIN']);
    }
- | 'FULL' 'CURSOR' error
-   {
-     suggestKeywords(['JOIN', 'OUTER JOIN']);
-   }
  | 'FULL' 'OUTER' 'CURSOR'
    {
      suggestKeywords(['JOIN']);
@@ -2250,16 +2242,6 @@ JoinTypes_EDIT
  | 'FULL' 'CURSOR' 'JOIN'
    {
      suggestKeywords(['OUTER']);
-   }
- | 'LEFT' 'CURSOR' error
-   {
-     if (isHive()) {
-       suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
-     }
    }
  | 'LEFT' 'SEMI' 'CURSOR'
    {
@@ -2281,14 +2263,6 @@ JoinTypes_EDIT
        suggestKeywords(['OUTER', 'SEMI']);
      } else {
        suggestKeywords(['OUTER']);
-     }
-   }
- | 'RIGHT' 'CURSOR' error
-   {
-     if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
    }
  | 'RIGHT' '<impala>ANTI' 'CURSOR'
@@ -3199,14 +3173,6 @@ SumFunction_EDIT
 LateralView
  : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $4, tableAlias: $5, columnAliases: $6 }]
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $4, columnAliases: $5 }]
- | LateralView_INVALID
- ;
-
-LateralView_INVALID
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier error  -> []
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction error                    -> []
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                        -> []
- | '<hive>LATERAL' error                                                                   -> []
  ;
 
 LateralView_EDIT
