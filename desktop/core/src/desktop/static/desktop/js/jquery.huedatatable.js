@@ -325,6 +325,7 @@
 
           if (force) {
             $t.data('plugin_jHueTableExtender').drawFirstColumn();
+            $t.data('plugin_jHueTableExtender').drawLockedRows();
           }
 
         }
