@@ -359,7 +359,7 @@
         }
         if (data.type === 'struct') {
           data.fields.forEach(function (field) {
-            completions.push({value: self.backTickIfNeeded(field.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN})
+            completions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN})
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {

@@ -17,8 +17,6 @@
 
 echo "Make sure you install jison first (npm install jison -g)"
 echo ""
-echo "Note: There's supposed to be one conflict when generating for token 'error' (reduce by rule: SelectStatement_EDIT -> SELECT OptionalAllOrDistinct SelectList_EDIT)"
-echo ""
 echo "Generating parser..."
 
 pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
@@ -32,7 +30,7 @@ echo "%%" > sql_end.jison
 # With this all create tests will pass
 # cat sql_main.jison sql_create.jison sql_end.jison ../sql_support.js > sql.jison
 
-cat sql_main.jison sql_valueExpression.jison sql_alter.jison sql_analyze.jison sql_create.jison sql_drop.jison sql_show.jison sql_update.jison sql_use.jison sql_end.jison ../sql_support.js > sql.jison
+cat sql_main.jison sql_valueExpression.jison sql_error.jison sql_alter.jison sql_analyze.jison sql_create.jison sql_drop.jison sql_show.jison sql_update.jison sql_use.jison sql_end.jison ../sql_support.js > sql.jison
 
 jison sql.jison sql.jisonlex -m amd
 cat license.txt sql.js > ../sql.js
