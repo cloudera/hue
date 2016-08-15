@@ -34,6 +34,7 @@ NonReservedKeyword
  | '<hive>ANALYZE'
  | '<hive>ARCHIVE'
  | '<hive>AVRO'
+ | '<hive>BUCKET'
  | '<hive>BUCKETS'
  | '<hive>CACHE'
  | '<hive>CASCADE'
@@ -200,8 +201,8 @@ SqlStatement_EDIT
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NOSCAN' | '<hive>ORC' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
- | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
+ : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
+ | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
  | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
  | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>HISTOGRAM_NUMERIC' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX'
@@ -1148,15 +1149,19 @@ SelectStatement_EDIT
  : 'SELECT' OptionalAllOrDistinct SelectList_EDIT
    {
      if ($3.cursorAtStart) {
+       var keywords = [];
        if ($2) {
-         suggestKeywords([{ value: '*', weight: 1000 }]);
+         keywords = [{ value: '*', weight: 1000 }];
        } else {
-         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
+         keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
        }
+       if (isImpala()) {
+         keywords.push('STRAIGHT_JOIN');
+       }
+       suggestKeywords(keywords);
      } else {
        checkForSelectListKeywords($3);
      }
-
      if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
@@ -1164,17 +1169,22 @@ SelectStatement_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
+     var keywords = [];
      if ($2) {
-       suggestKeywords([{ value: '*', weight: 1000 }]);
+       keywords = [{ value: '*', weight: 1000 }];
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
+       keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
+     if (isImpala()) {
+       keywords.push('STRAIGHT_JOIN');
+     }
+     suggestKeywords(keywords);
      suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
@@ -1185,11 +1195,16 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
      if ($3.cursorAtStart) {
+       var keywords = [];
        if ($2) {
-         suggestKeywords([{ value: '*', weight: 1000 }]);
+         keywords = [{ value: '*', weight: 1000 }];
        } else {
-         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
+         keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
        }
+       if (isImpala()) {
+         keywords.push('STRAIGHT_JOIN');
+       }
+       suggestKeywords(keywords);
      } else {
        checkForKeywords($3);
      }
@@ -1201,17 +1216,22 @@ SelectStatement_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
+     var keywords = [];
      if ($2) {
-       suggestKeywords([{ value: '*', weight: 1000 }]);
+       keywords = [{ value: '*', weight: 1000 }];
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
+       keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
+     if (isImpala()) {
+       keywords.push('STRAIGHT_JOIN');
+     }
+     suggestKeywords(keywords);
      suggestFunctions();
      suggestColumns();
      suggestTables({ prependQuestionMark: true, prependFrom: true });
@@ -1311,7 +1331,7 @@ TableExpression_EDIT
            keywords.push({ value: 'USING', weight: 3 });
          }
        } else if ($1 && $1.suggestKeywords) {
-         keywords = createWeightedKeywords($1.suggestKeywords, 1);
+         keywords = createWeightedKeywords($1.suggestKeywords, 3);
        } else if ($1 && $1.types) {
          var veKeywords = getValueExpressionKeywords($1);
          keywords = veKeywords.suggestKeywords;
@@ -1395,7 +1415,7 @@ OptionalSelectConditions_EDIT
 
      keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }]);
      if (isHive()) {
-       keywords = keywords.concat([{ value: 'LATERAL VIEW', weight: 1 }, { value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
+       keywords = keywords.concat([{ value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
      } else if (isImpala()) {
        keywords = keywords.concat([{ value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }]);
      } else {
@@ -2109,9 +2129,11 @@ TableReferenceList
 
 TableReferenceList_EDIT
  : TableReference_EDIT
- | TableReferenceList_EDIT ',' TableReference
+ | TableReference_EDIT ',' TableReference
+// | TableReferenceList 'CURSOR' ',' TableReferenceList   // TODO: Causes conflict for some reason
  | TableReferenceList ',' TableReference_EDIT
- | TableReferenceList ',' 'CURSOR'
+ | TableReferenceList ',' TableReference_EDIT ',' TableReferenceList
+ | TableReferenceList ',' AnyCursor
    {
        suggestTables();
        suggestDatabases({ appendDot: true });
@@ -2311,19 +2333,21 @@ JoinCondition_EDIT
  ;
 
 TablePrimary
- : TableOrQueryName OptionalCorrelationName OptionalLateralViews
+ : TableOrQueryName OptionalTableSample OptionalCorrelationName OptionalLateralViews
    {
      if ($1.identifierChain) {
-       if ($2) {
-         $1.alias = $2
+       if ($3) {
+         $1.alias = $3
        }
-       if ($3 && $3.length > 0) {
-         $1.lateralViews = $3;
+       if ($4 && $4.length > 0) {
+         $1.lateralViews = $4;
        }
        addTablePrimary($1);
      }
+     // Right-to-left for cursor after TablePrimary
+     $$.suggestKeywords = getKeywordsForOptionalsLR([$4, $3, $2], [{ value: 'LATERAL VIEW', weight: 1 }, { value: 'AS', weight: 2 }, { value: 'TABLESAMPLE', weight: 3 }], [isHive(), true, isHive()]);
    }
- | DerivedTable OptionalCorrelationName
+ | DerivedTable OptionalCorrelationName OptionalLateralViews
    {
       if ($2) {
        $1.alias = $2;
@@ -2333,22 +2357,32 @@ TablePrimary
  ;
 
 TablePrimary_EDIT
- : TableOrQueryName_EDIT OptionalCorrelationName OptionalLateralViews
- | TableOrQueryName OptionalCorrelationName OptionalLateralViews_EDIT
+ : TableOrQueryName_EDIT OptionalTableSample OptionalCorrelationName OptionalLateralViews
+ | TableOrQueryName OptionalTableSample_EDIT OptionalCorrelationName OptionalLateralViews
    {
-     if ($2) {
-       $1.alias = $2;
+     if ($3) {
+       $1.alias = $3;
      }
      addTablePrimary($1);
    }
- | DerivedTable_EDIT OptionalCorrelationName
+ | TableOrQueryName OptionalTableSample OptionalCorrelationName OptionalLateralViews_EDIT
+   {
+     if ($3) {
+       $1.alias = $3;
+     }
+     addTablePrimary($1);
+   }
+ | DerivedTable_EDIT OptionalCorrelationName OptionalLateralViews
    {
      if ($2) {
-       // TODO: Potentially add columns for SELECT bla.| FROM (SELECT * FROM foo) AS bla;
        addTablePrimary({ subQueryAlias: $2 });
      }
    }
- | DerivedTable OptionalCorrelationName_EDIT // TODO: OptionalLateralViews?
+ | DerivedTable OptionalCorrelationName_EDIT OptionalLateralViews
+ | DerivedTable OptionalCorrelationName OptionalLateralViews_EDIT
+   if ($2) {
+     addTablePrimary({ subQueryAlias: $2 });
+   }
  ;
 
 TableOrQueryName
@@ -2365,6 +2399,46 @@ DerivedTable
 
 DerivedTable_EDIT
  : TableSubQuery_EDIT
+ ;
+
+OptionalTableSample
+ :
+ | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' '<hive>OF' 'UNSIGNED_INTEGER' OptionalOnColumn ')'
+ ;
+
+OptionalTableSample_EDIT
+ : '<hive>TABLESAMPLE' '(' AnyCursor RightParenthesisOrError
+   {
+     suggestKeywords(['BUCKET']);
+   }
+ | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' 'CURSOR' RightParenthesisOrError
+   {
+     suggestKeywords(['OUT OF']);
+   }
+ | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' 'CURSOR' RightParenthesisOrError
+   {
+     suggestKeywords(['OF']);
+   }
+ | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' '<hive>OF' 'UNSIGNED_INTEGER' OptionalOnColumn 'CURSOR' RightParenthesisOrError
+   {
+     if (!$8) {
+       suggestKeywords(['ON']);
+     }
+   }
+ | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' '<hive>OF' 'UNSIGNED_INTEGER' OptionalOnColumn_EDIT RightParenthesisOrError
+ ;
+
+OptionalOnColumn
+ :
+ | 'ON' ValueExpression
+ ;
+
+OptionalOnColumn_EDIT
+ : 'ON' 'CURSOR'
+   {
+     valueExpressionSuggest();
+   }
+ | 'ON' ValueExpression_EDIT
  ;
 
 PushQueryState
@@ -3123,34 +3197,38 @@ SumFunction_EDIT
  ;
 
 LateralView
- : '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $3, tableAlias: $4, columnAliases: $5 }]
- | '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $3, columnAliases: $4 }]
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $4, tableAlias: $5, columnAliases: $6 }]
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $4, columnAliases: $5 }]
  | LateralView_INVALID
  ;
 
 LateralView_INVALID
- : '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction RegularIdentifier error                     -> []
- | '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction error                                       -> []
- | '<hive>LATERAL' '<hive>VIEW' error                                                           -> []
- | '<hive>LATERAL' error                                                                        -> []
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier error  -> []
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction error                    -> []
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                        -> []
+ | '<hive>LATERAL' error                                                                   -> []
  ;
 
 LateralView_EDIT
- : '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction_EDIT
- | '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction_EDIT LateralViewColumnAliases
- | '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction RegularIdentifier 'CURSOR'
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT LateralViewColumnAliases
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier 'CURSOR'
    {
      suggestKeywords(['AS']);
      $$ = [];
    }
- | '<hive>LATERAL' '<hive>VIEW' UserDefinedFunction 'CURSOR'
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction 'CURSOR'
    {
      suggestKeywords(['AS']);
      $$ = [];
    }
- | '<hive>LATERAL' '<hive>VIEW' 'CURSOR'
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter 'CURSOR'
    {
-     suggestKeywords(['explode', 'posexplode']);
+     if (!$3) {
+       suggestKeywords([{ value: 'OUTER', weight: 2 }, { value: 'explode', weight: 1 }, { value: 'posexplode', weight: 1 }]);
+     } else {
+       suggestKeywords(['explode', 'posexplode']);
+     }
      $$ = [];
    }
  | '<hive>LATERAL' 'CURSOR'
@@ -3158,6 +3236,11 @@ LateralView_EDIT
      suggestKeywords(['VIEW']);
      $$ = [];
    }
+ ;
+
+OptionalOuter
+ :
+ | 'OUTER'
  ;
 
 LateralViewColumnAliases

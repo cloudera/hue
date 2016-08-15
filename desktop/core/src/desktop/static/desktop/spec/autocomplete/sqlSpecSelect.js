@@ -119,7 +119,7 @@ define([
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+          suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
         }
       });
     });
@@ -595,7 +595,7 @@ define([
         });
       });
 
-    it('should handle "SELECT CASE cos(boo.a) > baa.boo \\n' +
+      it('should handle "SELECT CASE cos(boo.a) > baa.boo \\n' +
         '\\tWHEN baa.b THEN true \\n' +
         '\\tWHEN boo.c THEN false \\n' +
         '\\tWHEN baa.blue THEN boo.d \\n' +
@@ -632,9 +632,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: '',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestTables: {
               prependQuestionMark: true,
               prependFrom: true
@@ -655,9 +655,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'select ',
           afterCursor: '',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -678,9 +678,10 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ALL ',
           afterCursor: '',
+          containsKeywords: ['*'],
+          doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -701,9 +702,10 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT DISTINCT ',
           afterCursor: '',
+          containsKeywords: ['*'],
+          doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestFunctions: {},
             suggestTables: {
               prependQuestionMark: true,
@@ -722,9 +724,10 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT DISTINCT ',
           afterCursor: ' a, b, c FROM tbl',
+          containsKeywords: ['*'],
+          doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestFunctions: {},
             suggestColumns: { table: 'tbl' },
             locations: [
@@ -744,9 +747,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM tableA;',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -760,9 +763,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testWHERE',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -776,9 +779,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testON',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -792,9 +795,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM transactions',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -808,9 +811,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTableA tta, testTableB',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -824,9 +827,9 @@ define([
           beforeCursor: 'select ',
           afterCursor: ' from database_two.testTable',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -839,9 +842,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'select ',
           afterCursor: ' from `database one`.`test table`',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -984,9 +987,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' a, cast(b as int), c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -1027,9 +1030,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM ${some_variable};',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -2646,7 +2649,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+            suggestKeywords: ['TABLESAMPLE', 'AS', 'LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2659,7 +2662,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LATERAL VIEW', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+            suggestKeywords: ['LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
       });
@@ -2750,14 +2753,14 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['explode', 'posexplode']
+            suggestKeywords: ['OUTER', 'explode', 'posexplode']
           }
         });
       });
 
-      it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW explode(bar) |"', function () {
+      it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW OUTER explode(bar) |"', function () {
         assertAutoComplete({
-          beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) ',
+          beforeCursor: 'SELECT bar FROM foo LATERAL VIEW OUTER explode(bar) ',
           afterCursor: '',
           dialect: 'hive',
           hasLocations: true,
@@ -3231,7 +3234,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
+            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
             locations: [
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25}, table: 'testTableA'},
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 41}, table: 'testTableB'}
@@ -3398,7 +3401,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
+            suggestKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -4953,13 +4956,13 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' a, b, c FROM testTable',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
-            suggestColumns: { table: 'testTable' },
-            suggestKeywords: ['*', 'ALL', 'DISTINCT']
+            suggestColumns: { table: 'testTable' }
           }
         });
       });
@@ -5736,6 +5739,116 @@ define([
       });
     });
 
+    describe('TABLESAMPLE', function () {
+      it('should handle "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM boo |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['TABLESAMPLE', 'AS'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      xit('should suggest keywords for "SELECT * FROM boo |, baa', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo ',
+          afterCursor: ', baa',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['TABLESAMPLE', 'AS'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (|', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['BUCKET']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['OUT OF']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['OF']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['ON']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON |', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { table: 'boo' }
+          }
+        });
+      });
+    });
+
     describe('UNION clause', function () {
       // TODO: Fix locations
       xit('should handle "SELECT * FROM (SELECT x FROM few_ints UNION ALL SELECT x FROM few_ints) AS t1 ORDER BY x;|', function () {
@@ -5809,9 +5922,9 @@ define([
           afterCursor: '',
           hasLocations: true,
           noErrors: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -5909,9 +6022,9 @@ define([
           afterCursor: '',
           hasLocations: true,
           noErrors: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6403,7 +6516,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
+              suggestKeywords: ['LATERAL VIEW', 'CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
             }
           });
         });
@@ -6750,9 +6863,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT ',
           afterCursor: '',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6778,9 +6891,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM bar WHERE foo NOT IN (SELECT ',
           afterCursor: ')',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6829,9 +6942,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM (SELECT ',
           afterCursor: '',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6871,9 +6984,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTable tt, (SELECT bla FROM abc WHERE foo > 1) bar',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6899,9 +7012,9 @@ define([
           beforeCursor: 'select ',
           afterCursor: ' from (select id i, name as n, bla from foo) bar',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -6924,9 +7037,9 @@ define([
           beforeCursor: 'select ',
           afterCursor: ' from (select id i, name as n, bla from foo) bar',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7011,9 +7124,9 @@ define([
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM (SELECT ',
           afterCursor: ')',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7035,9 +7148,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM (SELECT * FROM tableOne) AS subQueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN table4 t4 ON t3.id = t4.id) subQueryTwo;',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7058,9 +7171,9 @@ define([
           beforeCursor: 'SELECT * FROM (SELECT ',
           afterCursor: ' FROM tableOne) subQueryOne, someDb.tableTwo talias, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) AS subQueryTwo;',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7076,9 +7189,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7101,9 +7214,9 @@ define([
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM (SELECT * FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7130,9 +7243,9 @@ define([
           beforeCursor: 'SELECT * FROM (SELECT ',
           afterCursor: ' FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -7155,9 +7268,9 @@ define([
           beforeCursor: 'SELECT * FROM (SELECT * FROM (SELECT ',
           afterCursor: ' FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree',
           hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
