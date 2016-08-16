@@ -335,6 +335,10 @@ from desktop.views import _ko
     .typeahead .active {
       padding: 0;
     }
+
+    .document-types .app-icon {
+      margin-right: 4px;
+    }
   </style>
 
   <script type="text/html" id="fb-template">
@@ -549,7 +553,7 @@ from desktop.views import _ko
           <div>
             <span class="dropdown">
               <a class="inactive-action fb-action" title="${_('New document')}" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
-              <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
+              <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
                 % if 'beeswax' in apps:
                   <li><a title="${_('Hive Query')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
                 % endif
@@ -571,7 +575,7 @@ from desktop.views import _ko
                   <li><a title="${_('Oozie Bundle')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_bundle') }') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Oozie Bundle')}</a></li>
                 % endif
                 % if 'search' in apps:
-                  <li><a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:index') }') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/>${_('Search Dashboard')}</a></li>
+                  <li><a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:index') }') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${_('Search Dashboard')}</a></li>
                 % endif
               </ul>
             </span>
