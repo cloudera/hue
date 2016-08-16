@@ -72,6 +72,7 @@ define([
           beforeCursor: 'SHOW COMPACTIONS;',
           afterCursor: '',
           dialect: 'hive',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -84,6 +85,20 @@ define([
           beforeCursor: 'SHOW CONF a.b.c;',
           afterCursor: '',
           dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW CURRENT ROLES;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW CURRENT ROLES;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -1309,6 +1324,7 @@ define([
           beforeCursor: 'SHOW CURRENT ROLES;',
           afterCursor: '',
           dialect: 'impala',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false

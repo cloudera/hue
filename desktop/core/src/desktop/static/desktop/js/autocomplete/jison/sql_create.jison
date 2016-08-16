@@ -1352,6 +1352,7 @@ RoleDefinition
 
 AnyRole
  : '<hive>ROLE'
+ | '<impala>ROLE'
  | 'ROLE'
  ;
 

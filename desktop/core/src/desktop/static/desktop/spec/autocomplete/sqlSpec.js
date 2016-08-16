@@ -25,6 +25,7 @@ define([
   'desktop/spec/autocomplete/sqlSpecError',
   'desktop/spec/autocomplete/sqlSpecLoad',
   'desktop/spec/autocomplete/sqlSpecSelect',
+  'desktop/spec/autocomplete/sqlSpecSet',
   'desktop/spec/autocomplete/sqlSpecShow',
   'desktop/spec/autocomplete/sqlSpecUpdate',
   'desktop/spec/autocomplete/sqlSpecUse'
