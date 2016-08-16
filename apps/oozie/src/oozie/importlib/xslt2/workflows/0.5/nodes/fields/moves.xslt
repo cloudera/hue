@@ -2,12 +2,13 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:template name="touchzs">
+<xsl:template name="moves">
 
-  "touchzs": [
+  "moves": [
 
-    <xsl:for-each select="*[local-name()='touchz']">
-      {"value": "<xsl:value-of select="@path"/>"}
+    <xsl:for-each select="*[local-name()='move']">
+      {"source": "<xsl:value-of select="@source"/>",
+      "destination": "<xsl:value-of select="@target"/>"}
       <xsl:if  test="position() &lt; last()">
         ,
       </xsl:if>

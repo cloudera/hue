@@ -590,8 +590,10 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties['user'] = '%s@%s' % (node.get('ssh').get('user'), node.get('ssh').get('host'))
         properties['ssh_command'] = node.get('ssh').get('command')
       elif node['node_type'] == 'fs':
-        fs_props = node.get('fs')
-        # TBD: gather props for different fs operations
+        properties['touchzs'] = node.get('fs').get('touchzs')
+        properties['mkdirs'] = node.get('fs').get('mkdirs')
+        properties['moves'] = node.get('fs').get('moves')
+        properties['deletes'] = node.get('fs').get('deletes')
       elif node['node_type'] == 'email':
         properties['to'] = node.get('email').get('to')
         properties['subject'] = node.get('email').get('subject')
