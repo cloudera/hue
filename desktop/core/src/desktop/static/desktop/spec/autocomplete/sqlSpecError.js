@@ -42,5 +42,91 @@ define([
         }
       });
     });
+
+    it('should suggest columns for "SELECT foo, bar, SELECT, | FROM testTable"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT foo, bar, SELECT, ',
+        afterCursor: ' FROM testTable',
+        hasLocations: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestColumns: { table: 'testTable' }
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT foo, baa baa baa baa, SELECT, | FROM testTable"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT foo, baa baa baa baa, SELECT, ',
+        afterCursor: ' FROM testTable',
+        hasLocations: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestColumns: { table: 'testTable' }
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT * FROM testTable WHERE baa baaa booo |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo',
+        afterCursor: '',
+        hasLocations: true,
+        containsKeywords: ['GROUP BY', 'ORDER BY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT * FROM testTable WHERE baa baaa booo GROUP |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo GROUP ',
+        afterCursor: '',
+        hasLocations: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['BY']
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT * FROM testTable WHERE baa baaa booo ORDER |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo ORDER ',
+        afterCursor: '',
+        hasLocations: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['BY']
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT * FROM testTable ORDER BY bla bla bla boo |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
+        afterCursor: '',
+        hasLocations: true,
+        containsKeywords: ['LIMIT', 'UNION'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT * FROM testTable GROUP BY boo hoo hoo ORDER BY bla bla bla boo |"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
+        afterCursor: '',
+        hasLocations: true,
+        containsKeywords: ['LIMIT', 'UNION'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
   });
 });

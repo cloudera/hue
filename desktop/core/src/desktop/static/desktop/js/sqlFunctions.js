@@ -1438,7 +1438,7 @@
       },
       concat: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}, {type: 'BINARY'}]],
+        arguments: [[{type: 'STRING', multiple: true}, {type: 'BINARY', multiple: true}]],
         signature: 'concat(STRING|BINARY a, STRING|BINARY b...)',
         description: 'Returns the string or bytes resulting from concatenating the strings or bytes passed in as parameters in order. For example, concat(\'foo\', \'bar\') results in \'foobar\'. Note that this function can take any number of input strings.'
       },

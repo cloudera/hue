@@ -136,6 +136,9 @@ define([
       expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 3)).toEqual([]);
       expect(sqlFunctions.getArgumentTypes('impala', 'strleft', 200)).toEqual([]);
 
+      expect(sqlFunctions.getArgumentTypes('hive', 'concat', 10)).toEqual(['BINARY', 'STRING']);
+      expect(sqlFunctions.getArgumentTypes('impala', 'concat', 10)).toEqual(['STRING']);
+
       expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 1)).toEqual(['STRING']);
       expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 2)).toEqual(['STRING']);
       expect(sqlFunctions.getArgumentTypes('hive', 'substring_index', 3)).toEqual(['INT']);
