@@ -455,6 +455,7 @@
     var currentScore = 1000;
     completions.forEach(function (completion) {
       completion.score = currentScore;
+      completion.prioritizeScore = true;
       currentScore--;
     });
 

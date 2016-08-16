@@ -437,6 +437,13 @@ var FilteredList = function(array, filterText) {
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
         matches = matches.sort(function (a, b) {
+          if (a.prioritizeScore && b.prioritzeScore) {
+            return b.score - a.score
+          } else if (a.prioritizeScore) {
+            return -1;
+          } else if (b.prioritizeScore) {
+            return 1;
+          }
           var alpha = 0;
           if (a.caption > b.caption) {
             alpha = 1;
