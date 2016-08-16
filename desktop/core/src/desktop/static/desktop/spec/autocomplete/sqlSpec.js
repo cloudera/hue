@@ -198,6 +198,129 @@ define([
       });
     });
 
+    describe('EXPLAIN', function () {
+      describe('Hive specific', function () {
+        it('should handle "EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "|"', function() {
+          assertAutoComplete({
+            beforeCursor: '',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['EXPLAIN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "EXPLAIN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['AUTHORIZATION', 'DEPENDENCY', 'EXTENDED', 'SELECT'],
+            doesNotContainKeywords: ['EXPLAIN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "EXPLAIN AUTHORIZATION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN AUTHORIZATION ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            doesNotContainKeywords: ['AUTHORIZATION', 'DEPENDENCY', 'EXTENDED', 'EXPLAIN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest tables for "EXPLAIN EXTENDED SELECT * FROM |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN EXTENDED SELECT * FROM ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should handle "EXPLAIN SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "|"', function() {
+          assertAutoComplete({
+            beforeCursor: '',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['EXPLAIN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "EXPLAIN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            doesNotContainKeywords: ['AUTHORIZATION', 'DEPENDENCY', 'EXTENDED', 'EXPLAIN'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest tables for "EXPLAIN SELECT * FROM |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'EXPLAIN SELECT * FROM ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+      });
+    });
+
     describe('Impala specific', function () {
       it('should suggest keywords for "|"', function() {
         assertAutoComplete({
