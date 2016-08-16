@@ -785,13 +785,13 @@ from metadata.conf import has_navigator
       <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()" style="display: none;">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
     </div>
     <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()" style="display: none;">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading tables.') }</span>
     </div>
   </script>

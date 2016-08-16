@@ -192,6 +192,8 @@
     var successCallback = function(data) {
       self.entries([]);
       self.hasErrors(false);
+      self.loading(false);
+
       var newEntries = [];
       if (typeof data.tables_meta !== "undefined") {
         newEntries = $.map(data.tables_meta, function(table) {
@@ -274,21 +276,19 @@
         }
       }
 
-      self.loading(false);
+
       if (data.type === 'array' || data.type === 'map') {
         self.entries(newEntries);
         self.entries()[0].open(true);
-        return;
+      } else {
+        newEntries.sort(function (a, b) {
+          if (a.definition.isColumn && b.definition.isColumn) {
+            return 0;
+          }
+          return a.definition.name.localeCompare(b.definition.name);
+        });
+        self.entries(newEntries);
       }
-
-      newEntries.sort(function (a, b) {
-        if (a.definition.isColumn && b.definition.isColumn) {
-          return 0;
-        }
-        return a.definition.name.localeCompare(b.definition.name);
-      });
-
-      self.entries(newEntries);
       if (typeof callback === 'function') {
         callback();
       }
