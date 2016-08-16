@@ -421,7 +421,7 @@
 
   Plugin.prototype.init = function () {
     var self = this;
-    $(self.element).empty().html('<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: fixed"></div><div class="filechooser-tree" style="width: 560px"></div></div>');
+    $(self.element).empty().html('<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: absolute"></div><div class="filechooser-tree" style="width: 560px"></div></div>');
     $.post('/filebrowser/api/get_filesystems', function (data) {
       var initialPath = $.trim(self.options.initialPath);
       if (data && data.status == 0) {
