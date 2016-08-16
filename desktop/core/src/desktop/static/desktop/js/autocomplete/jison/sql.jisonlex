@@ -30,6 +30,7 @@
 <hive>'ALL'                                { return '<hive>ALL'; }
 <hive>'ARRAY'                              { return '<hive>ARRAY'; }
 <hive>'AS'                                 { return '<hive>AS'; }
+<hive>'AUTHORIZATION'                      { return '<hive>AUTHORIZATION'; }
 <hive>'BINARY'                             { return '<hive>BINARY'; }
 <hive>'COLUMN'                             { return '<hive>COLUMN'; }
 <hive>'CONF'                               { return '<hive>CONF'; }
@@ -83,12 +84,14 @@
 <hive>'DEFERRED'                           { return '<hive>DEFERRED'; }
 <hive>'DEFINED'                            { return '<hive>DEFINED'; }
 <hive>'DELIMITED'                          { return '<hive>DELIMITED'; }
+<hive>'DEPENDENCY'                         { return '<hive>DEPENDENCY'; }
 <hive>'DESC'                               { return '<hive>DESC'; }
 <hive>'DISABLE'                            { return '<hive>DISABLE'; }
 <hive>'DISTRIBUTE'                         { return '<hive>DISTRIBUTE'; }
 <hive>'ESCAPED'                            { return '<hive>ESCAPED'; }
 <hive>'ENABLE'                             { return '<hive>ENABLE'; }
 <hive>'EXCHANGE'                           { return '<hive>EXCHANGE'; }
+<hive>'EXPLAIN'                            { determineCase(yytext); return '<hive>EXPLAIN'; }
 <hive>'FIELDS'                             { return '<hive>FIELDS'; }
 <hive>'FILE'                               { return '<hive>FILE'; }
 <hive>'FILEFORMAT'                         { return '<hive>FILEFORMAT'; }
@@ -183,6 +186,7 @@
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
 <impala>'DESCRIBE'                         { determineCase(yytext); return '<impala>DESCRIBE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
+<impala>'EXPLAIN'                          { determineCase(yytext); return '<impala>EXPLAIN'; }
 <impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
 <impala>'FILEFORMAT'                       { return '<impala>FILEFORMAT'; }

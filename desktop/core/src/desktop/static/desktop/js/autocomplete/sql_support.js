@@ -634,8 +634,12 @@ var getKeywordsForOptionalsLR = function (optionals, keywords, override) {
   return result;
 };
 
-var suggestDdlAndDmlKeywords = function () {
-  var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
+var suggestDdlAndDmlKeywords = function (extraKeywords) {
+  var keywords = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
+
+  if (extraKeywords) {
+    keywords = keywords.concat(extraKeywords);
+  }
 
   if (isHive()) {
     keywords = keywords.concat(['ANALYZE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
