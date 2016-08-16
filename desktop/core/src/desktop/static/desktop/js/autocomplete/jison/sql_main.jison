@@ -79,6 +79,7 @@ NonReservedKeyword
  | '<hive>OFFLINE'
  | '<hive>ORC'
  | '<hive>OUTPUTFORMAT'
+ | '<hive>OVERWRITE'
  | '<hive>PARQUET'
  | '<hive>PARTITIONED'
  | '<hive>PARTITIONS'
@@ -195,7 +196,7 @@ SqlStatement_EDIT
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>MACRO' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NONE' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
+ : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>LOCAL' | '<hive>MACRO' | '<hive>OVERWRITE' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NONE' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
  | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
  | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
@@ -212,15 +213,6 @@ DataDefinition
 DataDefinition_EDIT
  : DescribeStatement_EDIT
  ;
-
-DataManipulation
- : LoadStatement
- ;
-
-DataManipulation_EDIT
- : LoadStatement_EDIT
- ;
-
 
 // ===================================== Commonly used constructs =====================================
 
@@ -309,11 +301,6 @@ HiveOrImpalaCurrent
  | '<impala>CURRENT'
  ;
 
-HiveOrImpalaData
- : '<hive>DATA'
- | '<impala>DATA'
- ;
-
 HiveOrImpalaDatabasesOrSchemas
  : '<hive>DATABASES'
  | '<hive>SCHEMAS'
@@ -339,16 +326,6 @@ HiveOrImpalaFields
 HiveOrImpalaFormat
  : '<hive>FORMAT'
  | '<impala>FORMAT'
- ;
-
-HiveOrImpalaLoad
- : '<hive>LOAD'
- | '<impala>LOAD'
- ;
-
-HiveOrImpalaInpath
- : '<hive>INPATH'
- | '<impala>INPATH'
  ;
 
 HiveOrImpalaLeftSquareBracket
@@ -1026,34 +1003,6 @@ ImpalaDescribeStatement_EDIT
      $$ = { cursorOrPartialIdentifier: true };
    }
  ;
-
-// ===================================== LOAD statement =====================================
-
-LoadStatement
- : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' AnyTable RegularIdentifier
- ;
-
-LoadStatement_EDIT
- : HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath_EDIT 'INTO' AnyTable RegularIdentifier
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'INTO' 'CURSOR'
-   {
-     suggestKeywords([ 'TABLE' ]);
-   }
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath 'CURSOR'
-   {
-     suggestKeywords([ 'INTO' ]);
-   }
- | HiveOrImpalaLoad HiveOrImpalaData HiveOrImpalaInpath HdfsPath_EDIT
- | HiveOrImpalaLoad HiveOrImpalaData 'CURSOR'
-   {
-     suggestKeywords([ 'INPATH' ]);
-   }
- | HiveOrImpalaLoad 'CURSOR'
-   {
-     suggestKeywords([ 'DATA' ]);
-   }
- ;
-
 
 // ===================================== SELECT statement =====================================
 
