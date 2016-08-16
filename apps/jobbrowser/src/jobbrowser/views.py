@@ -72,8 +72,10 @@ def check_job_permission(view_func):
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
     except ApplicationNotRunning, e:
       if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
-        rm_api = resource_manager_api.get_resource_manager(request.user)
+        rm_pool = resource_manager_api.get_resource_manager_pool()
+        rm_api = rm_pool.get(request.user.username)
         job = Application(e.job, rm_api)
+        rm_pool.put(rm_api)
       else:
         # reverse() seems broken, using request.path but beware, it discards GET and POST info
         return job_not_assigned(request, jobid, request.path)
@@ -117,7 +119,7 @@ def jobs(request):
 
   if request.POST.get('format') == 'json':
     try:
-      # Limit number of jobs to be 10,000
+      # Limit number of jobs to be 1000
       jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=1000)
     except Exception, ex:
       ex_message = str(ex)
