@@ -3388,7 +3388,7 @@ ${ hueIcons.symbols() }
         }
       });
 
-      function resizeToggleResultSettings (snippet) {
+      function resizeToggleResultSettings (snippet, initial) {
         var _dtElement;
         if (snippet.showGrid()) {
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
@@ -3406,12 +3406,14 @@ ${ hueIcons.symbols() }
           "height": (_dtElement.height() - 30) + "px",
           "line-height": (_dtElement.height() - 30) + "px"
         });
-        $('#snippet_' + snippet.id()).find('.result-settings').animate({
-          'marginTop': 0
-        });
-        $('#snippet_' + snippet.id()).find('.snippet-actions').animate({
-          'marginTop': 0
-        });
+        if (initial) {
+          $('#snippet_' + snippet.id()).find('.result-settings').animate({
+            'marginTop': 0
+          });
+          $('#snippet_' + snippet.id()).find('.snippet-actions').animate({
+            'marginTop': 0
+          });
+        }
       }
 
       $(document).on("renderData", function (e, options) {
@@ -3436,7 +3438,7 @@ ${ hueIcons.symbols() }
             _dtElement.animate({opacity: '1'}, 50);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
             redrawFixedHeaders();
-            resizeToggleResultSettings(options.snippet);
+            resizeToggleResultSettings(options.snippet, options.initial);
           }, 300);
         } else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
@@ -3511,7 +3513,7 @@ ${ hueIcons.symbols() }
 
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
-          resizeToggleResultSettings(snippet);
+          resizeToggleResultSettings(snippet, true);
           forceChartDraws();
           $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 1 }, scrollInertia: 0});
           window.setTimeout(function(){
@@ -3524,7 +3526,7 @@ ${ hueIcons.symbols() }
 
       $(document).on("chartShown", function (e, snippet) {
         window.setTimeout(function () {
-          resizeToggleResultSettings(snippet);
+          resizeToggleResultSettings(snippet, true);
         }, 50);
       });
 
@@ -3558,7 +3560,7 @@ ${ hueIcons.symbols() }
                     var _dt = createDatatable(_el, snippet, viewModel);
                     _dt.fnClearTable();
                     _dt.fnAddData(snippet.result.data());
-                    resizeToggleResultSettings(snippet);
+                    resizeToggleResultSettings(snippet, true);
                     resetResultsResizer(snippet);
                     $(document).trigger("forceChartDraw", snippet);
                     window.clearInterval(_elCheckerInterval);
