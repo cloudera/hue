@@ -1412,7 +1412,7 @@ OptionalSelectConditions_EDIT
    {
      var keywords = getKeywordsForOptionalsLR([$3, $4, $5, $6, $7, $8, $9], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]);
      if ($1.suggestKeywords) {
-       keywords = createWeightedKeywords($1.suggestKeywords, 1);
+       keywords = keywords.concat(createWeightedKeywords($1.suggestKeywords, 1));
      }
      $$ = getValueExpressionKeywords($1, keywords);
      $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
@@ -1424,7 +1424,7 @@ OptionalSelectConditions_EDIT
    {
      var keywords = getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9], [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isHive(), true, isImpala()]);
      if ($2.suggestKeywords) {
-       keywords = createWeightedKeywords($2.suggestKeywords, 8);
+       keywords = keywords.concat(createWeightedKeywords($2.suggestKeywords, 8));
      }
      $$ = getValueExpressionKeywords($2, keywords);
      if ($2.columnReference) {
@@ -2126,7 +2126,6 @@ TableReferenceList
 TableReferenceList_EDIT
  : TableReference_EDIT
  | TableReference_EDIT ',' TableReference
-// | TableReferenceList 'CURSOR' ',' TableReferenceList   // TODO: Causes conflict for some reason
  | TableReferenceList ',' TableReference_EDIT
  | TableReferenceList ',' TableReference_EDIT ',' TableReferenceList
  | TableReferenceList ',' AnyCursor
@@ -2180,6 +2179,7 @@ Joins_INVALID
  : JoinTypes OptionalImpalaBroadcastOrShuffle                                           -> { joinType: $1 }
  | JoinTypes OptionalImpalaBroadcastOrShuffle Joins                                     -> { joinType: $1 }
  ;
+
 OptionalImpalaBroadcastOrShuffle
  :
  | '<impala>BROADCAST'

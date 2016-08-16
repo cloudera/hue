@@ -392,6 +392,7 @@ define([
           beforeCursor: 'SELECT testTableB.a, cos(1), tta.abcdefg',
           afterCursor: 'hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;',
           dialect: 'hive',
+          noErrors: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { table: 'testTableA' },
@@ -5151,15 +5152,17 @@ define([
     });
 
     describe('ORDER BY Clause', function () {
-      xit('should suggest keywords for "SELECT * FROM testTable GROUP BY a | LIMIT 10"', function () {
+      it('should suggest keywords for "SELECT * FROM testTable GROUP BY a | LIMIT 10"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable GROUP BY a ',
           afterCursor: ' LIMIT 10',
           hasLocations: true,
           doesNotContainKeywords: ['LIMIT'],
           containsKeywords: ['ORDER BY'],
+          containsColRefKeywords: true,
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            colRef: { identifierChain: [{ name: 'a' }], table: 'testTable' }
           }
         });
       });
