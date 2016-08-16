@@ -104,7 +104,7 @@ def index(request):
 
   try:
     if not request.fs.isdir(path):
-       path = '/'
+      path = '/'
   except Exception:
     pass
 
@@ -146,7 +146,7 @@ def download(request, path):
     response = HttpResponse(_file_reader(fh), content_type=content_type)
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = request.GET.get('disposition', 'attachment')
+    response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
     return response
 
 
@@ -556,9 +556,7 @@ def display(request, path):
 
     # display inline files just if it's not an ajax request
     if not request.is_ajax():
-      mimetype = mimetypes.guess_type(path)[0]
-      print mimetype
-      if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype) and INLINE_DISPLAY_MIMETYPE_EXCEPTIONS.search(mimetype) is None:
+      if _can_inline_display(path):
         return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
@@ -651,6 +649,11 @@ def display(request, path):
     data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
 
     return render("display.mako", request, data)
+
+
+def _can_inline_display(path):
+  mimetype = mimetypes.guess_type(path)[0]
+  return mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype) and INLINE_DISPLAY_MIMETYPE_EXCEPTIONS.search(mimetype) is None
 
 
 def read_contents(codec_type, path, fs, offset, length):
