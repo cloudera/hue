@@ -1467,6 +1467,9 @@
             $target.height(8 * 16);
             resized = true;
           }
+          if (ace().session.getLength() == editorHeight) {
+            resized = false;
+          }
           if (resized) {
             ace().resize();
             editorHeight = Math.min(maxAutoLines, ace().session.getLength());
