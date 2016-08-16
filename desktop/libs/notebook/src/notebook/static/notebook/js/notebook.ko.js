@@ -472,9 +472,11 @@
 
     self.ddlNotification = ko.observable();
     self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-    self.delayedDDLNotification.subscribe(function (val) {
-      huePubSub.publish('assist.db.refresh', self.type());
-    });
+    window.setTimeout(function () {
+      self.delayedDDLNotification.subscribe(function (val) {
+        huePubSub.publish('assist.db.refresh', self.type());
+      });
+    }, 0);
 
     self.progress.subscribe(function (val) {
       $(document).trigger("progress", {data: val, snippet: self});
