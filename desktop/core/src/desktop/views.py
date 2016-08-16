@@ -54,6 +54,7 @@ from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _res
 from desktop.models import UserPreferences, Settings, hue_version
 from desktop import appmanager
 
+from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 
 
 LOG = logging.getLogger(__name__)
@@ -411,6 +412,7 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_i
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
+    'is_s3_enabled': is_s3_enabled() and has_s3_access(user)
   })
 
 def commonshare():

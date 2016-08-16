@@ -60,6 +60,11 @@ def is_default_configured():
   return is_enabled() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None
 
 
+def has_s3_access(user):
+  return user.is_authenticated and user.is_active and \
+         (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser"))
+
+
 def config_validator(user):
   res = []
 
