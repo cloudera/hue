@@ -377,7 +377,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ url('desktop.views.home') }";
+    location.href = "${ url('desktop.views.home2') }";
   });
 
   $(".updatePreferences").click(function () {
