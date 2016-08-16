@@ -82,6 +82,7 @@ class HttpClient(object):
     self._exc_class = exc_class or RestException
     self._logger = logger or LOG
     self._session = requests.Session()
+    self._cookies = None
 
   def set_kerberos_auth(self):
     """Set up kerberos auth for the client, based on the current ticket."""
@@ -144,10 +145,7 @@ class HttpClient(object):
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
         data = None
 
-    request_kwargs = {}
-
-    if not allow_redirects:
-      request_kwargs['allow_redirects'] = False
+    request_kwargs = {'allow_redirects': allow_redirects}
     if headers:
       request_kwargs['headers'] = headers
     if data:
@@ -158,12 +156,15 @@ class HttpClient(object):
     if clear_cookies:
       self._session.cookies.clear()
 
+    if self._cookies:
+      request_kwargs['cookies'] = self._cookies
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
-
       if resp.status_code >= 300:
         resp.raise_for_status()
         raise exceptions.HTTPError(response=resp)
+      # Cache request cookie for the next http_client call.
+      self._cookies = resp.cookies
       return resp
     except (exceptions.ConnectionError,
             exceptions.HTTPError,
