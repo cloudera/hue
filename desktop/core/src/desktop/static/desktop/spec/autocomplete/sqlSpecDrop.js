@@ -392,6 +392,20 @@ define([
       });
     });
 
+    describe('DROP ROLE', function () {
+      it('should handle "DROP ROLE boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP ROLE boo;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+    });
+
     describe('DROP TABLE', function () {
       it('should suggest tables for "DROP TABLE |"', function() {
         assertAutoComplete({

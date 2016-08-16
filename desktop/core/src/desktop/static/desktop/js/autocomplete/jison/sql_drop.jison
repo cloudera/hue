@@ -25,6 +25,7 @@ DataDefinition_EDIT
 DropStatement
  : DropDatabaseStatement
  | DropFunctionStatement
+ | DropRoleStatement
  | DropTableStatement
  | DropIndexStatement
  | DropMacroStatement
@@ -157,6 +158,10 @@ DropHiveFunction_EDIT
    }
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+ ;
+
+DropRoleStatement
+ : 'DROP' AnyRole RegularIdentifier
  ;
 
 DropTableStatement

@@ -18,6 +18,7 @@ var prepareNewStatement = function () {
   linkTablePrimaries();
   commitLocations();
 
+  delete parser.yy.caseDetermined;
   delete parser.yy.latestTablePrimaries;
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
@@ -833,7 +834,10 @@ var suggestValues = function (details) {
 };
 
 var determineCase = function (text) {
-  parser.yy.lowerCase = text.toLowerCase() === text;
+  if (!parser.yy.caseDetermined) {
+    parser.yy.lowerCase = text.toLowerCase() === text;
+    parser.yy.caseDetermined = true;
+  }
 };
 
 var lexerModified = false;

@@ -48,6 +48,7 @@
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
 <hive>'MAP'                                { return '<hive>MAP'; }
+<hive>'NONE'                               { return '<hive>NONE'; }
 <hive>'OF'                                 { return '<hive>OF'; }
 <hive>'OUT'                                { return '<hive>OUT'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
@@ -302,7 +303,7 @@
 'SCHEMA'                                   { return 'SCHEMA'; }
 'SELECT'                                   { determineCase(yytext); return 'SELECT'; }
 'SEMI'                                     { return 'SEMI'; }
-'SET'                                      { return 'SET'; }
+'SET'                                      { determineCase(yytext); return 'SET'; }
 'SHOW'                                     { determineCase(yytext); return 'SHOW'; }
 'SMALLINT'                                 { return 'SMALLINT'; }
 'STRING'                                   { return 'STRING'; }

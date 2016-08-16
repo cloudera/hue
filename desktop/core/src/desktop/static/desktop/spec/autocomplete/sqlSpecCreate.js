@@ -53,6 +53,18 @@ define([
       });
     });
 
+    it('should handle "CREATE ROLE baaa;|', function () {
+      assertAutoComplete({
+        beforeCursor: 'CREATE ROLE baaa;',
+        afterCursor: '',
+        noError: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     describe('Hive specific', function () {
       it('should suggest keywords for "CREATE |"', function () {
         assertAutoComplete({
