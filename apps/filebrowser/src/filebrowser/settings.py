@@ -20,3 +20,7 @@ NICE_NAME = "File Browser"
 REQUIRES_HADOOP = False
 ICON = "filebrowser/art/icon_filebrowser_48.png"
 MENU_INDEX = 20
+
+PERMISSION_ACTIONS = (
+  ("s3_access", "Access to S3 from filebrowser and filepicker."),
+)

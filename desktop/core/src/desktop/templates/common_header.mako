@@ -15,7 +15,6 @@
 ## limitations under the License.
 
 <%!
-from aws.conf import is_enabled as is_s3_enabled
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
@@ -424,7 +423,7 @@ if USE_NEW_EDITOR.get():
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-      % if not is_s3_enabled():
+      % if not is_s3_enabled:
       <li class="hide1380">
         <a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
           <i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;
@@ -451,7 +450,7 @@ if USE_NEW_EDITOR.get():
         </a>
       </li>
       <li class="hideMoreThan1380">
-        % if is_s3_enabled():
+        % if is_s3_enabled:
           <a title="${_('S3 Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
             <i class="fa fa-cloud"></i>
           </a>
