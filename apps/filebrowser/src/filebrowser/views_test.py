@@ -769,6 +769,30 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(None, response.context['home_directory'])
 
 
+  def test_download(self):
+    prefix = self.cluster.fs_prefix + '/test_download'
+    self.cluster.fs.mkdir(prefix)
+
+    f = self.cluster.fs.open(prefix + '/xss', "w")
+    sdf_string = '''<html>
+<head>
+<title>Hello</title>
+<script>
+alert("XSS")
+</script>
+</head>
+<body>
+<h1>I am evil</h1>
+</body>
+</html>'''
+    f.write(sdf_string)
+    f.close()
+
+    response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=True)
+    assert_equal(200, response.status_code)
+    assert_equal('attachment', response['Content-Disposition'])
+
+
   def test_edit_i18n(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
