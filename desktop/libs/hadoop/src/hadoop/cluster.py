@@ -232,7 +232,6 @@ def get_next_ha_yarncluster():
           if cluster_info['clusterInfo']['haState'] == 'ACTIVE':
             MR_NAME_CACHE = name
             LOG.warn('Picking RM HA: %s' % name)
-            resource_manager_api.API_CACHE = None  # Reset cache
             mapreduce_api.API_CACHE = None
             return (config, rm)
           else:
