@@ -24,7 +24,7 @@ define([
       expect(completions.length).not.toEqual(0);
 
       var completionsWithCorrectType = completions.filter(function (completion) {
-        return completion.meta === 'BOOLEAN' || completion.meta === 'T' || completion.meta === 'ARRAY' || completion.meta === 'MAP' || completion.meta === 'STRUCT';
+        return completion.meta === 'BOOLEAN' || completion.meta === 'T' || completion.meta === 'ARRAY' || completion.meta === 'MAP' || completion.meta === 'STRUCT' || completion.meta === 'UNION' || completion.meta === 'table';
       });
 
       expect(completionsWithCorrectType.length).toEqual(completions.length);
@@ -97,6 +97,12 @@ define([
       expect(sqlFunctions.matchesType('hive', ['T'], ['NUMBER'])).toBeTruthy();
       expect(sqlFunctions.matchesType('hive', ['NUMBER'], ['BOOLEAN'])).toBeFalsy();
       expect(sqlFunctions.matchesType('hive', ['BOOLEAN'], ['NUMBER'])).toBeFalsy();
+    });
+
+    it('should strip precision', function () {
+      expect(sqlFunctions.matchesType('hive', ['STRING'], ['VARCHAR(10)'])).toBeTruthy();
+      expect(sqlFunctions.matchesType('hive', ['NUMBER'], ['DECIMAL(10,1)'])).toBeTruthy();
+      expect(sqlFunctions.matchesType('hive', ['T'], ['CHAR(1)'])).toBeTruthy();
     });
 
     it('should matchTypes for BIGINT', function () {

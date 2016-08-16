@@ -2185,96 +2185,99 @@
   var typeImplicitConversion = {
     hive: {
       BOOLEAN: {
-        BOOLEAN: true, T: true
+        BOOLEAN: true, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: false, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       TIMESTAMP: {
-        TIMESTAMP: true, T: true
+        BOOLEAN: false, TIMESTAMP: true, DATE: false, BINARY: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: false, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       DATE: {
-        DATE: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: true, BINARY: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: false, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       BINARY: {
-        BINARY: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: true, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: false, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       TINYINT: {
-        TINYINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: false, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: true, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       SMALLINT: {
-        TINYINT: true, SMALLINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: false, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: true, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       INT: {
-        TINYINT: true, SMALLINT: true, INT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: false, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: true, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       BIGINT: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: false, DOUBLE: false, DECIMAL: false, NUMBER: true, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       FLOAT: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: false, DECIMAL: false, NUMBER: true, STRING: false, CHAR: false, VARCHAR: false, T: true
       },
       DOUBLE: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: false, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       },
       DECIMAL: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       },
       NUMBER: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, DATE: false, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       },
       STRING: {
-        TIMESTAMP: true, DATE: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: true, DATE: true, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
+      },
+      CHAR: {
+        BOOLEAN: false, TIMESTAMP: true, DATE: true, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       },
       VARCHAR: {
-        TIMESTAMP: true, DATE: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: true, DATE: true, BINARY: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       },
       T: {
-        BOOLEAN: true, TIMESTAMP: true, DATE: true, BINARY: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, VARCHAR: true, T: true
+        BOOLEAN: true, TIMESTAMP: true, DATE: true, BINARY: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, DOUBLE: true, DECIMAL: true, NUMBER: true, STRING: true, CHAR: true, VARCHAR: true, T: true
       }
     },
     impala: {
       BOOLEAN: {
-        BOOLEAN: true, T: true
+        BOOLEAN: true, TIMESTAMP: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: false, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       TIMESTAMP :{
-        STRING: true, TIMESTAMP:true, T: true
+        BOOLEAN: false, TIMESTAMP: true, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: false, CHAR: false, VARCHAR: false, STRING: true, T: true
       },
       TINYINT: {
-        TINYINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       SMALLINT: {
-        TINYINT: true, SMALLINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       INT: {
-        TINYINT: true, SMALLINT: true, INT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       BIGINT: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       DOUBLE: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: false, FLOAT: true, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       REAL: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: false, FLOAT: true, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       DECIMAL: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       FLOAT: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: true, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       NUMBER: {
-        TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, NUMBER: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, NUMBER: true, CHAR: false, VARCHAR: false, STRING: false, T: true
       },
       CHAR: {
-        CHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: false, CHAR: true, VARCHAR: false, STRING: false, T: true
       },
       VARCHAR: {
-        CHAR: true, VARCHAR: true, T: true
+        BOOLEAN: false, TIMESTAMP: false, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: false, CHAR: true, VARCHAR: true, STRING: false, T: true
       },
       STRING: {
-        TIMESTAMP: true, CHAR: true, STRING: true, T: true
+        BOOLEAN: false, TIMESTAMP: true, TINYINT: false, SMALLINT: false, INT: false, BIGINT: false, DOUBLE: false, REAL: false, DECIMAL: false, FLOAT: false, NUMBER: false, CHAR: true, VARCHAR: false, STRING: true, T: true
       },
       T: {
-        BOOLEAN: true, TIMESTAMP: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, CHAR: true, VARCHAR: true, STRING: true, T: true
+        BOOLEAN: true, TIMESTAMP: true, TINYINT: true, SMALLINT: true, INT: true, BIGINT: true, DOUBLE: true, REAL: true, DECIMAL: true, FLOAT: true, NUMBER: true, CHAR: true, VARCHAR: true, STRING: true, T: true
       }
     }
   };
@@ -2288,6 +2291,18 @@
     return html;
   };
 
+  var stripPrecision = function (types) {
+    var result = [];
+    types.forEach(function (type) {
+      if (type.indexOf('(') > -1) {
+        result.push(type.substring(0, type.indexOf('(')))
+      } else {
+        result.push(type);
+      }
+    });
+    return result;
+  };
+
   /**
    * Matches types based on implicit conversion i.e. if you expect a BIGINT then INT is ok but not BOOLEAN etc.
    *
@@ -2296,15 +2311,20 @@
    * @param actualTypes
    * @returns {boolean}
    */
-  var matchesType = function (dialect, expectedTypes, actualTypes) {
+  var matchesType = function (dialect, expectedTypes, actualRawTypes) {
     if (dialect !== 'hive') {
       dialect = 'impala';
     }
+    var actualTypes = stripPrecision(actualRawTypes);
     if (actualTypes.indexOf('ARRAY') !== -1 || actualTypes.indexOf('MAP') !== -1 || actualTypes.indexOf('STRUCT') !== -1) {
       return true;
     }
     for (var i = 0; i < expectedTypes.length; i++) {
       for (var j = 0; j < actualTypes.length; j++) {
+        // To support future unknown types
+        if (typeof typeImplicitConversion[dialect][expectedTypes[i]] === 'undefined' || typeof typeImplicitConversion[dialect][expectedTypes[i]][actualTypes[j]] == 'undefined') {
+          return true;
+        }
         if (typeImplicitConversion[dialect][expectedTypes[i]] && typeImplicitConversion[dialect][expectedTypes[i]][actualTypes[j]]) {
           return true;
         }
