@@ -28,7 +28,7 @@ class SqoopResource(Resource):
   @see desktop.lib.rest.resource
   """
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None, allow_redirects=False):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, allow_redirects=False, clear_cookies=False):
     """
     Invoke an API method.
     Look for sqoop-error-code and sqoop-error-message.
