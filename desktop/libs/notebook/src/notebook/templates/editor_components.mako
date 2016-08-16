@@ -2836,6 +2836,7 @@ ${ hueIcons.symbols() }
 
     window.hideFixedHeaders = hideFixedHeaders;
 
+    var redrawTimeout = -1;
     var redrawFixedHeaders = function (timeout) {
       var renderer = function() {
         if (! viewModel.selectedNotebook()) {
@@ -2867,7 +2868,8 @@ ${ hueIcons.symbols() }
         });
       }
       if (timeout){
-        window.setTimeout(renderer, timeout);
+        window.clearTimeout(redrawTimeout);
+        redrawTimeout = window.setTimeout(renderer, timeout);
       } else {
         renderer();
       }
