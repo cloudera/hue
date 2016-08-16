@@ -3694,7 +3694,8 @@
         var $parentOwner;
 
         while ($lastParent) {
-          var lastRefOffset = $lastRef.offset().top;
+          // Include the header, parent() is .foreach-wrapper, parent().parent() is the container (ul or div)
+          var lastRefOffset = $lastRef.parent().parent().offset().top;
           var lastAddedSpace = 0;
           $lastParent.children().each(function (idx, child) {
             var $child = $(child);
