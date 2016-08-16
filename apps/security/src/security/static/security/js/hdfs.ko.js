@@ -416,7 +416,19 @@ var Assist = function (vm, assist) {
           }
           else {
             self.loadParents(data.breadcrumbs);
-            if (data['files'] && data['files'][0] && data['files'][0]['type'] == 'dir') { // Hack for now
+            function findDir(files) {
+              if (files.length < 1) {
+                return false;
+              }
+              var foundDir = false;
+              files.forEach(function (f) {
+                if (f.name === '.' && f.type === 'dir') {
+                  foundDir = true;
+                }
+              });
+              return foundDir;
+            }
+            if (data['files'] && findDir(data['files'])) {
               self.pathType("dir");
               $.each(data.files, function (index, item) {
                 self.convertItemToObject(item);
