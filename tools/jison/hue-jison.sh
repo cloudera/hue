@@ -30,7 +30,7 @@ echo "%%" > sql_end.jison
 # With this all create tests will pass
 # cat sql_main.jison sql_create.jison sql_end.jison ../sql_support.js > sql.jison
 
-cat sql_main.jison sql_valueExpression.jison sql_error.jison sql_alter.jison sql_analyze.jison sql_create.jison sql_drop.jison sql_set.jison sql_show.jison sql_update.jison sql_use.jison sql_end.jison ../sql_support.js > sql.jison
+cat sql_main.jison sql_valueExpression.jison sql_error.jison sql_alter.jison sql_analyze.jison sql_create.jison sql_drop.jison sql_load.jison sql_set.jison sql_show.jison sql_update.jison sql_use.jison sql_end.jison ../sql_support.js > sql.jison
 
 jison sql.jison sql.jisonlex -m amd
 cat license.txt sql.js > ../sql.js

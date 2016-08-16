@@ -46,6 +46,7 @@
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'GROUPING'                           { return '<hive>GROUPING'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
+<hive>'LOCAL'                              { return '<hive>LOCAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
 <hive>'MAP'                                { return '<hive>MAP'; }
 <hive>'NONE'                               { return '<hive>NONE'; }
@@ -116,6 +117,7 @@
 <hive>'OFFLINE'                            { return '<hive>OFFLINE'; }
 <hive>'ORC'                                { return '<hive>ORC'; }
 <hive>'OUTPUTFORMAT'                       { return '<hive>OUTPUTFORMAT'; }
+<hive>'OVERWRITE'                          { return '<hive>OVERWRITE'; }
 <hive>'PARQUET'                            { return '<hive>PARQUET'; }
 <hive>'PARTITIONED'                        { return '<hive>PARTITIONED'; }
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
@@ -203,6 +205,7 @@
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
 <impala>'OFFSET'                           { return '<impala>OFFSET'; }
+<impala>'OVERWRITE'                        { return '<impala>OVERWRITE'; }
 <impala>'PARQUET'                          { return '<impala>PARQUET'; }
 <impala>'PARTITIONED'                      { return '<impala>PARTITIONED'; }
 <impala>'PARTITIONS'                       { return '<impala>PARTITIONS'; }
