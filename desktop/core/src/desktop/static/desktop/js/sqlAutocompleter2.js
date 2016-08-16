@@ -25,6 +25,8 @@
   }
 }(this, function (sqlParser, sqlFunctions) {
 
+  var IDENTIFIER_REGEX = /[a-zA-Z_0-9\$\u00A2-\uFFFF]/;
+
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
@@ -456,6 +458,7 @@
     completions.forEach(function (completion) {
       completion.score = currentScore;
       completion.prioritizeScore = true;
+      completion.identifierRegex = IDENTIFIER_REGEX;
       currentScore--;
     });
 
