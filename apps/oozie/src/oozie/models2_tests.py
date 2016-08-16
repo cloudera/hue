@@ -741,6 +741,37 @@ class TestExternalWorkflowGraph(object):
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'email-widget')
     assert_equal(workflow_data['workflow']['nodes'][0]['name'], 'start-3f10')
 
+  def test_gen_workflow_data_from_xml_for_fs(self):
+    self.wf.definition = """<workflow-app name="My_Workflow" xmlns="uri:oozie:workflow:0.5">
+        <start to="fs-d2ff"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="fs-d2ff">
+            <fs>
+                  <delete path='${nameNode}/user/admin/y'/>
+                  <delete path='${nameNode}/user/admin/a'/>
+                  <mkdir path='${nameNode}/user/admin/sai'/>
+                  <mkdir path='${nameNode}/user/admin/sai1'/>
+                  <move source='${nameNode}/user/admin/sai/test' target='${nameNode}/user/admin/sai/test1'/>
+                  <move source='${nameNode}/user/admin/b' target='${nameNode}/user/admin/c'/>
+                  <touchz path='${nameNode}/user/admin/sai/test'/>
+                  <touchz path='${nameNode}/user/admin/temp1'/>
+            </fs>
+            <ok to="End"/>
+            <error to="Kill"/>
+        </action>
+        <end name="End"/>
+    </workflow-app>"""
+
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 4)
+    assert_true(len(workflow_data['workflow']['nodes']) == 4)
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'fs-widget')
+    assert_true(len(workflow_data['workflow']['nodes'][1]['properties']['deletes']), 2)
+    assert_equal(workflow_data['workflow']['nodes'][1]['properties']['deletes'][0]['value'], u'${nameNode}/user/admin/y')
+
   def test_gen_workflow_data_from_xml_for_decision_node(self):
     self.wf.definition = """<workflow-app xmlns="uri:oozie:workflow:0.5" name="capture-output-wf">
       <credentials>
