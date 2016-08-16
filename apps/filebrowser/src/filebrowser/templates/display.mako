@@ -165,7 +165,7 @@ ${ fb_components.menubar() }
     $.getJSON(_baseUrl, params, function (data) {
       var _html = "";
 
-      if (data.view.contents != null) {
+      if (data.view.contents) {
         var chunks = getChunks(startPage, endPage, data.view)
         for (var i = startPage; i <= endPage; i++) {
           pages[i] = chunks.shift();

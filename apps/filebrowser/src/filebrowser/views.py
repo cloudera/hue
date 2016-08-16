@@ -84,6 +84,9 @@ INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|appli
                                      'application/vnd\.ms|'
                                      'application/vnd\.openxmlformats')
 
+INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -554,8 +557,8 @@ def display(request, path):
     # display inline files just if it's not an ajax request
     if not request.is_ajax():
       mimetype = mimetypes.guess_type(path)[0]
-
-      if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
+      print mimetype
+      if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype) and INLINE_DISPLAY_MIMETYPE_EXCEPTIONS.search(mimetype) is None:
         return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
