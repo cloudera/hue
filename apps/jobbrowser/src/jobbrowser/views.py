@@ -94,6 +94,12 @@ def check_job_permission(view_func):
   return wraps(view_func)(decorate)
 
 
+def apps(request):
+  return render('apps.mako', request, {
+    'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
+  })
+
+
 def job_not_assigned(request, jobid, path):
   if request.GET.get('format') == 'json':
     result = {'status': -1, 'message': ''}
