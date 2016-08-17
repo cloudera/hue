@@ -38,3 +38,10 @@ LOG_OFFSET = Config(
   type=int,
   help=_('Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).')
 )
+
+ENABLE_V2 = Config(
+    key="enable_v2",
+    help=_("Show the version 2 of app which unifies all the past browsers into one."),
+    type=coerce_bool,
+    default=False
+)
