@@ -412,7 +412,12 @@ var Workflow = function (vm, workflow) {
             // Link top to above and delete fork
             fork.remove_link('to', childId);
             var forkParent = self.getParents(fork.id())[0];
-            forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
+            if (forkParent.type() == 'fork-widget') {
+              forkParent.remove_link('to', fork.id());
+              forkParent.children.push({'to': ko.mapping.toJS(fork.get_link('to'))['to'], 'condition': '${ 1 gt 0 }'});
+            } else {
+              forkParent.set_link('to', ko.mapping.toJS(fork.get_link('to'))['to']); // Only link
+            }
 
             self.nodes.remove(fork);
 
