@@ -796,6 +796,18 @@ AUTH = ConfigSection(
       type=coerce_bool,
       default=False,
     ),
+    BEHIND_REVERSE_PROXY = Config(
+      key="behind_reverse_proxy",
+      help=_("If True, it will look for the IP address from the header defined at reverse_proxy_header."),
+      type=coerce_bool,
+      default=False,
+    ),
+    REVERSE_PROXY_HEADER = Config(
+      key="reverse_proxy_header",
+      help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
+      type=str,
+      default="HTTP_X_FORWARDED_FOR",
+    ),
 ))
 
 
