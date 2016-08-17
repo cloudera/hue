@@ -260,7 +260,14 @@
             var _flink = $("<a>");
 
             if (file.type == "dir") {
-              _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
+              _flink.attr("href", "javascript:void(0)");
+              if (file.path.toLowerCase().indexOf('s3a://') == 0 && (file.path.substr(6).indexOf('/') > -1 || file.path.substr(6) == '')) {
+                _flink.text(" " + (cnt > 0 ? file.name : ".."))
+              }
+              else {
+                _flink.text(" " + (file.name != "" ? file.name : ".."));
+              }
+              _flink.appendTo(_f);
               if (file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1) {
                 $("<i class='fa fa-cloud'></i>").prependTo(_flink);
               }
