@@ -17,6 +17,7 @@
 
 from django.conf.urls import patterns, url
 
+
 urlpatterns = patterns('jobbrowser.views',
   # "Default"
   url(r'^$', 'jobs'),
@@ -46,4 +47,13 @@ urlpatterns = patterns('jobbrowser.views',
   url(r'^queues$', 'queues', name='queues'),
   url(r'^jobbrowser$', 'jobbrowser', name='jobbrowser'),
   url(r'^dock_jobs/$', 'dock_jobs', name='dock_jobs'),
+)
+
+# V2
+urlpatterns += patterns('jobbrowser.views',
+  url(r'apps$', 'apps', name='apps'),
+)
+
+urlpatterns += patterns('jobbrowser.api2',
+  url(r'api/jobs', 'jobs', name='jobs'),
 )
