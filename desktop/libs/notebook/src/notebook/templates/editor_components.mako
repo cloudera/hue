@@ -3445,7 +3445,7 @@ ${ hueIcons.symbols() }
           _dtElement.animate({opacity: '1'}, 50);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
-        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 1 }, scrollInertia: 0});
+        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
         window.setTimeout(function(){
           $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
             scrollInertia: 0
@@ -3515,7 +3515,7 @@ ${ hueIcons.symbols() }
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet, true);
           forceChartDraws();
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 1 }, scrollInertia: 0});
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
           window.setTimeout(function(){
             $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
               scrollInertia: 0
