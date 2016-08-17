@@ -43,7 +43,7 @@ def get_interpreters(user=None):
 
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
-  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and False
 
 
 SHOW_NOTEBOOKS = Config(
