@@ -46,6 +46,7 @@
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'GROUPING'                           { return '<hive>GROUPING'; }
+<hive>'INSERT'                             { determineCase(yytext); return '<hive>INSERT'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'LOCAL'                              { return '<hive>LOCAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
@@ -86,6 +87,7 @@
 <hive>'DELIMITED'                          { return '<hive>DELIMITED'; }
 <hive>'DEPENDENCY'                         { return '<hive>DEPENDENCY'; }
 <hive>'DESC'                               { return '<hive>DESC'; }
+<hive>'DIRECTORY'                          { this.begin('hdfs'); return '<hive>DIRECTORY'; }
 <hive>'DISABLE'                            { return '<hive>DISABLE'; }
 <hive>'DISTRIBUTE'                         { return '<hive>DISTRIBUTE'; }
 <hive>'ESCAPED'                            { return '<hive>ESCAPED'; }
@@ -279,13 +281,14 @@
 'FALSE'                                    { return 'FALSE'; }
 'FLOAT'                                    { return 'FLOAT'; }
 'FOLLOWING'                                { return 'FOLLOWING'; }
-'FROM'                                     { return 'FROM'; }
+'FROM'                                     { determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
 'GROUP'                                    { return 'GROUP'; }
 'HAVING'                                   { return 'HAVING'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
 'INNER'                                    { return 'INNER'; }
+'INSERT'                                   { return 'INSERT'; }
 'INT'                                      { return 'INT'; }
 'INTO'                                     { return 'INTO'; }
 'IS'                                       { return 'IS'; }
@@ -327,6 +330,7 @@
 'UNION'                                    { return 'UNION'; }
 'VIEW'                                     { return 'VIEW'; }
 'VARCHAR'                                  { return 'VARCHAR'; } // Not in Impala
+'VALUES'                                   { return 'VALUES'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
 'WITH'                                     { determineCase(yytext); return 'WITH'; }

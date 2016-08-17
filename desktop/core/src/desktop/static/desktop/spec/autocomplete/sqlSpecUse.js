@@ -65,9 +65,9 @@ define([
       });
     });
 
-    it('should use a use statement for "USE database_two; \\nselect |"', function () {
+    it('should use a use statement for "use database_two; \\nselect |"', function () {
       assertAutoComplete({
-        beforeCursor: 'USE database_two; \nselect ',
+        beforeCursor: 'use database_two; \nSELECT ',
         afterCursor: '',
         containsKeywords: ['*', 'ALL', 'DISTINCT'],
         expectedResult: {

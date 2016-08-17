@@ -23,6 +23,7 @@ define([
   'desktop/spec/autocomplete/sqlSpecDescribe',
   'desktop/spec/autocomplete/sqlSpecDrop',
   'desktop/spec/autocomplete/sqlSpecError',
+  'desktop/spec/autocomplete/sqlSpecInsert',
   'desktop/spec/autocomplete/sqlSpecLoad',
   'desktop/spec/autocomplete/sqlSpecSelect',
   'desktop/spec/autocomplete/sqlSpecSet',
@@ -142,9 +143,9 @@ define([
         });
       });
 
-      it('should suggest keywords for "FROM USE; |"', function() {
+      it('should suggest keywords for "INTO USE; |"', function() {
         assertAutoComplete({
-          beforeCursor: 'FROM USE; ',
+          beforeCursor: 'INTO USE; ',
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -153,9 +154,9 @@ define([
         });
       });
 
-      it('should suggest keywords for "FROM SELECT; OR FROM FROM; |"', function() {
+      it('should suggest keywords for "INTO SELECT; OR FROM FROM; |"', function() {
         assertAutoComplete({
-          beforeCursor: 'FROM SELECT; OR FROM FROM;',
+          beforeCursor: 'INTO SELECT; OR FROM FROM;',
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -164,9 +165,9 @@ define([
         });
       });
 
-      it('should suggest keywords for "FROM SELECT; OR FROM FROM; |;BLAAA; AND;"', function() {
+      it('should suggest keywords for "INTO SELECT; OR FROM FROM; |;BLAAA; AND;"', function() {
         assertAutoComplete({
-          beforeCursor: 'FROM SELECT; OR FROM FROM;',
+          beforeCursor: 'INTO SELECT; OR FROM FROM;',
           afterCursor: ';BLAAA; AND;',
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -175,9 +176,9 @@ define([
         });
       });
       
-      it('should suggest keywords for "FROM bla bla;AND booo; |"', function() {
+      it('should suggest keywords for "INTO bla bla;AND booo; |"', function() {
         assertAutoComplete({
-          beforeCursor: 'FROM bla bla;AND booo;',
+          beforeCursor: 'INTO bla bla;AND booo;',
           afterCursor: '',
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -346,7 +347,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'EXPORT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });

@@ -18,7 +18,6 @@ var prepareNewStatement = function () {
   linkTablePrimaries();
   commitLocations();
 
-  delete parser.yy.caseDetermined;
   delete parser.yy.latestTablePrimaries;
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
@@ -214,7 +213,7 @@ var commitLocations = function () {
   var i = parser.yy.locations.length;
   while (i--) {
     var location = parser.yy.locations[i];
-    expandIdentifierChain(location);
+    expandIdentifierChain(location, true);
     // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
     // In this testArray would be marked a type table so we need to switch it to column.
     if (location.type === 'table' && location.table && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0) {
@@ -342,6 +341,9 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
           firstPart[firstPart.length - 1].keySet = true;
         }
 
+        if (firstPart.length === 0 || typeof secondPart === 'undefined' || secondPart.length === 0) {
+          return firstPart;
+        }
         var result = firstPart.concat(secondPart);
         if (result.length > 0) {
           return expand(firstPart[0].name, result);
@@ -400,13 +402,17 @@ parser.expandLateralViews = function (tablePrimaries, originalIdentifierChain) {
   return identifierChain;
 };
 
-var expandIdentifierChain = function (wrapper) {
+var expandIdentifierChain = function (wrapper, anyOwner) {
   if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
     return;
   }
 
   var identifierChain = wrapper.identifierChain.concat();
   var tablePrimaries = parser.yy.latestTablePrimaries;
+
+  if (!anyOwner) {
+    tablePrimaries = filterTablePrimariesForOwner(wrapper.owner);
+  }
 
   if (identifierChain.length > 0 && identifierChain[identifierChain.length - 1].asterisk) {
     var tables = [];
@@ -496,6 +502,7 @@ var expandIdentifierChain = function (wrapper) {
       wrapper.subQuery = tablePrimaries[0].subQueryAlias;
     }
   }
+  delete wrapper.owner;
   wrapper.linked = true;
 };
 
@@ -543,21 +550,37 @@ var suggestLateralViewAliasesAsIdentifiers = function () {
   }
 };
 
+var filterTablePrimariesForOwner = function (owner) {
+  var result = [];
+  parser.yy.latestTablePrimaries.forEach(function (primary) {
+    if (typeof owner === 'undefined' && typeof primary.owner === 'undefined') {
+      result.push(primary);
+    } else if (owner === primary.owner) {
+      result.push(primary);
+    }
+  });
+  return result;
+};
+
 var linkTablePrimaries = function () {
   if (!parser.yy.cursorFound || typeof parser.yy.latestTablePrimaries === 'undefined') {
     return;
   }
+
+  var tablePrimaries = parser.yy.latestTablePrimaries;
   if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
+    tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
+
     if (parser.yy.subQueries.length > 0) {
       parser.yy.result.subQueries = parser.yy.subQueries;
     }
     if (typeof parser.yy.result.suggestColumns.identifierChain === 'undefined' || parser.yy.result.suggestColumns.identifierChain.length === 0) {
-      if (parser.yy.latestTablePrimaries.length > 1) {
+      if (tablePrimaries.length > 1) {
         suggestTablePrimariesAsIdentifiers();
         delete parser.yy.result.suggestColumns;
       } else {
         suggestLateralViewAliasesAsIdentifiers();
-        if (parser.yy.latestTablePrimaries.length == 1 && (parser.yy.latestTablePrimaries[0].alias || parser.yy.latestTablePrimaries[0].subQueryAlias)) {
+        if (tablePrimaries.length == 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
           suggestTablePrimariesAsIdentifiers();
         }
         expandIdentifierChain(parser.yy.result.suggestColumns);
@@ -858,6 +881,7 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, sqlFunctions, de
   parser.yy.subQueries = [];
   parser.yy.errors = [];
 
+  delete parser.yy.caseDetermined;
   delete parser.yy.cursorFound;
   delete parser.yy.partialCursor;
 

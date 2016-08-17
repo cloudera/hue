@@ -736,6 +736,20 @@ HiveOrImpalaRowFormat_EDIT
  ;
 
 HiveRowFormat
+ : HiveDelimitedRowFormat
+ | '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties
+   {
+     if (!$3) {
+       $$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
+     }
+   }
+ ;
+
+HiveRowFormat_EDIT
+ : HiveDelimitedRowFormat_EDIT
+ ;
+
+HiveDelimitedRowFormat
  : '<hive>DELIMITED' OptionalFieldsTerminatedBy OptionalCollectionItemsTerminatedBy OptionalMapKeysTerminatedBy
    OptionalLinesTerminatedBy OptionalNullDefinedAs
    {
@@ -753,15 +767,9 @@ HiveRowFormat
        $$ = { suggestKeywords: [{ value: 'NULL DEFINED AS', weight: 1 }] };
      }
    }
- | '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties
-   {
-     if (!$3) {
-       $$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
-     }
-   }
  ;
 
-HiveRowFormat_EDIT
+HiveDelimitedRowFormat_EDIT
  : '<hive>DELIMITED' OptionalFieldsTerminatedBy_EDIT OptionalCollectionItemsTerminatedBy OptionalMapKeysTerminatedBy
    OptionalLinesTerminatedBy OptionalNullDefinedAs
  | '<hive>DELIMITED' OptionalFieldsTerminatedBy OptionalCollectionItemsTerminatedBy_EDIT OptionalMapKeysTerminatedBy
