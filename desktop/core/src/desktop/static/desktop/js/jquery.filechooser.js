@@ -99,8 +99,8 @@
     }
 
     var initialPath = $.trim(self.options.initialPath);
-    if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && $(self.element).data('fs').indexOf('s3') > -1) {
-      self.options.fsSelected = 's3';
+    if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && $(self.element).data('fs').indexOf('s3a') > -1) {
+      self.options.fsSelected = 's3a';
     }
 
     $(self.element).find('.filechooser-services li').removeClass('active');
@@ -147,10 +147,10 @@
           self.options.fsSelected = fs;
           var storedPath = $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected);
           if (storedPath !== null) {
-            if (fs === 's3' && storedPath.toLowerCase().indexOf('s3') === -1) {
+            if (fs === 's3a' && storedPath.toLowerCase().indexOf('s3a') === -1) {
               self.navigateTo('S3A://');
             }
-            else if (fs !== 's3' && storedPath.toLowerCase().indexOf('s3') > -1) {
+            else if (fs !== 's3a' && storedPath.toLowerCase().indexOf('s3a') > -1) {
               self.navigateTo('');
             }
             else {
@@ -158,7 +158,7 @@
             }
           }
           else {
-            self.navigateTo(fs === 's3' ? 'S3A://' : '');
+            self.navigateTo(fs === 's3a' ? 'S3A://' : '');
           }
         });
         $li.appendTo($ul);
@@ -209,7 +209,7 @@
         _homelink.appendTo(_home);
 
         $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
-        if (_parent.options.fsSelected !== 's3') {
+        if (_parent.options.fsSelected !== 's3a') {
           _home.appendTo(_breadcrumbs);
         }
 
@@ -375,7 +375,7 @@
         _parent.options.onError();
       }
       if (e.status === 404 || e.status === 500) {
-        _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3' ? 'S3A://' : '/?default_to_home'));
+        _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3a' ? 'S3A://' : '/?default_to_home'));
       }
       else {
         console.error(e);
@@ -425,8 +425,8 @@
     $.post('/filebrowser/api/get_filesystems', function (data) {
       var initialPath = $.trim(self.options.initialPath);
       if (data && data.status == 0) {
-        if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && data.filesystems['s3']) {
-          self.options.fsSelected = 's3';
+        if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && data.filesystems['s3a']) {
+          self.options.fsSelected = 's3a';
         }
         self.setFileSystems(data.filesystems);
       }
