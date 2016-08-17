@@ -735,7 +735,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { database: 'foo', table: 'bar' }
+            suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
           }
         });
       });
@@ -748,7 +748,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { database: 'foo', table: 'bar' }
+            suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
           }
         });
       });
@@ -2268,7 +2268,7 @@ define([
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns: { table: 'tableOne' },
+            suggestColumns: { tables: [{ table: 'tableOne' }] },
             suggestKeywords: ['*']
           }
         });
@@ -2354,7 +2354,7 @@ define([
               suggestAggregateFunctions: true,
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { table: 'tableOne' },
+              suggestColumns: { tables: [{ table: 'tableOne' }] },
               suggestKeywords: ['*']
             }
           });

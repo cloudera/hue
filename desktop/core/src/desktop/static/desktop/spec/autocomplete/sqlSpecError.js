@@ -38,7 +38,7 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestColumns: { table: 'testTable' }
+          suggestColumns: { tables: [{ table: 'testTable' }] }
         }
       });
     });
@@ -51,7 +51,7 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestColumns: { table: 'testTable' }
+          suggestColumns: { tables: [{ table: 'testTable' }] }
         }
       });
     });
@@ -64,7 +64,7 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestColumns: { table: 'testTable' }
+          suggestColumns: { tables: [{ table: 'testTable' }] }
         }
       });
     });

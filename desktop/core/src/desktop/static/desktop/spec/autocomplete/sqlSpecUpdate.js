@@ -146,10 +146,7 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestColumns: {
-            database: 'bar',
-            table: 'foo'
-          },
+          suggestColumns: { tables: [{ database: 'bar', table: 'foo' }] },
           locations: [
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'}
           ]
@@ -163,10 +160,7 @@ define([
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestColumns: {
-            database: 'bar',
-            table: 'foo'
-          },
+          suggestColumns: { tables: [{ database: 'bar', table: 'foo' }] },
           locations: [
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 22}, database: 'bar', table: 'foo', identifierChain: [{ name: 'id' }]},
@@ -183,10 +177,7 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestColumns: {
-            database: 'bar',
-            table: 'foo'
-          },
+          suggestColumns: { tables: [{ database: 'bar', table: 'foo' }] },
           suggestKeywords: ['EXISTS', 'NOT EXISTS'],
           locations: [
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, database: 'bar', table: 'foo'},
@@ -210,7 +201,7 @@ define([
             table: 'foo',
             identifierChain: [{ name: 'id' }]
           },
-          suggestColumns : { types: ['COLREF'] , database: 'bar', table: 'foo' },
+          suggestColumns: { types: ['COLREF'], tables: [{ database: 'bar', table: 'foo' }] },
           locations: [
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, database:'bar', table: 'foo'},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bla'}], database: 'bar', table: 'foo'},
@@ -230,10 +221,7 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestColumns: {
-            database: 'bar',
-            table: 'foo'
-          },
+          suggestColumns: { tables: [{ database: 'bar', table: 'foo' }] },
           locations: [
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, database:'bar', table: 'foo'},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bla'}], database: 'bar', table: 'foo'},

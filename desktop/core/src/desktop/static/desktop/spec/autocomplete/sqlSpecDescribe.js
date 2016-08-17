@@ -241,10 +241,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: {
-              table: 'tbl',
-              database: 'db'
-            }
+            suggestColumns: { tables: [{ table: 'tbl', database: 'db' }] }
           }
         });
       });
@@ -382,10 +379,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: {
-              database: 'db',
-              table: 'tbl'
-            }
+            suggestColumns: { tables: [{ database: 'db', table: 'tbl' }] }
           }
         });
       });
@@ -425,10 +419,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: {
-              database: 'db',
-              table: 'tbl'
-            }
+            suggestColumns: { tables: [{ database: 'db', table: 'tbl' }] }
           }
         });
       });
@@ -441,11 +432,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: {
-              identifierChain: [{ name: 'col' }],
-              database: 'db',
-              table: 'tbl'
-            }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'col' }], database: 'db', table: 'tbl' }] }
           }
         });
       });
