@@ -1,0 +1,1016 @@
+Hue v3.11.0, released Aug 17th 2016
+===================================
+
+Hue, http://gethue.com, is an open source Web UI for easily doing Big Data analysis with Hadoop.
+
+Its main features:
+
+   * SQL editors for Hive, Impala, MySQL, Oracle, PostGresl, SparkSQL, Solr SQL, Phoenix...
+   * Dynamic Search dashboards with Solr
+   * Spark and Hadoop notebooks
+   * Scheduling of jobs and workflows through an Oozie Editor and Dashboard
+
+More user and developer documentation is available at http://gethue.com.
+
+
+Latest Notable Features
+-----------------------
+
+The complete list and video demos are on link:http://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/[http://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/].
+
+
+S3 Browser
+
+* List, browse
+* Upload, download
+* Create external Hive table
+* Export query result
+* List S3 URI in Sentry
+* Set Oozie coordinator dependencies on S3 paths
+
+
+SQL Autocompleter
+
+* Brand new SQL grammar for Hive and Impala
+* Support all the major operations like SELECT, CREATE, DROP
+* Autocomplete UDFs and show their documentation
+* Weight keywords and columns by importance
+* Infer the types and propose compatible columns or UDFs
+* See more in https://issues.cloudera.org/browse/HUE-4039
+
+
+SQL Result Refinements
+
+* Result grid improvements
+* Timeout popup when Impala hangs on fetch result
+* Offer to fix certain rows
+* Search through the results
+* Excel download now has a progress status
+* Fixed resultset legend and header when scrolling throught the results
+* Column and type search
+* Optimized to display hundred columns
+* Export SQL query result to Solr
+
+
+Solr Indexer
+
+* New indexer
+* Leverage Morphline to submit a MapReduce jobs that scales
+* Offer light ETL operations like splitting a field, GeoIp, replace, grok
+
+
+Compatibility
+-------------
+
+Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL 5 and 6), and Ubuntu 12.04 and 14.04.
+
+Tested with CDH5. Specifically:
+
+- Hadoop 2.6.0
+- Hive 1.1
+- Oozie 4.1
+- HBase 1.2
+- Pig 0.12
+- Impala 2.5
+- Solr 4.10
+- Sqoop2 1.99.5
+- Spark 1.6
+
+These minimum versions should work (not tested):
+
+- Hadoop 0.20 / 1.2.0 / 2.0.0
+- Hive 0.12.0
+- Oozie 3.2
+- HBase 0.92
+- Pig 0.8
+- Impala 1.0
+- Solr 3.6
+- Sqoop2 1.99.3
+- Spark 1.4
+
+Supported Browsers:
+
+Hue works with the two most recent versions of the following browsers. Make sure cookies and JavaScript are turned on for the browser.
+
+* Chrome
+* Firefox LTS
+* Safari (not supported on Windows)
+* Internet Explorer
+
+Hue might work with Chrome 23, Firefox 23, IE8, Safari 6, or older browser version, but you might not be able to use all of the features.
+
+
+Runs with Python 2.6.5+
+
+Note: CentOS 5 and RHEL 5 requires EPEL python 2.6 package.
+
+
+List of 756 Commits
+-------------------
+
+* d1222a2 HUE-4658 [doc] Update release 3.11
+* 1842de1 HUE-4567 [aws] Read AWS credentials from configured script files
+* cd6f67b HUE-4403 [aws] Close file after read using fast=True
+* c810ce2 HUE-4579 [editor] The new autocompleter should support Hive INSERT statements
+* 34979a0 HUE-4587 [editor] The new autocompleter should completely support EXPLAIN
+* 06320ef HUE-4637 [editor] Scroll on column list is extremly slow on Linux
+* 49ec11d HUE-4625 [fb] S3 filechooser popup do not display the parent directory as ..
+* d527018 HUE-4650 [fb] Selecting S3A from filechooser is not displaying the S3 filesystem
+* 3d8965b HUE-4651 [fb] Prevent inline display of non authorized mime types
+* f60472e HUE-4652 [core] Add settings for django-axes AXES_BEHIND_REVERSE_PROXY and AXES_REVERSE_PROXY_HEADER
+* e9851a9 HUE-2971 [oozie] Some links of a Fork can point to deleted nodes
+* ed3bb9a HUE-3831 [oozie] Show operations inside the HDFS fs graph node for external workflows
+* 47bbea3 HUE-4649 [sqoop] SqoopResource got broken after change in Resource
+* 99f3ada HUE-4502 [editor] Fix issue with column type precision
+* 27b5055 HUE-4641 [indexer] GeoIP will stop indexing if an IP is missing from it's lookup table
+* f89353d HUE-4582 [editor] The new autocompleter should fully support LOAD
+* 991b482 HUE-4577 [editor] The new autocompleter should support CREATE, DROP and SET ROLE
+* e0f85d7 HUE-4574 [editor] Enable autocompletion after '-' without whitespace
+* cbae56e HUE-4638 [editor] Infinite scroll blinks the fixed legend when fetching the next 100 batch
+* 1619501 HUE-4610 [editor] Avoid trembling of fixed headers on query editing
+* 5ee139c HUE-4648 [security] The File ACLs tree doesn't render if there's a file in the HDFS root
+* cfc91cc HUE-4647 [home] Better align new document dropdown
+* 65b202c HUE-4646 [core] The initial welcome wizard redirects to the old home
+* 89f5242 HUE-4067 [assist] Fix issue with truncated columns of the last assist entry
+* ee0a6a1 HUE-4644 [editor] Don't refresh the assist 5 seconds after loading a query
+* 9b21a3d HUE-4598 [editor] Empty table list sometimes the first time
+* b4578d3 HUE-4642 [editor] Ace autocomplete should honour the weights for partial matching
+* 00e77ec HUE-4643 [editor] Autocompleter is silent for the second argument of concat
+* 40281e5 HUE-4645 [core] Disable inline display of SVG files
+* 7ffccce HUE-4626 [fb] S3 in the filechooser do not show up with FF
+* 5b2879d HUE-4560 [core] Add permissions controls to authorize access to S3 across all components
+* 808dd74 HUE-4522 [beeswax] Remove max_rows limit for HiveServer2 get_configuration
+* 5fced5e HUE-4634 [editor] The autocompleter should allow some errors in the select list
+* 8e2c3eb HUE-4586 [editor] The new autocompleter should completely support SELECT
+* a6c4982 HUE-4635 [jb] Fix duration on jobs page for running jobs
+* bdeb8d3 HUE-4506 [editor] Update test with new detailed error message
+* 30f2923 HUE-4632 [oozie] Log which type of oozie action are created in workflows
+* 432d52b HUE-4611 [editor] Export to S3 should not say HDFS
+* 7490137 HUE-4569 [editor] If we don't have a query history select the saved query tab
+* c215733 HUE-4506 [editor] Provide more information why query couldn't be saved
+* 082f60b HUE-4628 [useradmin] Prettify and unify help icons
+* 14680cd HUE-4604 [editor] Locked rows does not go well with headers
+* 00e3440 HUE-4315 [editor] Error when sharing a query with R permission
+* 5502082 HUE-4621 [core] Fix tests due to closed stdout handle
+* 0c01184 HUE-4568 [editor] Export a query to an index
+* 8042ff0 HUE-4526 [indexer] Submit notebook as batch job
+* 8baecf4 HUE-4586 [editor] The new autocompleter should support GROUPING SETS, CUBE and ROLLUP
+* 0bf4a75 HUE-4581 [editor] The new autocompleter should support DROP FUNCTION
+* 3f5e1e0 HUE-4580 [editor] The new autocompleter should support ANALYZE TABLE
+* 5cf870b HUE-4600 [editor] Result table headers breaks on sort
+* 0d0def2 HUE-4609 [editor] Resizing the window should resize also the column list/grid
+* cccb67f HUE-4618 [editor] Query selection highlighting does not stay
+* f60c4ee HUE-4614 [editor] Query result search box always present when switching tabs
+* 0fb990b HUE-4603 [fb] Disable bucket move and copy
+* 1f56edc HUE-4623 [editor] ON and ASC and DESC are not being highlighted on Impala
+* 48fa31b HUE-4624 [editor] Doing enter in the query result search box could go to the next match
+* 5fe014e HUE-4397 [fb] Hide upload archive in S3
+* 059f4ae HUE-4601 [fb] Creating a bucket with a not allowed name on S3 will HTTP 500
+* 7c3324d HUE-4621 [core] On loaddata failure, print stdout to logs
+* 5e73a61 HUE-4616 [editor] Only select the snippet DB when executing the first statement
+* 20ae4d6 HUE-4563 [impala] Handle case for non-string partition keys or values
+* a150dd2 HUE-4570 [editor] Autocomplete popup disappears even when calling it when typing
+* 76a8068 HUE-4575 [core] Add notice to hue.ini regarding the custom maps and security
+* 34d9893 HUE-4572 [core] Fix HueDataTable with multiple instances on the same page
+* 4158ab4 HUE-4576 [editor] Fix autocompletion before OR in value expressions
+* 592a023 HUE-4374 [editor] No autocomplete appearing in ORDER BY with an operation
+* 8685080 HUE-4573 [editor] The autocompleter should support carriage return in statements
+* dc89922 HUE-4465 [notebook] Bump the darkness of the non selected icons
+* f72ea7a HUE-4519 [fb] Fix upload test with updated message
+* bbd851f HUE-4566 [metastore] Query created by Browse Data action should have a limit and semi-colon
+* 8b97243 HUE-4565 [core] Update natural sort algorithm
+* 7202728 HUE-4564 [core] Log stderr on failure to coerce password from script
+* 2384b67 HUE-4535 [editor] Add additional autocompletion for ALTER, CREATE and DROP
+* e5e8f80 HUE-4335 [editor] New autocompleter should handle date types
+* a4fe3af HUE-4551 [editor] The new autocompleter should support CTEs (WITH) and UNION
+* 014aa88 HUE-4562 [editor] Switching to marker map makes the page freeze
+* 63f788c HUE-4552 [editor] Improve performance on checking/unchecking all fields
+* aa2e9ad HUE-4555 [core] Avoid opening file chooser on enter key
+* 7c44807 HUE-4519 [fb] Check for user permissions first before uploading
+* bfdc73b HUE-4559 [indexer] Enable Select Fields button when a path has been entered into wizard
+* dcf56cb HUE-4556 [core] Fix coverage failure due to missing source files
+* 7275422 HUE-4524 [hadoop] Fix test_yarn_ssl_validate which assumes default YARN_CLUSTER is defined
+* 6f005fd HUE-4553 [oozie] The dashboard table scrolls horizontally
+* bdc87a4 HUE-4469 [editor] Can have lot of white spaces below the query
+* 0dfcc7a HUE-4554 [editor] Status checking can go in infinite loop in batch mode
+* ad0fde2 HUE-4549 [core] Missing file for the collect static plugin
+* 6ea74a9 HUE-4550 [fb] Fix file chooser for S3 after S3A migration
+* 272fb7d HUE-4548 [editor] Sample popup tab seems off
+* 8e602ed HUE-4513 [editor] Add default autocompletion weights for columns, tables, functions etc.
+* 14926bc HUE-4281 [editor] Fail gracefully and return an error when trying to import a wrong/corrupted JSON file
+* 2560694 HUE-4417 [aws] Switch from s3 to s3a to enable direct save to S3
+* f134a3c HUE-4544 [indexer] Extend Parquet morphline to support generic fields
+* 35a4385 HUE-4401 [fb] Do not return any date for bucket and directory objects
+* 6e55ce9 HUE-4513 [editor] Use weights for keyword autocompletion
+* cd0db36 HUE-4488 [editor] Show result row detail view
+* 1d42dc8 HUE-4530 [indexer] Fix field type guessing from a table
+* adfb382 HUE-4530 [indexer] Re-introduce job link for now
+* 5468e61 HUE-4542 [editor] Column filter should be 100% of the column list width
+* 19fb1df HUE-4530 [indexer] Improved look'n'feel of the app
+* ac40704 HUE-4511 [editor] Field scroll does not scroll or grey the column
+* 6c4bc66 HUE-4495 [assist] Switching DB does not display the tables
+* d6ba984 HUE-4530 [indexer] Enable the full assist and dragging options
+* 2a5f7c5 HUE-4539 [search] Remove field collapse icon
+* 93794f7 HUE-4538 [search] Field detail popup cannot always be closed
+* 80e29a6 HUE-4540 [jb] Lower max number of jobs displayed on the main page
+* 9df36a6 HUE-4530 [indexer] Progress bar on indexing
+* 52653b1 HUE-4530 [indexer] Hook up EditorViewModel with the table indexer
+* 38c5701 HUE-4530 [indexer] Prettify file format to stay on the same line
+* bb2c54b HUE-4530 [indexer] Add parquet format and full column types for nested types
+* b6b7636 HUE-4530 [indexer] Submit notebooks as batch
+* 25dbd6d HUE-4530 [indexer] Add hardcoded parquet format
+* b1334a7 HUE-4530 [indexer] Fix file type load
+* 4d5dd79 HUE-4530 [notebook] Submit indexer as a batch job
+* 3a1233f HUE-4530 [indexer] Enable dropdown to change file type
+* 2d7e8f6 HUE-4530 [indexer] First pass for nested fields style
+* 730ea7f HUE-4530 [indexer] Fixed nested add operation
+* c8c630f HUE-4530 [indexer] UX to ask the user to fill up the collection name in any case
+* 42af931 HUE-4530 [indexer] Allow to select parquet tables
+* 50b2440 HUE-4530 [indexer] Add link to Solr collection
+* 0599222 HUE-4530 [indexer] Dynamically pickup the column separator for test tables
+* cedbf46 HUE-4530 [indexer] Started restyling first step
+* 3948309 HUE-4530 [indexer] Added hive chooser
+* 364aff0 HUE-4530 [indexer] Move format selection to step 2
+* 2328c4a HUE-4530 [indexer] Index all the data of a CSV table
+* 1c091f9 HUE-4530 [indexer] Removed big loading and put spinner in the wizard circles
+* dbc5f4e HUE-4530 [indexer] Get full table metadata to get the correct field types
+* d1d7299 HUE-4530 [indexer] Added wizard circles
+* 1c9e5ee HUE-4530 [indexer] Work with the sample_07 table
+* 051b270 HUE-4530 [indexer] Basic metadata pulling for Hive tables
+* cf1532d HUE-4534 [indexer] Fix syslog groking for smart indexer
+* 56c808e HUE-4530 [indexer] Skeleton for file and table selection
+* 33ad8f8 HUE-4530 [indexer] Added wizard skeleton
+* 527e4e6 HUE-4530 [indexer] List available saved Hive queries
+* 5c1bc6b HUE-4530 [indexer] Added spinner for field type guessing
+* ea6c9a9 HUE-4530 [indexer] Removed horizontal scroll from the page
+* 6d91117 HUE-4530 [indexer] Offer 3 new input file formats
+* 47c4ee8 HUE-4530 [indexer] Only warn when the collection name is empty
+* cd5de7b HUE-4526 [oozie] Add tests to the generation of workflows
+* 587ef1c HUE-4526 [oozie] Rename test file to follow the _tests convention
+* ac53520 HUE-4526 [oozie] Refactor to have only one way to save a workflow
+* a72a419 HUE-4526 [oozie] API to generate sequential workflow with sequential document actions
+* b245e19 HUE-4395 [fb] S3 delete bucket implementation
+* 17585b7 HUE-4537 [core] Fix database_logging in hue config so it logs debug database messages
+* f82c280 HUE-4399 [fb] Renaming a key (non-bucket directory) creates an extraneous empty file
+* f232d86 HUE-4531 [fb] Enable deleting buckets on S3
+* 78ca1b7 HUE-4536 [editor] Load query generates JS error
+* 221ac4f HUE-4535 [editor] Add autocomplete for CREATE and ALTER statements
+* 411b335 HUE-4489 [editor] The new autocompleter should allow white space between UDF name and parenthesis
+* 6ae35be HUE-4533 [core] Disable password reveal on IE
+* 14f603e HUE-4512 [editor] Header and column not always aligned
+* a8837c1 HUE-4523 [editor] Enable resizing of the column list panel
+* 01bcbd4 HUE-4398 [fb] API should check if bucket already exists in the region and bubble up the error
+* bbbe104 HUE-4430 [editor] Batch execution often fails to show any output
+* e4c3a81 HUE-4527 [indexer] Date fields that aren't required can crash the indexing job
+* 3922210 HUE-4515 [oozie] Remove oozie.bundle.application.path from properties when rerunning workflow
+* 014a8d6 HUE-4518 [editor] Update basic state icon
+* 5a8e81a HUE-4518 [editor] Use different icon for the column list
+* 4f70b95 HUE-4521 [editor] Hide/show column doesn't work on fixed rows
+* 6d9284b HUE-4508 [editor] Search in result set is js erroring
+* 9bc2d5b HUE-4503 [fb] Update tests with for bucket dates
+* 945de4e HUE-4514 [beeswax] Fix test_explain_query and test_explain_query_i18n for default execution engine Tez
+* fa56692 HUE-4516 [indexer] Switching file types doesn't update fields properly in the indexer wizard
+* 758c3fc HUE-4501 [indexer] Add basic hive CSV file format outline to indexer
+* 91c977c HUE-4503 [fb] Disable timestamp for S3 buckets and folders
+* 3955f47 HUE-4492 [indexer] Rename test file to follow convention
+* 16a63c3 HUE-4492 [indexer] Migrate to the oozie library to submit the java indexer job
+* 383d91f HUE-4490 [oozie] Generate workflow from Java snippet
+* 14f2b3f HUE-4507 [editor] Cannot see column names in the gradient map visualization
+* 28f174f HUE-4505 [editor] Resultset search is too transparent
+* 0b8e7b4 HUE-4499 [editor] Gradient map not always showing on the editor
+* 63731ae HUE-4491 [fb] Enable creating buckets on S3
+* e128f66 HUE-4494 [indexer] Add a load from JSON function to Create Index Wizard
+* 702dbeb HUE-4479 [indexer] Allow indexing multiple files on the same collection
+* 22eddf3 HUE-4493 [oozie] Fix sync-workflow action when Workflow includes sub-workflow
+* 9cec497 HUE-4487 [editor] Result table search
+* 8fef8d2 HUE-4486 [editor] Add back sorting to the result table
+* fc380a3 HUE-4485 [editor] Scroll to assist entries from search result
+* 08f74de HUE-4484 [editor] Add column name and type to the title of column browser
+* 293b0eb HUE-4480 [meta] Add description and parent info to columns and partitions
+* ea01b79 HUE-4480 [meta] Search parameters are not all sent to the API
+* a7e16eb HUE-4483 [core] Do not use backticks in the ini files
+* e35d4ed HUE-4882 [editor] Redraw fixed header on column toggling
+* 8ca3005 HUE-4480 [core] JSON download is actually not a generator
+* bd2bc1c HUE-4481 [editor] Show a message when the Excel results have been truncated
+* cc311ca HUE-4480 [meta] Filter SQL objects in the backend
+* 6bb0b14 HUE-4462 [editor] Status and progress report when downloading large Excel files
+* 32809cc HUE-4441 [editor] Set result menu as fixed
+* ef6f90e HUE-4442 [editor] Prettify column list scroll bars
+* b28b5e2 HUE-3308 [oozie] Remove commented parts not used
+* a751f0c HUE-3308 [oozie] Generate graph of worklows not coming from the editor
+* d61b94e HUE-3308 [oozie] Display the selected Java program in the document action
+* 03378b2 HUE-3308 [editor] Get the output of the Java command
+* 2f0d543 HUE-3308 [oozie] Generate the workflow from the save document
+* 53eb8a7 HUE-3308 [editor] Jar snippet
+* b67941a HUE-3227 [connector] Java snippet
+* 368e6a6 HUE-3838 [oozie] Deprecate jar_path copy and use oozie.libpath instead for actions with jars
+* 3080671 HUE-4474 [indexer] Let user set an existing field to unique id
+* 2c748b0 HUE-4478 [editor] Style the editor settings panel
+* d1a3a98 HUE-4386 [editor] Make it possible to turn autocomplete on or off
+* e92d12d HUE-4433 [editor] The new autocompleter should handle analytical functions
+* 0addcba HUE-4477 [security] Select All is not filtering out the non visible roles from the selection
+* e485732 PR405 [build] Avoid make failure when default python is python3
+* c52f0f4 HUE-4476 [editor] Add RESET to the Hive highlight
+* 9dde45e HUE-4475 [editor] Lines are not expanded when loading a long query from the cookie
+* fafb5c5 HUE-4470 [editor] Snippet properties for File filechooser always starts at /
+* 1480fef HUE-4463 [editor] Result column search on column types too
+* fb79880 HUE-4464 [editor] Result column quick scroll does not scroll with a search
+* cede73e HUE-4461 [metastore] If create external table is selected, input path needs to be a directory
+* c70e6c3 HUE-4471 [indexer] Add geoip operation automatically to hue format
+* 732a8e0 HUE-4445 [fb] Fixed CSS for file uploader
+* fcda9d2 HUE-3308 [spark] Some more refactoring after moving Livy to external project
+* 8a93323 HUE-3394 [notebook] Jar submit button is always disabled
+* 14e240f HUE-4358 [metastore] Remove toggling meta switch
+* f211725 HUE-3308 [spark] Moving out references to Livy as it moved to its project
+* 27c7fa2 HUE-4445 [fb] Return correct result response on file upload
+* e1f30dc HUE-4466 [security] deliver csrftoken cookie with secure bit set if possible.
+* 0ee9a5d HUE-4080 [editor] Delete queries from editor does not send to the trash
+* 104e72f HUE-4452 [metadata] Restore tagging functionality to Navigator API client
+* 57e0031 HUE-4452 [metadata] Fix optimizer view name and update navigator API version to v9
+* de560a3 HUE-4467 [indexer] Add field operation morphline generation tests for each operation
+* 2af74a7 HUE-4455 [security] secure_content_security_policy breaks the editor and GA
+* 6de223d HUE-4459 [indexer] Add morphline generation tests for each file format
+* 749908d HUE-4438 [editor] Progress status and truncating warning whendirect downloading results as Excel
+* 8c86fb2 HUE-4451 [editor] Add tooltips to result set legend
+* d7a2b9a HUE-3308 [spark] Migrate Livy to external respository
+* 08383c4 HUE-4379 [editor] Autocompleter should support CREATE TABLE statements
+* b9e9456 HUE-4457 [editor] Column legend horizontal scroll bar are missing until we scroll down
+* 158b86f HUE-3960 [editor] Avoid redrawing on every horizontal scroll
+* 2d9feae HUE-3960 [editor] Furtherly improved initial rendering of the table
+* 3884632 HUE-4450 [desktop] Fix HTTPS termination using X-Forwarded-Proto header
+* 33b85b9 HUE-4448 [hbase] Change test_list_tables hbase test to query each cluster name
+* 9f52773 HUE-4454 [security] Disclosure of Web Server Information
+* 68b9434 HUE-4443 [security] Automatically default secure_ssl_redirect to True when HTTPS is setup
+* d428e97 HUE-4444 [beeswax] test_analyze_table_and_read_statistics doesn't test correctly with Hive 2
+* 76d944f HUE-4449 [indexer] Add ruby log to indexer
+* 2c00e06 HUE-4311 [fb] Add boto http_socket_timeout configuration
+* 772c542 HUE-4372 [core] Backport Django Security middleware or add HTTP security headers
+* 2318ad1 HUE-3960 [editor] Increase generation performance of the fixed header
+* a399c7a HUE-3960 [editor] Avoid complete redrawing of the fixed header
+* b55b0f2 HUE-4440 [editor] Assist slightly scrolls horizontally
+* f613b5c HUE-4427 [metastore] Filepicker should allow directories when selecting external table
+* 44e9ddf HUE-3960 [editor] Increase generation performance of the fixed first column
+* 0ebb013 HUE-4434 [editor] Fixed header has a wrong offset in fullscreen when the editor is manually resized
+* db996e5 HUE-4439 [notebook] Fix notebook TestHiveserver2ApiWithHadoop.test_explain
+* b021216 HUE-4345 [fb] Remove incorrect mkdir/listdir test for directory name with invalid chars
+* 2e95812 HUE-4345 [fb] Fix filebrowser tests by avoiding unicode decoding
+* 89e64c2 HUE-4435 [test] Add list_modules subcommand to hue test
+* 49b4e41 HUE-4436 [hive] Fix test_install_examples tests to point at the database configured in BeeswaxSampleProvide
+* 9182f6b HUE-4431 [editor] Batch mode does not always update the query
+* a525bdf HUE-4331 [editor] Log call should return only the additional ones after the first call
+* 8ee9f9c HUE-4345 [aws] Fix Actions when viewing an S3 file in filebrowser
+* 1cef9b4 HUE-4437 [editor] The autocompleter should handle multiple db references in table primaries for Impala
+* 94c99c9 HUE-4429 [oozie] Generate unique workspace for managed workflows
+* 7fbe1c8 HUE-4432 [editor] The new autocompleter should be more forgiving when editing incomplete UDFs in select list
+* 47ea04f HUE-3960 [editor] Removed performance degrading CSS
+* 105c1cc HUE-4416 [editor] Do not save the coordinator constants in the json model
+* e5c719d HUE-3960 [editor] Improved performances of the new datatable
+* 548ead4 HUE-4291 [metastore] Do not use smallints in the create table from file wizard
+* 4554c5a HUE-4418 [editor] Sessions tab doesn't display properly once the Settings is expanded
+* 69f85ee HUE-4425 [metastore] UX create table from a file, S3 or from a directory
+* 0075185 HUE-4366 [metastore] Avoid lowercasing non-S3 paths in create table wizard
+* 20ad49d HUE-4426 [editor] The new autocompleter should work with all SQL dialects
+* 962e026 HUE-4366 [metastore] Add an option to create a table from a file in an external location
+* 655de2f HUE-4414 [editor] Allow to send queries even after closing the session
+* 8be462b HUE-4413 [dbms] Security: Full XSS in DBQuery editor
+* cabc9ff HUE-4424 [librdbms] Support more than one database
+* 5123af8 HUE-4423 [editor] Persist the coordinator ID of a submitted schedule
+* 4780ddd HUE-4421 [editor] New saved query should be schedulable
+* 008a132 HUE-4419 [editor] The new autocompleter should suggest columns from sub-queries
+* 46d0f0e HUE-4367 [editor] Export query result to S3
+* ba1d7c7 HUE-4406 [core] Fails to start if Hive/Impala Not Installed
+* 3d46a4c HUE-4412 [editor] Errors should scroll to the line AND the column too
+* 7b3836d HUE-4391 [editor] Editor should not depend on Oozie
+* 40eb606 HUE-4390 [core] Do not recreate a new user for each request in demo mode
+* e67693a HUE-4402 [fb] S3 copy action is not using the picker and fails
+* c9a1378 HUE-4393 [fb] S3 bucket should not have any file upload or file creation action
+* 1d8264b HUE-4411 [editor] Enable scrolling past the end of the editor
+* f67b990 HUE-4400 [fb] Disable chmod and summary for S3 for now
+* b557a58 HUE-4392 [fb] S3 buckets should have a different icon
+* 3861a2a HUE-4394 [fb] Home button redirects to HDFS even if on S3
+* b909a7f HUE-4396 [fb] Delete button should be 'delete forever' all the time
+* 840b261 HUE-4407 [assist] Tables and views checkboxes can't be clicked
+* 67f267d HUE-4409 [editor] Main right scrollbar does not scoll when on the very right of the screen
+* 750ad2f HUE-4410 [editor] Fix editor size issue for large pasted queries
+* 2e7180f HUE-4391 [editor] Blacklisting oozie should not break the editor
+* 210b57a HUE-4327 [editor] Disable batch submit by default when oozie is not setup
+* 73ef431 HUE-4383 [editor] Trashed queries are showing up in the list of saved queries
+* 5d213fc HUE-4385 [indexer] Stop the indexer from dropping text fields that are under 100 character long
+* 1e49e73 HUE-4384 [indexer] Add support for combined apache log files
+* 5fbccf1 HUE-4380 [assist] Only enable navigator search when configured
+* 73ee047 HUE-4375 [editor] Horizontal scrollbar can be hidden under the first fixed column
+* a2d887b HUE-4378 [core] File chooser with multiple options overflow the modals
+* ed23d2b HUE-4376 [indexer] Added assist panel and filechooser
+* 9870020 HUE-4377 [editor] Autocompleter should support variable references like var in statements
+* 847c38f HUE-4337 [editor] The autocompleter should suggest backticked values when applicable
+* 1127d73 HUE-4313 [editor] The new autocompleter should accept non-reserved keywords for DBs, tables, columns etc.
+* 868d0da HUE-4058 [home] Rename a directory
+* 618542f HUE-4317 [jb] Logs on attempt page do not make links to job id
+* dde952e HUE-4324 [editor] Batch API get_jobs() should return the job ids
+* d94c1f7 HUE-4133 [search] Queries don't handle field names that contain spaces
+* aec2251 HUE-4360 [editor] Search enabling should be ko based
+* 53b2793 HUE-4326 [editor] Keep snippet DB list in sync like the assist
+* ef4b32d HUE-4371 [editor] Enable the new autocompleter by default
+* 3b05015 HUE-4365 [metastore] No information surfaced when LOAD data from Create table from file fails
+* 25e6f3c HUE-4364 [metastore] Handle files with carriage return in create table from a file
+* 0c85dd4 HUE-4362 [oozie] List more oozie workflow parameters on the workflow dashboard page
+* 39f203c HUE-3960 [editor] Fixed locked rows with new HueDatatable
+* f1060e6 HUE-4184 [editor] Set the result legend section as fixed
+* 41bccb9 HUE-4358 [meta] Tests need to use the new is enabled flag
+* 3666894 HUE-4360 [meta] Protect when the configuration files are missing
+* b75c497 HUE-4357 [oozie] Return the launcher task logs when submitting Oozie batch job
+* 96123f4 HUE-4363 [core] Do not rely on import hadoop config before loading core
+* 0fce233 HUE-4358 [meta] Database list view needs the metadata enabled flag
+* a22d9ab HUE-4360 [meta] Read configuration from a properties file
+* b302a5a HUE-4032 [editor] Identify locations of databases, tables, columns and functions
+* b0074bb HUE-4174 [editor] Fix nested type autocompletion of arrays, maps and structs
+* 7e22dd8 HUE-4358 [meta] Split metadata services into two
+* 8769ac7 HUE-4048 [editor] Clicking on .. of a file settings deletes the snippet header and the row
+* d16cfbb HUE-4356 [fb] File chooser picker does not select S3 tab when opening an existing path
+* 9c06051 HUE-4166 [metastore] Sample data dialog can't display very long table name properly
+* 9c5c722 HUE-4074 [editor] Clicking on table in assist sometimes expand or insert the name
+* 5cd65e4 HUE-3278 [core] Migrate Google Analytics from ga.js to analytics.js and use https if possible
+* 83cc700 HUE-3960 [editor] Optimize furtherly the count of visible rows
+* f73dd6c HUE-4312 [editor] Load query history, loses editor type when clicking on new query
+* 23d1e15 HUE-4062 [editor] Formatting action add extra spaces after group by and skip LIMIT
+* cd9d817 HUE-4329 [editor] Fix typo in handle reset
+* 9be92a4 HUE-4118 [fb] Context menu can be hidden by bottom bar
+* 71064b3 HUE-4354 [core] Warn than SQLite is the cause of the 'Database locked' error
+* 9e30cde HUE-4351 [editor] Show number of columns in the query result
+* 7046389 HUE-4322 [impala] Better error message when user already downloaded all the impala resultset cache
+* 62a944a HUE-4078 [oozie] Drag & Drop hive queries shows queries from the trash
+* a3153f4 HUE-4353 [search] Typing in the search bar always redirect to the end of the input
+* e3b4c25 HUE-4328 [editor] File chooser in 'In HDFS (large file)' always open on /
+* afa51cf HUE-3960 [editor] Optimize rendering of rows and white space
+* 735eacb HUE-3960 [editor] Improved performances of the header rendering on scroll
+* a458f77 HUE-4355 [indexer] Add i18n for arguments and extension based file type guessing
+* f66ebd8 HUE-4352 [indexer] Fix typo for grok dictionary file exists check
+* 98a9a01 HUE-3960 [editor] Implement virtual rendering of the result table
+* fbbe393 HUE-4320 [editor] The new autocompleter should be aware of column reference types in value expressions
+* b58e6d0 HUE-4325 [editor] Toggle the execute action depending on if last execution was batch or not
+* 1c08549 HUE-4224 [home] 'Did you know' on home page is gone
+* bc44c17 HUE-4303 [useradmin] Re-introduce '?' icon displaying description of each field
+* a99b9da HUE-4348 [indexer] Refactor format types such that all information is in one place
+* d55758d HUE-2975 [core] Only register S3FileUploadHandler is S3 is enabled
+* 88d01c5 HUE-2975 [aws] Add S3 UploadFileHandler and implement upload to S3
+* a3db25e HUE-4347 [core] Rename tests_convert.py to follow test conventions
+* 96836c6 HUE-4346 [editor] Query History disappeared after upgrade to 3.10
+* 1e053fc HUE-4342 [editor] DB prefix autocomplete can be lost
+* 59828fa HUE-4343 [editor] Improved autocompletion in select list
+* 8eaa533 HUE-4329 [editor] Multi query does not go past statement 1
+* 46266f1 HUE-4320 [editor] New autocompleter should make suggestions based on types in functions
+* 4922bd3 HUE-4320 [editor] New autocompleter should make suggestions based on type in value expressions
+* 7af37c1 HUE-4341 [indexer] Use info level logging for morphlines, add error handling for invalid dates
+* badf3fe HUE-4340 [indexer] Fix double matching and set required field default to false
+* 65fef05 HUE-4332 [indexer] Add hue logs as a supported file type
+* 7d4e1cc HUE-4334 [editor] Update status to error when canceling batch job
+* 4f7cfd2 HUE-4333 [core] Properly reset API_CACHE on failover
+* 3057fd9 HUE-4278 [useradmin] Restrict access to useradmin API to superusers
+* 8174f36 HUE-3647 [editor] SELECT statement that starts with a comment cannot be saved to table
+* e355d5c HUE-4321 [editor] Batch submit of SQL show USE the correct DB
+* 8cce716 HUE-4187 [editor] Integrate batch submission in the UI
+* 07267ff HUE-4186 [editor] Create a batch_oozie connector
+* 76bb4bb HUE-3765 [editor] Graphing with many columns is not readable
+* d30152d HUE-4223 [oozie] No indication that ${} can be used as parameters
+* 9d06dac HUE-4232 [notebook] Bulk operation button is gone
+* 393a8b2 HUE-4251 [editor] Explain on incorrect query should not error
+* 567d8f2 HUE-4306 [editor] The new autocompleter should complete CASE functions
+* c419f98 HUE-4285 [editor] Fix Scatter plot display
+* dd1161b HUE-4304 [core] Pie slices shrink after wrong timing of resize of the pie
+* 0039fc3 HUE-4309 [editor] UX lock rows should tooltip about clicking to lock and delete icon on hover
+* 0dda68b HUE-4308 [editor] UX lock rows keep adding rows when clicking on the same
+* ddd48c2 HUE-4307 [editor] Goto line number shorter conflicts with highlighting the address bar contents in Safari
+* 398a9fa HUE-4310 [fb] File chooser picker modal should have action buttons fixed to the bottom
+* 24e59d6 HUE-4278 [useradmin] Provide basic useradmin API
+* 0c2a890 HUE-4302 [editor] New autocompleter should suggest DISTINCT or ALL where appropriate in aggregate functions
+* 70f53f6 HUE-4301 [editor] Autocomplete for Impala extract function
+* e7b4365 HUE-4204 [editor] Add autocompletion support for CAST functions
+* 1e15498 HUE-4266 [indexer] Add geo, host, grok, split operations
+* a392661 HUE-4298 [security] Offer ability to resize the Impersonate the user drop down in Hue security app
+* 6266cf3 HUE-4300 [fb] Avoid double file listing call on folder search
+* b12073e HUE-4027 [editor] New autocompleter should support functions with descriptors and types
+* d74a159 HUE-4271 [editor] Autocomplete aggregate functions and various autocompleter improvements
+* 79fcd81 HUE-4296 [core] Need info message if kt_renwer exits due to no hue_keytab
+* 76008b0 HUE-4279 [editor] Shrink back the editor if the query is not big enough and it hasn't been resized manually
+* 798ce11 HUE-4290 [editor] Style the coordinator history on the context panel
+* 95ff8b3 HUE-4270 [fb] Enable S3 on the file pickers
+* 44e0fa9 HUE-4277 [fb] Add endpoint that returns enabled status for each filesystem
+* 88a7aca HUE-4276 [editor] Autocomplete around arithmetic operations and support BETWEEN, EXISTS, RLIKE and REGEX
+* 84fa031 HUE-4271 [editor] New autocompleter should support UDAFs and numeric expressions
+* 00a2a0a HUE-4269 [editor] Improve sample popover
+* 0e19137 HUE-4085 [editor] Fixed result col headers when cell is wide
+* 071a085 HUE-4268 [core] Do not remove the table fixed rows on plugin redraw
+* 8d3523e HUE-4275 [core] Avoid filechooser modals to scroll to the action buttons on modal open
+* ceb9a55 HUE-3795 [editor] Scroll lock a row to enable comparison with other rows
+* 4f062ec HUE-4238 [doc2] Ignore history docs in find_jobs_with_no_doc during sync documents
+* a12c90f HUE-4267 [core] Fix livy maven dependencies
+* f547dd3 HUE-4177 [editor] Horizontal scroll in FF (Chrome fine) with touch pad is extremely slow
+* b91e1b6 HUE-4265 [beeswax] Bring back the show preview in the assist
+* 9208846 HUE-4020 [editor] Canceling query at wrong timing breaks the editor
+* f577b94 HUE-4262 [editor] Improve performances of the table fixed header
+* 144591a HUE-4018 [editor] Error when canceling a query that is slow being submitted
+* e70fe5a HUE-4207 [doc2] Delete history command to clean up old history or orphaned history
+* bd91651 HUE-4170 [aws] Fix S3 object timestamp
+* 53cc6f0 HUE-4258 [jb] Close and pool Spark History Server connections
+* e5e7eba HUE-4252 [core] Handle 307 redirect from YARN upon standby failover
+* d6010d0 HUE-4242 [editor] Retry should use generic callback for the current operation
+* 6f53190 HUE-4239 [liboauth] Does no handle "next" urls, always sending user back to homepage
+* 3dd029b HUE-4248 [liboauth] OAuth integration Redirect URL is Assumed to be HTTP
+* 407747e HUE-4246 [libsaml] SAML Integration Doesn't Check Forwarded Protocol
+* 28990b4 HUE-4175 [editor] Improved autocompletion after WHERE
+* 5fda503 HUE-4242 [editor] Show a modal to retry the query
+* d865e61 HUE-4242 [editor] Offer retries when submission or result fetching timed out
+* ea91f82 HUE-4242 [editor] Add a message when query submission takes time
+* 2d63fa6 HUE-4250 [editor] Add configurable timeout for autocompletion API calls
+* d81acde HUE-4245 [editor] Autocomplete subqueries in FROM and WHERE
+* bd6a0eb HUE-4252 [core] Handle 307 redirect from YARN upon standby failover
+* 203e2a1 HUE-4253 [editor] Prompt for variables just once per variable name
+* 611a51a HUE-4081 [core] Skip idle session timeout relogin popup on running jb jobs call when idle session timeout is disabled
+* 0bbd5ca HUE-4234 [editor] Improved JOIN autocompletion
+* 25276d5 HUE-4243 [aws] Only raise aws warning if default account configs are provided
+* af51f4c HUE-4244 [indexer] First skeleton on scalable indexer
+* 79ada34 HUE-4192 [editor] Document2 matching query does not exist when saving
+* 8fccedc HUE-4241 [editor] Schedule are showing up in home
+* f515b9d HUE-4240 [filebrowser] Remove unused sortby param returned from listdir
+* 94f085f HUE-4238 [doc2] Ignore history docs in find_jobs_with_no_doc during sync documents
+* 6c1224a HUE-4212 [hive] Also provide if the job is started or finished
+* e569229 HUE-4149 [editor] Integrated progress report of MR jobs
+* fe5f147 HUE-4236 [editor] Changing fields of a query we chart should re-select default values for the axis
+* 406fb88 HUE-4225 [editor] Colors are flipped when sorting bar results in reverse order
+* f0e3dac HUE-4217 [editor] Autocomplete for DESCRIBE
+* a12947d HUE-4228 [search] Used to be able to toggle the field list of grid widget
+* d412a8f HUE-4230 [core] Finer version number logging
+* 211c940 HUE-4220 [oozie] Saving a workflow make the save button blink
+* 17645b4 HUE-4218 [oozie] Refresh parameters of a d&dropped action
+* 1f0d785 HUE-4219 [oozie] Add quick link to selected d&dropped query
+* 9cd79a7 HUE-4229 [oozie] js error when selecting another query in the hive document action
+* 2884aca HUE-4227 [yarn] Fix unittest for MR API Cache
+* f2a5141 HUE-4215 [yarn] Reset API_CACHE on logout
+* 3fea69c HUE-4200 [editor] Autocompletion of SHOW statements
+* 0c41ae8 HUE-4216 [editor] The editor type title blinks at page load and shows all the different types
+* 574fd75 HUE-4206 [notebook] Ignore history and other calls in notebook mode
+* 6d3dae2 HUE-4201 [editor] Add warning about max limit of cells before truncation in the export / download query result
+* 52dffd6 HUE-4199 [editor] Make the editor 'editorMode' a ko variable
+* a9ee56f HUE-4105 [editor] Make the editor 'editorType' a ko variable
+* 502479c HUE-4144 [editor] Add search functionality to snippet DB selection
+* bba7356 HUE-4210 [editor] Don't revert to Hive on browser refresh of new Impala query
+* abe248d HUE-4203 [editor] Column search on resultset is not empty, do a scroll to any column will hide the search input
+* d0df22c HUE-4068 [metastore] Format date and file size of table stats
+* 02caa95 HUE-4211 [editor] Autoexpand query editor sometimes bugs the result headers
+* cd345bd HUE-4209 [editor] Fix Regex for deleting SQL comments
+* e226625 HUE-4205 [doc2] Ignore history dependencies on import
+* 5aff350 HUE-4202 [jb] Enable offset param for fetching jobbrowser logs
+* eacfe0d HUE-4197 [editor] Autocomplete for DROP TABLE, DATABASE and SCHEMA
+* 26989ac HUE-4198 [metastore] Sample fetch breaks the page when it fails with error 1
+* 4269910 HUE-4068 [metastore] Show owners and last time instead of files and size
+* 74af668 HUE-4196 [editor] Add return code so that we can load saved queries
+* 37d2ff6 HUE-4190 [oozie] Option to return coordinator id instead of redirect in coordinator submission popup
+* f96fc84 HUE-4193 [search] Toggling on all the fields of a grid widgets breaks
+* bcd5ad2 HUE-4195 [editor] Last digit of multiquery can be hidden
+* 125520c HUE-4196 [editor] Catch open notebook errors
+* e65e102 HUE-4194 [editor] Autocomplete CREATE DATABASE
+* fcd1124 HUE-4158 [oozie] Do not lose existing values when renaming variables
+* ea996ac HUE-4191 [oozie] Prevent 500 error when listing a workflow which coordinator is none
+* 41a8c25 HUE-4176 [editor] Autocomplete field values
+* b2e8aac HUE-4173 [editor] Enable autocomplete when there are backticks in table and database names
+* a4638dc HUE-4180 [editor] JS error on help icon
+* 1a01014 HUE-4167 [aws] Implement S3 rmtree operation
+* 8ef0d31 HUE-4183 [fb] Offer two File Browser links when S3 is configured
+* 5a67846 HUE-4164 [editor] The ApiHelper should treat any negative status in the response as an error
+* 0163fcf HUE-4157 [aws] Fix aws is_enabled
+* 2fe746e HUE-4141 [oozie] Graph breaks for external workflows when there is more than one kill node
+* c741084 HUE-4163 [aws] Implement S3 mkdir operation
+* 4621ea9 HUE-4157 [aws] Fix aws config check
+* 7e24660 HUE-4161 [editor] Autocomplete tables and columns in update statements
+* 9c8cc31 HUE-4155 [home] Improve document drag to select
+* 1e325e2 HUE-4160 [editor] Do not create multiple coordinator for a new saved query
+* 981cf11 HUE-4156 [oozie] Do not list the managed worklows in the coordinator editor
+* a45fe6a HUE-4137 [editor] Fix typo when updating the list of saved queries
+* 6efda7f HUE-4147 [editor] Older queries after upgrade do not have any document1
+* 002b257 HUE-4157 [aws] Fix aws config_check
+* 33ea726 HUE-4151 [oozie] Avoid dashboard page crash when coordinator does not exist in Oozie
+* e7afa07 HUE-4152 [oozie] Managed document property blocks access to workflows of coordinators
+* 087d123 HUE-4137 [editor] Open editor, create query and save it, click on Saved queries will have one item
+* 1444af2 HUE-4129 [impala] Long running query getting terminated when leaving the editor
+* f02ad20 HUE-4148 [editor] Improve import testing of beeswax queries to notebook format
+* e33a030 HUE-4142 [aws] Enable S3 browse option in filebrowser
+* e1f7114 HUE-4153 [impala] Report last seen progress when running impala query
+* ebd99e5 HUE-4143 [editor] Snippet configuration layout is broken
+* cb684f9 HUE-4131 [assist] Search on the query editors should be case insensitive
+* 9f4d66f HUE-4071 [metastore] Table columns should sorted on their initial table order
+* 456a554 HUE-4116 [editor] Extracted running coordinator model
+* 7f5040c HUE-4116 [editor] Avoid JS error on coordinator save
+* ba178f7 HUE-4116 [editor] Submit the correct workflow
+* 9054363 HUE-4140 [editor] Do not reload saved query list when opening a saved query
+* fc3e5af HUE-4116 [oozie] Add a dependency from the coordinator to the query
+* 7011f31 HUE-4116 [oozie] Add dependency from coordinator to query
+* 2b75cdd HUE-4116 [editor] Added ignore properties for mapping
+* e635351 HUE-4116 [editor] Render jqCron on query load as well
+* 53040ce HUE-4135 [editor] Automatically update on save the variables of a scheduled query
+* 50a0061 HUE-4127 [oozie] SLA can not be enabled for a coordinator
+* f238dff5 HUE-4116 [oozie] Cleaner way to refresh the parameters of a workflow in a coordinator
+* 174141c HUE-4116 [editor] Accept non observables on select2 parameters
+* 6b5649b HUE-3797 [editor] Add refresh parameter call
+* b186e49 HUE-3797 [editor] Loading a saved query should stay on the Saved query tab
+* 211300c HUE-4116 [editor] Do not break on unsaved query
+* 5e8bd50 HUE-3797 [editor] Add basic coordinator submit
+* c2f664f HUE-4122 [editor] Examples should have isSaved set to true
+* 3ccbc07 HUE-4116 [editor] Removed icons from tab names
+* b41cad2 HUE-4116 [editor] Avoid creating more than one instance of jQCron
+* affcc3f HUE-4116 [editor] Restyled workflow parameters
+* 953ab12 HUE-4116 [editor] Resolved all the jQCron issues
+* dfc938c HUE-4116 [editor] ChangeTracker now works in hybrid mode
+* 8ef5003 HUE-4116 [editor] Converted coordinator ko to Require
+* 8876178 HUE-4116 [editor] Prettified context panel
+* d543f46 HUE-4116 [editor] Removed margins from the embedded coordinator version
+* a066440 HUE-4116 [editor] Remove debug variable
+* 146c5ca HUE-4116 [editor] Move out cron specific JS
+* 0ee3a61 HUE-4116 [editor] Remove commenting of dependencies
+* e183490 HUE-4116 [editor] Automatically load the schedule of a query
+* e8d546a HUE-4116 [editor] First reorganization of the coordinator html
+* 94e91c6 HUE-4116 [editor] Integrate saving schedule into the main save button
+* 25bf2b2 HUE-4116 [editor] Loads the coordinator of the query
+* cfc527c HUE-4115 [oozie] Autoatically persist the coordinator of a scheduled query
+* 6163384 HUE-4112 [oozie] Automatically persist the workflow of a scheduled query
+* 2d3f72a HUE-4110 [editor] Skeleton of running schedule actions
+* 39400d7 HUE-4109 [oozie] First pass at refactoring Coordinator editor to be pluggable
+* 23afa3e HUE-3797 [oozie] Move the workflow creation logic out of the view
+* 6cfacdd HUE-4107 [desktop] Add a 'managed' field to Document2
+* 70e516c HUE-4106 [editor] Move schedule edition to the context panel
+* 410a064 HUE-3797 [oozie] API to create workflow for Hive documents
+* 8550f57 HUE-4146 [editor] Older saved queries defaults to default' DB
+* dc029fd HUE-4145 [editor] Older queries after upgrade do not provide direct save
+* 8badf5b HUE-4138 [editor] Last modified time of a saved query is not in the correct timezone
+* 45547f5 HUE-3956 [sentry] Browse to table does not load the object in v1
+* f91ed51 HUE-4051 [hive] Have lighter Impala and Hive check configs call than list DBs
+* f5006ad HUE-4136 [aws] Fix aws tests and only enable aws filesystem if configured
+* 3b33dd9 HUE-4136 [fb] Fix normpath and parent path logic for aws fs
+* 1d4b8ca HUE-4134 [liboozie] Avoid logging truststore credentials
+* 724f8f7 HUE-4130 [core] Triple amount of lines in the /logs page
+* e66bd1a HUE-4123 [beeswax] Fix tests by only checking design_id if not None
+* ddb0adf HUE-4123 [core] Verify id parameter values in GET requests
+* 7b636e4 HUE-4119 [jobbrowser] Change list jobs call to POST
+* 7040a60 HUE-3998 [oozie] Blacklisting oozie prevents hue launch
+* 510a6d3 HUE-4121 [oozie] Improve UX of entering args to distcp action in workflow editor
+* ba7b337 HUE-4120 [core] Update NVD3 color palette
+* a778126 HUE-4075 [editor] Hue will not start if impala is blacklisted
+* cfd2483 HUE-4111 [editor] Toggle to show or hide the column search field on result is always on
+* 8e9eccf HUE-4092 [security] Can't type any / in the HDFS ACLs path input
+* 94f0adb HUE-4100 [core] First user login checks are not displayed
+* 3a1865b HUE-3908 [useradmin] Ignore (objectclass=*) filter when searching for LDAP users
+* 82a0acd HUE-4099 [editor] Allow searching of raw SQL in query history
+* 7223b30 HUE-4097 [core] Still print error message when Oracle connector is not configured
+* bb92959 HUE-4059 [editor] Lost the green bar when the query finishes on query execution
+* e2cc753 HUE-4101 [editor] Hide search input when input is empty and it loses focus
+* a6109e9 HUE-4102 [editor] Move session settings to a context panel
+* 0f55dd6 HUE-4103 [core] Upgrade Font Awesome to 4.6.3
+* 8f22fe0 HUE-4104 [core] Introduce Roboto as a main font
+* aa94ca2 HUE-3065 [desktop] Fix test_redact_statements
+* 2fab3d0 HUE-3065 [desktop] Add Document2 search field migration
+* c9b17a2 HUE-3065 [desktop] Allow searching of raw SQL in saved queries
+* 9bd1d98 HUE-4096 [oozie] Fix unit tests for HUE-4054
+* ce0c152 HUE-4087 [jobbrowser] Unable to kill jobs with Resource Manager HA enabled
+* 50a9397 HUE-4055 [oozie] Upgrade oozie spark action to support spark-action:0.2 schema version
+* 0036d91 HUE-3981 [core] Restyle the login page a little
+* fc1a889 HUE-4089 [editor] Keyboard shortcut for a new query and save query
+* 15e2d39 HUE-4088 [oozie] Make workflow action parameter dragabble
+* 828c4df HUE-4070 [editor] Uncheck all freezes the browser with many columns
+* c819785 HUE-4076 [editor] Column value autocomplete does not filter duplicates
+* 7f8ebc4 HUE-4063 [home] 'done' button on wizard redirects to old home2
+* 67374ba HUE-4061 [jb] Job attempt logs not appearing for running jobs
+* a76e654 HUE-4075 [editor] Hue will not start if impala is blacklisted
+* 3243219 HUE-4084 [metastore] Drop table popup confirmation button is not accessible
+* 499aa7b HUE-4079 [editor] Amount of 2M is missing a zero in the Y axis of bar charts
+* 6ec3fe2 HUE-4077 [editor] Decimal not supported in bar charts
+* 6cccb42 HUE-4083 [editor] Bar charts gets all of the same color
+* a00d73c HUE-4073 [editor] Scroll to column in result set does not update the horizontal scroll bar
+* deb7125 HUE-4069 [metastore] Add scroll to top on sample and column pages of a table
+* d0c0c3c HUE-4072 [editor] Focus on input search box when opening result column filtering
+* 4365e9f HUE-4064 [editor] Format creation and update date on the table details popover
+* 8af04a1 HUE-4066 [editor] Put a toggle all columns in the result column list
+* 82d71b0 HUE-4053 [oozie] Fix oozie share workflow test to work with old and new editor mode
+* 18341c5 HUE-4053 [oozie] Fix oozie share workflow test
+* b7a2243 HUE-4053 [oozie] Check permissions based on USE_NEW_EDITOR status
+* 0d492db HUE-3997 [core] Add useradmin feature that resets axes lockouts
+* 4c67407 HUE-4056 [home] Click on trash icons errors
+* dceafa4 HUE-4054 [oozie] Light prettifying of bundle inputs
+* 814e08a HUE-3897 [metastore] Add column search on the table page
+* b997dd1 HUE-3764 [editor] When exporting results to a new table, the new table is not shown
+* 50c997e HUE-3913 [editor] Drag and drop table names is flaky
+* a626919 HUE-3348 [indexer] Update deprecated field in schema.xml
+* 288681b HUE-4023 [useradmin] update AuthenticationForm to allow activated users to login
+* 28df8cc HUE-3885 [metastore] Add check to prevent space in table name in both create table wizards
+* fc2d67a HUE-3788 [home] No way to middle click to open document in a new tab
+* 9cbbd45 HUE-4044 [editor] Copy pasted query with \u2002 fails
+* 746b918 HUE-4040 [editor] US map blinks when hovering texas
+* 1b8a59d HUE-4041 [editor] Auto select axes value if there is only one possible choice
+* 891c5e0 HUE-4037 [doc] Update docker image with 3.10
+* edbbaf1 HUE-3786 [editor] Search box and foreach binding in the snippet DB list dropdown
+* 03a620f HUE-4043 [editor] Bubble up error about queries with \u2002 fails
+* 3718d8c HUE-3799 [editor] Impala logs have a new line
+* 428e8ad HUE-4022 [doc] Promote docker image to get ramped up quicker
+* 9129a79 HUE-4025 [editor] Add keyword completion based on the current parser capabilities
+* 1fbde55 HUE-4024 [editor] The new autocompleter should suggest identifiers and aliases
+* 9543e7a HUE-4021 [libsolr] Allow customization of the Solr path in ZooKeeper
+* 58a3389 HUE-4019 [impala] Always fetch the logs on check status
+* 0a68343 HUE-4019 [impala] Do not blank error on query with good syntax but invalid query
+* 3ce9a15 HUE-4017 [editor] Make ace editor suggestions from the new autocompleter
+* 5d61845 HUE-4016 [editor] Add configuration option to enable the new autocompleter
+* 72ce3f6 HUE-4008 [core] Expandable and fixed close icon for error popup
+* 4d773e9 HUE-4014 [editor] Weird scroll and menu part hidden when a few rows
+* d4a7ab2 HUE-4007 [oozie] Fix deployement_dir for the bundle in oozie example fixtures
+* fa0550b HUE-4006 [oozie] Create new deployment directory when coordinator or bundle is copied
+* 0e19a1d HUE-4005 [oozie] Remove oozie.coord.application.path from properties when rerunning workflow
+* 961e152 HUE-3941 [search] Use sentry base solr config for examples when Sentry is on
+* dd8115e HUE-4004 [editor] Make all parser tests pass from the previous autocompleter
+* 51a46c5 HUE-4003 [editor] Add parser support for HDFS path completion
+* ded4731 HUE-4002 [editor] Add parser support for all generic SQL test cases from the old autocompleter
+* fc2e6cd HUE-3329 [editor] Include database references with table suggestions
+* 8988acd HUE-3328 [editor] Follow case in keyword suggestions
+* 7bdab74 HUE-3327 [editor] Suggest tables after select
+* 9072772 HUE-3326 [editor] Introduce the cursor and add suggestions for possible statements
+* b353348 HUE-3325 [editor] Generate the parser using the makefile
+* 771be07 HUE-3324 [editor] Create initial jison parser
+* b603688 [oozie] Don't modify start_date and end_date vairable for workflow submissions
+* 4f61fa1 HUE-3999 [oozie] list_oozie_workflow page shouldn't break incase of bad json from oozie
+* bbaf74f HUE-3896 [editor] Add search on column list result set
+* 74a3d96 HUE-4001 [search] Field list does not display the field analysis icon if it has vertical scroll
+* 790ec25 HUE-3959 [core] Double blurry login popup on /security/solr page
+* cda428f HUE-3921 [fb] Clicking outside of an empty upload window does not close it
+* b0eb884 HUE-4000 [doc] Wrong year listed in the release summary
+* a70e2fd ISSUE-381 [spark] Fix rules for stderror in spark_shell
+* e33db63 HUE-3954 [search] Editing record more than once will error because of old version id
+* 509733e HUE-3988 [search] Support schemaless collections
+* dd38bb2 HUE-3994 [editor] Canceled Hive queries stays as running in the history
+* 8ca9351 HUE-3992 [editor] Losing results after resize in results of 100 columns
+* 4c9ad8d HUE-3991 [editor] Removing a result column in a table > 300 rows breaks the grid
+* 629388f HUE-3960 [editor] Optimize result set of thousand of columns
+* f75c05e HUE-3822 [pig] Display logs when found
+* ce66f01 HUE-3756 [editor] Better update of the available queries in the History refresh
+* 93f42db HUE-3957 [editor] Clicking on failed query should still open it and not another one
+* e3f3e95 HUE-3975 [core] Add docstring to dynamic_default function
+* 37edd6d HUE-3975 [core] Rename login_lock_out_by_combination_user_and_ip to login_lock_out_use_user_agent
+* bb6addc HUE-3969 [oozie] Create a new workflow js error
+* 8d26ccf HUE-3980 [hbase] Silence errors from getColumnDescriptors API call
+* 4738932 HUE-3973 [core] Show or hide configuration based on the config flag
+* 590e280 HUE-3974 [editor] Query builder gives an error
+* c9f97d9 HUE-3979 [notebook] Prevent id conflict in the sample notebook
+* 21bd5c3 HUE-3978 [notebook] Backward compatibility for older notebooks
+* 7775392 HUE-3977 [editor] Session failing when opening Hive on a blank DB
+* e4acf9d HUE-3976 [doc2] Exporting doc dependencies should not include history docs
+* 18cec50 HUE-3958 [core] Allow Oracle database config to use service name configuration by setting host and port to empty
+* 74040cb HUE-3973 [core] Add a global flag to enable/disable the new configuration system
+* 47fea8f HUE-3974 [editor] Query builder gives an error in IE 11
+* 769497f HUE-3914 [editor] Fix mouse wheel vertical scroll in result table for IE 11
+* c80abf0 HUE-3972 [core] Do not update saved configuration if properties is an empty list
+* d3290f0 HUE-3971 [editor] Hide "Set as default settings" from the session config
+* 81c2f0c HUE-3970 [core] Hide the configurations menu alternative
+* 4d61962 HUE-3964 [core] Expand first property in configuration
+* b57ab11 HUE-3968 [core] Job XML configuration for Oozie gives an error
+* 765701f HUE-3967 [core] There are missing properties when opening existing group overrides
+* b506c52 HUE-3963 [core] Rename “Group override” to “Role”
+* 9c5dcde HUE-3966 [core] Error message when adding “Queue” to spark properties
+* fcc8ef6 HUE-3962 [core] Hide Global Properties in configuration
+* 1f0050f HUE-3961 [sentry] Add Collection links from privilege
+* b236923 HUE-3953 [sentry] Collection links on Toles section should point to the Browse section
+* 69b15ae PR378 [rdbms] Result escape for XML xml
+* 1a81044 HUE-3718 [fb] Opening and scrolling in a file can lag a lot
+* b9fb838 HUE-3756 [editor] Only insert the saved as in the saved query list
+* 4f31442 HUE-3951 [solr] Cleaner user message when missing UPDATE privilege permission
+* 2f02ca9 HUE-3952 [oozie] Hive document should get its credentials checked with kerberos
+* 04b6104 HUE-3756 [editor] Append the new saved query in to the list of saved queries
+* 79feae7 HUE-3945 [core] Allow to disable the 'beeswax' app
+* dcc4c54 HUE-3935 [core] Also use error code 10 in the catch all of the is_db_alive command
+* 620855a HUE-3742 [editor] Stop losing the saved query list when opening other queries
+* 38c20c8 HUE-3912 [editor] Dotted line when clicking on assist
+* 7df8dc2 HUE-3938 [editor] Query history parsing error on alter table
+* 2ec649c HUE-3942 [editor] Exiting full screen seems to refresh or redraw the assist
+* 507417f HUE-3943 [editor] History and query search string can overlay with the clearable icon
+* a788447 HUE-3950 [core] Re-login from auto-login popup is missing the hue icon
+* 1af3035 HUE-3933 [editor] Improve performances with hundreds of columns
+* 4d7af63 HUE-3944 [doc] Updates Readme to comply with Apache trademark rules
+* afd5c5a HUE-3937 [editor] Remove ignored hive.server2.logging settings
+* 3912120 HUE-3939 [doc2] Support import of 5.5 doc2 into 5.7+ versions
+* d6cbec4 HUE-3677 [impala] Check handle state before attempting download
+* 9e85595 HUE-3935 [core] Use error code 10 for missing Oracle connector in the is_db_alive command
+* 10f92e4 HUE-3932 [core] Don't reset session TTL by avoiding setting test cookie every request
+* 040f2ee HUE-3925 [sentry] New privilege from the Roles section are not blank
+* c4d033b HUE-3927 [sentry] Disallow to create an empty privilege
+* 5f5e1f1 HUE-3934 [core] Remove system default clear button from IE
+* 3e7a57a HUE-3928 [sentry] Add clearable icon to the role search box
+* 8186247 HUE-3933 [editor] Improve performances with hundreds of columns
+* e7fedf2 HUE-3924 [core] Refresh login page a little
+* 9abf60c HUE-3931 [hive] Update impersonation tests to expect a default value of true
+* 2714fcc HUE-3930 [sentry] Fix Solr privileges filtering view
+* fb85538 HUE-3929 [sentry] Fix role filtering for solr
+* 8c06cce HUE-3926 [sentry] Link to the search collections on the Roles section
+* a175e93 HUE-3922 [core] Truncate log buffer size to be more performant
+* 6db38b4 HUE-3923 [core] Simplify force debug logic option
+* fd2ac2a HUE-3920 [jb] Inform the user when Hive impersonation is off
+* 38f2af9 HUE-3906 [sentry] Offer role name autocomplete by just clicking in name field of add or select role popup
+* 500db74 HUE-3891 [sentry] Disallow to create a URI privilege that has an empty path
+* 6619cb7 HUE-3917 [core] Catch missing Oracle connector in is_db_alive command
+* 062e0e3 HUE-3916 [core] Check more globally for MySql error code in is_db_alive command
+* 4f1f9cb HUE-3909 [editor] Fetching saved query order is not deterministic
+* c597b70 HUE-3669 [jb] Display the proxied user of a HS2 map reduce job
+* 6cfac76 HUE-3856 [editor] Backend search for the query history
+* 1065e4a HUE-3845 [sentry] Sometimes see group as editable on role section
+* d381bf4 [desktop] requests should only set tls hostname if supported
+* 6bece41 HUE-3866 [core] Upgrade requests to 2.10.0
+* ca9965d HUE-3902 [sentry] Provide * to select all the collections or configs
+* b2ca087 HUE-3825 [editor] We can see the same table twice in the autocomplete
+* 81ca89c HUE-3849 [editor] Sample popup does not fail gracefully when failing to load a table
+* 60c6655 HUE-3780 [metastore] Hide refresh stats button if user does not have the permissions on col stats
+* 9ddf7b7 HUE-3910 [editor] Don't show a dotted box on execute in Firefox
+* fe77312 HUE-3828 [sentry] Autocomplete list of configs
+* 176874c HUE-3829 [sentry] Preset the privilege to the selected one when creating from browse section
+* b5314b3 HUE-3907 [sentry] Delete then add new privileges
+* 12b2965 HUE-3904 [search] Get minimum list of collection fields through REST API
+* c3c937a HUE-3903 [search] Still display collections even if we can't list cores
+* dcdbc70 HUE-3905 [beeswax] Reset beeswax.conf params in beeswax.tests:test_hiveserver2_jdbc_url
+* 2adbc59 HUE-3892 [oozie] [core] Fix fetch of saved properties for Oozie user
+* 4a012e1 HUE-3901 [core] Update API document tests to look at uuids
+* 61e80b3 PR372 [doc] Fix postgresql spelling in README.md
+* 5bacf8e HUE-3895 [sentry] Rename Sentry Table section to Hive Tables
+* 6aead05 HUE-3894 [core] Validate LDAP server's certificate
+* 1de7fa7 HUE-3893 [sentry] Use the same component and serviceName as the Solr Sentry service
+* dc0cf66 HUE-3735 [editor] History API filter on text
+* 0735050 HUE-3889 [core] uuid of documents and json do not match in sample queries
+* 819f800 HUE-3869 [editor] If a DDL doesn’t execute, it’s not part of the history
+* 03074fa HUE-3862 [editor] Fetch status timers are not cleared when switching queries
+* 2c89520 HUE-3875 [home] Right click context menu is oddly positioned when scrolling
+* 4d3ab8a HUE-3782 [editor] The shared permissions do not show up when sharing from list of query page
+* e11527e HUE-3813 [editor] Persist select columns and graph selection in saved queries
+* ba345a7 HUE-3768 [editor] Graph tooltips can be hidden by editor
+* 6c97925 HUE-3884 [editor] Opening a query from saved query tab should not switch to the history tab
+* 44606a3 HUE-3883 [editor] Update background of optional currently selected history or saved query
+* 906bdd6 HUE-3873 [core] Sort configuration and properties by name
+* 964018d HUE-3729 [editor] Display the address of the impalad of the current session
+* 6208065 HUE-3874 [home] Default sorting on the name
+* 418159a HUE-3881 [core] Increase truncation limit of external API responses in DEBUG mode
+* 588d3a8 HUE-3729 [editor] Display the address of the impala of the current session
+* 65c6463 HUE-3880 [core] Add importlib directly for Python 2.6
+* a4cd513 HUE-3876 [editor] Sometimes query history is ordered weirdly
+* 3e0b288 HUE-3789 [editor] Improved close icon in full editor mode
+* 36303ce HUE-3859 [editor] History not sending back past queries
+* dcb85bd HUE-3559 [editor] Expired result message not always obvious when scrolling
+* b660eaf HUE-3816 [editor] Re-highlight the statement of a multi query statement when opening it in history
+* 97ced2c HUE-3806 [search] Long fields in grid widget legend scroll weirdly
+* bb13485 HUE-3762 [editor] Improve showing it’s a query history query
+* f323589 HUE-3867 [editor] Resizing issue when dropping large query with already a result
+* 9ac0a65 HUE-3854 [core] Add delete action for configuration default and group overrides
+* 816b0e1 HUE-3837 [core] Implement parameters config type
+* 15e0a0d HUE-3872 [core] Add options combobox to properties that have options defined
+* bdf625b HUE-3853 [core] Configuration help icon wraps when label is long
+* 6934b3f HUE-3865 [editor] Flag to enable the query scheduling
+* a5ec8b5 HUE-3842 [core] HTTP 500 while emptying Hue 3.9 trash directory
+
+
+Contributors
+------------
+
+This Hue release is made possible thanks to the contribution from:
+
+- Aaron Newton
+- Aaron T. Myers
+- abec
+- Abraham Elmahrek
+- Aditya Acharya
+- airokey
+- Alex Breshears
+- Alex Newman
+- Alex (posi) Newman
+- alheio
+- alphaskade
+- Ambreen Kazi
+- Amit Kabra
+- Andrei Savu
+- Andrew Bayer
+- Andrew Yao
+- Ann McCown
+- Antonio Bellezza
+- arahuja
+- Ashu Pachauri
+- Atupal
+- Avindra Goolcharan
+- bcwalrus
+- bc Wong
+- Ben Bishop
+- Ben Gooley
+- Ben White
+- Bhargava Kalathuru
+- Bruce Mitchener
+- Bruno Mahé
+- bwang
+- Chris Conner
+- Chris Stephens
+- Christopher Conner
+- Christopher McConnell
+- Christopherwq Conner
+- Craig Minihan
+- cwalet
+- Daehan Kim
+- dbeech
+- Derek Chen-Becker
+- Dominik Gehl
+- Eli Collins
+- Enrico Berti
+- Erick Tryzelaar
+- fatherfox
+- gdgt
+- Gilad Wolff
+- grundprinzip
+- Guido Serra
+- happywind
+- Harsh
+- Harsh J
+- Henry Robinson
+- Igor Wiedler
+- Ilkka Turunen
+- Istvan
+- Ivan Orlov
+- Jaguar Xiong
+- Jakub Kukul
+- Jarcek
+- jeff.melching
+- Jenny Kim
+- Joe Crobak
+- Joey Echeverria
+- Johan Ahlen
+- Johan Åhlén
+- Jon Natkins
+- Josh Walters
+- Karissa McKelvey
+- Kevin Wang
+- krish
+- Lars Francke
+- linchan-ms
+- Linden Hillenbrand
+- Luca Natali
+- Luke Carmichael
+- lvziling
+- Marcus McLaughlin
+- Mariusz Strzelecki
+- Matías Javier Rossi
+- Michael Prim
+- Michal Ferlinski
+- Michalis Kongtongk
+- Mobin Ranjbar
+- motta
+- mrmrs
+- Nicolas Fouché
+- Olaf Flebbe
+- Oren Mazor
+- oxpa
+- Pala M Muthaia Chettiar
+- Patricia Sz
+- Patrycja Szabłowska
+- Paul Battaglia
+- Paul McCaughtry
+- Peter Slawski
+- Philip Zeyliger
+- Piotr Ackermann
+- Prasad Mujumdar
+- Qi Xiao
+- raphi
+- Renxia Wang
+- Rick Bernotas
+- Ricky Saltzer
+- Romain Rigaux
+- Roman Shaposhnik
+- Rui Pereira
+- Sai Chirravuri
+- Scott Kahler
+- Sean Mackrory
+- Shawn Van Ittersum
+- shobull
+- Shrijeet
+- Shrijeet Paliwal
+- Shuo Diao
+- Siddhartha Sahu
+- Simon Beale
+- Simon Whittaker
+- sky4star
+- Stephanie Bodoff
+- Suhas Satish
+- Tatsuo Kawasaki
+- thinker0
+- Thomas Aylott
+- Tianjin Gu
+- Todd Lipcon
+- Tom Mulder
+- Vadim Markovtsev
+- van Orlov
+- vinithra
+- voyageth
+- vybs
+- William Bourque
+- wilson
+- Word
+- Xhxiong
+- xq262144
+- Yixiao Lin
+- Yoer
+- Zachary York
+- Zach York
+- Zhihai Xu
