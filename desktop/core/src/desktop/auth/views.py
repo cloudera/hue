@@ -158,7 +158,7 @@ def dt_login(request, from_modal=False):
     first_user_form = None
     auth_form = AuthenticationForm()
 
-  if DEMO_ENABLED.get() and not 'admin' in request.REQUEST:
+  if DEMO_ENABLED.get() and not 'admin' in request.REQUEST and request.user.username != 'hdfs':
     user = authenticate(username=request.user.username, password='HueRocks')
     login(request, user)
     ensure_home_directory(request.fs, user.username)
