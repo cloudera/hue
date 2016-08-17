@@ -311,7 +311,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'baa' }
+            suggestColumns: { tables: [{ table: 'baa' }] }
           }
         });
       });
@@ -324,7 +324,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'baa' }
+            suggestColumns: { tables: [{ table: 'baa' }] }
           }
         });
       });
@@ -356,7 +356,7 @@ define([
             suggestFunctions: {},
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
-            suggestColumns: { table: 'boo', database: 'baa' }
+            suggestColumns: { tables: [{ table: 'boo', database: 'baa' }] }
           }
         });
       });
@@ -373,7 +373,7 @@ define([
             suggestFunctions: {},
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
-            suggestColumns: { table: 'boo', database: 'baa' }
+            suggestColumns: { tables: [{ table: 'boo', database: 'baa' }] }
           }
         });
       });
@@ -431,7 +431,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'ble', database: 'bla' }
+            suggestColumns: { tables: [{ table: 'ble', database: 'bla' }] }
           }
         });
       });
@@ -505,7 +505,7 @@ define([
             suggestFunctions: {},
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
-            suggestColumns: { table: 'boo', database: 'baa' }
+            suggestColumns: { tables: [{ table: 'boo', database: 'baa' }] }
           }
         });
       });
@@ -557,7 +557,7 @@ define([
             suggestFunctions: {},
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
-            suggestColumns: { table: 'boo', database: 'baa' }
+            suggestColumns: { tables: [{ table: 'boo', database: 'baa' }] }
           }
         });
       });
@@ -642,7 +642,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'baa' }
+            suggestColumns: { tables: [{ table: 'baa' }] }
           }
         });
       });
@@ -655,7 +655,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'baa' }
+            suggestColumns: { tables: [{ table: 'baa' }] }
           }
         });
       });
@@ -763,7 +763,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { table: 'ble', database: 'bla' }
+            suggestColumns: { tables: [{ table: 'ble', database: 'bla' }] }
           }
         });
       });
