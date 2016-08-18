@@ -975,6 +975,12 @@ from django.utils.translation import ugettext as _
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isS3.subscribe(function (newVal) {
+        if (newVal) {
+          huePubSub.publish('update.autocompleters');
+        }
+      });
+
       self.isS3Root = ko.pureComputed(function () {
         return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
       });
@@ -1873,13 +1879,25 @@ from django.utils.translation import ugettext as _
         }
        });
 
-      $("#moveDestination").jHueHdfsAutocomplete({
-        showOnFocus: true,
-        skipKeydownEvents: true,
-        onEnter: function (el) {
-          $("#jHueHdfsAutocomplete").hide();
-        }
+      huePubSub.subscribe('update.autocompleters', function(){
+        $("#moveDestination").jHueHdfsAutocomplete({
+          showOnFocus: true,
+          skipKeydownEvents: true,
+          onEnter: function (el) {
+            $("#jHueHdfsAutocomplete").hide();
+          },
+          isS3: viewModel.isS3()
+        });
+        $("#copyDestination").jHueHdfsAutocomplete({
+          showOnFocus: true,
+          skipKeydownEvents: true,
+          onEnter: function (el) {
+            $("#jHueHdfsAutocomplete").hide();
+          },
+          isS3: viewModel.isS3()
+        });
       });
+
 
       $("#copyForm").on("submit", function () {
         if ($.trim($("#copyDestination").val()) == "") {
@@ -1897,14 +1915,7 @@ from django.utils.translation import ugettext as _
         }
        });
 
-
-      $("#copyDestination").jHueHdfsAutocomplete({
-        showOnFocus: true,
-        skipKeydownEvents: true,
-        onEnter: function (el) {
-          $("#jHueHdfsAutocomplete").hide();
-        }
-      });
+      huePubSub.publish('update.autocompleters');
 
       $(".create-directory-link").click(function () {
         $("#createDirectoryModal").modal({

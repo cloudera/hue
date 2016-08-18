@@ -33,7 +33,8 @@
         showOnFocus: false,
         skipKeydownEvents: false,
         skipScrollEvent: false,
-        zIndex: 33000
+        zIndex: 33000,
+        isS3: false
       };
 
   function Plugin(element, options) {
@@ -212,6 +213,15 @@
     var _currentFiles = [];
 
     function prepareAutocompletePath(path) {
+      if (_this.options.isS3){
+        if (path.indexOf('s3a://') === 0){
+          path = path.substr(6);
+        }
+        if (path.indexOf('/') === 0){
+          path = path.substr(1);
+        }
+        return path;
+      }
       if (path.indexOf('/') == 0 || /^([a-zA-Z0-9]+):\/\//.test(path))
         return path.substr(0, path.lastIndexOf("/") + 1);
       if (path.indexOf("/") > 0)
@@ -220,7 +230,10 @@
     }
 
     function showHdfsAutocomplete(callback) {
-      autocompleteUrl = BASE_PATH + prepareAutocompletePath(_el.val());
+      if (_this.options.isS3 && BASE_PATH.indexOf('S3A://') == -1) {
+        BASE_PATH += 'S3A://';
+      }
+      var autocompleteUrl = BASE_PATH + prepareAutocompletePath(_el.val());
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {
@@ -242,10 +255,20 @@
               var item = $(this).text().trim();
               var path = autocompleteUrl.substring(BASE_PATH.length);
               if (item == "..") { // one folder up
+                if (_this.options.isS3) {
+                  path = path.substring(0, path.lastIndexOf("/"));
+                }
                 _el.val(path.substring(0, path.lastIndexOf("/")));
               }
               else {
                 _el.val(path + (path.charAt(path.length - 1) == "/" ? "" : "/") + item);
+              }
+              if (_this.options.isS3 && _el.val().indexOf('s3a://') === -1) {
+                var val = _el.val();
+                if (val.indexOf('/') === 0){
+                  val = val.substr(1);
+                }
+                _el.val('s3a://' + val);
               }
               if ($(this).html().indexOf("folder") > -1) {
                 _el.val(_el.val() + "/");
@@ -313,6 +336,9 @@
     return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
         $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+      }
+      else {
+        $.data(this, 'plugin_' + pluginName).setOptions(options);
       }
     });
   }
