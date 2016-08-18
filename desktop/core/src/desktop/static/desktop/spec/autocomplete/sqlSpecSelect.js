@@ -2677,28 +2677,15 @@ define([
         });
       });
 
-      it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW OUTER explode(bar) |"', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT bar FROM foo LATERAL VIEW OUTER explode(bar) ',
-          afterCursor: '',
-          dialect: 'hive',
-          hasLocations: true,
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
-          }
-        });
-      });
-
       it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW explode(bar) b |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) b ',
           afterCursor: '',
           dialect: 'hive',
           hasLocations: true,
+          containsKeywords: ['AS', 'WHERE'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['AS']
+            lowerCase: false
           }
         });
       });
@@ -2902,10 +2889,10 @@ define([
           });
         });
 
-        it('should suggest aliases for "SELECT |  FROM testTable LATERAL VIEW explode(testMap) explodedTable AS (testKey, testValue)"', function () {
+        it('should suggest aliases for "SELECT |  FROM testTable LATERAL VIEW explode(testMap) explodedTable AS testKey, testValue"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT ',
-            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS (testKey, testValue)',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS testKey, testValue',
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {
@@ -2928,7 +2915,6 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArray' }, { name: 'item' }] }] }
             }
           });
@@ -2944,7 +2930,6 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArrayA' }, { name: 'item' }] }] }
             }
           });
@@ -2959,7 +2944,6 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: { tables: [{ table: 'testTable2', identifierChain: [{ name: 'testArrayB' }, { name: 'item' }] }] },
               locations: [
                 { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], table: 'testTable2'},
@@ -2984,7 +2968,6 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }] }] }
             }
           });
@@ -2998,72 +2981,93 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArray' }, { name: 'item' }] }] },
-              suggestKeywords: ['*']
-            }
-          });
-        });
-
-        it('should suggest identifiers for "SELECT testValue.| FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS (testIndex, testValue)"', function () {
-          assertAutoComplete({
-            beforeCursor: 'SELECT testValue.',
-            afterCursor: ' FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS (testIndex, testValue)',
-            dialect: 'hive',
-            hasLocations: true,
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['*'], // TODO: Verify that this is true
               suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArray' }, { name: 'item' }] }] }
             }
           });
         });
 
-        it('should suggest columns for "SELECT testMapValue.| FROM testTable LATERAL VIEW explode(testMap) AS (testMapKey, testMapValue)"', function () {
+        it('should suggest identifiers for "SELECT testValue.| FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS testIndex, testValue"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT testValue.',
+            afterCursor: ' FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS testIndex, testValue',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testArray' }, { name: 'item' }] }] }
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT boo.| FROM customers LATERAL VIEW explode(baa) boo;"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT boo.',
+            afterCursor: ' FROM customers LATERAL VIEW explode(baa) boo;',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestIdentifiers: [{ name: 'key', type: 'alias' }, { name: 'value', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT boo.| FROM customers LATERAL VIEW posexplode(baa) boo;"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT boo.',
+            afterCursor: ' FROM customers LATERAL VIEW posexplode(baa) boo;',
+            dialect: 'hive',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestIdentifiers: [{ name: 'pos', type: 'alias' }, { name: 'val', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT testMapValue.| FROM testTable LATERAL VIEW explode(testMap) bla AS testMapKey, testMapValue"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT testMapValue.',
-            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) AS (testMapKey, testMapValue)',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) AS testMapKey, testMapValue',
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testMap' }, { name: 'value' }] }] },
-              suggestKeywords: ['*'] // TODO: Verify that this is true
+              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testMap' }, { name: 'value' }] }] }
             }
           });
         });
 
-        it('should suggest columns for "SELECT explodedMap.testMapValue.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)"', function () {
+        it('should suggest columns for "SELECT explodedMap.testMapValue.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT explodedMap.testMapValue.',
-            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testMap' }, { name: 'value' }] }] },
-              suggestKeywords: ['*'] // TODO: Verify that this is true
+              suggestColumns: { tables: [{ table: 'testTable', identifierChain: [{ name: 'testMap' }, { name: 'value' }] }] }
             }
           });
         });
 
-        it('should suggest identifier for "SELECT explodedMap.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)"', function () {
+        it('should suggest identifier for "SELECT explodedMap.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT explodedMap.',
-            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
-              suggestKeywords: ['*'] // TODO: Check if really true
+              suggestIdentifiers: [{ name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }]
             }
           });
         });
 
-        it('should suggest identifiers for "SELECT | FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)"', function () {
+        it('should suggest identifiers for "SELECT | FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT ',
-            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)',
+            afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {

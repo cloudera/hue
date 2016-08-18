@@ -70,10 +70,10 @@ ErrorList
  ;
 
 LateralView
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier error  -> []
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction error                    -> []
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                        -> []
- | '<hive>LATERAL' error                                                                   -> []
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier '<hive>AS' error  -> { }
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction error                                           -> { }
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                                               -> { }
+ | '<hive>LATERAL' error                                                                                          -> { }
  ;
 
 JoinTypes_EDIT
