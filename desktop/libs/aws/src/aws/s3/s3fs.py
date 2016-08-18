@@ -59,12 +59,14 @@ class S3FileSystem(object):
 
   def _get_bucket(self, name):
     self._init_bucket_cache()
+    name = name.lower()
     if name not in self._bucket_cache:
       self._bucket_cache[name] = self._s3_connection.get_bucket(name)
     return self._bucket_cache[name]
 
   def _get_or_create_bucket(self, name):
     try:
+      name = name.lower()
       bucket = self._get_bucket(name)
     except S3ResponseError, e:
       if e.status == 403:
