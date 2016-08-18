@@ -983,6 +983,7 @@
     }).success(function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
       if (data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
+        cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
         cachedData[options.url] = {
           timestamp: (new Date()).getTime(),
           data: data
