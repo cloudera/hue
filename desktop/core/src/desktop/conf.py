@@ -197,7 +197,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
           "img-src 'self' *.google-analytics.com *.doubleclick.net *.tile.osm.org data:;"+
           "style-src 'self' 'unsafe-inline';"+
           "connect-src 'self';"+
-          "child-src 'none';"+
+          "child-src 'self' data:;"+
           "object-src 'none'")
 
 SECURE_SSL_REDIRECT = Config(
