@@ -1302,19 +1302,27 @@ TableExpression_EDIT
    {
      var keywords = [];
 
-     if ($1 && typeof $1.hasJoinCondition !== 'undefined' && !$1.hasJoinCondition) {
-       keywords.push({ value: 'ON', weight: 3 });
-       if (isImpala()) {
-         keywords.push({ value: 'USING', weight: 3 });
+     if ($1) {
+       if (!$1.hasLateralViews && typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
+         keywords.push({ value: 'ON', weight: 3 });
+         if (isImpala()) {
+           keywords.push({ value: 'USING', weight: 3 });
+         }
        }
-     } else if ($1 && $1.suggestKeywords) {
-       keywords = createWeightedKeywords($1.suggestKeywords, 3);
-     } else if ($1 && $1.types) {
-       var veKeywords = getValueExpressionKeywords($1);
-       keywords = veKeywords.suggestKeywords;
-       if (veKeywords.suggestColRefKeywords) {
-         suggestColRefKeywords(veKeywords.suggestColRefKeywords);
-         addColRefIfExists($1);
+       if ($1.suggestKeywords) {
+         keywords = createWeightedKeywords($1.suggestKeywords, 3);
+       }
+       if (!$1.hasLateralViews && $1.tableReferenceList.suggestKeywords) {
+         keywords = keywords.concat(createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
+       }
+
+       if (!$1.hasLateralViews && $1.tableReferenceList.types) {
+         var veKeywords = getValueExpressionKeywords($1.tableReferenceList);
+         keywords = keywords.concat(veKeywords.suggestKeywords);
+         if (veKeywords.suggestColRefKeywords) {
+           suggestColRefKeywords(veKeywords.suggestColRefKeywords);
+           addColRefIfExists($1.tableReferenceList);
+         }
        }
      }
 
@@ -1389,16 +1397,36 @@ OptionalJoins
  ;
 
 FromClause
- : 'FROM' TableReferenceList  -> $2
+ : 'FROM' TableReferenceList OptionalLateralViews
+   {
+     if (isHive()) {
+       $$ = { tableReferenceList : $2, suggestKeywords: ['LATERAL VIEW'] }
+     } else {
+       $$ = { tableReferenceList : $2 }
+     }
+     if (isHive() && $3) {
+       parser.yy.lateralViews = $3.lateralViews;
+       $$.hasLateralViews = true;
+       if ($3.suggestKeywords) {
+         $$.suggestKeywords = $$.suggestKeywords.concat($3.suggestKeywords);
+       }
+     }
+   }
  ;
 
 FromClause_EDIT
- : 'FROM' TableReferenceList_EDIT
- | 'FROM' 'CURSOR'
+ : 'FROM' 'CURSOR'
    {
        suggestTables();
        suggestDatabases({ appendDot: true });
    }
+ | 'FROM' TableReferenceList_EDIT OptionalLateralViews
+   {
+     if ($3) {
+       parser.yy.lateralViews = $3.lateralViews;
+     }
+   }
+ | 'FROM' TableReferenceList OptionalLateralViews_EDIT
  ;
 
 OptionalSelectConditions
@@ -2322,56 +2350,44 @@ JoinCondition_EDIT
  ;
 
 TablePrimary
- : TableOrQueryName OptionalTableSample OptionalCorrelationName OptionalLateralViews
+ : TableOrQueryName OptionalTableSample OptionalCorrelationName
    {
      if ($1.identifierChain) {
        if ($3) {
          $1.alias = $3
        }
-       if ($4 && $4.length > 0) {
-         $1.lateralViews = $4;
-       }
        addTablePrimary($1);
      }
      // Right-to-left for cursor after TablePrimary
-     $$.suggestKeywords = getKeywordsForOptionalsLR([$4, $3, $2], [{ value: 'LATERAL VIEW', weight: 1 }, { value: 'AS', weight: 2 }, { value: 'TABLESAMPLE', weight: 3 }], [isHive(), true, isHive()]);
+     $$.suggestKeywords = getKeywordsForOptionalsLR([$3, $2], [{ value: 'AS', weight: 1 }, { value: 'TABLESAMPLE', weight: 2 }], [true, isHive()]);
    }
- | DerivedTable OptionalCorrelationName OptionalLateralViews
+ | DerivedTable OptionalCorrelationName
    {
-      if ($2) {
+     if ($2) {
        $1.alias = $2;
        addTablePrimary({ subQueryAlias: $2 });
+     } else {
+       $$.suggestKeywords = [{ value: 'AS', weight: 1 }];
      }
    }
  ;
 
 TablePrimary_EDIT
- : TableOrQueryName_EDIT OptionalTableSample OptionalCorrelationName OptionalLateralViews
- | TableOrQueryName OptionalTableSample_EDIT OptionalCorrelationName OptionalLateralViews
+ : TableOrQueryName_EDIT OptionalTableSample OptionalCorrelationName
+ | TableOrQueryName OptionalTableSample_EDIT OptionalCorrelationName
    {
      if ($3) {
        $1.alias = $3;
      }
      addTablePrimary($1);
    }
- | TableOrQueryName OptionalTableSample OptionalCorrelationName OptionalLateralViews_EDIT
-   {
-     if ($3) {
-       $1.alias = $3;
-     }
-     addTablePrimary($1);
-   }
- | DerivedTable_EDIT OptionalCorrelationName OptionalLateralViews
+ | DerivedTable_EDIT OptionalCorrelationName
    {
      if ($2) {
        addTablePrimary({ subQueryAlias: $2 });
      }
    }
- | DerivedTable OptionalCorrelationName_EDIT OptionalLateralViews
- | DerivedTable OptionalCorrelationName OptionalLateralViews_EDIT
-   if ($2) {
-     addTablePrimary({ subQueryAlias: $2 });
-   }
+ | DerivedTable OptionalCorrelationName_EDIT
  ;
 
 TableOrQueryName
@@ -2439,6 +2455,9 @@ PushQueryState
      if (typeof parser.yy.primariesStack === 'undefined') {
        parser.yy.primariesStack = [];
      }
+     if (typeof parser.yy.lateralViewsStack === 'undefined') {
+       parser.yy.lateralViewsStack = [];
+     }
      if (typeof parser.yy.subQueriesStack === 'undefined') {
        parser.yy.subQueriesStack = [];
      }
@@ -2447,6 +2466,7 @@ PushQueryState
        parser.yy.resultStack = [];
      }
      parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
+     parser.yy.lateralViewsStack.push(parser.yy.lateralViews);
      parser.yy.resultStack.push(parser.yy.result);
      parser.yy.locationsStack.push(parser.yy.locations);
      parser.yy.subQueriesStack.push(parser.yy.subQueries);
@@ -2579,10 +2599,14 @@ OptionalLateralViews
  :
  | OptionalLateralViews LateralView
    {
-     if ($1) {
-       $$ = $1.concat($2);
-     } else {
-       $$ = $2;
+     if ($1 && $2.lateralView) {
+       $1.lateralViews.push($2.lateralView);
+       $$ = $1;
+     } else if ($2.lateralView) {
+       $$ = { lateralViews: [ $2.lateralView ] };
+     }
+     if ($2.suggestKeywords) {
+       $$.suggestKeywords = $2.suggestKeywords
      }
    }
  ;
@@ -3186,23 +3210,24 @@ SumFunction_EDIT
  ;
 
 LateralView
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier LateralViewColumnAliases  -> [{ udtf: $4, tableAlias: $5, columnAliases: $6 }]
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction LateralViewColumnAliases                    -> [{ udtf: $4, columnAliases: $5 }]
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier LateralViewColumnAliases  -> { lateralView: { udtf: $4, tableAlias: $5, columnAliases: $6 }}
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier
+   {
+     if ($4.function.toLowerCase() === 'explode') {
+       $$ = { lateralView: { udtf: $4, tableAlias: $5, columnAliases: ['key', 'value'] }, suggestKeywords: ['AS'] };
+     } else if ($4.function.toLowerCase() === 'posexplode') {
+       $$ = { lateralView: { udtf: $4, tableAlias: $5, columnAliases: ['pos', 'val'] }, suggestKeywords: ['AS'] };
+     } else {
+       $$ = { lateralView: { udtf: $4, tableAlias: $5, columnAliases: [] }, suggestKeywords: ['AS'] };
+     }
+   }
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction LateralViewColumnAliases                                -> { lateralView: { udtf: $4, columnAliases: $5 }}
  ;
 
 LateralView_EDIT
  : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT LateralViewColumnAliases
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularIdentifier 'CURSOR'
-   {
-     suggestKeywords(['AS']);
-     $$ = [];
-   }
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction 'CURSOR'
-   {
-     suggestKeywords(['AS']);
-     $$ = [];
-   }
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier LateralViewColumnAliases
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter 'CURSOR'
    {
      if (!$3) {
@@ -3210,12 +3235,10 @@ LateralView_EDIT
      } else {
        suggestKeywords(['explode', 'posexplode']);
      }
-     $$ = [];
    }
  | '<hive>LATERAL' 'CURSOR'
    {
      suggestKeywords(['VIEW']);
-     $$ = [];
    }
  ;
 
@@ -3225,6 +3248,6 @@ OptionalOuter
  ;
 
 LateralViewColumnAliases
- : '<hive>AS' RegularIdentifier                                -> [ $2 ]
- | '<hive>AS' '(' RegularIdentifier ',' RegularIdentifier ')'  -> [ $3, $5 ]
+ : '<hive>AS' RegularOrBacktickedIdentifier                                    -> [ $2 ]
+ | '<hive>AS' RegularOrBacktickedIdentifier ',' RegularOrBacktickedIdentifier  -> [ $2, $4 ]
  ;
