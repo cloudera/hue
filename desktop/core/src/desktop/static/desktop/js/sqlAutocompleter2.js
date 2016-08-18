@@ -60,6 +60,7 @@
     var completions = [];
     var columnSuggestions = [];
 
+    editor.showSpinner();
     if (parseResult.suggestKeywords) {
       parseResult.suggestKeywords.forEach(function (keyword) {
         completions.push({
@@ -105,7 +106,7 @@
       if (foundVarRef.length > 0) {
         colRefCallback({ type: 'T' });
       } else {
-        self.fetchFieldsForIdentifiers(editor, parseResult.colRef.table, parseResult.colRef.database || database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+        self.fetchFieldsForIdentifiers(parseResult.colRef.table, parseResult.colRef.database || database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
       }
 
     } else {
@@ -158,16 +159,16 @@
         $.when.apply($, colRefDeferral).done(function () {
           parseResult.suggestColumns.tables.forEach(function (table) {
             if (colRef !== null) {
-              deferrals.push(self.addColumns(parseResult, table, editor, database, [colRef.type.toUpperCase()], columnSuggestions));
+              deferrals.push(self.addColumns(parseResult, table, database, [colRef.type.toUpperCase()], columnSuggestions));
             } else {
-              deferrals.push(self.addColumns(parseResult, table, editor, database, ['T'], columnSuggestions));
+              deferrals.push(self.addColumns(parseResult, table, database, ['T'], columnSuggestions));
             }
           });
           suggestColumnsDeferral.resolve();
         });
       } else {
         parseResult.suggestColumns.tables.forEach(function (table) {
-          deferrals.push(self.addColumns(parseResult, table, editor, database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
+          deferrals.push(self.addColumns(parseResult, table, database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
         });
         suggestColumnsDeferral.resolve();
       }
@@ -183,11 +184,11 @@
     }
 
     if (parseResult.suggestHdfs) {
-      deferrals.push(self.addHdfs(parseResult, editor, completions));
+      deferrals.push(self.addHdfs(parseResult, completions));
     }
 
     if (parseResult.suggestTables) {
-      deferrals.push(self.addTables(parseResult, editor, database, completions))
+      deferrals.push(self.addTables(parseResult, database, completions))
     }
 
     $.when.apply($, deferrals).done(function () {
@@ -246,7 +247,7 @@
     });
   };
 
-  SqlAutocompleter2.prototype.fetchFieldsForIdentifiers = function (editor, tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields) {
+  SqlAutocompleter2.prototype.fetchFieldsForIdentifiers = function (tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields) {
     var self = this;
     if (!fetchedFields) {
       fetchedFields = [];
@@ -270,7 +271,6 @@
       databaseName: databaseName,
       tableName: tableName,
       fields: fetchedFields,
-      editor: editor,
       timeout: self.timeout,
       successCallback: function (data) {
         if (identifierChain.length > 0) {
@@ -280,7 +280,7 @@
           if (data.type === 'map') {
             fetchedFields.push('value')
           }
-          self.fetchFieldsForIdentifiers(editor, tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields)
+          self.fetchFieldsForIdentifiers(tableName, databaseName, identifierChain, callback, errorCallback, fetchedFields)
         } else {
           callback(data);
         }
@@ -290,7 +290,7 @@
     });
   };
 
-  SqlAutocompleter2.prototype.addTables = function (parseResult, editor, database, completions) {
+  SqlAutocompleter2.prototype.addTables = function (parseResult, database, completions) {
     var self = this;
     var tableDeferred = $.Deferred();
     var prefix = parseResult.suggestTables.prependQuestionMark ? '? ' : '';
@@ -317,7 +317,6 @@
       },
       silenceErrors: true,
       errorCallback: tableDeferred.resolve,
-      editor: editor,
       timeout: self.timeout
     });
     return tableDeferred;
@@ -333,7 +332,7 @@
     return null;
   };
 
-  SqlAutocompleter2.prototype.addColumns = function (parseResult, table, editor, database, types, columnSuggestions) {
+  SqlAutocompleter2.prototype.addColumns = function (parseResult, table, database, types, columnSuggestions) {
     var self = this;
     var addColumnsDeferred = $.Deferred();
 
@@ -419,7 +418,7 @@
         addColumnsDeferred.resolve();
       };
 
-      self.fetchFieldsForIdentifiers(editor, table.table, table.database || database, table.identifierChain, callback, addColumnsDeferred.resolve);
+      self.fetchFieldsForIdentifiers(table.table, table.database || database, table.identifierChain, callback, addColumnsDeferred.resolve);
     }
     return addColumnsDeferred;
   };
@@ -449,7 +448,7 @@
     return databasesDeferred;
   };
 
-  SqlAutocompleter2.prototype.addHdfs = function (parseResult, editor, completions) {
+  SqlAutocompleter2.prototype.addHdfs = function (parseResult, completions) {
     var self = this;
     var hdfsDeferred = $.Deferred();
     var parts = parseResult.suggestHdfs.path.split('/');
@@ -476,7 +475,6 @@
       },
       silenceErrors: true,
       errorCallback: hdfsDeferred.resolve,
-      editor: editor,
       timeout: self.timeout
     });
 
@@ -494,10 +492,7 @@
       currentScore--;
     });
 
-    // TODO Figure out why SELECT | FROM customers LATERAL VIEW explode(a) AS (b, c)
-    if (typeof editor !== 'undefined') {
-      editor.hideSpinner();
-    }
+    editor.hideSpinner();
     callback(completions);
   };
 
