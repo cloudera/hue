@@ -26,7 +26,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 
 from aws.s3 import join, parse_uri
-from aws.s3.s3fs import S3FileSystem
+from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 from aws.s3.s3test_utils import S3TestBase, generate_id
 from aws.s3.upload import DEFAULT_WRITE_SIZE
 
@@ -48,7 +48,7 @@ class S3FSTest(S3TestBase):
     path = self.get_test_path('test_open.txt')
 
     with self.cleaning(path):
-      assert_raises(IOError, self.fs.open, path)
+      assert_raises(S3FileSystemException, self.fs.open, path)
 
       key = self.get_key(path)
       key.set_contents_from_string('Hello')
@@ -104,7 +104,7 @@ class S3FSTest(S3TestBase):
   def test_stats(self):
     assert_raises(ValueError, self.fs.stats, 'ftp://archive')
     not_exists = self.get_test_path('does_not_exist')
-    assert_raises(IOError, self.fs.stats, not_exists)
+    assert_raises(S3FileSystemException, self.fs.stats, not_exists)
 
     root_stat = self.fs.stats('s3a://')
     eq_(True, root_stat.isDir)
@@ -154,7 +154,7 @@ class S3FSTest(S3TestBase):
       assert_true(self.fs.exists(join(dst_folder_path, 'file.txt')))
 
       # Copy directory to file should fail.
-      assert_raises(IOError, self.fs.copy, src_path, dst_file_path, True)
+      assert_raises(S3FileSystemException, self.fs.copy, src_path, dst_file_path, True)
 
 
   def test_copy_remote_dir(self):

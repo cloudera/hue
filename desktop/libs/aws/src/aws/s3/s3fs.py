@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 
-import errno
 import itertools
 import logging
 import os
@@ -173,7 +172,7 @@ class S3FileSystem(object):
   def open(self, path, mode='r'):
     key = self._get_key(path, validate=True)
     if key is None:
-      raise IOError(errno.ENOENT, "No such file or directory: '%s'" % path)
+      raise S3FileSystemException("No such file or directory: '%s'" % path)
     return s3file.open(key, mode=mode)
 
   @translate_s3_error
@@ -206,7 +205,7 @@ class S3FileSystem(object):
     stats = self._stats(path)
     if stats:
       return stats
-    raise IOError(errno.ENOENT, "No such file or directory: '%s'" % path)
+    raise S3FileSystemException("No such file or directory: '%s'" % path)
 
   @translate_s3_error
   def listdir_stats(self, path, glob=None):
@@ -286,7 +285,7 @@ class S3FileSystem(object):
       if stats.isDir:
         return None
       else:
-        raise IOError(errno.ENOTDIR, "'%s' already exists and is not a directory" % path)
+        raise S3FileSystemException("'%s' already exists and is not a directory" % path)
     path = self._append_separator(path)  # folder-key should ends by /
     self.create(path)  # create empty object
 
@@ -297,7 +296,7 @@ class S3FileSystem(object):
   @translate_s3_error
   def copyfile(self, src, dst, *args, **kwargs):
     if self.isdir(dst):
-      raise IOError(errno.EINVAL, "Copy dst '%s' is a directory" % dst)
+      raise S3FileSystemException("Copy dst '%s' is a directory" % dst)
     self._copy(src, dst, recursive=False, use_src_basename=False)
 
   @translate_s3_error
@@ -312,7 +311,7 @@ class S3FileSystem(object):
     dst = s3.abspath(src, dst)
     dst_st = self._stats(dst)
     if src_st.isDir and dst_st and not dst_st.isDir:
-      raise IOError(errno.EEXIST, "Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
+      raise S3FileSystemException("Cannot overwrite non-directory '%s' with directory '%s'" % (dst, src))
 
     src_bucket, src_key = s3.parse_uri(src)[:2]
     dst_bucket, dst_key = s3.parse_uri(dst)[:2]
@@ -332,8 +331,12 @@ class S3FileSystem(object):
 
     for key in src_bucket.list(prefix=src_key):
       if not key.name.startswith(src_key):
-        raise RuntimeError(_("Invalid key to transform: %s") % key.name)
+        raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
       dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
+
+      if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
+        dst_name = self._append_separator(dst_name)
+
       key.copy(dst_bucket, dst_name)
 
   @translate_s3_error
@@ -347,9 +350,9 @@ class S3FileSystem(object):
   @translate_s3_error
   def rename_star(self, old_dir, new_dir):
     if not self.isdir(old_dir):
-      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % old_dir)
+      raise S3FileSystemException("'%s' is not a directory" % old_dir)
     if self.isfile(new_dir):
-      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % new_dir)
+      raise S3FileSystemException("'%s' is not a directory" % new_dir)
     ls = self.listdir(old_dir)
     for entry in ls:
       self.rename(s3.join(old_dir, entry), s3.join(new_dir, entry))
