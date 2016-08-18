@@ -56,11 +56,17 @@
     var self = this;
     var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions, false);
 
+    if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
+      console.log(parseResult);
+    }
+
     var deferrals = [];
     var completions = [];
     var columnSuggestions = [];
 
-    editor.showSpinner();
+    if (typeof editor !== 'undefined' && editor !== null) {
+      editor.showSpinner();
+    }
     if (parseResult.suggestKeywords) {
       parseResult.suggestKeywords.forEach(function (keyword) {
         completions.push({
@@ -492,7 +498,9 @@
       currentScore--;
     });
 
-    editor.hideSpinner();
+    if (typeof editor !== 'undefined' && editor !== null) {
+      editor.hideSpinner();
+    }
     callback(completions);
   };
 

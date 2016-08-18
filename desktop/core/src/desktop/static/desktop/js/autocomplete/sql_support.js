@@ -18,6 +18,7 @@ var prepareNewStatement = function () {
   linkTablePrimaries();
   commitLocations();
 
+  delete parser.yy.lateralViews;
   delete parser.yy.latestTablePrimaries;
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
@@ -51,6 +52,7 @@ var popQueryState = function (subQuery) {
     parser.yy.subQueries.push(subQuery);
   }
 
+  parser.yy.lateralViews = parser.yy.lateralViewsStack.pop();
   parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
   parser.yy.locations = parser.yy.locationsStack.pop();
 };
@@ -360,42 +362,43 @@ parser.identifyPartials = function (beforeCursor, afterCursor) {
   return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
 };
 
-parser.expandLateralViews = function (tablePrimaries, originalIdentifierChain) {
+parser.expandLateralViews = function (lateralViews, originalIdentifierChain) {
   var identifierChain = originalIdentifierChain.concat(); // Clone in case it's re-used
   var firstIdentifier = identifierChain[0];
-  tablePrimaries.forEach(function (tablePrimary) {
-    if (typeof tablePrimary.lateralViews !== 'undefined') {
-      tablePrimary.lateralViews.concat().reverse().forEach(function (lateralView) {
-        if (!lateralView.udtf.expression.columnReference) {
-          return;
+  if (typeof lateralViews !== 'undefined') {
+    lateralViews.concat().reverse().forEach(function (lateralView) {
+      if (!lateralView.udtf.expression.columnReference) {
+        return;
+      }
+      if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
+        identifierChain.shift();
+        firstIdentifier = identifierChain[0];
+        delete parser.yy.result.suggestKeywords;
+      } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
+        if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+          parser.yy.result.suggestIdentifiers = [];
         }
-        if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
-          identifierChain.shift();
-          firstIdentifier = identifierChain[0];
-        } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
-          if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-            parser.yy.result.suggestIdentifiers = [];
-          }
-          lateralView.columnAliases.forEach(function (columnAlias) {
-            parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
-          });
-          delete parser.yy.result.suggestColumns;
-          return identifierChain;
+        lateralView.columnAliases.forEach(function (columnAlias) {
+          parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
+        });
+        delete parser.yy.result.suggestColumns;
+        delete parser.yy.result.suggestKeywords;
+        return identifierChain;
+      }
+      if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
+        if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[0]) {
+          identifierChain[0] = {name: 'key'};
+        } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[1]) {
+          identifierChain[0] = {name: 'value'};
+        } else {
+          identifierChain[0] = {name: 'item'};
         }
-        if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
-          if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[0]) {
-            identifierChain[0] = {name: 'key'};
-          } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[1]) {
-            identifierChain[0] = {name: 'value'};
-          } else {
-            identifierChain[0] = {name: 'item'};
-          }
-          identifierChain = lateralView.udtf.expression.columnReference.concat(identifierChain);
-          firstIdentifier = identifierChain[0];
-        }
-      });
-    }
-  });
+        identifierChain = lateralView.udtf.expression.columnReference.concat(identifierChain);
+        delete parser.yy.result.suggestKeywords;
+        firstIdentifier = identifierChain[0];
+      }
+    });
+  }
   return identifierChain;
 };
 
@@ -447,7 +450,7 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
   }
   // Expand exploded views in the identifier chain
   if (isHive() && identifierChain.length > 0) {
-    identifierChain = parser.expandLateralViews(tablePrimaries, identifierChain);
+    identifierChain = parser.expandLateralViews(parser.yy.lateralViews, identifierChain);
     wrapper.identifierChain = identifierChain;
   }
 
@@ -540,20 +543,19 @@ var suggestTablePrimariesAsIdentifiers = function () {
 };
 
 var suggestLateralViewAliasesAsIdentifiers = function () {
+  if (typeof parser.yy.lateralViews === 'undefined' || parser.yy.lateralViews.length === 0) {
+    return;
+  }
   if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
     parser.yy.result.suggestIdentifiers = [];
   }
-  parser.yy.latestTablePrimaries.forEach(function (tablePrimary) {
-    if (typeof tablePrimary.lateralViews !== 'undefined') {
-      tablePrimary.lateralViews.forEach(function (lateralView) {
-        if (typeof lateralView.tableAlias !== 'undefined') {
-          parser.yy.result.suggestIdentifiers.push({name: lateralView.tableAlias + '.', type: 'alias'});
-        }
-        lateralView.columnAliases.forEach(function (columnAlias) {
-          parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
-        });
-      });
+  parser.yy.lateralViews.forEach(function (lateralView) {
+    if (typeof lateralView.tableAlias !== 'undefined') {
+      parser.yy.result.suggestIdentifiers.push({name: lateralView.tableAlias + '.', type: 'alias'});
     }
+    lateralView.columnAliases.forEach(function (columnAlias) {
+      parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
+    });
   });
   if (parser.yy.result.suggestIdentifiers.length === 0) {
     delete parser.yy.result.suggestIdentifiers;
