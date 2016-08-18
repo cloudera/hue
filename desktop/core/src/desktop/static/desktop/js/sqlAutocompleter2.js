@@ -191,35 +191,35 @@
     }
 
     $.when.apply($, deferrals).done(function () {
-      columnSuggestions.sort(function (a, b) {
-        return a.value.localeCompare(b.value);
-      });
-
-      for (var i = 0; i < columnSuggestions.length; i++) {
-        var suggestion = columnSuggestions[i];
-        if (i + 1 < columnSuggestions.length) {
-          var nextSuggestion = columnSuggestions[i + 1];
-          if (suggestion.value === nextSuggestion.value) {
-            if (suggestion.table.alias) {
-              suggestion.value = suggestion.table.alias + '.' + suggestion.value;
-            } else {
-              suggestion.value = suggestion.table.table + '.' + suggestion.value;
-            }
-            if (nextSuggestion.table.alias) {
-              nextSuggestion.value = nextSuggestion.table.alias + '.' + nextSuggestion.value;
-            } else {
-              nextSuggestion.value = nextSuggestion.table.table + '.' + nextSuggestion.value;
-            }
-          }
-        }
-        if (suggestion.table.alias && suggestion.value.indexOf(suggestion.table.alias) !== 0) {
-          suggestion.value = suggestion.table.alias + '.' + suggestion.value;
-        }
-        delete suggestion.table;
-      }
+      self.mergeColumns(columnSuggestions);
       completions = completions.concat(columnSuggestions);
       self.finalizeCompletions(completions, callback, editor);
     });
+  };
+
+  SqlAutocompleter2.prototype.mergeColumns = function (columnSuggestions) {
+    columnSuggestions.sort(function (a, b) {
+      return a.value.localeCompare(b.value);
+    });
+
+    for (var i = 0; i < columnSuggestions.length; i++) {
+      var suggestion = columnSuggestions[i];
+      var hasDuplicates = false;
+      for (i; i + 1 < columnSuggestions.length && columnSuggestions[i + 1].value === suggestion.value; i++) {
+        if (typeof columnSuggestions[i + 1].table.alias !== 'undefined') {
+          columnSuggestions[i + 1].value = columnSuggestions[i + 1].table.alias + '.' + columnSuggestions[i + 1].value
+        } else {
+          columnSuggestions[i + 1].value = columnSuggestions[i + 1].table.table + '.' + columnSuggestions[i + 1].value
+        }
+        hasDuplicates = true;
+      }
+      if (typeof suggestion.table.alias !== 'undefined') {
+        suggestion.value = suggestion.table.alias + '.' + suggestion.value;
+      } else if (hasDuplicates) {
+        suggestion.value = suggestion.table.table + '.' + suggestion.value;
+      }
+      delete suggestion.table;
+    }
   };
 
   SqlAutocompleter2.prototype.addValues = function (columnReference, completions) {
