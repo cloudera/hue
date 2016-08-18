@@ -26,6 +26,7 @@ from itertools import groupby
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.conf import SERVER_USER
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
@@ -37,8 +38,6 @@ from libsolr.conf import SSL_CERT_CA_VERIFY
 
 
 LOG = logging.getLogger(__name__)
-
-DEFAULT_USER = 'hue'
 
 
 def utf_quoter(what):
@@ -72,7 +71,7 @@ class SolrApi(object):
   def _get_params(self):
     if self.security_enabled:
       return (('doAs', self._user ),)
-    return (('user.name', DEFAULT_USER), ('doAs', self._user),)
+    return (('user.name', SERVER_USER.get()), ('doAs', self._user),)
 
   def _get_q(self, query):
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
