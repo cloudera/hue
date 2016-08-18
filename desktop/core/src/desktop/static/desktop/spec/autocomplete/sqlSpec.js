@@ -401,219 +401,166 @@ define([
     });
 
     describe('identifierChain expansion', function () {
-      it('should expand 1', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testItem' ],
-            tableAlias: 'explodedTable',
-            udtf: {
-              expression: { columnReference: [{ name: 'testArray' }] },
-              function: 'explode'
-            }
-          }]
+      it('should expand 01', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testItem' ],
+          tableAlias: 'explodedTable',
+          udtf: {
+            expression: { columnReference: [{ name: 'testArray' }] },
+            function: 'explode'
+          }
         }];
 
-        var identifierChain = [{ name: 'explodedTable' }, { name: 'testItem' }];
-
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var identifierChain = [{ name: 'testItem' }];
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
-      it('should expand 2', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testMapKey', 'testMapValue' ],
-            tableAlias: 'explodedMap',
-            udtf: {
-              expression: { columnReference: [{ name: 'testMap' }] },
-              function: 'explode'
-            }
-          }]
+      it('should expand 02', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testMapKey', 'testMapValue' ],
+          tableAlias: 'explodedMap',
+          udtf: {
+            expression: { columnReference: [{ name: 'testMap' }] },
+            function: 'explode'
+          }
         }];
 
         var identifierChain = [{ name: 'explodedMap' }, { name: 'testMapValue' }];
 
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
       });
 
-      it('should expand 3', function () {
-        var tablePrimaries = [{ identifierChain: [{ name: 'testTable' }] }];
+      it('should expand 03', function () {
         var identifierChain = [{ name: 'testMap', keySet: true }];
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews([], identifierChain);
         expect(result).toEqual([{ name: 'testMap', keySet: true }]);
       });
 
-      it('should expand 4', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testItem' ],
-            tableAlias: 'explodedTable',
-            udtf: {
-              function: 'explode',
-              expression: { columnReference: [{ name: 'testArray' }] }
-            }
-          }]
+      it('should expand 04', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testItem' ],
+          tableAlias: 'explodedTable',
+          udtf: {
+            function: 'explode',
+            expression: { columnReference: [{ name: 'testArray' }] }
+          }
         }];
+
         var identifierChain = [{ name: 'testItem' }];
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
-      it('should expand 5', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testItemB' ],
-            tableAlias: 'explodedTableB',
-            udtf: {
-              function: 'explode',
-              expression: { columnReference: [{ name: 'testArrayB' }] }
-            }
-          }, {
-            columnAliases: [ 'testItemA' ],
-            tableAlias: 'explodedTableA',
-            udtf: {
-              function: 'explode',
-              expression: { columnReference: [{ name: 'testArrayA' }] }
-            }
-          }]
+      it('should expand 05', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testItemB' ],
+          tableAlias: 'explodedTableB',
+          udtf: {
+            function: 'explode',
+            expression: { columnReference: [{ name: 'testArrayB' }] }
+          }
+        }, {
+          columnAliases: [ 'testItemA' ],
+          tableAlias: 'explodedTableA',
+          udtf: {
+            function: 'explode',
+            expression: { columnReference: [{ name: 'testArrayA' }] }
+          }
         }];
+
         var identifierChain = [{ name: 'testItemA' }];
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArrayA' }, { name: 'item' }]);
       });
 
-      it('should expand 6', function () {
-        var tablePrimaries = [{
-          alias: 'tt2',
-          identifierChain: [{ name: 'testTable2' }],
-          lateralViews: [{
-            columnAliases: [ 'testItemB' ],
-            tableAlias: 'explodedTableB',
-            udtf: {
-              function: 'explode',
-              expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayB' }] }
-            }
-          }, {
-            columnAliases: [ 'testItemA' ],
-            tableAlias: 'explodedTableA',
-            udtf: {
-              function: 'explode',
-              expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayA' }] }
-            }
-          }]
+      it('should expand 06', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testItemB' ],
+          tableAlias: 'explodedTableB',
+          udtf: {
+            function: 'explode',
+            expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayB' }] }
+          }
+        }, {
+          columnAliases: [ 'testItemA' ],
+          tableAlias: 'explodedTableA',
+          udtf: {
+            function: 'explode',
+            expression: { columnReference: [{ name: 'tt2' }, { name: 'testArrayA' }] }
+          }
         }];
         var identifierChain = [{ name: 'testItemB' }];
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'tt2' }, { name: 'testArrayB' }, { name: 'item' }]);
       });
 
-      it('should expand 7', function () {
-        var tablePrimaries = [{
-          alias: 'tt',
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'ta1_exp' ],
-            tableAlias: 'ta1',
-            udtf: {
-              expression: { columnReference: [{ name: 'tt' }, { name: 'testArray1' }] },
-              function: 'explode'
-            }
-          }, {
-            columnAliases: [ 'ta2_exp' ],
-            tableAlias: 'ta2',
-            udtf: {
-              expression: { columnReference: [{ name: 'ta1_exp' },{ name: 'testArray2' }] },
-              function: 'explode'
-            }
-          }]
+      it('should expand 07', function () {
+        var lateralViews = [{
+          columnAliases: [ 'ta1_exp' ],
+          tableAlias: 'ta1',
+          udtf: {
+            expression: { columnReference: [{ name: 'tt' }, { name: 'testArray1' }] },
+            function: 'explode'
+          }
+        }, {
+          columnAliases: [ 'ta2_exp' ],
+          tableAlias: 'ta2',
+          udtf: {
+            expression: { columnReference: [{ name: 'ta1_exp' },{ name: 'testArray2' }] },
+            function: 'explode'
+          }
         }];
 
         var identifierChain = [{ name: 'ta2_exp' }];
-
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'tt' }, { name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }]);
       });
 
-      it('should expand 8', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testIndex', 'testValue' ],
-            tableAlias: 'explodedTable',
-            udtf: {
-              expression: { columnReference: [{ name: 'testArray' }] },
-              function: 'posexplode'
-            }
-          }]
+      it('should expand 08', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testIndex', 'testValue' ],
+          tableAlias: 'explodedTable',
+          udtf: {
+            expression: { columnReference: [{ name: 'testArray' }] },
+            function: 'posexplode'
+          }
         }];
 
         var identifierChain = [{ name: 'testValue' }];
-
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
-      it('should expand 9', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testMapKey', 'testMapValue' ],
-            tableAlias: 'explodedTable',
-            udtf: {
-              expression: { columnReference: [{ name: 'testMap' }] },
-              function: 'explode'
-            }
-          }]
+      it('should expand 09', function () {
+        var lateralViews = [{
+          columnAliases: [ 'testMapKey', 'testMapValue' ],
+          tableAlias: 'explodedTable',
+          udtf: {
+            expression: { columnReference: [{ name: 'testMap' }] },
+            function: 'explode'
+          }
         }];
 
         var identifierChain = [{ name: 'testMapValue' }];
-
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
       });
 
 
       it('should expand 10', function () {
-        var tablePrimaries = [{
-          identifierChain: [{ name: 'testTable' }],
-          lateralViews: [{
-            columnAliases: [ 'testItem' ],
-            tableAlias: 'explodedTable',
-            udtf: {
-              expression: { columnReference: [{ name: 'testArray' }] },
-              function: 'explode'
-            }
-          }]
+        var lateralViews = [{
+          columnAliases: [ 'testItem' ],
+          tableAlias: 'explodedTable',
+          udtf: {
+            expression: { columnReference: [{ name: 'testArray' }] },
+            function: 'explode'
+          }
         }];
 
         var identifierChain = [{ name: 'testItem' }];
-
-        var tablePrimariesBefore = tablePrimaries.concat();
-        var result = sql.expandLateralViews(tablePrimaries, identifierChain);
-        expect(tablePrimariesBefore).toEqual(tablePrimaries);
+        var result = sql.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
