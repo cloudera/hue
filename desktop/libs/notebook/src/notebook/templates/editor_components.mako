@@ -2364,7 +2364,11 @@ ${ hueIcons.symbols() }
           window.clearTimeout(resultFollowTimeout);
           resultFollowTimeout = window.setTimeout(function () {
             var topCoord = vm.isPlayerMode() ? 1 : 73;
-            var margin = Math.max(((snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1), 0);
+            var offsetTop = 0;
+            if (snippetEl.find('.dataTables_wrapper').length > 0 && snippetEl.find('.dataTables_wrapper').offset()){
+              offsetTop = (snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1;
+            }
+            var margin = Math.max(offsetTop, 0);
             if (snippet.isResultSettingsVisible()) {
               snippetEl.find('.snippet-grid-settings').css({
                 "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
