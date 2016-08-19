@@ -28,12 +28,14 @@ import stat as stat_module
 import urllib
 
 from datetime import datetime
+from cStringIO import StringIO
+from gzip import GzipFile
 
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, HttpResponse, HttpResponseNotModified
+from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
@@ -41,11 +43,9 @@ from django.utils.functional import curry
 from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
-from cStringIO import StringIO
-from gzip import GzipFile
-from avro import datafile, io
 
 from aws.s3.s3fs import S3FileSystemException
+from avro import datafile, io
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
@@ -53,6 +53,7 @@ from desktop.lib.django_util import make_absolute, render, format_preserving_red
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
+from desktop.lib.i18n import smart_str
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -990,10 +991,16 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 if request.user.is_superuser and not _is_hdfs_superuser(request):
                     msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                            % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-                raise PopupException(msg, detail=e)
+                if request.is_ajax():
+                    return HttpResponseForbidden(smart_str(e))
+                else:
+                    raise PopupException(msg, detail=e)
             except S3FileSystemException, e:
               msg = _("S3 filesystem exception.")
-              raise PopupException(msg, detail=e)
+              if request.is_ajax():
+                  return HttpResponseForbidden(smart_str(e))
+              else:
+                  raise PopupException(msg, detail=e)
             except NotImplementedError, e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
@@ -1015,7 +1022,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 ret["result_error"] = True
 
             ret['user'] = request.user
-            return render(template, request, ret)
+            if request.is_ajax():
+              return HttpResponse()
+            else:
+              return render(template, request, ret)
     else:
         # Initial parameters may be specified with get with the default extractor
         initial_values = initial_value_extractor(request, parameter_names)
