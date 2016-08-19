@@ -520,7 +520,7 @@ from django.utils.translation import ugettext as _
 </div>
 
   <script id="fileTemplate" type="text/html">
-    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && !$root.isS3(), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted() }">
+    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -534,7 +534,7 @@ from django.utils.translation import ugettext as _
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" data-bind="drag: { value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
+        <strong><a href="#" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -582,13 +582,17 @@ from django.utils.translation import ugettext as _
     var _dropzone;
 
     ko.bindingHandlers.drag = {
-      init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+      update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
         var dragElement = $(element);
+        try {
+          dragElement.draggable('destroy');
+        }
+        catch (e) {}
         var dragOptions = {
           helper: 'clone',
           revert: true,
           revertDuration: 0,
-          start: function() {
+          start: function () {
             if ($(element).is('[draggable]')) {
               viewModel.selected(true);
             }
@@ -602,16 +606,19 @@ from django.utils.translation import ugettext as _
     };
 
     ko.bindingHandlers.drop = {
-      init: function(element, valueAccessor) {
+      update: function (element, valueAccessor) {
         var dropElement = $(element);
-
-        if (valueAccessor().enabled){
+        try {
+          dropElement.droppable('destroy');
+        }
+        catch (e) {}
+        if (valueAccessor().enabled) {
           var dropOptions = {
             hoverClass: 'drag-hover',
-            drop: function(event, ui) {
+            drop: function (event, ui) {
               var destpath = valueAccessor().value.path;
 
-              dropElement.fadeOut(200, function(){
+              dropElement.fadeOut(200, function () {
                 dropElement.fadeIn(200);
               });
 
