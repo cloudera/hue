@@ -2492,7 +2492,7 @@ function updateSidebarTooltips(selector) {
     $(this).tooltip({
       placement: "right",
       title: $(this).val()
-    }).attr('data-original-title', $(this).val()).tooltip('fixTitle');
+    }).attr('data-original-title', escapeOutput($(this).val())).tooltip('fixTitle');
   });
 }
 
