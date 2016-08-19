@@ -363,3 +363,7 @@ if (!('getParameter' in window.location)) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
   };
 }
+
+var escapeOutput = function (str) {
+  return $('<span>').text(str).html().trim();
+};
