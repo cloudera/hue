@@ -3344,6 +3344,7 @@ ${ hueIcons.symbols() }
           },
           stop: function () {
             redrawFixedHeaders();
+            huePubSub.publish('resize.leaflet.map');
           }
         });
       }
@@ -3419,6 +3420,7 @@ ${ hueIcons.symbols() }
           $('#snippet_' + snippet.id()).find('.snippet-actions').animate({
             'marginTop': 0
           });
+          huePubSub.publish('resize.leaflet.map');
         }
       }
 
