@@ -123,7 +123,7 @@
       var suggestFunctionsDeferral = $.Deferred();
       if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
         $.when.apply($, colRefDeferral).done(function () {
-          if (colRef !== null) {
+          if (colRef !== null && colRef.type) {
             sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           } else {
             sqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
@@ -135,6 +135,17 @@
         suggestFunctionsDeferral.resolve();
       }
       deferrals.push(suggestFunctionsDeferral);
+    }
+
+    if (parseResult.suggestColumnAliases) {
+      parseResult.suggestColumnAliases.forEach(function (columnAlias) {
+        var type = columnAlias.types && columnAlias.types.length == 1 ? columnAlias.types[0] : 'T';
+        if (type === 'COLREF') {
+          completions.push({ value: columnAlias.name, meta: 'alias', weight: DEFAULT_WEIGHTS.COLUMN });
+        } else {
+          completions.push({ value: columnAlias.name, meta: type, weight: DEFAULT_WEIGHTS.COLUMN });
+        }
+      });
     }
 
     if (parseResult.suggestValues) {

@@ -5488,7 +5488,8 @@ define([
               lowerCase: false,
               suggestFunctions: {},
               suggestAggregateFunctions: true,
-              suggestColumns: { tables: [{ table: 'testTable' }] }
+              suggestColumns: { tables: [{ table: 'testTable' }] },
+              suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
             }
           });
         });
@@ -5506,7 +5507,54 @@ define([
               lowerCase: false,
               suggestFunctions: {},
               suggestAggregateFunctions: true,
-              suggestColumns: { tables: [{ table: 'testTable' }] }
+              suggestColumns: { tables: [{ table: 'testTable' }] },
+              suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
+            }
+          });
+        });
+      });
+    });
+
+    describe('LIMIT clause', function () {
+      it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
+          afterCursor: '',
+          dialect: 'generic',
+          hasLocations: true,
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      describe('Hive specific', function () {
+        it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
+            afterCursor: '',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['BIGINT'] }
             }
           });
         });
@@ -5515,9 +5563,9 @@ define([
 
     describe('OFFSET clause', function () {
       describe('Impala specific', function () {
-        it('should handle "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa OFFSET 1;|"', function() {
+        it('should handle "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1;|"', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa OFFSET 1; ',
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1; ',
             afterCursor: '',
             dialect: 'impala',
             hasLocations: true,
@@ -5529,9 +5577,23 @@ define([
           });
         });
 
-        it('should suggest keywords for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT 10 |"', function() {
+        it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET |"', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT 10 ',
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: { types: ['BIGINT'] }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 ',
             afterCursor: '',
             dialect: 'impala',
             hasLocations: true,
