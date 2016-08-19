@@ -3375,6 +3375,8 @@ ${ hueIcons.symbols() }
 
       $(document).on("executeStarted", function (e, snippet) {
         var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+        _el.data('scrollToCol', null);
+        _el.data('scrollToRow', null);
         $("#snippet_" + snippet.id()).find(".progress-snippet").animate({
           height: "3px"
         }, 100);
