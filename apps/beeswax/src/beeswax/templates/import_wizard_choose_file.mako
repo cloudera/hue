@@ -242,7 +242,6 @@ ${ assist.assistPanel() }
     }
 
     $(document).ready(function () {
-
       var options = {
         user: '${ user.username }',
         i18n: {
@@ -272,11 +271,12 @@ ${ assist.assistPanel() }
           onFileChoose: handleChoice,
           onFolderChoose: handleChoice,
           createFolder: $('#id_load_data').val() === 'EXTERNAL',
-          selectFolder: $('#id_load_data').val() === 'EXTERNAL',
+          selectFolder: true,
           displayOnlyFolders: $('#id_load_data').val() === 'EXTERNAL'
         });
         $("#chooseFile").modal("show");
       });
+
       $("#id_load_data").change(function () {
         if ($(this).val() === 'IMPORT') {
           $("#fileWillBeMoved").show();
@@ -285,6 +285,7 @@ ${ assist.assistPanel() }
           $("#fileWillBeMoved").hide();
         }
       });
+
       $('.pathChooser').change(function () {
         var initialLoadValue = $('#id_load_data').val();
         if ($(this).val().toLowerCase().indexOf('s3') === 0) {
@@ -294,10 +295,12 @@ ${ assist.assistPanel() }
           $('#id_load_data').val(initialLoadValue).trigger('change').find('option[value="IMPORT"]').removeAttr('disabled');
         }
       });
+
       $("#step2").click(function (e) {
         e.preventDefault();
         $("input[name='submit_file']").click();
       });
+
       $("body").keypress(function (e) {
         if (e.which == 13) {
           e.preventDefault();
@@ -307,8 +310,6 @@ ${ assist.assistPanel() }
 
     });
   });
-
 </script>
-
 
 ${ commonfooter(request, messages) | n,unicode }
