@@ -40,6 +40,10 @@ def get_default_secret_key():
   return secret_access_key_script or get_s3a_secret_key()
 
 
+def get_default_region():
+  return AWS_ACCOUNTS['default'].REGION.get()
+
+
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
   help='One entry for each AWS account',
