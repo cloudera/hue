@@ -1844,6 +1844,11 @@
 
       ko.utils.extend(options, local);
 
+      if (options.title) {
+        var title = ko.unwrap(options.title); // Not always an observable
+        options.title = escapeOutput(title);
+      }
+
       $(element).tooltip(options);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
