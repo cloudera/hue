@@ -648,7 +648,7 @@
 
         $(_data).each(function (cnt, item) {
           addToLegend(getHighestCategoryValue(cnt, item));
-          var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
+          var _place = typeof item.label == "string" ? item.label.toUpperCase() : item.label;
           if (_place != null) {
             if (_scope != "world" && _scope != "usa" && _scope != "europe" && _place.indexOf(".") == -1) {
               _place = HueGeo.getISOAlpha2(_scope) + "." + _place;
