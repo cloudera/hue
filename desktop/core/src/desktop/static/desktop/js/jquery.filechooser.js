@@ -342,9 +342,6 @@
                 name: _folderName.val(),
                 path: path
               },
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-Requested-With", "Hue"); // need to override the default one because otherwise Django returns HTTP 500
-              },
               success: function (xhr, status) {
                 if (status == "success") {
                   _parent.navigateTo(path);
@@ -354,9 +351,11 @@
                   _createFolderBtn.removeClass("disabled");
                   _createFolderDetails.slideUp();
                 }
+              },
+              error: function (xhr) {
+                $(document).trigger("error", xhr.responseText);
               }
             });
-
           });
 
           _createFolderDetails.appendTo(_actions);
