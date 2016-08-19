@@ -195,6 +195,38 @@ class S3FSTest(S3TestBase):
       eq_(data, actual)
 
 
+  def test_rename_dir(self):
+    src_dir = self.get_test_path('test_rename_dir_src')
+    dst_dir = self.get_test_path('test_rename_dir_dst')
+
+    with self.cleaning(src_dir, dst_dir):
+      self.fs.mkdir(src_dir)
+      self.fs.create(join(src_dir, 'file_one.txt'), data='foo')
+      self.fs.create(join(src_dir, 'file_two.txt'), data='bar')
+
+      src_ls = self.fs.listdir(src_dir)
+      eq_(2, len(src_ls))
+      assert_true('file_one.txt' in src_ls)
+      assert_true('file_two.txt' in src_ls)
+
+      # Assert that no directories with dst_dir name exist yet
+      assert_false(self.fs.exists(dst_dir))
+
+      # Rename src to dst
+      self.fs.rename(src_dir, dst_dir)
+      assert_true(self.fs.exists(dst_dir))
+      assert_false(self.fs.exists(src_dir))
+
+      dst_ls = self.fs.listdir(dst_dir)
+      eq_(2, len(dst_ls))
+      assert_true('file_one.txt' in dst_ls)
+      assert_true('file_two.txt' in dst_ls)
+
+      # Assert that only the renamed directory, and not an empty file, exists
+      bucket_ls = self.bucket.list()
+      assert_equal(1, len([key for key in bucket_ls if key.name.strip('/') == self.get_key(dst_dir).name.strip('/')]))
+
+
   def test_rename_star(self):
     src_dir = self.get_test_path('test_rename_star_src')
     dst_dir = self.get_test_path('test_rename_star_dst')
