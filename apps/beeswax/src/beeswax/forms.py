@@ -309,7 +309,7 @@ class CreateByImportFileForm(forms.Form):
   comment = forms.CharField(label=_t("Description"), required=False)
 
   # File info
-  path = PathField(label=_t("Input File or Location"))
+  path = PathField(label=_t("Input File or Directory"))
   load_data = forms.ChoiceField(required=True,
     choices=[
       ("IMPORT", _("Import data")),
