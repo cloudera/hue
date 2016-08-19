@@ -64,6 +64,16 @@ def coerce_file(path):
 def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
+def get_dn():
+  """This function returns fqdn(if possible)"""
+  val = []
+  LOG = logging.getLogger(__name__)
+  try:
+    val.append(socket.getfqdn())
+  except:
+    LOG.warning("allowed_hosts value to '*'. It is a security risk")
+    val.append('*')
+  return val
 
 def coerce_positive_integer(integer):
   integer = int(integer)
@@ -388,7 +398,7 @@ LOG_REDACTION_FILE = Config(
 
 ALLOWED_HOSTS = Config(
   key='allowed_hosts',
-  default=['*'],
+  dynamic_default=get_dn,
   type=coerce_csv,
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
