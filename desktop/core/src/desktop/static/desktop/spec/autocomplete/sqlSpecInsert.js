@@ -217,6 +217,19 @@ define([
         });
       });
 
+      it('should suggest keywords for "WITH t1 as (select 1), t2 as (select 2) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 as (select 1), t2 as (select 2) ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['INSERT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest tables for "FROM |"', function() {
         assertAutoComplete({
           beforeCursor: 'FROM ',
@@ -855,6 +868,259 @@ define([
             lowerCase: false,
             suggestTables: { prependFrom: true },
             suggestDatabases:  { prependFrom: true, appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest identifier for "WITH t1 AS (SELECT 1), t2 AS (SELECT 2) INSERT INTO tab SELECT * FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT 1), t2 AS (SELECT 2) INSERT INTO tab SELECT * FROM ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true},
+            suggestCommonTableExpressions: [{ name: 't1' },{ name: 't2' }]
+          }
+        });
+      });
+    });
+
+    describe('Impala specific', function () {
+      it('should handle "INSERT INTO TABLE boo.baa (a, b) PARTITION (a=1) VALUES (1, 2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) PARTITION (a=1) VALUES (1, 2);',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "INSERT OVERWRITE boo.baa [SHUFFLE] SELECT * FROM bla;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE boo.baa [SHUFFLE] SELECT * FROM bla;',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "WITH t1 AS (SELECT 1), t2 AS (SELECT 2) INSERT OVERWRITE tab SELECT * FROM t1, t2;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT 1), t2 AS (SELECT 2) INSERT OVERWRITE tab SELECT * FROM t1, t2;',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "WITH t1 as (select 1), t2 as (select 2) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 as (select 1), t2 as (select 2) ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['INSERT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "INSERT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['INTO', 'OVERWRITE' ]
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT INTO |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            suggestKeywords: ['TABLE' ]
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT INTO boo.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO boo.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { database: 'boo' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "INSERT INTO baa |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO baa ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
+          }
+        });
+      });
+
+      it('should suggest keywords for "INSERT INTO baa [SHUFFLE] |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO baa [SHUFFLE] ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT INTO baa [SHUFFLE] SELECT * FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO baa [SHUFFLE] SELECT * FROM ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT INTO TABLE boo.baa (|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO boo.baa (',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ database: 'boo', table: 'baa' }] }
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT INTO TABLE boo.baa (a, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO boo.baa (a, ',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ database: 'boo', table: 'baa' }] }
+          }
+        });
+      });
+
+      it('should suggest keywords for "WITH t1 as (select 1), t2 as (select 2) INSERT INTO baa (a, b) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 as (select 1), t2 as (select 2) INSERT INTO baa ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
+          }
+        });
+      });
+
+      it('should suggest columns for "INSERT INTO TABLE boo.baa (a, b) PARTITION(a = 1, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) PARTITION(a = 1, ',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ database: 'boo', table: 'baa' }] }
+          }
+        });
+      });
+
+      it('should not suggest keywords for "INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) |',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT OVERWRITE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            suggestKeywords: ['TABLE' ]
+          }
+        });
+      });
+
+      it('should suggest identifier for "with t1 as (select 1), t2 as (select 2) insert into tab select * from |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'with t1 as (select 1), t2 as (select 2) insert into tab select * from ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: true,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true},
+            suggestCommonTableExpressions: [{ name: 't1' },{ name: 't2' }]
           }
         });
       });

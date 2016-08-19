@@ -199,6 +199,7 @@
 <impala>'FUNCTIONS'                        { return '<impala>FUNCTIONS'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
+<impala>'INSERT'                           { determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
@@ -245,9 +246,10 @@
 <impala>'GRANT'                            { return '<impala>GRANT'; }
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }
-
-<impala>\[SHUFFLE\]                        { return '<impala>SHUFFLE'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
+<impala>\[NOSHUFFLE\]                      { return '<impala>NOSHUFFLE'; }
+<impala>\[SHUFFLE\]                        { return '<impala>SHUFFLE'; }
+
 <impala>'...'                              { return '<impala>...'; }
 <impala>'.'                                { return '<impala>.'; }
 <impala>'['                                { return '<impala>['; }
