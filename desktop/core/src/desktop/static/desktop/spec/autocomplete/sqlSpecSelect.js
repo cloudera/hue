@@ -5876,9 +5876,9 @@ define([
           beforeCursor: 'WITH t1 AS (SELECT * FROM boo) ',
           afterCursor: '',
           hasLocations: true,
+          containsKeywords: ['SELECT'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['SELECT']
+            lowerCase: false
           }
         });
       });

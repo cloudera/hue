@@ -133,8 +133,8 @@ define([
               pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                          '          Dialect: ' + testDefinition.dialect + '\n' +
-                         'Expected response: ' + JSON.stringify(testDefinition.expectedResult) + '\n' +
-                         '  Parser response: ' + JSON.stringify(actualResponse) +   '\n'
+                         'Expected response: ' + JSON.stringify(testDefinition.expectedResult).replace(/["]/g, '\'') + '\n' +
+                         '  Parser response: ' + JSON.stringify(actualResponse).replace(/["]/g, '\'') +   '\n'
             };
           }
         }
