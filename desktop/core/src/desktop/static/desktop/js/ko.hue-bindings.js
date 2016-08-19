@@ -2866,6 +2866,7 @@
             if (token) {
               var self = this;
               if (token.value === " * ") {
+                // TODO: Figure out why called 7 times every once in a while
                 snippet.autocompleter.autocomplete(editor.getValue().substring(0, token.start + 1), editor.getValue().substring(token.start + 2), function (suggestions) {
                   var cols = [];
                   $.each(suggestions, function (idx, suggestion) {

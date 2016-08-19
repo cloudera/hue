@@ -129,7 +129,6 @@ NonReservedKeyword
 // | '<hive>FUNCTION'
 // | '<hive>INDEX'
 // | '<hive>INDEXES'
-// | '<hive>LIMIT'
 // | '<hive>SCHEMA'
 // | '<hive>SORT'
  ;
@@ -242,8 +241,8 @@ OptionalHiveExplainTypes
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AUTHORIZATION' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DEPENDENCY' | '<hive>DIRECTORY' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>LOCAL' | '<hive>MACRO' | '<hive>OVERWRITE' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LIMIT' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NONE' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
- | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
+ : '<hive>ALL' | '<hive>ARRAY' | '<hive>AS' | '<hive>AUTHORIZATION' | '<hive>AVRO' | '<hive>BINARY' | '<hive>BUCKET' | '<hive>BUCKETS' | '<hive>CACHE' | '<hive>CLUSTER' | '<hive>CLUSTERED' | '<hive>COLLECTION' | '<hive>COMPUTE' | '<hive>CONF' | '<hive>CROSS' | '<hive>CUBE' | '<hive>CURRENT' | '<hive>DATE' | '<hive>DEFERRED' | '<hive>DELIMITED' | '<hive>DEPENDENCY' | '<hive>DIRECTORY' | '<hive>DISTRIBUTE' | '<hive>DISTRIBUTED' | '<hive>ESCAPED' | '<hive>EXTENDED' | '<hive>EXTERNAL' | '<hive>FIELDS' | '<hive>FILE' | '<hive>FOR' | '<hive>FORMAT' | '<hive>FUNCTION' | '<hive>GRANT' | '<hive>GROUPING' | '<hive>IDXPROPERTIES' | '<hive>LATERAL' | '<hive>LOCAL' | '<hive>MACRO' | '<hive>OVERWRITE' | '<hive>PARTITION' | '<hive>REBUILD' | '<hive>REPAIR' | '<hive>ROLLUP' | '<hive>SETS' | '<hive>STATISTICS' | '<hive>TABLE' | '<hive>USER' | '<hive>ASC' | '<hive>COLUMNS' | '<hive>COMMENT' | '<hive>COMPACTIONS' | '<hive>DATA' | '<hive>DATABASES' | '<hive>DEFINED' | '<hive>DESC' |  '<hive>FORMATTED' | '<hive>FUNCTIONS' | '<hive>INDEX' | '<hive>INDEXES' | '<hive>INPATH' | '<hive>INPUTFORMAT' | '<hive>ITEMS' | '<hive>JAR' | '<hive>KEYS' | '<hive>LINES' | '<hive>LOCATION' | '<hive>LOCKS' | '<hive>MAP' | '<hive>METADATA' | '<hive>NONE' | '<hive>NOSCAN' | '<hive>OF' | '<hive>ORC' | '<hive>OUT' | '<hive>OUTPUTFORMAT' | '<hive>PARQUET' | '<hive>PARTITIONED' | '<hive>PARTITIONS' | '<hive>RCFILE' | '<hive>ROLE' | '<hive>ROLES' | '<hive>SCHEMA' | '<hive>SCHEMAS' | '<hive>SEQUENCEFILE' | '<hive>SERDE' | '<hive>SERDEPROPERTIES' | '<hive>SKEWED' | '<hive>SORTED' | '<hive>STORED' | '<hive>STORED_AS_DIRECTORIES' | '<hive>STRING' | '<hive>STRUCT' | '<hive>TABLES' | '<hive>TABLESAMPLE' | '<hive>TBLPROPERTIES' | '<hive>TEMPORARY' | '<hive>TERMINATED' | '<hive>TEXTFILE' | '<hive>TINYINT' | '<hive>TRANSACTIONS' | '<hive>UNIONTYPE' | '<hive>USING' | '<hive>VIEW' | '<hive>WINDOW' | '<hive>.' | '<hive>[' | '<hive>]'
+ | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>LAST' | '<impala>LIMIT' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
  | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INSERT' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VALUES' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
  | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>HISTOGRAM_NUMERIC' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX'
@@ -1551,9 +1550,13 @@ GroupByClause
 
 GroupByClause_EDIT
  : AnyGroup 'BY' GroupByColumnList_EDIT OptionalHiveGroupingSetsCubeOrRollup
+   {
+     suggestSelectListAliases();
+   }
  | AnyGroup 'BY' 'CURSOR' OptionalHiveGroupingSetsCubeOrRollup
    {
      valueExpressionSuggest();
+     suggestSelectListAliases();
    }
  | AnyGroup 'CURSOR'
    {
@@ -1675,6 +1678,7 @@ OrderByColumnList_EDIT
    {
      valueExpressionSuggest();
      suggestAnalyticFunctions();
+     suggestSelectListAliases();
    }
  | OrderByColumnList ',' OrderByIdentifier_EDIT
  | OrderByColumnList ',' OrderByIdentifier_EDIT ','
@@ -1687,11 +1691,15 @@ OrderByIdentifier
 
 OrderByIdentifier_EDIT
  : ValueExpression_EDIT OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
+   {
+     suggestSelectListAliases();
+   }
  | ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
  | AnyCursor OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
      valueExpressionSuggest();
      suggestAnalyticFunctions();
+     suggestSelectListAliases();
    }
  ;
 
@@ -1758,8 +1766,12 @@ ClusterByClause_EDIT
  | '<hive>CLUSTER' 'BY' 'CURSOR'
    {
      suggestColumns();
+     suggestSelectListAliases();
    }
  | '<hive>CLUSTER' 'BY' ColumnList_EDIT
+   {
+     suggestSelectListAliases();
+   }
  ;
 
 DistributeByClause
@@ -1774,8 +1786,12 @@ DistributeByClause_EDIT
  | '<hive>DISTRIBUTE' 'BY' 'CURSOR'
    {
      suggestColumns();
+     suggestSelectListAliases();
    }
  | '<hive>DISTRIBUTE' 'BY' ColumnList_EDIT
+   {
+     suggestSelectListAliases();
+   }
  ;
 
 SortByClause
@@ -1788,6 +1804,9 @@ SortByClause_EDIT
      suggestKeywords: ['BY'];
    }
  | '<hive>SORT' 'BY' SortByList_EDIT
+   {
+     suggestSelectListAliases();
+   }
  ;
 
 SortByList
@@ -1814,27 +1833,26 @@ SortByIdentifier_EDIT
    }
  ;
 
-AnyLimit
- : 'LIMIT'
- | '<hive>LIMIT'
- ;
-
 OptionalLimitClause
  :
  | LimitClause
  ;
 
 LimitClause
- : AnyLimit ValueExpression
+ : 'LIMIT' UnsignedNumericLiteral
+ | '<impala>LIMIT' ValueExpression
  ;
 
 LimitClause_EDIT
- : AnyLimit 'CURSOR'
+ : 'LIMIT' 'CURSOR'
+ | '<impala>LIMIT' 'CURSOR'
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['INT']);
+     suggestFunctions({ types: ['BIGINT'] });
    }
- | AnyLimit ValueExpression_EDIT
+ | '<impala>LIMIT' ValueExpression_EDIT
+   {
+     delete parser.yy.result.suggestColumns;
+   }
  ;
 
 OptionalOffsetClause
@@ -1849,10 +1867,12 @@ OffsetClause
 OffsetClause_EDIT
  : '<impala>OFFSET' 'CURSOR'
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['INT']);
+     suggestFunctions({ types: ['BIGINT'] });
    }
  | '<impala>OFFSET' ValueExpression_EDIT
+   {
+     delete parser.yy.result.suggestColumns;
+   }
  ;
 
 SearchCondition
@@ -2045,6 +2065,10 @@ SelectSubList
    {
      if ($2) {
        $$ = { valueExpression: $1, alias: $2 };
+       if (!parser.yy.selectListAliases) {
+         parser.yy.selectListAliases = [];
+       }
+       parser.yy.selectListAliases.push({ name: $2, types: $1.types || ['T'] });
      } else {
        $$ = { valueExpression: $1 }
      }
@@ -2449,37 +2473,7 @@ OptionalOnColumn_EDIT
 PushQueryState
  :
    {
-     if (typeof parser.yy.locationsStack === 'undefined') {
-       parser.yy.locationsStack = [];
-     }
-     if (typeof parser.yy.primariesStack === 'undefined') {
-       parser.yy.primariesStack = [];
-     }
-     if (typeof parser.yy.lateralViewsStack === 'undefined') {
-       parser.yy.lateralViewsStack = [];
-     }
-     if (typeof parser.yy.subQueriesStack === 'undefined') {
-       parser.yy.subQueriesStack = [];
-     }
-
-     if (typeof parser.yy.resultStack === 'undefined') {
-       parser.yy.resultStack = [];
-     }
-     parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
-     parser.yy.lateralViewsStack.push(parser.yy.lateralViews);
-     parser.yy.resultStack.push(parser.yy.result);
-     parser.yy.locationsStack.push(parser.yy.locations);
-     parser.yy.subQueriesStack.push(parser.yy.subQueries);
-
-     parser.yy.result = {};
-     parser.yy.locations = [];
-     if (parser.yy.correlatedSubQuery) {
-       parser.yy.latestTablePrimaries = parser.yy.latestTablePrimaries.concat();
-       parser.yy.subQueries = parser.yy.subQueries.concat();
-     } else {
-       parser.yy.latestTablePrimaries = [];
-       parser.yy.subQueries = [];
-     }
+     pushQueryState();
    }
  ;
 
@@ -2913,10 +2907,12 @@ HavingClause_EDIT
    {
      valueExpressionSuggest();
      suggestAggregateFunctions();
+     suggestSelectListAliases(true);
    }
  | 'HAVING' ValueExpression_EDIT
    {
      suggestAggregateFunctions();
+     suggestSelectListAliases(true);
    }
  ;
 
@@ -3228,6 +3224,9 @@ LateralView_EDIT
  : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier LateralViewColumnAliases
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier LateralViewColumnAliases_EDIT
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction PartialBacktickedOrCursor
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction PartialBacktickedOrCursor LateralViewColumnAliases
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter 'CURSOR'
    {
      if (!$3) {
@@ -3250,4 +3249,9 @@ OptionalOuter
 LateralViewColumnAliases
  : '<hive>AS' RegularOrBacktickedIdentifier                                    -> [ $2 ]
  | '<hive>AS' RegularOrBacktickedIdentifier ',' RegularOrBacktickedIdentifier  -> [ $2, $4 ]
+ ;
+
+LateralViewColumnAliases_EDIT
+ : '<hive>AS' PartialBacktickedOrCursor
+ | '<hive>AS' RegularOrBacktickedIdentifier ',' PartialBacktickedOrAnyCursor
  ;
