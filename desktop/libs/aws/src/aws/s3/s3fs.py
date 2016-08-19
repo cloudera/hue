@@ -30,6 +30,7 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
+from aws.conf import get_default_region
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -69,11 +70,11 @@ class S3FileSystem(object):
       name = name.lower()
       bucket = self._get_bucket(name)
     except S3ResponseError, e:
-      if e.status == 403:
+      if e.status == 403 or e.status == 301:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       elif e.status == 404:
-        bucket = self._s3_connection.create_bucket(name)
+        bucket = self._s3_connection.create_bucket(name, location=get_default_region())
         self._bucket_cache[name] = bucket
       else:
         raise S3FileSystemException(e.message)
