@@ -401,9 +401,9 @@
         toggleVisibility();
 
         var _map = null;
-        if (element._map != null) {
-          _map = element._map;
-          _map.removeLayer(element._markerLayer);
+        if ($(element).data('_map') != null) {
+          _map = $(element).data('_map');
+          _map.removeLayer($(element).data('_markerLayer'));
         }
 
         var _clusterGroup = L.markerClusterGroup({
@@ -514,13 +514,25 @@
               }
             }, 0);
 
+            if (huePubSub) {
+              huePubSub.subscribe('resize.leaflet.map', function(){
+                $(element).data('_map').invalidateSize();
+                if ($(element).data('_markerLayer')) {
+                  try {
+                    $(element).data('_map').fitBounds(_bounds);
+                  }
+                  catch (e) {}
+                }
+              });
+            }
+
           }
           catch (err) {
             $.jHueNotify.error(err.message);
           }
         }
-        element._map = _map;
-        element._markerLayer = _clusterGroup;
+        $(element).data('_map', _map);
+        $(element).data('_markerLayer', _clusterGroup);
         if (_options.onComplete != null) {
           _options.onComplete();
         }
