@@ -23,6 +23,7 @@ var prepareNewStatement = function () {
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
   parser.yy.subQueries = [];
+  parser.yy.selectListAliases = [];
 
   parser.parseError = function (message, error) {
     parser.yy.errors.push(error);
@@ -32,6 +33,28 @@ var prepareNewStatement = function () {
 
 var addCommonTableExpressions = function (identifiers) {
   parser.yy.latestCommonTableExpressions = identifiers;
+};
+
+var pushQueryState = function () {
+  parser.yy.resultStack.push(parser.yy.result);
+  parser.yy.locationsStack.push(parser.yy.locations);
+  parser.yy.lateralViewsStack.push(parser.yy.lateralViews);
+  parser.yy.selectListAliasesStack.push(parser.yy.selectListAliases);
+  parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
+  parser.yy.subQueriesStack.push(parser.yy.subQueries);
+
+  parser.yy.result = {};
+  parser.yy.locations = [];
+  parser.yy.selectListAliases = []; // Not allowed in correlated sub-queries
+  parser.yy.lateralViews = []; // Not allowed in correlated sub-queries
+
+  if (parser.yy.correlatedSubQuery) {
+    parser.yy.latestTablePrimaries = parser.yy.latestTablePrimaries.concat();
+    parser.yy.subQueries = parser.yy.subQueries.concat();
+  } else {
+    parser.yy.latestTablePrimaries = [];
+    parser.yy.subQueries = [];
+  }
 };
 
 var popQueryState = function (subQuery) {
@@ -55,6 +78,14 @@ var popQueryState = function (subQuery) {
   parser.yy.lateralViews = parser.yy.lateralViewsStack.pop();
   parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
   parser.yy.locations = parser.yy.locationsStack.pop();
+  parser.yy.selectListAliases = parser.yy.selectListAliasesStack.pop();
+};
+
+var suggestSelectListAliases = function () {
+  if (parser.yy.selectListAliases && parser.yy.selectListAliases.length > 0 && parser.yy.result.suggestColumns
+      && (typeof parser.yy.result.suggestColumns.identifierChain === 'undefined' || parser.yy.result.suggestColumns.identifierChain.length === 0)) {
+    parser.yy.result.suggestColumnAliases = parser.yy.selectListAliases;
+  }
 };
 
 var isHive = function () {
@@ -931,6 +962,14 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, sqlFunctions, de
   parser.yy.allLocations = [];
   parser.yy.subQueries = [];
   parser.yy.errors = [];
+  parser.yy.selectListAliases = [];
+
+  parser.yy.locationsStack = [];
+  parser.yy.primariesStack = [];
+  parser.yy.lateralViewsStack = [];
+  parser.yy.subQueriesStack = [];
+  parser.yy.resultStack = [];
+  parser.yy.selectListAliasesStack = [];
 
   delete parser.yy.caseDetermined;
   delete parser.yy.cursorFound;

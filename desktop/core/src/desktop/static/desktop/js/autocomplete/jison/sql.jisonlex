@@ -110,7 +110,6 @@
 <hive>'ITEMS'                              { return '<hive>ITEMS'; }
 <hive>'JAR'                                { return '<hive>JAR'; }
 <hive>'KEYS'                               { return '<hive>KEYS'; }
-<hive>'LIMIT'                              { return '<hive>LIMIT'; }
 <hive>'LINES'                              { return '<hive>LINES'; }
 <hive>'LOAD'                               { determineCase(yytext); return '<hive>LOAD'; }
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
@@ -205,6 +204,7 @@
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
+<impala>'LIMIT'                            { return '<impala>LIMIT'; }
 <impala>'LINES'                            { return '<impala>LINES'; }
 <impala>'LOAD'                             { determineCase(yytext); return '<impala>LOAD'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
