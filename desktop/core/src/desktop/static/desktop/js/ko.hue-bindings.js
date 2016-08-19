@@ -2740,15 +2740,17 @@
         }
       }
 
-      editor.on("input", function() {
-        if (editor.getValue().length == 0 && !placeHolderVisible) {
-          placeHolderElement.appendTo(editor.renderer.scroller);
-          placeHolderVisible = true;
-        } else if (placeHolderVisible) {
+      editor.on("input", function () {
+        if (editor.getValue().length == 0) {
+          if (!placeHolderVisible) {
+            placeHolderElement.appendTo(editor.renderer.scroller);
+            placeHolderVisible = true;
+          }
+        } else {
           placeHolderElement.remove();
           placeHolderVisible = false;
         }
-        if (options.updateOnInput){
+        if (options.updateOnInput) {
           snippet.statement_raw(removeUnicodes(editor.getValue()));
         }
       });
