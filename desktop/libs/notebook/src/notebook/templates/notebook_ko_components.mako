@@ -347,7 +347,7 @@ except ImportError, e:
           </a>
         </li>
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to HDFS or a new table') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to a large file or a new table') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Export') }
           </a>
         </li>
@@ -393,7 +393,7 @@ except ImportError, e:
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
                   <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }', placement: 'top' }" style="padding: 8px">
-                    <i class="fa fa-question-circle muted"></i>
+                    <i class="fa fa-2x fa-question-circle muted"></i>
                   </div>
                 </div>
               </div>
