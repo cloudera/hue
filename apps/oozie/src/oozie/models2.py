@@ -17,6 +17,7 @@
 
 import json
 import logging
+import os
 import re
 import time
 import uuid
@@ -758,6 +759,17 @@ class Node():
       self.data['properties']['app_jar'] = properties['app_jar'] # Not used here
       self.data['properties']['files'] = [{'value': f['path']} for f in properties['files']]
       self.data['properties']['arguments'] = [{'value': prop} for prop in properties['arguments']]
+    elif self.data['type'] == SparkDocumentAction.TYPE:
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+      properties = notebook.get_data()['snippets'][0]['properties']
+
+      self.data['properties']['class'] = properties['class']
+      self.data['properties']['jars'] = os.path.basename(properties['jars'][0])
+      self.data['properties']['files'] = [{'value': f} for f in properties['jars']] + [{'value': f['path']} for f in properties['files']]
+      self.data['properties']['spark_arguments'] = [{'value': prop} for prop in properties['spark_arguments']]
+      self.data['properties']['spark_opts'] = ' '.join(properties['spark_opts'])
+      if len(properties['jars']) > 1:
+        self.data['properties']['spark_opts'] += ' --py-files ' + ','.join([os.path.basename(f) for f in properties['jars'][1:]])
 
     data = {
       'node': self.data,
@@ -2140,6 +2152,11 @@ class JavaDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
+class SparkDocumentAction(SparkAction):
+  TYPE = 'spark2-document'
+
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -2974,8 +2991,12 @@ class WorkflowBuilder():
     for document in documents:
       if document.type == 'query-java':
         node = self.get_java_document_node(document, name)
-      else:
+      elif document.type == 'query-hive':
         node = self.get_hive_document_node(document, user)
+      elif document.type == 'query-spark2':
+        node = self.get_spark_document_node(document, user)
+      else:
+        raise PopupException(_('Snippet type %(type)s is not supported in batch execution.') % document.type)
 
       nodes.append(node)
 
@@ -3069,6 +3090,64 @@ class WorkflowBuilder():
 
     return node
 
+  def _get_spark_node(self, node_id, user, is_document_node=False):
+    credentials = []
+
+    return {
+        u'id': node_id,
+        u'name': u'spark2-%s' % node_id[:4],
+        u"type": u"spark2-document-widget", # if is_document_node else u"hive2-widget",
+        u'properties': {
+            u'files': [],
+            u'job_xml': u'',
+            u'retry_interval': [],
+            u'retry_max': [],
+            u'job_properties': [],
+            u'sla': [
+                {u'key': u'enabled', u'value': False},
+                {u'key': u'nominal-time', u'value': u'${nominal_time}'},
+                {u'key': u'should-start', u'value': u''},
+                {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
+                {u'key': u'max-duration', u'value': u''},
+                {u'key': u'alert-events', u'value': u''},
+                {u'key': u'alert-contact', u'value': u''},
+                {u'key': u'notification-msg', u'value': u''},
+                {u'key': u'upstream-apps', u'value': u''},
+            ],
+            u'archives': [],
+            u'prepares': [],
+            u'credentials': credentials,
+            u'spark_master': u'yarn',
+            u'mode': u'client',
+            u'app_name': u'BatchSpark2'
+        },
+        u'children': [
+            {u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
+            {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'}
+        ],
+        u'actionParameters': [],
+    }
+
+  def get_spark_snippet_node(self, snippet):
+    credentials = []
+
+    node_id = snippet.get('id', str(uuid.uuid4()))
+
+    node = self._get_java_node(node_id, credentials)
+    node['properties']['class'] = snippet['properties']['class']
+    node['properties']['jars'] = snippet['properties']['app_jar'] # Not used, submission add it to oozie.libpath instead
+    node['properties']['spark_opts'] = [{'value': f['path']} for f in snippet['properties']['files']]
+    node['properties']['spark_arguments'] = [{'value': f} for f in snippet['properties']['arguments']]
+
+    return node
+
+  def get_spark_document_node(self, document, user):
+    node = self._get_spark_node(document.uuid, user, is_document_node=True)
+
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
   def _get_java_node(self, node_id, credentials=None, is_document_node=False):
     if credentials is None:
       credentials = []
@@ -3087,7 +3166,7 @@ class WorkflowBuilder():
               "capture_output": False,
               "prepares": [],
               "credentials": credentials,
-              "sla":[{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
               "archives": []
         },
         "children": [
