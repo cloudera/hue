@@ -1835,21 +1835,21 @@ class SparkAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('Files put in the running directory.'),
+          'help_text': _('Path to files put in the running directory.'),
           'type': ''
      },
     'class': {
           'name': 'class',
           'label': _('Main class'),
           'value': '',
-          'help_text': _("e.g. org.apache.spark.examples.mllib.JavaALS."),
+          'help_text': _("Only if using jars, e.g. org.apache.spark.examples.mllib.JavaALS"),
           'type': 'text'
      },
      'jars': {
           'name': 'jars',
-          'label': _('Jars/py files'),
+          'label': _('Jar/py names'),
           'value': '',
-          'help_text': _('Comma separated list of jars or python HDFS files.'),
+          'help_text': _('Comma separated list of filenames.'),
           'type': ''
      },
      'spark_opts': {
@@ -1903,7 +1903,7 @@ class SparkAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['jars']]
+    return [cls.FIELDS['jars'], cls.FIELDS['files']]
 
 
 class KillAction(Action):
