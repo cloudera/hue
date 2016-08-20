@@ -182,6 +182,10 @@ def _default_interpreters():
           'name': 'Java', 'interface': 'oozie', 'options': {}
       })
       ,
+      ('spark2', {
+          'name': 'Spark', 'interface': 'oozie', 'options': {}
+      })
+      ,
       ('text', {
           'name': 'Text', 'interface': 'text', 'options': {}
       }),

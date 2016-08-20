@@ -182,6 +182,15 @@
       properties['files'] = [];
     }
 
+    if (snippetType == 'spark2') {
+      properties['app_name'] = '';
+      properties['class'] = '';
+      properties['jars'] = [];
+      properties['spark_opts'] = [];
+      properties['spark_arguments'] = [];
+      properties['files'] = [];
+    }
+
     if (snippetType == 'jar' || snippetType == 'java') {
       properties['app_jar'] = '';
       properties['class'] = '';
@@ -696,8 +705,9 @@
 
     self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
     self.isReady = ko.computed(function() {
-      return ((self.type() != 'jar' && self.type() != 'java') && self.statement() !== '') ||
-        ((self.type() == 'jar' || self.type() == 'java') && (self.properties().app_jar() != '' && self.properties().class() != ''));
+      return (['jar', 'java', 'spark2'].indexOf(self.type()) == -1 && self.statement() !== '') ||
+        (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
+        (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 

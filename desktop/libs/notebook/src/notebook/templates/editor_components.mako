@@ -299,11 +299,15 @@ ${ hueIcons.symbols() }
                 <i class="fa fa-file-code-o app-icon" style="vertical-align: middle"></i>
                 Java
               <!-- /ko -->
+              <!-- ko if: editorType() == 'spark2' -->
+                <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" />
+                Spark
+              <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java'].indexOf(editorType()) == -1 -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
               <!-- /ko -->
@@ -1415,17 +1419,17 @@ ${ hueIcons.symbols() }
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'java', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: ['java', 'jar', 'py'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['java', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
               <!-- ko template: 'snippet-settings' --><!-- /ko -->
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && type() != 'java', name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ['java', 'spark2'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
           <!-- ko if: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: 'query-tabs' --><!-- /ko -->
@@ -1806,7 +1810,24 @@ ${ hueIcons.symbols() }
         </div>
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Arguments') }', value: properties().arguments, title: '${ _ko('The YARN queue to submit to (Default: default)') }', placeholder: '${ _ko('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
+      <!-- ko if: type() == 'spark2' -->
+      <div class="control-group">
+        <!-- ko template: { if: typeof properties().jars != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Libs') }', value: properties().jars, title: '${ _ko('Path to jar or python files.') }', placeholder: '${ _ko('e.g. /user/hue/pi.py') }'}} --><!-- /ko -->
+      </div>
+      <!-- ko if: $.grep(properties().jars(), function(val, index) { return val.toLowerCase().endsWith('.jar'); }).length > 0 -->
+        <div class="control-group">
+          <label class="control-label">
+            ${_('Class')}
+          </label>
+          <div class="controls">
+            <input type="text" class="input-xxlarge" data-bind="value: properties().class, valueUpdate: 'afterkeydown'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
+          </div>
+        </div>
+      <!-- /ko -->
+      <div class="control-group">
+        <!-- ko template: { if: typeof properties().spark_arguments != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Arguments') }', value: properties().spark_arguments, title: '${ _ko('Arguments to the application.') }', placeholder: '${ _ko('e.g. 10, /user/hue/input') }'}} --><!-- /ko -->
+      </div>
+      <!-- /ko -->
     </form>
   </div>
 </script>
