@@ -800,40 +800,23 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <span data-bind="text: properties.app_name" />
+      <span data-bind="text: properties.app_name"></span>
       &nbsp;&nbsp;&nbsp;
-      <span data-bind="text: properties.spark_master" />
-      <span data-bind="text: properties.mode" />
+      <span data-bind="text: properties.class"></span>
       <br/>
-      <span data-bind="text: properties.jars" />
-      <span data-bind="text: properties.class" />
+      <span data-bind="text: properties.jars"></span>
     </div>
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
 
         <div class="airy">
-          <span class="widget-label" data-bind="text: $root.workflow_properties.spark_master.label"></span>
-          <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
-        </div>
-
-        <div class="airy">
-          <span class="widget-label" data-bind="text: $root.workflow_properties.mode.label"></span>
-          <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
-        </div>
-
-        <div class="airy">
-          <span class="widget-label" data-bind="text: $root.workflow_properties.app_name.label"></span>
-          <input type="text" class="input-xlarge seventy" data-bind="value: properties.app_name, attr: { placeholder: $root.workflow_properties.app_name.help_text }" />
-        </div>
-
-        <div class="airy">
           <span class="widget-label" data-bind="text: $root.workflow_properties.jars.label"></span>
-          <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" validate="nonempty"/>
+          <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, valueUpdate:'afterkeydown', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" validate="nonempty"/>
           <span data-bind='template: { name: "common-fs-link", data: {path: properties.jars(), with_label: false}}'></span>
         </div>
 
-        <div class="airy">
+        <div class="airy" data-bind="visible: $.grep( properties.jars().split(','), function(val, index) { return val.toLowerCase().endsWith('.jar'); }).length > 0">
           <span class="widget-label" data-bind="text: $root.workflow_properties.class.label"></span>
           <input type="text" class="input-xlarge seventy" data-bind="value: properties.class, attr: { placeholder: $root.workflow_properties.class.help_text }" />
         </div>
@@ -874,6 +857,21 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.spark_master.label"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.mode.label"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.app_name.label"></span>
+            <input type="text" class="input-xlarge seventy" data-bind="value: properties.app_name, attr: { placeholder: $root.workflow_properties.app_name.help_text }" />
+          </div>
+
           <span class="widget-label"  data-bind="text: $root.workflow_properties.spark_opts.label"></span>
           <input type="text" class="input-xlarge seventy" data-bind="value: properties.spark_opts, attr: { placeholder: $root.workflow_properties.spark_opts.help_text }" />
 
