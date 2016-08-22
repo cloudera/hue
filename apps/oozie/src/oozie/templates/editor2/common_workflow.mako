@@ -812,8 +812,7 @@
 
         <div class="airy">
           <span class="widget-label" data-bind="text: $root.workflow_properties.jars.label"></span>
-          <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, valueUpdate:'afterkeydown', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" validate="nonempty"/>
-          <span data-bind='template: { name: "common-fs-link", data: {path: properties.jars(), with_label: false}}'></span>
+          <input type="text" data-bind="value: properties.jars, valueUpdate:'afterkeydown', attr: { placeholder:  $root.workflow_properties.jars.help_text }" validate="nonempty"/>
         </div>
 
         <div class="airy" data-bind="visible: $.grep( properties.jars().split(','), function(val, index) { return val.toLowerCase().endsWith('.jar'); }).length > 0">
