@@ -759,9 +759,12 @@ class Node():
       self.data['properties']['app_jar'] = properties['app_jar'] # Not used here
       self.data['properties']['files'] = [{'value': f['path']} for f in properties['files']]
       self.data['properties']['arguments'] = [{'value': prop} for prop in properties['arguments']]
-    elif self.data['type'] == SparkDocumentAction.TYPE:
+    elif self.data['type'] == SparkDocumentAction.TYPE or self.data['type'] == 'spark-document':
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
       properties = notebook.get_data()['snippets'][0]['properties']
+
+      if self.data['type'] == 'spark-document': # Oozie Document Action
+        self.data['properties']['app_name'] = properties['app_name']
 
       self.data['properties']['class'] = properties['class']
       self.data['properties']['jars'] = os.path.basename(properties['jars'][0])
@@ -1825,7 +1828,7 @@ class SparkAction(Action):
      'spark_master': {
           'name': 'spark_master',
           'label': _('Spark Master'),
-          'value': 'local[*]',
+          'value': 'yarn',
           'help_text': _('Ex: spark://host:port, mesos://host:port, yarn, or local.'),
           'type': ''
      },
@@ -1833,7 +1836,7 @@ class SparkAction(Action):
           'name': 'mode',
           'label': _('Mode'),
           'value': 'client',
-          'help_text': _('e.g. client,cluster'),
+          'help_text': _('e.g. Client cluster'),
           'type': ''
      },
      'app_name': {
@@ -2152,9 +2155,89 @@ class JavaDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
-class SparkDocumentAction(SparkAction):
+class SparkDocumentAction(Action):
   TYPE = 'spark2-document'
+  FIELDS = {
+    'uuid': {
+        'name': 'uuid',
+        'label': _('Spark program'),
+        'value': '',
+        'help_text': _('Select a saved Spark program you want to schedule.'),
+        'type': 'spark'
+     },
+     'spark_master': {
+          'name': 'spark_master',
+          'label': _('Spark Master'),
+          'value': 'yarn',
+          'help_text': _('Ex: spark://host:port, mesos://host:port, yarn, or local.'),
+          'type': ''
+     },
+     'mode': {
+          'name': 'mode',
+          'label': _('Mode'),
+          'value': 'client',
+          'help_text': _('e.g. Client cluster'),
+          'type': ''
+     },
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Path to file to put in the running directory.'),
+          'type': ''
+     },
+     'spark_arguments': {
+          'name': 'spark_arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('Arguments, one by one, e.g. 1000, /path/a.')
+     },
+     'parameters': { # For Oozie Action Document
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
+     },
+     # Common
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production')
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.')
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': '',
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
 
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
 
 
 class DecisionNode(Action):
@@ -2189,7 +2272,8 @@ NODES = {
   'spark-widget': SparkAction,
   'generic-widget': GenericAction,
   'hive-document-widget': HiveDocumentAction,
-  'java-document-widget': JavaDocumentAction
+  'java-document-widget': JavaDocumentAction,
+  'spark-document-widget': SparkDocumentAction
 }
 
 

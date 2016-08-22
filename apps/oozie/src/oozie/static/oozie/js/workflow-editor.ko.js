@@ -166,7 +166,7 @@ var Node = function (node) {
     });
   }
 
-  if (type == 'hive-document-widget' && typeof self.properties.uuid != "undefined") {
+  if ((type == 'hive-document-widget' || type == 'spark-document-widget') && typeof self.properties.uuid != "undefined") {
     self.properties.uuid.subscribe(function () {
       self.actionParametersFetched(false);
       self.fetch_parameters();
@@ -509,6 +509,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
     self.getDocuments('query-hive', self.hiveQueries);
     self.getDocuments('query-java', self.javaQueries);
+    self.getDocuments('query-spark2', self.sparkApps);
   };
 
   self.getDocuments = function(type, destination) {
@@ -553,12 +554,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
   self.hiveQueries = ko.observableArray();
   self.javaQueries = ko.observableArray();
+  self.sparkApps = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
   self.getDocumentById = function (type, uuid) {
     var _query = null;
     if (type.indexOf('java') != -1) {
       data = self.javaQueries();
+    } else if (type.indexOf('spark') != -1) {
+      data = self.sparkApps();
     } else {
       data = self.hiveQueries();
     }
@@ -1284,6 +1288,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
   self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
   self.draggableJavaDocumentAction = ko.observable(bareWidgetBuilder("Java", "java-document-widget"));
+  self.draggableSparkDocumentAction = ko.observable(bareWidgetBuilder("Spark", "spark-document-widget"));
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 
