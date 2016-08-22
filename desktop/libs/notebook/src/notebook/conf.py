@@ -109,13 +109,6 @@ ENABLE_BATCH_EXECUTE = Config(
   dynamic_default=is_oozie_enabled
 )
 
-ENABLE_JAVA_DOCUMENT = Config(
-  key="enable_java_document",
-  help=_t("Flag to enable the Java document in editor and workflow."),
-  type=bool,
-  dynamic_default=is_oozie_enabled
-)
-
 
 GITHUB_REMOTE_URL = Config(
     key="github_remote_url",

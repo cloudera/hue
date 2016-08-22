@@ -303,6 +303,10 @@ def action_parameters(request):
     elif node_data['type'] == 'hive-document':
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=request.user, uuid=node_data['properties']['uuid']))
       parameters = parameters.union(set(find_dollar_braced_variables(notebook.get_str())))
+    elif node_data['type'] == 'spark-document':
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=request.user, uuid=node_data['properties']['uuid']))
+      for arg in notebook.get_data()['snippets'][0]['properties']['spark_arguments']:
+        parameters = parameters.union(set(find_dollar_braced_variables(arg)))
 
     response['status'] = 0
     response['parameters'] = list(parameters)
@@ -384,7 +388,7 @@ def gen_xml_workflow(request):
 @check_editor_access_permission
 @check_document_access_permission()
 def submit_workflow(request, doc_id):
-  workflow = Workflow(document=Document2.objects.get(id=doc_id))
+  workflow = Workflow(document=Document2.objects.get(id=doc_id), user=request.user)
 
   return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}))
 

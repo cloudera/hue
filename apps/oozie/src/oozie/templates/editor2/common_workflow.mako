@@ -898,6 +898,83 @@
 </script>
 
 
+<script type="text/html" id="spark-document-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko if: $root.getDocumentById('spark2', properties.uuid()) -->
+      <!-- ko with: $root.getDocumentById('spark2', properties.uuid()) -->
+        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <br/>
+        <span data-bind='text: description' class="muted"></span>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
+        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
+          <select data-bind="options: $root.sparkApps, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Java program name...')}'}"></select>
+          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
+          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.spark_master.label"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.spark_master, attr: { placeholder: $root.workflow_properties.spark_master.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.mode.label"></span>
+            <input type="text" class="input-medium" data-bind="value: properties.mode, attr: { placeholder: $root.workflow_properties.mode.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.app_name.label"></span>
+            <input type="text" class="input-xlarge seventy" data-bind="value: properties.app_name, attr: { placeholder: $root.workflow_properties.app_name.help_text }" />
+          </div>
+
+          <br/>
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="generic-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
