@@ -1835,7 +1835,7 @@ class SparkAction(Action):
           'name': 'files',
           'label': _('Files'),
           'value': [],
-          'help_text': _('Path to files put in the running directory.'),
+          'help_text': _('Path to file to put in the running directory.'),
           'type': ''
      },
     'class': {
@@ -1847,10 +1847,10 @@ class SparkAction(Action):
      },
      'jars': {
           'name': 'jars',
-          'label': _('Jar/py names'),
+          'label': _('Jar/py name'),
           'value': '',
-          'help_text': _('Comma separated list of filenames.'),
-          'type': ''
+          'help_text': _('Name of main file added in Files.'),
+          'type': 'text'
      },
      'spark_opts': {
           'name': 'spark_opts',
@@ -1903,7 +1903,7 @@ class SparkAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['jars'], cls.FIELDS['files']]
+    return [cls.FIELDS['files'], cls.FIELDS['jars']]
 
 
 class KillAction(Action):
