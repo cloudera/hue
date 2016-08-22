@@ -133,7 +133,7 @@
       }
     }
 
-    self.fnSearch = function (what) {
+    self.fnSearch = function (what, avoidScroll) {
       var $t = self.$table;
       $t.find('.columnSelected').removeClass('columnSelected');
       $t.data('scrollToCol', null);
@@ -163,7 +163,12 @@
             $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted');
             $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted');
           }
-          self.fnScrollTo(coords[0].row, coords[0].col);
+          if (typeof avoidScroll === 'undefined' || !avoidScroll) {
+            self.fnScrollTo(coords[0].row, coords[0].col);
+          }
+          else {
+            $('.hue-datatable-search').find('span').text(($t.data('searchCoordHighlighted') + 1) + ' ' + $t.data('oInit')['i18n'].OF + ' ' + $t.data('searchCoords').length);
+          }
         }
         else {
           $('.hue-datatable-search').find('span').text($t.data('oInit')['i18n'].NO_RESULTS);
@@ -360,6 +365,9 @@
 
       self.fnDraw(true);
 
+      if ($('.hue-datatable-search').is(':visible')){
+        self.fnSearch($('.hue-datatable-search').find('input').val(), true);
+      }
     };
 
     self.fnSettings = function () {
@@ -391,11 +399,11 @@
 
     return self.each(function () {
       self.$table = $(this);
-      $('.hue-datatable-search').remove();
       var parent = self.$table.parent();
       if (parent.hasClass('dataTables_wrapper')) {
         return;
       }
+      $('.hue-datatable-search').remove();
       self.$table.data('data', []);
       self.$table.data('aoRows', []);
       self.$table.data('aoColumns', []);
