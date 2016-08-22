@@ -392,9 +392,9 @@ except ImportError, e:
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
-                  <span data-bind="tooltip: { title: '${ _ko("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }', placement: 'top' }">
+                  <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }', placement: 'top' }" style="padding: 8px">
                     <i class="fa fa-question-circle muted"></i>
-                  </span>
+                  </div>
                 </div>
               </div>
             </div>
