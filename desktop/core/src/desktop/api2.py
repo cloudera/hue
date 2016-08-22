@@ -411,24 +411,26 @@ def import_documents(request):
   uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
 
   for doc in documents:
-    # Remove any deprecated fields
-    if 'tags' in doc['fields']:
-      doc['fields'].pop('tags')
+    # Filter docs to import, ignoring reserved directories (home and Trash) and history docs
+    if doc['fields']['type'] != 'directory' or doc['fields']['name'] not in (Document2.HOME_DIR, Document2.TRASH_DIR):
+      # Remove any deprecated fields
+      if 'tags' in doc['fields']:
+        doc['fields'].pop('tags')
 
-    # If doc is not owned by current user, make a copy of the document with current user as owner
-    if doc['fields']['owner'][0] != request.user.username:
-      doc = _copy_document_with_owner(doc, request.user, uuids_map)
-    else:  # Update existing doc or create new
-      doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
+      # If doc is not owned by current user, make a copy of the document with current user as owner
+      if doc['fields']['owner'][0] != request.user.username:
+        doc = _copy_document_with_owner(doc, request.user, uuids_map)
+      else:  # Update existing doc or create new
+        doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
 
-    # If the doc contains any history dependencies, ignore them
-    # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
-    deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
-    doc['fields']['dependencies'] = deps_minus_history
+      # If the doc contains any history dependencies, ignore them
+      # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
+      deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
+      doc['fields']['dependencies'] = deps_minus_history
 
-    # Set last modified date to now
-    doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
-    docs.append(doc)
+      # Set last modified date to now
+      doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
+      docs.append(doc)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
   f.write(json.dumps(docs))
