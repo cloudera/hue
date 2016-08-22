@@ -44,12 +44,15 @@
   };
 
   Plugin.prototype.init = function () {
-    var _this = this;
+    var _this = this,
+      link = null;
 
-    var link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
     if ($("#jHueScrollUpAnchor").length > 0) { // just one scroll up per page
       link = $("#jHueScrollUpAnchor");
       $(document).off("click", "#jHueScrollUpAnchor");
+    }
+    else {
+      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
     }
 
     $(_this.element).attr("jHueScrollified", "true");
