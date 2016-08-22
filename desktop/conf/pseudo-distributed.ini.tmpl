@@ -620,9 +620,6 @@
   ## Flag to enable the creation of a coordinator for the current SQL query.
   # enable_query_scheduling=true
 
-  ## Flag to enable the Java document in editor and workflow.
-  # enable_java_document=true
-
   ## Base URL to Remote GitHub Server
   # github_remote_url=https://github.com
 
@@ -998,8 +995,9 @@
   # Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.
   ## enable_cron_scheduling=true
 
-  # Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).
-  ## log_offset=-1000000
+  ## Flag to enable the saved Editor queries to be dragged and dropped into a workflow.
+  # enable_document_action=false
+
 
 ###########################################################################
 # Settings to configure the Filebrowser app
@@ -1151,6 +1149,7 @@
 
   # Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).
   ## log_offset=-1000000
+
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

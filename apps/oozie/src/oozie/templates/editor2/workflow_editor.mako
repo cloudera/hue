@@ -14,9 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop.views import commonheader, commonfooter, commonshare, _ko
 from desktop import conf
-from django.utils.translation import ugettext as _
+
+from oozie.conf import ENABLE_DOCUMENT_ACTION
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -25,6 +28,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="../navigation-bar.mako" />
 
 ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
+
 <div id="editor">
 
 <%def name="buttons()">
@@ -115,12 +119,22 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
+    % if ENABLE_DOCUMENT_ACTION.get():
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaDocumentAction());}}}"
          title="${_('Saved Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableSparkDocumentAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSparkDocumentAction());}}}"
+         title="${_('Saved Spark program')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon"></a>
+    </div>
+
+    % endif
 
     <div class="toolbar-label">${ _('ACTIONS') }</div>
 
@@ -276,8 +290,8 @@ ${ workflow.render() }
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
-          <!-- ko if: type() == 'hive' || type() == 'java' -->
-          <select data-bind="options: type() == 'java' ? $root.javaQueries() : $root.hiveQueries(), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
+          <!-- ko if: type() == 'hive' || type() == 'java' || type() == 'spark' -->
+          <select data-bind="options: type() == 'java' ? $root.javaQueries() : (type() == 'spark' ? $root.sparkApps() : $root.hiveQueries()), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
           <!-- ko if: $root.getDocumentById(type(), value()) -->
             <!-- ko with: $root.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
