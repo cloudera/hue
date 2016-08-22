@@ -843,7 +843,12 @@
             </ul>
             <em data-bind="visible: properties.spark_arguments().length == 0">${ _('No arguments defined.') }</em>
           </div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
+
+          <div data-bind="template: { name: 'common-properties-files' }"></div>
+
+          <span class="widget-label"  data-bind="text: $root.workflow_properties.spark_opts.label"></span>
+          <input type="text" class="input-xlarge seventy" data-bind="value: properties.spark_opts, attr: { placeholder: $root.workflow_properties.spark_opts.help_text }" />
+
         </div>
       </div>
     </div>
@@ -871,9 +876,6 @@
             <span class="widget-label" data-bind="text: $root.workflow_properties.app_name.label"></span>
             <input type="text" class="input-xlarge seventy" data-bind="value: properties.app_name, attr: { placeholder: $root.workflow_properties.app_name.help_text }" />
           </div>
-
-          <span class="widget-label"  data-bind="text: $root.workflow_properties.spark_opts.label"></span>
-          <input type="text" class="input-xlarge seventy" data-bind="value: properties.spark_opts, attr: { placeholder: $root.workflow_properties.spark_opts.help_text }" />
 
           <br/>
           <span data-bind="template: { name: 'common-action-properties' }"></span>
