@@ -139,7 +139,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'foo', onlyTables: true  }
+            suggestTables: { identifierChain: [{ name: 'foo' }], onlyTables: true  }
           }
         });
       });
@@ -325,7 +325,7 @@ define([
             dialect: 'hive',
             hasLocations: true,
             expectedResult: {
-              suggestColumns: { tables: [{ table: 'bar' }] },
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] } ,
               lowerCase: false
             }
           });
@@ -339,7 +339,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -391,7 +391,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] },
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] },
               suggestKeywords: ['COLUMN']
             }
           });
@@ -444,7 +444,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar'}] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -457,7 +457,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar'}] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -509,7 +509,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -522,7 +522,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -574,7 +574,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
             }
           });
         });
@@ -653,7 +653,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -864,7 +864,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] },
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] },
               suggestKeywords: ['COLUMN']
             }
           });
@@ -930,7 +930,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar'}] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -943,7 +943,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar'}] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1281,7 +1281,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1294,7 +1294,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1320,7 +1320,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1333,7 +1333,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
             }
           });
         });
@@ -1519,7 +1519,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1532,7 +1532,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1558,7 +1558,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] },
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] },
               suggestKeywords: ['COLUMN', 'PARTITION']
             }
           });
@@ -1573,7 +1573,7 @@ define([
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { tables: [{ table: 'bar' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
             }
           });
         });
@@ -1689,7 +1689,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'boo', onlyViews: true }
+            suggestTables: { identifierChain: [{ name: 'boo' }], onlyViews: true }
           }
         });
       });

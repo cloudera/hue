@@ -93,7 +93,7 @@ define([
           noErrors:true,
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'boo', onlyTables: true }
+            suggestTables: { identifierChain: [{ name: 'boo' }], onlyTables: true }
           }
         });
       });

@@ -64,6 +64,7 @@ ShowStatement_EDIT
      // ROLES is considered a non-reserved keywords so we can't match it in ShowCurrentRolesStatement_EDIT
      if ($3.identifierChain && $3.identifierChain.length === 1 && $3.identifierChain[0].name.toLowerCase() === 'roles') {
        suggestKeywords(['CURRENT']);
+       parser.yy.locations.pop();
      } else {
        addTablePrimary($3);
        if (isImpala()) {
@@ -340,7 +341,7 @@ ShowIndexStatement_EDIT
    }
  | AnyShow OptionallyFormattedIndex 'ON' 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
    {
-     suggestTablesOrColumns($6);
+     suggestTables({identifierChain: [{name: $6}]});
    }
  ;
 

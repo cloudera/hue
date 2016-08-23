@@ -113,7 +113,7 @@ AlterTable_EDIT
      suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists_EDIT
- | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation_EDIT OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs 'CURSOR'
    {
@@ -186,7 +186,7 @@ AlterTable_EDIT
  ;
 
 HiveSpecificOperations
- : HiveClusteredBy
+ : ClusteredBy
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
  | HiveExchange
  | '<hive>RECOVER' '<hive>PARTITIONS'
@@ -205,7 +205,7 @@ HiveSpecificOperations_EDIT
      suggestKeywords(['PARTITION']);
    }
  | HiveArchiveOrUnArchive PartitionSpec_EDIT
- | HiveClusteredBy_EDIT
+ | ClusteredBy_EDIT
  | HiveExchange_EDIT
  | 'NOT' 'CURSOR'
    {
@@ -266,9 +266,9 @@ OptionalPartitionOperations
  : 'SET' AnyFileFormat FileFormat
  | 'SET' HdfsLocation
  | 'SET' HiveOrImpalaTblproperties ParenthesizedPropertyAssignmentList
- | 'SET' '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties
+ | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' HiveOrImpalaSerdeproperties ParenthesizedPropertyAssignmentList
- | 'SET' ImpalaCachedIn
+ | 'SET' CachedIn
  | 'SET' '<impala>UNCACHED'
  | AddReplaceColumns
  | '<hive>CONCATENATE'
@@ -311,14 +311,14 @@ OptionalPartitionOperations_EDIT
      suggestFileFormats();
    }
  | 'SET' HdfsLocation_EDIT
- | 'SET' ImpalaCachedIn_EDIT
- | 'SET' '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties 'CURSOR'
+ | 'SET' CachedIn_EDIT
+ | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties 'CURSOR'
    {
      if (!$4) {
        suggestKeywords(['WITH SERDEPROPERTIES']);
      }
    }
- | 'SET' '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties_EDIT
+ | 'SET' '<hive>SERDE' QuotedValue WithSerdeproperties_EDIT
  ;
 
 AddReplaceColumns
@@ -583,7 +583,7 @@ OptionalPartitionSpecs_EDIT
  ;
 
 PartitionSpecWithLocation_EDIT
- : PartitionSpec OptionalHdfsLocation_EDIT
+ : PartitionSpec HdfsLocation_EDIT
  | PartitionSpec_EDIT OptionalHdfsLocation
  ;
 
