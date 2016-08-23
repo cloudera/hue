@@ -206,12 +206,11 @@
       try {
         $t.parents($t.data('oInit')['scrollable']).animate({
           scrollTop: $t.find('tbody tr').find('td:eq(0)').filter(function () {
-            return $(this).text() == row
+            return $(this).text() - 1 == row
           }).position().top + 73
         });
       }
-      catch (e) {
-      }
+      catch (e) {}
 
       colSel = $t.find("tr td:nth-child(" + (col + 1) + ")");
       $t.data('scrollToCol', col);
@@ -308,11 +307,15 @@
 
           if ($t.data('scrollToCol')) {
             var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
-            colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+            if ($t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").length > 0){
+              colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+            }
             if ($t.data('scrollAnimate')) {
               $t.parent().animate({
                 scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
-              }, 300);
+              }, 300, function () {
+                $t.parent().trigger('scroll');
+              });
               $t.data('scrollAnimate', null);
             }
             if ($t.data('scrollToRow') == null) {

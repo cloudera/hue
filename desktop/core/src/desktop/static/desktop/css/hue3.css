@@ -1011,7 +1011,7 @@ div.box {
 }
 
 .table tr.locked, .table tr.locked td {
-  background-color: #fcf8e3!important;
+  background-color: #FFFACC!important;
 }
 
 div.locked {
@@ -1196,7 +1196,7 @@ a#advanced-btn:hover {
 }
 
 .columnSelected {
-  background-color: #EEEEEE !important;
+  background-color: #FFFACC !important;
 }
 
 .cellSelected {
