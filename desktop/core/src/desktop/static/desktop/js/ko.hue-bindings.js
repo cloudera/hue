@@ -2259,6 +2259,11 @@
         self.on("blur", function () {
           valueAccessor()(self.val());
         });
+        if (allBindingsAccessor().valueUpdate != null && allBindingsAccessor().valueUpdate == "afterkeydown") {
+          self.on("keyup", function () {
+            valueAccessor()(self.val());
+          });
+        }
         self.jHueGenericAutocomplete({
           showOnFocus: true,
           home: "/",
