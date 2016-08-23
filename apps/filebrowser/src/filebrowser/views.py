@@ -762,8 +762,11 @@ def _read_avro(fhandle, path, offset, length, stats):
 
 def _read_parquet(fhandle, path, offset, length, stats):
     try:
+        size = 1 * 1024 * 1024 # Limit readable file, ParquetOptions.limit does not help
+        data = StringIO(fhandle.read(size)) # There is a footer
+
         dumped_data = StringIO()
-        parquet._dump(fhandle, ParquetOptions(), out=dumped_data)
+        parquet._dump(data, ParquetOptions(), out=dumped_data)
         dumped_data.seek(offset)
         return dumped_data.read()
     except:
