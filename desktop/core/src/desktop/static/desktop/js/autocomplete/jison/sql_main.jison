@@ -671,6 +671,11 @@ SchemaQualifiedTableIdentifier
      addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
    }
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier ImpalaFields
+   {
+     // This is a special case for Impala expression like "SELECT | FROM db.table.col"
+     $$ = { identifierChain: [ { name: $1 }, { name: $3 } ].concat($4) };
+   }
  ;
 
 SchemaQualifiedTableIdentifier_EDIT
@@ -689,6 +694,54 @@ SchemaQualifiedTableIdentifier_EDIT
      // In Impala you can have statements like 'SELECT ... FROM testTable t, t.|'
      suggestTablesOrColumns($1);
    }
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier ImpalaFields_EDIT
+   {
+     // TODO: switch to suggestColumns, it's currently handled in sqlAutocompleter2.js
+     // Issue is that suggestColumns is deleted if no tables are defined and this is
+     // Impala only cases like "SELECT | FROM db.table.col"
+     suggestTables({ identifierChain: [{ name: $1 }, { name: $3 }].concat($4) });
+   }
+ ;
+
+ImpalaFields
+ : ImpalaField               -> [$1]
+ | ImpalaFields ImpalaField
+   {
+     $1.push($2);
+   }
+ ;
+
+ImpalaFields_EDIT
+ : ImpalaField_EDIT                            -> []
+ | ImpalaFields ImpalaField_EDIT               -> $1
+ | ImpalaFields ImpalaField_EDIT ImpalaFields  -> $1
+ | ImpalaField_EDIT ImpalaFields               -> []
+ ;
+
+ImpalaField
+ : '<impala>.' RegularOrBacktickedIdentifier  -> { name: $2 }
+ ;
+
+ImpalaField_EDIT
+ : '<impala>.' PartialBacktickedOrPartialCursor
+ ;
+
+SchemaQualifiedIdentifier
+ : RegularOrBacktickedIdentifier
+ | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
+ ;
+
+SchemaQualifiedIdentifier_EDIT
+ : PartialBacktickedIdentifier
+   {
+     suggestDatabases({ appendDot: true });
+   }
+ | PartialBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
+   {
+     suggestDatabases();
+     $$ = { identifierChain: [{ name: $1 }] };
+   }
+ | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
  ;
 
 DatabaseIdentifier
@@ -1389,10 +1442,7 @@ TableExpression_EDIT
      if ($2.cursorAtEnd) {
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
-
-     if (keywords.length > 0) {
-       suggestKeywords(keywords);
-     }
+     suggestKeywords(keywords);
    }
  ;
 
@@ -2761,20 +2811,36 @@ WindowExpression
  ;
 
 WindowExpression_EDIT
- : '(' OptionalPartitionBy_EDIT  RightParenthesisOrError
- | '(' AnyCursor RightParenthesisOrError
-   {
-     suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
-   }
+ : '(' PartitionBy_EDIT OptionalOrderByAndWindow RightParenthesisOrError
  | '(' OptionalPartitionBy OptionalOrderByAndWindow_EDIT RightParenthesisOrError
- ;
+ | '(' AnyCursor OptionalPartitionBy OptionalOrderByAndWindow RightParenthesisOrError
+   {
+     if (!$3 && !$4) {
+       suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
+     } else if (!$3) {
+       suggestKeywords(['PARTITION BY']);
+     }
+   }
+ | '(' AnyPartition 'BY' ValueExpressionList 'CURSOR' OptionalOrderByAndWindow RightParenthesisOrError
+    {
+      if (!$6) {
+        suggestValueExpressionKeywords($4, [{ value: 'ORDER BY', weight: 2 }]);
+      } else {
+        suggestValueExpressionKeywords($4);
+      }
+    }
+  ;
 
 OptionalPartitionBy
  :
- | AnyPartition 'BY' ValueExpressionList
+ | PartitionBy
  ;
 
-OptionalPartitionBy_EDIT
+PartitionBy
+ : AnyPartition 'BY' ValueExpressionList  -> $3
+ ;
+
+PartitionBy_EDIT
  : AnyPartition 'CURSOR'
    {
      suggestKeywords(['BY']);
@@ -2797,25 +2863,30 @@ OptionalOrderByAndWindow_EDIT
       // Only allowed in last order by
       delete parser.yy.result.suggestAnalyticFunctions;
     }
-  | OrderByClause OptionalWindowSpec 'CURSOR'
+  | OrderByClause 'CURSOR' OptionalWindowSpec
     {
-      if (!$2) {
-        if ($1.suggestKeywords) {
-          suggestKeywords(createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]));
-        } else {
-          suggestKeywords(['RANGE BETWEEN', 'ROWS BETWEEN']);
-        }
+      var keywords = [];
+      if ($1.suggestKeywords) {
+        keywords = createWeightedKeywords($1.suggestKeywords, 2);
       }
+      if (!$3) {
+        keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
+      }
+      suggestKeywords(keywords);
     }
-  | OrderByClause OptionalWindowSpec_EDIT
+  | OrderByClause WindowSpec_EDIT
   ;
 
 OptionalWindowSpec
  :
- | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
+ | WindowSpec
  ;
 
-OptionalWindowSpec_EDIT
+WindowSpec
+ : RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
+ ;
+
+WindowSpec_EDIT
  : RowsOrRange 'CURSOR'
    {
      suggestKeywords(['BETWEEN']);
