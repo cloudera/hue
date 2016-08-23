@@ -1,6 +1,0 @@
-*.pyc
-.coverage
-cover
-build
-dist
-parquet.egg-info
