@@ -101,7 +101,7 @@ DatabaseDefinitionOptionals
 
 DatabaseDefinitionOptionals_EDIT
  : OptionalComment_INVALID OptionalHdfsLocation OptionalHiveDbProperties
- | OptionalComment OptionalHdfsLocation_EDIT OptionalHiveDbProperties
+ | OptionalComment HdfsLocation_EDIT OptionalHiveDbProperties
  ;
 
 OptionalComment
@@ -127,10 +127,6 @@ OptionalComment_INVALID
 OptionalHdfsLocation
  :
  | HdfsLocation
- ;
-
-OptionalHdfsLocation_EDIT
- : HdfsLocation_EDIT
  ;
 
 HdfsLocation
@@ -211,31 +207,31 @@ TableDefinition_EDIT
  ;
 
 TableDefinitionRightPart
- : TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
+ : TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
  ;
 
 TableDefinitionRightPart_EDIT
- : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy_EDIT OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties_EDIT OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy_EDIT
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy_EDIT OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy_EDIT OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation_EDIT OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn_EDIT OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn OptionalAsSelectStatement_EDIT
- | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalImpalaWithSerdeproperties OptionalHiveClusteredBy
-   OptionalHiveSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalImpalaCachedIn 'CURSOR'
+ : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment PartitionedBy_EDIT OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy WithSerdeproperties_EDIT OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties ClusteredBy_EDIT
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   SkewedBy_EDIT OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy StoredAsOrBy_EDIT OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy HdfsLocation_EDIT OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement_EDIT
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn 'CURSOR'
    {
      // TODO: Don't always sort the keywords as order is important
      var keywords = [];
@@ -290,11 +286,12 @@ TableDefinitionRightPart_EDIT
  ;
 
 TableIdentifierAndOptionalColumnSpecification
- : SchemaQualifiedTableIdentifier OptionalColumnSpecificationsOrLike  -> $2
+ : SchemaQualifiedIdentifier OptionalColumnSpecificationsOrLike  -> $2
  ;
 
 TableIdentifierAndOptionalColumnSpecification_EDIT
- : SchemaQualifiedTableIdentifier OptionalColumnSpecificationsOrLike_EDIT
+ : SchemaQualifiedIdentifier OptionalColumnSpecificationsOrLike_EDIT
+ | SchemaQualifiedIdentifier_EDIT OptionalColumnSpecificationsOrLike
  ;
 
 OptionalColumnSpecificationsOrLike
@@ -333,17 +330,21 @@ ColumnSpecificationList
 
 ColumnSpecificationList_EDIT
  : ColumnSpecification_EDIT
+ | ColumnSpecification_EDIT ',' ColumnSpecificationList
+ | ColumnSpecificationList ',' ColumnSpecification_EDIT
+ | ColumnSpecificationList ',' ColumnSpecification_EDIT ',' ColumnSpecificationList
  | ColumnSpecification 'CURSOR'
    {
      checkForKeywords($1);
    }
- | ColumnSpecification_EDIT ',' ColumnSpecificationList
  | ColumnSpecification 'CURSOR' ',' ColumnSpecificationList
    {
      checkForKeywords($1);
    }
- | ColumnSpecificationList ',' ColumnSpecification_EDIT
- | ColumnSpecificationList ',' ColumnSpecification_EDIT ',' ColumnSpecificationList
+ | ColumnSpecificationList ',' ColumnSpecification 'CURSOR'
+   {
+     checkForKeywords($3);
+   }
  | ColumnSpecificationList ',' ColumnSpecification 'CURSOR' ',' ColumnSpecificationList
    {
      checkForKeywords($3);
@@ -521,10 +522,14 @@ GreaterThanOrError
 
 OptionalPartitionedBy
  :
- | HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList
+ | PartitionedBy
  ;
 
-OptionalPartitionedBy_EDIT
+PartitionedBy
+ : HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList
+ ;
+
+PartitionedBy_EDIT
  : HiveOrImpalaPartitioned 'CURSOR'
    {
      suggestKeywords(['BY']);
@@ -537,20 +542,16 @@ OptionalPartitionedBy_EDIT
  | HiveOrImpalaPartitioned ParenthesizedColumnSpecificationList_EDIT
  ;
 
-OptionalHiveClusteredBy
+OptionalClusteredBy
  :
- | HiveClusteredBy
+ | ClusteredBy
  ;
 
-HiveClusteredBy
+ClusteredBy
  : '<hive>CLUSTERED' 'BY' ParenthesizedColumnList OptionalHiveSortedBy 'INTO' 'UNSIGNED_INTEGER' '<hive>BUCKETS'
  ;
 
-OptionalHiveClusteredBy_EDIT
- : HiveClusteredBy_EDIT
- ;
-
-HiveClusteredBy_EDIT
+ClusteredBy_EDIT
  : '<hive>CLUSTERED' 'CURSOR'
    {
      suggestKeywords(['BY']);
@@ -622,13 +623,17 @@ SortIdentifier_EDIT
    }
  ;
 
-OptionalHiveSkewedBy
+OptionalSkewedBy
  :
- | '<hive>SKEWED' 'BY' ParenthesizedColumnList ON ParenthesizedSkewedValueList  -> { suggestKeywords: ['STORED AS DIRECTORIES'] }
+ | SkewedBy
+ ;
+
+SkewedBy
+ : '<hive>SKEWED' 'BY' ParenthesizedColumnList ON ParenthesizedSkewedValueList  -> { suggestKeywords: ['STORED AS DIRECTORIES'] }
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList ON ParenthesizedSkewedValueList '<hive>STORED_AS_DIRECTORIES' // Hack otherwise ambiguous with OptionalHiveStoredAsOrBy
  ;
 
-OptionalHiveSkewedBy_EDIT
+SkewedBy_EDIT
  : '<hive>SKEWED' 'CURSOR'
    {
      suggestKeywords(['BY']);
@@ -650,12 +655,16 @@ SkewedValueList
 
 OptionalStoredAsOrBy
  :
- | StoredAs
+ | StoredAsOrBy
+ ;
+
+StoredAsOrBy
+ : StoredAs
  | 'ROW' HiveOrImpalaFormat HiveOrImpalaRowFormat OptionalStoredAs
    {
      $$ = mergeSuggestKeywords($3, $4)
    }
- | '<hive>STORED' 'BY' QuotedValue OptionalHiveWithSerdeproperties
+ | '<hive>STORED' 'BY' QuotedValue OptionalWithSerdeproperties
   {
     if (!$4) {
       $$ = { suggestKeywords: ['WITH SERDEPROPERTIES'] };
@@ -663,7 +672,7 @@ OptionalStoredAsOrBy
   }
  ;
 
-OptionalStoredAsOrBy_EDIT
+StoredAsOrBy_EDIT
  : HiveOrImpalaStored 'CURSOR'
    {
      if (isHive()) {
@@ -691,7 +700,7 @@ OptionalStoredAsOrBy_EDIT
      suggestKeywords(['AS']);
    }
  | 'ROW' HiveOrImpalaFormat HiveOrImpalaRowFormat StoredAs_EDIT
- | '<hive>STORED' 'BY' QuotedValue OptionalHiveWithSerdeproperties_EDIT
+ | '<hive>STORED' 'BY' QuotedValue WithSerdeproperties_EDIT
  ;
 
 OptionalStoredAs
@@ -737,7 +746,7 @@ HiveOrImpalaRowFormat_EDIT
 
 HiveRowFormat
  : HiveDelimitedRowFormat
- | '<hive>SERDE' QuotedValue OptionalHiveWithSerdeproperties
+ | '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
    {
      if (!$3) {
        $$ = { suggestKeywords: [{ value: 'WITH SERDEPROPERTIES', weight: 1 }] };
@@ -893,21 +902,17 @@ OptionalNullDefinedAs_EDIT
    }
  ;
 
-OptionalHiveWithSerdeproperties
+OptionalWithSerdeproperties
  :
- | 'WITH' '<hive>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ | WithSerdeproperties
  ;
 
-OptionalHiveWithSerdeproperties_EDIT
- : OptionalImpalaWithSerdeproperties_EDIT
- ;
-
-OptionalImpalaWithSerdeproperties
- :
+WithSerdeproperties
+ : 'WITH' '<hive>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'WITH' '<impala>SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  ;
 
-OptionalImpalaWithSerdeproperties_EDIT
+WithSerdeproperties_EDIT
  : 'WITH' 'CURSOR'
    {
      suggestKeywords(['SERDEPROPERTIES']);
@@ -920,7 +925,11 @@ OptionalImpalaWithSerdeproperties_EDIT
 
 OptionalTblproperties
  :
- | HiveOrImpalaTblproperties ParenthesizedPropertyAssignmentList
+ | TblProperties
+ ;
+ 
+TblProperties
+ : HiveOrImpalaTblproperties ParenthesizedPropertyAssignmentList
  ;
 
 OptionalHiveTblproperties
@@ -948,20 +957,16 @@ CommitLocations
    }
  ;
 
-OptionalImpalaCachedIn
+OptionalCachedIn
  :
- | ImpalaCachedIn
+ | CachedIn
  ;
 
-OptionalImpalaCachedIn_EDIT
- : ImpalaCachedIn_EDIT
- ;
-
-ImpalaCachedIn
+CachedIn
  : '<impala>CACHED' 'IN' SingleQuotedValue
  ;
 
-ImpalaCachedIn_EDIT
+CachedIn_EDIT
  : '<impala>CACHED' 'CURSOR'
    {
      suggestKeywords(['IN']);
@@ -969,7 +974,7 @@ ImpalaCachedIn_EDIT
  ;
 
 ViewDefinition
- : AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification
+ : AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification
  ;
 
 ViewDefinition_EDIT
@@ -980,14 +985,14 @@ ViewDefinition_EDIT
      }
      suggestDatabases({ appendDot: true });
    }
- | AnyCreate AnyView OptionalIfNotExists 'CURSOR' SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification
+ | AnyCreate AnyView OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification
    {
      if (!$3) {
        suggestKeywords(['IF NOT EXISTS']);
      }
    }
  | AnyCreate AnyView OptionalIfNotExists_EDIT
- | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties 'CURSOR'
+ | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties 'CURSOR'
    {
      if (isHive() && !$6 && !$7) {
        suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
@@ -997,14 +1002,14 @@ ViewDefinition_EDIT
        suggestKeywords([{value: 'AS', weight: 1 }]);
      }
    }
- | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs 'CURSOR'
+ | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs 'CURSOR'
    {
      suggestKeywords(['SELECT']);
    }
- | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedTableIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification_EDIT
+ | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification_EDIT
+ | AnyCreate AnyView OptionalIfNotExists SchemaQualifiedIdentifier_EDIT OptionalParenthesizedViewColumnList OptionalComment OptionalHiveTblproperties AnyAs QuerySpecification
  ;
 
-// TODO: rename SchemaQualifiedTableIdentifier to SchemaQualifiedIdentifier
 FunctionDefinition
  : ImpalaFunctionDefinition
  | ImpalaAggregateFunctionDefinition
@@ -1020,7 +1025,7 @@ FunctionDefinition_EDIT
  ;
 
 ImpalaFunctionDefinition
- : AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
+ : AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
  ;
 
 ImpalaFunctionDefinition_EDIT
@@ -1031,36 +1036,36 @@ ImpalaFunctionDefinition_EDIT
      }
      suggestDatabases({ appendDot: true });
    }
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
    {
      if (!$3) {
        suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList 'CURSOR'
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList 'CURSOR'
    {
      suggestKeywords(['RETURNS']);
    }
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns 'CURSOR'
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns 'CURSOR'
    {
      suggestKeywords(['LOCATION']);
    }
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation 'CURSOR'
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation 'CURSOR'
    {
      suggestKeywords(['SYMBOL']);
    }
  | AnyCreate '<impala>FUNCTION' OptionalIfNotExists_EDIT
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation_EDIT
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT ImpalaReturns HdfsLocation ImpalaSymbol
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT HdfsLocation ImpalaSymbol
- | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation_EDIT ImpalaSymbol
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation_EDIT
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation ImpalaSymbol
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT ImpalaReturns HdfsLocation ImpalaSymbol
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT HdfsLocation ImpalaSymbol
+ | AnyCreate '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns HdfsLocation_EDIT ImpalaSymbol
  ;
 
 ImpalaAggregateFunctionDefinition
- : AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ : AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
  ;
 
@@ -1069,7 +1074,7 @@ ImpalaAggregateFunctionDefinition_EDIT
    {
      suggestKeywords(['FUNCTION']);
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
    {
      if (!$4) {
@@ -1084,21 +1089,21 @@ ImpalaAggregateFunctionDefinition_EDIT
      suggestDatabases({ appendDot: true });
    }
  | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList 'CURSOR'
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList 'CURSOR'
    {
      suggestKeywords(['RETURNS']);
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    'CURSOR'
    {
      suggestKeywords(['LOCATION']);
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn 'CURSOR'
    {
      if (!$9) {
@@ -1107,12 +1112,12 @@ ImpalaAggregateFunctionDefinition_EDIT
        suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
      }
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn 'CURSOR'
    {
      suggestKeywords(['MERGE_FN']);
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn 'CURSOR'
    {
      if (!$12 && !$13 && !$14 && !$15) {
@@ -1125,46 +1130,46 @@ ImpalaAggregateFunctionDefinition_EDIT
        suggestKeywords([{value: 'FINALIZE_FN', weight: 1 }]);
      }
    }
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation_EDIT OptionalImpalaInitFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn_EDIT OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn_EDIT OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn_EDIT  OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn_EDIT OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn_EDIT
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns_EDIT
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation_EDIT OptionalImpalaInitFn ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn_EDIT ImpalaUpdateFn ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
- | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
+ | AnyCreate '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList ImpalaReturns
    HdfsLocation OptionalImpalaInitFn ImpalaUpdateFn_EDIT ImpalaMergeFn OptionalImpalaPrepareFn OptionalImpalaCloseFn OptionalImpalaSerializeFn OptionalImpalaFinalizeFn
  ;
 
 HiveFunctionDefinition
- : AnyCreate '<hive>FUNCTION' SchemaQualifiedTableIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing
+ : AnyCreate '<hive>FUNCTION' SchemaQualifiedIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing
  ;
 
 HiveFunctionDefinition_EDIT
- : AnyCreate '<hive>FUNCTION' SchemaQualifiedTableIdentifier 'CURSOR'
+ : AnyCreate '<hive>FUNCTION' SchemaQualifiedIdentifier 'CURSOR'
    {
      suggestKeywords(['AS']);
    }
- | AnyCreate '<hive>FUNCTION' SchemaQualifiedTableIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing_EDIT
- | AnyCreate '<hive>FUNCTION' SchemaQualifiedTableIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing 'CURSOR'
+ | AnyCreate '<hive>FUNCTION' SchemaQualifiedIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing_EDIT
+ | AnyCreate '<hive>FUNCTION' SchemaQualifiedIdentifier '<hive>AS' SingleQuotedValue OptionalHiveUsing 'CURSOR'
    {
      if (!$6) {
        suggestKeywords(['USING']);
@@ -1422,10 +1427,10 @@ IndexDefinition_EDIT
    '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable_EDIT OptionalStoredAsOrBy OptionalHdfsLocation
    OptionalTblproperties OptionalComment
  | AnyCreate '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' '<hive>TABLE' ExistingTable ParenthesizedIndexColumnList
-   '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalStoredAsOrBy_EDIT OptionalHdfsLocation
+   '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable StoredAsOrBy_EDIT OptionalHdfsLocation
    OptionalTblproperties OptionalComment
  | AnyCreate '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' '<hive>TABLE' ExistingTable ParenthesizedIndexColumnList
-   '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalStoredAsOrBy OptionalHdfsLocation_EDIT
+   '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalStoredAsOrBy HdfsLocation_EDIT
    OptionalTblproperties OptionalComment
  | AnyCreate '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' '<hive>TABLE' ExistingTable ParenthesizedIndexColumnList
    '<hive>AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalStoredAsOrBy OptionalHdfsLocation

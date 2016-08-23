@@ -41,7 +41,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, table:'tbl' }
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] }
             ]
           }
         });
@@ -56,8 +56,8 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, table:'tbl' },
-              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'col' }, { name: 'field'}], table:'tbl' }
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] },
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }, { name: 'field'}] }
             ]
           }
         });
@@ -72,7 +72,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 22 }, table:'tbl' }
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 22 }, identifierChain: [{ name: 'tbl' }] }
             ]
           }
         });
@@ -228,7 +228,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'db' }
+            suggestTables: { identifierChain: [{ name: 'db' }] }
           }
         });
       });
@@ -241,7 +241,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ table: 'tbl', database: 'db' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
           }
         });
       });
@@ -366,7 +366,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: true,
-            suggestTables: { database: 'db' }
+            suggestTables: { identifierChain: [{ name: 'db' }] }
           }
         });
       });
@@ -379,7 +379,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ database: 'db', table: 'tbl' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
           }
         });
       });
@@ -405,7 +405,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestTables: {
-              database: 'db'
+              identifierChain: [{ name: 'db' }]
             }
           }
         });
@@ -419,7 +419,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ database: 'db', table: 'tbl' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
           }
         });
       });
@@ -432,7 +432,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'col' }], database: 'db', table: 'tbl' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }, { name: 'col' }] }] }
           }
         });
       });
@@ -448,7 +448,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13}, table:'tbl' }
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13}, identifierChain: [{ name: 'tbl' }] }
             ]
           }
         });
@@ -463,7 +463,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16}, database:'db', table:'tbl' }
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16}, identifierChain: [{ name: 'db' }, { name: 'tbl' }] }
             ]
           }
         });
@@ -491,9 +491,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['FORMATTED'],
             suggestTables: {},
-            suggestDatabases: {
-              appendDot: true
-            }
+            suggestDatabases: { appendDot: true }
           }
         });
       });
@@ -507,9 +505,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['FORMATTED'],
             suggestTables: {},
-            suggestDatabases: {
-              appendDot: true
-            }
+            suggestDatabases: { appendDot: true }
           }
         });
       });
@@ -521,9 +517,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {
-              database: 'db'
-            }
+            suggestTables: { identifierChain: [{ name: 'db' }] }
           }
         });
       });

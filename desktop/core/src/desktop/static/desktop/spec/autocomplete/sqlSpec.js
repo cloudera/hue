@@ -361,7 +361,7 @@ define([
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false,
-          locations: [{ type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, table: 'testTable1' }]
+          locations: [{ type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }]
         }
       });
     });
@@ -373,7 +373,7 @@ define([
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false,
-          locations: [{ type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, table: 'testTable1' }]
+          locations: [{ type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }]
         }
       });
     });

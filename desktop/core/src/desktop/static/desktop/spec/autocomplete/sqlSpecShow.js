@@ -335,9 +335,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {
-              database: 'databaseOne'
-            }
+            suggestTables: { identifierChain: [{ name: 'databaseOne' }] }
           }
         });
       });
@@ -349,9 +347,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {
-              database: 'databaseOne'
-            }
+            suggestTables: { identifierChain: [{ name: 'databaseOne' }] }
           }
         });
       });
@@ -459,9 +455,7 @@ define([
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestTables: {
-              database: 'databaseOne'
-            }
+            suggestTables: { identifierChain: [{ name: 'databaseOne' }] }
           }
         });
       });
