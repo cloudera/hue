@@ -102,6 +102,10 @@
 
         search.find('.fa-times').on('click', function () {
           search.hide();
+          var $t = self.$table;
+          if ($t.data('scrollToRow') != null) {
+            $t.find('.columnSelected').removeClass('columnSelected');
+          }
         });
 
         search.find('.fa-chevron-down').on('click', function () {
@@ -116,12 +120,17 @@
           self.fnSearch(search.find('input').val());
         }, 300, true);
 
-        search.find('input').keydown(function(e){
-          if(e.keyCode == 13) {
+        search.find('input').keydown(function (e) {
+          if ([13, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            search.find('.fa-chevron-down').trigger('click');
+            if ([13, 39, 40].indexOf(e.keyCode) > -1) {
+              search.find('.fa-chevron-down').trigger('click');
+            }
+            else {
+              search.find('.fa-chevron-up').trigger('click');
+            }
           }
         });
 
@@ -135,9 +144,11 @@
 
     self.fnSearch = function (what, avoidScroll) {
       var $t = self.$table;
-      $t.find('.columnSelected').removeClass('columnSelected');
-      $t.data('scrollToCol', null);
-      $t.data('scrollToRow', null);
+      if (typeof avoidScroll === 'undefined' || !avoidScroll) {
+        $t.find('.columnSelected').removeClass('columnSelected');
+        $t.data('scrollToCol', null);
+        $t.data('scrollToRow', null);
+      }
 
       if (what !== '') {
         $('.hue-datatable-search').find('span').text('');
@@ -203,27 +214,23 @@
       $t.parent().animate({
         scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
       }, 300);
-      try {
-        $t.parents($t.data('oInit')['scrollable']).animate({
-          scrollTop: $t.find('tbody tr').find('td:eq(0)').filter(function () {
-            return $(this).text() - 1 == row
-          }).position().top + 73
-        });
-      }
-      catch (e) {}
+      $t.parents($t.data('oInit')['scrollable']).animate({
+        scrollTop: $t.find('tbody tr').find('td:eq(0)').filter(function () {
+          return $(this).text() - 1 == row
+        }).position().top + 73
+      }, 100, function(){
+        $t.data('scrollToCol', col);
+        $t.data('scrollToRow', row);
+        $t.data('scrollAnimate', true);
+        $t.parent().trigger('scroll');
+      });
 
-      colSel = $t.find("tr td:nth-child(" + (col + 1) + ")");
-      $t.data('scrollToCol', col);
-      $t.data('scrollToRow', row);
-      $t.data('scrollAnimate', true);
-      $t.parent().trigger('scroll');
     }
 
     self.isDrawing = false;
 
     self.fnDraw = function (force) {
       if (!self.isDrawing) {
-
         self.isDrawing = true;
         var $t = self.$table;
         var aoColumns = self.$table.data('aoColumns');
@@ -305,25 +312,26 @@
             appendable.children().eq(i).html(html);
           }
 
-          if ($t.data('scrollToCol')) {
-            var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
-            if ($t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").length > 0){
-              colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
-            }
-            if ($t.data('scrollAnimate')) {
-              $t.parent().animate({
-                scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
-              }, 300, function () {
-                $t.parent().trigger('scroll');
-              });
-              $t.data('scrollAnimate', null);
-            }
-            if ($t.data('scrollToRow') == null) {
-              colSel.addClass("columnSelected");
-            }
-            else {
-              $t.find("tr:nth-child(" + ($t.data('scrollToRow') + 1) + ") td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").addClass('columnSelected');
-            }
+          }
+        if ($t.data('scrollToCol')) {
+          $t.find('.columnSelected').removeClass('columnSelected');
+          var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+          if ($t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").length > 0){
+            colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
+          }
+          if ($t.data('scrollAnimate')) {
+            $t.parent().animate({
+              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+            }, 300, function () {
+              $t.parent().trigger('scroll');
+            });
+            $t.data('scrollAnimate', null);
+          }
+          if ($t.data('scrollToRow') == null) {
+            colSel.addClass("columnSelected");
+          }
+          else {
+            $t.find("tr:nth-child(" + ($t.data('scrollToRow') + 1) + ") td:nth-child(" + ($t.data('scrollToCol') + 1) + ")").addClass('columnSelected');
           }
 
           if ($t.data('plugin_jHueTableExtender')) {
