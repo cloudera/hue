@@ -376,7 +376,7 @@ except ImportError, e:
                   &nbsp;${ _('In store (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
-                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
                 </div>
                 <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
                   <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
@@ -391,9 +391,9 @@ except ImportError, e:
                   &nbsp;${ _('In store (large result)') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
-                  <input data-bind="value: savePath, filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
                   <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }', placement: 'top' }" style="padding: 8px">
-                    <i class="fa fa-2x fa-question-circle muted"></i>
+                    <i class="fa fa-fw fa-question-circle muted"></i>
                   </div>
                 </div>
               </div>
@@ -417,7 +417,7 @@ except ImportError, e:
                   &nbsp;${ _('A search dashboard') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
                 </div>
               </div>
             </div>
@@ -427,7 +427,7 @@ except ImportError, e:
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-        <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
+        <button data-bind="click: trySaveResults, css: {'disabled': isPathEmpty}" class="btn btn-primary disable-feedback">${_('Save')}</button>
       </div>
     </div>
 
@@ -483,11 +483,16 @@ except ImportError, e:
         self.downloadTruncated = ko.observable(false);
         self.downloadCounter = ko.observable(0);
 
-        self.trySaveResults = function() {
-          self.saveResults();
+        self.isPathEmpty = ko.pureComputed(function () {
+          return self.savePath() === '';
+        });
 
-          $("#saveResultsModal button.btn-primary").button('loading');
-          $("#saveResultsModal .loader").show();
+        self.trySaveResults = function () {
+          if (!self.isPathEmpty()) {
+            self.saveResults();
+            $("#saveResultsModal button.btn-primary").button('loading');
+            $("#saveResultsModal .loader").show();
+          }
         };
 
         self.saveResults = function() {
