@@ -428,7 +428,7 @@ define([
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestTables: { onlyTables: true, database: 'db' }
+            suggestTables: { identifierChain: [{ name: 'db' }], onlyTables: true }
           }
         });
       });
@@ -468,7 +468,7 @@ define([
               lowerCase: false,
               suggestKeywords: ['PURGE'],
               locations: [
-                {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, table: 'foo'}
+                {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'foo' }]}
               ]
             }
           });
@@ -600,7 +600,7 @@ define([
           noErrors: true,
           expectedResult: {
             lowerCase: false,
-            suggestTables: { database: 'boo', onlyViews: true }
+            suggestTables: { identifierChain: [{ name: 'boo' }], onlyViews: true }
           }
         });
       });

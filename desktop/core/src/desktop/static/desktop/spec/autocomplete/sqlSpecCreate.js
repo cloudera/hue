@@ -735,7 +735,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
           }
         });
       });
@@ -748,7 +748,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ database: 'foo', table: 'bar' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
           }
         });
       });
@@ -1155,7 +1155,7 @@ define([
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestTables: { database: 'dbOne' }
+              suggestTables: { identifierChain: [{ name: 'dbOne' }] }
             }
           });
         });
@@ -1460,6 +1460,7 @@ define([
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo.baa COMMENT \'Table comment...\' STORED ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS']
@@ -1554,7 +1555,7 @@ define([
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestTables: { database: 'dbOne' }
+              suggestTables: { identifierChain: [{ name: 'dbOne' }] }
             }
           });
         });
@@ -2103,6 +2104,18 @@ define([
           });
         });
 
+        it('should suggest keywords for "CREATE TABLE foo (bla BIGINT, blabla INT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (bla BIGINT, blabla INT ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
         it('should suggest keywords for "CREATE TABLE foo (bla MAP<|, STRUCT<boo: INT, foo:STRUCT<blo:DOUBLE, doo:VARCHAR, bla:DOUBLE>"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE foo (bla MAP<',
@@ -2268,7 +2281,7 @@ define([
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ table: 'tableOne' }] },
+            suggestColumns:  { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2354,7 +2367,7 @@ define([
               suggestAggregateFunctions: true,
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { tables: [{ table: 'tableOne' }] },
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestKeywords: ['*']
             }
           });

@@ -94,8 +94,8 @@ DropFunctionStatement_EDIT
 
 // OptionalAggregate is no go for look ahead reasons
 DropImpalaFunction
- : 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList
+ : 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
+ | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
  ;
 
 DropImpalaFunction_EDIT
@@ -113,34 +113,36 @@ DropImpalaFunction_EDIT
      }
      suggestDatabases({ appendDot: true });
    }
- | 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList
+ | 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<impala>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' 'CURSOR' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList
+ | 'DROP' 'CURSOR' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
      suggestKeywords(['AGGREGATE']);
    }
- | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT
+ | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT
  | 'DROP' '<impala>AGGREGATE' 'CURSOR'
    {
      suggestKeywords(['FUNCTION']);
    }
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList
+ | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
      if (!$4) {
        suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier ParenthesizedImpalaArgumentList_EDIT
+ | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT
+ | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedImpalaArgumentList
+ | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedImpalaArgumentList
  ;
 
 DropHiveFunction
- : 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedTableIdentifier
+ : 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier
  ;
 
 DropHiveFunction_EDIT
@@ -150,14 +152,15 @@ DropHiveFunction_EDIT
        suggestKeywords(['IF EXISTS']);
      }
    }
- | 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
+ | 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier
    {
      if (!$3) {
        suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+ | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT SchemaQualifiedIdentifier
+ | 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT
  ;
 
 DropRoleStatement

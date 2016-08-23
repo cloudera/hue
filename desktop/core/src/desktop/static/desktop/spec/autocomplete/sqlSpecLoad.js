@@ -148,7 +148,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ table: 'boo' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }] }] }
           }
         });
       });
@@ -313,7 +313,7 @@ define([
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ table: 'baa', database: 'boo' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
           }
         });
       });
