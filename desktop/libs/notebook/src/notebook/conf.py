@@ -163,7 +163,7 @@ def _default_interpreters():
           'name': 'Spark Submit Python', 'interface': 'livy-batch', 'options': {}
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'options': {}
+          'name': 'Pig', 'interface': 'oozie', 'options': {}
       }),
       ('solr', {
           'name': 'Solr SQL', 'interface': 'solr', 'options': {}

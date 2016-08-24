@@ -224,6 +224,13 @@ class Submission(object):
               paths.append(self.properties['oozie.libpath'])
             self.properties['oozie.libpath'] = ','.join(paths)
 
+        elif action.data['type'] == 'pig-document':
+          from notebook.models import Notebook
+          notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+          statements = notebook.get_data()['snippets'][0]['statement_raw']
+
+          self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
+
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
 
