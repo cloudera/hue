@@ -101,12 +101,16 @@
 
     if (parseResult.colRef) {
       var colRefCallback = function (data) {
-        colRef = data;
+        if (typeof data.type !== 'undefined') {
+          colRef = data;
+        } else if (typeof data.extended_columns !== 'undefined' && data.extended_columns.length === 1) {
+          colRef = data.extended_columns[0];
+        }
         colRefDeferral.resolve();
       };
 
       var foundVarRef = parseResult.colRef.identifierChain.filter(function (identifier) {
-        return identifier.name.indexOf('${') === 0;
+        return typeof identifier.name !== 'undefined' && identifier.name.indexOf('${') === 0;
       });
 
       if (foundVarRef.length > 0) {
@@ -114,7 +118,6 @@
       } else {
         self.fetchFieldsForIdentifiers(database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
       }
-
     } else {
       colRefDeferral.resolve();
     }
@@ -122,7 +125,7 @@
     if (parseResult.suggestFunctions) {
       var suggestFunctionsDeferral = $.Deferred();
       if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
-        $.when.apply($, colRefDeferral).done(function () {
+        colRefDeferral.done(function () {
           if (colRef !== null && colRef.type) {
             sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           } else {
@@ -150,7 +153,7 @@
 
     if (parseResult.suggestValues) {
       var suggestValuesDeferral = $.Deferred();
-      $.when.apply($, colRefDeferral).done(function () {
+      colRefDeferral.done(function () {
         if (colRef !== null) {
           self.addValues(colRef, completions);
         }
@@ -161,7 +164,7 @@
 
     if (parseResult.suggestColRefKeywords) {
       var suggestColRefKeywordsDeferral = $.Deferred();
-      $.when.apply($, colRefDeferral).done(function () {
+      colRefDeferral.done(function () {
         if (colRef !== null) {
           self.addColRefKeywords(parseResult, colRef.type, completions);
         }
@@ -173,7 +176,7 @@
     if (parseResult.suggestColumns) {
       var suggestColumnsDeferral =  $.Deferred();
       if (parseResult.suggestColumns.types && parseResult.suggestColumns.types[0] === 'COLREF') {
-        $.when.apply($, colRefDeferral).done(function () {
+        colRefDeferral.done(function () {
           parseResult.suggestColumns.tables.forEach(function (table) {
             if (colRef !== null) {
               deferrals.push(self.addColumns(parseResult, table, database, [colRef.type.toUpperCase()], columnSuggestions));
@@ -291,8 +294,10 @@
     });
   };
 
-  SqlAutocompleter2.prototype.fetchFieldsForIdentifiers = function (defaultDatabase, identifierChain, callback, errorCallback) {
+  SqlAutocompleter2.prototype.fetchFieldsForIdentifiers = function (defaultDatabase, originalIdentifierChain, callback, errorCallback) {
     var self = this;
+
+    var identifierChain = originalIdentifierChain.concat();
 
     var fetchFieldsInternal =  function (table, database, identifierChain, callback, errorCallback, fetchedFields) {
       if (!identifierChain) {
@@ -414,8 +419,8 @@
     var self = this;
     var addColumnsDeferred = $.Deferred();
 
-    if (table.subQuery && !table.identifierChain) {
-      var foundSubQuery = self.locateSubQuery(parseResult.subQueries, table.subQuery);
+    if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].subQuery !== 'undefined') {
+      var foundSubQuery = self.locateSubQuery(parseResult.subQueries, table.identifierChain[0].subQuery);
 
       var addSubQueryColumns = function (subQueryColumns) {
         subQueryColumns.forEach(function (column) {
@@ -424,8 +429,8 @@
             var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.alias), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
-            } else if (column.identifierChain && column.identifierChain.length === 1) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.identifierChain[0].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.identifierChain && column.identifierChain.length > 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             }
             addColumnsDeferred.resolve();
             return addColumnsDeferred;
@@ -479,19 +484,25 @@
               columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
           });
-        } else if (data.type === 'array' && (data.item && data.item.fields)) {
-          data.item.fields.forEach(function (field) {
-            if ((field.type === 'array' || field.type === 'map')) {
-              if (self.snippet.type() === 'hive') {
-                columnSuggestions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
-              } else {
+        } else if (data.type === 'array' && data.item) {
+          if (data.item.fields) {
+            data.item.fields.forEach(function (field) {
+              if ((field.type === 'array' || field.type === 'map')) {
+                if (self.snippet.type() === 'hive') {
+                  columnSuggestions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                } else {
+                  columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                }
+              } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                  sqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
                 columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
               }
-            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+            });
+          } else if (typeof data.item.type !== 'undefined') {
+            if (sqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
+              columnSuggestions.push({value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
-          });
+          }
         }
         addColumnsDeferred.resolve();
       };
