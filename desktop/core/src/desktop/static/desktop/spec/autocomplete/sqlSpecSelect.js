@@ -271,7 +271,7 @@ define([
             ],
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }, { name: 'a' }] }] },
             suggestKeywords: ['*'],
-            lowerCase: false,
+            lowerCase: false
           }
         });
       });
@@ -541,6 +541,7 @@ define([
             ],
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable3' }], alias: 't3' }, { identifierChain: [{ name: 'testTable4' }], alias: 't4' }] },
+            suggestIdentifiers: [{ name: 't3.', type: 'alias' }, { name: 't4.', type: 'alias'}],
             lowerCase: false
           }
         });
@@ -840,7 +841,44 @@ define([
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT | FROM db.tbl1, db.tbl2"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM db.tbl1, db.tbl2',
+          dialect: 'generic',
+          hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
+            suggestIdentifiers: [{ name: 'tbl1.', type: 'table' },{ name: 'tbl2.', type: 'table' }]
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT | FROM db.tbl1.col, db.tbl2"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' FROM db.tbl1.col, db.tbl2',
+          dialect: 'impala',
+          hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }, { name: 'col' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
+            suggestIdentifiers: [{ name: 'col.', type: 'table' },{ name: 'tbl2.', type: 'table' }]
           }
         });
       });
@@ -896,6 +934,7 @@ define([
               alias: 'ttaSum',
               columns: [{ alias: 'total', type: 'DOUBLE' }]
             }],
+            suggestIdentifiers: [{ name:'tta.', type:'alias' }, { name:'ttaSum.', type:'sub-query' }, { name:'ttb.', type:'alias' }],
             lowerCase: false
           }
         });
@@ -3260,7 +3299,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
-            suggestIdentifiers: [{ name: 'tm.', type: 'alias' }]
+            suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
           }
         });
       });
@@ -3304,7 +3343,7 @@ define([
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: true,
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
-            suggestIdentifiers : [{ name: 'tm.', type: 'alias' }],
+            suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }],
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'key' }] }
           }
         });
@@ -3321,7 +3360,7 @@ define([
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: true,
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
-            suggestIdentifiers : [{ name: 'm.', type: 'alias' }],
+            suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'field' }] },
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, identifierChain: [{ name: 'testTable' }]},
@@ -3551,7 +3590,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
-            suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 'tableOne' }], alias: 'boo'}, { identifierChain: [{ name: 'tableTwo' }], alias: 'baa'}] }
+            suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 'tableOne' }], alias: 'boo'}, { identifierChain: [{ name: 'tableTwo' }], alias: 'baa'}] },
+            suggestIdentifiers:[{ name: 'boo.', type: 'alias'},{ name: 'baa.', type: 'alias'}]
           }
         });
       });
@@ -4544,7 +4584,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }, { identifierChain: [{ name: 'bar' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }, { identifierChain: [{ name: 'bar' }] }] },
+            suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
           }
         });
       });
@@ -4558,7 +4599,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
+            suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
         });
       });
@@ -4572,7 +4614,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
+            suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
         });
       });
@@ -4586,7 +4629,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
+            suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
         });
       });
@@ -4600,7 +4644,8 @@ define([
             lowerCase: false,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bar' }] },
-            suggestKeywords: ['EXISTS']
+            suggestKeywords: ['EXISTS'],
+            suggestIdentifiers: [{ name: 'bar.', type: 'alias' }]
           }
         });
       });
@@ -4613,7 +4658,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['BOOLEAN'] },
-            suggestColumns: { types: ['BOOLEAN'], tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bar' }] }
+            suggestColumns: { types: ['BOOLEAN'], tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bar' }] },
+            suggestIdentifiers: [{ name: 'bar.', type: 'alias' }]
           }
         });
       });
@@ -5304,7 +5350,8 @@ define([
           expectedResult : {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -5319,7 +5366,8 @@ define([
           expectedResult : {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -5334,7 +5382,8 @@ define([
           expectedResult : {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
-            suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -5349,7 +5398,8 @@ define([
           expectedResult : {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
           }
         });
       });
@@ -6075,7 +6125,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -6089,7 +6140,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -6103,7 +6155,8 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -6116,6 +6169,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
             suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, identifierChain: [{ name: 'testTable1' }]},
@@ -6161,7 +6215,8 @@ define([
           expectedResult: {
             lowerCase: true,
             suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'db' }, { name: 'testTable2' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'db' }, { name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
         });
       });
@@ -6177,6 +6232,7 @@ define([
             colRef: { identifierChain: [{ name: 'testTable1' }, { name: 'testColumn1'}] },
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
             lowerCase: true
           }
         });
@@ -6456,7 +6512,8 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }, { identifierChain: [{ name: 'table2' }] }, { identifierChain: [{ name: 'table3' }] }, { identifierChain: [{ name: 'table4' }], alias: 't4' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }, { identifierChain: [{ name: 'table2' }] }, { identifierChain: [{ name: 'table3' }] }, { identifierChain: [{ name: 'table4' }], alias: 't4' }] },
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
             }
           });
         });
@@ -6487,7 +6544,8 @@ define([
               lowerCase: false,
               suggestFunctions: {},
               suggestKeywords: ['EXISTS', 'NOT EXISTS'],
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }], alias: 't2' }] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }], alias: 't2' }] },
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 't2.', type: 'alias' }]
             }
           });
         });
@@ -6647,7 +6705,8 @@ define([
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }]}, { identifierChain: [{ name: 'table3' }]}, { identifierChain: [{ name: 'table4' }], alias: 't4'}] }
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }]}, { identifierChain: [{ name: 'table3' }]}, { identifierChain: [{ name: 'table4' }], alias: 't4'}] },
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
             }
           });
         });
@@ -6724,6 +6783,7 @@ define([
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: true,
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] },
+            suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
             colRef: { identifierChain: [{ name: 'bar' }, {name: 'bla'}] }
           }
         });
@@ -6740,6 +6800,7 @@ define([
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: true,
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] },
+            suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
             colRef: { identifierChain: [{ name: 'bar' }, {name: 'bla'}] }
           }
         });
@@ -6856,6 +6917,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
             suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 't1' }] }, { identifierChain: [{ name: 't2' }], alias: 'ta2' }, { identifierChain: [{ name: 't3' }]}] },
+            suggestIdentifiers: [{ name: 't1.', type: 'table' }, { name: 'ta2.', type: 'alias' }, { name: 't3.', type:'table' }],
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 41}, identifierChain: [{ name: 't1' }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 43, last_column: 45}, identifierChain: [{ name: 't2' }] },
@@ -6882,6 +6944,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }, { identifierChain: [{ subQuery: 'bar' }] }] },
+            suggestIdentifiers: [{ name: 'tt.', type: 'alias' }, { name: 'bar.', type: 'sub-query' }],
             subQueries: [{
               alias: 'bar',
               columns: [
@@ -6912,6 +6975,7 @@ define([
                 { identifierChain: [{ name: 'foo' }, { name: 'bla' }], type: 'COLREF' }
               ]
             }],
+            suggestIdentifiers: [{ name: 'bar.', type: 'sub-query' }],
             lowerCase: true
           }
         });
@@ -6967,6 +7031,7 @@ define([
           containsKeywords: ['CASE'],
           expectedResult: {
             suggestColumns: { types: ['T'], tables: [{ identifierChain: [{ subQuery: 'boo'}] }, { identifierChain: [{ subQuery: 'bar' }] }] },
+            suggestIdentifiers: [{ name: 'boo.', type: 'sub-query' }, { name: 'bar.', type: 'sub-query' }],
             suggestFunctions: { types: ['T'] },
             subQueries: [{
               alias: 'boo',
@@ -7020,6 +7085,7 @@ define([
               { identifierChain: [{ name: 'tableThree' }] },
               { identifierChain: [{ subQuery: 'subQueryTwo'}] }
             ]},
+            suggestIdentifiers: [{ name: 'subQueryOne.', type: 'sub-query' }, { name: 'tAlias.', type: 'alias' }, { name: 'tableThree.', type: 'table' }, { name: 'subQueryTwo.', type: 'sub-query' }],
             subQueries: [{
               columns: [{ tables: [{ identifierChain: [{ name: 'tableOne' }] }] }],
               alias: 'subQueryOne'
@@ -7059,6 +7125,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ subQuery: 'subQueryTwo'}] }] },
+            suggestIdentifiers: [{ name: 'subQueryTwo.', type: 'sub-query' }],
             subQueries: [{
               alias: 'subQueryTwo',
               columns: [{ tables: [{ identifierChain: [{ subQuery: 'subQueryOne' }] }] }],
@@ -7084,6 +7151,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ subQuery: 'subQueryThree'}] }] },
+            suggestIdentifiers: [{ name: 'subQueryThree.', type: 'sub-query' }],
             subQueries: [{
               alias: 'subQueryThree',
               columns: [{ tables: [{ identifierChain: [{ subQuery: 'subQueryTwo' }] }] }],
@@ -7112,6 +7180,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ subQuery: 'subQueryTwo'}] }] },
+            suggestIdentifiers: [{ name: 'subQueryTwo.', type: 'sub-query' }],
             subQueries: [{
               alias: 'subQueryTwo',
               columns: [{ tables: [{ identifierChain: [{ subQuery: 'subQueryOne' }] }] }],
@@ -7136,6 +7205,7 @@ define([
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ subQuery: 'subQueryOne'}] }] },
+            suggestIdentifiers: [{ name: 'subQueryOne.', type: 'sub-query' }],
             subQueries: [{
               alias: 'subQueryOne',
               columns: [{ tables: [{ identifierChain: [{ name: 'tableOne' }] }] }]
