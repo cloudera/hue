@@ -3110,7 +3110,7 @@
       });
 
       var $tableDropMenu = $el.next('.table-drop-menu');
-      var $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier')
+      var $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier');
 
 
       var hideDropMenu = function () {
@@ -3203,6 +3203,10 @@
           if (questionMarkMatch) {
             editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
             editor.removeTextBeforeCursor(1);
+            window.setTimeout(function () {
+              editor.execCommand("startAutocomplete");
+            }, 1);
+          } else if (/\.$/.test(editor.getTextBeforeCursor())) {
             window.setTimeout(function () {
               editor.execCommand("startAutocomplete");
             }, 1);
