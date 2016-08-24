@@ -91,7 +91,7 @@ class OAuthBackend(DesktopBackendBase):
   
 
   @classmethod
-  def handleAuthenticationRequest(self, request):
+  def handleAuthenticationRequest(cls, request):
     assert oauth is not None
  
     if 'oauth_verifier' in request.GET:
@@ -116,7 +116,7 @@ class OAuthBackend(DesktopBackendBase):
         if 'error' in request.GET or 'code' not in request.GET:
             return ""
 
-        redirect_uri = get_redirect_uri()
+        redirect_uri = get_redirect_uri(request)
         code = request.GET['code']
         grant_type = 'authorization_code'
 
@@ -190,18 +190,8 @@ class OAuthBackend(DesktopBackendBase):
     return access_token, nexturl
 
 
-  def get_redirect_uri(self, request):
-    # Either use the proxy-specified protocol or the one from the request itself.
-    # This is useful if the server is behind some kind of proxy
-    protocol = request.META.get("HTTP_X_FORWARDED_PROTO", request.scheme)
-    host = request.get_host()
-    path = '/oauth/social_login/oauth_authenticated'
-
-    return protocol + "://" + host + path
-
-
   @classmethod
-  def handleLoginRequest(self, request):
+  def handleLoginRequest(cls, request):
     assert oauth is not None
 
     redirect_uri = get_redirect_uri(request)
@@ -295,3 +285,13 @@ def find_or_create_user(username, password=None):
     user.is_superuser = True
     user.save()
   return user
+
+def get_redirect_uri(request):
+  # Either use the proxy-specified protocol or the one from the request itself.
+  # This is useful if the server is behind some kind of proxy
+  protocol = request.META.get("HTTP_X_FORWARDED_PROTO",
+                              request.META.get('wsgi.url_scheme', 'http'))
+  host = request.get_host()
+  path = '/oauth/social_login/oauth_authenticated'
+
+  return protocol + "://" + host + path
