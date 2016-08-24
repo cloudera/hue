@@ -24,6 +24,7 @@ import re
 import sys
 
 from boto.exception import S3ResponseError
+from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
@@ -74,10 +75,12 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       elif e.status == 404:
-        bucket = self._s3_connection.create_bucket(name, location=get_default_region())
+        bucket = self._s3_connection.create_bucket(name, location=self._get_location())
         self._bucket_cache[name] = bucket
+      elif e.status == 400:
+        raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
       else:
-        raise S3FileSystemException(e.message)
+        raise S3FileSystemException(e.reason)
     return bucket
 
   def _delete_bucket(self, name):
@@ -106,6 +109,13 @@ class S3FileSystem(object):
     except:
       e, exc, tb = sys.exc_info()
       raise ValueError(e)
+
+  def _get_location(self):
+    if get_default_region() in (Location.EU, Location.EUCentral1, Location.USWest, Location.USWest2, Location.SAEast,
+                                Location.APNortheast, Location.APSoutheast, Location.APSoutheast2, Location.CNNorth1):
+      return get_default_region()
+    else:
+      return Location.DEFAULT
 
   def _stats(self, path):
     if s3.is_root(path):
@@ -282,7 +292,12 @@ class S3FileSystem(object):
     bucket_name, key_name = s3.parse_uri(path)[:2]
     if not BUCKET_NAME_PATTERN.match(bucket_name):
       raise S3FileSystemException(_('Invalid bucket name: %s') % bucket_name)
-    self._get_or_create_bucket(bucket_name)
+
+    try:
+      self._get_or_create_bucket(bucket_name)
+    except S3ResponseError, e:
+      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e.reason))
+
     stats = self._stats(path)
     if stats:
       if stats.isDir:
