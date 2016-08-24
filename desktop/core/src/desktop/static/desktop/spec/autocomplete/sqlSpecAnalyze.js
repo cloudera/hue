@@ -252,5 +252,61 @@ define([
         });
       });
     });
+
+    describe('REFRESH', function () {
+      it('should handle "REFRESH db.tbl;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH db.tbl;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['REFRESH'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "REFRESH |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "REFRESH db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+    })
   });
 });

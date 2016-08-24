@@ -16,10 +16,12 @@
 
 DataDefinition
  : AnalyzeStatement
+ | RefreshStatement
  ;
 
 DataDefinition_EDIT
  : AnalyzeStatement_EDIT
+ | RefreshStatement_EDIT
  ;
 
 AnalyzeStatement
@@ -122,4 +124,20 @@ CacheMetadata_EDIT
 OptionalNoscan
  :
  | '<hive>NOSCAN'
+ ;
+
+RefreshStatement
+ : '<impala>REFRESH' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($2);
+   }
+ ;
+
+RefreshStatement_EDIT
+ : '<impala>REFRESH' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | '<impala>REFRESH' SchemaQualifiedTableIdentifier_EDIT
  ;
