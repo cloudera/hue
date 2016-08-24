@@ -1085,8 +1085,10 @@ from metadata.conf import has_navigator
         huePubSub.publish("assist.db.panel.ready");
 
         self.selectedSource.subscribe(function (newSource) {
-          if (newSource && newSource.databases().length === 0) {
-            newSource.initDatabases();
+          if (newSource) {
+            if (newSource.databases().length === 0) {
+              newSource.initDatabases();
+            }
             self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
           } else {
             self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
