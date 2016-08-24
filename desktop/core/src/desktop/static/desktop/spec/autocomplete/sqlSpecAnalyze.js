@@ -253,6 +253,88 @@ define([
       });
     });
 
+    describe('INVALIDATE METADATA', function () {
+      it('should handle "INVALIDATE METADATA;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE METADATA;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "INVALIDATE METADATA db.tbl;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE METADATA db.tbl;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['INVALIDATE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "INVALIDATE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['METADATA']
+          }
+        });
+      });
+
+      it('should suggest tables for "INVALIDATE METADATA |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE METADATA ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "INVALIDATE METADATA db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE METADATA db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+    });
+
     describe('REFRESH', function () {
       it('should handle "REFRESH db.tbl;|"', function() {
         assertAutoComplete({
@@ -307,6 +389,6 @@ define([
           }
         });
       });
-    })
+    });
   });
 });
