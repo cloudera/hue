@@ -18,12 +18,14 @@ DataDefinition
  : AnalyzeStatement
  | RefreshStatement
  | InvalidateStatement
+ | ComputeStatsStatement
  ;
 
 DataDefinition_EDIT
  : AnalyzeStatement_EDIT
  | RefreshStatement_EDIT
  | InvalidateStatement_EDIT
+ | ComputeStatsStatement_EDIT
  ;
 
 AnalyzeStatement
@@ -163,4 +165,54 @@ InvalidateStatement_EDIT
      suggestDatabases({ appendDot: true });
    }
  | '<impala>INVALIDATE' '<impala>METADATA' SchemaQualifiedTableIdentifier_EDIT
+ ;
+
+ComputeStatsStatement
+ : '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     addTablePrimary($4);
+   }
+ ;
+
+ComputeStatsStatement_EDIT
+ : '<impala>COMPUTE' 'CURSOR'
+   {
+     suggestKeywords(['STATS', 'INCREMENTAL STATS']);
+   }
+ | '<impala>COMPUTE' '<impala>STATS' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
+ | '<impala>COMPUTE' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     addTablePrimary($4);
+     suggestKeywords(['INCREMENTAL']);
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' 'CURSOR'
+   {
+     suggestKeywords(['STATS']);
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier 'CURSOR' OptionalPartitionSpec
+   {
+     addTablePrimary($4);
+     if (!$6) {
+       suggestKeywords(['PARTITION']);
+     }
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+   {
+     addTablePrimary($4);
+   }
  ;
