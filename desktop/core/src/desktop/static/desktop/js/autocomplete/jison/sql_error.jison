@@ -64,6 +64,10 @@ SelectList_ERROR_EDIT
    }
  ;
 
+SetSpecification
+ : 'SET' SetOption '=' error
+ ;
+
 ErrorList
  : error
  | Errors ',' error
