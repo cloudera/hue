@@ -619,6 +619,40 @@ define([
         });
       });
 
+      it('should handle "SELECT * FROM foo WHERE bar IN (1+1, 2+2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IN (1+1, 2+2);',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]}
+            ]
+          }
+        });
+      });
+
+      it('should handle "SELECT * FROM foo WHERE bar IN (id+1-1, id+1-2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IN (id+1-1, id+1-2);',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false,
+            locations: [
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 35 }, identifierChain: [{ name: 'foo' }, { name: 'id'}]},
+              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 43 }, identifierChain: [{ name: 'foo' }, { name: 'id'}]}
+            ]
+          }
+        });
+      });
+
       it('should handle "SELECT CASE cos(boo.a) > baa.boo \\n' +
         '\\tWHEN baa.b THEN true \\n' +
         '\\tWHEN boo.c THEN false \\n' +
