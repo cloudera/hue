@@ -1012,7 +1012,7 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, sqlFunctions, de
   var result;
   try {
     // Add |CURSOR| or |PARTIAL_CURSOR| to represent the different cursor states in the lexer
-    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /.*\s+$/.test(beforeCursor) ? ' \u2020 ' : '\u2021') + afterCursor);
+    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /[\s\(]$$/.test(beforeCursor) ? ' \u2020 ' : '\u2021') + afterCursor);
   } catch (err) {
     // On any error try to at least return any existing result
     if (typeof parser.yy.result === 'undefined') {

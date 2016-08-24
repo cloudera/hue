@@ -798,8 +798,6 @@ define([
         });
       });
 
-
-
       it('should suggest tables for "SELECT | FROM tableA;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
@@ -826,6 +824,48 @@ define([
             lowerCase: false,
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testWHERE' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT (bl|a AND boo FROM testWHERE"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT (bl',
+          afterCursor: ' AND boo FROM testWHERE',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testWHERE' }] }] }
+          }
+        });
+      });
+
+      // TODO: Parser can't handle multiple errors in a row, in this case 2 missing ')')
+      xit('should suggest columns for "SELECT ((| FROM testWHERE"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ((',
+          afterCursor: ' FROM testWHERE',
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testWHERE' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT (bla| AND boo FROM testWHERE"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT (bla',
+          afterCursor: ' AND boo FROM testWHERE',
+          hasLocations: true,
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testWHERE' }] }] }
           }
@@ -1929,41 +1969,41 @@ define([
 
       it('should suggest columns for "SELECT <GeneralSetFunction>(|) FROM testTable"', function () {
         var aggregateFunctions = [
-          { name: 'APPX_MEDIAN', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'AVG', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'AVG', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'AVG', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'collect_set', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'COLLECT_LIST', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'COUNT', dialect: 'generic', suggestKeywords: ['*', 'DISTINCT'] },
-          { name: 'COUNT', dialect: 'hive', suggestKeywords: ['*', 'DISTINCT'] },
-          { name: 'COUNT', dialect: 'impala', suggestKeywords: ['*', 'ALL', 'DISTINCT'] },
-          { name: 'GROUP_CONCAT', dialect: 'impala', suggestKeywords: ['ALL'], types: ['STRING'] },
-          { name: 'stddev', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'STDDEV_POP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'STDDEV_POP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'STDDEV_POP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'STDDEV_SAMP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'STDDEV_SAMP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'STDDEV_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'SUM', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'sum', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'SUM', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'MAX', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'MAX', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'max', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'MIN', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'MIN', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'MIN', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'VARIANCE', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'variance_pop', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'VARIANCE_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'VAR_POP', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'VAR_POP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'VAR_POP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] },
-          { name: 'var_samp', dialect: 'generic', suggestKeywords: ['DISTINCT'] },
-          { name: 'VAR_SAMP', dialect: 'hive', suggestKeywords: ['DISTINCT'] },
-          { name: 'VAR_SAMP', dialect: 'impala', suggestKeywords: ['ALL', 'DISTINCT'] }
+          { name: 'APPX_MEDIAN', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'AVG', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'AVG', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'AVG', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'collect_set', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'COLLECT_LIST', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'COUNT', dialect: 'generic', containsKeywords: ['*', 'DISTINCT'] },
+          { name: 'COUNT', dialect: 'hive', containsKeywords: ['*', 'DISTINCT'] },
+          { name: 'COUNT', dialect: 'impala', containsKeywords: ['*', 'ALL', 'DISTINCT'] },
+          { name: 'GROUP_CONCAT', dialect: 'impala', containsKeywords: ['ALL'], types: ['STRING'] },
+          { name: 'stddev', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_POP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'STDDEV_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'SUM', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'sum', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'SUM', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'MAX', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'MAX', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'max', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'MIN', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'MIN', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'MIN', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VARIANCE', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'variance_pop', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VARIANCE_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'VAR_POP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'var_samp', dialect: 'generic', containsKeywords: ['DISTINCT'] },
+          { name: 'VAR_SAMP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
+          { name: 'VAR_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] }
         ];
         aggregateFunctions.forEach(function (aggregateFunction) {
           if (aggregateFunction.name === 'COUNT') {
@@ -1972,10 +2012,11 @@ define([
               afterCursor: ') FROM testTable',
               dialect: aggregateFunction.dialect,
               hasLocations: true,
+              containsKeywords: aggregateFunction.containsKeywords.concat(['*', 'CASE']),
               expectedResult: {
                 lowerCase: false,
-                suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-                suggestKeywords: aggregateFunction.suggestKeywords || ['*']
+                suggestFunctions: {},
+                suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
               }
             });
           } else {
@@ -1984,14 +2025,12 @@ define([
               suggestFunctions: { types: aggregateFunction.types || ['T'] },
               suggestColumns: { types: aggregateFunction.types || ['T'], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             };
-            if (aggregateFunction.suggestKeywords) {
-              expectedResult.suggestKeywords = aggregateFunction.suggestKeywords
-            }
             assertAutoComplete({
               beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
               afterCursor: ') FROM testTable',
               dialect: aggregateFunction.dialect,
               hasLocations: true,
+              containsKeywords: aggregateFunction.containsKeywords.concat(['CASE']),
               expectedResult: expectedResult
             });
           }
@@ -2011,11 +2050,12 @@ define([
             afterCursor: ',col) FROM testTable',
             dialect: binaryFunction.dialect,
             hasLocations: true,
+            containsKeywords: ['DISTINCT', 'CASE'],
+            doesNotContainKeywords: ['ALL'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
-              suggestColumns: { types: ['T'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-              suggestKeywords: ['DISTINCT']
+              suggestColumns: { types: ['T'], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         })
@@ -2057,11 +2097,12 @@ define([
             afterCursor: ' FROM testTable',
             dialect: binaryFunction.dialect,
             hasLocations: true,
+            containsKeywords: ['CASE', 'DISTINCT'],
+            doesNotContainKeywords: ['ALL'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: { types: ['T'] },
-              suggestColumns: { types: ['T'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-              suggestKeywords: ['DISTINCT']
+              suggestColumns: { types: ['T'], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         })
@@ -6201,18 +6242,19 @@ define([
           afterCursor: ' AND testTable1.testColumn1 = testTable2.testColumn3',
           containsKeywords: ['CASE'],
           expectedResult: {
-            lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
-            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
-            suggestFunctions: {},
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, identifierChain: [{ name: 'testTable1' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 42, last_column: 52}, identifierChain: [{ name: 'testTable2' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 62, last_column: 84}, identifierChain: [{ name: 'testTable1' }, { name: 'testColumn1'}] },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 87, last_column: 109}, identifierChain: [{ name: 'testTable2' }, { name: 'testColumn3'}] }
-            ]
+            ],
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
+            suggestFunctions: {},
+            lowerCase: false
           }
         });
+
       });
 
     it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', function() {
