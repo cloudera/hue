@@ -219,10 +219,10 @@ ValueExpression_EDIT
 // ------------------  IN ------------------
 
 ValueExpression
- : ValueExpression 'NOT' 'IN' '(' TableSubQueryInner ')'  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'NOT' 'IN' '(' InValueList ')'         -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IN' '(' TableSubQueryInner ')'        -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IN' '(' InValueList ')'               -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression 'NOT' 'IN' '(' TableSubQueryInner ')'   -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'NOT' 'IN' '(' ValueExpressionList ')'  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IN' '(' TableSubQueryInner ')'         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IN' '(' ValueExpressionList ')'        -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpression_EDIT
@@ -248,15 +248,15 @@ ValueExpression_EDIT
      }
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | ValueExpression_EDIT 'NOT' 'IN' '(' InValueList RightParenthesisOrError         -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubQueryInner RightParenthesisOrError  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'IN' '(' InValueList RightParenthesisOrError               -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'IN' '(' TableSubQueryInner RightParenthesisOrError        -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'IN' '(' ValueExpressionList RightParenthesisOrError  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubQueryInner RightParenthesisOrError   -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'IN' '(' ValueExpressionList RightParenthesisOrError        -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'IN' '(' TableSubQueryInner RightParenthesisOrError         -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpressionInSecondPart_EDIT
  : '(' TableSubQueryInner_EDIT RightParenthesisOrError
- | '(' InValueList_EDIT RightParenthesisOrError         -> { inValueEdit: true }
+ | '(' ValueExpressionList_EDIT RightParenthesisOrError -> { inValueEdit: true }
  | '(' AnyCursor RightParenthesisOrError                -> { inValueEdit: true, cursorAtStart: true }
  ;
 
