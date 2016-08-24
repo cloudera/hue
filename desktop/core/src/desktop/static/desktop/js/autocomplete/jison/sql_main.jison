@@ -178,6 +178,7 @@ SqlStatements
  | DataDefinition
  | DataManipulation
  | QuerySpecification
+ | SetSpecification
  | ExplainClause DataDefinition
  | ExplainClause DataManipulation
  | ExplainClause QuerySpecification
@@ -220,6 +221,25 @@ SqlStatement_EDIT
  | ExplainClause_EDIT DataDefinition
  | ExplainClause_EDIT DataManipulation
  | ExplainClause_EDIT QuerySpecification
+ ;
+
+SetSpecification
+ : 'SET' SetOption '=' SetValue
+ ;
+
+SetOption
+ : RegularIdentifier
+ | SetOption AnyDot RegularIdentifier
+ ;
+
+SetValue
+ : RegularIdentifier
+ | SignedInteger
+ | SignedInteger RegularIdentifier
+ | QuotedValue
+ | 'TRUE'
+ | 'FALSE'
+ | 'NULL'
  ;
 
 ExplainClause
