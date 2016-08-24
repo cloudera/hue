@@ -93,6 +93,137 @@ define([
       });
     });
 
+    describe('DELETE FROM', function () {
+      it('should handle "DELETE FROM boo.baa;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM boo.baa;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DELETE FROM boo.baa WHERE id < 1 AND bla IN (SELECT * FROM boo);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM boo.baa WHERE id < 1 AND bla IN (SELECT * FROM boo);',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['DELETE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "DELETE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FROM']
+          }
+        });
+      });
+
+      it('should suggest tables for "DELETE FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "DELETE FROM db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM db.',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "DELETE FROM boo.baa |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM boo.baa ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['WHERE']
+          }
+        });
+      });
+
+      it('should suggest columns for "DELETE FROM boo.baa WHERE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM boo.baa WHERE ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          hasLocations: true,
+          containsKeywords: ['EXISTS'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "DELETE FROM boo.baa WHERE id > |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DELETE FROM boo.baa WHERE id > ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          hasLocations: true,
+          containsKeywords: ['EXISTS'],
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: true,
+            suggestFunctions: { types: ['COLREF'] },
+            colRef: { identifierChain: [{ name: 'boo'}, { name: 'baa' }, { name: 'id' }] },
+            suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
+          }
+        });
+      });
+    });
+
     describe('DROP DATABASE', function () {
       it('should suggest databases for "DROP DATABASE |"', function() {
         assertAutoComplete({

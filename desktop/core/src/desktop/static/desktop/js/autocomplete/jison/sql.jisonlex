@@ -39,6 +39,7 @@
 <hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
 <hive>'DATE'                               { return '<hive>DATE'; }
+<hive>'DELETE'                             { determineCase(yytext); return '<hive>DELETE'; }
 <hive>'DESCRIBE'                           { determineCase(yytext); return '<hive>DESCRIBE'; }
 <hive>'EXTENDED'                           { return '<hive>EXTENDED'; }
 <hive>'EXTERNAL'                           { return '<hive>EXTERNAL'; }
