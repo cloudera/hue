@@ -406,6 +406,156 @@ define([
       });
     });
 
+    describe('DROP STATS', function () {
+      it('should handle "DROP STATS bla.boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP STATS bla.boo;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "DROP INCREMENTAL STATS bla.boo PARTITION (a=1, b = 2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL STATS bla.boo PARTITION (a=1, b = 2);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['INCREMENTAL STATS', 'STATS'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "DROP STATS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP STATS ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "DROP STATS db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP STATS db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP INCREMENTAL |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['STATS']
+          }
+        });
+      });
+
+      it('should suggest tables for "DROP INCREMENTAL STATS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL STATS ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "DROP INCREMENTAL STATS db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP STATS db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP INCREMENTAL STATS db.tbl |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL STATS db.tbl ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION']
+          }
+        });
+      });
+
+      it('should suggest columns for "DROP INCREMENTAL STATS db.tbl PARTITION (|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL STATS db.tbl PARTITION (',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
+          }
+        });
+      });
+
+      it('should suggest columns for "DROP INCREMENTAL STATS db.tbl PARTITION (bla = 1, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
+          }
+        });
+      });
+    });
+
     describe('DROP TABLE', function () {
       it('should suggest tables for "DROP TABLE |"', function() {
         assertAutoComplete({

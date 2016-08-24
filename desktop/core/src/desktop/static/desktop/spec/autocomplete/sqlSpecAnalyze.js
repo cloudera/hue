@@ -253,6 +253,183 @@ define([
       });
     });
 
+    describe('COMPUTE STATS', function () {
+      it('should handle "COMPUTE STATS bla.boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS bla.boo;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "COMPUTE INCREMENTAL STATS bla.boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS bla.boo;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "COMPUTE INCREMENTAL STATS bla.boo PARTITION (a=1, b = 2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS bla.boo PARTITION (a=1, b = 2);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['COMPUTE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['INCREMENTAL STATS', 'STATS']
+          }
+        });
+      });
+
+      it('should suggest tables for "COMPUTE STATS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "COMPUTE STATS db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE INCREMENTAL |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['STATS']
+          }
+        });
+      });
+
+      it('should suggest tables for "COMPUTE INCREMENTAL STATS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "COMPUTE INCREMENTAL STATS db.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE STATS db.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE INCREMENTAL STATS db.tbl |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION']
+          }
+        });
+      });
+
+      it('should suggest columns for "COMPUTE INCREMENTAL STATS db.tbl PARTITION (|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
+          }
+        });
+      });
+
+      it('should suggest columns for "COMPUTE INCREMENTAL STATS db.tbl PARTITION (bla = 1, |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
+          afterCursor: '',
+          dialect: 'impala',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
+          }
+        });
+      });
+    });
+
     describe('INVALIDATE METADATA', function () {
       it('should handle "INVALIDATE METADATA;|"', function() {
         assertAutoComplete({

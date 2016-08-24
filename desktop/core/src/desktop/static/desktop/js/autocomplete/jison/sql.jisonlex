@@ -181,6 +181,7 @@
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
 <impala>'COLUMNS'                          { return '<impala>COLUMNS'; }
 <impala>'COMMENT'                          { return '<impala>COMMENT'; }
+<impala>'COMPUTE'                          { determineCase(yytext); return '<impala>COMPUTE'; }
 <impala>'CREATE'                           { determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
