@@ -219,6 +219,7 @@
 <impala>'PREPARE_FN'                       { return '<impala>PREPARE_FN'; }
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
+<impala>'REFRESH'                          { determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
