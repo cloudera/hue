@@ -26,6 +26,7 @@ DropStatement
  : DropDatabaseStatement
  | DropFunctionStatement
  | DropRoleStatement
+ | DropStatsStatement
  | DropTableStatement
  | DropIndexStatement
  | DropMacroStatement
@@ -36,6 +37,7 @@ DropStatement
 DropStatement_EDIT
  : DropDatabaseStatement_EDIT
  | DropFunctionStatement_EDIT
+ | DropStatsStatement_EDIT
  | DropTableStatement_EDIT
  | DropIndexStatement_EDIT
  | DropMacroStatement_EDIT
@@ -165,6 +167,56 @@ DropHiveFunction_EDIT
 
 DropRoleStatement
  : 'DROP' AnyRole RegularIdentifier
+ ;
+
+DropStatsStatement
+ : 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
+   {
+     addTablePrimary($4);
+   }
+ ;
+
+DropStatsStatement_EDIT
+ : 'DROP' '<impala>STATS' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($4);
+     suggestKeywords(['INCREMENTAL']);
+   }
+ | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
+   {
+     addTablePrimary($4);
+     suggestKeywords(['INCREMENTAL']);
+   }
+ | 'DROP' '<impala>INCREMENTAL' 'CURSOR'
+   {
+     suggestKeywords(['STATS']);
+   }
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT PartitionSpec
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier 'CURSOR'
+   {
+     addTablePrimary($4);
+     suggestKeywords(['PARTITION']);
+   }
+ | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+   {
+     addTablePrimary($4);
+   }
  ;
 
 DropTableStatement

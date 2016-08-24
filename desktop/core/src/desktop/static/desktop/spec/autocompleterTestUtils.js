@@ -141,7 +141,7 @@ define([
       }
     },
     assertAutocomplete: function(testDefinition) {
-      var debug = false;
+      var debug = true;
       if (typeof testDefinition.dialect === 'undefined') {
         expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, sqlFunctions, debug)).toEqualDefinition(testDefinition);
         testDefinition.dialect = 'hive';
