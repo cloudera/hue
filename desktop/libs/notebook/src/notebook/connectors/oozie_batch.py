@@ -47,6 +47,7 @@ class OozieApi(Api):
   LOG_END_PATTERN = '<<< Invocation of Main class completed <<<'
   RESULTS_PATTERN = "(?P<results>>>> Invoking Beeline command line now >>>.+<<< Invocation of Beeline command completed <<<)"
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
+  RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
 
   def __init__(self, *args, **kwargs):
     Api.__init__(self, *args, **kwargs)
@@ -192,7 +193,12 @@ class OozieApi(Api):
   def _get_results(self, log_output, action_type):
     results = ''
 
-    pattern = self.RESULTS_PATTERN if action_type == 'hive' else self.RESULTS_PATTERN_GENERIC
+    if action_type == 'hive':
+      pattern = self.RESULTS_PATTERN
+    elif action_type == 'pig':
+      pattern = self.RESULTS_PATTERN_PIG
+    else:
+      pattern = self.RESULTS_PATTERN_GENERIC
 
     re_results = re.compile(pattern, re.M | re.DOTALL)
     if re_results.search(log_output):

@@ -91,7 +91,6 @@ def get_api(request, snippet):
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
   from notebook.connectors.oozie_batch import OozieApi
-  from notebook.connectors.pig_batch import PigApi
   from notebook.connectors.solr import SolrApi
   from notebook.connectors.spark_shell import SparkApi
   from notebook.connectors.spark_batch import SparkBatchApi
@@ -123,7 +122,7 @@ def get_api(request, snippet):
   elif interface == 'solr':
     return SolrApi(request.user, interpreter=interpreter)
   elif interface == 'pig':
-    return PigApi(user=request.user, request=request)
+    return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
   else:
     raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 

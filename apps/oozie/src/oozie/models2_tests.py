@@ -1012,6 +1012,18 @@ class TestModelAPI(OozieMockBase):
     assert_equal(len(_data['workflow']['nodes']), 4)
 
 
+  def test_gen_pig_document(self):
+    notebook = make_notebook(name='Browse', editor_type='pig', statement='ls', status='ready')
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
+
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True)
+
+    workflow = Workflow(document=workflow_doc, user=self.user)
+
+    _data = workflow.get_data()
+    assert_equal(len(_data['workflow']['nodes']), 5)
+
+
   def test_gen_workflow_from_notebook(self):
     snippets = [
       {
