@@ -99,7 +99,7 @@ ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
   type=bool,
-  dynamic_default=is_oozie_enabled
+  default=False
 )
 
 ENABLE_BATCH_EXECUTE = Config(
