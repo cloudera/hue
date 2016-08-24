@@ -4071,14 +4071,26 @@ var prioritizeSuggestions = function () {
     delete parser.yy.result.suggestDatabases;
   }
   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-    if (typeof parser.yy.result.suggestColumns.tables === 'undefined' || parser.yy.result.suggestColumns.tables.length === 0) {
-      delete parser.yy.result.suggestColumns;
-      delete parser.yy.result.subQueries;
+    var suggestColumns = parser.yy.result.suggestColumns;
+    if (typeof suggestColumns.tables === 'undefined' || suggestColumns.tables.length === 0) {
+      // Impala supports statements like SELECT * FROM tbl1, tbl2 WHERE db.tbl1.col = tbl2.bla
+      if (isImpala() && typeof suggestColumns.identifierChain !== 'undefined' && suggestColumns.identifierChain.length > 0) {
+        if (suggestColumns.identifierChain.length === 1) {
+          parser.yy.result.suggestTables = suggestColumns;
+          delete parser.yy.result.suggestColumns
+        } else {
+          suggestColumns.tables = [{ identifierChain: suggestColumns.identifierChain }];
+          delete suggestColumns.identifierChain;
+        }
+      } else {
+        delete parser.yy.result.suggestColumns;
+        delete parser.yy.result.subQueries;
+      }
     } else {
       delete parser.yy.result.suggestTables;
       delete parser.yy.result.suggestDatabases;
-      if (typeof parser.yy.result.suggestColumns.identifierChain !== 'undefined') {
-        delete parser.yy.result.suggestColumns.identifierChain;
+      if (typeof suggestColumns.identifierChain !== 'undefined') {
+        delete suggestColumns.identifierChain;
       }
     }
   } else {
@@ -4226,7 +4238,7 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
     var tables = [];
     tablePrimaries.forEach(function (tablePrimary) {
       if (tablePrimary.subQueryAlias) {
-        tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]})
+        tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]});
       } else {
         tables.push({ identifierChain: tablePrimary.identifierChain });
       }
@@ -4276,6 +4288,11 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
       } else if (!foundPrimary && tablePrimaries[i].identifierChain[0].name === identifierChain[0].name) {
         foundPrimary = tablePrimaries[i];
         // No break as first two can still match.
+      } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1
+          && tablePrimaries[i].identifierChain[tablePrimaries[i].identifierChain.length - 1].name === identifierChain[0].name) {
+        // This is for the case SELECT baa. FROM bla.baa, blo.boo;
+        foundPrimary = tablePrimaries[i];
+        break;
       }
     }
     if (foundPrimary) {
@@ -4350,28 +4367,37 @@ var filterTablePrimariesForOwner = function (owner) {
 
 var convertTablePrimariesToSuggestions = function (tablePrimaries) {
   var tables = [];
-  var impalaIdentifiers = [];
+  var identifiers = [];
   tablePrimaries.forEach(function (tablePrimary) {
     if (tablePrimary.identifierChain && tablePrimary.identifierChain.length > 0) {
       var table = { identifierChain: tablePrimary.identifierChain };
       if (tablePrimary.alias) {
         table.alias = tablePrimary.alias;
+        identifiers.push({ name: table.alias + '.', type: 'alias' });
         if (isImpala()) {
           var testForImpalaAlias = [{ name: table.alias }];
           var result = parser.expandImpalaIdentifierChain(tablePrimaries, testForImpalaAlias);
           if (result.length > 1) {
-            impalaIdentifiers.push({ name: table.alias + '.', type: 'alias' });
+            // Continue if it's a reference to a complex type
             return;
           }
+        }
+      } else {
+        var lastIdentifier = tablePrimary.identifierChain[tablePrimary.identifierChain.length - 1];
+        if (typeof lastIdentifier.name !== 'undefined') {
+          identifiers.push({ name: lastIdentifier.name + '.', type: 'table' });
+        } else if (typeof lastIdentifier.subQuery !== 'undefined') {
+          identifiers.push({ name: lastIdentifier.subQuery + '.', type: 'sub-query' });
         }
       }
       tables.push(table);
     } else if (tablePrimary.subQueryAlias) {
+      identifiers.push({ name: tablePrimary.subQueryAlias + '.', type: 'sub-query' });
       tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }] });
     }
   });
-  if (impalaIdentifiers.length > 0) {
-    parser.yy.result.suggestIdentifiers = impalaIdentifiers;
+  if (identifiers.length > 0) {
+    parser.yy.result.suggestIdentifiers = identifiers;
   }
   parser.yy.result.suggestColumns.tables = tables;
   if (parser.yy.result.suggestColumns.identifierChain && parser.yy.result.suggestColumns.identifierChain.length == 0) {
