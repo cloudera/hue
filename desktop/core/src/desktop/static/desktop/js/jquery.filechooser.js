@@ -402,7 +402,10 @@
       },
       onComplete: function (id, fileName, responseJSON) {
         num_of_pending_uploads--;
-        if (num_of_pending_uploads == 0) {
+        if (responseJSON.status == -1) {
+          $(document).trigger("error", responseJSON.data);
+        }
+        else if (num_of_pending_uploads == 0) {
           _parent.navigateTo(path);
         }
       },
