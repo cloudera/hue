@@ -3066,13 +3066,13 @@ CountFunction
 CountFunction_EDIT
  : 'COUNT' '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
-     suggestColumns();
+     valueExpressionSuggest();
      if (!$3) {
-       if (isImpala()) {
-         suggestKeywords([{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT']);
-       } else {
-         suggestKeywords([{ value: '*', weight: 1000 }, 'DISTINCT']);
+       var keywords = isImpala() ? [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 1000 }, 'DISTINCT'];
+       if (parser.yy.result.suggestKeywords) {
+         keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
+       suggestKeywords(keywords);
      }
      $$ = { types: findReturnTypes($1) };
    }
@@ -3102,16 +3102,20 @@ OtherAggregateFunction
 OtherAggregateFunction_EDIT
  : OtherAggregateFunction_Type '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
-     suggestFunctions();
-     suggestColumns();
+     valueExpressionSuggest();
      if (!$3) {
+       var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
-         suggestKeywords(['ALL' ]);
+         keywords = ['ALL'];
        } else if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
+         keywords = ['ALL', 'DISTINCT'];
        } else {
-         suggestKeywords(['DISTINCT']);
+         keywords = ['DISTINCT'];
        }
+       if (parser.yy.result.suggestKeywords) {
+         keywords = parser.yy.result.suggestKeywords.concat(keywords);
+       }
+       suggestKeywords(keywords);
      }
      applyArgumentTypesToSuggestions($1, 1);
      $$ = { types: findReturnTypes($1) };
@@ -3124,13 +3128,18 @@ OtherAggregateFunction_EDIT
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart && !$3) {
+       var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
-         suggestKeywords(['ALL' ]);
+         keywords = ['ALL'];
        } else if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
+         keywords = ['ALL', 'DISTINCT'];
        } else {
-         suggestKeywords(['DISTINCT']);
+         keywords = ['DISTINCT'];
        }
+       if (parser.yy.result.suggestKeywords) {
+         keywords = parser.yy.result.suggestKeywords.concat(keywords);
+       }
+       suggestKeywords(keywords);
      }
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
        applyArgumentTypesToSuggestions($1, $4.position);
@@ -3261,11 +3270,11 @@ SumFunction_EDIT
      valueExpressionSuggest();
      applyArgumentTypesToSuggestions($1, 1);
      if (!$3) {
-       if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
-       } else {
-         suggestKeywords(['DISTINCT']);
+       var keywords = isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
+       if (parser.yy.result.suggestKeywords) {
+         keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
+       suggestKeywords(keywords);
      }
      $$ = { types: findReturnTypes($1) };
    }
