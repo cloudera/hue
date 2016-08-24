@@ -2656,7 +2656,7 @@ body {
 
 .stats-popover-name {
   max-width: 440px;
-  overflow-x: hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 

@@ -230,6 +230,12 @@ from desktop.views import _ko
               lastOffset.top = Math.min(Math.max(lastOffset.top, 10), $(window).height() - $popover.outerHeight());
               self.popoverTop(lastOffset.top);
               self.popoverLeft(lastOffset.left);
+              var $t = $('.samples-table');
+              if ($t.data('plugin_jHueTableExtender')) {
+                $t.data('plugin_jHueTableExtender').drawHeader();
+                $t.data('plugin_jHueTableExtender').drawFirstColumn();
+              }
+              $t.parents('.dataTables_wrapper').getNiceScroll().resize();
               if (self.popoverArrowTop() < 80) {
                 $popover.hide();
               } else {
@@ -307,7 +313,7 @@ from desktop.views import _ko
                       forceInvisible: 10
                     });
 
-                    $t.parents('.dataTables_wrapper').jHueTableScroller().height(350);
+                    $t.parents('.dataTables_wrapper').height(350);
                     $t.jHueTableExtender({
                       fixedHeader: true,
                       fixedFirstColumn: true,
@@ -316,7 +322,7 @@ from desktop.views import _ko
                       includeNavigator: false,
                       parentId: 'sampleTab',
                       classToRemove: 'samples-table',
-                      clonedContainerPosition: "absolute"
+                      clonedContainerPosition: 'fixed'
                     });
 
                     $t.parents('.dataTables_wrapper').niceScroll({
