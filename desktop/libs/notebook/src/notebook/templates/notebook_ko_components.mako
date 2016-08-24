@@ -164,7 +164,7 @@ except ImportError, e:
 
 <%def name="downloadSnippetResults()">
   <script type="text/html" id="download-results-template">
-    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
+    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline" target="_blank">
       ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="notebook"/>
       <input type="hidden" name="snippet"/>
