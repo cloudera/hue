@@ -22,6 +22,14 @@ DataDefinition_EDIT
  : DropStatement_EDIT
  ;
 
+DataManipulation
+ : DeleteStatement
+ ;
+
+DataManipulation_EDIT
+ : DeleteStatement_EDIT
+ ;
+
 DropStatement
  : DropDatabaseStatement
  | DropFunctionStatement
@@ -359,6 +367,37 @@ TruncateTableStatement_EDIT
      }
    }
  | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+   {
+     addTablePrimary($3);
+   }
+ ;
+
+DeleteStatement
+ : '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier OptionalWhereClause
+   {
+     addTablePrimary($3);
+   }
+ ;
+
+DeleteStatement_EDIT
+ : '<hive>DELETE' 'CURSOR'
+   {
+     suggestKeywords(['FROM']);
+   }
+ | '<hive>DELETE' 'FROM' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier 'CURSOR' OptionalWhereClause
+   {
+     addTablePrimary($3);
+     if (!$5) {
+       suggestKeywords(['WHERE']);
+     }
+   }
+ | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier_EDIT OptionalWhereClause
+ | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier WhereClause_EDIT
    {
      addTablePrimary($3);
    }
