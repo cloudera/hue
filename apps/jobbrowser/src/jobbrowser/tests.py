@@ -18,6 +18,7 @@
 
 import json
 import logging
+import Queue
 import re
 import time
 import unittest
@@ -386,10 +387,9 @@ class TestMapReduce2NoHadoop:
 
   def setUp(self):
     # Beware: Monkey patching
-    if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
-      rm_pool = resource_manager_api.get_resource_manager_pool()
-      resource_manager_api.old_get_resource_manager = rm_pool.get("test2")
-    if not hasattr(resource_manager_api, 'old_get_mapreduce_api'):
+    if not hasattr(resource_manager_api, 'old_get_resource_manager_pool'):
+      resource_manager_api.old_get_resource_manager_pool = resource_manager_api.get_resource_manager_pool
+    if not hasattr(mapreduce_api, 'old_get_mapreduce_api'):
       mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
     if not hasattr(history_server_api, 'old_get_history_server_api'):
       history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
@@ -402,7 +402,7 @@ class TestMapReduce2NoHadoop:
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
 
-    resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
+    resource_manager_api.get_resource_manager_pool = lambda: MockResourceManagerApiPool()
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
 
@@ -414,9 +414,7 @@ class TestMapReduce2NoHadoop:
 
 
   def tearDown(self):
-    resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
-    rm_pool = resource_manager_api.get_resource_manager_pool()
-    rm_pool.put(resource_manager_api.get_resource_manager)
+    resource_manager_api.get_resource_manager_pool = getattr(resource_manager_api, 'old_get_resource_manager_pool')
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
 
@@ -501,6 +499,22 @@ class TestMapReduce2NoHadoop:
     finally:
       MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
 
+class MockResourceManagerApiPool:
+
+  def __init__(self):
+    pool_size = 10
+    self.rmobj_pool = Queue.LifoQueue()
+    for i in range(pool_size):
+      rm_instance = MockResourceManagerApi()
+      self.rmobj_pool.put(rm_instance)
+
+  def get(self, user):
+    rmobj = self.rmobj_pool.get()
+    rmobj.setuser(user)
+    return rmobj
+
+  def put(self, rmobj):
+    self.rmobj_pool.put(rmobj)
 
 class MockResourceManagerApi:
   APPS = {
@@ -603,7 +617,7 @@ class MockResourceManagerApi:
     },
   }
 
-  def __init__(self, user, rm_url=None): pass
+  def __init__(self, rm_url=None): pass
 
   def apps(self, **kwargs):
     return {
@@ -626,6 +640,17 @@ class MockResourceManagerApi:
       u'app': MockResourceManagerApi.APPS[job_id]
     }
 
+  def setuser(self, user):
+    self.user = user
+    return user
+
+  @property
+  def user(self):
+    return self.username
+
+  @property
+  def username(self):
+    return self.user.username
 
 class MockMapreduce2Api(object):
   """
