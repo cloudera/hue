@@ -5779,7 +5779,7 @@ define([
         });
       });
 
-      xit('should suggest keywords for "SELECT * FROM boo |, baa', function () {
+      it('should suggest keywords for "SELECT * FROM boo |, baa', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM boo ',
           afterCursor: ', baa',

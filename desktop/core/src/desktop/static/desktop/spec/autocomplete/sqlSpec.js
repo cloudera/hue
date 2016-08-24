@@ -404,7 +404,7 @@ define([
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
+            suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
               'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
