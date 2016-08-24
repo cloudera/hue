@@ -17,11 +17,13 @@
 DataDefinition
  : AnalyzeStatement
  | RefreshStatement
+ | InvalidateStatement
  ;
 
 DataDefinition_EDIT
  : AnalyzeStatement_EDIT
  | RefreshStatement_EDIT
+ | InvalidateStatement_EDIT
  ;
 
 AnalyzeStatement
@@ -140,4 +142,25 @@ RefreshStatement_EDIT
      suggestDatabases({ appendDot: true });
    }
  | '<impala>REFRESH' SchemaQualifiedTableIdentifier_EDIT
+ ;
+
+InvalidateStatement
+ : '<impala>INVALIDATE' '<impala>METADATA'
+ | '<impala>INVALIDATE' '<impala>METADATA' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+   }
+ ;
+
+InvalidateStatement_EDIT
+ : '<impala>INVALIDATE' 'CURSOR'
+   {
+     suggestKeywords(['METADATA']);
+   }
+ | '<impala>INVALIDATE' '<impala>METADATA' 'CURSOR'
+   {
+     suggestTables();
+     suggestDatabases({ appendDot: true });
+   }
+ | '<impala>INVALIDATE' '<impala>METADATA' SchemaQualifiedTableIdentifier_EDIT
  ;

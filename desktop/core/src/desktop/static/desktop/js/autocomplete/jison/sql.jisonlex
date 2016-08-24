@@ -202,6 +202,7 @@
 <impala>'INSERT'                           { determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
+<impala>'INVALIDATE'                       { determineCase(yytext); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
@@ -210,6 +211,7 @@
 <impala>'LOAD'                             { determineCase(yytext); return '<impala>LOAD'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
+<impala>'METADATA'                         { return '<impala>METADATA'; }
 <impala>'NULLS'                            { return '<impala>NULLS'; }
 <impala>'OFFSET'                           { return '<impala>OFFSET'; }
 <impala>'OVERWRITE'                        { return '<impala>OVERWRITE'; }
