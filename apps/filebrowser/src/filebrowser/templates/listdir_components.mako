@@ -624,7 +624,7 @@ from django.utils.translation import ugettext as _
 
               if (destpath) {
                 $('#moveDestination').val(destpath);
-                viewModel.move('nomodal');
+                viewModel.move('nomodal', _dragged);
               }
             }
           };
@@ -1194,7 +1194,7 @@ from django.utils.translation import ugettext as _
         });
       };
 
-      self.move = function (mode) {
+      self.move = function (mode, unselectedDrag) {
         var paths = [];
 
         var isMoveOnSelf = false;
@@ -1204,6 +1204,10 @@ from django.utils.translation import ugettext as _
           }
           paths.push(file.path);
         });
+
+        if (paths.length == 0 && typeof unselectedDrag !== 'undefined'){
+          paths.push(_dragged.path);
+        }
 
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
@@ -1579,7 +1583,9 @@ from django.utils.translation import ugettext as _
       // Place all values into hidden fields under parent element.
       // Looks for managed hidden fields and handles sizing appropriately.
       var hiddenFields = function (parentEl, name, values) {
-        parentEl = $(parentEl);
+        if (!(parentEl instanceof jQuery)){
+          parentEl = $(parentEl);
+        }
         parentEl.find("input.hidden-field").remove();
 
         $(values).each(function (index, value) {
