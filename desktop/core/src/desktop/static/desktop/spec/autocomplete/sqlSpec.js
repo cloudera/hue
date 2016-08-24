@@ -322,6 +322,80 @@ define([
       });
     });
 
+    describe('SET', function () {
+      it('should handle "set hive.exec.compress.output=true;|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set hive.exec.compress.output=true;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should handle "set bla.bla="ble";|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set bla.bla="ble";',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should handle "set bla.bla=\'ble\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set bla.bla=\'ble\';',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should handle "set mem_limit=64g;|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set mem_limit=64g;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should handle "set DISABLE_UNSAFE_SPILLS=true;|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set DISABLE_UNSAFE_SPILLS=true;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
+      it('should handle "set RESERVATION_REQUEST_TIMEOUT=900000;|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'set RESERVATION_REQUEST_TIMEOUT=900000;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+    });
+
     describe('Impala specific', function () {
       it('should suggest keywords for "|"', function() {
         assertAutoComplete({
