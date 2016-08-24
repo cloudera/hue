@@ -49,10 +49,6 @@ class Client(object):
       region=conf.REGION.get()
     )
 
-  @property
-  def region(self):
-    return self._region
-
   def get_s3_connection(self):
     connection = boto.s3.connect_to_region(self._region,
                                            aws_access_key_id=self._access_key_id,
