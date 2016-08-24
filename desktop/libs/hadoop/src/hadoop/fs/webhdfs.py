@@ -571,7 +571,13 @@ class WebHdfs(Hdfs):
     params = self._getparams()
     params['op'] = 'CHECKACCESS'
     params['fsaction'] = aclspec
-    return self._root.get(path, params)
+
+    try:
+      return self._root.get(path, params)
+    except WebHdfsException, ex:
+      if ex.code == 500:
+        LOG.warn('Failed to check access to path %s, CHECKACCESS operation may not be supported.' % path)
+      return None
 
 
   def copyfile(self, src, dst, skip_header=False):
