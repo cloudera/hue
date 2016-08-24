@@ -1,0 +1,268 @@
+
+/* ---------------------------------------------------------------------------
+   Hue Docs styles
+--------------------------------------------------------------------------- */
+
+body {
+  background-color: #FFFFFF;
+  border-top: 3px solid #287DBD;
+  padding: 30px;
+  font-family: 'Open Sans',sans-serif;
+  color: #333333;
+  margin:0;
+  line-height: 1.1em;
+}
+
+hr {
+    border-color: #EEEEEE -moz-use-text-color #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+    border-top: 1px solid #CCCCCC;
+    border-image: none;
+    border-left: 0 none;
+    border-right: 0 none;
+    margin: 20px 0;
+}
+
+.section {
+    border: 1px solid #EEEEEE;
+    box-shadow: none;
+    color: #333333;
+    margin-bottom: 20px;
+    margin-top: 15px;
+    padding: 20px;
+    padding-top: 5px;
+    position: relative;
+}
+
+.title, h1, .toc p, h2 {
+    color: #338BB8;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+h2 {
+  font-size: 20px;
+  margin-top: 24px;
+}
+
+a:link, a:visited {
+    color: #338BB8;
+    text-decoration: none;
+}
+a:hover {
+    color: #3799CA;
+    text-decoration: underline;
+}
+
+.table {
+  margin-top: 20px;
+}
+
+table {
+  border: none!important;
+}
+
+table {
+  max-width: 100%;
+  background-color: transparent;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+table th,
+table td {
+  padding: 8px;
+  line-height: 20px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid #e5e5e5;
+}
+
+table th {
+  font-weight: bold;
+}
+
+table thead th {
+  vertical-align: bottom;
+}
+
+table caption + thead tr:first-child th,
+table caption + thead tr:first-child td,
+table colgroup + thead tr:first-child th,
+table colgroup + thead tr:first-child td,
+table thead:first-child tr:first-child th,
+table thead:first-child tr:first-child td {
+  border-top: 0;
+}
+
+table tbody + tbody {
+  border-top: 2px solid #e5e5e5;
+}
+
+table {
+  background-color: #f1f1f1;
+}
+
+table {
+  border: 1px solid #e5e5e5;
+  border-collapse: separate;
+  *border-collapse: collapse;
+  border-left: 0;
+  -webkit-border-radius: 2px;
+     -moz-border-radius: 2px;
+          border-radius: 2px;
+}
+
+table th,
+table td {
+  border-left: 1px solid #e5e5e5;
+  border-bottom: 1px solid #FFFFFF!important;
+}
+
+table caption + thead tr:first-child th,
+table caption + tbody tr:first-child th,
+table caption + tbody tr:first-child td,
+table colgroup + thead tr:first-child th,
+table colgroup + tbody tr:first-child th,
+table colgroup + tbody tr:first-child td,
+table thead:first-child tr:first-child th,
+table tbody:first-child tr:first-child th,
+table tbody:first-child tr:first-child td {
+  border-top: 0;
+}
+
+table thead:first-child tr:first-child > th:first-child,
+table tbody:first-child tr:first-child > td:first-child,
+table tbody:first-child tr:first-child > th:first-child {
+  -webkit-border-top-left-radius: 2px;
+          border-top-left-radius: 2px;
+  -moz-border-radius-topleft: 2px;
+}
+
+table thead:first-child tr:first-child > th:last-child,
+table tbody:first-child tr:first-child > td:last-child,
+table tbody:first-child tr:first-child > th:last-child {
+  -webkit-border-top-right-radius: 2px;
+          border-top-right-radius: 2px;
+  -moz-border-radius-topright: 2px;
+}
+
+table thead:last-child tr:last-child > th:first-child,
+table tbody:last-child tr:last-child > td:first-child,
+table tbody:last-child tr:last-child > th:first-child,
+table tfoot:last-child tr:last-child > td:first-child,
+table tfoot:last-child tr:last-child > th:first-child {
+  -webkit-border-bottom-left-radius: 2px;
+          border-bottom-left-radius: 2px;
+  -moz-border-radius-bottomleft: 2px;
+}
+
+table thead:last-child tr:last-child > th:last-child,
+table tbody:last-child tr:last-child > td:last-child,
+table tbody:last-child tr:last-child > th:last-child,
+table tfoot:last-child tr:last-child > td:last-child,
+table tfoot:last-child tr:last-child > th:last-child {
+  -webkit-border-bottom-right-radius: 2px;
+          border-bottom-right-radius: 2px;
+  -moz-border-radius-bottomright: 2px;
+}
+
+table tfoot + tbody:last-child tr:last-child td:first-child {
+  -webkit-border-bottom-left-radius: 0;
+          border-bottom-left-radius: 0;
+  -moz-border-radius-bottomleft: 0;
+}
+
+table tfoot + tbody:last-child tr:last-child td:last-child {
+  -webkit-border-bottom-right-radius: 0;
+          border-bottom-right-radius: 0;
+  -moz-border-radius-bottomright: 0;
+}
+
+table caption + thead tr:first-child th:first-child,
+table caption + tbody tr:first-child td:first-child,
+table colgroup + thead tr:first-child th:first-child,
+table colgroup + tbody tr:first-child td:first-child {
+  -webkit-border-top-left-radius: 2px;
+          border-top-left-radius: 2px;
+  -moz-border-radius-topleft: 2px;
+}
+
+table caption + thead tr:first-child th:last-child,
+table caption + tbody tr:first-child td:last-child,
+table colgroup + thead tr:first-child th:last-child,
+table colgroup + tbody tr:first-child td:last-child {
+  -webkit-border-top-right-radius: 2px;
+          border-top-right-radius: 2px;
+  -moz-border-radius-topright: 2px;
+}
+
+table tbody > tr:nth-child(odd) > td,
+table tbody > tr:nth-child(odd) > th {
+  background-color: #f9f9f9;
+}
+
+table tbody tr:hover > td,
+table tbody tr:hover > th {
+  background-color: #ffffff;
+}
+
+code,
+pre {
+  padding: 0 3px 2px;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size: 11px;
+  color: #444444;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+}
+
+code {
+  padding: 2px 4px;
+  color: #d14;
+  white-space: pre-line;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 14px;
+  font-size: 12px;
+  line-height: 20px;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre;
+  white-space: pre-wrap;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 2px;
+     -moz-border-radius: 2px;
+          border-radius: 2px;
+}
+
+.toc .section {
+  border: none;
+}
+
+.toc {
+  background-color: #F6F6F6;
+  padding: 10px;
+}
+
+.note {
+  background-color: #fcf8e3;
+  border: 1px solid #fbeed5;
+  border-left-width: 5px;
+  padding: 10px;
+}
