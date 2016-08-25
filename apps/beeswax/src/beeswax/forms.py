@@ -267,6 +267,9 @@ class CreateTableForm(DependencyAwareForm):
   use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location."))
   external_location = forms.CharField(required=False, help_text=_t("Path to HDFS directory or file of table data."))
 
+  # Table Properties
+  skip_header = forms.BooleanField(required=False, initial=False, label=_t("Use header row for column names?"))
+
   dependencies += [
     ("use_default_location", False, "external_location")
   ]
