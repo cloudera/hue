@@ -56,7 +56,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document, Document2, get_data_link, _version_from_properties, HUE_VERSION
+from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home
@@ -894,6 +894,29 @@ class TestDocument(object):
     assert_true(Document.objects.filter(name='Test Document').exists())
     assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
     assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
+
+  def test_document_trashed(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+    test_dir, created = Directory.objects.get_or_create(
+          parent_directory=home_dir,
+          owner=self.user,
+          name='test_dir'
+        )
+    test_doc = Document2.objects.create(name='Test Document2',
+                                              type='search-dashboard',
+                                              owner=self.user,
+                                              description='Test Document2',
+                                              parent_directory=test_dir)
+
+    assert_false(test_dir.is_trashed)
+    assert_false(test_doc.is_trashed)
+
+    test_dir.trash()
+    assert_true(test_doc.is_trashed)
+    assert_true(test_dir.is_trashed)
+
+    test_doc.delete()
+    test_dir.delete()
 
   def test_document_copy(self):
     name = 'Test Document2 Copy'

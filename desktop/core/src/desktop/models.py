@@ -1072,6 +1072,11 @@ class Document2(models.Model):
     return self.type == 'directory'
 
   @property
+  def is_trashed(self):
+    dirs = self.path.split('/')
+    return len(dirs) > 1 and dirs[1] == '.Trash'
+
+  @property
   def is_home_directory(self):
     return self.is_directory and self.parent_directory == None and self.name == self.HOME_DIR
 
