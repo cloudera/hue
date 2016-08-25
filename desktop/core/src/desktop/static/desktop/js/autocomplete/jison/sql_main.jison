@@ -2158,6 +2158,12 @@ SelectSubList
 
 SelectSubList_EDIT
  : ValueExpression_EDIT OptionalCorrelationName
+ | AnyCursor AnyAs RegularOrBacktickedIdentifier
+   {
+     suggestFunctions();
+     suggestColumns();
+     $$ = { suggestAggregateFunctions: true };
+   }
  | ValueExpression OptionalCorrelationName_EDIT  -> $2
  ;
 
@@ -2180,14 +2186,12 @@ SelectList_EDIT
    {
      suggestFunctions();
      suggestColumns();
-     suggestFunctions();
      $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
    }
  | 'CURSOR' SelectList
    {
      suggestFunctions();
      suggestColumns();
-     suggestFunctions();
      $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
    }
  | SelectList 'CURSOR' SelectList

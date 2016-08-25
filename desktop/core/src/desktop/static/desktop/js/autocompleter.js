@@ -88,9 +88,14 @@
     var before = editor.getTextBeforeCursor();
     var after = editor.getTextAfterCursor(";");
 
-    self.autocomplete(before, after, function(result) {
-      callback(null, result);
-    }, editor);
+    try {
+      self.autocomplete(before, after, function(result) {
+        callback(null, result);
+      }, editor);
+    } catch (err) {
+      editor.hideSpinner();
+      throw err;
+    }
   };
 
   Autocompleter.prototype.getDocTooltip = function (item) {
