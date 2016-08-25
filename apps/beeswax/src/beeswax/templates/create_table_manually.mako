@@ -343,6 +343,17 @@ ${ assist.assistPanel() }
                     <fieldset>
                         <div class="alert alert-info"><h3>${_('Configure Table Columns')}</h3>
                         </div>
+                        <div class="control-group">
+                            <label class="control-label">${_('Table Properties')}</label>
+                            <div class="controls">
+                                <label class="checkbox">
+                                    ${comps.field(table_form["skip_header"],
+                                    render_default=True
+                                    )}
+                                    ${_('Skip Header Row?')}
+                                </label>
+                            </div>
+                        </div>
                         % for form in columns_form.forms:
                             ${render_column(form)}
                         %endfor

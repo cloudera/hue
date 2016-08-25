@@ -250,6 +250,7 @@ def import_wizard(request, database='default'):
                 'file_format': 'TextFile',
                 'load_data': load_data,
                 'path': path,
+                'skip_header': request.REQUEST.get('removeHeader', 'off').lower() == 'on'
              },
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
@@ -282,7 +283,6 @@ def _submit_create_and_load(request, create_hql, table_name, path, load_data, da
   if load_data == 'IMPORT':
     on_success_params['table'] = table_name
     on_success_params['path'] = path
-    on_success_params['removeHeader'] = request.POST.get('removeHeader')
     on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database}) + '?' + on_success_params.urlencode()
   else:
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
@@ -482,21 +482,11 @@ def load_after_create(request, database):
   """
   tablename = request.REQUEST.get('table')
   path = request.REQUEST.get('path')
-  is_remove_header = request.REQUEST.get('removeHeader').lower() == 'on' and not path.endswith('gz')
 
   if not tablename or not path:
     msg = _('Internal error: Missing needed parameter to load data into table.')
     LOG.error(msg)
     raise PopupException(msg)
-
-  if is_remove_header:
-    try:
-      path = path.rstrip('/')  # need to remove trailing slash before overwrite
-      remove_header(request.fs, path)
-    except Exception, e:
-      msg = "The headers of the file could not be removed."
-      LOG.exception(msg)
-      raise PopupException(_(msg), detail=e)
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
