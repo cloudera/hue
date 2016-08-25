@@ -783,9 +783,9 @@ class Node():
       self.data['properties']['arguments'] = []
       job_properties = []
       for prop in action['properties']['hadoopProperties']:
-        name, value = prop.split('=', 1) 
+        name, value = prop.split('=', 1)
         job_properties.append({'name': name, 'value': value})
-        self.data['properties']['job_properties'] = job_properties 
+        self.data['properties']['job_properties'] = job_properties
       self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['parameters']]
 
     data = {
@@ -2262,7 +2262,7 @@ class PigDocumentAction(Action):
         'label': _('Spark program'),
         'value': '',
         'help_text': _('Select a saved Spark program you want to schedule.'),
-        'type': 'spark'
+        'type': 'pig'
      },
      # Common
      'files': {
@@ -2354,7 +2354,8 @@ NODES = {
   'generic-widget': GenericAction,
   'hive-document-widget': HiveDocumentAction,
   'java-document-widget': JavaDocumentAction,
-  'spark-document-widget': SparkDocumentAction
+  'spark-document-widget': SparkDocumentAction,
+  'pig-document-widget': PigDocumentAction
 }
 
 
