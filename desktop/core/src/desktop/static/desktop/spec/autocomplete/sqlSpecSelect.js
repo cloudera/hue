@@ -814,6 +814,52 @@ define([
         });
       });
 
+      it('should suggest tables for "SELECT | AS boo FROM tableA;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' AS boo FROM tableA;',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'tableA' }] }] }
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT | boo FROM tableA;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ' boo FROM tableA;',
+          hasLocations: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'tableA' }] }] }
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT bla| AS boo FROM tableA;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bla',
+          afterCursor: ' AS boo FROM tableA;',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: true,
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'tableA' }] }] }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT | FROM testWHERE"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT ',

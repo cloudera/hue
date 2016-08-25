@@ -175,6 +175,10 @@
 
     if (parseResult.suggestColumns) {
       var suggestColumnsDeferral =  $.Deferred();
+      if (self.snippet.type() === 'hive' && /[^\.]$/.test(beforeCursor)) {
+        completions.push({value: 'BLOCK__OFFSET__INSIDE__FILE', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
+        completions.push({value: 'INPUT__FILE__NAME', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
+      }
       if (parseResult.suggestColumns.types && parseResult.suggestColumns.types[0] === 'COLREF') {
         colRefDeferral.done(function () {
           parseResult.suggestColumns.tables.forEach(function (table) {
@@ -191,10 +195,6 @@
           deferrals.push(self.addColumns(parseResult, table, database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
         });
         suggestColumnsDeferral.resolve();
-      }
-      if (typeof parseResult.suggestColumns.identifierChain === 'undefined' && self.snippet.type() === 'hive') {
-        completions.push({value: 'BLOCK__OFFSET__INSIDE__FILE', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
-        completions.push({value: 'INPUT__FILE__NAME', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
       }
       deferrals.push(suggestColumnsDeferral);
     }
@@ -254,17 +254,28 @@
       var suggestion = columnSuggestions[i];
       var hasDuplicates = false;
       for (i; i + 1 < columnSuggestions.length && columnSuggestions[i + 1].value === suggestion.value; i++) {
-        if (typeof columnSuggestions[i + 1].table.alias !== 'undefined') {
-          columnSuggestions[i + 1].value = columnSuggestions[i + 1].table.alias + '.' + columnSuggestions[i + 1].value
-        } else {
-          columnSuggestions[i + 1].value = columnSuggestions[i + 1].table.table + '.' + columnSuggestions[i + 1].value
+        var nextTable = columnSuggestions[i + 1].table;
+        if (typeof nextTable.alias !== 'undefined') {
+          columnSuggestions[i + 1].value = nextTable.alias + '.' + columnSuggestions[i + 1].value
+        } else if (typeof nextTable.identifierChain !== 'undefined' && nextTable.identifierChain.length > 0) {
+          var lastIdentifier = nextTable.identifierChain[nextTable.identifierChain.length - 1];
+          if (typeof lastIdentifier.name !== 'undefined') {
+            columnSuggestions[i + 1].value = lastIdentifier.name + '.' + columnSuggestions[i + 1].value;
+          } else if (typeof lastIdentifier.subQuery !== 'undefined') {
+            columnSuggestions[i + 1].value = lastIdentifier.subQuery + '.' + columnSuggestions[i + 1].value;
+          }
         }
         hasDuplicates = true;
       }
       if (typeof suggestion.table.alias !== 'undefined') {
         suggestion.value = suggestion.table.alias + '.' + suggestion.value;
-      } else if (hasDuplicates) {
-        suggestion.value = suggestion.table.table + '.' + suggestion.value;
+      } else if (hasDuplicates && typeof suggestion.table.identifierChain !== 'undefined' && suggestion.table.identifierChain.length > 0) {
+        var lastIdentifier = suggestion.table.identifierChain[suggestion.table.identifierChain.length - 1];
+        if (typeof lastIdentifier.name !== 'undefined') {
+          suggestion.value = lastIdentifier.name + '.' + suggestion.value;
+        } else if (typeof lastIdentifier.subQuery !== 'undefined') {
+          suggestion.value = lastIdentifier.subQuery + '.' + suggestion.value;
+        }
       }
       delete suggestion.table;
     }
@@ -321,12 +332,24 @@
         fields: fetchedFields,
         timeout: self.timeout,
         successCallback: function (data) {
+          if (self.snippet.type() === 'hive'
+              && typeof data.extended_columns !== 'undefined'
+              && data.extended_columns.length === 1
+              && data.extended_columns.length
+              && /^map|array|struct/i.test(data.extended_columns[0].type)) {
+            identifierChain.unshift({ name: data.extended_columns[0].name })
+          }
           if (identifierChain.length > 0) {
-            if (data.type === 'array') {
-              fetchedFields.push('item')
-            }
-            if (data.type === 'map') {
-              fetchedFields.push('value')
+            if (typeof identifierChain[0].name !== 'undefined' && /value|item|key/i.test(identifierChain[0].name)) {
+              fetchedFields.push(identifierChain[0].name);
+              identifierChain.shift();
+            } else {
+              if (data.type === 'array') {
+                fetchedFields.push('item')
+              }
+              if (data.type === 'map') {
+                fetchedFields.push('value')
+              }
             }
             fetchFieldsInternal(table, database, identifierChain, callback, errorCallback, fetchedFields)
           } else {
@@ -340,7 +363,10 @@
 
     // For Impala the first parts of the identifier chain could be either database or table, either:
     // SELECT | FROM database.table -or- SELECT | FROM table.column
-    if (self.snippet.type() === 'impala') {
+
+    // For Hive it could be either:
+    // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
+    if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
       if (identifierChain.length > 1) {
         self.snippet.getApiHelper().loadDatabases({
           sourceType: self.snippet.type(),
@@ -406,6 +432,9 @@
   };
 
   SqlAutocompleter2.prototype.locateSubQuery = function (subQueries, subQueryName) {
+    if (typeof subQueries === 'undefined') {
+      return null;
+    }
     var foundSubQueries = subQueries.filter(function (knownSubQuery) {
       return knownSubQuery.alias === subQueryName
     });
@@ -444,6 +473,8 @@
       };
       if (foundSubQuery !== null) {
         addSubQueryColumns(foundSubQuery.columns);
+      } else {
+        addColumnsDeferred.resolve();
       }
     } else {
       var callback = function (data) {
