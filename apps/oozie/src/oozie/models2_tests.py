@@ -1021,7 +1021,7 @@ class TestModelAPI(OozieMockBase):
     workflow = Workflow(document=workflow_doc, user=self.user)
 
     _data = workflow.get_data()
-    assert_equal(len(_data['workflow']['nodes']), 5)
+    assert_equal(len(_data['workflow']['nodes']), 4)
 
 
   def test_gen_workflow_from_notebook(self):
