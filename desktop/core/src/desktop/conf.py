@@ -1181,7 +1181,7 @@ USE_NEW_AUTOCOMPLETER = Config( # To remove when it's working properly, not supp
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,
-  default=3000,
+  default=5000,
   help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled')
 )
 
