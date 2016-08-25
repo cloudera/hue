@@ -10,7 +10,12 @@ import logging
 import os
 import struct
 import sys
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 
 import thriftpy
 from thriftpy.protocol.compact import TCompactProtocolFactory
@@ -470,7 +475,7 @@ def _dump(fo, options, out=sys.stdout):
             writer.writeheader()
         if options.limit != -1 and total_count >= options.limit:
             return
-        row_unicode = {k: v.decode("utf-8") if type(v) is bytes else v for k, v in row.items()}
+        row_unicode = dict([(k, v.decode("utf-8")) if type(v) is bytes else v for k, v in row.items()])
         writer.writerow(row_unicode)
         total_count += 1
 
