@@ -33,7 +33,7 @@
       "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "selectedStatement", "user",
       "availableDatabases", "hasProperties", "aceMode", "snippetImage", "errorLoadingQueries",
       "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta", "cleanedNumericMeta",
-      "dependents", "canWrite", "queries"
+      "dependents", "canWrite", "queries", "avoidClosing"
     ]
   };
 
@@ -1311,6 +1311,8 @@
 
     self.retryModalConfirm = null;
     self.retryModalCancel = null;
+
+    self.avoidClosing = false;
 
     self.loadingHistory = ko.observable(self.history().length == 0);
     // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.

@@ -318,7 +318,7 @@ except ImportError, e:
 
 <%def name="downloadSnippetResults()">
   <script type="text/html" id="download-results-template">
-    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline" target="_blank">
+    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
       ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="notebook"/>
       <input type="hidden" name="snippet"/>
@@ -556,6 +556,7 @@ except ImportError, e:
               self.downloadTruncated(result.truncated);
               self.downloadCounter(result.row_counter);
               self.isDownloading(false);
+              self.notebook.avoidClosing = false;
               if (self.downloadTruncated()) {
                 $('#downloadProgressModal').modal('show');
               }
@@ -566,11 +567,13 @@ except ImportError, e:
             catch (e) {
               self.isDownloading(false);
               $('#downloadProgressModal').modal('hide');
+              self.notebook.avoidClosing = false;
             }
           }
           timesChecked++;
         }, 500);
 
+        self.notebook.avoidClosing = true;
         self.$downloadForm.submit();
       };
 
