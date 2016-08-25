@@ -3231,7 +3231,9 @@ ${ hueIcons.symbols() }
 
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function (e) {
-        viewModel.selectedNotebook().close();
+        if (!viewModel.selectedNotebook().avoidClosing) {
+          viewModel.selectedNotebook().close();
+        }
       };
       $(window).data('beforeunload', window.onbeforeunload);
 
