@@ -93,3 +93,6 @@ INPUTFORMAT ${table["input_format_class"] | n} OUTPUTFORMAT ${table["output_form
 % if table.get("load_data", "IMPORT") == 'EXTERNAL':
 LOCATION "${table["path"] | n}"
 % endif
+% if table.get("skip_header", False):
+TBLPROPERTIES("skip.header.line.count" = "1")
+% endif
