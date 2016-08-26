@@ -180,6 +180,33 @@ var addColRefIfExists = function (valueExpression) {
   }
 };
 
+var selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
+  if (selectListEdit.cursorAtStart) {
+    var keywords = [];
+    if (hasDistinctOrAll) {
+      keywords = [{ value: '*', weight: 1000 }];
+    } else {
+      keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
+    }
+    if (isImpala()) {
+      keywords.push('STRAIGHT_JOIN');
+    }
+    suggestKeywords(keywords);
+  } else {
+    checkForKeywords(selectListEdit);
+  }
+  if (selectListEdit.suggestFunctions) {
+    suggestFunctions();
+  }
+  if (selectListEdit.suggestColumns) {
+    suggestColumns();
+  }
+  if (selectListEdit.suggestAggregateFunctions && (!hasDistinctOrAll || hasDistinctOrAll === 'ALL')) {
+    suggestAggregateFunctions();
+    suggestAnalyticFunctions();
+  }
+};
+
 var valueExpressionSuggest = function (oppositeValueExpression, operator) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
     suggestValues();
@@ -259,6 +286,9 @@ var commitLocations = function () {
     }
 
     if (location.type === 'column') {
+      if (isHive() && !location.linked) {
+        location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
+      }
       expandIdentifierChain(location, true);
     }
 
@@ -415,7 +445,7 @@ parser.identifyPartials = function (beforeCursor, afterCursor) {
   return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
 };
 
-parser.expandLateralViews = function (lateralViews, originalIdentifierChain) {
+parser.expandLateralViews = function (lateralViews, originalIdentifierChain, columnSuggestion) {
   var identifierChain = originalIdentifierChain.concat(); // Clone in case it's re-used
   var firstIdentifier = identifierChain[0];
   if (typeof lateralViews !== 'undefined') {
@@ -426,16 +456,20 @@ parser.expandLateralViews = function (lateralViews, originalIdentifierChain) {
       if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
         identifierChain.shift();
         firstIdentifier = identifierChain[0];
-        delete parser.yy.result.suggestKeywords;
-      } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
-        if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-          parser.yy.result.suggestIdentifiers = [];
+        if (columnSuggestion) {
+          delete parser.yy.result.suggestKeywords;
         }
-        lateralView.columnAliases.forEach(function (columnAlias) {
-          parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
-        });
-        delete parser.yy.result.suggestColumns;
-        delete parser.yy.result.suggestKeywords;
+      } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
+        if (columnSuggestion) {
+          if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+            parser.yy.result.suggestIdentifiers = [];
+          }
+          lateralView.columnAliases.forEach(function (columnAlias) {
+            parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
+          });
+          delete parser.yy.result.suggestColumns;
+          delete parser.yy.result.suggestKeywords;
+        }
         return identifierChain;
       }
       if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
@@ -447,7 +481,6 @@ parser.expandLateralViews = function (lateralViews, originalIdentifierChain) {
           identifierChain[0] = {name: 'item'};
         }
         identifierChain = lateralView.udtf.expression.columnReference.concat(identifierChain);
-        delete parser.yy.result.suggestKeywords;
         firstIdentifier = identifierChain[0];
       }
     });
@@ -631,7 +664,11 @@ var convertTablePrimariesToSuggestions = function (tablePrimaries) {
     }
   });
   if (identifiers.length > 0) {
-    parser.yy.result.suggestIdentifiers = identifiers;
+    if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
+      parser.yy.result.suggestIdentifiers = identifiers;
+    } else {
+      parser.yy.result.suggestIdentifiers = identifiers.concat(parser.yy.result.suggestIdentifiers);
+    }
   }
   parser.yy.result.suggestColumns.tables = tables;
   if (parser.yy.result.suggestColumns.identifierChain && parser.yy.result.suggestColumns.identifierChain.length == 0) {
@@ -665,7 +702,23 @@ var linkTablePrimaries = function () {
         expandIdentifierChain(parser.yy.result.suggestColumns);
       }
     } else {
-      expandIdentifierChain(parser.yy.result.suggestColumns);
+      // Expand exploded views in the identifier chain
+      if (isHive() && !parser.yy.result.suggestColumns.linked) {
+        var originalLength = parser.yy.result.suggestColumns.identifierChain.length;
+        parser.yy.result.suggestColumns.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, parser.yy.result.suggestColumns.identifierChain, true);
+        // Drop '*' keyword for lateral views
+        if (typeof parser.yy.result.suggestColumns !== 'undefined') {
+          if (parser.yy.result.suggestColumns.identifierChain.length > originalLength &&
+              typeof parser.yy.result.suggestKeywords !== 'undefined' &&
+              parser.yy.result.suggestKeywords.length === 1 &&
+              parser.yy.result.suggestKeywords[0].value === '*') {
+            delete parser.yy.result.suggestKeywords;
+          }
+          expandIdentifierChain(parser.yy.result.suggestColumns);
+        }
+      } else {
+        expandIdentifierChain(parser.yy.result.suggestColumns);
+      }
     }
   }
 

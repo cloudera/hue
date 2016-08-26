@@ -39,6 +39,9 @@ SelectStatement
 
 SelectStatement_EDIT
  : 'SELECT' OptionalAllOrDistinct SelectList_ERROR_EDIT TableExpression
+   {
+     selectListNoTableSuggest($3, $2);
+   }
  | 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression_EDIT
  ;
 
@@ -51,29 +54,20 @@ SelectList_ERROR
  ;
 
 SelectList_ERROR_EDIT
- : ErrorList ',' SelectList_EDIT
- | SelectList ',' ErrorList ',' SelectList_EDIT
- | ErrorList ',' SelectList ',' ErrorList ',' SelectList_EDIT
+ : ErrorList ',' SelectList_EDIT                               -> $3
+ | SelectList ',' ErrorList ',' SelectList_EDIT                -> $5
+ | ErrorList ',' SelectList ',' ErrorList ',' SelectList_EDIT  -> $7
  | ErrorList ',' AnyCursor
    {
-     suggestFunctions();
-     suggestColumns();
-     suggestFunctions();
-     $$ = { cursorAtStart : false, suggestAggregateFunctions: true };
+     $$ = { cursorAtStart : false, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  | SelectList ',' ErrorList ',' AnyCursor
    {
-     suggestFunctions();
-     suggestColumns();
-     suggestFunctions();
-     $$ = { cursorAtStart : false, suggestAggregateFunctions: true };
+     $$ = { cursorAtStart : false, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  | ErrorList ',' SelectList ',' Errors ',' AnyCursor
    {
-     suggestFunctions();
-     suggestColumns();
-     suggestFunctions();
-     $$ = { cursorAtStart : false, suggestAggregateFunctions: true };
+     $$ = { cursorAtStart : true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  ;
 
