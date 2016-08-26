@@ -38,6 +38,8 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
+          suggestAggregateFunctions: true,
+          suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
@@ -51,6 +53,8 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
+          suggestAggregateFunctions: true,
+          suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
@@ -64,6 +68,8 @@ define([
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
+          suggestAggregateFunctions: true,
+          suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });

@@ -381,6 +381,7 @@ define([
           dialect: 'hive',
           noErrors: true,
           hasLocations: true,
+          containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
