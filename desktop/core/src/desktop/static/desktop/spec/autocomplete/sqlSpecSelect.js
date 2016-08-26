@@ -3008,6 +3008,44 @@ define([
           });
         });
 
+        it('should suggest aliases for "SELECT | FROM testTable LATERAL VIEW EXPLODE(testTable.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT ',
+            afterCursor: ' FROM testTable LATERAL VIEW EXPLODE(testTable.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;',
+            dialect: 'hive',
+            hasLocations: true,
+            noErrors: true,
+            containsKeywords: ['*', 'ALL', 'DISTINCT'],
+            expectedResult: {
+              suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
+              suggestFunctions: {},
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+              suggestIdentifiers: [{ name: 'a.', type: 'alias' }, { name: 'arr_exp', type: 'alias' }, { name: 'i.', type: 'alias' }, { name: 'arr_items', type: 'alias' }],
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest aliases for "SELECT | FROM testTable t LATERAL VIEW EXPLODE(t.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT ',
+            afterCursor: ' FROM testTable t LATERAL VIEW EXPLODE(t.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;',
+            dialect: 'hive',
+            noErrors: true,
+            hasLocations: true,
+            containsKeywords: ['*', 'ALL', 'DISTINCT'],
+            expectedResult: {
+              suggestAggregateFunctions: true,
+              suggestAnalyticFunctions: true,
+              suggestFunctions: {},
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
+              suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'a.', type: 'alias' }, { name: 'arr_exp', type: 'alias' }, { name: 'i.', type: 'alias' }, { name: 'arr_items', type: 'alias' }],
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest columns for "SELECT | FROM testTable LATERAL VIEW explode("', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT ',
@@ -3122,8 +3160,6 @@ define([
             '\t LATERAL VIEW EXPLODE(tt2.testArrayB) explodedTableB AS testItemB',
             dialect: 'hive',
             expectedResult: {
-              lowerCase: false,
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB' }, { name: 'item' }] }] },
               locations: [
                 { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayA'}, {name: 'item'}] },
                 { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, identifierChain: [{ name: 'testTable2' }]},
@@ -3131,7 +3167,9 @@ define([
                 { type: 'column', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayA'}] },
                 { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 22 }, function: 'explode'},
                 { type: 'column', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 38 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB'}] }
-              ]
+              ],
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB' }, { name: 'item' }] }] },
+              lowerCase: false
             }
           });
         });

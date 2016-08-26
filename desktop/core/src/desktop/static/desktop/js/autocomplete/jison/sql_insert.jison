@@ -332,24 +332,7 @@ SelectWithoutTableExpression_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT
    {
-     if ($3.cursorAtStart) {
-       var keywords = [];
-       if ($2) {
-         keywords = [{ value: '*', weight: 1000 }];
-       } else {
-         keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       }
-       if (isImpala()) {
-         keywords.push('STRAIGHT_JOIN');
-       }
-       suggestKeywords(keywords);
-     } else {
-       checkForSelectListKeywords($3);
-     }
-     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
-     }
+     selectListNoTableSuggest($3, $2);
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
@@ -371,8 +354,6 @@ SelectWithoutTableExpression_EDIT
      suggestKeywords(keywords);
      suggestFunctions();
      suggestColumns();
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  ;
 
