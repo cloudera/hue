@@ -197,6 +197,28 @@ define([
           }
         });
       });
+
+      it('should suggest keywords for "| * FROM boo; SELECT LIMIT 10"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: ' * FROM boo; SELECT LIMIT 10',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "bla| * FROM boo; SELECT LIMIT 10"', function() {
+        assertAutoComplete({
+          beforeCursor: 'bla',
+          afterCursor: ' * FROM boo; SELECT LIMIT 10',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
     });
 
     describe('EXPLAIN', function () {

@@ -19,6 +19,19 @@ SqlStatements
  | NonStartingToken error // Having just ': error' does not work for some reason, jison bug?
  ;
 
+SqlStatement_EDIT
+ : AnyCursor error
+   {
+     if (isHive()) {
+       suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
+     } else if (isImpala()) {
+       suggestDdlAndDmlKeywords(['EXPLAIN']);
+     } else {
+       suggestDdlAndDmlKeywords();
+     }
+   }
+ ;
+
 SelectStatement
  : 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_ERROR
