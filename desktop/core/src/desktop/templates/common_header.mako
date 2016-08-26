@@ -665,7 +665,7 @@ if USE_NEW_EDITOR.get():
                  <%!
                  from indexer.conf import ENABLE_NEW_INDEXER
                  %>
-                 % if ENABLE_NEW_INDEXER.get():
+                 % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
                  <li><a href="${ url('indexer:indexer') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Index') }</a></li>
                  % endif
                  % endif
