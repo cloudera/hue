@@ -1238,6 +1238,18 @@ SelectStatement_EDIT
      } else {
        checkForSelectListKeywords($3);
      }
+     if ($3.suggestFunctions) {
+       suggestFunctions();
+     }
+     if ($3.suggestColumns) {
+       suggestColumns();
+     }
+     if ($3.suggestTables) {
+       suggestTables({ prependQuestionMark: true, prependFrom: true });
+     }
+     if ($3.suggestDatabases) {
+       suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     }
      if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
@@ -1269,25 +1281,7 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
-     if ($3.cursorAtStart) {
-       var keywords = [];
-       if ($2) {
-         keywords = [{ value: '*', weight: 1000 }];
-       } else {
-         keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       }
-       if (isImpala()) {
-         keywords.push('STRAIGHT_JOIN');
-       }
-       suggestKeywords(keywords);
-     } else {
-       checkForKeywords($3);
-     }
-
-     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
-     }
+     selectListNoTableSuggest($3, $2);
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
@@ -2137,7 +2131,7 @@ OptionalNot
  | 'NOT'
  ;
 
-SelectSubList
+SelectSpecification
  : ValueExpression OptionalCorrelationName
    {
      if ($2) {
@@ -2156,7 +2150,7 @@ SelectSubList
    }
  ;
 
-SelectSubList_EDIT
+SelectSpecification_EDIT
  : ValueExpression_EDIT OptionalCorrelationName
  | AnyCursor AnyAs RegularOrBacktickedIdentifier
    {
@@ -2168,60 +2162,51 @@ SelectSubList_EDIT
  ;
 
 SelectList
- : SelectSubList                 -> [ $1 ]
- | SelectList ',' SelectSubList
+ : SelectSpecification                 -> [ $1 ]
+ | SelectList ',' SelectSpecification
    {
      $1.push($3);
    }
  ;
 
 SelectList_EDIT
- : SelectSubList_EDIT
- | SelectSubList_EDIT ',' SelectList
+ : SelectSpecification_EDIT
+ | 'CURSOR' SelectList
+   {
+     $$ = { cursorAtStart : true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+   }
+ | 'CURSOR' ',' SelectList
+   {
+     $$ = { cursorAtStart : true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+   }
+ | SelectSpecification_EDIT ',' SelectList
+ | SelectList 'CURSOR' SelectList
+   {
+     checkForSelectListKeywords($1);
+   }
  | SelectList 'CURSOR' ',' SelectList
    {
      checkForSelectListKeywords($1);
    }
- | 'CURSOR' ',' SelectList
+ | SelectList ',' AnyCursor
    {
-     suggestFunctions();
-     suggestColumns();
-     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
- | 'CURSOR' SelectList
-   {
-     suggestFunctions();
-     suggestColumns();
-     $$ = { cursorAtStart : true, suggestAggregateFunctions: true };
-   }
- | SelectList 'CURSOR' SelectList
-   {
-     if ($1.suggestKeywords) {
-       suggestKeywords($1.suggestKeywords);
-     }
-   }
+ | SelectList ',' SelectSpecification_EDIT                 -> $3
  | SelectList ',' AnyCursor SelectList
    {
-     suggestFunctions();
-     suggestColumns();
-     $$ = { suggestAggregateFunctions: true, suggestKeywords: [{ value: '*', weight: 1000 }] };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
- | SelectList ',' SelectListPartTwo_EDIT                 -> $3
- | SelectList ',' SelectListPartTwo_EDIT ','             -> $3
- | SelectList ',' SelectListPartTwo_EDIT ',' SelectList  -> $3
- ;
-
-SelectListPartTwo_EDIT
- : SelectSubList_EDIT
- | AnyCursor
+ | SelectList ',' AnyCursor ','
    {
-     suggestFunctions();
-     suggestColumns();
-     // TODO: Only if there's no FROM
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
+ | SelectList ',' SelectSpecification_EDIT ','             -> $3
+ | SelectList ',' AnyCursor ',' SelectList
+   {
+     $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+   }
+ | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
  ;
 
 DerivedColumn_TWO
