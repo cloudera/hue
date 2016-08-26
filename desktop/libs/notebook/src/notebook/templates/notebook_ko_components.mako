@@ -409,7 +409,7 @@ except ImportError, e:
                 </div>
               </div>
             </div>
-            % if ENABLE_NEW_INDEXER and ENABLE_NEW_INDEXER.get():
+            % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
