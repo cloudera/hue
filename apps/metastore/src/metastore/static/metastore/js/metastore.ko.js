@@ -29,6 +29,7 @@
    * @param {Object} options
    * @param {string} options.name
    * @param {ApiHelper} options.apiHelper
+   * @param {MetastoreViewModel} options.metastore
    * @param {string} [options.tableName]
    * @param {string} [options.tableComment]
    * @param {Object} options.i18n
@@ -43,6 +44,7 @@
     self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
     self.name = options.name;
+    self.metastore = options.metastore;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -382,6 +384,13 @@
       apiHelper: self.apiHelper,
       metastoreTable: self
     });
+
+    self.partitionsCountLabel = ko.pureComputed(function () {
+      if (self.partitions.values().length === self.database.metastore.partitionsLimit) {
+        return self.partitions.values().length + '+'
+      }
+      return self.partitions.values().length;
+    });
     self.tableDetails = ko.observable();
     self.tableStats = ko.observable();
     self.refreshingTableStats = ko.observable(false);
@@ -506,7 +515,7 @@
                   $.each(self.optimizerDetails().sortedTotal(), function(index, optimizerCol) {
                     var metastoreCol = $.grep(self.columns(), function(col) {
                       return col.name() == optimizerCol.columnName();
-                    })
+                    });
                     if (metastoreCol.length > 0) {
                       metastoreCol[0].popularity(optimizerCol.totalCount())
                     }
@@ -530,7 +539,7 @@
           self.loading(false);
         }
       })
-    }
+    };
 
     self.addTags = function () {
       $.post('/metadata/api/navigator/add_tags', {
@@ -643,6 +652,7 @@
    */
   function MetastoreViewModel(options) {
     var self = this;
+    self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
     self.apiHelper = ApiHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
@@ -698,6 +708,7 @@
               name: name,
               apiHelper: self.apiHelper,
               i18n: self.i18n,
+              metastore: self,
               optimizerEnabled: self.optimizerEnabled,
               navigatorEnabled: self.navigatorEnabled
             })
