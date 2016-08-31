@@ -3197,20 +3197,24 @@
       });
 
       var autocompleteTemporarilyDisabled = false;
+      var autocompleteThrottle = -1;
       editor.commands.on("afterExec", function (e) {
         if (editor.getOption('enableLiveAutocompletion') && e.command.name === "insertstring") {
-          var questionMarkMatch = editor.getTextBeforeCursor().match(/select \? from \S+[^.]$/i);
-          if (questionMarkMatch) {
-            editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
-            editor.removeTextBeforeCursor(1);
-            window.setTimeout(function () {
-              editor.execCommand("startAutocomplete");
-            }, 1);
-          } else if (/\.$/.test(editor.getTextBeforeCursor())) {
-            window.setTimeout(function () {
-              editor.execCommand("startAutocomplete");
-            }, 1);
-          }
+          window.clearTimeout(autocompleteThrottle);
+          autocompleteThrottle = window.setTimeout(function () {
+              var questionMarkMatch = editor.getTextBeforeCursor().match(/select \? from \S+[^.]$/i);
+              if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
+                editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
+                editor.removeTextBeforeCursor(1);
+                window.setTimeout(function () {
+                  editor.execCommand("startAutocomplete");
+                }, 1);
+              } else if (/\.$/.test(editor.getTextBeforeCursor())) {
+                window.setTimeout(function () {
+                  editor.execCommand("startAutocomplete");
+                }, 1);
+              }
+          }, 400);
         }
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
         // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
