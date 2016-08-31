@@ -34,18 +34,18 @@ from desktop.lib import i18n
 
 LOG = logging.getLogger(__name__)
 
-XLS_ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
+ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
 
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
 
-def encode_row(row, encoding=None, is_xls=False):
+def encode_row(row, encoding=None):
   encoded_row = []
   for cell in row:
-    if is_xls and isinstance(cell, six.string_types):
-      cell = re.sub(XLS_ILLEGAL_CHARS, '?', cell)
+    if isinstance(cell, six.string_types):
+      cell = re.sub(ILLEGAL_CHARS, '?', cell)
     cell = nullify(cell)
     if not isinstance(cell, numbers.Number):
       cell = smart_str(cell, encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
@@ -96,12 +96,12 @@ def create_generator(content_generator, format, encoding=None):
     for _headers, _data in content_generator:
       # Write headers to workbook once
       if _headers and row_ctr == 0:
-        worksheet.append(encode_row(_headers, encoding, is_xls=True))
+        worksheet.append(encode_row(_headers, encoding))
         row_ctr += 1
 
       # Write row data to workbook
       for row in _data:
-        worksheet.append(encode_row(row, encoding, is_xls=True))
+        worksheet.append(encode_row(row, encoding))
         row_ctr += 1
 
     yield xls_dataset(workbook).xls
