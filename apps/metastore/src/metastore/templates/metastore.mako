@@ -19,6 +19,7 @@ from django.utils.translation import ugettext as _
 
 from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
+from beeswax.conf import LIST_PARTITIONS_LIMIT
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 %>
@@ -794,7 +795,7 @@ ${ assist.assistPanel() }
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-      <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
+      <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
     <!-- ko if: $root.optimizerEnabled() -->
@@ -1241,7 +1242,8 @@ ${ assist.assistPanel() }
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
         navigatorEnabled: '${ is_navigator_enabled }' === 'True',
         optimizerUrl: '${ optimizer_url }',
-        navigatorUrl: '${ navigator_url }'
+        navigatorUrl: '${ navigator_url }',
+        partitionsLimit: ${ LIST_PARTITIONS_LIMIT.get() }
       };
 
       var viewModel = new MetastoreViewModel(options);
