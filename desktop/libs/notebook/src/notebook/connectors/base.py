@@ -157,6 +157,9 @@ class Api(object):
   def fetch_result(self, notebook, snippet, rows, start_over):
     pass
 
+  def fetch_result_size(self, notebook, snippet):
+    pass
+
   def download(self, notebook, snippet, format):
     pass
 

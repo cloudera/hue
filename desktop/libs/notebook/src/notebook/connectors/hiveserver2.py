@@ -19,8 +19,10 @@ import copy
 import logging
 import re
 import StringIO
+import time
 
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
@@ -29,6 +31,8 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
+
+from jobbrowser.views import job_single_logs
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout
 
@@ -280,8 +284,55 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def fetch_result_metadata(self):
-    pass
+  def fetch_result_size(self, notebook, snippet):
+    resp = {
+      'rows': None,
+      'size': None
+    }
+
+    # Check that the results are available
+    if snippet.get('status') == 'available':
+      # Attempt to get metadata
+      if snippet['type'] == 'hive':
+        engine = self._get_hive_execution_engine(notebook, snippet).lower()
+        if engine == 'mr':
+          # Get last task of last job
+          logs = self.get_log(notebook, snippet, startFrom=0)
+          jobs = self.get_jobs(notebook, snippet, logs)
+          if jobs:
+            last_job_id = jobs[-1].get('name')
+            LOG.info("Hive query executed %d jobs, last job ID is: %s" % (len(jobs), last_job_id))
+
+            # Attempt to fetch last task's syslog and parse the total records
+            task_syslog = self._get_syslog(last_job_id)
+            if task_syslog:
+              total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
+              total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
+              if total_records_match:
+                resp['rows'] = int(total_records_match.group('total_records'))
+            else:
+              LOG.warn("Failed to get task syslog for Hive query with job ID: %s" % last_job_id)
+          else:
+            LOG.info("Hive query did not execute any jobs.")
+        elif engine == 'spark':
+          logs = self.get_log(notebook, snippet, startFrom=0)
+
+          total_records_re = "RECORDS_OUT_0: (?P<total_records>\d+)"
+          total_size_re = "Spark Job\[[a-z0-9-]+\] Metrics[A-Za-z0-9:\s]+ResultSize: (?P<total_size>\d+)"
+          total_records_match = re.search(total_records_re, logs, re.MULTILINE)
+          total_size_match = re.search(total_size_re, logs, re.MULTILINE)
+
+          if total_records_match:
+            resp['rows'] = int(total_records_match.group('total_records'))
+          if total_size_match:
+            resp['size'] = int(total_size_match.group('total_size'))
+        else:
+          LOG.warn('Cannot fetch result metadata for execution engine: %s' % engine)
+      # TODO: Impala
+      else:
+        LOG.warn('Cannot fetch result metadata for snippet type: %s' % snippet['type'])
+
+    return resp
 
 
   @query_error_handler
@@ -615,3 +666,26 @@ class HS2Api(Api):
       name = 'spark-sql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
+
+
+  def _get_syslog(self, job_id):
+    # TODO: Refactor this (and one in oozie_batch.py) to move to jobbrowser
+    syslog = None
+    q = QueryDict(self.request.GET, mutable=True)
+    q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
+    self.request.GET = q
+
+    attempts = 0
+    max_attempts = 10
+    while syslog is None and attempts < max_attempts:
+      data = job_single_logs(self.request, **{'job': job_id})
+      if data:
+        log_output = data['logs'][3]
+        if log_output.startswith('Unable to locate'):
+          LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
+          time.sleep(2.0)
+        else:
+          syslog = log_output
+      attempts += 1
+
+    return syslog

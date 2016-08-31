@@ -20,6 +20,7 @@ import json
 import logging
 import re
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
@@ -470,9 +471,14 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
           "statement_raw": "%(statement)s",
           "type": "hive",
           "properties": {
-              "files": [],
-              "functions": [],
-              "settings": []
+            "files": [],
+            "functions": [],
+            "settings": [
+              {
+                "value": "mr",
+                "key": "hive.execution.engine"
+              }
+            ]
           }
       }
     """ % {'database': self.db_name, 'statement': self.statement}
@@ -489,7 +495,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def test_query_with_unicode(self):
     statement = "SELECT * FROM sample_07 WHERE code='validé';"
 
-    snippet_json = json.loads("""
+    snippet = json.loads("""
         {
             "status": "running",
             "database": "default",
@@ -510,17 +516,17 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
         }
       """ % {'statement': statement})
 
-    notebook_json = json.loads(self.notebook_json)
-    notebook_json['snippets'] = [snippet_json]
+    notebook = json.loads(self.notebook_json)
+    notebook['snippets'] = [snippet]
     response = self.client.post(reverse('notebook:execute'),
-                                {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
 
 
   def test_get_current_statement(self):
     multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\\r\\nSELECT AVG(salary) FROM sample_07;"
-    snippet_json = json.loads("""
+    snippet = json.loads("""
       {
           "status": "running",
           "database": "default",
@@ -542,9 +548,10 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     """ % {'statement': multi_statement}
     )
 
-    notebook_json = json.loads(self.notebook_json)
-    notebook_json['snippets'] = [snippet_json]
-    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+    notebook = json.loads(self.notebook_json)
+    notebook['snippets'] = [snippet]
+    response = self.client.post(reverse('notebook:execute'),
+                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -555,7 +562,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
 
 
-    snippet_json = json.loads("""
+    snippet = json.loads("""
       {
           "status": "running",
           "database": "default",
@@ -581,9 +588,10 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     """ % {'statement': multi_statement}
     )
 
-    notebook_json = json.loads(self.notebook_json)
-    notebook_json['snippets'] = [snippet_json]
-    response = self.client.post(reverse('notebook:execute'), {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+    notebook = json.loads(self.notebook_json)
+    notebook['snippets'] = [snippet]
+    response = self.client.post(reverse('notebook:execute'),
+                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -597,9 +605,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def test_explain(self):
     # Hive 2 with Tez set hive.explain.user to true by default, but this test is expecting output when this setting
     # is set to false.
-    snippet_json = json.loads(self.snippet_json)
-    snippet_json['properties']['settings'].append({"key": "hive.explain.user", "value": "false"})
-    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': json.dumps(snippet_json)})
+    snippet = json.loads(self.snippet_json)
+    snippet['properties']['settings'].append({"key": "hive.explain.user", "value": "false"})
+    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
