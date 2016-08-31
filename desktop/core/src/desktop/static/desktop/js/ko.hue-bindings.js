@@ -558,7 +558,13 @@
         if (visible && $element.data('popover') && ! $.contains($element.data('popover').$tip[0], event.target)) {
           hidePopover();
         }
-      }
+      };
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        if (visible && $element.data('popover')) {
+          hidePopover();
+        }
+      });
 
       var showPopover = function () {
         ko.renderTemplate(options.contentTemplate, viewModel, {
