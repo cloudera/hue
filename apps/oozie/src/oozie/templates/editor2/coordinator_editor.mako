@@ -465,7 +465,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       <input data-bind="value: coordinator.properties.timeout" type="number"/>
 
       <h4>${ _('Concurrency') }</h4>
-      <select data-bind="options: availableSettings, optionsCaption: '${ _ko("Default") }', value: coordinator.properties.concurrency"></select>
+      <select data-bind="options: availableSettings, value: coordinator.properties.concurrency"></select>
 
       <h4>${ _('Execution') }</h4>
       <select data-bind="value: coordinator.properties.execution">
@@ -475,7 +475,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       </select>
 
       <h4>${ _('Throttle') }</h4>
-      <select data-bind="options: availableSettings, optionsCaption: '${ _ko("Default") }', value: coordinator.properties.throttle"></select>
+      <select data-bind="options: availableSettings, value: coordinator.properties.throttle"></select>
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.coordinator.properties">
