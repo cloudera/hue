@@ -160,6 +160,20 @@ define([
         });
       });
 
+      it('should handle "INSERT OVERWRITE DIRECTORY \'blabla\' SELECT * FROM boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE DIRECTORY \'blabla\' SELECT * FROM boo;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "INSERT INTO bla.boo SELECT ba.boo, ba, ble FROM db.tbl; |"', function() {
         assertAutoComplete({
           beforeCursor: 'INSERT INTO bla.boo SELECT ba.boo, ba, ble FROM db.tbl;',
@@ -737,6 +751,60 @@ define([
             lowerCase: false,
             suggestTables: { prependFrom: true },
             suggestDatabases:  { prependFrom: true, appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT OVERWRITE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            suggestKeywords: ['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE' ]
+          }
+        });
+      });
+
+      it('should suggest tables for "INSERT OVERWRITE LOCAL |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE LOCAL ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DIRECTORY' ]
+          }
+        });
+      });
+
+      it('should suggest hdfs for "INSERT OVERWRITE DIRECTORY \'|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE DIRECTORY \'',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "INSERT OVERWRITE DIRECTORY \'blabla\' |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INSERT OVERWRITE DIRECTORY \'blabla\' ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SELECT']
           }
         });
       });
