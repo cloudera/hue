@@ -2848,9 +2848,18 @@
 
           this.token = {};
           this.marker = null;
+          this.updateThrottle = -1;
 
           this.update = function () {
-            this.$timer = null;
+            var self = this;
+            self.$timer = null;
+            window.clearTimeout(self.updateThrottle);
+            self.updateThrottle = window.setTimeout(function () {
+              self.performUpdate();
+            }, 100);
+          };
+
+          this.performUpdate = function () {
             var editor = this.editor;
             var renderer = editor.renderer;
 
@@ -2882,18 +2891,14 @@
             if (token) {
               var self = this;
               if (token.value === " * ") {
-                // TODO: Figure out why called 7 times every once in a while
-                snippet.autocompleter.autocomplete(editor.getValue().substring(0, token.start + 1), editor.getValue().substring(token.start + 2), function (suggestions) {
-                  var cols = [];
-                  $.each(suggestions, function (idx, suggestion) {
-                    if (suggestion.meta === "column" && suggestion.value !== "*") {
-                      cols.push(suggestion.value);
-                    }
-                  });
+                var start = token.value == " * " ? token.start + 1 : token.start;
+                var end = token.value == " * " ? token.start + 2 : token.start + token.value.length;
+                var beforeToken = editor.session.doc.getTextRange(new AceRange(0, 0, docPos.row, start));
+                var afterToken = editor.getValue().substring(beforeToken.length + 1);
+
+                var colHiglightCallback = function (cols) {
                   if (cols.length > 0) {
                     // add highlight for the clicked token
-                    var start = token.value == " * " ? token.start + 1 : token.start;
-                    var end = token.value == " * " ? token.start + 2 : token.start + token.value.length;
                     var range = new AceRange(docPos.row, start, docPos.row, end);
                     token.range = range;
                     token.columns = cols;
@@ -2907,7 +2912,22 @@
                     self.link = token;
                     self.isClearable = true
                   }
-                });
+                };
+
+                if ((typeof token.columns === 'undefined' || token.lastLengthAfter !== afterToken.length) && beforeToken.length < 50000 && afterToken.length < 50000) {
+                  token.lastLengthAfter = afterToken.length;
+                  snippet.autocompleter.autocomplete(beforeToken, afterToken, function (suggestions) {
+                    var cols = [];
+                    $.each(suggestions, function (idx, suggestion) {
+                      if (suggestion.isColumn) {
+                        cols.push(suggestion.value);
+                      }
+                    });
+                    colHiglightCallback(cols);
+                  });
+                } else if (typeof token.columns !== 'undefined') {
+                  colHiglightCallback(token.columns);
+                }
               }
               else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
                   token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||

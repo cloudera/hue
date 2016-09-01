@@ -252,6 +252,7 @@
 
     for (var i = 0; i < columnSuggestions.length; i++) {
       var suggestion = columnSuggestions[i];
+      suggestion.isColumn = true;
       var hasDuplicates = false;
       for (i; i + 1 < columnSuggestions.length && columnSuggestions[i + 1].value === suggestion.value; i++) {
         var nextTable = columnSuggestions[i + 1].table;
