@@ -123,7 +123,15 @@ HiveInsertWithoutQuery
        $$ = { suggestKeywords: ['STORED AS'] };
      }
    }
- | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalParenthesizedColumnList
+ | '<hive>INSERT' '<hive>OVERWRITE_DIRECTORY' HdfsPath OptionalInsertRowFormat OptionalStoredAs
+    {
+      if (!$4 && !$5) {
+        $$ = { suggestKeywords: [{ value: 'ROW FORMAT', weight: 2 }, { value: 'STORED AS', weight: 1}] };
+      } else if (!$5) {
+        $$ = { suggestKeywords: ['STORED AS'] };
+      }
+    }
+  | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalParenthesizedColumnList
    {
      $4.owner = 'insert';
      addTablePrimary($4);
@@ -143,7 +151,7 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['LOCAL DIRECTORY', 'TABLE']);
+       suggestKeywords(['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE']);
      }
      suggestTables();
      suggestDatabases({ appendDot: true });
@@ -166,13 +174,16 @@ HiveInsertWithoutQuery_EDIT
      $4.owner = 'insert';
      addTablePrimary($4);
    }
- | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL'
+ | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' 'CURSOR'
    {
      suggestKeywords(['DIRECTORY']);
    }
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' '<hive>DIRECTORY' HdfsPath_EDIT OptionalInsertRowFormat OptionalStoredAs
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' '<hive>DIRECTORY' HdfsPath OptionalInsertRowFormat_EDIT OptionalStoredAs
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' '<hive>DIRECTORY' HdfsPath OptionalInsertRowFormat OptionalStoredAs_EDIT
+ | '<hive>INSERT' '<hive>OVERWRITE_DIRECTORY' HdfsPath_EDIT OptionalInsertRowFormat OptionalStoredAs  // DIRECTORY is a non-reserved keyword
+ | '<hive>INSERT' '<hive>OVERWRITE_DIRECTORY' HdfsPath OptionalInsertRowFormat_EDIT OptionalStoredAs
+ | '<hive>INSERT' '<hive>OVERWRITE_DIRECTORY' HdfsPath OptionalInsertRowFormat OptionalStoredAs_EDIT
  | '<hive>INSERT' 'INTO' OptionalHiveTable 'CURSOR'
    {
      if (!$3) {
