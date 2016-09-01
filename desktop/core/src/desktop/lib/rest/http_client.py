@@ -21,9 +21,14 @@ import urllib
 
 from django.utils.encoding import iri_to_uri, smart_str
 
+from desktop import conf
+
 from requests import exceptions
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+from requests.packages.urllib3.contrib import pyopenssl
+
+pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
 __docformat__ = "epytext"
 
