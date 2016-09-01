@@ -3076,7 +3076,7 @@
 
       editor.commands.addCommand({
         name: "new",
-        bindKey: {win: "Ctrl-e", mac: "Command-e|Ctrl-e"},
+        bindKey: {win: "Ctrl-e", mac: "Command-e"},
         exec: function () {
           huePubSub.publish('editor.create.new');
         }
