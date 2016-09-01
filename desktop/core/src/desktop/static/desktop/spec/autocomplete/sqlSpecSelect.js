@@ -602,6 +602,61 @@ define([
         });
       });
 
+      it('should handle 100k rows before "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
+        var beforeCursor = '';
+        for (var i = 0; i < 100000; i++) {
+          beforeCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
+        }
+        assertAutoComplete({
+          beforeCursor: beforeCursor,
+          afterCursor: ';SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);',
+          dialect: 'hive',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle 100k rows after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
+        var afterCursor = ';\n';
+        for (var i = 0; i < 100000; i++) {
+          afterCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
+        }
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: afterCursor,
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle 100k rows before and after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
+        var beforeCursor = '';
+        var afterCursor = ';\n';
+        for (var i = 0; i < 100000; i++) {
+          beforeCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
+          afterCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
+        }
+        assertAutoComplete({
+          beforeCursor: beforeCursor,
+          afterCursor: afterCursor,
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);',

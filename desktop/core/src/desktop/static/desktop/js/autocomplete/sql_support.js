@@ -1036,6 +1036,29 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, sqlFunctions, de
 
   prepareNewStatement();
 
+  var REASONABLE_SURROUNDING_LENGTH = 150000; // About 3000 lines before and after
+
+  if (beforeCursor.length > REASONABLE_SURROUNDING_LENGTH) {
+    if ((beforeCursor.length - beforeCursor.lastIndexOf(';')) > REASONABLE_SURROUNDING_LENGTH) {
+      // Bail out if the last complete statement is more than 150000 chars before
+      return {};
+    }
+    // Cut it at the first statement found within 150000 chars before
+    var lastReasonableChunk = beforeCursor.substring(beforeCursor.length - REASONABLE_SURROUNDING_LENGTH);
+    beforeCursor = lastReasonableChunk.substring(lastReasonableChunk.indexOf(';') + 1);
+  }
+
+  if (afterCursor.length > REASONABLE_SURROUNDING_LENGTH) {
+    if ((afterCursor.length - afterCursor.indexOf(';')) > REASONABLE_SURROUNDING_LENGTH) {
+      // No need to bail out for what's comes after, we can still get keyword completion
+      afterCursor = '';
+    } else {
+      // Cut it at the last statement found within 150000 chars after
+      var firstReasonableChunk = afterCursor.substring(0, REASONABLE_SURROUNDING_LENGTH);
+      afterCursor = firstReasonableChunk.substring(0, firstReasonableChunk.lastIndexOf(';'));
+    }
+  }
+
   parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
 
   if (parser.yy.partialLengths.left > 0) {
