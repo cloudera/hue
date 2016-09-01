@@ -123,6 +123,7 @@
 <hive>'ORC'                                { return '<hive>ORC'; }
 <hive>'OUTPUTFORMAT'                       { return '<hive>OUTPUTFORMAT'; }
 <hive>'OVERWRITE'                          { return '<hive>OVERWRITE'; }
+<hive>OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return '<hive>OVERWRITE_DIRECTORY'; }
 <hive>'PARQUET'                            { return '<hive>PARQUET'; }
 <hive>'PARTITIONED'                        { return '<hive>PARTITIONED'; }
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
