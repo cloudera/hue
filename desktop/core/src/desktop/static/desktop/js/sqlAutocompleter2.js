@@ -462,8 +462,6 @@
             } else if (column.identifierChain && column.identifierChain.length > 0) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             }
-            addColumnsDeferred.resolve();
-            return addColumnsDeferred;
           } else if (column.subQuery && foundSubQuery.subQueries) {
             var foundNestedSubQuery = self.locateSubQuery(foundSubQuery.subQueries, column.subQuery);
             if (foundNestedSubQuery !== null) {
@@ -472,11 +470,10 @@
           }
         });
       };
-      if (foundSubQuery !== null) {
+      if (foundSubQuery !== null && foundSubQuery.columns.length > 0) {
         addSubQueryColumns(foundSubQuery.columns);
-      } else {
-        addColumnsDeferred.resolve();
       }
+      addColumnsDeferred.resolve();
     } else {
       var callback = function (data) {
         if (data.extended_columns) {
