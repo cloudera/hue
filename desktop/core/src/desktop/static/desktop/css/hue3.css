@@ -2798,3 +2798,9 @@ body {
 input[type='password']::-ms-reveal {
   display: none;
 }
+
+.hue-ace-error {
+  position: absolute;
+  border-bottom: 1px dotted #FF0000;
+  border-radius: 0 !important;
+}

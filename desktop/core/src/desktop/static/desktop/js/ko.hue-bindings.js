@@ -2678,6 +2678,8 @@
         setShowGutter: true
       };
 
+      var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', false);
+
       editor.customMenuOptions = {
         setEnableAutocompleter: function (enabled) {
           editor.setOption('enableBasicAutocompletion', enabled);
@@ -2703,7 +2705,52 @@
         }
       };
 
+      if (window.Worker) {
+        editor.customMenuOptions.setExperimentalErrorHighlighting = function (enabled) {
+          errorHighlightingEnabled = enabled;
+          snippet.getApiHelper().setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+        };
+        editor.customMenuOptions.getExperimentalErrorHighlighting = function () {
+          return errorHighlightingEnabled;
+        };
+      }
+
       $.extend(editorOptions, aceOptions);
+
+      if (window.Worker) {
+        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js');
+        var AceRange = ace.require('ace/range').Range;
+        aceSqlWorker.onmessage = function(e) {
+          if (errorHighlightingEnabled) {
+            for (var id in editor.session.getMarkers()) {
+              var marker = editor.session.getMarkers()[id];
+              if (marker.clazz == "hue-ace-error"){
+                editor.session.removeMarker(marker.id);
+              }
+            }
+
+            e.data.errors.forEach(function (error) {
+              if (error.expected.length > 0) {
+                var token = editor.session.getTokenAt(error.loc.first_line - 1, error.loc.first_column);
+                token.error = error;
+                editor.session.addMarker(new AceRange(error.loc.first_line - 1, error.loc.first_column, error.loc.last_line - 1, error.loc.last_column), 'hue-ace-error', 'fail');
+              }
+            });
+          }
+          e.data.locations.forEach(function (location) {
+            var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
+            if (token && location.type === 'table') {
+              token.parseLocation = location;
+            }
+          });
+        };
+
+        editor.on("change", function (e) {
+          if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
+            aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
+          }
+        });
+      }
 
       editorOptions['enableBasicAutocompletion'] = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'enableBasicAutocompletion', true);
       if (editorOptions['enableBasicAutocompletion']) {
@@ -2928,11 +2975,7 @@
                 } else if (typeof token.columns !== 'undefined') {
                   colHiglightCallback(token.columns);
                 }
-              }
-              else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
-                  token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
-                  currentAssistTables[token.value]) {
-                // add highlight for the clicked token
+              } else if (token.parseLocation) {
                 var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
                 editor.session.removeMarker(this.marker);
                 this.marker = editor.session.addMarker(range, 'ace_bracket red');
@@ -2941,16 +2984,44 @@
                 if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
                   this.show(null, this.x + 10, this.y + 10);
                 }
-                this.link = token;
+                this.link = token.parseLocation;
                 this.isClearable = true
-              }
-              else {
+              } else if (token.error) {
+                this.setText(this.createErrorMessage(token.error));
+                this.show(null, this.x + 10, this.y + 10);
+                this.isClearable = true
+              } else {
                 this.clear();
               }
-            }
-            else {
+            } else {
               this.clear();
             }
+          };
+
+          this.createErrorMessage = function (error) {
+            var expectedTokens = {};
+            error.expected.forEach(function (expected) {
+              expected = expected.substring(1, expected.length-1);
+              if (expected.indexOf('<') === 0) {
+                expected = expected.substring(expected.indexOf('>') + 1);
+              }
+              if (/^[A-Z]+$/.test(expected) && !/PARTIAL_CURSOR|CURSOR|EOF/.test(expected)) {
+                expectedTokens[expected] = true;
+              }
+            });
+            var errorString = 'Expected: ';
+            var count = 1;
+            Object.keys(expectedTokens).forEach(function (expected) {
+              if (count > 1) {
+                errorString += ', ';
+              }
+              if (count % 5 === 0) {
+                errorString += '\n';
+              }
+              errorString += expected;
+              count++;
+            });
+            return errorString;
           };
 
           this.clear = function () {
@@ -3003,7 +3074,15 @@
       HueLink = ace.require("huelink").HueLink;
       editor.hueLink = new HueLink(editor);
       editor.hueLink.on("open", function (token) {
-        if (token.value === " * " && token.columns.length > 0) {
+        if (token.location) {
+          if (token.type === 'table') {
+            if (token.identifierChain.length === 1) {
+              window.open("/metastore/table/" + snippet.database() + "/" + token.identifierChain[0].name, '_blank');
+            } else if (token.identifierChain.length === 2) {
+              window.open("/metastore/table/" + token.identifierChain[0].name + '/' + token.identifierChain[1].name, '_blank');
+            }
+          }
+        } else if (token.value === " * " && token.columns.length > 0) {
           editor.session.replace(token.range, token.columns.join(", "))
         } else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
           window.open("/filebrowser/#" + token.value.replace(/'/gi, ""), '_blank');
