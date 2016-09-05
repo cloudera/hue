@@ -2377,13 +2377,37 @@ body {
   padding: 6px 1px;
   list-style: none;
   font-size: 13px;
-  opacity: 0;
 
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.hue-context-menu, .sql-context-popover-bottom {
   border-radius: 2px;
   background-color: #FFF;
   -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
-  transition: opacity .3s;
+}
+
+.sql-context-popover-top {
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0 -2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.18), 0 -2px 8px 0 rgba(0, 0, 0, 0.13);
+}
+
+.sql-context-popover-right {
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 2px 0 8px rgba(0,0,0,.18);
+  box-shadow: 2px 0 6px 0 rgba(0, 0, 0, 0.18), 2px 0 8px 0 rgba(0, 0, 0, 0.13);
+}
+
+.sql-context-popover-left {
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: -2px 0 8px rgba(0,0,0,.18);
+  box-shadow: -2px 0 6px 0 rgba(0, 0, 0, 0.18), -2px 0 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .hue-inner-drop-down {

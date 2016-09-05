@@ -20,6 +20,7 @@
 %>
 
 <%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
@@ -50,6 +51,7 @@ ${ editorComponents.topBar() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
+${ sqlContextPopover.sqlContextPopover() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
