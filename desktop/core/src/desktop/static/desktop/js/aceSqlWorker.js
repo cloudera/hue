@@ -24,6 +24,10 @@ require([
   this.throttle = -1;
 
   this.onmessage = function (msg) {
+    if (msg.data.ping) {
+      postMessage({ ping: true });
+      return;
+    }
     clearTimeout(this.throttle);
     this.throttle = setTimeout(function () {
       if (msg.data) {
