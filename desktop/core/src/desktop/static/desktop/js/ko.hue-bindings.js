@@ -2627,6 +2627,10 @@
 
       $el.text(snippet.statement_raw());
 
+      window.setTimeout(function () {
+        huePubSub.publish('editor.refresh.locations');
+      }, 0);
+
       var editor = ace.edit($el.attr("id"));
       editor.session.setMode(snippet.getAceMode());
       if (navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1) {
@@ -2719,8 +2723,13 @@
 
       if (window.Worker) {
         var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js');
+        var workerIsReady = false;
         var AceRange = ace.require('ace/range').Range;
         aceSqlWorker.onmessage = function(e) {
+          workerIsReady = true;
+          if (e.data.ping) {
+            return;
+          }
           if (errorHighlightingEnabled) {
             for (var id in editor.session.getMarkers()) {
               var marker = editor.session.getMarkers()[id];
@@ -2748,6 +2757,25 @@
         editor.on("change", function (e) {
           if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
             aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
+          }
+        });
+
+        var whenWorkerIsReady = function (callback) {
+          if (!workerIsReady) {
+            aceSqlWorker.postMessage({ ping: true });
+            window.setTimeout(function () {
+              whenWorkerIsReady(callback);
+            }, 500);
+          } else {
+            callback();
+          }
+        };
+
+        huePubSub.subscribe('editor.refresh.locations', function () {
+          if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
+            whenWorkerIsReady(function () {
+              aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
+            });
           }
         });
       }
