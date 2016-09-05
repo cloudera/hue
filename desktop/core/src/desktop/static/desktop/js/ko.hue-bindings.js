@@ -2748,9 +2748,7 @@
           }
           e.data.locations.forEach(function (location) {
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
-            if (token && location.type === 'table') {
-              token.parseLocation = location;
-            }
+            token.parseLocation = location;
           });
         };
 
@@ -3012,7 +3010,7 @@
                 if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
                   this.show(null, this.x + 10, this.y + 10);
                 }
-                this.link = token.parseLocation;
+                this.link = { token: token, marker: this.marker };
                 this.isClearable = true
               } else if (token.error) {
                 this.setText(this.createErrorMessage(token.error));
@@ -3101,23 +3099,24 @@
 
       HueLink = ace.require("huelink").HueLink;
       editor.hueLink = new HueLink(editor);
-      editor.hueLink.on("open", function (token) {
-        if (token.location) {
-          if (token.type === 'table') {
-            if (token.identifierChain.length === 1) {
-              window.open("/metastore/table/" + snippet.database() + "/" + token.identifierChain[0].name, '_blank');
-            } else if (token.identifierChain.length === 2) {
-              window.open("/metastore/table/" + token.identifierChain[0].name + '/' + token.identifierChain[1].name, '_blank');
-            }
-          }
+      editor.hueLink.on("open", function (link) {
+        var marker = editor.session.getMarkers()[link.marker];
+        var startCoordinates = editor.renderer.textToScreenCoordinates(marker.range.start.row, marker.range.start.column);
+        var endCoordinates = editor.renderer.textToScreenCoordinates(marker.range.end.row, marker.range.end.column);
+        var token = link.token;
+        if (token.parseLocation) {
+          huePubSub.publish('sql.context.popover.show', { data: token.parseLocation, source: {
+            left: startCoordinates.pageX,
+            top: startCoordinates.pageY,
+            right: endCoordinates.pageX,
+            bottom: endCoordinates.pageY + editor.renderer.lineHeight
+          }});
         } else if (token.value === " * " && token.columns.length > 0) {
           editor.session.replace(token.range, token.columns.join(", "))
         } else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
           window.open("/filebrowser/#" + token.value.replace(/'/gi, ""), '_blank');
         } else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
           window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""), '_blank');
-        } else {
-          window.open("/metastore/table/" + snippet.database() + "/" + token.value, '_blank');
         }
       });
 
