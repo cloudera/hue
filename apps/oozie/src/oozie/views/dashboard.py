@@ -320,7 +320,10 @@ def list_oozie_workflow(request, job_id):
     try:
       # To update with the new History document model
       hue_coord = get_history().get_coordinator_from_config(oozie_workflow.conf_dict)
-      hue_workflow = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(oozie_workflow.conf_dict)
+      hue_workflow = get_history().get_workflow_from_config(oozie_workflow.conf_dict)
+      # When a workflow is submitted by a coordinator
+      if not hue_workflow and hue_coord:
+        hue_workflow = hue_coord.workflow
 
       if hue_coord and hue_coord.workflow: hue_coord.workflow.document.doc.get().can_read_or_exception(request.user)
       if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
