@@ -206,20 +206,24 @@ this.$ = { identifierChain: $$[$0-1].identifierChain, alias: $$[$0] };
 break;
 case 658:
 
-     addColumnLocation(_$[$0], $$[$0]);
+     addColumnLocation(parser.yy.lastIdentifierChainLocation, $$[$0]);
    
 break;
 case 659:
 
-     addColumnLocation(_$[$0-2], $$[$0-2]);
+     addColumnLocation(parser.yy.lastIdentifierChainLocation, $$[$0-2]);
    
 break;
-case 661: case 669: case 1138: case 1454:
-this.$ = [ $$[$0] ];
+case 661:
+
+     this.$ = [$$[$0]];
+     parser.yy.lastIdentifierChainLocation = _$[$0];
+   
 break;
-case 662: case 670: case 1139:
+case 662:
 
      $$[$0-2].push($$[$0]);
+     parser.yy.lastIdentifierChainLocation = _$[$0];
    
 break;
 case 663: case 671:
@@ -254,6 +258,14 @@ case 668:
        identifierChain: $$[$0-4]
      });
      this.$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
+   
+break;
+case 669: case 1138: case 1454:
+this.$ = [ $$[$0] ];
+break;
+case 670: case 1139:
+
+     $$[$0-2].push($$[$0]);
    
 break;
 case 673:

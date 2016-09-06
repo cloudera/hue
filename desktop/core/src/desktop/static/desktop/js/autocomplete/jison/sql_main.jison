@@ -855,11 +855,11 @@ LocalOrSchemaQualifiedName_EDIT
 ColumnReference
  : BasicIdentifierChain
    {
-     addColumnLocation(@1, $1);
+     addColumnLocation(parser.yy.lastIdentifierChainLocation, $1);
    }
  | BasicIdentifierChain AnyDot '*'
    {
-     addColumnLocation(@1, $1);
+     addColumnLocation(parser.yy.lastIdentifierChainLocation, $1);
    }
  ;
 
@@ -868,10 +868,15 @@ ColumnReference_EDIT
  ;
 
 BasicIdentifierChain
- : ColumnIdentifier                              -> [ $1 ]
+ : ColumnIdentifier
+   {
+     $$ = [$1];
+     parser.yy.lastIdentifierChainLocation = @1;
+   }
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
      $1.push($3);
+     parser.yy.lastIdentifierChainLocation = @3;
    }
  ;
 
