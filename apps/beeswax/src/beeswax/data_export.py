@@ -61,7 +61,7 @@ def download(handle, format, db, id=None):
   return resp
 
 
-def upload(path, handle, user, db, fs):
+def upload(path, handle, user, db, fs, max_cells=-1):
   """
   upload(query_model, path, user, db, fs) -> None
 
@@ -72,7 +72,7 @@ def upload(path, handle, user, db, fs):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, max_cells=-1, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)

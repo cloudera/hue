@@ -39,7 +39,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import data_export
   from beeswax.api import _autocomplete, _get_sample_data
-  from beeswax.conf import CONFIG_WHITELIST as hive_settings
+  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_CELL_LIMIT
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
@@ -413,8 +413,9 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
+    max_cells = DOWNLOAD_CELL_LIMIT.get()
 
-    upload(target_file, handle, self.request.user, db, self.request.fs)
+    upload(target_file, handle, self.request.user, db, self.request.fs, max_cells=max_cells)
 
     return '/filebrowser/view=%s' % target_file
 
