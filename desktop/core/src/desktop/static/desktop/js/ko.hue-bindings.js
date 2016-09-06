@@ -2869,254 +2869,77 @@
         }
       });
 
-      var currentAssistTables = {};
+      var lastHoveredToken = null;
+      var activeMarker = null;
 
-      var refreshTables = function() {
-        currentAssistTables = {};
-        if (snippet.database()) {
-          apiHelper.fetchTables({
-            sourceType: snippet.type(),
-            databaseName: snippet.database(),
-            successCallback: function(data) {
-              $.each(data.tables_meta, function(index, tableMeta) {
-                currentAssistTables[tableMeta.name] = true;
-              });
-            },
-            silenceErrors: true
-          });
+      var clearActiveMarker = function () {
+        if (activeMarker !== null) {
+          editor.session.removeMarker(activeMarker);
+          activeMarker = null;
         }
       };
-      snippet.database.subscribe(refreshTables);
-      refreshTables();
 
-      ace.define("huelink", [], function (require, exports, module) {
-        "use strict";
+      var markLocation = function (parseLocation) {
+        var range;
+        if (parseLocation.type === 'function') {
+          // Todo: Figure out why functions need an extra char at the end
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column);
+        } else {
+          range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
+        }
+        activeMarker = editor.session.addMarker(range, 'hue-ace-location');
+        return range;
+      };
 
-        var Oop = ace.require("ace/lib/oop");
-        var Event = ace.require("ace/lib/event");
-        var Range = ace.require("ace/range").Range;
-        var EventEmitter = ace.require("ace/lib/event_emitter").EventEmitter;
-        var Tooltip = ace.require("ace/tooltip").Tooltip;
-
-        var HueLink = function (editor) {
-          if (editor.hueLink)
-            return;
-          editor.hueLink = this;
-          this.editor = editor;
-          Tooltip.call(this, editor.container);
-
-          this.update = this.update.bind(this);
-          this.onMouseMove = this.onMouseMove.bind(this);
-          this.onMouseOut = this.onMouseOut.bind(this);
-          this.onClick = this.onClick.bind(this);
-          Event.addListener(editor.renderer.scroller, "mousemove", this.onMouseMove);
-          Event.addListener(editor.renderer.content, "mouseout", this.onMouseOut);
-          Event.addListener(editor.renderer.content, "click", this.onClick);
-        };
-
-        Oop.inherits(HueLink, Tooltip);
-
-        (function () {
-          Oop.implement(this, EventEmitter);
-
-          this.token = {};
-          this.marker = null;
-          this.updateThrottle = -1;
-
-          this.update = function () {
-            var self = this;
-            self.$timer = null;
-            window.clearTimeout(self.updateThrottle);
-            self.updateThrottle = window.setTimeout(function () {
-              self.performUpdate();
-            }, 100);
-          };
-
-          this.performUpdate = function () {
-            var editor = this.editor;
-            var renderer = editor.renderer;
-
-            var canvasPos = renderer.scroller.getBoundingClientRect();
-            var offset = (this.x + renderer.scrollLeft - canvasPos.left - renderer.$padding) / renderer.characterWidth;
-            var row = Math.floor((this.y + renderer.scrollTop - canvasPos.top) / renderer.lineHeight);
-            var col = Math.round(offset);
-
-            var screenPos = {row: row, column: col, side: offset - col > 0 ? 1 : -1};
-            var session = editor.session;
-            var docPos = session.screenToDocumentPosition(screenPos.row, screenPos.column);
-
-            var selectionRange = editor.selection.getRange();
-            if (!selectionRange.isEmpty()) {
-              if (selectionRange.start.row <= row && selectionRange.end.row >= row)
-                return this.clear();
+      editor.on("mousemove", function (e) {
+        var selectionRange = editor.selection.getRange();
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX+5, e.clientY);
+          var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+          if (lastHoveredToken !== token) {
+            clearActiveMarker();
+            if (token.parseLocation) {
+              markLocation(token.parseLocation);
             }
-
-            var line = editor.session.getLine(docPos.row);
-            if (docPos.column == line.length) {
-              var clippedPos = editor.session.documentToScreenPosition(docPos.row, docPos.column);
-              if (clippedPos.column != screenPos.column) {
-                return this.clear();
-              }
-            }
-
-            var token = editor.session.getTokenAt(docPos.row, docPos.column);
-
-            if (token) {
-              var self = this;
-              if (token.value === " * ") {
-                var start = token.value == " * " ? token.start + 1 : token.start;
-                var end = token.value == " * " ? token.start + 2 : token.start + token.value.length;
-                var beforeToken = editor.session.doc.getTextRange(new AceRange(0, 0, docPos.row, start));
-                var afterToken = editor.getValue().substring(beforeToken.length + 1);
-
-                var colHiglightCallback = function (cols) {
-                  if (cols.length > 0) {
-                    // add highlight for the clicked token
-                    var range = new AceRange(docPos.row, start, docPos.row, end);
-                    token.range = range;
-                    token.columns = cols;
-                    editor.session.removeMarker(self.marker);
-                    self.marker = editor.session.addMarker(range, 'ace_bracket red');
-                    editor.renderer.setCursorStyle("pointer");
-                    self.setText(options.expandStar);
-                    if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
-                      self.show(null, self.x + 10, self.y + 10);
-                    }
-                    self.link = token;
-                    self.isClearable = true
-                  }
-                };
-
-                if ((typeof token.columns === 'undefined' || token.lastLengthAfter !== afterToken.length) && beforeToken.length < 50000 && afterToken.length < 50000) {
-                  token.lastLengthAfter = afterToken.length;
-                  snippet.autocompleter.autocomplete(beforeToken, afterToken, function (suggestions) {
-                    var cols = [];
-                    $.each(suggestions, function (idx, suggestion) {
-                      if (suggestion.isColumn) {
-                        cols.push(suggestion.value);
-                      }
-                    });
-                    colHiglightCallback(cols);
-                  });
-                } else if (typeof token.columns !== 'undefined') {
-                  colHiglightCallback(token.columns);
-                }
-              } else if (token.parseLocation) {
-                var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
-                editor.session.removeMarker(this.marker);
-                this.marker = editor.session.addMarker(range, 'ace_bracket red');
-                editor.renderer.setCursorStyle("pointer");
-                this.setText(options.openIt);
-                if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
-                  this.show(null, this.x + 10, this.y + 10);
-                }
-                this.link = { token: token, marker: this.marker };
-                this.isClearable = true
-              } else if (token.error) {
-                this.setText(this.createErrorMessage(token.error));
-                this.show(null, this.x + 10, this.y + 10);
-                this.isClearable = true
-              } else {
-                this.clear();
-              }
-            } else {
-              this.clear();
-            }
-          };
-
-          this.createErrorMessage = function (error) {
-            var expectedTokens = {};
-            error.expected.forEach(function (expected) {
-              expected = expected.substring(1, expected.length-1);
-              if (expected.indexOf('<') === 0) {
-                expected = expected.substring(expected.indexOf('>') + 1);
-              }
-              if (/^[A-Z]+$/.test(expected) && !/PARTIAL_CURSOR|CURSOR|EOF/.test(expected)) {
-                expectedTokens[expected] = true;
-              }
-            });
-            var errorString = 'Expected: ';
-            var count = 1;
-            Object.keys(expectedTokens).forEach(function (expected) {
-              if (count > 1) {
-                errorString += ', ';
-              }
-              if (count % 5 === 0) {
-                errorString += '\n';
-              }
-              errorString += expected;
-              count++;
-            });
-            return errorString;
-          };
-
-          this.clear = function () {
-            if (this.isClearable) {
-              this.hide(); // hides the tooltip
-              this.editor.session.removeMarker(this.marker);
-              this.editor.renderer.setCursorStyle("");
-              this.isClearable = false;
-              this.link = null;
-            }
-          };
-
-          this.onClick = function (e) {
-            if (this.link && e.shiftKey) {
-              this.link.editor = this.editor;
-              this.editor.session.selection.clearSelection();
-              this._signal("open", this.link);
-              this.clear();
-            }
-          };
-
-          this.onMouseMove = function (e) {
-            if (this.editor.$mouseHandler.isMousePressed) {
-              if (!this.editor.selection.isEmpty())
-                this.clear();
-              return;
-            }
-            this.x = e.clientX;
-            this.y = e.clientY;
-            this.update();
-          };
-
-          this.onMouseOut = function (e) {
-            Tooltip.prototype.hide();
-            this.clear();
-          };
-
-          this.destroy = function () {
-            this.onMouseOut();
-            Event.removeListener(this.editor.renderer.scroller, "mousemove", this.onMouseMove);
-            Event.removeListener(this.editor.renderer.content, "mouseout", this.onMouseOut);
-            delete this.editor.hueLink;
-          };
-
-        }).call(HueLink.prototype);
-
-        exports.HueLink = HueLink;
+            lastHoveredToken = token;
+          }
+        }
       });
 
-      HueLink = ace.require("huelink").HueLink;
-      editor.hueLink = new HueLink(editor);
-      editor.hueLink.on("open", function (link) {
-        var marker = editor.session.getMarkers()[link.marker];
-        var startCoordinates = editor.renderer.textToScreenCoordinates(marker.range.start.row, marker.range.start.column);
-        var endCoordinates = editor.renderer.textToScreenCoordinates(marker.range.end.row, marker.range.end.column);
-        var token = link.token;
-        if (token.parseLocation) {
-          huePubSub.publish('sql.context.popover.show', { data: token.parseLocation, source: {
-            left: startCoordinates.pageX,
-            top: startCoordinates.pageY,
-            right: endCoordinates.pageX,
-            bottom: endCoordinates.pageY + editor.renderer.lineHeight
-          }});
-        } else if (token.value === " * " && token.columns.length > 0) {
-          editor.session.replace(token.range, token.columns.join(", "))
-        } else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
-          window.open("/filebrowser/#" + token.value.replace(/'/gi, ""), '_blank');
-        } else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
-          window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""), '_blank');
+      editor.on("input", function (e) {
+        clearActiveMarker();
+        lastHoveredToken = null;
+      });
+
+      editor.container.addEventListener("mouseout", function (e) {
+        clearActiveMarker();
+        lastHoveredToken = null;
+      });
+
+      editor.container.addEventListener("contextmenu", function (e) {
+        var selectionRange = editor.selection.getRange();
+        huePubSub.publish('sql.context.popover.hide');
+        if (selectionRange.isEmpty()) {
+          var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+          var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+
+          if (typeof token.parseLocation !== 'undefined') {
+            var range = markLocation(token.parseLocation);
+            var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
+            var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
+            huePubSub.publish('sql.context.popover.show', {
+              data: token.parseLocation,
+              snippet: snippet,
+              source: {
+                left: startCoordinates.pageX - 3,
+                top: startCoordinates.pageY,
+                right: endCoordinates.pageX - 3,
+                bottom: endCoordinates.pageY + editor.renderer.lineHeight
+              }
+            });
+            e.preventDefault();
+            return false;
+          }
         }
       });
 
