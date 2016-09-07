@@ -2335,9 +2335,17 @@ class SqoopDocumentAction(Action):
   FIELDS = {
     'uuid': {
         'name': 'uuid',
-        'label': _('Spark program'),
+        'label': _('Sqoop program'),
         'value': '',
-        'help_text': _('Select a saved Spark program you want to schedule.'),
+        'help_text': _('Select a saved Sqoop program you want to schedule.'),
+        'type': 'sqoop'
+     },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
      },
      # Common
      'files': {
