@@ -222,7 +222,10 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-function-details">
-    Function details
+    <div style="padding: 8px" data-bind="with: func">
+      <p><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
+      <p><span data-bind="text: description"></span></p>
+    <div>
   </script>
 
   <script type="text/html" id="sql-context-popover-template">
@@ -254,8 +257,9 @@ from metadata.conf import has_navigator
     require([
       'knockout',
       'desktop/js/apiHelper',
-      'desktop/js/assist/tableStats'
-    ], function (ko, ApiHelper, TableStats) {
+      'desktop/js/assist/tableStats',
+      'desktop/js/sqlFunctions'
+    ], function (ko, ApiHelper, TableStats, sqlFunctions) {
 
       var intervals = [];
 
@@ -395,12 +399,13 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('sample');
       }
 
-      function functionContextTabs(data) {
+      function functionContextTabs(data, snippet) {
         var self = this;
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', template: 'sql-context-function-details' }
         ];
         self.activeTab = ko.observable('details');
+        self.func = ko.observable(sqlFunctions.findFunction(snippet.type(), data.function));
       }
 
       function sqlContextPopoverViewModel(params) {
@@ -453,7 +458,7 @@ from metadata.conf import has_navigator
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-columns'
         } else if (self.isFunction) {
-          self.contents = new functionContextTabs(self.data);
+          self.contents = new functionContextTabs(self.data, self.snippet);
           self.title = self.data.function;
           self.iconClass = 'fa-superscript'
         } else {
