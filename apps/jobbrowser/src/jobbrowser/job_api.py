@@ -18,16 +18,28 @@
 import logging
 
 from django.utils.translation import ugettext as _
+
+# TODO Protect in case modules are not there
 from jobbrowser.api import YarnApi as NativeYarnApi
+from liboozie.oozie_api import get_oozie
+from oozie.conf import OOZIE_JOBS_COUNT
+
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
 
 
-def get_api(user):
-  pass
-
+def get_api(user, interface):
+  if interface == 'batches':
+    return BatchApi(user)
+  elif interface == 'schedules':
+    return ScheduleApi(user)
+  elif interface == 'jobs':
+    return YarnApi(user)
+  else:
+    raise PopupException(_('Interface %s is unknown') % interface)
 
 
 class Api():
@@ -80,12 +92,25 @@ class ImpalaApi(Api):
 # Batch
 
 class BatchApi(Api):
-  pass
+
+  def apps(self):
+    oozie_api = get_oozie(self.user)
+    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    wf_list = oozie_api.get_workflows(**kwargs)
+
+    return [{'id': app.id, 'status': app.status} for app in wf_list.jobs]
+
 
 # Schedule
 
 class ScheduleApi(Api):
-  pass
+
+  def apps(self):
+    oozie_api = get_oozie(self.user)
+    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    wf_list = oozie_api.get_coordinators(**kwargs)
+
+    return [{'id': app.id, 'status': app.status} for app in wf_list.jobs]
 
 
 # History

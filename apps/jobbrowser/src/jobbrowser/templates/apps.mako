@@ -51,10 +51,18 @@ ${ require.config() }
   ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
   &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
 
+  <span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: jobs.interface" />${ _('Jobs') }</span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: jobs.interface" />${ _('Batches') }</span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: jobs.interface" />${ _('Schedules') }</span>
+  </span>
+
   <span class="btn-group">
-    <a class="btn btn-status" data-value="completed">${ _('Jobs') }</a>
-    <a class="btn btn-status" data-value="running">${ _('Batches') }</a>
-    <a class="btn btn-status" data-value="killed">${ _('Schedules') }</a>
+    <span class="btn-group">
+      <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+      <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+      <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+    </span>
   </span>
 
   <div class="card card-small">
@@ -74,7 +82,7 @@ ${ require.config() }
       <th>${_('Submitted')}</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: apps">
+    <tbody data-bind="foreach: jobs.apps">
       <tr>
         <td></td>
         <td data-bind="text: id"></td>
@@ -119,27 +127,46 @@ ${ require.config() }
       self.submitted = ko.observable(typeof job.submitted != "undefined" && job.submitted != null ? job.submitted : null);
     };
 
-    var JobBrowserViewModel = function (options) {
+    var Jobs = function (vm, options) {
       var self = this;
 
       self.apps = ko.observableArray();
       self.loadingApps = ko.observable(false);
 
-      self.fetchJobs = function (callback) {
+      self.username = ko.observable('${ user.username }');
+
+      self.interface = ko.observable('jobs');
+      self.interface.subscribe(function(val) {
+        self.fetchJobs();
+      });
+
+      self.fetchJobs = function () {
         self.loadingApps(true);
-        $.get("/jobbrowser/api/jobs", {
+        $.post("/jobbrowser/api/jobs", {
+          username: ko.mapping.toJSON(self.username),
+          interface: ko.mapping.toJSON(self.interface)
         }, function(data) {
-          var apps = [];
-          if (data && data.apps){
-            data.apps.forEach(function(job){
-              apps.push(new Job(self, job));
-            });
+          if (data.status == 0) {
+            var apps = [];
+            if (data && data.apps) {
+              data.apps.forEach(function(job){
+                apps.push(new Job(self, job));
+              });
+            }
+            self.apps(apps);
+          } else {
+            $(document).trigger("error", data.message);
           }
-          self.apps(apps);
         }).always(function(){
           self.loadingApps(false);
         });
       };
+    }
+
+    var JobBrowserViewModel = function (options) {
+      var self = this;
+
+      self.jobs = new Jobs(self, options);
     };
 
     var viewModel;
@@ -154,7 +181,7 @@ ${ require.config() }
       viewModel = new JobBrowserViewModel(options);
       ko.applyBindings(viewModel);
 
-      viewModel.fetchJobs();
+      viewModel.jobs.fetchJobs();
     });
   });
 </script>
