@@ -2718,7 +2718,7 @@ ArbitraryFunction
        $$ = { function: $1, types: findReturnTypes($1) }
      }
    }
- | 'IF' ArbitraryFunctionRightPart
+ | ArbitraryFunctionName ArbitraryFunctionRightPart
    {
      addFunctionLocation(@1, $1);
      if ($2.expression) {
@@ -2738,7 +2738,7 @@ ArbitraryFunction_EDIT
      }
      $$ = { types: findReturnTypes($1) };
    }
- | 'IF' ArbitraryFunctionRightPart_EDIT
+ | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
      addFunctionLocation(@1, $1);
      if ($2.position) {
@@ -2746,6 +2746,13 @@ ArbitraryFunction_EDIT
      }
      $$ = { types: findReturnTypes($1) };
    }
+ ;
+
+ArbitraryFunctionName
+ : 'IF'
+ | '<hive>ARRAY'
+ | '<hive>BINARY'
+ | '<hive>MAP'
  ;
 
 ArbitraryFunctionRightPart
