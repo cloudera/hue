@@ -18,7 +18,7 @@
 
 import json
 
-from nose.tools import assert_equal, assert_false, assert_true
+from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -98,6 +98,16 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert_equal(-1, data['status'])
     assert_true('not found' in data['message'])
+
+    # Document UUID and XML UUID missmatch
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    doc.uuid = '1234-5678-9'
+    doc.save()
+    assert_not_equal(doc.uuid, data['document']['uuid'])
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['document']['uuid'])
 
 
   def test_directory_create_and_rename(self):

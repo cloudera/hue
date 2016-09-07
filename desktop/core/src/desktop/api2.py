@@ -168,7 +168,7 @@ def get_document(request):
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
-      if 'uuid' not in data:
+      if data.get('uuid') != document.uuid: # Old format < 3.11
         data['uuid'] = document.uuid
 
     response['data'] = data
