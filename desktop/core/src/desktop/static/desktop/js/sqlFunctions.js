@@ -2433,7 +2433,7 @@
     suggestFunctions: suggestFunctions,
     getArgumentTypes: getArgumentTypes,
     getReturnTypes: getReturnTypes,
-    matchesType: matchesType
+    matchesType: matchesType,
+    findFunction: findFunction
   };
-
 }));
