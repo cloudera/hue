@@ -172,6 +172,10 @@ def _default_interpreters():
           'name': 'Java', 'interface': 'oozie', 'options': {}
       })
       ,
+      ('sqoop1', {
+          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
+      })
+      ,
       ('spark2', {
           'name': 'Spark', 'interface': 'oozie', 'options': {}
       })

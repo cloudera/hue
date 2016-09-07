@@ -303,11 +303,15 @@ ${ hueIcons.symbols() }
                 <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" />
                 Spark
               <!-- /ko -->
+              <!-- ko if: editorType() == 'sqoop1' -->
+                <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" />
+                Sqoop 1
+              <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2'].indexOf(editorType()) == -1 -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
               <!-- /ko -->

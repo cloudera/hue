@@ -788,6 +788,15 @@ class Node():
         self.data['properties']['job_properties'] = job_properties
       self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['parameters']]
 
+    elif self.data['type'] == SqoopDocumentAction.TYPE:
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+      action = notebook.get_data()['snippets'][0]
+
+      name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
+      self.data['properties']['command'] = action['statement']
+      self.data['properties']['arguments'] = []
+
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -2321,6 +2330,72 @@ class PigDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
+class SqoopDocumentAction(Action):
+  TYPE = 'sqoop-document'
+  FIELDS = {
+    'uuid': {
+        'name': 'uuid',
+        'label': _('Spark program'),
+        'value': '',
+        'help_text': _('Select a saved Spark program you want to schedule.'),
+     },
+     # Common
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Files put in the running directory.'),
+          'type': ''
+     },
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production'),
+          'type': ''
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.'),
+          'type': ''
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': '',
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -2355,7 +2430,8 @@ NODES = {
   'hive-document-widget': HiveDocumentAction,
   'java-document-widget': JavaDocumentAction,
   'spark-document-widget': SparkDocumentAction,
-  'pig-document-widget': PigDocumentAction
+  'pig-document-widget': PigDocumentAction,
+  'sqoop-document-widget': SqoopDocumentAction
 }
 
 
@@ -3163,6 +3239,8 @@ class WorkflowBuilder():
         node = self.get_spark_document_node(document, user)
       elif document.type == 'query-pig':
         node = self.get_pig_document_node(document, user)
+      elif document.type == 'query-sqoop1':
+        node = self.get_sqoop_document_node(document, user)
       else:
         raise PopupException(_('Snippet type %s is not supported in batch execution.') % document.type)
 
@@ -3315,6 +3393,41 @@ class WorkflowBuilder():
     node['properties']['uuid'] = document.uuid
 
     return node
+
+  def get_sqoop_document_node(self, document, user):
+    node = self._get_sqoop_node(document.uuid, is_document_node=True)
+
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
+  def _get_sqoop_node(self, node_id, credentials=None, is_document_node=False):
+    if credentials is None:
+      credentials = []
+
+    return {
+        "id": node_id,
+        'name': 'sqoop-%s' % node_id[:4],
+        "type": "sqoop-document-widget",
+        "properties":{
+              "command": "",
+              "arguments": [],
+              "retry_max": [],
+              "retry_interval": [],
+              "job_properties": [],
+              "capture_output": False,
+              "prepares": [],
+              "credentials": credentials,
+              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "archives": []
+        },
+        "children": [
+            {"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+            {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}
+        ],
+        "actionParameters": [],
+        "actionParametersFetched": False
+    }
 
   def get_pig_document_node(self, document, user):
     node = self._get_pig_node(document.uuid, is_document_node=True)
