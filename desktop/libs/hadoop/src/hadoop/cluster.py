@@ -71,13 +71,11 @@ def rm_ha(funct):
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'Connection aborted' in ex_message or 'standby RM' in ex_message:
         LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
-        user = api.user()
-        rm_ha = get_next_ha_yarncluster()
+        rm_ha = get_next_ha_yarncluster(current_user=api.user())
         if rm_ha is not None:
           if rm_ha[1].url == api.resource_manager_api.url:
             raise ex
           config, api.resource_manager_api = rm_ha
-          api.setuser(user)
           return funct(api, *args, **kwargs)
       raise ex
   return wraps(funct)(decorate)
@@ -212,7 +210,7 @@ def get_yarn():
       return yarn
 
 
-def get_next_ha_yarncluster():
+def get_next_ha_yarncluster(current_user=None):
   """
   Return the next available YARN RM instance and cache its name.
   """
@@ -227,7 +225,10 @@ def get_next_ha_yarncluster():
     config = conf.YARN_CLUSTERS[name]
     if config.SUBMIT_TO.get():
       rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get(), config.SSL_CERT_CA_VERIFY.get())
-      rm.setuser(DEFAULT_USER)
+      if current_user is None:
+        rm.setuser(DEFAULT_USER)
+      else:
+        rm.setuser(current_user)
       if has_ha:
         try:
           cluster_info = rm.cluster()
