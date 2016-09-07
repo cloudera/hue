@@ -22,14 +22,11 @@ from django.utils.translation import ugettext as _
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
 
-from jobbrowser.job_api import YarnApi
+from jobbrowser.job_api import get_api
 
 
 LOG = logging.getLogger(__name__)
 
-
-def get_api(user):
-  pass
 
 
 def api_error_handler(func):
@@ -53,9 +50,9 @@ def api_error_handler(func):
 def jobs(request):
   response = {'status': -1}
 
-  search = json.loads(request.POST.get('search', '{}'))
+  interface = json.loads(request.POST.get('interface'))
 
-  response['apps'] = YarnApi(request.user).apps()
+  response['apps'] = get_api(request.user, interface).apps()
   response['status'] = 0
 
   return JsonResponse(response)
