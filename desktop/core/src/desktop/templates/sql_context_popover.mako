@@ -169,7 +169,7 @@ from metadata.conf import has_navigator
     }
   </style>
 
-  <script type="text/html" id="sql-context-table-sample">
+  <script type="text/html" id="sql-context-table-and-column-sample">
     <!-- ko with: tableStats -->
     <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
     <!-- ko ifnot: loadingSamples -->
@@ -217,15 +217,27 @@ from metadata.conf import has_navigator
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="sql-context-column-sample">
-    Column sample
+  <script type="text/html" id="sql-context-column-analysis">
+    <!-- ko with: tableStats -->
+    <!-- ko hueSpinner: { spin: loadingStats, center: true, size: 'large' } --><!-- /ko -->
+    <!-- ko ifnot: loadingStats -->
+    <div class="content" data-bind="ifnot: isComplexType">
+      <table class="table table-condensed">
+        <tbody data-bind="foreach: statRows">
+        <tr><th data-bind="text: Object.keys($data)[0], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th><td data-bind="text: $data[Object.keys($data)[0]], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sql-context-function-details">
     <div style="padding: 8px" data-bind="with: func">
-      <p><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
+      <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
       <p><span data-bind="text: description"></span></p>
-    <div>
+    </div>
   </script>
 
   <script type="text/html" id="sql-context-popover-template">
@@ -279,25 +291,41 @@ from metadata.conf import has_navigator
 
       var i18n = {
         errorLoadingStats: "${ _('There was a problem loading the stats.') }",
-        errorRefreshingStats: "${ _('There was a problem refreshing the stats.') }",
-        errorLoadingTerms: "${ _('There was a problem loading the terms.') }"
+        errorRefreshingStats: "${ _('There was a problem refreshing the stats.') }"
       };
 
-      function tableContextTabs(data, snippet) {
+      function tableAndColumnContextTabs(data, snippet, isColumn) {
         var self = this;
         self.tabs = ko.observableArray([
-          { id: 'sample', label: '${ _("Sample") }', template: 'sql-context-table-sample' }
+          { id: 'sample', label: '${ _("Sample") }', template: 'sql-context-table-and-column-sample' }
         ]);
         self.activeTab = ko.observable('sample');
 
-        var database = data.identifierChain.length > 1 ? data.identifierChain[0].name : snippet.database();
-        var tableName = data.identifierChain[data.identifierChain.length - 1].name;
+        var apiHelper = ApiHelper.getInstance();
+
+        var columnName = null;
+        var databaseName = null;
+        var tableName = null;
+
+        if (data.identifierChain.length > 1 && typeof apiHelper.lastKnownDatabases[data.identifierChain[0].name] !== 'undefined') {
+          databaseName = data.identifierChain[0].name;
+        } else {
+          databaseName = snippet.database();
+        }
+
+        if (isColumn && data.identifierChain.length > 1) {
+          columnName = data.identifierChain[data.identifierChain.length - 1].name;
+          tableName =  data.identifierChain[data.identifierChain.length - 2].name;
+        } else {
+          tableName = data.identifierChain[data.identifierChain.length - 1].name;
+        }
 
         self.tableStats = new TableStats({
           i18n: i18n,
           sourceType: snippet.type(),
-          databaseName: database,
+          databaseName: databaseName,
           tableName: tableName,
+          columnName: columnName,
           apiHelper: ApiHelper.getInstance(),
           showViewMore: false
         });
@@ -308,7 +336,7 @@ from metadata.conf import has_navigator
 
         self.tableStats.showAnalysis.subscribe(function (newValue) {
           if (newValue && self.tabs().length === 1) {
-            self.tabs.push({ id: 'analysis', label: '${ _("Analysis") }', template: 'sql-context-table-analysis' });
+            self.tabs.push({ id: 'analysis', label: '${ _("Analysis") }', template: isColumn ? 'sql-context-column-analysis' : 'sql-context-table-analysis' });
           }
         });
 
@@ -391,14 +419,6 @@ from metadata.conf import has_navigator
         });
       }
 
-      function columnContextTabs(data) {
-        var self = this;
-        self.tabs = [
-          { id: 'sample', label: '${ _("Sample") }', template: 'sql-context-column-sample' }
-        ];
-        self.activeTab = ko.observable('sample');
-      }
-
       function functionContextTabs(data, snippet) {
         var self = this;
         self.tabs = [
@@ -450,11 +470,11 @@ from metadata.conf import has_navigator
         self.isFunction = params.data.type === 'function';
 
         if (self.isTable) {
-          self.contents = new tableContextTabs(self.data, self.snippet);
+          self.contents = new tableAndColumnContextTabs(self.data, self.snippet, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-table'
         } else if (self.isColumn) {
-          self.contents = new columnContextTabs(self.data);
+          self.contents = new tableAndColumnContextTabs(self.data, self.snippet, true);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-columns'
         } else if (self.isFunction) {
