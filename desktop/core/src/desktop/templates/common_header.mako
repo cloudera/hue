@@ -466,7 +466,7 @@ if USE_NEW_EDITOR.get():
     %>
     <li class="dropdown">
       <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
-        <i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span>
+        <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
         % if view_profile:
           <b class="caret"></b>
         % endif
