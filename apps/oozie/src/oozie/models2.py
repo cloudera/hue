@@ -2419,7 +2419,7 @@ class DistCpDocumentAction(Action):
         'label': _('DistCp program'),
         'value': '',
         'help_text': _('Select a saved DistCp program you want to schedule.'),
-        'type': 'distcp'
+        'type': 'distcp-doc'
      },
      'parameters': {
           'name': 'parameters',
