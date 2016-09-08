@@ -305,9 +305,12 @@ class SolrApi(object):
 
           if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
             keys.update(self._get_time_filter_query(timeFilter, facet))
-
           params += (
-             ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+             ('facet.range', '{!key=%(key)s ex=%(id)s}%(field)s' % keys),
+             ('f.%(field)s.facet.range.start' % keys, '%(start)s' % keys),
+             ('f.%(field)s.facet.range.end' % keys, '%(end)s' % keys),
+             ('f.%(field)s.facet.range.gap' % keys, '%(gap)s' % keys),
+             ('f.%(field)s.facet.mincount' % keys, '%(mincount)s' % keys),
           )
         elif facet['type'] == 'field':
           keys = {
@@ -318,7 +321,9 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
           params += (
-              ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+              ('facet.field', '{!key=%(key)s ex=%(id)s}%(field)s' % keys),
+              ('f.%(field)s.facet.limit' % keys, '%(limit)s' % keys),
+              ('f.%(field)s.facet.mincount' % keys, '%(mincount)s' % keys),
           )
         elif facet['type'] == 'nested':
           _f = {
@@ -371,8 +376,8 @@ class SolrApi(object):
             fields = facet['field']
             fields_limits = []
             for f in facet['properties']['facets']:
-              fields_limits.append('f.%s.facet.limit=%s' % (f['field'], f['limit']))
-              fields_limits.append('f.%s.facet.mincount=%s' % (f['field'], f['mincount']))
+              fields_limits.append(('f.%s.facet.limit' % f['field'], '%s' % f['limit']))
+              fields_limits.append(('f.%s.facet.mincount' % f['field'], '%s' % f['mincount']))
               fields += ',' + f['field']
             keys = {
                 'id': '%(id)s' % facet,
@@ -381,10 +386,12 @@ class SolrApi(object):
                 'fields': fields,
                 'limit': int(facet['properties'].get('limit', 10)),
                 'mincount': int(facet['properties']['mincount']),
-                'fields_limits': ' '.join(fields_limits)
             }
+            params += tuple(fields_limits)
             params += (
-                ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
+                ('facet.pivot', '{!key=%(key)s ex=%(id)s}%(fields)s' % keys),
+                ('f.%(field)s.facet.limit' % keys, '%(limit)s' % keys),
+                ('f.%(field)s.facet.mincount' % keys, '%(mincount)s' % keys),
             )
 
       if json_facets:
