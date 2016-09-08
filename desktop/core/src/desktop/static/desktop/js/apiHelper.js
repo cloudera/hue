@@ -906,6 +906,133 @@
     }));
   };
 
+  ApiHelper.prototype.identifierChainToPath = function (identifierChain, defaultDatabase) {
+    var self = this;
+    var path = [];
+    if (typeof self.lastKnownDatabases[identifierChain[0].name] === 'undefined') {
+      path.push(defaultDatabase);
+    }
+    return path.concat($.map(identifierChain, function (identifier) { return identifier.name }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.identifierChain.name
+   * @param {string} options.defaultDatabase
+   */
+  ApiHelper.prototype.fetchAutocomplete = function (options) {
+    var self = this;
+    var path = self.identifierChainToPath(options.identifierChain, options.defaultDatabase);
+
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: fieldCacheCondition
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.identifierChain.name
+   * @param {string} options.defaultDatabase
+   */
+  ApiHelper.prototype.fetchSamples = function (options) {
+    var self = this;
+    var path = self.identifierChainToPath(options.identifierChain, options.defaultDatabase);
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: SAMPLE_API_PREFIX + path.join('/'),
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: function (data) {
+        return data.status === 0 && typeof data.rows !== 'undefined' && data.rows.length > 0;
+      }
+    }));
+  };
+
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.identifierChain.name
+   * @param {string} options.defaultDatabase
+   */
+  ApiHelper.prototype.fetchAnalysis = function (options) {
+    var self = this;
+    var clonedIdentifierChain = options.identifierChain.concat();
+
+    var hierarchy = '';
+    if (typeof self.lastKnownDatabases[options.identifierChain[0].name] === 'undefined') {
+      hierarchy = options.defaultDatabase;
+    } else {
+      hierarchy = clonedIdentifierChain.shift().name
+    }
+    hierarchy += '/' + clonedIdentifierChain.shift().name;
+    if (clonedIdentifierChain.length > 0) {
+      hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
+    }
+
+    var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
+
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        url: url,
+        data: {
+          "format" : 'json'
+        },
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-Requested-With", "Hue");
+        },
+        timeout: options.timeout
+      }).done(function (data) {
+        if (! self.successResponseIsError(data)) {
+          if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
+            storeInCache(data);
+          }
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
   /**
    * @param {Object} options
    * @param {string} options.sourceType
