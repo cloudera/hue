@@ -201,11 +201,11 @@
       <a class="widget-icon"><i class="fa fa-exchange"></i></a>
       <!-- /ko -->
 
-      <!-- ko if: widgetType() == 'distcp-widget' -->
+      <!-- ko if: widgetType() == 'distcp-widget' || widgetType() == 'distcp-document-widget' -->
       <a class="widget-icon"><i class="fa fa-files-o"></i></a>
       <!-- /ko -->
 
-      <!-- ko if: widgetType() == 'spark-widget' -->
+      <!-- ko if: widgetType() == 'spark-widget' || widgetType() == 'spark-document-widget' -->
       <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon">
       <!-- /ko -->
 
@@ -2123,6 +2123,110 @@
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
         </li>
       </ul>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+
+         <h6>${ _('Prepare') }</h6>
+           <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
+             <li>
+               <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
+               <input type="text" class="filechooser-input input-xlarge seventy"
+                    data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }" validate="nonempty"/>
+                <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
+                  <i class="fa fa-minus"></i>
+                </a>
+              </li>
+           </ul>
+           <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
+             ${ _('Directory') } <i class="fa fa-plus"></i>
+           </a>
+           <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
+             ${ _('Delete') } <i class="fa fa-plus"></i>
+           </a>
+
+           <h6>
+             <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+               ${ _('Properties') } <i class="fa fa-plus"></i>
+             </a>
+           </h6>
+           <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+           <li>
+             <input type="text" data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }" validate="nonempty"/>
+             <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.job_properties.help_text }"  validate="nonempty"/>
+             <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
+               <i class="fa fa-minus"></i>
+              </a>
+             </li>
+           </ul>
+           <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+
+           <h6>
+             <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
+           </h6>
+           <input type="text" class="input-xlarge seventy" data-bind="value: properties.java_opts, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" />
+
+           <span data-bind="template: { name: 'common-properties-retry' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="distcp-document-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko if: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
+      <!-- ko with: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
+        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <br/>
+        <span data-bind='text: description' class="muted"></span>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
+        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
+          <select data-bind="options: $root.distCpScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('DistCp program name...')}'}"></select>
+          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
+          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <div class="row-fluid">
+          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
+          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
+        </div>
+
+      </div>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
