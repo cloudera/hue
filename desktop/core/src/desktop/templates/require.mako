@@ -47,10 +47,13 @@ DEBUG = DJANGO_DEBUG_MODE.get()
       },
       shim: {
         "knockout": { exports: "ko" },
+        "ko.charts": { deps: ["knockout"] },
         "knockout-mapping": { deps: ["knockout"] },
         "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
         "ko.editable": { deps: ["knockout"] },
         "ko.switch-case": { deps: ["knockout"] },
+        "ko.hue-bindings": { deps: ["knockout"] },
+        "ko.selectize": { deps: ["knockout", "selectize"] },
         "ace.extended": { deps: ["ace"] },
         "ace.ext-language-tools": { deps: ["ace"] }
       },
