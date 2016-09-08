@@ -392,6 +392,9 @@ def export_documents(request):
 
 @ensure_csrf_cookie
 def import_documents(request):
+  def is_reserved_directory(doc):
+    return doc['fields']['type'] == 'directory' and doc['fields']['name'] in (Document2.HOME_DIR, Document2.TRASH_DIR)
+
   try:
     if request.FILES.get('documents'):
       documents = request.FILES['documents'].read()
@@ -408,11 +411,11 @@ def import_documents(request):
 
   docs = []
 
-  uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
+  uuids_map = dict((doc['fields']['uuid'], None) for doc in documents if not is_reserved_directory(doc))
 
   for doc in documents:
     # Filter docs to import, ignoring reserved directories (home and Trash) and history docs
-    if doc['fields']['type'] != 'directory' or doc['fields']['name'] not in (Document2.HOME_DIR, Document2.TRASH_DIR):
+    if not is_reserved_directory(doc):
       # Remove any deprecated fields
       if 'tags' in doc['fields']:
         doc['fields'].pop('tags')
