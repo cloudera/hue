@@ -512,6 +512,7 @@ var Collection = function (vm, collection) {
   self.template.extracode.extend({rateLimit: {timeout: 3000, method: "notifyWhenChangesStop"}});
   self.template.template.extend({rateLimit: {timeout: 3000, method: "notifyWhenChangesStop"}});
   self.template.template.subscribe(function () {
+    vm.resultsHash = '';
     vm.search();
   });
   self.template.isGridLayout.subscribe(function () {
