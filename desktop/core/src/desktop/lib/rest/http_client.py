@@ -82,6 +82,7 @@ class HttpClient(object):
     self._exc_class = exc_class or RestException
     self._logger = logger or LOG
     self._session = requests.Session()
+    self._cookies = None
 
   def set_kerberos_auth(self):
     """Set up kerberos auth for the client, based on the current ticket."""
@@ -149,11 +150,17 @@ class HttpClient(object):
       request_kwargs['data'] = data
     if files:
       request_kwargs['files'] = files
+
+    if self._cookies:
+      request_kwargs['cookies'] = self._cookies
+
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
       if resp.status_code >= 300:
         resp.raise_for_status()
         raise exceptions.HTTPError(response=resp)
+      # Cache request cookie for the next http_client call.
+      self._cookies = resp.cookies
       return resp
     except (exceptions.ConnectionError,
             exceptions.HTTPError,

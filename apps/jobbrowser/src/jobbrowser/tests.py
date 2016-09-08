@@ -387,7 +387,8 @@ class TestMapReduce2NoHadoop:
   def setUp(self):
     # Beware: Monkey patching
     if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
-      resource_manager_api.old_get_resource_manager = resource_manager_api.get_resource_manager
+      rm_pool = resource_manager_api.get_resource_manager_pool()
+      resource_manager_api.old_get_resource_manager = rm_pool.get("test2")
     if not hasattr(resource_manager_api, 'old_get_mapreduce_api'):
       mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
     if not hasattr(history_server_api, 'old_get_history_server_api'):
@@ -414,6 +415,8 @@ class TestMapReduce2NoHadoop:
 
   def tearDown(self):
     resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
+    rm_pool = resource_manager_api.get_resource_manager_pool()
+    rm_pool.put(resource_manager_api.get_resource_manager)
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
 
