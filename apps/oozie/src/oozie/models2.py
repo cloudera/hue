@@ -796,6 +796,13 @@ class Node():
       self.data['properties']['command'] = action['statement']
       self.data['properties']['arguments'] = []
 
+    elif self.data['type'] == DistCpDocumentAction.TYPE:
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+      action = notebook.get_data()['snippets'][0]
+
+      name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
+      self.data['properties']['source_path'] = action['properties']['source_path']
+      self.data['properties']['destination_path'] = action['properties']['destination_path']
 
     data = {
       'node': self.data,
@@ -2404,6 +2411,63 @@ class SqoopDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
+class DistCpDocumentAction(Action):
+  TYPE = 'distcp-document'
+  FIELDS = {
+    'uuid': {
+        'name': 'uuid',
+        'label': _('DistCp program'),
+        'value': '',
+        'help_text': _('Select a saved DistCp program you want to schedule.'),
+        'type': 'distcp'
+     },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
+     },
+      # Common
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.')
+     },
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production')
+     },
+     'java_opts': {
+          'name': 'java_opts',
+          'label': _('Java options'),
+          'value': '',
+          'help_text': _('Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b')
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -2439,7 +2503,8 @@ NODES = {
   'java-document-widget': JavaDocumentAction,
   'spark-document-widget': SparkDocumentAction,
   'pig-document-widget': PigDocumentAction,
-  'sqoop-document-widget': SqoopDocumentAction
+  'sqoop-document-widget': SqoopDocumentAction,
+  'distcp-document-widget': DistCpDocumentAction
 }
 
 
@@ -3249,6 +3314,8 @@ class WorkflowBuilder():
         node = self.get_pig_document_node(document, user)
       elif document.type == 'query-sqoop1':
         node = self.get_sqoop_document_node(document, user)
+      elif document.type == 'query-distcp':
+        node = self.get_distcp_document_node(document, user)
       else:
         raise PopupException(_('Snippet type %s is not supported in batch execution.') % document.type)
 
@@ -3420,6 +3487,43 @@ class WorkflowBuilder():
         "properties":{
               "command": "",
               "arguments": [],
+              "retry_max": [],
+              "retry_interval": [],
+              "job_properties": [],
+              "capture_output": False,
+              "prepares": [],
+              "credentials": credentials,
+              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "archives": []
+        },
+        "children": [
+            {"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+            {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}
+        ],
+        "actionParameters": [],
+        "actionParametersFetched": False
+    }
+
+  def get_distcp_document_node(self, document, user):
+    node = self._get_distcp_node(document.uuid, is_document_node=True)
+
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
+  def _get_distcp_node(self, node_id, credentials=None, is_document_node=False):
+    if credentials is None:
+      credentials = []
+
+    return {
+        "id": node_id,
+        'name': 'distcp-%s' % node_id[:4],
+        "type": "distcp-document-widget",
+        "properties":{
+              "source_path": "",
+              "destination_path": "",
+              "arguments": [],
+              "java_opts": [],
               "retry_max": [],
               "retry_interval": [],
               "job_properties": [],
