@@ -512,6 +512,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.getDocuments('query-spark2', self.sparkApps);
     self.getDocuments('query-pig', self.pigScripts);
     self.getDocuments('query-sqoop1', self.sqoopScripts);
+    self.getDocuments('query-distcp', self.distCpScripts);
   };
 
   self.getDocuments = function(type, destination) {
@@ -559,6 +560,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.sparkApps = ko.observableArray();
   self.pigScripts = ko.observableArray();
   self.sqoopScripts = ko.observableArray();
+  self.distCpScripts = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
   self.getDocumentById = function (type, uuid) {
@@ -571,6 +573,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       data = self.pigScripts();
     } else if (type.indexOf('sqoop1') != -1) {
       data = self.sqoopScripts();
+    } else if (type.indexOf('distcp') != -1) {
+      data = self.distCpScripts();
     } else {
       data = self.hiveQueries();
     }
@@ -1299,6 +1303,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSparkDocumentAction = ko.observable(bareWidgetBuilder("Spark", "spark-document-widget"));
   self.draggablePigDocumentAction = ko.observable(bareWidgetBuilder("Pig", "pig-document-widget"));
   self.draggableSqoopDocumentAction = ko.observable(bareWidgetBuilder("Sqoop", "sqoop-document-widget"));
+  self.draggableDistCpDocumentAction = ko.observable(bareWidgetBuilder("DistCp", "distcp-document-widget"));
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 
