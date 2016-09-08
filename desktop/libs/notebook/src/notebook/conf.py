@@ -176,6 +176,10 @@ def _default_interpreters():
           'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
       })
       ,
+      ('distcp', {
+          'name': 'Distcp', 'interface': 'oozie', 'options': {}
+      })
+      ,
       ('spark2', {
           'name': 'Spark', 'interface': 'oozie', 'options': {}
       })

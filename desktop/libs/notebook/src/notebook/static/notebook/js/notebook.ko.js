@@ -197,6 +197,10 @@
       properties['class'] = '';
       properties['arguments'] = [];
     }
+    else if (snippetType == 'distcp') {
+      properties['source_path'] = '';
+      properties['destination_path'] = '';
+    }
     else if (snippetType == 'py') {
       properties['py_file'] = '';
       properties['arguments'] = [];
@@ -706,9 +710,10 @@
 
     self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
     self.isReady = ko.computed(function() {
-      return (['jar', 'java', 'spark2'].indexOf(self.type()) == -1 && self.statement() !== '') ||
+      return (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
         (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
-        (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0);
+        (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
+        (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
