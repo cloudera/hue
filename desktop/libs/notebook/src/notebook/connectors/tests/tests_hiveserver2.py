@@ -20,7 +20,6 @@ import json
 import logging
 import re
 
-from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
@@ -28,8 +27,10 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
-from desktop.models import Document2
+
+from notebook.api import _save_notebook
 from notebook.connectors.hiveserver2 import HS2Api
+from notebook.models import make_notebook, Notebook
 
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config
@@ -445,113 +446,68 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.api = HS2Api(self.user)
 
-    self.notebook_json = """
-      {
-        "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
-        "id": 1234,
-        "sessions": [{"type": "hive", "properties": [], "id": "1234"}],
-        "type": "query-hive",
-        "name": "Test Hiveserver2 Editor",
-        "isSaved": false,
-        "parentUuid": null
-      }
-    """
     self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
-    self.snippet_json = """
-      {
-          "status": "running",
-          "database": "%(database)s",
-          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
-          "result": {
-              "type": "table",
-              "handle": {},
-              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
-          },
-          "statement": "%(statement)s",
-          "statement_raw": "%(statement)s",
-          "type": "hive",
-          "properties": {
-            "files": [],
-            "functions": [],
-            "settings": [
-              {
-                "value": "mr",
-                "key": "hive.execution.engine"
-              }
-            ]
-          }
-      }
-    """ % {'database': self.db_name, 'statement': self.statement}
 
-    doc, created = Document2.objects.get_or_create(
-      id=1234,
-      name='Test Hive Query',
-      type='query-hive',
-      owner=self.user,
-      is_history=True,
-      data=self.notebook_json)
+
+  def create_query_document(self, owner, query_type='hive', database='default',
+                            name='Test Query', description='Test Query', statement='',
+                            files=None, functions=None, settings=None):
+      """
+      Creates and returns a query Document2 object
+      :param owner: owner of doc
+      :param query_type: hive, impala or spark
+      :param database: database name
+      :param name: name of document
+      :param description: description of document
+      :param statement: SQL statement (can be multi-query statement)
+      :param files: list of dicts representing files
+      :param functions: list of dicts representing functions
+      :param settings: list of dicts representing settings
+      :return: Document2 object representing query
+      """
+      if query_type not in ('hive', 'impala', 'spark'):
+          raise ValueError("Invalid query_type: %s" % query_type)
+
+      notebook = make_notebook(name=name, description=description, editor_type=query_type, statement=statement,
+                               status='ready', database=database, files=files, functions=functions, settings=settings)
+      notebook_doc, save_as = _save_notebook(notebook.get_data(), owner)
+      return notebook_doc
+
+
+  def get_snippet(self, notebook, snippet_idx=0):
+    data = notebook.get_data()
+    snippet = data['snippets'][snippet_idx]
+
+    if 'result' not in snippet:
+      snippet['result'] = {}
+    if 'handle' not in snippet['result']:
+      snippet['result']['handle'] = {}
+
+    return snippet
 
 
   def test_query_with_unicode(self):
     statement = "SELECT * FROM sample_07 WHERE code='validé';"
 
-    snippet = json.loads("""
-        {
-            "status": "running",
-            "database": "default",
-            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
-            "result": {
-                "type": "table",
-                "handle": {},
-                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
-            },
-            "statement": "%(statement)s",
-            "statement_raw": "%(statement)s",
-            "type": "hive",
-            "properties": {
-                "files": [],
-                "functions": [],
-                "settings": []
-            }
-        }
-      """ % {'statement': statement})
+    doc = self.create_query_document(owner=self.user, statement=statement)
+    notebook = Notebook(document=doc)
+    snippet = self.get_snippet(notebook, snippet_idx=0)
 
-    notebook = json.loads(self.notebook_json)
-    notebook['snippets'] = [snippet]
     response = self.client.post(reverse('notebook:execute'),
-                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
 
 
   def test_get_current_statement(self):
-    multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\\r\\nSELECT AVG(salary) FROM sample_07;"
-    snippet = json.loads("""
-      {
-          "status": "running",
-          "database": "default",
-          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
-          "result": {
-              "type": "table",
-              "handle": {},
-              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
-          },
-          "statement": "%(statement)s",
-          "statement_raw": "%(statement)s",
-          "type": "hive",
-          "properties": {
-              "files": [],
-              "functions": [],
-              "settings": []
-          }
-      }
-    """ % {'statement': multi_statement}
-    )
+    multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\r\nSELECT AVG(salary) FROM sample_07;"
 
-    notebook = json.loads(self.notebook_json)
-    notebook['snippets'] = [snippet]
+    doc = self.create_query_document(owner=self.user, statement=multi_statement)
+    notebook = Notebook(document=doc)
+    snippet = self.get_snippet(notebook, snippet_idx=0)
+
     response = self.client.post(reverse('notebook:execute'),
-                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -561,37 +517,10 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal({'row': 0, 'column': 0}, data['handle']['start'], data)
     assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
 
+    snippet['result']['handle'] = data['handle']
 
-    snippet = json.loads("""
-      {
-          "status": "running",
-          "database": "default",
-          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
-          "result": {
-              "type": "table",
-              "handle": {
-                "statement_id": 0,
-                "statements_count": 2,
-                "has_more_statements": true
-              },
-              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
-          },
-          "statement": "%(statement)s",
-          "statement_raw": "%(statement)s",
-          "type": "hive",
-          "properties": {
-              "files": [],
-              "functions": [],
-              "settings": []
-          }
-      }
-    """ % {'statement': multi_statement}
-    )
-
-    notebook = json.loads(self.notebook_json)
-    notebook['snippets'] = [snippet]
     response = self.client.post(reverse('notebook:execute'),
-                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -605,9 +534,14 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def test_explain(self):
     # Hive 2 with Tez set hive.explain.user to true by default, but this test is expecting output when this setting
     # is set to false.
-    snippet = json.loads(self.snippet_json)
+    doc = self.create_query_document(owner=self.user, statement=self.statement)
+    notebook = Notebook(document=doc)
+    snippet = self.get_snippet(notebook, snippet_idx=0)
     snippet['properties']['settings'].append({"key": "hive.explain.user", "value": "false"})
-    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': json.dumps(snippet)})
+
+    response = self.client.post(reverse('notebook:explain'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -616,9 +550,13 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
 
   def test_get_sample(self):
+    doc = self.create_query_document(owner=self.user, statement=self.statement)
+    notebook = Notebook(document=doc)
+    snippet = self.get_snippet(notebook, snippet_idx=0)
+
     response = self.client.post(reverse('notebook:api_sample_data',
       kwargs={'database': 'default', 'table': 'sample_07'}),
-      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+      {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
@@ -628,7 +566,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
     response = self.client.post(reverse('notebook:api_sample_data_column',
       kwargs={'database': 'default', 'table': 'sample_07', 'column': 'code'}),
-      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+      {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
