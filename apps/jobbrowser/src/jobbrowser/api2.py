@@ -59,7 +59,16 @@ def jobs(request):
 
 
 @api_error_handler
-def job(request): return {}
+def job(request):
+  response = {'status': -1}
+
+  interface = json.loads(request.POST.get('interface'))
+  appid = json.loads(request.POST.get('appid'))
+
+  response['app'] = get_api(request.user, interface).app(appid)
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler

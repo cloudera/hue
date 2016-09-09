@@ -19,16 +19,19 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-# TODO Protect in case modules are not there
-from jobbrowser.api import YarnApi as NativeYarnApi
 from liboozie.oozie_api import get_oozie
-from oozie.conf import OOZIE_JOBS_COUNT
 
 from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
+
+try:
+  from jobbrowser.api import YarnApi as NativeYarnApi
+  from oozie.conf import OOZIE_JOBS_COUNT
+except Exception, e:
+  LOG.exception('Some application are not enabled: %s' % e)
 
 
 def get_api(user, interface):
@@ -49,7 +52,7 @@ class Api():
 
   def apps(self): return []
 
-  def app(self): return {}
+  def app(self, appid): return {}
 
   def kill(self): return {}
 
@@ -69,6 +72,10 @@ class YarnApi(Api):
   def apps(self):
     jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
     return [{'id': app.jobId, 'status': app.status} for app in jobs]
+
+  def app(self, appid):
+    app = NativeYarnApi(self.user).get_job(jobid=appid)
+    return {'id': app.jobId, 'name': app.name, 'status': app.status}
 
 
 class MapReduce2Api(Api):
@@ -100,6 +107,12 @@ class BatchApi(Api):
 
     return [{'id': app.id, 'status': app.status} for app in wf_list.jobs]
 
+  def app(self, appid):
+    oozie_api = get_oozie(self.user)
+    workflow = oozie_api.get_job(jobid=appid)
+
+    return {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status}
+
 
 # Schedule
 
@@ -111,6 +124,12 @@ class ScheduleApi(Api):
     wf_list = oozie_api.get_coordinators(**kwargs)
 
     return [{'id': app.id, 'status': app.status} for app in wf_list.jobs]
+
+  def app(self, appid):
+    oozie_api = get_oozie(self.user)
+    workflow = oozie_api.get_coordinator(jobid=appid)
+
+    return {'id': workflow.coordJobId, 'name': workflow.coordJobName, 'status': workflow.status}
 
 
 # History
