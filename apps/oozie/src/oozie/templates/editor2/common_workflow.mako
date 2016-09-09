@@ -717,6 +717,25 @@
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+          <a class="pointer" data-bind="click: function(){ properties.arguments.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
+            ${ _('Arguments') } <i class="fa fa-plus"></i>
+          </a>
+          <div class="row-fluid">
+            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
+              <li>
+                <span class="muted move-widget">
+                  <i class="fa fa-arrows"></i>
+                </span>
+                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.arguments.help_text }" validate="nonempty"/>
+                <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
+                <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
+                  <i class="fa fa-minus"></i>
+                </a>
+              </li>
+            </ul>
+            <em data-bind="visible: properties.arguments().length == 0">${ _('No arguments defined.') }</em>
+          </div>
+          <br/>
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
           <br/>

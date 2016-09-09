@@ -1024,6 +1024,16 @@ class TestModelAPI(OozieMockBase):
     assert_equal(len(_data['workflow']['nodes']), 4)
 
 
+  def test_gen_hive_xml(self):
+    notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
+
+    workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True)
+
+    workflow = Workflow(document=workflow_doc, user=self.user)
+    assert_true(re.search('<script>\$\{wf:appPath\(\)}/hive\-....\.sql</script>', workflow.to_xml({'output': '/path'})))
+
+
   def test_gen_workflow_from_notebook(self):
     snippets = [
       {
