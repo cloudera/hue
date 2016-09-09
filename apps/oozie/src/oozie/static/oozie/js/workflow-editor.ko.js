@@ -513,6 +513,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.getDocuments('query-pig', self.pigScripts);
     self.getDocuments('query-sqoop1', self.sqoopScripts);
     self.getDocuments('query-distcp', self.distCpScripts);
+    self.getDocuments('query-shell', self.shellScripts);
   };
 
   self.getDocuments = function(type, destination) {
@@ -561,6 +562,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.pigScripts = ko.observableArray();
   self.sqoopScripts = ko.observableArray();
   self.distCpScripts = ko.observableArray();
+  self.shellScripts = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
   self.getDocumentById = function (type, uuid) {
@@ -575,6 +577,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       data = self.sqoopScripts();
     } else if (type.indexOf('distcp') != -1) {
       data = self.distCpScripts();
+    } else if (type.indexOf('shell') != -1) {
+      data = self.shellScripts();
     } else {
       data = self.hiveQueries();
     }
@@ -1304,6 +1308,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggablePigDocumentAction = ko.observable(bareWidgetBuilder("Pig", "pig-document-widget"));
   self.draggableSqoopDocumentAction = ko.observable(bareWidgetBuilder("Sqoop", "sqoop-document-widget"));
   self.draggableDistCpDocumentAction = ko.observable(bareWidgetBuilder("DistCp", "distcp-document-widget"));
+  self.draggableShellDocumentAction = ko.observable(bareWidgetBuilder("Shell", "shell-document-widget"));
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 

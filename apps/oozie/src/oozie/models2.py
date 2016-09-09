@@ -812,6 +812,7 @@ class Node():
       self.data['properties']['shell_command'] = action['properties']['command_path']
       self.data['properties']['env_var'] = [{'value': prop} for prop in action['properties']['env_var']]
       self.data['properties']['capture_output'] = action['properties']['capture_output']
+      self.data['properties']['arguments'] = []
 
       self.data['properties']['files'] = [{'value': action['properties']['command_path']}] + [{'value': prop} for prop in action['properties']['files']]
       self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]

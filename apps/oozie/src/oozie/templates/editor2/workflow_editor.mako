@@ -154,6 +154,13 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          title="${_('Saved DistCp command')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableShellDocumentAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableShellDocumentAction());}}}"
+         title="${_('Saved Shell command')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
+    </div>
     % endif
 
     <div class="toolbar-label">${ _('ACTIONS') }</div>
@@ -310,8 +317,8 @@ ${ workflow.render() }
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
-          <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc'].indexOf(type()) != -1 -->
-          <select data-bind="options: type() == 'java' ? $root.javaQueries() : (type() == 'spark' ? $root.sparkApps() : (type() == 'pig' ? $root.pigScripts() : (type() == 'sqoop' ? $root.sqoopScripts() : (type() == 'distcp-doc' ? $root.distCpScripts() : $root.hiveQueries())))), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
+          <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc'].indexOf(type()) != -1 -->
+          <select data-bind="options: type() == 'java' ? $root.javaQueries() : (type() == 'spark' ? $root.sparkApps() : (type() == 'pig' ? $root.pigScripts() : (type() == 'sqoop' ? $root.sqoopScripts() : (type() == 'distcp-doc' ? $root.distCpScripts() : (type() == 'shell-doc' ? $root.shellScripts() : $root.hiveQueries()))))), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
           <!-- ko if: $root.getDocumentById(type(), value()) -->
             <!-- ko with: $root.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">

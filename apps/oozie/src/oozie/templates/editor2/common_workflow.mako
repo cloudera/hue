@@ -181,7 +181,7 @@
       <a class="widget-icon"><i class="fa fa-code-fork"></i></a>
       <!-- /ko -->
 
-      <!-- ko if: widgetType() == 'shell-widget' -->
+      <!-- ko if: widgetType() == 'shell-widget' || widgetType() == 'shell-document-widget' -->
       <a class="widget-icon"><i class="fa fa-terminal"></i></a>
       <!-- /ko -->
 
@@ -1705,6 +1705,70 @@
 </script>
 
 
+<script type="text/html" id="shell-document-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
+      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
+        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <br/>
+        <span data-bind='text: description' class="muted"></span>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
+        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
+          <select data-bind="options: $root.shellScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Shell program name...')}'}"></select>
+          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
+          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <div class="row-fluid">
+          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#properties-' + id()}" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <span data-bind="template: { name: 'common-action-properties' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="ssh-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
@@ -2219,8 +2283,8 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
+      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
+      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
         <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
