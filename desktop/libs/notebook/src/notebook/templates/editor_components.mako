@@ -311,11 +311,15 @@ ${ hueIcons.symbols() }
                 <i class="fa fa-files-o app-icon" style="vertical-align: middle"></i>
                 DistCp
               <!-- /ko -->
+              <!-- ko if: editorType() == 'shell' -->
+                <i class="fa fa-terminal app-icon" style="vertical-align: middle"></i>
+                Shell
+              <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp'].indexOf(editorType()) == -1 -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
               <!-- /ko -->
@@ -1427,24 +1431,24 @@ ${ hueIcons.symbols() }
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: ['java', 'distcp', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['java', 'distcp', 'shell', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
               <!-- ko template: 'snippet-settings' --><!-- /ko -->
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ['java', 'spark2', 'distcp'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ['java', 'spark2', 'distcp', 'shell'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
           <!-- ko if: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: 'query-tabs' --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
           <!-- /ko -->
 
           <div class="clearfix"></div>
@@ -1474,6 +1478,8 @@ ${ hueIcons.symbols() }
         <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().resources != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Resources') }', value: properties().resources, title: '${ _ko('HDFS Files or compressed files') }', placeholder: '${ _ko('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
+
+        <!-- ko template: { if: typeof properties().capture_output != 'undefined', name: 'property', data: { type: 'boolean', label: '${ _ko('Capture output') }', value: properties().capture_output, title: '${ _ko('If capturing the output of the shell script') }' }} --><!-- /ko -->
       </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
@@ -1807,6 +1813,20 @@ ${ hueIcons.symbols() }
         <label class="control-label">${_('Destination')}</label>
         <div class="controls">
           <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().destination_path, valueUpdate: 'afterkeydown', filechooser: properties().destination_path" placeholder="${ _('Destination path, e.g. ${nameNode2}/path/to/output.txt') }"/>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: type() == 'shell' -->
+      <div class="control-group">
+        <label class="control-label">${_('Script path')}</label>
+        <div class="controls">
+          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().command_path, valueUpdate: 'afterkeydown', filechooser: properties().command_path" placeholder="${ _('Source path to the command') }"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${_('Environment variables')}</label>
+        <div class="controls">
+          <!-- ko template: { if: typeof properties().env_var != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Arguments') }', value: properties().env_var, title: '${ _ko('Environment variable for the scritp') }', placeholder: '${ _ko('e.g. MAX=10, PATH=$PATH:/user/path') }'}} --><!-- /ko -->
         </div>
       </div>
       <!-- /ko -->

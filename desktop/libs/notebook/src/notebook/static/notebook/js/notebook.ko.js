@@ -178,7 +178,7 @@
       properties['files'] = [];
     }
 
-    if (snippetType == 'java') {
+    if (snippetType == 'java' || snippetType == 'shell') {
       properties['archives'] = [];
       properties['files'] = [];
     }
@@ -200,6 +200,11 @@
     else if (snippetType == 'distcp') {
       properties['source_path'] = '';
       properties['destination_path'] = '';
+    }
+    else if (snippetType == 'shell') {
+      properties['command_path'] = '';
+      properties['env_var'] = [];
+      properties['capture_output'] = true;
     }
     else if (snippetType == 'py') {
       properties['py_file'] = '';
@@ -714,6 +719,7 @@
       return (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
         (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
         (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
+        (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
         (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
