@@ -892,7 +892,7 @@ def submit_external_job(request, application_path):
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       application_name = os.path.basename(application_path)
       application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else get_workflow()
-      mapping[application_class.get_application_path_key()] = application_path
+      mapping[application_class.get_application_path_key()] = os.path.dirname(application_path)
 
       try:
         submission = Submission(request.user, fs=request.fs, jt=request.jt, properties=mapping)
