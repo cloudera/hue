@@ -178,9 +178,23 @@
       properties['files'] = [];
     }
 
-    if (snippetType == 'java' || snippetType == 'shell') {
+    if (snippetType == 'java') {
       properties['archives'] = [];
       properties['files'] = [];
+      properties['capture_output'] = false;
+    }
+
+    if (snippetType == 'shell') {
+      properties['archives'] = [];
+      properties['files'] = [];
+    }
+
+    if (snippetType == 'mapreduce') {
+      properties['app_jar'] = '';
+      properties['hadoopProperties'] = [];
+      properties['jars'] = [];
+      properties['files'] = [];
+      properties['archives'] = [];
     }
 
     if (snippetType == 'spark2') {
@@ -720,6 +734,7 @@
         (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
         (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
         (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
+        (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
         (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);

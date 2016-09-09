@@ -315,11 +315,15 @@ ${ hueIcons.symbols() }
                 <i class="fa fa-terminal app-icon" style="vertical-align: middle"></i>
                 Shell
               <!-- /ko -->
+              <!-- ko if: editorType() == 'mapreduce' -->
+                <i class="fa fa-file-archive-o app-icon" style="vertical-align: middle"></i>
+                MapReduce
+              <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell'].indexOf(editorType()) == -1 -->
+              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 SQL
               <!-- /ko -->
@@ -1431,24 +1435,24 @@ ${ hueIcons.symbols() }
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: ['java', 'distcp', 'shell', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
               <!-- ko template: 'snippet-settings' --><!-- /ko -->
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ['java', 'spark2', 'distcp', 'shell'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ['java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
           <!-- ko if: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
           <!-- ko template: 'query-tabs' --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.editorMode() -->
           <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
           <!-- /ko -->
 
           <div class="clearfix"></div>
@@ -1826,7 +1830,21 @@ ${ hueIcons.symbols() }
       <div class="control-group">
         <label class="control-label">${_('Environment variables')}</label>
         <div class="controls">
-          <!-- ko template: { if: typeof properties().env_var != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Arguments') }', value: properties().env_var, title: '${ _ko('Environment variable for the scritp') }', placeholder: '${ _ko('e.g. MAX=10, PATH=$PATH:/user/path') }'}} --><!-- /ko -->
+          <!-- ko template: { if: typeof properties().env_var != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Arguments') }', value: properties().env_var, title: '${ _ko('Environment variable for the script') }', placeholder: '${ _ko('e.g. MAX=10, PATH=$PATH:/user/path') }'}} --><!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: type() == 'mapreduce' -->
+      <div class="control-group">
+        <label class="control-label">${_('Jar path')}</label>
+        <div class="controls">
+          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().app_jar, valueUpdate: 'afterkeydown', filechooser: properties().app_jar" placeholder="${ _('Source path to the main MapReduce jar') }"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${_('Hadoop properties')}</label>
+        <div class="controls">
+          <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
         </div>
       </div>
       <!-- /ko -->

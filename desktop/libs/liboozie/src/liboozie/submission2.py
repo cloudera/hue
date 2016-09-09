@@ -209,8 +209,8 @@ class Submission(object):
           if statements is not None:
             self._create_file(deployment_dir, action.data['name'] + '.sql', statements)
 
-        elif action.data['type'] == 'java-document' or action.data['type'] == 'java':
-          if action.data['type'] == 'java-document':
+        elif action.data['type'] in ('java-document', 'java', 'mapreduce-document'):
+          if action.data['type'] == 'java-document' or action.data['type'] == 'mapreduce-document':
             from notebook.models import Notebook
             notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
             properties = notebook.get_data()['snippets'][0]['properties']

@@ -785,7 +785,7 @@ class Node():
       for prop in action['properties']['hadoopProperties']:
         name, value = prop.split('=', 1)
         job_properties.append({'name': name, 'value': value})
-        self.data['properties']['job_properties'] = job_properties
+      self.data['properties']['job_properties'] = job_properties
       self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['parameters']]
 
     elif self.data['type'] == SqoopDocumentAction.TYPE:
@@ -815,6 +815,24 @@ class Node():
       self.data['properties']['arguments'] = []
 
       self.data['properties']['files'] = [{'value': action['properties']['command_path']}] + [{'value': prop} for prop in action['properties']['files']]
+      self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
+
+    elif self.data['type'] == MapReduceDocumentAction.TYPE:
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+      action = notebook.get_data()['snippets'][0]
+
+      name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
+      self.data['properties']['app_jar'] = action['properties']['app_jar']
+      self.data['properties']['arguments'] = []
+      self.data['properties']['parameters'] = []
+
+      job_properties = []
+      for prop in action['properties']['hadoopProperties']:
+        name, value = prop.split('=', 1)
+        job_properties.append({'name': name, 'value': value})
+      self.data['properties']['job_properties'] = job_properties
+
+      self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['files']]
       self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
     data = {
@@ -2565,6 +2583,80 @@ class ShellDocumentAction(Action):
     return [cls.FIELDS['uuid']]
 
 
+class MapReduceDocumentAction(Action):
+  TYPE = 'mapreduce-document'
+  FIELDS = {
+    'uuid': {
+        'name': 'uuid',
+        'label': _('MapReduce program'),
+        'value': '',
+        'help_text': _('Select a saved MapReduce program you want to schedule.'),
+        'type': 'mapreduce-doc'
+     },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
+     },
+     # Common
+     'files': {
+          'name': 'files',
+          'label': _('Files'),
+          'value': [],
+          'help_text': _('Files put in the running directory.'),
+          'type': ''
+     },
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'job_properties': {
+          'name': 'job_properties',
+          'label': _('Hadoop job properties'),
+          'value': [],
+          'help_text': _('value, e.g. production'),
+          'type': ''
+     },
+     'prepares': {
+          'name': 'prepares',
+          'label': _('Prepares'),
+          'value': [],
+          'help_text': _('Path to manipulate before starting the application.'),
+          'type': ''
+     },
+     'job_xml': {
+          'name': 'job_xml',
+          'label': _('Job XML'),
+          'value': '',
+          'help_text': _('Refer to a Hadoop JobConf job.xml'),
+          'type': ''
+     },
+     'retry_max': {
+          'name': 'retry_max',
+          'label': _('Max retry'),
+          'value': [],
+          'help_text': _('Number of times, default is 3'),
+          'type': ''
+     },
+     'retry_interval': {
+          'name': 'retry_interval',
+          'label': _('Retry interval'),
+          'value': [],
+          'help_text': _('Wait time in minutes, default is 10'),
+          'type': ''
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['uuid']]
+
+
 class DecisionNode(Action):
   TYPE = 'decision'
   FIELDS = {}
@@ -2602,7 +2694,8 @@ NODES = {
   'pig-document-widget': PigDocumentAction,
   'sqoop-document-widget': SqoopDocumentAction,
   'distcp-document-widget': DistCpDocumentAction,
-  'shell-document-widget': ShellDocumentAction
+  'shell-document-widget': ShellDocumentAction,
+  'mapreduce-document-widget': MapReduceDocumentAction
 }
 
 
@@ -3416,6 +3509,8 @@ class WorkflowBuilder():
         node = self.get_distcp_document_node(document, user)
       elif document.type == 'query-shell':
         node = self.get_shell_document_node(document, user)
+      elif document.type == 'query-mapreduce':
+        node = self.get_mapreduce_document_node(document, user)
       else:
         raise PopupException(_('Snippet type %s is not supported in batch execution.') % document.type)
 
@@ -3665,6 +3760,41 @@ class WorkflowBuilder():
               "retry_interval": [],
               "job_properties": [],
               "capture_output": True,
+              "prepares": [],
+              "credentials": credentials,
+              "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
+              "archives": []
+        },
+        "children": [
+            {"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
+            {"error": "17c9c895-5a16-7443-bb81-f34b30b21548"}
+        ],
+        "actionParameters": [],
+        "actionParametersFetched": False
+    }
+
+  def get_mapreduce_document_node(self, document, user):
+    node = self._get_mapreduce_node(document.uuid, is_document_node=True)
+
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
+  def _get_mapreduce_node(self, node_id, credentials=None, is_document_node=False):
+    if credentials is None:
+      credentials = []
+
+    return {
+        "id": node_id,
+        'name': 'mapreduce-%s' % node_id[:4],
+        "type": "mapreduce-document-widget",
+        "properties":{
+              "jar_path": "",
+              "arguments": [],
+              "java_opts": [],
+              "retry_max": [],
+              "retry_interval": [],
+              "job_properties": [],
               "prepares": [],
               "credentials": credentials,
               "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
