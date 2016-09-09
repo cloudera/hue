@@ -209,6 +209,7 @@
       properties['settings'] = [];
       properties['files'] = [];
       properties['functions'] = [];
+      properties['arguments'] = [];
     }
     else if (snippetType == 'impala') {
       properties['settings'] = [];

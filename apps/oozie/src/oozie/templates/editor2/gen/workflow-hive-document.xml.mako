@@ -37,6 +37,9 @@
             % for param in node['properties']['parameters']:
               <param>${ param['value'] }</param>
             % endfor
+            % for param in node['properties']['arguments']:
+              <argument>${ param['value'] }</argument>
+            % endfor
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </hive2>

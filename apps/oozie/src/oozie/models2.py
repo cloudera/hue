@@ -884,6 +884,9 @@ def _upgrade_older_node(node):
   if node['type'] == 'spark-widget' and 'files' not in node['properties']:
     node['properties']['files'] = []
 
+  if (node['type'] == 'hive2-widget' or node['type'] == 'hive-document-widget') and 'arguments' not in node['properties']:
+    node['properties']['arguments'] = []
+
 
 class Action(object):
 
@@ -1185,6 +1188,13 @@ class HiveServer2Action(Action):
           'value': [],
           'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
           'type': ''
+     },
+     'arguments': {
+          'name': 'arguments',
+          'label': _('Arguments'),
+          'value': [],
+          'help_text': _('Arguments for beeline. E.g. --showHeader=true, -Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks'),
+          'type': []
      },
      # Common
      'jdbc_url': {
@@ -3368,6 +3378,8 @@ class WorkflowBuilder():
             u'retry_interval': [],
             u'retry_max': [],
             u'job_properties': [],
+            u'arguments': [],
+            u'parameters': [],
             u'sla': [
                 {u'key': u'enabled', u'value': False},
                 {u'key': u'nominal-time', u'value': u'${nominal_time}'},
