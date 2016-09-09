@@ -47,14 +47,13 @@ ${ require.config() }
 
 
 <div class="container-fluid">
-
   ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
   &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
 
   <span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: jobs.interface" />${ _('Jobs') }</span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: jobs.interface" />${ _('Batches') }</span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: jobs.interface" />${ _('Schedules') }</span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" />${ _('Jobs') }</span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" />${ _('Batches') }</span>
+    <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" />${ _('Schedules') }</span>
   </span>
 
   <span class="btn-group">
@@ -83,7 +82,7 @@ ${ require.config() }
     </tr>
     </thead>
     <tbody data-bind="foreach: jobs.apps">
-      <tr>
+      <tr data-bind="click: fetchJob">
         <td></td>
         <td data-bind="text: id"></td>
         <td data-bind="text: name"></td>
@@ -99,6 +98,18 @@ ${ require.config() }
   </table>
     </div>
 </div>
+
+
+<!-- ko if: $root.job() -->
+<div data-bind="template: { name: 'app-page', data: $root.job() }"></div>
+<!-- /ko -->
+
+
+<script type="text/html" id="app-page">
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+</script>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -125,32 +136,47 @@ ${ require.config() }
       self.progress = ko.observable(typeof job.progress != "undefined" && job.progress != null ? job.progress : null);
       self.duration = ko.observable(typeof job.duration != "undefined" && job.duration != null ? job.duration : null);
       self.submitted = ko.observable(typeof job.submitted != "undefined" && job.submitted != null ? job.submitted : null);
+
+      self.properties = ko.observable(typeof job.properties != "undefined" && job.properties != null ? job.properties : {});
+
+      self.loadingJob = ko.observable(false);
+
+      self.fetchJob = function () {
+        self.loadingJob(true);
+        $.post("/jobbrowser/api/job", {
+          appid: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(vm.interface)
+        }, function(data) {
+          if (data.status == 0) {
+            vm.job(new Job(self, job));
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).always(function(){
+          self.loadingJob(false);
+        });
+      };
     };
 
     var Jobs = function (vm, options) {
       var self = this;
 
       self.apps = ko.observableArray();
-      self.loadingApps = ko.observable(false);
+      self.loadingJobs = ko.observable(false);
 
       self.username = ko.observable('${ user.username }');
 
-      self.interface = ko.observable('jobs');
-      self.interface.subscribe(function(val) {
-        self.fetchJobs();
-      });
-
       self.fetchJobs = function () {
-        self.loadingApps(true);
+        self.loadingJobs(true);
         $.post("/jobbrowser/api/jobs", {
           username: ko.mapping.toJSON(self.username),
-          interface: ko.mapping.toJSON(self.interface)
+          interface: ko.mapping.toJSON(vm.interface)
         }, function(data) {
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {
               data.apps.forEach(function(job){
-                apps.push(new Job(self, job));
+                apps.push(new Job(vm, job));
               });
             }
             self.apps(apps);
@@ -158,7 +184,7 @@ ${ require.config() }
             $(document).trigger("error", data.message);
           }
         }).always(function(){
-          self.loadingApps(false);
+          self.loadingJobs(false);
         });
       };
     }
@@ -167,6 +193,12 @@ ${ require.config() }
       var self = this;
 
       self.jobs = new Jobs(self, options);
+      self.job = ko.observable();
+
+      self.interface = ko.observable('jobs');
+      self.interface.subscribe(function(val) {
+        self.jobs.fetchJobs();
+      });
     };
 
     var viewModel;
