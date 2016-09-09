@@ -470,6 +470,13 @@ def _copy_document_with_owner(doc, owner, uuids_map):
     uuids_map[old_uuid] = uuid_default()
   doc['fields']['uuid'] = uuids_map[old_uuid]
 
+  # Update UUID in data if needed
+  if 'data' in doc['fields']:
+    data = json.loads(doc['fields']['data'])
+    if 'uuid' in data:
+      data['uuid'] = uuids_map[old_uuid]
+      doc['fields']['data'] = json.dumps(data)
+
   # Remap parent directory if needed
   parent_uuid = None
   if 'parent_directory' in doc['fields']:
