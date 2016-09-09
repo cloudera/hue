@@ -27,6 +27,7 @@ from nose.tools import assert_equal, assert_true, assert_false
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
@@ -520,7 +521,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
 
   def test_query_with_unicode(self):
-    statement = "SELECT * FROM sample_07 WHERE code='validé';"
+    statement = "SELECT * FROM sample_07 WHERE code='한';"
 
     doc = self.create_query_document(owner=self.user, statement=statement)
     notebook = Notebook(document=doc)
@@ -530,6 +531,14 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
+
+    snippet['result']['handle'] = data['handle']
+
+    response = self.client.post(reverse('notebook:get_logs'),
+                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true("SELECT * FROM sample_07 WHERE code='한'" in smart_str(data['logs']))
 
 
   def test_get_current_statement(self):
