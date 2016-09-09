@@ -47,6 +47,7 @@ class OozieApi(Api):
   LOG_END_PATTERN = '<<< Invocation of Main class completed <<<'
   RESULTS_PATTERN = "(?P<results>>>> Invoking Beeline command line now >>>.+<<< Invocation of Beeline command completed <<<)"
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
+  RESULTS_PATTERN_MAPREDUCE = "(?P<results>.+)"
   RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
 
   def __init__(self, *args, **kwargs):
@@ -97,6 +98,8 @@ class OozieApi(Api):
         results = self._get_results(log_output, snippet['type'])
         if results:
           response['status'] = 'available'
+        else:
+          LOG.warn('No log result could be matched for %s' % job_id)
       else:
         response['status'] = 'failed'
 
@@ -197,10 +200,13 @@ class OozieApi(Api):
       pattern = self.RESULTS_PATTERN
     elif action_type == 'pig':
       pattern = self.RESULTS_PATTERN_PIG
+    elif action_type == 'mapreduce':
+      pattern = self.RESULTS_PATTERN_MAPREDUCE
     else:
       pattern = self.RESULTS_PATTERN_GENERIC
 
     re_results = re.compile(pattern, re.M | re.DOTALL)
     if re_results.search(log_output):
       results = re.search(re_results, log_output).group('results').strip()
+
     return results

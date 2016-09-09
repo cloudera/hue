@@ -184,6 +184,10 @@ def _default_interpreters():
           'name': 'Spark', 'interface': 'oozie', 'options': {}
       })
       ,
+      ('mapreduce', {
+          'name': 'MapReduce', 'interface': 'oozie', 'options': {}
+      })
+      ,
       ('shell', {
           'name': 'Shell', 'interface': 'oozie', 'options': {}
       })
