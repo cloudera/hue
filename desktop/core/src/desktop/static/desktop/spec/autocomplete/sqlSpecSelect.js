@@ -602,41 +602,6 @@ define([
         });
       });
 
-      it('should handle 100k rows before "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
-        var beforeCursor = '';
-        for (var i = 0; i < 100000; i++) {
-          beforeCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
-        }
-        assertAutoComplete({
-          beforeCursor: beforeCursor,
-          afterCursor: ';SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);',
-          dialect: 'hive',
-          hasLocations: true,
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should handle 100k rows after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
-        var afterCursor = ';\n';
-        for (var i = 0; i < 100000; i++) {
-          afterCursor += 'SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);\n';
-        }
-        assertAutoComplete({
-          beforeCursor: '',
-          afterCursor: afterCursor,
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
       it('should handle 100k rows before and after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
         var beforeCursor = '';
         var afterCursor = ';\n';
@@ -1826,11 +1791,111 @@ define([
           afterCursor: ',bla) FROM bar;',
           hasLocations: true,
           containsKeywords: ['CASE'],
+          hasErrors: false,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'bar' }] }] },
-            suggestValues: true,
+            suggestValues: {},
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = \'| FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = \'',
+          afterCursor: ' FROM bar;',
+          hasErrors: false,
+          expectedResult: {
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bar' }, { name: 'bl' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bar' }] }
+            ],
+            lowerCase: false,
+            suggestValues: { partialQuote: '\'', missingEndQuote: true },
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = \'|\' FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = \'',
+          afterCursor: '\' FROM bar;',
+          hasErrors: false,
+          expectedResult: {
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bar' }, { name: 'bl' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 }, identifierChain: [{ name: 'bar' }] }
+            ],
+            lowerCase: false,
+            suggestValues: { partialQuote: '\'', missingEndQuote: false },
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = \'bl| bl\' FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = \'bl',
+          afterCursor: ' bl\' FROM bar;',
+          hasErrors: false,
+          expectedResult: {
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bar' }, { name: 'bl' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 29 }, identifierChain: [{ name: 'bar' }] }
+            ],
+            lowerCase: false,
+            suggestValues: { partialQuote: '\'', missingEndQuote: false },
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = "| FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = "',
+          afterCursor: ' FROM bar;',
+          hasLocations: true,
+          hasErrors: false,
+          expectedResult: {
+            lowerCase: false,
+            suggestValues: { partialQuote: '"', missingEndQuote: true },
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = "|" FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = "',
+          afterCursor: '" FROM bar;',
+          hasErrors: false,
+          expectedResult: {
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bar' }, { name: 'bl' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 }, identifierChain: [{ name: 'bar' }] }
+            ],
+            lowerCase: false,
+            suggestValues: { partialQuote: '"', missingEndQuote: false },
+            colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
+          }
+        });
+      });
+
+      it('should suggest columns and values for "SELECT bl = "bl| bl" FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bl = "bl',
+          afterCursor: ' bl" FROM bar;',
+          hasErrors: false,
+          expectedResult: {
+            locations: [
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bar' }, { name: 'bl' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 29 }, identifierChain: [{ name: 'bar' }] }
+            ],
+            lowerCase: false,
+            suggestValues: { partialQuote: '"', missingEndQuote: false },
             colRef: { identifierChain: [{ name: 'bar' }, { name: 'bl' }] }
           }
         });
@@ -2315,7 +2380,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
           }
         });
@@ -2331,7 +2396,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
           }
         });
@@ -2361,7 +2426,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
         });
@@ -2635,7 +2700,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain :[{ name: 'testTable' }, { name :'a'}] }
           }
         });
@@ -2707,7 +2772,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
           }
         });
@@ -3555,7 +3620,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
             suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }],
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'key' }] }
@@ -3577,7 +3642,7 @@ define([
             ],
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
             suggestIdentifiers : [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'field' }] }
@@ -3856,7 +3921,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'id' }] }
           }
@@ -3926,7 +3991,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['NUMBER'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'id' }] }
           }
@@ -4345,7 +4410,7 @@ define([
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'id' }] }
           }
         });
@@ -4360,7 +4425,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'id' }] }
           }
@@ -4376,7 +4441,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4392,7 +4457,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4408,7 +4473,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4424,7 +4489,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4440,7 +4505,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4456,7 +4521,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4472,7 +4537,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -4488,7 +4553,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
@@ -5112,7 +5177,7 @@ define([
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
           }
@@ -6443,7 +6508,7 @@ define([
           hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
-            suggestValues: true,
+            suggestValues: {},
             colRef: { identifierChain: [{ name: 'testTable1' }, { name: 'testColumn1'}] },
             suggestFunctions: { types: ['COLREF'] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
@@ -6980,7 +7045,7 @@ define([
             lowerCase: false,
             suggestKeywords: ['SELECT'],
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'foo' }] }] },
             colRef: { identifierChain: [{ name: 'foo' }, { name: 'bar'}] }
           }
@@ -6996,7 +7061,7 @@ define([
             lowerCase: true,
             suggestKeywords: ['SELECT'],
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] },
             suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
             colRef: { identifierChain: [{ name: 'bar' }, {name: 'bla'}] }
@@ -7013,7 +7078,7 @@ define([
           expectedResult: {
             lowerCase: true,
             suggestFunctions: { types: ['COLREF'] },
-            suggestValues: true,
+            suggestValues: {},
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }] },
             suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
             colRef: { identifierChain: [{ name: 'bar' }, {name: 'bla'}] }

@@ -195,7 +195,7 @@ define([
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 40 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'id'}]}
           ],
           suggestFunctions: { types: ['COLREF'] },
-          suggestValues: true,
+          suggestValues: {},
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'foo' }, { name: 'id' }] },
           suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           lowerCase: false

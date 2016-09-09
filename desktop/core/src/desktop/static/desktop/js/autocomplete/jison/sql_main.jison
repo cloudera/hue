@@ -463,10 +463,13 @@ SingleQuotedValue_EDIT
  : 'SINGLE_QUOTE' 'PARTIAL_VALUE'
  ;
 
-
 DoubleQuotedValue
  : 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'  -> $2
  | 'DOUBLE_QUOTE' 'DOUBLE_QUOTE'          -> ''
+ ;
+
+DoubleQuotedValue_EDIT
+ : 'DOUBLE_QUOTE' 'PARTIAL_VALUE'
  ;
 
 QuotedValue
@@ -2064,7 +2067,8 @@ NonParenthesizedValueExpressionPrimary
  ;
 
 NonParenthesizedValueExpressionPrimary_EDIT
- : ColumnReference_EDIT
+ : UnsignedValueSpecification_EDIT
+ | ColumnReference_EDIT
    {
      if ($1.suggestKeywords) {
        $$ = { types: ['COLREF'], columnReference: $1, suggestKeywords: $1.suggestKeywords };
@@ -2097,9 +2101,20 @@ UnsignedValueSpecification
  : UnsignedLiteral
  ;
 
+UnsignedValueSpecification_EDIT
+ : UnsignedLiteral_EDIT
+   {
+     suggestValues($1);
+   }
+ ;
+
 UnsignedLiteral
  : UnsignedNumericLiteral  -> { types: [ 'NUMBER' ] }
  | GeneralLiteral
+ ;
+
+UnsignedLiteral_EDIT
+ : GeneralLiteral_EDIT
  ;
 
 UnsignedNumericLiteral
@@ -2124,6 +2139,17 @@ GeneralLiteral
  : SingleQuotedValue  -> { types: [ 'STRING' ] }
  | DoubleQuotedValue  -> { types: [ 'STRING' ] }
  | TruthValue         -> { types: [ 'BOOLEAN' ] }
+ ;
+
+GeneralLiteral_EDIT
+ : SingleQuotedValue_EDIT
+  {
+    $$ = { partialQuote: '\'', missingEndQuote: parser.yy.missingEndQuote };
+  }
+ | DoubleQuotedValue_EDIT
+  {
+    $$ = { partialQuote: '"', missingEndQuote: parser.yy.missingEndQuote };
+  }
  ;
 
 TruthValue
