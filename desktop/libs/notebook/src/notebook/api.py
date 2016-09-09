@@ -20,11 +20,11 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.forms import ValidationError
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
@@ -273,7 +273,7 @@ def get_logs(request):
 
   db = get_api(request, snippet)
 
-  full_log = str(request.POST.get('full_log', ''))
+  full_log = smart_str(request.POST.get('full_log', ''))
   logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
   full_log += logs
 
@@ -378,13 +378,6 @@ def _historify(notebook, user):
   history_doc.save()
 
   return history_doc
-
-
-def _set_search_field(notebook_doc):
-  notebook = Notebook(document=notebook_doc).get_data()
-  statement = _get_statement(notebook)
-  notebook_doc.search = statement
-  return notebook_doc
 
 
 def _get_statement(notebook):
