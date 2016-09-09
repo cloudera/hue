@@ -514,6 +514,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.getDocuments('query-sqoop1', self.sqoopScripts);
     self.getDocuments('query-distcp', self.distCpScripts);
     self.getDocuments('query-shell', self.shellScripts);
+    self.getDocuments('query-mapreduce', self.mapReduceScripts);
   };
 
   self.getDocuments = function(type, destination) {
@@ -563,6 +564,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.sqoopScripts = ko.observableArray();
   self.distCpScripts = ko.observableArray();
   self.shellScripts = ko.observableArray();
+  self.mapReduceScripts = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
   self.getDocumentById = function (type, uuid) {
@@ -579,6 +581,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       data = self.distCpScripts();
     } else if (type.indexOf('shell') != -1) {
       data = self.shellScripts();
+    } else if (type.indexOf('mapreduce') != -1) {
+      data = self.mapReduceScripts();
     } else {
       data = self.hiveQueries();
     }
@@ -1309,6 +1313,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSqoopDocumentAction = ko.observable(bareWidgetBuilder("Sqoop", "sqoop-document-widget"));
   self.draggableDistCpDocumentAction = ko.observable(bareWidgetBuilder("DistCp", "distcp-document-widget"));
   self.draggableShellDocumentAction = ko.observable(bareWidgetBuilder("Shell", "shell-document-widget"));
+  self.draggableMapReduceDocumentAction = ko.observable(bareWidgetBuilder("MapReduce", "mapreduce-document-widget"));
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
 
