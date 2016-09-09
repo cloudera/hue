@@ -155,7 +155,7 @@
       var suggestValuesDeferral = $.Deferred();
       colRefDeferral.done(function () {
         if (colRef !== null) {
-          self.addValues(colRef, completions);
+          self.addValues(parseResult, colRef, completions);
         }
         suggestValuesDeferral.resolve();
       });
@@ -282,11 +282,14 @@
     }
   };
 
-  SqlAutocompleter2.prototype.addValues = function (columnReference, completions) {
+  SqlAutocompleter2.prototype.addValues = function (parseResult, columnReference, completions) {
     if (columnReference.sample) {
+      var suggestValues = parseResult.suggestValues;
       var isString = columnReference.type === "string";
+      var startQuote = suggestValues.partialQuote ? '' : '\'';
+      var endQuote = typeof suggestValues.missingEndQuote !== 'undefined' && suggestValues.missingEndQuote === false ? '' : suggestValues.partialQuote || '\'';
       columnReference.sample.forEach(function (sample) {
-        completions.push({meta: 'value', value: isString ? "'" + sample + "'" : new String(sample), weight: DEFAULT_WEIGHTS.SAMPLE })
+        completions.push({meta: 'value', value: isString ? startQuote + sample + endQuote : new String(sample), weight: DEFAULT_WEIGHTS.SAMPLE })
       });
     }
   };

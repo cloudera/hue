@@ -215,7 +215,7 @@ define([
           containsKeywords: ['EXISTS'],
           expectedResult: {
             lowerCase: false,
-            suggestValues: true,
+            suggestValues: {},
             suggestFunctions: { types: ['COLREF'] },
             colRef: { identifierChain: [{ name: 'boo'}, { name: 'baa' }, { name: 'id' }] },
             suggestColumns: { types: ['COLREF'], tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }

@@ -444,8 +444,7 @@
 
 \`                                         { this.begin('backtickedValue'); return 'BACKTICK'; }
 <backtickedValue>[^`]+                     {
-                                             if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
-                                               this.popState();
+                                             if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '`')) {
                                                return 'PARTIAL_VALUE';
                                              }
                                              return 'VALUE';
@@ -454,8 +453,7 @@
 
 \'                                         { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
 <singleQuotedValue>(?:\\[']|[^'])+         {
-                                             if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
-                                               this.popState();
+                                             if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
                                                return 'PARTIAL_VALUE';
                                              }
                                              return 'VALUE';
@@ -463,7 +461,12 @@
 <singleQuotedValue>\'                      { this.popState(); return 'SINGLE_QUOTE'; }
 
 \"                                         { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
-<doubleQuotedValue>(?:\\["]|[^"])+         { return 'VALUE'; }
+<doubleQuotedValue>(?:\\["]|[^"])+         {
+                                             if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
+                                               return 'PARTIAL_VALUE';
+                                             }
+                                             return 'VALUE';
+                                           }
 <doubleQuotedValue>\"                      { this.popState(); return 'DOUBLE_QUOTE'; }
 
 <<EOF>>                                    { return 'EOF'; }

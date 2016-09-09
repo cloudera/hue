@@ -998,7 +998,7 @@ var suggestHdfs = function (details) {
 };
 
 var suggestValues = function (details) {
-  parser.yy.result.suggestValues = true;
+  parser.yy.result.suggestValues = details || {};
 };
 
 var determineCase = function (text) {
@@ -1006,6 +1006,31 @@ var determineCase = function (text) {
     parser.yy.lowerCase = text.toLowerCase() === text;
     parser.yy.caseDetermined = true;
   }
+};
+
+parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
+  if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
+    parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
+    var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
+    parser.yy.cursorFound = {
+      first_line: yylloc.first_line,
+      last_line: yylloc.last_line,
+      first_column: yylloc.first_column + cursorIndex,
+      last_column: yylloc.first_column + cursorIndex + 1
+    };
+    var remainder = yytext.substring(cursorIndex + 1);
+    var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
+    if (remainingQuotes > 0 && remainingQuotes & 1  != 0) {
+      parser.yy.missingEndQuote = false;
+      lexer.input();
+    } else {
+      parser.yy.missingEndQuote = true;
+      lexer.unput(remainder);
+    }
+    lexer.popState();
+    return true;
+  }
+  return false;
 };
 
 var lexerModified = false;
