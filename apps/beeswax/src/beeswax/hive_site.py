@@ -137,11 +137,11 @@ def hiveserver2_jdbc_url():
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
 
-  if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH):
-    urlbase += ';sslTrustStore=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH)
+    if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH):
+      urlbase += ';sslTrustStore=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PATH)
 
-  if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
-    urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
+    if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
+      urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
 
   return urlbase
 
