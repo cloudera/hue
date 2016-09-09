@@ -28,6 +28,7 @@ import logging
 import re
 import time
 from time import strftime
+from django.utils.html import escape
 
 LOG = logging.getLogger(__name__)
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
@@ -62,7 +63,7 @@ def config_gen(dic):
   print >> sio, "<configuration>"
   for k, v in dic.iteritems():
     print >> sio, "<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
-        % (k, v)
+        % (k, escape(v))
   print >>sio, "</configuration>"
   sio.flush()
   sio.seek(0)
