@@ -28,7 +28,7 @@ import logging
 import re
 import time
 from time import strftime
-from django.utils.html import escape
+from xml.sax.saxutils import escape
 
 LOG = logging.getLogger(__name__)
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
@@ -61,9 +61,10 @@ def config_gen(dic):
   sio = StringIO()
   print >> sio, '<?xml version="1.0" encoding="UTF-8"?>'
   print >> sio, "<configuration>"
+  # if dic's key contains <,>,& then it will be escaped and if dic's value contains ']]>' then ']]>' will be stripped
   for k, v in dic.iteritems():
     print >> sio, "<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
-        % (k, escape(v))
+        % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v)
   print >>sio, "</configuration>"
   sio.flush()
   sio.seek(0)

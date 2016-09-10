@@ -75,7 +75,21 @@ def test_config_gen():
 </property>
 </configuration>"""), reformat_xml(config_gen(properties)))
 
-
+def test_config_gen_negative():
+  properties = {
+    'user.name': 'hue<foo>bar</foo>',
+    'test.1': 'http://localhost/test?test1=test&test2=test]]>&test3=test'
+  }
+  assert_equal(reformat_xml("""<configuration>
+<property>
+  <name>test.1</name>
+  <value><![CDATA[http://localhost/test?test1=test&test2=test&test3=test]]></value>
+</property>
+<property>
+  <name>user.name</name>
+  <value><![CDATA[hue<foo>bar</foo>]]></value>
+</property>
+</configuration>"""), reformat_xml(config_gen(properties)))
 
 def test_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
