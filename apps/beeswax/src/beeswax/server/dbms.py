@@ -522,7 +522,7 @@ class HiveServer2Dbms(object):
     hql = []
 
     for database in databases:
-      hql.append("DROP DATABASE `%s`" % database)
+      hql.append("DROP DATABASE `%s` CASCADE" % database)
     query = hql_query(';'.join(hql), database)
     design.data = query.dumps()
     design.save()

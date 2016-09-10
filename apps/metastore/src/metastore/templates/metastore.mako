@@ -325,7 +325,17 @@ ${ assist.assistPanel() }
           ${ csrf_token(request) | n,unicode }
           <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times</a>
-            <h3 id="dropDatabaseMessage">${ _('Do you really want to delete the database(s)?') }</h3>
+            <div class="alert-message block-message warning">${ _('Warning: This will drop all tables and objects within the database.') }</div>
+            </br>
+            <h3 id="dropDatabaseMessage">${ _('Do you really want to delete the following database(s)?') }</h3>
+            <ul data-bind="foreach: selectedDatabases">
+              <li>
+                <span data-bind="text: name"></span>
+                <!-- ko if: $data.tables().length > 0 -->
+                    (<span data-bind="text: $data.tables().length"></span> tables)
+                <!-- /ko -->
+              </li>
+            </ul>
           </div>
           <div class="modal-footer">
             <input type="button" class="btn" data-dismiss="modal" value="${_('No')}">
