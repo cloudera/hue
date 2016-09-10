@@ -259,6 +259,12 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       resp = _make_query(self.client, hql)
       resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
+      # Add a table to db1
+      hql = "CREATE TABLE " + "`" + db1 + "`." + "`test_drop_1` (a int);"
+      resp = _make_query(self.client, hql, database=db1)
+      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+      assert_equal(resp.status_code, 200)
+
       # Drop them
       resp = self.client.get('/metastore/databases/drop', follow=True)
       assert_true('want to delete' in resp.content, resp.content)
