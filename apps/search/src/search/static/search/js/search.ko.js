@@ -1470,7 +1470,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             try {
               data = JSON.bigdataParse(data);
 
-              if (typeof callback != undefined && callback != null) {
+              if (typeof callback === "function") {
                 callback(data);
               }
 
