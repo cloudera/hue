@@ -298,6 +298,7 @@ class HS2Api(Api):
         if engine == 'mr':
           # Get last task of last job
           logs = self.get_log(notebook, snippet, startFrom=0)
+
           jobs = self.get_jobs(notebook, snippet, logs)
           if jobs:
             last_job_id = jobs[-1].get('name')
@@ -453,11 +454,6 @@ class HS2Api(Api):
       'statement': query.get_query_statement(0),
     }
 
-  def fetch_result_size(self, notebook, snippet):
-    return {
-      'rows': 1000,
-      'size': 1024 * 1024 * 100, # Until HUE-4181
-    }
 
   @query_error_handler
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):

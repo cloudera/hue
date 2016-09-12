@@ -59,6 +59,7 @@ LOG = logging.getLogger(__name__)
 def is_hive_on_spark():
   return os.environ.get('ENABLE_HIVE_ON_SPARK', 'false').lower() == 'true'
 
+
 def get_available_execution_engines():
   available_engines = os.environ.get('AVAILABLE_EXECUTION_ENGINES_FOR_TEST', 'mr').lower().split(",")
   if any(engine not in _SUPPORTED_EXECUTION_ENGINES for engine in available_engines):
