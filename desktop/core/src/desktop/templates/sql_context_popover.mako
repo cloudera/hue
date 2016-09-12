@@ -133,7 +133,7 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-popover-content {
-      padding: 0 9px 14px 9px;
+      padding: 0;
       overflow: hidden;
     }
 
@@ -148,8 +148,8 @@ from metadata.conf import has_navigator
 
     .sql-context-tabs {
       border-bottom: 1px solid #ebebeb;
-      margin-left: -10px;
-      margin-right: -10px;
+      margin-left: -1px;
+      margin-right: -1px;
       padding-left: 15px;
     }
 
@@ -167,63 +167,124 @@ from metadata.conf import has_navigator
       content: "";
       border-width: 5px;
     }
+
+    .sql-context-flex {
+      position: relative;
+      display: flex;
+      flex-flow: column nowrap;
+      height: 100%;
+    }
+
+    .sql-context-flex-header {
+      flex: 0 0 35px;
+    }
+
+    .sql-context-flex-fill {
+      position: relative;
+      flex: 1 1 100%;
+      overflow: auto;
+    }
+
+    .sql-context-flex-bottom-links {
+      flex: 0 0 35px;
+      border-top: 1px solid #ebebeb;
+      z-index: 100;
+      background-color: #FFF;
+    }
+
+    .sql-context-link-row {
+      float: right;
+      margin: 10px 15px 0 10px;
+    }
+
+    .sql-context-link-row a {
+      margin-left: 10px;
+    }
+
+    .sql-context-inline-search {
+      border-radius: 8px !important;
+      min-height: 18px !important;
+      height: 18px !important;
+      margin: 0 5px 0 5px !important;
+      padding-right: 18px !important;
+    }
+
+    .sql-context-empty-columns {
+      letter-spacing: 0.035em;
+      margin-top: 50px;
+      font-size: 14px;
+      color: #737373;
+      text-align: center;
+    }
   </style>
 
 
   <script type="text/html" id="sql-context-table-details">
-    <!-- ko with: fetchedData -->
-      <div style="margin: 15px;" data-bind="foreach: extended_columns">
-        <div>
-          <a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+    <div class="sql-context-flex">
+      <div class="sql-context-flex-fill" data-bind="with: fetchedData">
+        <!-- ko component: { name: 'sql-columns-table', params: { columns: extended_columns } } --><!-- /ko -->
+      </div>
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
         </div>
       </div>
-      <div style="clear: both; margin-top: 20px;">
-        ${ _("Show in ") } <a class="pointer"  data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }">${ _("Assist") }</a><br />
-        ${ _("Open in ") } <a class="pointer"  data-bind="click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }">${ _("Metastore") }</a>, <a class="pointer" data-bind="attr: { href: hdfs_link }" target="_blank">${ _("File Browser") }</a>
-      </div>
-    <!-- /ko -->
+    </div>
   </script>
 
   <script type="text/html" id="sql-context-column-details">
-    <!-- ko with: fetchedData -->
-    <div style="margin: 15px;">
-      <div><a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)</div>
-      <div style="margin-top: 10px; font-weight: bold;">${ _("Comment") }</div>
-      <div data-bind="text: comment"></div>
+    <div class="sql-context-flex">
+      <div class="sql-context-flex-fill">
+        <div style="margin: 15px;" data-bind="with: fetchedData">
+          <a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+          <div style="margin-top: 10px; font-weight: bold;">${ _("Comment") }</div>
+          <div data-bind="text: comment"></div>
+        </div>
+      </div>
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+        </div>
+      </div>
     </div>
-    <div style="clear: both; margin-top: 20px;">
-      ${ _("Show in ") } <a class="pointer"  data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }">${ _("Assist") }</a><br />
-    </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sql-context-table-and-column-sample">
-    <!-- ko with: fetchedData -->
-      <div class="sample-scroll" style="text-align: left; padding: 3px; overflow: hidden">
-        <!-- ko if: rows.length == 0 -->
-        <div class="alert">${ _('The selected table has no data.') }</div>
-        <!-- /ko -->
-        <!-- ko if: rows.length > 0 -->
-        <table id="samples-table" class="samples-table table table-striped table-condensed">
-          <thead>
-          <tr>
-            <th style="width: 10px">&nbsp;</th>
-            <!-- ko foreach: headers -->
-            <th data-bind="text: $data"></th>
-            <!-- /ko -->
-          </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-        <!-- /ko -->
+    <div class="sql-context-flex">
+      <div style="overflow: hidden;" class="sql-context-flex-fill" data-bind="with: fetchedData">
+        <div class="sample-scroll" style="text-align: left; padding: 3px; overflow: hidden">
+          <!-- ko if: rows.length == 0 -->
+          <div class="alert">${ _('The selected table has no data.') }</div>
+          <!-- /ko -->
+          <!-- ko if: rows.length > 0 -->
+          <table id="samples-table" class="samples-table table table-striped table-condensed">
+            <thead>
+            <tr>
+              <th style="width: 10px">&nbsp;</th>
+              <!-- ko foreach: headers -->
+              <th data-bind="text: $data"></th>
+              <!-- /ko -->
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <!-- /ko -->
+        </div>
       </div>
-    <!-- /ko -->
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+          <a class="inactive-action pointer" data-bind="visible: ! $parent.isColumn, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="sql-context-table-analysis">
-    <!-- ko with: fetchedData -->
-      <div class="content" data-bind="niceScroll">
+    <div class="sql-context-flex">
+      <div style="overflow: hidden;" class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
         <!-- ko if: stats.length > 0 -->
           <table class="table table-striped">
             <tbody data-bind="foreach: stats">
@@ -235,12 +296,18 @@ from metadata.conf import has_navigator
           </table>
         <!-- /ko -->
       </div>
-    <!-- /ko -->
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+          <a class="inactive-action pointer" data-bind="visible: ! $parent.isColumn, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="sql-context-column-analysis">
-    <!-- ko with: fetchedData -->
-      <div class="content" data-bind="niceScroll">
+    <div class="sql-context-flex">
+      <div style="overflow: hidden;" class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
         <table class="table table-condensed">
           <tbody data-bind="foreach: stats">
             <tr>
@@ -250,7 +317,13 @@ from metadata.conf import has_navigator
           </tbody>
         </table>
       </div>
-    <!-- /ko -->
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+          <a class="inactive-action pointer" data-bind="visible: ! $parent.isColumn, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="sql-context-function-details">
@@ -266,7 +339,6 @@ from metadata.conf import has_navigator
       <div class="sql-context-popover-title">
         <i class="pull-left fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span data-bind="text: title"></span>
         <a class="pull-right pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
-        <a class="pull-right pointer inactive-action" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="margin-top: 3px;" title="${ _('Open in Metastore...') }" class="fa fa-fw fa-external-link"></i></a>
       </div>
       <div class="sql-context-popover-content">
         <!-- ko with: contents -->
@@ -276,7 +348,7 @@ from metadata.conf import has_navigator
           </li>
         </ul>
         <div class="tab-content" style="border: none; overflow: auto; height: 365px;" data-bind="foreach: tabs">
-          <div class="tab-pane" id="sampleTab" data-bind="attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="overflow: hidden">
+          <div class="tab-pane" id="sampleTab" data-bind="attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="height: 100%; overflow: hidden;">
             <!-- ko with: templateData -->
               <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
               <!-- ko if: ! loading() && hasErrors() -->
@@ -289,6 +361,41 @@ from metadata.conf import has_navigator
           </div>
         </div>
         <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="sql-columns-table-template">
+    <div class="sql-context-flex">
+      <div class="sql-context-flex-header">
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
+          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action" data-bind="css: { 'blue': searchVisible }"></i></a>
+          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+        </div>
+      </div>
+      <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+        <table style="width: 100%" class="table table-striped table-condensed table-nowrap">
+          <thead>
+            <tr data-bind="visible: filteredColumns().length !== 0">
+              <th width="6%">&nbsp;</th>
+              <th width="60%">${_('Name')}</th>
+              <th width="34%">${_('Type')}</th>
+              <th width="6%">&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'sql.context.popover.dispose' }">
+            <tr>
+              <td data-bind="text: $index()+$indexOffset()+1"></td>
+              <td style="overflow: hidden;">
+                <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+              </td>
+              <td><span data-bind="text: type, attr: { 'title': extendedType }, tooltip: { placement: 'bottom' }"></span></td>
+              <td><i class="snippet-icon fa fa-question-circle" data-bind="visible: comment, attr: { 'title': comment }, tooltip: { placement: 'bottom' }"></i></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sql-context-empty-columns" data-bind="visible: filteredColumns().length === 0">${_('No columns found')}</div>
       </div>
     </div>
   </script>
@@ -350,6 +457,14 @@ from metadata.conf import has_navigator
           defaultDatabase: self.snippet.database(),
           silenceErrors: true,
           successCallback: function (data) {
+            if (typeof data.extended_columns !== 'undefined') {
+              data.extended_columns.forEach(function (column) {
+                column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                if (column.type.indexOf('<') !== -1) {
+                  column.type = column.type.substring(0, column.type.indexOf('<'));
+                }
+              });
+            }
             self.fetchedData(data);
             self.loading(false);
             if (typeof callback === 'function') {
@@ -379,7 +494,8 @@ from metadata.conf import has_navigator
           label: '${ _("Details") }',
           template: isColumn ? 'sql-context-column-details' : 'sql-context-table-details',
           templateData: self.details,
-          errorText: '${ _("There was a problem loading the details.") }'
+          errorText: '${ _("There was a problem loading the details.") }',
+          isColumn: isColumn
         });
 
         self.tabs.push({
@@ -387,7 +503,8 @@ from metadata.conf import has_navigator
           label: '${ _("Sample") }',
           template: 'sql-context-table-and-column-sample',
           templateData: self.sample,
-          errorText: '${ _("There was a problem loading the samples.") }'
+          errorText: '${ _("There was a problem loading the samples.") }',
+          isColumn: isColumn
         });
 
         self.details.fetch(function (data) {
@@ -397,7 +514,8 @@ from metadata.conf import has_navigator
               label: '${ _("Analysis") }',
               template: isColumn ? 'sql-context-column-analysis' : 'sql-context-table-analysis',
               templateData: self.analysis,
-              errorText: '${ _("There was a problem loading the analysis.") }'
+              errorText: '${ _("There was a problem loading the analysis.") }',
+              isColumn: isColumn
             });
           }
         });
@@ -513,6 +631,7 @@ from metadata.conf import has_navigator
           });
 
           $t.parents('.dataTables_wrapper').height(350);
+
           $t.jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
@@ -630,7 +749,39 @@ from metadata.conf import has_navigator
         window.setTimeout(function() {
           $(document).on('click', hideOnClickOutside);
         }, 0);
-      })
+      });
+
+
+      function SqlColumnsTable(params) {
+        var self = this;
+
+        var columns = params.columns;
+
+        self.searchInput = ko.observable('');
+        self.searchVisible = ko.observable(false);
+        self.searchFocus = ko.observable(false);
+
+        self.searchVisible.subscribe(function (newValue) {
+          if (newValue) {
+            self.searchFocus(true);
+          }
+        });
+
+        self.filteredColumns = ko.pureComputed(function () {
+          if (self.searchInput() === '') {
+            return columns;
+          }
+          var query = self.searchInput();
+          return columns.filter(function (column) {
+            return column.name.indexOf(query) !== -1 || column.comment.indexOf(query) !== -1;
+          })
+        });
+      }
+
+      ko.components.register('sql-columns-table', {
+        viewModel: SqlColumnsTable,
+        template: { element: 'sql-columns-table-template' }
+      });
     });
   </script>
 </%def>
