@@ -230,7 +230,7 @@ class S3FileSystem(object):
 
     if s3.is_root(path):
       self._init_bucket_cache()
-      return [S3Stat.from_bucket(b) for b in self._bucket_cache.values()]
+      return sorted([S3Stat.from_bucket(b) for b in self._bucket_cache.values()], key=lambda x: x.name)
 
     bucket_name, prefix = s3.parse_uri(path)[:2]
     bucket = self._get_bucket(bucket_name)
