@@ -305,6 +305,7 @@ from metadata.conf import has_navigator
         $('#sqlContextPopover').remove();
         $(document).off('click', hideOnClickOutside);
         huePubSub.publish('sql.context.popover.dispose');
+        huePubSub.publish('sql.context.popover.hidden');
       };
 
       var hideOnClickOutside = function (event) {
@@ -625,6 +626,7 @@ from metadata.conf import has_navigator
         var $sqlContextPopover = $('<div id="sqlContextPopover" data-bind="component: { name: \'sql-context-popover\', params: $data }" />');
         $('body').append($sqlContextPopover);
         ko.applyBindings(details, $sqlContextPopover[0]);
+        huePubSub.publish('sql.context.popover.shown');
         window.setTimeout(function() {
           $(document).on('click', hideOnClickOutside);
         }, 0);
