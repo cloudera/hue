@@ -191,6 +191,15 @@ def view(request, path):
           return JsonResponse(exception)
         else:
           raise PopupException(msg , detail=e)
+    except S3FileSystemException, e:
+        msg = _("S3 filesystem exception.")
+        if request.is_ajax():
+            exception = {
+                'error': smart_str(e)
+            }
+            return JsonResponse(exception)
+        else:
+            raise PopupException(msg, detail=e)
 
 
 def home_relative_view(request, path):
