@@ -109,6 +109,14 @@ from django.utils.translation import ugettext as _
       <!-- /ko -->
       <!-- ko ifnot: isS3() && isS3Root() -->
       <p>${_('Are you sure you want to delete these files?')}</p>
+      <ul data-bind="foreach: $root.selectedFiles">
+        <li data-bind="visible: $index() <= 10">
+          <span data-bind="text: name"></span>
+        </li>
+      </ul>
+      <!-- ko if: $root.selectedFiles().length > 10 -->
+        and <span data-bind="text: $root.selectedFiles().length - 10"></span> others.
+      <!-- /ko -->
       <!-- /ko -->
     </div>
     <div class="modal-footer">
