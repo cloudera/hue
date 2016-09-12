@@ -106,9 +106,12 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     try:
       return bucket.get_key(key_name, validate=validate)
-    except:
-      e, exc, tb = sys.exc_info()
-      raise ValueError(e)
+    except S3ResponseError, e:
+      if e.status == 301:
+        raise S3FileSystemException(_('Failed to access path: "%s". '
+          'Check that you have access to read this bucket and that the region is correct.') % path)
+      else:
+        raise S3FileSystemException(e.reason)
 
   def _get_location(self):
     if get_default_region() in (Location.EU, Location.EUCentral1, Location.USWest, Location.USWest2, Location.SAEast,
