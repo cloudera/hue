@@ -108,7 +108,7 @@ class S3FileSystem(object):
       return bucket.get_key(key_name, validate=validate)
     except S3ResponseError, e:
       if e.status == 301:
-        raise S3FileSystemException(_('Failed to access path: "%s". '
+        raise S3FileSystemException(_('Failed to access path: "%s" '
           'Check that you have access to read this bucket and that the region is correct.') % path)
       else:
         raise S3FileSystemException(e.reason)
@@ -129,9 +129,10 @@ class S3FileSystem(object):
     except S3ResponseError as e:
       if e.status == 404:
         return None
+      elif e.status == 403:
+        raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
-        exc_class, exc, tb = sys.exc_info()
-        raise exc_class, exc, tb
+        raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
 
     if key is None:
       key = self._get_key(path, validate=False)
