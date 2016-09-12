@@ -19,7 +19,9 @@
 import json
 import logging
 import re
+import time
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
@@ -27,13 +29,14 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from notebook.api import _save_notebook
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
 from beeswax.server import dbms
-from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config
+from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
 
 
 LOG = logging.getLogger(__name__)
@@ -486,6 +489,36 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     return snippet
 
 
+  def execute_and_wait(self, query_doc, snippet_idx=0, timeout=30.0, wait=1.0):
+      notebook = Notebook(document=query_doc)
+      snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
+
+      curr = time.time()
+      end = curr + timeout
+      status = 'ready'
+
+      response = self.client.post(reverse('notebook:execute'),
+                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+      notebook = Notebook(document=query_doc)
+      snippet = self.get_snippet(notebook, snippet_idx=snippet_idx)
+      data = json.loads(response.content)
+      snippet['result']['handle'] = data['handle']
+
+      while status != 'available' and curr <= end:
+        response = self.client.post(reverse('notebook:check_status'),
+                                    {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+        data = json.loads(response.content)
+        status = data['query_status']['status']
+        snippet['status'] = status
+        time.sleep(wait)
+        curr = time.time()
+
+      if status != 'available':
+        raise Exception('Query failed to complete or return results.')
+
+      return snippet
+
+
   def test_query_with_unicode(self):
     statement = "SELECT * FROM sample_07 WHERE code='validé';"
 
@@ -574,3 +607,107 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(['code'], data['headers'])
     assert_true('rows' in data)
     assert_true(len(data['rows']) > 0)
+
+
+  def test_fetch_result_size_mr(self):
+    # Assert that a query with no job will return no rows or size
+    statement = "SELECT 'hello world';"
+
+    settings = [
+        {
+            'key': 'hive.execution.engine',
+            'value': 'mr'
+        }
+    ]
+    doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true('size' in data['result'])
+    assert_equal(None, data['result']['rows'])
+    assert_equal(None, data['result']['size'])
+
+    # Assert that a query with map & reduce task returns rows
+    statement = "SELECT DISTINCT code FROM sample_07;"
+    doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true(data['result']['rows'] > 0)
+
+    # Assert that a query with multiple jobs returns rows
+    statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
+    doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true(data['result']['rows'] > 0)
+
+
+  def test_fetch_result_size_spark(self):
+    if not is_live_cluster() or not is_hive_on_spark():
+      raise SkipTest
+
+    # TODO: Add session cleanup here so we don't have orphan spark sessions
+
+    # Assert that a query with no job will return no rows or size
+    statement = "SELECT 'hello world';"
+
+    settings = [
+        {
+            'key': 'hive.execution.engine',
+            'value': 'spark'
+        }
+    ]
+    doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true('size' in data['result'])
+    assert_equal(None, data['result']['rows'])
+    assert_equal(None, data['result']['size'])
+
+    # Assert that a query that runs a job will return rows and size
+    statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
+    doc = self.create_query_document(owner=self.user, statement=statement, settings=settings)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true('size' in data['result'])
+    assert_true(data['result']['rows'] > 0)
+    assert_true(data['result']['size'] > 0)
