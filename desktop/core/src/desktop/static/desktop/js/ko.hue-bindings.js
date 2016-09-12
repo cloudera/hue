@@ -3408,6 +3408,17 @@
    *  </ul>
    * </div>
    *
+   * For tables the binding has to be attached to the tbody element:
+   *
+   * <div class=".container" style="overflow-y: scroll; height: 100px">
+   *  <table>
+   *    <thead>...</thead>
+   *    <tbody data-bind="foreachVisible: { data: items, minHeight: 20, container: '.container' }>
+   *      <tr>...</tr>
+   *    </tbody>
+   *  </ul>
+   * </div>
+   *
    * Currently the binding only supports one element inside the bound element otherwise the height
    * calculations will be off. In other words this will make it go bonkers:
    *
@@ -3432,6 +3443,13 @@
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
       var $element = $(element);
+      var isTable = false;
+
+      if ($element.parent().is('table')) {
+        $element = $element.parent();
+        isTable = true;
+      }
+
       var $container = $element.closest(options.container);
 
       var id = Math.random();
@@ -3457,7 +3475,7 @@
             return false;
           }
         });
-      };
+      }
 
       if ($parentFVOwnerElement.data('disposalFunction')) {
         $parentFVOwnerElement.data('disposalFunction')();
@@ -3486,6 +3504,8 @@
           huePubSub.publish('foreach.visible.update', id);
         }
       };
+
+      // TODO: Move intervals to webworker
       var updateCountInterval = setInterval(updateVisibleEntryCount, 300);
       updateVisibleEntryCount();
 
@@ -3569,8 +3589,7 @@
           cursorminheight: options.cursorminheight || 20,
           horizrailenabled: options.horizrailenabled || false
         });
-      }
-      else {
+      } else {
         window.setTimeout(function(){
           $container.getNiceScroll().resize();
         }, 200);
@@ -3653,7 +3672,7 @@
       };
 
       var afterRender = function () {
-        renderedElements = $element.children();
+        renderedElements = isTable ? $element.children('tbody').children() : $element.children();
         $container.data('busyRendering', false);
         huePubSub.publish('foreach.visible.update.heights', id);
       };
@@ -3778,6 +3797,10 @@
         $parentFVOwnerElement.data('disposalFunction', null);
       });
 
+      if (typeof options.pubSubDispose !== 'undefined') {
+        huePubSubs.push(huePubSub.subscribe(options.pubSubDispose, $parentFVOwnerElement.data('disposalFunction')));
+      }
+
       ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
       setStartAndEndFromScrollTop();
@@ -3793,7 +3816,7 @@
         return {
           data: ko.observableArray([])
         }
-      }
+      };
       ko.bindingHandlers.foreach.init(element, valueAccessorBuilder, allBindings);
     },
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
