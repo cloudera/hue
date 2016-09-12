@@ -667,11 +667,10 @@ def export_result(request):
   api = get_api(request, snippet)
 
   if data_format == 'hdfs-file':
+    if request.fs.isdir(destination):
+      destination += '/%(type)s-%(id)s.csv' % notebook
     if overwrite and request.fs.exists(destination):
-      if request.fs.isfile(destination):
-        request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
-      else:
-        raise ValidationError(_("The target path is a directory"))
+      request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
     response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
     response['status'] = 0
   elif data_format == 'hive-table':

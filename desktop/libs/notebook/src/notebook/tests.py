@@ -26,9 +26,12 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2
+from hadoop import cluster as originalCluster
+
+import notebook.connectors.hiveserver2
 
 from notebook.api import _historify
-from notebook.connectors.base import Notebook, QueryError
+from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 
 
@@ -249,3 +252,109 @@ FROM déclenché c, c.addresses a"""
     response =send_exception(message)
     data = json.loads(response.content)
     assert_equal(1, data['status'])
+
+
+class MockedApi(Api):
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    return {'destination': target_file}
+
+
+class MockFs():
+  def __init__(self, logical_name=None):
+
+    self.fs_defaultfs = 'hdfs://curacao:8020'
+    self.logical_name = logical_name if logical_name else ''
+    self.DEFAULT_USER = 'test'
+    self.user = 'test'
+
+  def setuser(self, user):
+    self.user = user
+
+  @property
+  def user(self):
+    return self.user
+
+  def do_as_user(self, username, fn, *args, **kwargs):
+    return ''
+
+  def exists(self, path):
+    return True
+
+  def isdir(self, path):
+    return path == '/user/hue'
+
+
+class TestNotebookApiMocked(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+    # Beware: Monkey patch HS2API Mock API
+    if not hasattr(notebook.connectors.hiveserver2, 'original_HS2Api'): # Could not monkey patch base.get_api
+      notebook.connectors.hiveserver2.original_HS2Api = notebook.connectors.hiveserver2.HS2Api
+    notebook.connectors.hiveserver2.HS2Api = MockedApi
+
+    originalCluster.get_hdfs()
+    self.original_fs = originalCluster.FS_CACHE["default"]
+    originalCluster.FS_CACHE["default"] = MockFs()
+
+    grant_access("test", "default", "notebook")
+    grant_access("not_perm_user", "default", "notebook")
+
+  def tearDown(self):
+    notebook.connectors.hiveserver2.HS2Api = notebook.connectors.hiveserver2.original_HS2Api
+
+    if originalCluster.FS_CACHE is None:
+      originalCluster.FS_CACHE = {}
+    originalCluster.FS_CACHE["default"] = self.original_fs
+
+
+  def test_export_result(self):
+    notebook_json = """
+      {
+        "selectedSnippet": "hive",
+        "showHistory": false,
+        "description": "Test Hive Query",
+        "name": "Test Hive Query",
+        "sessions": [
+            {
+                "type": "hive",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "query-hive",
+        "id": null,
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+    }
+    """
+
+    response = self.client.post(reverse('notebook:export_result'), {
+        'notebook': notebook_json,
+        'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+        'format': json.dumps('hdfs-file'),
+        'destination': json.dumps('/user/hue'),
+        'overwrite': json.dumps(False)
+    })
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('/user/hue/query-hive-None.csv', data['watch_url']['destination'], data)
+
+
+    response = self.client.post(reverse('notebook:export_result'), {
+        'notebook': notebook_json,
+        'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+        'format': json.dumps('hdfs-file'),
+        'destination': json.dumps('/user/hue/path.csv'),
+        'overwrite': json.dumps(False)
+    })
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
