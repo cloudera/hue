@@ -610,6 +610,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
 
   def test_fetch_result_size_mr(self):
+    if not is_live_cluster():  # Mini-cluster does not have JHS
+      raise SkipTest
+
     # Assert that a query with no job will return no rows or size
     statement = "SELECT 'hello world';"
 
