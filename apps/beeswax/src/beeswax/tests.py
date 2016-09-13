@@ -1217,7 +1217,7 @@ for x in sys.stdin:
     resp = self.client.get('/beeswax/install_examples')
     assert_true('POST request is required.' in json.loads(resp.content)['message'])
 
-    self.client.post('/beeswax/install_examples')
+    self.client.post('/beeswax/install_examples', {'db_name': self.db_name})
 
     # New tables exists
     resp = self.client.get('/metastore/tables/%s?format=json' % self.db_name)
@@ -1259,7 +1259,7 @@ for x in sys.stdin:
       assert_true('Sample: Customers' in resp.content)
 
       # Now install it a second time, and no error
-      resp = self.client.post('/beeswax/install_examples')
+      resp = self.client.post('/beeswax/install_examples', {'db_name': self.db_name})
       assert_equal(0, json.loads(resp.content)['status'])
       assert_equal('', json.loads(resp.content)['message'])
 

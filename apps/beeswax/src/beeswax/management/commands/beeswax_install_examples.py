@@ -46,15 +46,17 @@ class InstallException(Exception):
 
 
 class Command(BaseCommand):
-  args = '<beeswax|impala>'
+  args = '<beeswax|impala> <db_name>'
   help = 'Install examples but do not overwrite them.'
 
   def handle(self, *args, **options):
     if args:
       app_name = args[0]
+      db_name = args[1] if len(args) > 1 else 'default'
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
     else:
       app_name = options['app_name']
+      db_name = options.get('db_name', 'default')
       user = options['user']
 
     tables = options['tables'] if 'tables' in options else 'tables.json'
@@ -65,7 +67,7 @@ class Command(BaseCommand):
     try:
       sample_user = install_sample_user()
       self._install_queries(sample_user, app_name)
-      self._install_tables(user, app_name, tables)
+      self._install_tables(user, app_name, db_name, tables)
     except Exception, ex:
       exception = ex
 
@@ -84,14 +86,14 @@ class Command(BaseCommand):
       else: 
         raise exception
 
-  def _install_tables(self, django_user, app_name, tables):
+  def _install_tables(self, django_user, app_name, db_name, tables):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     table_file = file(os.path.join(data_dir, tables))
     table_list = json.load(table_file)
     table_file.close()
 
     for table_dict in table_list:
-      table = SampleTable(table_dict, app_name)
+      table = SampleTable(table_dict, app_name, db_name)
       try:
         table.install(django_user)
       except Exception, ex:
@@ -118,7 +120,7 @@ class SampleTable(object):
   """
   Represents a table loaded from the tables.json file
   """
-  def __init__(self, data_dict, app_name):
+  def __init__(self, data_dict, app_name, db_name='default'):
     self.name = data_dict['table_name']
     if 'partition_files' in data_dict:
       self.partition_files = data_dict['partition_files']
@@ -128,6 +130,7 @@ class SampleTable(object):
     self.hql = data_dict['create_hql']
     self.query_server = get_query_server_config(app_name)
     self.app_name = app_name
+    self.db_name = db_name
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -159,14 +162,15 @@ class SampleTable(object):
     try:
       # Already exists?
       if self.app_name == 'impala':
-        db.invalidate(database='default', flush_all=False)
-      db.get_table('default', self.name)
+        db.invalidate(database=self.db_name, flush_all=False)
+      db.get_table(self.db_name, self.name)
       msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
       return False
     except Exception:
       query = hql_query(self.hql)
       try:
+        db.use(self.db_name)
         results = db.execute_and_wait(query)
         if not results:
           msg = _('Error creating table %(table)s: Operation timeout.') % {'table': self.name}
