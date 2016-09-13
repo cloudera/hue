@@ -368,6 +368,7 @@
       if (self.columnQuery() !== '') {
         returned = $.grep(self.columns(), function (column) {
           return column.name().toLowerCase().indexOf(self.columnQuery()) > -1
+            || (column.type() && column.type().toLowerCase().indexOf(self.columnQuery()) > -1)
             || (column.comment() && column.comment().toLowerCase().indexOf(self.columnQuery()) > -1);
         });
       }
