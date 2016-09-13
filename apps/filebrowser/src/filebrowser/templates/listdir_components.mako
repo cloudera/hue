@@ -115,7 +115,7 @@ from django.utils.translation import ugettext as _
         </li>
       </ul>
       <!-- ko if: $root.selectedFiles().length > 10 -->
-        and <span data-bind="text: $root.selectedFiles().length - 10"></span> others.
+        ${_('and')} <span data-bind="text: $root.selectedFiles().length - 10"></span> ${_('others')}.
       <!-- /ko -->
       <!-- /ko -->
     </div>
