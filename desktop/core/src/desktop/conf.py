@@ -1192,6 +1192,13 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   help=_('Choose whether to show the new SQL editor.')
 )
 
+USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
+  key='use_new_side_panels',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to show extended left and right panels.')
+)
+
 USE_DEFAULT_CONFIGURATION = Config(
   key='use_default_configuration',
   default=False,

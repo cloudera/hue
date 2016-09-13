@@ -16,9 +16,10 @@
 
 <%!
 from desktop import conf
+from desktop.conf import USE_NEW_SIDE_PANELS
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
+from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
 %>
 
@@ -816,6 +817,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-panel-template">
     <div style="display: flex; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
+      <!-- ko if: availablePanels.length > 1 -->
       <div style="position: relative; flex: 0 0 29px;" class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, attr: { 'title': name }">
@@ -823,7 +825,8 @@ from metadata.conf import has_navigator
         </div>
         <!-- /ko -->
       </div>
-      <div style="position: relative; flex: 1 1 100%; overflow: hidden;padding-top: 10px;" data-bind="with: visiblePanel">
+      <!-- /ko -->
+      <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
         <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       </div>
     </div>
@@ -1253,32 +1256,35 @@ from metadata.conf import has_navigator
             type: 'db',
             icon: 'fa-database',
             minHeight: 75
-          }),
-          new AssistInnerPanel({
-            panelData: new AssistHdfsPanel({
-              apiHelper: self.apiHelper
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("HDFS") }',
-            type: 'hdfs',
-            icon: 'fa-folder-o',
-            minHeight: 50
           })
-##           }),
-##           new AssistInnerPanel({
-##             panelData: new AssistDocumentsPanel({
-##               user: params.user,
-##               apiHelper: self.apiHelper,
-##               i18n: i18n
-##             }),
-##             apiHelper: self.apiHelper,
-##             name: '${ _("Documents") }',
-##             type: 'documents',
-##             icon: 'fa-files-o',
-##             minHeight: 50,
-##             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-##           })
         ];
+
+        % if USE_NEW_SIDE_PANELS.get():
+        self.availablePanels.push(new AssistInnerPanel({
+          panelData: new AssistHdfsPanel({
+            apiHelper: self.apiHelper
+          }),
+          apiHelper: self.apiHelper,
+          name: '${ _("HDFS") }',
+          type: 'hdfs',
+          icon: 'fa-folder-o',
+          minHeight: 50
+        }));
+
+##         self.availablePanels.push(new AssistInnerPanel({
+##           panelData: new AssistDocumentsPanel({
+##             user: params.user,
+##             apiHelper: self.apiHelper,
+##             i18n: i18n
+##           }),
+##           apiHelper: self.apiHelper,
+##           name: '${ _("Documents") }',
+##           type: 'documents',
+##           icon: 'fa-files-o',
+##           minHeight: 50,
+##           visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+##         }));
+        % endif
 
         self.performSearch = function () {
           if (self.searchInput() === lastQuery) {
