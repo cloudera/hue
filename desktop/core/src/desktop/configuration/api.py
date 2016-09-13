@@ -199,28 +199,31 @@ def _update_default_and_group_configurations(configurations):
   :param configurations: Dictionary of app to configuration objects. Only processes "default" and "groups" configs
   :return: updated configurations dict
   """
-  with transaction.atomic():
-    # delete all previous default and group configurations
-    DefaultConfiguration.objects.filter(Q(is_default=True) | Q(groups__isnull=False)).delete()
+  try:
+    with transaction.atomic():
+      # delete all previous default and group configurations
+      DefaultConfiguration.objects.filter(Q(is_default=True) | Q(groups__isnull=False)).delete()
 
-    for app, configs in configurations.items():
-      if 'default' in configs:
-        properties = configs['default']
-        if properties:
-          _save_configuration(app, properties, is_default=True)
-          LOG.info('Saved default configuration for app: %s' % app)
-
-      if 'groups' in configs:
-        for group_config in configs['groups']:
-          group_ids = group_config.get('group_ids')
-          properties = group_config.get('properties')
-
+      for app, configs in configurations.items():
+        if 'default' in configs:
+          properties = configs['default']
           if properties:
-            try:
-              groups = Group.objects.filter(id__in=group_ids)
-              _save_configuration(app, properties, is_default=False, groups=groups)
-            except Group.DoesNotExist, e:
-              raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
+            _save_configuration(app, properties, is_default=True)
+            LOG.info('Saved default configuration for app: %s' % app)
+
+        if 'groups' in configs:
+          for group_config in configs['groups']:
+            group_ids = group_config.get('group_ids')
+            properties = group_config.get('properties')
+
+            if properties:
+              try:
+                groups = Group.objects.filter(id__in=group_ids)
+                _save_configuration(app, properties, is_default=False, groups=groups)
+              except Group.DoesNotExist, e:
+                raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
+  except Exception, e:
+    raise PopupException(_('Failed to update configurations: %s') % e)
 
   return _get_default_configurations()
 
