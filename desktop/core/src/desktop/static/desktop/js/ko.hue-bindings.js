@@ -2748,7 +2748,9 @@
           }
           e.data.locations.forEach(function (location) {
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
-            token.parseLocation = location;
+            if (token !== null) {
+              token.parseLocation = location;
+            }
           });
         };
 
@@ -2919,7 +2921,7 @@
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX+5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token.parseLocation && !disableTooltip) {
+            if (token !== null && token.parseLocation && !disableTooltip) {
               tooltipTimeout = window.setTimeout(function () {
                 var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                 contextTooltip.show(options.contextTooltip, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
@@ -2929,7 +2931,7 @@
             }
             if (lastHoveredToken !== token) {
               clearActiveMarker();
-              if (token.parseLocation) {
+              if (token !== null && token.parseLocation) {
                 markLocation(token.parseLocation);
               }
               lastHoveredToken = token;
@@ -2956,7 +2958,7 @@
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
 
-            if (typeof token.parseLocation !== 'undefined') {
+            if (token !== null && typeof token.parseLocation !== 'undefined') {
               var range = markLocation(token.parseLocation);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
