@@ -21,7 +21,6 @@ import logging
 import os
 import posixpath
 import re
-import sys
 
 from boto.exception import S3ResponseError
 from boto.s3.connection import Location
@@ -54,7 +53,10 @@ class S3FileSystem(object):
 
   def _init_bucket_cache(self):
     if self._bucket_cache is None:
-      buckets = self._s3_connection.get_all_buckets()
+      try:
+        buckets = self._s3_connection.get_all_buckets()
+      except S3ResponseError, e:
+        raise S3FileSystemException(e.message or e.reason)
       self._bucket_cache = {}
       for bucket in buckets:
         self._bucket_cache[bucket.name] = bucket
@@ -80,7 +82,7 @@ class S3FileSystem(object):
       elif e.status == 400:
         raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
       else:
-        raise S3FileSystemException(e.reason)
+        raise S3FileSystemException(e.message or e.reason)
     return bucket
 
   def _delete_bucket(self, name):
@@ -99,7 +101,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       else:
-        raise S3FileSystemException(e.message)
+        raise S3FileSystemException(e.message or e.reason)
 
   def _get_key(self, path, validate=True):
     bucket_name, key_name = s3.parse_uri(path)[:2]
@@ -111,7 +113,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('Failed to access path: "%s" '
           'Check that you have access to read this bucket and that the region is correct.') % path)
       else:
-        raise S3FileSystemException(e.reason)
+        raise S3FileSystemException(e.message or e.reason)
 
   def _get_location(self):
     if get_default_region() in (Location.EU, Location.EUCentral1, Location.USWest, Location.USWest2, Location.SAEast,
