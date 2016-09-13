@@ -63,10 +63,10 @@ from metadata.conf import has_navigator
     }
 
     .assist-inner-panel {
-      display: none;
+      overflow: hidden;
+      height: 100%;
       position: relative;
       padding: 0 0 0 10px;
-      overflow: hidden;
       margin-right: 1px;
     }
 
@@ -796,16 +796,6 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/html" id="assist-panel-switches">
-    <div class="assist-panel-switches assist-fixed-height" style="display:none;">
-      <!-- ko foreach: availablePanels -->
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
-        <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
-      </div>
-      <!-- /ko -->
-    </div>
-  </script>
-
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="searchbar">
@@ -824,14 +814,18 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div style="position:relative; height: 100%; overflow: hidden" data-bind="assistVerticalResizer: { panels: visiblePanels, apiHelper: apiHelper, noFixedHeights: onlySql }">
+    <div style="display: flex; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
-      <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
-      <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
-      <!-- ko foreach: visiblePanels -->
-      <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header', data: panelData }--><!-- /ko -->
-      <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
-      <!-- /ko -->
+      <div style="position: relative; flex: 0 0 29px;" class="assist-panel-switches">
+        <!-- ko foreach: availablePanels -->
+        <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, attr: { 'title': name }">
+          <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
+        </div>
+        <!-- /ko -->
+      </div>
+      <div style="position: relative; flex: 1 1 100%; overflow: hidden;padding-top: 10px;" data-bind="with: visiblePanel">
+        <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
+      </div>
     </div>
   </script>
 
@@ -973,7 +967,7 @@ from metadata.conf import has_navigator
         self.name = options.name;
         self.panelData = options.panelData;
 
-        self.visible = ko.observable(options.visible);
+        self.visible = ko.observable(options.visible || true);
         options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
         self.templateName = 'assist-' + self.type + '-inner-panel';
 
@@ -1246,7 +1240,6 @@ from metadata.conf import has_navigator
           }
         });
 
-        self.onlySql = typeof params.onlySql !== 'undefined' ? params.onlySql : true;
         self.loading = ko.observable(false);
 
         self.availablePanels = [
@@ -1259,13 +1252,9 @@ from metadata.conf import has_navigator
             name: '${ _("SQL") }',
             type: 'db',
             icon: 'fa-database',
-            minHeight: 75,
-            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('sql') !== -1
-          })
-        ];
-
-        if (! self.onlySql) {
-          self.availablePanels.push(new AssistInnerPanel({
+            minHeight: 75
+          }),
+          new AssistInnerPanel({
             panelData: new AssistHdfsPanel({
               apiHelper: self.apiHelper
             }),
@@ -1273,32 +1262,23 @@ from metadata.conf import has_navigator
             name: '${ _("HDFS") }',
             type: 'hdfs',
             icon: 'fa-folder-o',
-            minHeight: 50,
-            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('hdfs') !== -1
-          }));
-          <%
-            from desktop.conf import USE_NEW_EDITOR
-          %>
-          % if USE_NEW_EDITOR.get():
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistDocumentsPanel({
-              user: params.user,
-              apiHelper: self.apiHelper,
-              i18n: i18n
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("Documents") }',
-            type: 'documents',
-            icon: 'fa-files-o',
-            minHeight: 50,
-            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-          }));
-          % endif
-        }
-
-        if (self.availablePanels.length == 1) {
-          self.availablePanels[0].visible(true);
-        }
+            minHeight: 50
+          })
+##           }),
+##           new AssistInnerPanel({
+##             panelData: new AssistDocumentsPanel({
+##               user: params.user,
+##               apiHelper: self.apiHelper,
+##               i18n: i18n
+##             }),
+##             apiHelper: self.apiHelper,
+##             name: '${ _("Documents") }',
+##             type: 'documents',
+##             icon: 'fa-files-o',
+##             minHeight: 50,
+##             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+##           })
+        ];
 
         self.performSearch = function () {
           if (self.searchInput() === lastQuery) {
@@ -1354,13 +1334,7 @@ from metadata.conf import has_navigator
           })
         };
 
-
-        self.visiblePanels = ko.pureComputed(function () {
-          var result = $.grep(self.availablePanels, function (panel) {
-            return panel.visible();
-          });
-          return result;
-        });
+        self.visiblePanel = ko.observable(self.availablePanels[0]);
       }
 
       ko.components.register('assist-panel', {
