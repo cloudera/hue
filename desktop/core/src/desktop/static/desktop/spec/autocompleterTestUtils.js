@@ -41,14 +41,6 @@ define([
       toEqualDefinition : function() {
         return {
           compare: function(actualResponse, testDefinition) {
-            if (actualResponse.suggestKeywords) {
-              var weightFreeKeywords = [];
-              actualResponse.suggestKeywords.forEach(function (keyword) {
-                weightFreeKeywords.push(keyword.value);
-              });
-              actualResponse.suggestKeywords = weightFreeKeywords;
-            }
-
             if (typeof testDefinition.noErrors === 'undefined' && actualResponse.errors) {
               var allRecoverable = true;
               actualResponse.errors.forEach(function (error) {
@@ -58,6 +50,25 @@ define([
                 delete actualResponse.errors;
               }
             }
+
+            if (testDefinition.locationsOnly) {
+              return {
+                pass: jasmine.matchersUtil.equals(actualResponse.locations, testDefinition.expectedLocations),
+                message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                '          Dialect: ' + testDefinition.dialect + '\n' +
+                'Expected locations: ' + JSON.stringify(testDefinition.expectedLocations).replace(/["]/g, '\'') + '\n' +
+                '  Parser locations: ' + JSON.stringify(actualResponse.locations).replace(/["]/g, '\'') +   '\n'
+              };
+            }
+
+            if (actualResponse.suggestKeywords) {
+              var weightFreeKeywords = [];
+              actualResponse.suggestKeywords.forEach(function (keyword) {
+                weightFreeKeywords.push(keyword.value);
+              });
+              actualResponse.suggestKeywords = weightFreeKeywords;
+            }
+
             if (testDefinition.hasLocations) {
               if (actualResponse.locations.length === 0) {
                 return {

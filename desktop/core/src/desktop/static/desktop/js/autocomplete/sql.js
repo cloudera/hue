@@ -211,7 +211,7 @@ case 659:
 break;
 case 660:
 
-     addColumnLocation(parser.yy.lastIdentifierChainLocation, $$[$0-2]);
+     // TODO: Add table/column locations for identifiers before *
    
 break;
 case 662:
@@ -4223,8 +4223,17 @@ var commitLocations = function () {
     if (location.type === 'table' && (typeof location.identifierChain === 'undefined' || location.identifierChain.length === 0)) {
       parser.yy.locations.splice(i, 1);
     }
-    if (location.type === 'column' && (typeof location.identifierChain === 'undefined' || location.identifierChain.length < 2)) {
-      parser.yy.locations.splice(i, 1);
+    if (location.type === 'column') {
+      if (typeof location.identifierChain === 'undefined') {
+        parser.yy.locations.splice(i, 1);
+      } else if (location.identifierChain.length < 2) {
+        location.tables = [];
+        location.linked = false;
+        expandIdentifierChain(location, true);
+        if (location.tables.length === 0) {
+          parser.yy.locations.splice(i, 1);
+        }
+      }
     }
   }
   if (parser.yy.locations.length > 0) {
@@ -4463,9 +4472,9 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
 
   // IdentifierChain contains a possibly started identifier or empty, example: a.b.c = ['a', 'b', 'c']
   // Reduce the tablePrimaries to the one that matches the first identifier if found
+  var foundPrimary;
+  var doubleMatch = false;
   if (identifierChain.length > 0) {
-    var foundPrimary;
-    var doubleMatch = false;
     for (var i = 0; i < tablePrimaries.length; i++) {
       if (tablePrimaries[i].subQueryAlias) {
         if (tablePrimaries[i].subQueryAlias === identifierChain[0].name) {
@@ -4490,26 +4499,28 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
         break;
       }
     }
-    if (foundPrimary) {
+  }
+
+  if (foundPrimary) {
+    identifierChain.shift();
+    if (doubleMatch) {
       identifierChain.shift();
-      if (doubleMatch) {
-        identifierChain.shift();
-      }
-    } else if (tablePrimaries.length === 1) {
-      foundPrimary = tablePrimaries[0];
     }
-    if (foundPrimary) {
-      if (foundPrimary.subQueryAlias) {
-        identifierChain.unshift({ subQuery: foundPrimary.subQueryAlias });
-      } else {
-        identifierChain = foundPrimary.identifierChain.concat(identifierChain);
-      }
-      if (wrapper.tables) {
-        wrapper.tables.push({ identifierChain: identifierChain });
-        delete wrapper.identifierChain;
-      } else {
-        wrapper.identifierChain = identifierChain;
-      }
+  } else if (tablePrimaries.length === 1) {
+    foundPrimary = tablePrimaries[0];
+  }
+
+  if (foundPrimary) {
+    if (foundPrimary.subQueryAlias) {
+      identifierChain.unshift({ subQuery: foundPrimary.subQueryAlias });
+    } else {
+      identifierChain = foundPrimary.identifierChain.concat(identifierChain);
+    }
+    if (wrapper.tables) {
+      wrapper.tables.push({ identifierChain: identifierChain });
+      delete wrapper.identifierChain;
+    } else {
+      wrapper.identifierChain = identifierChain;
     }
   } else {
     tablePrimaries.forEach(function (tablePrimary) {
@@ -4520,7 +4531,6 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
       if (wrapper.tables) {
         wrapper.tables.push(targetTable)
       }
-
     });
   }
 

@@ -2749,7 +2749,31 @@
           e.data.locations.forEach(function (location) {
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
             if (token !== null) {
-              token.parseLocation = location;
+              if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
+
+                var findIdentifierChainInTable = function (tablesToGo) {
+                  var nextTable = tablesToGo.shift();
+                  apiHelper.fetchAutocomplete({
+                    sourceType: snippet.type(),
+                    defaultDatabase: snippet.database(),
+                    identifierChain: nextTable.identifierChain,
+                    silenceErrors: true,
+                    successCallback: function (data) {
+                      if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
+                        location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                        delete location.tables;
+                        token.parseLocation = location;
+                      } else if (tablesToGo.length > 0) {
+                        findIdentifierChainInTable(tablesToGo);
+                      }
+                    }
+                  })
+                };
+
+                findIdentifierChainInTable(location.tables.concat());
+              } else {
+                token.parseLocation = location;
+              }
             }
           });
         };

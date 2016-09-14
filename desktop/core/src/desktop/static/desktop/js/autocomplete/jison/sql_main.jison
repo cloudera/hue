@@ -862,7 +862,7 @@ ColumnReference
    }
  | BasicIdentifierChain AnyDot '*'
    {
-     addColumnLocation(parser.yy.lastIdentifierChainLocation, $1);
+     // TODO: Add table/column locations for identifiers before *
    }
  ;
 
