@@ -335,6 +335,61 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-table-partitions">
+    <div class="sql-context-flex">
+      <div style="overflow: hidden;" class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
+        </div>
+        <div>
+          <table class="table table-striped table-condensed table-nowrap">
+            <thead>
+            <tr>
+              <th style="width: 1%">&nbsp;</th>
+              <th>${_('Name')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: partition_keys_json">
+            <tr>
+              <td data-bind="text: $index()+1"></td>
+              <td><a href="#" data-bind="text: $data, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', $data); }"></a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Partitions')}</span>
+        </div>
+        <table class="table table-striped table-condensed table-nowrap">
+          <thead>
+            <tr>
+              <th style="width: 1%">&nbsp;</th>
+              <th>${_('Values')}</th>
+              <th>${_('Spec')}</th>
+              <th>${_('Browse')}</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: partition_values_json">
+            <tr>
+              <td data-bind="text: $index()+1"></td>
+              <td><a href="#" data-bind="click: function () { window.open(readUrl, '_blank'); return false; }, text: '[\'' + columns.join('\',\'') + '\']'"></a></td>
+              <td data-bind="text: partitionSpec"></td>
+              <td>
+                <a href="#" data-bind="click: function () { window.open(readUrl, '_blank'); return false; }" title="${_('Data')}"><i class="fa fa-th"></i></a> <a href="#" data-bind="click: function () { window.open(browseUrl, '_blank'); return false; }" title="${_('Files')}"><i class="fa fa-file-o"></i></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sql-context-flex-bottom-links">
+        <div class="sql-context-link-row">
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
+          <a class="inactive-action pointer" data-bind="click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-popover-template">
     <div class="sql-context-popover sql-context-popover-bottom" data-bind="css: orientationClass, style: { left: left() + 'px', top: top() + 'px' }">
       <div class="sql-context-popover-arrow"></div>
@@ -489,6 +544,8 @@ from metadata.conf import has_navigator
         self.details = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchAutocomplete);
         self.sample = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchSamples);
         self.analysis = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchAnalysis);
+        self.partitions = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchPartitions);
+
         self.activeTab = ko.observable('details');
 
         self.tabs.push({
@@ -519,6 +576,15 @@ from metadata.conf import has_navigator
               errorText: '${ _("There was a problem loading the analysis.") }',
               isColumn: isColumn
             });
+          } else if (!isColumn && data.partition_keys.length > 0) {
+            self.tabs.push({
+              id: 'partitions',
+              label: '${ _("Partitions") }',
+              template: 'sql-context-table-partitions',
+              templateData: self.partitions,
+              errorText: '${ _("There was a problem loading the partitions.") }',
+              isColumn: isColumn
+            });
           }
         });
 
@@ -527,6 +593,8 @@ from metadata.conf import has_navigator
             self.sample.fetch(self.initializeSamplesTable);
           } else if (newValue === 'analysis' && typeof self.analysis.fetchedData() === 'undefined') {
             self.analysis.fetch();
+          } else if (newValue === 'partitions' && typeof self.partitions.fetchedData() === 'undefined') {
+            self.partitions.fetch();
           }
         });
 
