@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import logging
+
+from django.utils.translation import ugettext as _
+
+from jobbrowser.apis.base_api import Api
+
+
+LOG = logging.getLogger(__name__)
+
+
+try:
+  from jobbrowser.api import YarnApi as NativeYarnApi
+except Exception, e:
+  LOG.exception('Some application are not enabled: %s' % e)
+
+
+class JobApi(Api):
+
+  def __init__(self, user):
+    self.user =  user
+    self.yarn_api = YarnApi(user)
+
+  def apps(self):
+    jobs = self.self.yarn_api.apps()
+
+    return jobs
+
+  def app(self, appid):
+    app = self.self.yarn_api.app(appid)
+
+    return app
+
+
+# Hadoop 2, to be removed in Hue 4
+
+class YarnApi(Api):
+
+  def apps(self):
+    jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
+    return [{'id': app.jobId, 'status': app.status} for app in jobs]
+
+  def app(self, appid):
+    app = NativeYarnApi(self.user).get_job(jobid=appid)
+    return {'id': app.jobId, 'name': app.name, 'status': app.status}
+
+# Hadoop 3
+
+class YarnAtsApi(Api):
+  pass
+
+
+# Impala
+
+class ImpalaApi(Api):
+  pass
+
