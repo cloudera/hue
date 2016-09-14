@@ -63,7 +63,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
 
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
-        data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
+        data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
         data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }">
       <i class="fa fa-fw fa-folder-open"></i>
     </a>
@@ -245,7 +245,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableFsAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableFsAction());}}}"
-         title="${_('HDFS Fs')}" rel="tooltip" data-placement="top">
+         title="${_('Fs')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-o"></i></a>
     </div>
 
@@ -308,6 +308,15 @@ ${ workflow.render() }
 
 <div id="addActionDemiModal" class="demi-modal demi-modal-half hide" data-backdrop="false">
   <div class="modal-body">
+
+    <!-- ko if: newAction() && newAction().widgetType() == 'fs-widget' -->
+    <ul class="unstyled">
+      <li>
+        ${ _('Select some file systems operations after adding the action.') }
+      </li>
+    </ul>
+    <!-- /ko -->
+
     <table data-bind="foreach: addActionProperties">
       <tr>
         <td data-bind="text: label" style="width: 1%; padding-right: 10px" class="no-wrap"></td>
@@ -353,6 +362,7 @@ ${ workflow.render() }
           <!-- ko if: ['jar_path', 'script_path', 'mapper', 'reducer', 'hive_xml'].indexOf(name()) != -1 &&  value().length > 0 -->
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false}}'></span>
           <!-- /ko -->
+
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
           <span data-bind="with: $root.getSubWorkflow(value())">
             <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
