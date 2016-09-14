@@ -20,6 +20,8 @@ import logging
 from nose.tools import assert_equal, assert_true
 from nose.plugins.skip import SkipTest
 
+from django.contrib.auth.models import User
+
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
@@ -242,11 +244,13 @@ class TestIndexer():
     _test_generate_field_operation_morphline(find_replace_dict)
 
   def test_end_to_end(self):
-    if not is_live_cluster():
+    if not is_live_cluster() or True: # Skipping as requires morplines libs to be setup
       raise SkipTest()
 
     cluster = shared_cluster()
     fs = cluster.fs
+    make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    user = User.objects.get(username="test")
     collection_name = "test_collection"
     indexer = Indexer("test", fs=fs, jt=cluster.jt)
     input_loc = "/tmp/test.csv"
@@ -284,4 +288,11 @@ class TestIndexer():
     collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
 
     # index the file
-    indexer.run_morphline(collection_name, morphline, input_loc)
+    indexer.run_morphline(MockedRequest(user=user, fs=cluster.fs, jt=cluster.jt), collection_name, morphline, input_loc)
+
+
+class MockedRequest():
+  def __init__(self, user, fs, jt):
+    self.user = user
+    self.fs = fs
+    self.jt = jt
