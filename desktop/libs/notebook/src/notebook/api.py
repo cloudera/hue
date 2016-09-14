@@ -668,7 +668,10 @@ def export_result(request):
 
   if data_format == 'hdfs-file':
     if request.fs.isdir(destination):
-      destination += '/%(type)s-%(id)s.csv' % notebook
+      if notebook.get('name'):
+        destination += '/%(name)s.csv' % notebook
+      else:
+        destination += '/%(type)s-%(id)s.csv' % notebook
     if overwrite and request.fs.exists(destination):
       request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
     response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
