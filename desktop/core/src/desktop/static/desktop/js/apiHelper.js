@@ -633,16 +633,28 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.defaultDatabase
    */
   ApiHelper.prototype.fetchPartitions = function (options) {
     var self = this;
+
+    var url;
+    if (typeof options.identifierChain !== 'undefined' && options.identifierChain.length === 1) {
+      url = '/metastore/table/' + options.defaultDatabase + '/' + options.identifierChain[0].name + '/partitions';
+    } else if (typeof options.identifierChain !== 'undefined' && options.identifierChain.length === 2) {
+      url = '/metastore/table/' + options.identifierChain[0].name + '/' + options.identifierChain[1].name + '/partitions';
+    } else {
+      url = '/metastore/table/' + options.databaseName + '/' + options.tableName + '/partitions';
+    }
+
     $.ajax({
-      url: "/metastore/table/" + options.databaseName + "/" + options.tableName + "/partitions",
+      url: url,
       data: {
-        "format" : 'json'
+        format: 'json'
       },
       beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
+        xhr.setRequestHeader('X-Requested-With', 'Hue');
       },
       success: function (response) {
         if (! self.successResponseIsError(response)) {
