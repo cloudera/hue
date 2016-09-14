@@ -662,7 +662,7 @@ class HS2Api(Api):
     elif snippet['type'] == 'impala':
       name = 'impala'
     else:
-      name = 'spark-sql'
+      name = 'sparksql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
 
