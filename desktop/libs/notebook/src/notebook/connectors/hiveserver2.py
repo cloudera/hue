@@ -32,8 +32,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
 
-from jobbrowser.views import job_single_logs
-
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout
 
 
@@ -61,6 +59,11 @@ try:
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
   impala_settings = None
+
+try:
+  from jobbrowser.views import job_single_logs
+except (AttributeError, ImportError), e:
+  LOG.warn("Job Browser app is not enabled")
 
 
 DEFAULT_HIVE_ENGINE = 'mr'
