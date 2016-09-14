@@ -1548,7 +1548,8 @@
          parentSavedQueryUuid: self.parentSavedQueryUuid,
          isSaved: self.isSaved,
          sessions: self.sessions,
-         type: self.type
+         type: self.type,
+         name: self.name
       };
     };
 
