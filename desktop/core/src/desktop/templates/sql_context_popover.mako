@@ -238,8 +238,10 @@ from metadata.conf import has_navigator
       <div class="sql-context-flex-fill">
         <div style="margin: 15px;" data-bind="with: fetchedData">
           <a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+          <!-- ko if: comment -->
           <div style="margin-top: 10px; font-weight: bold;">${ _("Comment") }</div>
           <div data-bind="text: comment"></div>
+          <!-- /ko -->
         </div>
       </div>
       <div class="sql-context-flex-bottom-links">
