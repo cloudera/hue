@@ -453,6 +453,7 @@ class LdapBackend(object):
       if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
         is_super = User.objects.get(**username_filter_kwargs).is_superuser
     elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
+      LOG.warn("Create users when they login with their LDAP credentials is turned off")
       return None
 
     try:
