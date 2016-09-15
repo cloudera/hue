@@ -1467,6 +1467,10 @@ a#advanced-btn:hover {
   color: #338BB8!important;
 }
 
+.red {
+  color: #D84A38!important;
+}
+
 .card-heading-nopadding {
   padding-left: 0!important;
 }
