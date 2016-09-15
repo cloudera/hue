@@ -34,7 +34,7 @@ DEBUG = DJANGO_DEBUG_MODE.get()
       %endif
       baseUrl: "${ static('') }",
       paths: {
-        "jquery.ui.sortable": "desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min",
+        "jquery.ui.sortable": "desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min",
         "knockout": "desktop/ext/js/knockout.min",
         "ko.charts" : "desktop/js/ko.charts",
         "knockout-mapping" : "desktop/ext/js/knockout-mapping.min",
@@ -52,7 +52,7 @@ DEBUG = DJANGO_DEBUG_MODE.get()
         "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
         "ko.editable": { deps: ["knockout"] },
         "ko.switch-case": { deps: ["knockout"] },
-        "ko.hue-bindings": { deps: ["knockout"] },
+        "ko.hue-bindings": { deps: ["knockout", "jquery.ui.sortable"] },
         "ko.selectize": { deps: ["knockout", "selectize"] },
         "ace.extended": { deps: ["ace"] },
         "ace.ext-language-tools": { deps: ["ace"] }
