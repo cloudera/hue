@@ -126,6 +126,7 @@ def browse(request, database, table):
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
+          'editor_type': editor_type
       }),
       'editor_type': editor_type,
   })
