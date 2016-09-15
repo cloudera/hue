@@ -344,7 +344,7 @@ class TestNotebookApiMocked(object):
 
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
-    assert_equal('/user/hue/query-hive-None.csv', data['watch_url']['destination'], data)
+    assert_equal('/user/hue/Test Hive Query.csv', data['watch_url']['destination'], data)
 
 
     response = self.client.post(reverse('notebook:export_result'), {
