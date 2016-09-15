@@ -192,6 +192,19 @@
   };
 
   /**
+   * Binding for jquery UI resizable
+   *
+   * @type {{init: ko.bindingHandlers.resizable.init}}
+   */
+  ko.bindingHandlers.resizable = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor() || {};
+      $(element).resizable(options);
+      $(element).children('.ui-resizable-handle').css('z-index', 10000);
+    }
+  };
+
+  /**
    * This binding can be used to toggle a boolean value on click
    *
    * Example:
