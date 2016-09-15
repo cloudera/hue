@@ -368,8 +368,8 @@ from metadata.conf import has_navigator
       <div class="sql-context-flex-header">
         <div style="margin: 10px 5px 0 10px;">
           <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
-          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action" data-bind="css: { 'blue': searchVisible }"></i></a>
-          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
+          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
         </div>
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
@@ -899,9 +899,11 @@ from metadata.conf import has_navigator
           if (self.searchInput() === '') {
             return columns;
           }
-          var query = self.searchInput();
+          var query = self.searchInput().toLowerCase();
           return columns.filter(function (column) {
-            return column.name.indexOf(query) !== -1 || column.comment.indexOf(query) !== -1 || column.type.indexOf(query) !== -1;
+            return column.name.toLowerCase().indexOf(query) != -1
+              || column.type.toLowerCase().indexOf(query) != -1
+              || column.comment.toLowerCase().indexOf(query) != -1;
           })
         });
       }
