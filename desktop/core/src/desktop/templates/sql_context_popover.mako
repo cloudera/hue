@@ -16,9 +16,10 @@
 
 <%!
 from desktop import conf
+from desktop.conf import USE_NEW_SIDE_PANELS
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
+from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
 %>
 
@@ -402,36 +403,42 @@ from metadata.conf import has_navigator
       <div class="sql-context-popover-title">
         <i class="pull-left fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span data-bind="text: title"></span>
         <a class="pull-right pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
+        <a class="pull-right pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
       </div>
-      <div class="sql-context-popover-content">
-        <!-- ko with: contents -->
-          <ul class="nav nav-pills sql-context-tabs" data-bind="foreach: tabs">
-            <li data-bind="click: function () { $parent.activeTab(id); }, css: { 'active' : $parent.activeTab() === id }">
-              <a class="sql-context-tab" data-toggle="tab" data-bind="text: label, attr: { href: '#' + id }"></a>
-            </li>
-          </ul>
-          <div class="sql-context-tab-container" data-bind="foreach: tabs">
-            <div class="tab-pane" id="sampleTab" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="height: 100%; overflow: hidden; display: none;">
-              <div class="sql-context-flex">
-                <!-- ko with: templateData -->
-                <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
-                <!-- ko if: ! loading() && hasErrors() -->
-                <div class="sql-context-flex-fill">
-                  <div class="alert" data-bind="text: $parent.errorText"></div>
-                </div>
-                <!-- /ko -->
-                <!-- ko if: ! loading() && ! hasErrors() -->
-                <!-- ko template: { name: $parent.template } --><!-- /ko -->
-                <!-- /ko -->
-                <!-- /ko -->
-                <!-- ko template: { name: 'sql-context-footer', data: $parents[1] } --><!-- /ko -->
-              </div>
-            </div>
-          </div>
-        <!-- /ko -->
-      </div>
+      <!-- ko template: 'sql-context-contents' --><!-- /ko -->
     </div>
   </script>
+
+  <script type="text/html" id="sql-context-contents">
+    <div class="sql-context-popover-content">
+      <!-- ko with: contents -->
+      <ul class="nav nav-pills sql-context-tabs" data-bind="foreach: tabs">
+        <li data-bind="click: function () { $parent.activeTab(id); }, css: { 'active' : $parent.activeTab() === id }">
+          <a class="sql-context-tab" data-toggle="tab" data-bind="text: label, attr: { href: '#' + id }"></a>
+        </li>
+      </ul>
+      <div class="sql-context-tab-container" data-bind="foreach: tabs">
+        <div class="tab-pane" id="sampleTab" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="height: 100%; overflow: hidden; display: none;">
+          <div class="sql-context-flex">
+            <!-- ko with: templateData -->
+            <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
+            <!-- ko if: ! loading() && hasErrors() -->
+            <div class="sql-context-flex-fill">
+              <div class="alert" data-bind="text: $parent.errorText"></div>
+            </div>
+            <!-- /ko -->
+            <!-- ko if: ! loading() && ! hasErrors() -->
+            <!-- ko template: { name: $parent.template } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko template: { name: 'sql-context-footer', data: $parents[1] } --><!-- /ko -->
+          </div>
+        </div>
+      </div>
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
@@ -873,6 +880,10 @@ from metadata.conf import has_navigator
         self.sourceType = params.sourceType;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
+        self.pinEnabled = false;
+        % if USE_NEW_SIDE_PANELS.get():
+          self.pinEnabled = params.pinEnabled || false;
+        % endif
         var orientation = params.orientation || 'bottom';
         self.contents = null;
         self.resizeHelper = new ResizeHelper(orientation, self.leftAdjust, self.topAdjust);
@@ -960,6 +971,12 @@ from metadata.conf import has_navigator
         }
         self.orientationClass = 'sql-context-popover-' + orientation;
       }
+
+      SqlContextPopoverViewModel.prototype.pin = function () {
+        var self = this;
+        huePubSub.publish('sql.context.pin', self);
+        hidePopover();
+      };
 
       SqlContextPopoverViewModel.prototype.dispose = function () {
         hidePopover();

@@ -979,7 +979,8 @@ ${ hueIcons.symbols() }
             navigationSettings: {
               openDatabase: false,
               openItem: false,
-              showStats: true
+              showStats: true,
+              pinEnabled: true
             },
           },
           visibleAssistPanels: editorMode() ? ['sql'] : []
@@ -1258,6 +1259,14 @@ ${ hueIcons.symbols() }
         <!-- ko if: result.explanation().length > 0 -->
         <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
         <!-- /ko -->
+        <!-- ko foreach: pinnedContextTabs -->
+        <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
+          <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
+            <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
+            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }"><i class="snippet-icon fa fa-times"></i></div>
+          </a>
+        </li>
+        <!-- /ko -->
       </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}">
@@ -1380,8 +1389,13 @@ ${ hueIcons.symbols() }
           <!-- ko template: { name: 'snippet-explain' } --><!-- /ko -->
         </div>
         <!-- /ko -->
-      </div>
 
+        <!-- ko foreach: pinnedContextTabs -->
+        <div class="tab-pane" style="height: 300px; position: relative; overflow: hidden;" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
+          <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'sql-context-contents'"></div>
+        </div>
+        <!-- /ko -->
+      </div>
     </div>
   </div>
 </script>
