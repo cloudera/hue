@@ -22,11 +22,12 @@
   from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
-<%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="layout" file="layout.mako" />
-<%namespace name="dashboard" file="common_dashboard.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="assist" file="/assist.mako" />
+<%namespace name="comps" file="beeswax_components.mako" />
+<%namespace name="dashboard" file="common_dashboard.mako" />
+<%namespace name="layout" file="layout.mako" />
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${ layout.menubar(section='query') }
@@ -877,9 +878,9 @@ ${ commonshare() | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-
 ${ assist.assistPanel() }
 ${ tableStats.tableStats() }
+${ sqlContextPopover.sqlContextPopover() }
 
 <style type="text/css">
   h1 {

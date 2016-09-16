@@ -19,12 +19,12 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="assist" file="/assist.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%namespace name="assist" file="/assist.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="require" file="/require.mako" />
-
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
 ${layout.metastore_menubar()}
@@ -33,6 +33,7 @@ ${ require.config() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
+${ sqlContextPopover.sqlContextPopover() }
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 

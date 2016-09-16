@@ -19,12 +19,12 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="configKoComponents" file="/config_ko_components.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 <%namespace name="assist" file="/assist.mako" />
+<%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
 

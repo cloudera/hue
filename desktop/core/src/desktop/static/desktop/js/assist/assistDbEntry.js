@@ -138,6 +138,31 @@
     });
   }
 
+  AssistDbEntry.prototype.showContextPopover = function (entry, event) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+    entry.statsVisible(true);
+    huePubSub.publish('sql.context.popover.show', {
+      data: {
+        type: entry.definition.isColumn ? 'column' : 'table',
+        identifierChain: entry.definition.isColumn ? [{ name: entry.tableName }, { name: entry.columnName }] : [{ name: entry.tableName }]
+      },
+      orientation: 'right',
+      sourceType: entry.sourceType,
+      defaultDatabase: entry.databaseName,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 2,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 2
+      }
+    });
+    huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
+      entry.statsVisible(false);
+    });
+  };
+
   AssistDbEntry.prototype.toggleSearch = function () {
     var self = this;
     self.isSearchVisible(!self.isSearchVisible());

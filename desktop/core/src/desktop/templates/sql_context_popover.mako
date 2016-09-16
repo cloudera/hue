@@ -32,7 +32,7 @@ from metadata.conf import has_navigator
       left: 0;
       z-index: 1060;
       width: 450px;
-      height: 425px;
+      height: 400px;
       padding: 1px;
       background-color: #fff;
       -webkit-background-clip: padding-box;
@@ -444,10 +444,19 @@ from metadata.conf import has_navigator
 
       var preventHide = false;
 
+      var intervals = [];
+      var pubSubs = [];
+
       var hidePopover = function () {
         if (! preventHide) {
           $('#sqlContextPopover').remove();
           $(document).off('click', hideOnClickOutside);
+          while (intervals.length > 0) {
+            window.clearInterval(intervals.pop());
+          }
+          while (pubSubs.length > 0) {
+            pubSubs.pop().remove();
+          }
           huePubSub.publish('sql.context.popover.dispose');
           huePubSub.publish('sql.context.popover.hidden');
         }
@@ -459,10 +468,11 @@ from metadata.conf import has_navigator
         }
       };
 
-      function TableAndColumnTabContents(identifierChain, snippet, apiFunction) {
+      function TableAndColumnTabContents(identifierChain, sourceType, defaultDatabase, apiFunction) {
         var self = this;
         self.identifierChain = identifierChain;
-        self.snippet = snippet;
+        self.sourceType = sourceType;
+        self.defaultDatabase = defaultDatabase;
         self.apiHelper = ApiHelper.getInstance();
         self.apiFunction = apiFunction;
 
@@ -490,9 +500,9 @@ from metadata.conf import has_navigator
         self.hasErrors(false);
 
         self.apiFunction.bind(self.apiHelper)({
-          sourceType: self.snippet.type(),
+          sourceType: self.sourceType,
           identifierChain: self.identifierChain,
-          defaultDatabase: self.snippet.database(),
+          defaultDatabase: self.defaultDatabase,
           silenceErrors: true,
           successCallback: function (data) {
             if (typeof data.extended_columns !== 'undefined') {
@@ -516,16 +526,16 @@ from metadata.conf import has_navigator
         });
       };
 
-      function TableAndColumnContextTabs(data, snippet, isColumn) {
+      function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn) {
         var self = this;
         self.tabs = ko.observableArray();
 
         var apiHelper = ApiHelper.getInstance();
 
-        self.details = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchAutocomplete);
-        self.sample = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchSamples);
-        self.analysis = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchAnalysis);
-        self.partitions = new TableAndColumnTabContents(data.identifierChain, snippet, apiHelper.fetchPartitions);
+        self.details = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
+        self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
+        self.partitions = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
 
         self.activeTab = ko.observable('details');
 
@@ -579,7 +589,7 @@ from metadata.conf import has_navigator
           }
         });
 
-        var samplesInterval = window.setInterval(function () {
+        intervals.push(window.setInterval(function () {
           if (self.activeTab() !== 'sample') {
             return;
           }
@@ -593,7 +603,7 @@ from metadata.conf import has_navigator
             $t.data('plugin_jHueTableExtender').drawFirstColumn();
           }
           $t.parents('.dataTables_wrapper').getNiceScroll().resize();
-        }, 300);
+        }, 300));
 
         var performScrollToColumn = function (colName) {
           self.activeTab('sample');
@@ -618,7 +628,7 @@ from metadata.conf import has_navigator
           }, 0);
         };
 
-        var scrollToSubscription = huePubSub.subscribe('sql.context.popover.scroll.to.column', function (colName) {
+        pubSubs.push(huePubSub.subscribe('sql.context.popover.scroll.to.column', function (colName) {
           if (typeof self.sample.fetchedData() === 'undefined') {
             self.sample.fetch(function (data) {
               self.initializeSamplesTable(data);
@@ -629,27 +639,19 @@ from metadata.conf import has_navigator
           } else {
             performScrollToColumn(colName);
           }
-        });
+        }));
 
-        var showInAssistSubscription = huePubSub.subscribe('sql.context.popover.show.in.assist', function () {
+        pubSubs.push(huePubSub.subscribe('sql.context.popover.show.in.assist', function () {
           huePubSub.publish('assist.db.highlight', {
-            sourceType: snippet.type(),
-            path: apiHelper.identifierChainToPath(data.identifierChain, snippet.database())
+            sourceType: sourceType,
+            path: apiHelper.identifierChainToPath(data.identifierChain, defaultDatabase)
           });
           huePubSub.publish('sql.context.popover.hide')
-        });
+        }));
 
-        var openInMetastoreSubscription = huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
-          window.open('/metastore/table/' + apiHelper.identifierChainToPath(data.identifierChain, snippet.database()).join('/'), '_blank');
-        });
-
-        var disposeSubscription = huePubSub.subscribe('sql.context.popover.dispose', function () {
-          window.clearInterval(samplesInterval);
-          disposeSubscription.remove();
-          scrollToSubscription.remove();
-          openInMetastoreSubscription.remove();
-          showInAssistSubscription.remove();
-        });
+        pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
+          window.open('/metastore/table/' + apiHelper.identifierChainToPath(data.identifierChain, defaultDatabase).join('/'), '_blank');
+        }));
       }
 
       TableAndColumnContextTabs.prototype.initializeSamplesTable = function (data) {
@@ -719,10 +721,10 @@ from metadata.conf import has_navigator
         }, 0);
       };
 
-      function FunctionContextTabs(data, snippet) {
+      function FunctionContextTabs(data, sourceType) {
         var self = this;
         self.func = ko.observable({
-          details: sqlFunctions.findFunction(snippet.type(), data.function),
+          details: sqlFunctions.findFunction(sourceType, data.function),
           loading: ko.observable(false),
           hasErrors: ko.observable(false)
         });
@@ -811,14 +813,29 @@ from metadata.conf import has_navigator
 
       function SqlContextPopoverViewModel(params) {
         var self = this;
-        self.left = ko.observable();
-        self.top = ko.observable();
+        self.left = ko.observable(0);
+        self.top = ko.observable(0);
         self.data = params.data;
-        self.snippet = params.snippet;
+        self.sourceType = params.sourceType;
+        self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
         var orientation = params.orientation || 'bottom';
         self.contents = null;
         self.resizeHelper = new ResizeHelper(orientation);
+
+        if (typeof params.source.element !== 'undefined') {
+          // Track the source element and close the popover if moved
+          var $source = $(params.source.element);
+          var originalSourceOffset = $source.offset();
+          var currentSourceOffset;
+          intervals.push(window.setInterval(function () {
+            currentSourceOffset = $source.offset();
+            if (currentSourceOffset.left !== originalSourceOffset.left || currentSourceOffset.top !== originalSourceOffset.top) {
+              hidePopover();
+            }
+          }, 200));
+
+        }
 
         switch (orientation) {
           case 'top':
@@ -826,6 +843,8 @@ from metadata.conf import has_navigator
             self.top(params.source.top - 300);
             break;
           case 'right':
+            self.left(params.source.right);
+            self.top(params.source.top + Math.round((params.source.bottom - params.source.top) / 2) - 200);
             break;
           case 'bottom':
             self.left(params.source.left + Math.round((params.source.right - params.source.left) / 2) - 225);
@@ -839,15 +858,15 @@ from metadata.conf import has_navigator
         self.isFunction = params.data.type === 'function';
 
         if (self.isTable) {
-          self.contents = new TableAndColumnContextTabs(self.data, self.snippet, false);
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-table'
         } else if (self.isColumn) {
-          self.contents = new TableAndColumnContextTabs(self.data, self.snippet, true);
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-columns'
         } else if (self.isFunction) {
-          self.contents = new FunctionContextTabs(self.data, self.snippet);
+          self.contents = new FunctionContextTabs(self.data, self.sourceType);
           self.title = self.data.function;
           self.iconClass = 'fa-superscript'
         } else {

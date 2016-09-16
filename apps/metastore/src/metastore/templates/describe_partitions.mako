@@ -19,11 +19,11 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="components" file="components.mako" />
 <%namespace name="assist" file="/assist.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="components" file="components.mako" />
 <%namespace name="require" file="/require.mako" />
-
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
@@ -32,7 +32,7 @@ ${ require.config() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
-
+${ sqlContextPopover.sqlContextPopover() }
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 

@@ -20,8 +20,9 @@
 
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="fileBrowser" file="/file_browser.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="require" file="/require.mako" />
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
@@ -29,6 +30,7 @@ ${ require.config() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
+${ sqlContextPopover.sqlContextPopover() }
 ${ fileBrowser.fileBrowser() }
 
 <style type="text/css">
