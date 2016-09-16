@@ -25,10 +25,11 @@ from desktop.views import commonheader, commonfooter, _ko
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
-<%namespace name="components" file="components.mako" />
 <%namespace name="assist" file="/assist.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="components" file="components.mako" />
 <%namespace name="require" file="/require.mako" />
+<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
@@ -37,6 +38,7 @@ ${ require.config() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
+${ sqlContextPopover.sqlContextPopover() }
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
@@ -101,9 +103,7 @@ ${ assist.assistPanel() }
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
-        ## no stats for partition key type
         <th width="2%" class="no-sort">&nbsp;</th>
-  ##       <th width="1%">&nbsp;</th>
         <th width="17%">${_('Name')}</th>
         <th width="15%">${_('Type')}</th>
         <!-- ko if: $root.optimizerEnabled  -->
@@ -114,23 +114,8 @@ ${ assist.assistPanel() }
       </thead>
       <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
         <tr>
-          ## start at 1
           <td data-bind="text: $index() + $indexOffset() + 1"></td>
-          ## no stats for partition key type
-          <td>
-           <span class="blue" data-bind="component: { name: 'table-stats', params: {
-              alwaysActive: true,
-              statsVisible: true,
-              sourceType: 'hive',
-              databaseName: table.database.name,
-              tableName: table.name,
-              columnName: name,
-              fieldType: type,
-              apiHelper: table.apiHelper,
-              showViewMore: false
-            } }"></span>
-          </td>
-  ##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
+          <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a></td>
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database().table().samples.loading() -->
             <span data-bind="text: name"></span>
@@ -473,16 +458,7 @@ ${ assist.assistPanel() }
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
               </td>
-              <td width="1%"><span class="blue" data-bind="component: { name: 'table-stats', params: {
-                  alwaysActive: true,
-                  statsVisible: true,
-                  sourceType: 'hive',
-                  databaseName: database.name,
-                  tableName: name,
-                  fieldType: type,
-                  apiHelper: apiHelper,
-                  showViewMore: false
-                } }"></span></td>
+              <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a></td>
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>

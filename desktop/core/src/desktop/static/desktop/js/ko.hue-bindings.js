@@ -3001,7 +3001,8 @@
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
               huePubSub.publish('sql.context.popover.show', {
                 data: token.parseLocation,
-                snippet: snippet,
+                sourceType: snippet.type(),
+                defaultDatabase: snippet.database(),
                 source: {
                   left: startCoordinates.pageX - 3,
                   top: startCoordinates.pageY,

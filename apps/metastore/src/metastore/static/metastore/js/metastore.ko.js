@@ -605,6 +605,27 @@
     self.fetchDetails();
   };
 
+  MetastoreTable.prototype.showContextPopover = function (entry, event) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+    huePubSub.publish('sql.context.popover.show', {
+      data: {
+        type: 'table',
+        identifierChain: [{ name: entry.name }]
+      },
+      orientation: 'right',
+      sourceType: 'hive',
+      defaultDatabase: entry.database.name,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 2,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 2
+      }
+    });
+  };
+
   /**
    * @param {Object} options
    * @param {MetastoreTable} options.table
@@ -638,6 +659,27 @@
       });
     })
   }
+
+  MetastoreColumn.prototype.showContextPopover = function (entry, event) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+    huePubSub.publish('sql.context.popover.show', {
+      data: {
+        type: 'column',
+        identifierChain: [{ name: entry.table.name }, { name: entry.name() }]
+      },
+      orientation: 'right',
+      sourceType: 'hive',
+      defaultDatabase: entry.table.database.name,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 2,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 2
+      }
+    });
+  };
 
   /**
    * @param {Object} options
