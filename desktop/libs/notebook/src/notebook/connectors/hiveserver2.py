@@ -290,51 +290,47 @@ class HS2Api(Api):
   def fetch_result_size(self, notebook, snippet):
     resp = {
       'rows': None,
-      'size': None
+      'size': None,
+      'message': ''
     }
 
-    # Check that the results are available
-    if snippet.get('status') == 'available':
-      # Attempt to get metadata
-      if snippet['type'] == 'hive':
-        engine = self._get_hive_execution_engine(notebook, snippet).lower()
-        if engine == 'mr':
-          # Get last task of last job
-          logs = self.get_log(notebook, snippet, startFrom=0)
+    total_records_match = None
+    total_size_match = None
 
-          jobs = self.get_jobs(notebook, snippet, logs)
-          if jobs:
-            last_job_id = jobs[-1].get('name')
-            LOG.info("Hive query executed %d jobs, last job ID is: %s" % (len(jobs), last_job_id))
+    if snippet.get('status') != 'available':
+      raise QueryError(_('Result status is not available'))
 
-            # Attempt to fetch last task's syslog and parse the total records
-            task_syslog = self._get_syslog(last_job_id)
-            if task_syslog:
-              total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
-              total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
-              if total_records_match:
-                resp['rows'] = int(total_records_match.group('total_records'))
-            else:
-              LOG.warn("Failed to get task syslog for Hive query with job ID: %s" % last_job_id)
-          else:
-            LOG.info("Hive query did not execute any jobs.")
-        elif engine == 'spark':
-          logs = self.get_log(notebook, snippet, startFrom=0)
+    if snippet['type'] != 'hive':
+      raise QueryError(_('Cannot fetch result metadata for snippet type: %s') % snippet['type'])
 
-          total_records_re = "RECORDS_OUT_0: (?P<total_records>\d+)"
-          total_size_re = "Spark Job\[[a-z0-9-]+\] Metrics[A-Za-z0-9:\s]+ResultSize: (?P<total_size>\d+)"
-          total_records_match = re.search(total_records_re, logs, re.MULTILINE)
-          total_size_match = re.search(total_size_re, logs, re.MULTILINE)
+    engine = self._get_hive_execution_engine(notebook, snippet).lower()
+    logs = self.get_log(notebook, snippet, startFrom=0)
 
-          if total_records_match:
-            resp['rows'] = int(total_records_match.group('total_records'))
-          if total_size_match:
-            resp['size'] = int(total_size_match.group('total_size'))
+    if engine == 'mr':
+      jobs = self.get_jobs(notebook, snippet, logs)
+      if jobs:
+        last_job_id = jobs[-1].get('name')
+        LOG.info("Hive query executed %d jobs, last job is: %s" % (len(jobs), last_job_id))
+
+        # Attempt to fetch last task's syslog and parse the total records
+        task_syslog = self._get_syslog(last_job_id)
+        if task_syslog:
+          total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
+          total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
         else:
-          LOG.warn('Cannot fetch result metadata for execution engine: %s' % engine)
-      # TODO: Impala
+          raise QueryError(_('Failed to get task syslog for Hive query with job: %s')  % last_job_id)
       else:
-        LOG.warn('Cannot fetch result metadata for snippet type: %s' % snippet['type'])
+        resp['message'] = _('Hive query did not execute any jobs.')
+    elif engine == 'spark':
+      total_records_re = "RECORDS_OUT_0: (?P<total_records>\d+)"
+      total_size_re = "Spark Job\[[a-z0-9-]+\] Metrics[A-Za-z0-9:\s]+ResultSize: (?P<total_size>\d+)"
+      total_records_match = re.search(total_records_re, logs, re.MULTILINE)
+      total_size_match = re.search(total_size_re, logs, re.MULTILINE)
+
+    if total_records_match:
+      resp['rows'] = int(total_records_match.group('total_records'))
+    if total_size_match:
+      resp['size'] = int(total_size_match.group('total_size'))
 
     return resp
 

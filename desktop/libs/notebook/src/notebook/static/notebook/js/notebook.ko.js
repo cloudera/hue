@@ -163,6 +163,7 @@
       self.endTime(new Date());
       self.explanation('');
       self.logLines = 0;
+      self.size({});
     };
   };
 
@@ -1082,7 +1083,7 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         if (data.status == 0) {
-          self.result.size(data.result.size);
+          self.result.size(data.result);
         } else {
           $(document).trigger("error", data.message);
         }
@@ -1112,7 +1113,7 @@
             }
             else if (self.status() == 'available') {
               self.fetchResult(100);
-              // self.fetchResultSize(); Disabled for now
+              self.fetchResultSize();
               self.progress(100);
              if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
                 self.ddlNotification(Math.random());
