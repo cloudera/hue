@@ -24,7 +24,6 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="require" file="/require.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="util" file="util.mako" />
 
 
@@ -33,7 +32,6 @@ ${ layout.metastore_menubar() }
 
 ${ require.config() }
 
-${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 
 
@@ -228,7 +226,6 @@ ${ assist.assistPanel() }
     "ko.charts",
     "desktop/js/apiHelper",
     "assistPanel",
-    "tableStats",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",

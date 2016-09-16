@@ -24,13 +24,11 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="require" file="/require.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 ${ require.config() }
 
-${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ sqlContextPopover.sqlContextPopover() }
 
@@ -506,7 +504,6 @@ ${ sqlContextPopover.sqlContextPopover() }
     "desktop/js/apiHelper",
     "notebook/js/notebook.ko",
     "assistPanel",
-    "tableStats",
     "knockout-mapping",
     "knockout-sortable",
     "ko.editable",
@@ -520,7 +517,7 @@ ${ sqlContextPopover.sqlContextPopover() }
     var getNewFieldName = function () {
       fieldNum++;
       return "new_field_" + fieldNum
-    }
+    };
 
     var createDefaultField = function () {
       var defaultField = ko.mapping.fromJS(${default_field_type | n});

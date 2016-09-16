@@ -24,7 +24,6 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Notebook'), app_name, user, "68px") | n,unicode }
 
@@ -49,7 +48,6 @@ ${ editorComponents.topBar() }
   </%def>
 </%editorComponents:commonHTML>
 
-${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ sqlContextPopover.sqlContextPopover() }
 ${ configKoComponents.config() }
