@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from desktop.lib.rest.http_client import HttpClient, RestException
+from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
 from hadoop import cluster
