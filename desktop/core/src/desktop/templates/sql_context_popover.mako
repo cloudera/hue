@@ -31,8 +31,6 @@ from metadata.conf import has_navigator
       top: 0;
       left: 0;
       z-index: 1060;
-      width: 450px;
-      height: 400px;
       padding: 1px;
       background-color: #fff;
       -webkit-background-clip: padding-box;
@@ -399,8 +397,8 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-popover-template">
-    <div class="sql-context-popover" data-bind="css: orientationClass, style: { left: left() + 'px', top: top() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
-      <div class="sql-context-popover-arrow"></div>
+    <div class="sql-context-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
+      <div class="sql-context-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
       <div class="sql-context-popover-title">
         <i class="pull-left fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span data-bind="text: title"></span>
         <a class="pull-right pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
@@ -447,8 +445,11 @@ from metadata.conf import has_navigator
       }
     }(function (ko, ApiHelper, sqlFunctions) {
 
-      var preventHide = false;
+      var HALF_SIZE_LIMIT_X = 130;
+      var HALF_SIZE_LIMIT_Y = 100;
+      var HALF_ARROW = 6;
 
+      var preventHide = false;
       var intervals = [];
       var pubSubs = [];
 
@@ -740,19 +741,30 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
-      function ResizeHelper (orientation) {
+      function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
 
-        var originalMidX, originalWidth, originalRightX, originalLeftX;
-        var rightX, leftX, leftDiff, rightDiff;
+        var originalMidX, originalWidth, originalRightX, originalLeftX, originalMidY, originalHeight, originalTopY, originalBottomY;
+        var rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
+
+        window.setTimeout(function () {
+          var offset = $('.sql-context-popover').offset();
+          if (orientation === 'right') {
+            offset.left -= 5;
+          } else if (orientation === 'bottom') {
+            offset.top -= 5;
+          }
+          originalHeight = $('.sql-context-popover').height();
+          originalWidth = $('.sql-context-popover').width();
+          originalMidX = offset.left + originalWidth / 2;
+          originalMidY = offset.top + originalHeight / 2;
+          originalLeftX = offset.left;
+          originalRightX = offset.left + originalWidth;
+          originalTopY = offset.top;
+          originalBottomY = offset.top + originalHeight;
+        }, 0);
 
         self.resizeStart = function (event, ui) {
-          if (typeof originalMidX === 'undefined') {
-            originalMidX = ui.originalPosition.left + ui.originalSize.width / 2;
-            originalWidth = ui.originalSize.width;
-            originalLeftX = ui.originalPosition.left;
-            originalRightX = ui.originalPosition.left + ui.originalSize.width;
-          }
           preventHide = true;
         };
 
@@ -764,17 +776,17 @@ from metadata.conf import has_navigator
         };
 
         var resizeTopBottomHorizontal = function (event, ui) {
-          rightX = ui.position.left + ui.size.width;
           leftX = ui.position.left;
+          rightX = ui.position.left + ui.size.width;
 
-          if (rightX < originalMidX + 130) {
-            ui.size.width = originalMidX + 130 - ui.position.left;
+          if (rightX < originalMidX + HALF_SIZE_LIMIT_X) {
+            ui.size.width = originalMidX + HALF_SIZE_LIMIT_X - ui.position.left;
             rightX = ui.position.left + ui.size.width;
             $('.sql-context-popover').css('width', ui.size.width + 'px');
           }
 
-          if (leftX > originalMidX - 130) {
-            ui.position.left = originalMidX - 130;
+          if (leftX > originalMidX - HALF_SIZE_LIMIT_X) {
+            ui.position.left = originalMidX - HALF_SIZE_LIMIT_X;
             ui.size.width = ui.originalSize.width - (ui.position.left - ui.originalPosition.left);
             leftX = ui.position.left;
             rightX = ui.position.left + ui.size.width;
@@ -784,7 +796,31 @@ from metadata.conf import has_navigator
 
           leftDiff = originalLeftX - leftX;
           rightDiff = originalRightX - rightX;
-          $('.sql-context-popover-arrow').css('margin-left', (leftDiff + rightDiff) / 2 - 6 + 'px');
+          $('.sql-context-popover-arrow').css('margin-left', (leftDiff + rightDiff) / 2 + leftAdjust() + 'px');
+        };
+
+        var resizeLeftRightVertical = function (event, ui) {
+          topY = ui.position.top;
+          bottomY = ui.position.top + ui.size.height;
+
+          if (bottomY < originalMidY + HALF_SIZE_LIMIT_Y) {
+            ui.size.height = originalMidY + HALF_SIZE_LIMIT_Y - ui.position.top;
+            bottomY = ui.position.top + ui.size.height;
+            $('.sql-context-popover').css('height', ui.size.height + 'px');
+          }
+
+          if (topY > originalMidY - HALF_SIZE_LIMIT_Y) {
+            ui.position.top = originalMidY - HALF_SIZE_LIMIT_Y;
+            ui.size.height = ui.originalSize.height - (ui.position.top - ui.originalPosition.top);
+            topY = ui.position.top;
+            bottomY = ui.position.top + ui.size.height;
+            $('.sql-context-popover').css('top', ui.position.top + 'px');
+            $('.sql-context-popover').css('height', ui.size.height + 'px');
+          }
+
+          topDiff = originalTopY - topY;
+          bottomDiff = originalBottomY - bottomY;
+          $('.sql-context-popover-arrow').css('margin-top', (topDiff + bottomDiff) / 2 + topAdjust() + 'px');
         };
 
         switch(orientation) {
@@ -792,12 +828,18 @@ from metadata.conf import has_navigator
             self.resizableHandles = "w, nw, n, ne, e";
             self.resize = function (event, ui) {
               resizeTopBottomHorizontal(event, ui);
-              // TODO: Implement resize limits when popover is above
+              // TODO: Implement resize height limits when popover is above
             };
             break;
           case 'right':
             self.resizableHandles = "n, ne, e, se, s";
-            // TODO: Implement resize limits when popover is to the right
+            self.resize = function (event, ui) {
+              resizeLeftRightVertical(event, ui);
+              if (ui.size.width < 260) {
+                ui.size.width = 260;
+                $('.sql-context-popover').css('width', 260 + 'px');
+              }
+            };
             break;
           case 'bottom':
             self.resizableHandles = "e, se, s, sw, w";
@@ -811,7 +853,10 @@ from metadata.conf import has_navigator
             break;
           case 'left':
             self.resizableHandles = "s, sw, w, nw, n";
-            // TODO: Implement resize limits when popover is to the left
+            self.resize = function (event, ui) {
+              resizeLeftRightVertical(event, ui);
+              // TODO: Implement resize width limits when popover is on the left
+            };
             break;
         }
       }
@@ -820,13 +865,17 @@ from metadata.conf import has_navigator
         var self = this;
         self.left = ko.observable(0);
         self.top = ko.observable(0);
+        self.width = ko.observable(450);
+        self.height = ko.observable(400);
+        self.leftAdjust = ko.observable(0);
+        self.topAdjust = ko.observable(0);
         self.data = params.data;
         self.sourceType = params.sourceType;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
         var orientation = params.orientation || 'bottom';
         self.contents = null;
-        self.resizeHelper = new ResizeHelper(orientation);
+        self.resizeHelper = new ResizeHelper(orientation, self.leftAdjust, self.topAdjust);
 
         if (typeof params.source.element !== 'undefined') {
           // Track the source element and close the popover if moved
@@ -839,23 +888,54 @@ from metadata.conf import has_navigator
               hidePopover();
             }
           }, 200));
-
         }
+
+        var windowWidth = $(window).width();
+        var fitHorizontally = function () {
+          var left = params.source.left + Math.round((params.source.right - params.source.left) / 2) - (self.width() / 2);
+          if (left + self.width() > windowWidth - 10) {
+            self.leftAdjust(left + self.width() - windowWidth + 5);
+            left = windowWidth - self.width() - 10;
+          } else if (left < 10) {
+            self.leftAdjust(left - 10 - HALF_ARROW);
+            left = 10;
+          } else {
+            self.leftAdjust(-HALF_ARROW);
+          }
+          self.left(left);
+        };
+
+        var windowHeight = $(window).height();
+        var fitVertically = function () {
+          var top = params.source.top + Math.round((params.source.bottom - params.source.top) / 2) - (self.height() / 2);
+          if (top + self.height() > windowHeight - 10) {
+            self.topAdjust(top + self.height() - windowHeight + 5);
+            top = windowHeight - self.height() - 10;
+          } else if (top < 10) {
+            self.topAdjust(top - 10 - HALF_ARROW);
+            top = 10;
+          } else {
+            self.topAdjust(-HALF_ARROW);
+          }
+          self.top(top);
+        };
 
         switch (orientation) {
           case 'top':
-            self.left(params.source.left + Math.round((params.source.right - params.source.left) / 2) - 225);
-            self.top(params.source.top - 300);
+            fitHorizontally();
+            self.top(params.source.top - self.height());
             break;
           case 'right':
+            fitVertically();
             self.left(params.source.right);
-            self.top(params.source.top + Math.round((params.source.bottom - params.source.top) / 2) - 200);
             break;
           case 'bottom':
-            self.left(params.source.left + Math.round((params.source.right - params.source.left) / 2) - 225);
+            fitHorizontally();
             self.top(params.source.bottom);
             break;
           case 'left':
+            fitVertically();
+            self.left(params.source.left - self.width());
         }
 
         self.isTable = params.data.type === 'table';
