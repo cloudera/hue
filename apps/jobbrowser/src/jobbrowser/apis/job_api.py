@@ -36,37 +36,53 @@ class JobApi(Api):
   def __init__(self, user):
     self.user =  user
     self.yarn_api = YarnApi(user)
+    self.impala_api = ImpalaApi(user)
 
   def apps(self):
     jobs = self.self.yarn_api.apps()
-
+    # += Impala
     return jobs
 
   def app(self, appid):
-    app = self.self.yarn_api.app(appid)
+    return self._get_api(appid).app(appid)
 
-    return app
+  def _get_api(self, appid):
+    return self.impala_api if not appid.startswith('application_') else self.yarn_api
 
 
-# Hadoop 2, to be removed in Hue 4
 
 class YarnApi(Api):
 
   def apps(self):
     jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
-    return [{'id': app.jobId, 'status': app.status} for app in jobs]
+    return [{
+        'id': app.jobId,
+        'name': 'name',
+        'type': app.applicationType,
+        'status': app.status,
+        'user': self.user.username,
+        'progress': 100,
+        'duration': 10 * 3600,
+        'submitted': 10 * 3600
+    } for app in jobs]
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
-    return {'id': app.jobId, 'name': app.name, 'status': app.status}
+    return {
+        'id': app.jobId,
+        'name': 'name',
+        'type': app.applicationType,
+        'status': app.status,
+        'user': self.user.username,
+        'progress': 100,
+        'duration': 10 * 3600,
+        'submitted': 10 * 3600
+    }
 
-# Hadoop 3
 
 class YarnAtsApi(Api):
   pass
 
-
-# Impala
 
 class ImpalaApi(Api):
   pass

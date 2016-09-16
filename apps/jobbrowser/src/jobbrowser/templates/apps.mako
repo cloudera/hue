@@ -47,6 +47,14 @@ ${ require.config() }
 
 
 <div class="container-fluid">
+  <!-- ko if: $root.section() == 'app' -->
+  <a href="javascript:void(0)" data-bind="click: function() { $root.section('apps'); }">
+    <h2>${ _('Apps') } ></h2>
+  </a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.section() == 'apps' -->
+  <h2>${ _('Apps') }</h2>
   ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
   &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
 
@@ -65,50 +73,155 @@ ${ require.config() }
   </span>
 
   <div class="card card-small">
-
-  <table id="jobsTable" class="datatables table table-condensed">
-    <thead>
-    <tr>
-      <th>${_('Logs')}</th>
-      <th>${_('Id')}</th>
-      <th>${_('Name')}</th>
-      <th>${_('Type')}</th>
-      <th>${_('Status')}</th>
-      <th>${_('User')}</th>
-      <th>${_('Cluster')}</th>
-      <th>${_('Progress')}</th>
-      <th>${_('Duration')}</th>
-      <th>${_('Submitted')}</th>
-    </tr>
-    </thead>
-    <tbody data-bind="foreach: jobs.apps">
-      <tr data-bind="click: fetchJob">
-        <td></td>
-        <td data-bind="text: id"></td>
-        <td data-bind="text: name"></td>
-        <td data-bind="text: type"></td>
-        <td data-bind="text: status"></td>
-        <td data-bind="text: user"></td>
-        <td data-bind="text: cluster"></td>
-        <td data-bind="text: progress"></td>
-        <td data-bind="text: duration"></td>
-        <td data-bind="text: submitted"></td>
+    <table id="jobsTable" class="datatables table table-condensed">
+      <thead>
+      <tr>
+        <th>${_('Logs')}</th>
+        <th>${_('Id')}</th>
+        <th>${_('Name')}</th>
+        <th>${_('Type')}</th>
+        <th>${_('Status')}</th>
+        <th>${_('User')}</th>
+        <th>${_('Progress')}</th>
+        <th>${_('Duration')}</th>
+        <th>${_('Submitted')}</th>
       </tr>
-    </tbody>
-  </table>
-    </div>
+      </thead>
+      <tbody data-bind="foreach: jobs.apps">
+        <tr data-bind="click: fetchJob">
+          <td></td>
+          <td data-bind="text: id"></td>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: type"></td>
+          <td data-bind="text: status"></td>
+          <td data-bind="text: user"></td>
+          <td data-bind="text: progress"></td>
+          <td data-bind="text: duration"></td>
+          <td data-bind="text: submitted"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /ko -->
 </div>
 
 
-<!-- ko if: $root.job() -->
-<div data-bind="template: { name: 'app-page', data: $root.job() }"></div>
+<!-- ko if: $root.section() == 'app' && $root.job() -->
+  <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
+    <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: $root.job().mainType() == 'batches' && $root.interface() == 'batches' -->
+    <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: $root.job().mainType() == 'schedules' && $root.interface() == 'schedules' -->
+    <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
+  <!-- /ko -->
 <!-- /ko -->
 
 
-<script type="text/html" id="app-page">
+<script type="text/html" id="job-page">
+  <!-- ko if: type() == 'MAPREDUCE' -->
+    <div data-bind="template: { name: 'job-mapreduce-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'YARN' -->
+    <div data-bind="template: { name: 'job-yarn-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'IMPALA' -->
+    <div data-bind="template: { name: 'job-impala-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'SPARK' -->
+    <div data-bind="template: { name: 'job-spark-page', data: $root.job() }"></div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="job-yarn-page">
+  <h2>YARN</h2>
+  <br/>
+
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
   ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+</script>
+
+<script type="text/html" id="job-mapreduce-page">
+  <h2>MapReduce</h2>
+  <br/>
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+</script>
+
+<script type="text/html" id="job-impala-page">
+  <h2>Impala</h2>
+  <br/>
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+</script>
+
+<script type="text/html" id="job-spark-page">
+  <h2>Spark</h2>
+  <br/>
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+</script>
+
+
+<script type="text/html" id="batch-page">
+  <h2>Workflow</h2>
+  <br/>
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+</script>
+
+<script type="text/html" id="schedule-page">
+  <h2>Schedule > Instance</h2>
+  <br/>
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 </script>
 
 
@@ -138,17 +251,19 @@ ${ require.config() }
       self.submitted = ko.observable(typeof job.submitted != "undefined" && job.submitted != null ? job.submitted : null);
 
       self.properties = ko.observable(typeof job.properties != "undefined" && job.properties != null ? job.properties : {});
+      self.mainType = ko.observable(vm.interface());
 
       self.loadingJob = ko.observable(false);
 
       self.fetchJob = function () {
         self.loadingJob(true);
+        vm.section('app');
         $.post("/jobbrowser/api/job", {
           appid: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
         }, function(data) {
           if (data.status == 0) {
-            vm.job(new Job(self, job));
+            vm.job(new Job(vm, job));
           } else {
             $(document).trigger("error", data.message);
           }
@@ -168,6 +283,7 @@ ${ require.config() }
 
       self.fetchJobs = function () {
         self.loadingJobs(true);
+        vm.section('apps');
         $.post("/jobbrowser/api/jobs", {
           username: ko.mapping.toJSON(self.username),
           interface: ko.mapping.toJSON(vm.interface)
@@ -175,7 +291,7 @@ ${ require.config() }
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {
-              data.apps.forEach(function(job){
+              data.apps.forEach(function(job) { // TODO: update and merge
                 apps.push(new Job(vm, job));
               });
             }
@@ -195,6 +311,7 @@ ${ require.config() }
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
 
+      self.section = ko.observable('apps');
       self.interface = ko.observable('jobs');
       self.interface.subscribe(function(val) {
         self.jobs.fetchJobs();
