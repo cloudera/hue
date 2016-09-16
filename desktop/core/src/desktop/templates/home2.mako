@@ -22,13 +22,11 @@
 <%namespace name="fileBrowser" file="/file_browser.mako" />
 <%namespace name="require" file="/require.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 ${ require.config() }
 
-${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ sqlContextPopover.sqlContextPopover() }
 ${ fileBrowser.fileBrowser() }
@@ -228,12 +226,11 @@ ${ fileBrowser.fileBrowser() }
     'knockout',
     'desktop/js/home2.vm',
     'assistPanel',
-    'tableStats',
     'fileBrowser',
     'knockout-mapping',
     'knockout-sortable',
     'ko.hue-bindings'
-  ], function (ko, HomeViewModel, ShareViewModel) {
+  ], function (ko, HomeViewModel) {
 
     ko.options.deferUpdates = true;
 

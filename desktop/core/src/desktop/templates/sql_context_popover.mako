@@ -435,12 +435,17 @@ from metadata.conf import has_navigator
     </div>
   </script>
   <script type="text/javascript" charset="utf-8">
-    require([
-      'knockout',
-      'desktop/js/apiHelper',
-      'desktop/js/assist/tableStats',
-      'desktop/js/sqlFunctions'
-    ], function (ko, ApiHelper, TableStats, sqlFunctions) {
+    (function (factory) {
+      if(typeof require === "function") {
+        require([
+          'knockout',
+          'desktop/js/apiHelper',
+          'desktop/js/sqlFunctions'
+        ], factory);
+      } else {
+        factory(ko, ApiHelper, SqlFunctions);
+      }
+    }(function (ko, ApiHelper, sqlFunctions) {
 
       var preventHide = false;
 
@@ -921,8 +926,8 @@ from metadata.conf import has_navigator
           var query = self.searchInput().toLowerCase();
           return columns.filter(function (column) {
             return column.name.toLowerCase().indexOf(query) != -1
-              || column.type.toLowerCase().indexOf(query) != -1
-              || column.comment.toLowerCase().indexOf(query) != -1;
+                || column.type.toLowerCase().indexOf(query) != -1
+                || column.comment.toLowerCase().indexOf(query) != -1;
           })
         });
       }
@@ -931,6 +936,6 @@ from metadata.conf import has_navigator
         viewModel: SqlColumnsTable,
         template: { element: 'sql-columns-table-template' }
       });
-    });
+    }));
   </script>
 </%def>

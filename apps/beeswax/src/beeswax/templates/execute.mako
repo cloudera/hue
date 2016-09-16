@@ -27,7 +27,6 @@
 <%namespace name="dashboard" file="common_dashboard.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${ layout.menubar(section='query') }
@@ -809,8 +808,8 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/assist/tableStats.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/sqlFunctions.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }" type="text/javascript" charset="utf-8"></script>
@@ -879,7 +878,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistPanel() }
-${ tableStats.tableStats() }
 ${ sqlContextPopover.sqlContextPopover() }
 
 <style type="text/css">

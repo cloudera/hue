@@ -907,8 +907,7 @@ from metadata.conf import has_navigator
           'desktop/js/assist/assistDbSource',
           'desktop/js/assist/assistHdfsEntry',
           'desktop/js/apiHelper',
-          'desktop/js/fileBrowser/hueFileEntry',
-          'tableStats'
+          'desktop/js/fileBrowser/hueFileEntry'
         ], factory);
       } else {
         factory(ko, AssistDbSource, AssistHdfsEntry, ApiHelper, HueFileEntry);

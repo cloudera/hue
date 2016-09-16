@@ -29,14 +29,12 @@ from desktop.views import commonheader, commonfooter, _ko
 <%namespace name="components" file="components.mako" />
 <%namespace name="require" file="/require.mako" />
 <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
-<%namespace name="tableStats" file="/table_stats.mako" />
 
 ${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
 
 ${ require.config() }
 
-${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ sqlContextPopover.sqlContextPopover() }
 
@@ -1195,7 +1193,6 @@ ${ sqlContextPopover.sqlContextPopover() }
     'metastore/js/metastore.ko',
     'ko.charts',
     'assistPanel',
-    'tableStats',
     'knockout-mapping',
     'knockout-sortable',
     'ko.editable',
