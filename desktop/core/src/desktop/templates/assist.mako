@@ -419,7 +419,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable || definition.isView, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event, navigationSettings.pinEnabled); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem || (navigationSettings.openDatabase && definition.isDatabase), click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
   </script>
@@ -427,7 +427,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event, navigationSettings.pinEnabled); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }"><i class="fa fa-fw fa-table muted valign-middle"></i><span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span></a>
@@ -988,6 +988,7 @@ from metadata.conf import has_navigator
        * @param {Object} options.navigationSettings - enable/disable the links
        * @param {boolean} options.navigationSettings.openItem
        * @param {boolean} options.navigationSettings.showStats
+       * @param {boolean} options.navigationSettings.pinEnabled
        * @constructor
        **/
       function AssistDbPanel (options) {

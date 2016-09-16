@@ -301,6 +301,21 @@
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
 
+    self.pinnedContextTabs = ko.observableArray(typeof snippet.pinnedContextTabs != "undefined" && snippet.pinnedContextTabs != null ? snippet.pinnedContextTabs : []);
+
+    huePubSub.subscribe('sql.context.pin', function (contextData) {
+      contextData.tabId = 'context' + self.pinnedContextTabs().length;
+      self.pinnedContextTabs.push(contextData);
+      self.currentQueryTab(contextData.tabId);
+    });
+
+    self.removeContextTab = function (context) {
+      if (context.tabId === self.currentQueryTab()) {
+        self.currentQueryTab('queryHistory');
+      }
+      self.pinnedContextTabs.remove(context);
+    };
+
     self.errorLoadingQueries = ko.observable(false);
     self.loadingQueries = ko.observable(false);
 

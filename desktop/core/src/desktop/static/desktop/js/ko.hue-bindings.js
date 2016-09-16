@@ -3003,6 +3003,7 @@
                 data: token.parseLocation,
                 sourceType: snippet.type(),
                 defaultDatabase: snippet.database(),
+                pinEnabled: true,
                 source: {
                   left: startCoordinates.pageX - 3,
                   top: startCoordinates.pageY,

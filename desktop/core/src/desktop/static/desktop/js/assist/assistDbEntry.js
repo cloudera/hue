@@ -138,7 +138,7 @@
     });
   }
 
-  AssistDbEntry.prototype.showContextPopover = function (entry, event) {
+  AssistDbEntry.prototype.showContextPopover = function (entry, event, pinEnabled) {
     var $source = $(event.target);
     var offset = $source.offset();
     entry.statsVisible(true);
@@ -150,12 +150,13 @@
       orientation: 'right',
       sourceType: entry.sourceType,
       defaultDatabase: entry.databaseName,
+      pinEnabled: pinEnabled,
       source: {
         element: event.target,
         left: offset.left,
-        top: offset.top - 2,
+        top: offset.top - 3,
         right: offset.left + $source.width() + 1,
-        bottom: offset.top + $source.height() - 2
+        bottom: offset.top + $source.height() - 3
       }
     });
     huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
