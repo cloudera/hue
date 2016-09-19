@@ -170,7 +170,8 @@ class LdapConnection(object):
     else:
       return (base_dn, '(' + attr + '=' + name + ')')
 
-  def _transform_find_user_results(self, result_data, user_name_attr):
+  @classmethod
+  def _transform_find_user_results(cls, result_data, user_name_attr):
     """
     :param result_data: List of dictionaries that have ldap attributes and their associated values. Generally the result list from an ldapsearch request.
     :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
@@ -203,9 +204,13 @@ class LdapConnection(object):
           }
 
           if 'givenName' in data:
-            ldap_info['first'] = data['givenName'][0]
+            if len(data['givenName'][0]) > 30:
+              LOG.warn('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
+            ldap_info['first'] = data['givenName'][0][:30]
           if 'sn' in data:
-            ldap_info['last'] = data['sn'][0]
+            if len(data['sn'][0]) > 30:
+              LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
+            ldap_info['last'] = data['sn'][0][:30]
           if 'mail' in data:
             ldap_info['email'] = data['mail'][0]
           # memberOf and isMemberOf should be the same if they both exist
