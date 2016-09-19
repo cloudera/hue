@@ -18,6 +18,8 @@
 
 import json
 
+from datetime import datetime
+
 from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal
 from django.contrib.auth.models import User
 
@@ -845,6 +847,29 @@ class TestDocument2ImportExport(object):
     assert_true('test2.wf' in [doc['fields']['name'] for doc in documents])
     assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
     assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+
+
+  def test_export_documents_file_name(self):
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir)
+    query3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir, is_history=True)
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={},
+                                        parent_directory=self.home_dir)
+    workflow.dependencies.add(query1)
+    workflow.dependencies.add(query2)
+    workflow.dependencies.add(query3)
+
+    # Test that exporting multiple workflows with overlapping dependencies works
+    workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={},
+                                         parent_directory=self.home_dir)
+    workflow2.dependencies.add(query1)
+
+    # Test that exporting to a file includes the date and number of documents in the filename
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
+    assert_equal(response['Content-Disposition'], 'attachment; filename=hue-documents-%s-(4).json' % datetime.today().strftime('%Y-%m-%d'))
 
 
   def test_export_directories_with_children(self):
