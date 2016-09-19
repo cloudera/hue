@@ -615,6 +615,16 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in done:
         finish()
 
+  def test_ldap_import_truncate_first_last_name(self):
+    test_ldap_data = [('uid=testuser,ou=people,dc=sec,dc=test,dc=com', {'objectClass': ['inetOrgPerson', 'posixAccount', 'shadowAccount'], 'mail': ['testuser@sec.test.com'], 'givenName': ['Firstnamehasmorethanthirtycharacters'], 'uid': ['testuser'], 'sn': ['Lastnamehasmorethanthirtycharacters']})]
+
+    # Checking if first/last name truncation works for LDAP imports
+    user_info = ldap_access.LdapConnection._transform_find_user_results(result_data=test_ldap_data, user_name_attr='uid')
+    assert_false(len(user_info[0]['first']) > 30)
+    assert_false(len(user_info[0]['last']) > 30)
+    assert_true(user_info[0]['first'] == 'Firstnamehasmorethanthirtychar', user_info[0]['first'])
+    assert_true(user_info[0]['last'] == 'Lastnamehasmorethanthirtychara', user_info[0]['last'])
+
 
   def test_add_ldap_groups(self):
     URL = reverse(add_ldap_groups)
