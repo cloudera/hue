@@ -32,7 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import DefaultConfiguration
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
 
 
 LOG = logging.getLogger(__name__)
@@ -301,7 +301,7 @@ class HS2Api(Api):
       raise QueryError(_('Result status is not available'))
 
     if snippet['type'] != 'hive':
-      raise QueryError(_('Cannot fetch result metadata for snippet type: %s') % snippet['type'])
+      raise OperationNotSupported(_('Cannot fetch result metadata for snippet type: %s') % snippet['type'])
 
     engine = self._get_hive_execution_engine(notebook, snippet).lower()
     logs = self.get_log(notebook, snippet, startFrom=0)

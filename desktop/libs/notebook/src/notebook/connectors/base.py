@@ -41,6 +41,9 @@ class AuthenticationRequired(Exception):
 class OperationTimeout(Exception):
   pass
 
+class OperationNotSupported(Exception):
+  pass
+
 
 class QueryError(Exception):
   def __init__(self, message, handle=None):

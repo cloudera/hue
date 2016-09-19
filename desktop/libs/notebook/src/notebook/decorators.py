@@ -28,7 +28,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document2, Document, FilesystemException
 
-from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout
+from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout,\
+  OperationNotSupported
 
 
 LOG = logging.getLogger(__name__)
@@ -102,6 +103,9 @@ def api_error_handler(func):
         response['handle'] = e.handle
       if e.extra:
         response.update(e.extra)
+    except OperationNotSupported, e:
+      response['status'] = 5
+      response['message'] = e.message
     except Exception, e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
