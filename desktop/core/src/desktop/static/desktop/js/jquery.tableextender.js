@@ -86,10 +86,6 @@
     }
   };
 
-  Plugin.prototype.destroy = function () {
-    console.log('destroy');
-  };
-
   Plugin.prototype.drawHeader = function (skipCreation) {
     drawHeader(this, skipCreation);
   };
@@ -211,11 +207,79 @@
         $('.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr:eq('+($(this).index())+')').addClass('selected');
       }
     });
+
     $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
       if (huePubSub){
         huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
       }
     });
+
+    var $pluginElement = $(self.element);
+    $pluginElement.parent().resize(function () {
+      $pluginElement.data('clonedTableContainer').height($pluginElement.parent().get(0).scrollHeight);
+      $pluginElement.data('clonedTableVisibleContainer').height($pluginElement.parent().height());
+    });
+
+    var scrollThrottle = -1;
+    var lastMarginTop = -$pluginElement.parent().scrollTop() + self.options.fixedFirstColumnTopMargin;
+    var newMarginTop;
+    $pluginElement.parent().scroll(function () {
+      window.clearTimeout(scrollThrottle);
+      scrollThrottle = window.setTimeout(function () {
+        newMarginTop = -$pluginElement.parent().scrollTop() + self.options.fixedFirstColumnTopMargin;
+        if (newMarginTop !== lastMarginTop) {
+          $pluginElement.data('clonedTableContainer').css("marginTop", newMarginTop + "px");
+          lastMarginTop = newMarginTop;
+        }
+      }, 50);
+    });
+    $pluginElement.data('clonedTableContainer').css("marginTop", lastMarginTop + "px");
+
+    var topPos, pos;
+    var $parent = $pluginElement.parent();
+    function positionClones() {
+      pos = self.options.stickToTopPosition;
+      if (typeof pos === 'function'){
+        pos = pos();
+      }
+      if (pos > -1) {
+        topPos = $pluginElement.offset().top;
+        if (topPos < pos) {
+          $pluginElement.data('clonedCellVisibleContainer').css("top", pos + "px");
+        } else {
+          $pluginElement.data('clonedCellVisibleContainer').css("top", topPos + "px");
+        }
+        $pluginElement.data('clonedTableVisibleContainer').css("top", topPos + "px");
+      } else {
+        if (self.options.clonedContainerPosition == 'absolute') {
+          topPos = $parent.position().top;
+        } else {
+          topPos = $parent.offset().top;
+        }
+        $pluginElement.data('clonedTableVisibleContainer').css("top", topPos + "px");
+        $pluginElement.data('clonedCellVisibleContainer').css("top", topPos + "px");
+      }
+    }
+
+    positionClones();
+
+    var $mainScrollable = $(self.options.mainScrollable);
+    if ($mainScrollable.data('lastScroll')) {
+      $mainScrollable.off('scroll', $mainScrollable.data('lastScroll'));
+      $mainScrollable.data('lastScroll', false);
+    }
+    if (navigator.userAgent.toLowerCase().indexOf("firefox") > 0) {
+      var ffThrottle = -1;
+      var throttledPositionClones = function () {
+        window.clearTimeout(ffThrottle);
+        ffThrottle = window.setTimeout(positionClones, 10);
+      };
+      $mainScrollable.on('scroll', throttledPositionClones);
+      $mainScrollable.data('lastScroll', throttledPositionClones);
+    } else {
+      $mainScrollable.on('scroll', positionClones);
+      $mainScrollable.data('lastScroll', positionClones);
+    }
   };
 
   function drawLockedRow(plugin, rowNo, force) {
@@ -345,6 +409,10 @@
 
     clonedCellVisibleContainer.appendTo($pluginElement.parent());
 
+    $pluginElement.data('clonedTableContainer', clonedTableContainer);
+    $pluginElement.data('clonedCellVisibleContainer', clonedCellVisibleContainer);
+    $pluginElement.data('clonedTableVisibleContainer', clonedTableVisibleContainer);
+
     window.clearInterval($pluginElement.data('firstcol_interval'));
     var firstColInt = window.setInterval(function () {
       if ($pluginElement.parent().height() != $pluginElement.parent().data("h")) {
@@ -354,44 +422,6 @@
       }
     }, 250);
     $pluginElement.data('firstcol_interval', firstColInt);
-
-    $pluginElement.parent().resize(function () {
-      clonedTableContainer.height($pluginElement.parent().get(0).scrollHeight);
-      clonedTableVisibleContainer.height($pluginElement.parent().height());
-    });
-
-    $pluginElement.parent().scroll(function () {
-      clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop() + plugin.options.fixedFirstColumnTopMargin) + "px");
-    });
-
-    clonedTableContainer.css("marginTop", (-$pluginElement.parent().scrollTop() + plugin.options.fixedFirstColumnTopMargin) + "px");
-
-    function positionClones() {
-      var pos = plugin.options.stickToTopPosition;
-      if (typeof pos === 'function'){
-        pos = pos();
-      }
-      if (pos > -1) {
-        if ($pluginElement.offset().top < pos) {
-          clonedCellVisibleContainer.css("top", pos + "px");
-        } else {
-          clonedCellVisibleContainer.css("top", $pluginElement.offset().top + "px");
-        }
-        clonedTableVisibleContainer.css("top", $pluginElement.offset().top + "px");
-      } else {
-        if (plugin.options.clonedContainerPosition == 'absolute') {
-          clonedTableVisibleContainer.css("top", $pluginElement.parent().position().top + "px");
-          clonedCellVisibleContainer.css("top", $pluginElement.parent().position().top + "px");
-        } else {
-          clonedTableVisibleContainer.css("top", $pluginElement.parent().offset().top + "px");
-          clonedCellVisibleContainer.css("top", $pluginElement.parent().offset().top + "px");
-        }
-      }
-    }
-
-    positionClones();
-
-    $(mainScrollable).on('scroll', positionClones);
   }
 
   function drawHeader(plugin, skipCreation) {
@@ -446,17 +476,6 @@
       });
       $pluginElement.data('thMapping', thMapping);
 
-      var updateThWidths = function () {
-        $pluginElement.data('thMapping').forEach(function (mapping) {
-          if (mapping.clone.width() !== mapping.original.width()) {
-            mapping.clone.width(mapping.original.width())
-          }
-        });
-      };
-
-      updateThWidths();
-      $pluginElement.data('updateThWidthsInterval', window.setInterval(updateThWidths, 300));
-
       var clonedTableContainer = $("<div>").width($pluginElement.outerWidth());
       clonedTable.appendTo(clonedTableContainer);
 
@@ -472,6 +491,17 @@
       clonedTableContainer.appendTo(clonedTableVisibleContainer);
       clonedTableVisibleContainer.prependTo($pluginElement.parent());
 
+      var updateThWidths = function () {
+        clonedTableVisibleContainer.width($pluginElement.parent().width());
+        $pluginElement.data('thMapping').forEach(function (mapping) {
+          if (mapping.clone.width() !== mapping.original.width()) {
+            mapping.clone.width(mapping.original.width())
+          }
+        });
+      };
+
+      updateThWidths();
+      $pluginElement.data('updateThWidthsInterval', window.setInterval(updateThWidths, 300));
 
       function throttledHeaderPadding() {
         var firstCellWidth = clonedTable.find("thead>tr th:eq(0)").outerWidth();
