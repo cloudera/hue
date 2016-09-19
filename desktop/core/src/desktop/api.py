@@ -189,9 +189,22 @@ def massaged_documents_for_json(documents, user):
 
 @require_GET
 def get_document(request):
-  doc_id = request.GET['id']
-  doc = Document.objects.get(id=doc_id)
-  response = massage_doc_for_json(doc, request.user)
+  response = {'status': -1, 'message': ''}
+  doc_id = request.GET.get('id', '')
+
+  if doc_id.isdigit():
+    doc = None
+    try:
+      doc = Document.objects.get(id=doc_id)
+    except Document.DoesNotExist:
+      pass
+    if doc and doc.can_read(request.user):
+      response = massage_doc_for_json(doc, request.user)
+    else:
+      response['message'] = _('get_document requires read priviledge or document does not exist for: %s') % doc_id
+  else:
+    response['message'] = _('get_document requires an id integer parameter: %s') % doc_id
+
   return JsonResponse(response)
 
 def massage_doc_for_json(document, user, url=''):
