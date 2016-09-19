@@ -156,6 +156,45 @@ class SparkApi(Api):
 
     props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
+
+    # Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
+    # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
+    # not being formed properly, they are quoted csv strings (without brackets) instead of proper List
+    # types, this is for keys; archives, jars, files and pyFiles. The Mako frontend probably should be
+    # modified to pass the values as Livy expects but for now we coerce these types to be Lists.
+    # Issue only occurs when non-default values are used because the default path properly sets the
+    # empty list '[]' for these four values.
+    # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
+    # be increased for requests that take longer, for example when loading large archives.
+    tmparchives = props['archives']
+    if type(tmparchives) is not list:
+       listitems = tmparchives.split(",")
+       props['archives'] = listitems
+    else:
+      LOG.debug("Check List type: archives is already a list")
+
+    tmpjars =  props['jars']
+    if type(tmpjars) is not list:
+       listitems = tmpjars.split(",")
+       props['jars'] = listitems
+    else:
+      LOG.debug("Check List type: jars is already a list")
+
+    tmpfiles =  props['files']
+    if type(tmpfiles) is not list:
+       listitems = tmpfiles.split(",")
+       props['files'] = listitems
+    else:
+      LOG.debug("Check List type: files is already a list")
+
+    tmppyFiles =  props['pyFiles']
+    if type(tmppyFiles) is not list:
+       listitems = tmppyFiles.split(",")
+       props['pyFiles'] = listitems
+    else:
+      LOG.debug("Check List type: pyFiles is already a list")
+
+
     props['kind'] = lang
 
     api = get_spark_api(self.user)
