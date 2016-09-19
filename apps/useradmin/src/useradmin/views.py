@@ -87,13 +87,18 @@ def list_for_autocomplete(request):
   if request.ajax:
     extended_user_object = request.GET.get('extend_user') == 'true'
 
-    users = User.objects.all().order_by('username')
+    if request.user.is_superuser:
+      users = User.objects.all().order_by('username')
+      groups = Group.objects.all().order_by('name')
+      if request.GET.get('only_mygroups'):
+        groups = request.user.groups.all()
+    else:
+      usergroups = request.user.groups.all()
+      users = User.objects.filter(groups__in=usergroups).order_by('username')
+      groups = usergroups.order_by('name')
+
     if not request.GET.get('include_myself'):
       users = users.exclude(pk=request.user.pk)
-
-    groups = Group.objects.all().order_by('name')
-    if request.GET.get('only_mygroups'):
-      groups = request.user.groups.all()
 
     users = users[:2000]
     groups = groups[:2000]

@@ -693,44 +693,51 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
   def test_list_for_autocomplete(self):
+
     # Now the autocomplete has access to all the users and groups
     c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
     c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
     c3_other_group = make_logged_in_client('test_list_for_autocomplete3', is_superuser=False, groupname='test_list_for_autocomplete_other_group')
 
-    # c1 is in the same group as c2
+    # c1 users should list only 'test_list_for_autocomplete2' and group should not list 'test_list_for_autocomplete_other_group'
     response = c1.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete2', u'test_list_for_autocomplete3'], users)
+    assert_equal([u'test_list_for_autocomplete2'], users)
     assert_true(u'test_list_for_autocomplete' in groups, groups)
-    assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
+    assert_false(u'test_list_for_autocomplete_other_group' in groups, groups)
 
-    # c2 is in the same group as c1
-    response = c2_same_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    # only_mygroups has no effect if user is not super user
+    response = c1.get(reverse('useradmin.views.list_for_autocomplete'), {'only_mygroups':False, 'include_myself':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete', u'test_list_for_autocomplete3'], users)
+    assert_equal([u'test_list_for_autocomplete',u'test_list_for_autocomplete2'], users)
     assert_true(u'test_list_for_autocomplete' in groups, groups)
-    assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
+    assert_false(u'test_list_for_autocomplete_other_group' in groups, groups)
 
-    # c3 is alone except for groups
-    response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    # c3 is alone
+    response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), {'include_myself':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
     groups = [smart_unicode(user['name']) for user in content['groups']]
 
-    assert_equal([u'test_list_for_autocomplete', u'test_list_for_autocomplete2'], users)
-    assert_true(u'test_list_for_autocomplete' in groups, groups)
+    assert_equal([u'test_list_for_autocomplete3'], users)
     assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
 
+    # superuser should get all users
+    c4_super_user = make_logged_in_client(is_superuser=True)
+    response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself':True,'only_mygroups':True}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    content = json.loads(response.content)
+
+    users = [smart_unicode(user['username']) for user in content['users']]
+    assert_equal([u'test', u'test_list_for_autocomplete', u'test_list_for_autocomplete2', u'test_list_for_autocomplete3'],  users)
 
   def test_language_preference(self):
     # Test that language selection appears in Edit Profile for current user
