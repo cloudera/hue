@@ -1011,6 +1011,10 @@ class TestDocument(object):
     finally:
       redaction.global_redaction_engine.policies = old_policies
 
+  def test_get_document(self):
+    c1 = make_logged_in_client(username='test_get_user', groupname='test_get_group', recreate=True, is_superuser=False)
+    r1 = c1.get('/desktop/api/doc/get?id=1')
+    assert_true(-1, json.loads(r1.content)['status'])
 
 def test_session_secure_cookie():
   with tempfile.NamedTemporaryFile() as cert_file:
