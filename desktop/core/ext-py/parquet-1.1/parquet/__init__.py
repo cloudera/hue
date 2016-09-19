@@ -66,7 +66,7 @@ def _check_footer_magic_bytes(fo):
 def _get_footer_size(fo):
     "Readers the footer size in bytes, which is serialized as little endian"
     fo.seek(-8, 2)
-    tup = struct.unpack("<i", fo.read(4))
+    tup = struct.unpack(b"<i", fo.read(4))
     return tup[0]
 
 

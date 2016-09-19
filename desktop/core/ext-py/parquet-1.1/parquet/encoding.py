@@ -31,36 +31,36 @@ def read_plain_int32(fo, count):
     length = 4 * count
     data = fo.read(length)
     if len(data) != length:
-        raise EOFError("Expected {} bytes but got {} bytes".format(length, len(data)))
-    res = struct.unpack("<{}i".format(count), data)
+        raise EOFError("Expected {} bytes but got {0} bytes".format(length, len(data)))
+    res = struct.unpack(b"<{0}i".format(count), data)
     return res
 
 
 def read_plain_int64(fo, count):
     """Reads `count` 64-bit ints using the plain encoding"""
-    return struct.unpack("<{}q".format(count), fo.read(8 * count))
+    return struct.unpack(b"<{0}q".format(count), fo.read(8 * count))
 
 
 def read_plain_int96(fo, count):
     """Reads `count` 96-bit ints using the plain encoding"""
-    items = struct.unpack("<qi" * count, fo.read(12) * count)
+    items = struct.unpack(b"<qi" * count, fo.read(12) * count)
     args = [iter(items)] * 2
     return [q << 32 | i for (q, i) in zip(*args)]
 
 
 def read_plain_float(fo, count):
     """Reads `count` 32-bit floats using the plain encoding"""
-    return struct.unpack("<{}f".format(count), fo.read(4 * count))
+    return struct.unpack(b"<{0}f".format(count), fo.read(4 * count))
 
 
 def read_plain_double(fo, count):
     """Reads `count` 64-bit float (double) using the plain encoding"""
-    return struct.unpack("<{}d".format(count), fo.read(8 * count))
+    return struct.unpack(b"<{0}d".format(count), fo.read(8 * count))
 
 
 def read_plain_byte_array(fo, count):
     """Read `count` byte arrays using the plain encoding"""
-    return [fo.read(struct.unpack("<i", fo.read(4))[0]) for i in range(count)]
+    return [fo.read(struct.unpack(b"<i", fo.read(4))[0]) for i in range(count)]
 
 
 def read_plain_byte_array_fixed(fo, fixed_length):
@@ -92,7 +92,7 @@ def read_unsigned_var_int(fo):
     result = 0
     shift = 0
     while True:
-        byte = struct.unpack("<B", fo.read(1))[0]
+        byte = struct.unpack(b"<B", fo.read(1))[0]
         result |= ((byte & 0x7F) << shift)
         if (byte & 0x80) == 0:
             break
@@ -112,7 +112,7 @@ def read_rle(fo, header, bit_width, debug_logging):
     width = (bit_width + 7) // 8
     data = fo.read(width)
     data = data + zero_data[len(data):]
-    value = struct.unpack("<i", data)[0]
+    value = struct.unpack(b"<i", data)[0]
     if debug_logging:
         logger.debug("Read RLE group with value %s of byte-width %s and count %s",
                      value, width, count)
