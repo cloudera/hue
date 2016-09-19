@@ -1084,6 +1084,8 @@
       }, function (data) {
         if (data.status == 0) {
           self.result.size(data.result);
+        } else if (data.status == 5) {
+          // No supported yet for this snippet
         } else {
           $(document).trigger("error", data.message);
         }
