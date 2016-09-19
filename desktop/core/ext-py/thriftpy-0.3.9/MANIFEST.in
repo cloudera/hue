@@ -1,0 +1,4 @@
+include README.rst CHANGES.rst
+recursive-include thriftpy/protocol/cybin *.pyx *.c *.h
+recursive-include thriftpy/transport *.pyx *.pxd *.c
+include thriftpy/contrib/tracking/tracking.thrift
