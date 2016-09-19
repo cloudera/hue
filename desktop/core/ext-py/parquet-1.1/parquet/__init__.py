@@ -10,7 +10,12 @@ import logging
 import os
 import struct
 import sys
-from collections import defaultdict, OrderedDict
+
+from collections import defaultdict
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 
 import thriftpy
 from thriftpy.protocol.compact import TCompactProtocolFactory
