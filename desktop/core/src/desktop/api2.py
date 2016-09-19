@@ -361,6 +361,8 @@ def export_documents(request):
 
   # Get PKs of documents to export
   doc_ids = [doc.pk for doc in export_doc_set]
+  num_docs = len(doc_ids)
+  filename = 'hue-documents-%s-(%s)' % (datetime.today().strftime('%Y-%m-%d'), num_docs)
 
   f = StringIO.StringIO()
 
@@ -383,11 +385,11 @@ def export_documents(request):
     zfile.close()
     response = HttpResponse(content_type="application/zip")
     response["Content-Length"] = len(f.getvalue())
-    response['Content-Disposition'] = 'attachment; filename="hue-documents.zip"'
+    response['Content-Disposition'] = 'attachment; filename="%s".zip' % filename
     response.write(f.getvalue())
     return response
   else:
-    return make_response(f.getvalue(), 'json', 'hue-documents')
+    return make_response(f.getvalue(), 'json', filename)
 
 
 @ensure_csrf_cookie
