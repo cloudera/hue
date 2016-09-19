@@ -42,10 +42,11 @@
     };
 
   function Plugin(element, options) {
-    this.element = element;
-    this.setOptions(options);
-    this._name = pluginName;
-    this.init();
+    var self = this;
+    self.element = element;
+    self.setOptions(options);
+    self._name = pluginName;
+    self.init();
   }
 
   Plugin.prototype.setOptions = function (options) {
@@ -56,8 +57,7 @@
       if (options != null) {
         this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
       }
-    }
-    else {
+    } else {
       this.options = $.extend({}, defaults, options);
       if (options != null) {
         this.options.labels = $.extend({}, defaults.labels, options.labels);
@@ -86,13 +86,17 @@
     }
   };
 
+  Plugin.prototype.destroy = function () {
+    console.log('destroy');
+  };
+
   Plugin.prototype.drawHeader = function (skipCreation) {
     drawHeader(this, skipCreation);
-  }
+  };
 
   Plugin.prototype.drawFirstColumn = function () {
     drawFirstColumn(this);
-  }
+  };
 
   Plugin.prototype.drawLockedRows = function (force) {
     var _this = this;
@@ -103,27 +107,28 @@
         drawLockedRow(_this, idx.substr(1), force);
       });
     }
-  }
-
+  };
 
   Plugin.prototype.init = function () {
+    var self = this;
 
     $.expr[":"].econtains = function (obj, index, meta, stack) {
       return (obj.textContent || obj.innerText || $(obj).text() || "").toLowerCase() == meta[3].toLowerCase();
-    }
+    };
 
-    var _this = this;
-    if (_this.options.includeNavigator) {
+    var $element = $(self.element);
+
+    if (self.options.includeNavigator) {
       var jHueTableExtenderNavigator = $("<div>").attr("id", "jHueTableExtenderNavigator");
       $("<a>").attr("href", "#").addClass("pull-right").html("&times;").click(function (e) {
         e.preventDefault();
         $(this).parent().hide();
       }).appendTo(jHueTableExtenderNavigator);
-      $("<label>").html(_this.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + _this.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
+      $("<label>").html(self.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + self.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
 
       jHueTableExtenderNavigator.appendTo($("body"));
 
-      $(_this.element).find("tbody").click(function (event) {
+      $element.find("tbody").click(function (event) {
         if ($.trim(getSelection()) == "") {
           window.setTimeout(function () {
             $(".rowSelected").removeClass("rowSelected");
@@ -140,7 +145,7 @@
       });
 
       var source = [];
-      $(_this.element).find("th").each(function () {
+      $element.find("th").each(function () {
         source.push($(this).text());
       });
 
@@ -148,22 +153,22 @@
         source: source,
         updater: function (item) {
           jHueTableExtenderNavigator.hide();
-          $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("columnSelected");
-          if (_this.options.firstColumnTooltip) {
-            $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").each(function () {
+          $element.find("tr td:nth-child(" + ($(self.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("columnSelected");
+          if (self.options.firstColumnTooltip) {
+            $element.find("tr td:nth-child(" + ($(self.element).find("th:econtains(" + item + ")").index() + 1) + ")").each(function () {
               $(this).attr("rel", "tooltip").attr("title", "#" + $(this).parent().find("td:first-child").text()).tooltip({
                 placement: 'left'
               });
             });
           }
-          $(_this.element).parent().animate({
-            scrollLeft: $(_this.element).find("th:econtains(" + item + ")").position().left + $(_this.element).parent().scrollLeft() - $(_this.element).parent().offset().left - 30
+          $(self.element).parent().animate({
+            scrollLeft: $(self.element).find("th:econtains(" + item + ")").position().left + $(self.element).parent().scrollLeft() - $(self.element).parent().offset().left - 30
           }, 300);
-          $(_this.element).find("tr.rowSelected td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("cellSelected");
+          $(self.element).find("tr.rowSelected td:nth-child(" + ($(self.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("cellSelected");
         }
       });
 
-      $(_this.element).parent().bind("mouseleave", function () {
+      $element.parent().bind("mouseleave", function () {
         jHueTableExtenderNavigator.hide();
       });
 
@@ -172,27 +177,28 @@
       });
     }
 
-    if (_this.options.hintElement != null) {
+    if (self.options.hintElement != null) {
+      var $hintElement = $(self.options.hintElement);
       var showAlertTimeout = -1;
-      $(_this.element).find("tbody").mousemove(function () {
+      $element.find("tbody").mousemove(function () {
         window.clearTimeout(showAlertTimeout);
-        if ($(_this.options.hintElement).data("show") == null || $(_this.options.hintElement).data("show")) {
+        if ($hintElement.data("show") == null || $hintElement.data("show")) {
           showAlertTimeout = window.setTimeout(function () {
-            $(_this.options.hintElement).fadeIn();
+            $hintElement.fadeIn();
           }, 1300);
         }
       });
 
-      $(_this.options.hintElement).find(".close").click(function () {
-        $(_this.options.hintElement).data("show", false);
+      $hintElement.find(".close").click(function () {
+        $hintElement.data("show", false);
       });
     }
 
-    if (_this.options.fixedHeader) {
-      drawHeader(_this);
+    if (self.options.fixedHeader) {
+      drawHeader(self);
     }
-    if (_this.options.fixedFirstColumn) {
-      drawFirstColumn(_this);
+    if (self.options.fixedFirstColumn) {
+      drawFirstColumn(self);
     }
 
     $(document).on('click dblclick', '.dataTables_wrapper > table tbody tr', function () {
@@ -224,7 +230,7 @@
       $header.find('tr td:first-child').filter(function () {
         return $(this).text() === rowNo + '';
       }).closest('tr').remove();
-      delete lockedRows['r' + $el.text()]
+      delete lockedRows['r' + $el.text()];
       $el.parent().remove();
       if ($header.find('tbody tr').length == 0) {
         $header.removeClass('locked');
@@ -255,8 +261,7 @@
         row: $clone,
         cell: $newTr
       };
-    }
-    else {
+    } else {
       lockedRows['r' + rowNo].row.appendTo($header.find('tbody'));
       lockedRows['r' + rowNo].cell.appendTo($headerCounter.find('tbody'));
       lockedRows['r' + rowNo].cell.find('td').on('click', function () {
@@ -369,20 +374,17 @@
       if (pos > -1) {
         if ($pluginElement.offset().top < pos) {
           clonedCellVisibleContainer.css("top", pos + "px");
-        }
-        else {
+        } else {
           clonedCellVisibleContainer.css("top", $pluginElement.offset().top + "px");
         }
         clonedTableVisibleContainer.css("top", $pluginElement.offset().top + "px");
-      }
-      else {
+      } else {
         if (plugin.options.clonedContainerPosition == 'absolute') {
-          clonedTableVisibleContainer.css("top", ($pluginElement.parent().position().top) + "px");
-          clonedCellVisibleContainer.css("top", ($pluginElement.parent().position().top) + "px");
-        }
-        else {
-          clonedTableVisibleContainer.css("top", ($pluginElement.parent().offset().top) + "px");
-          clonedCellVisibleContainer.css("top", ($pluginElement.parent().offset().top) + "px");
+          clonedTableVisibleContainer.css("top", $pluginElement.parent().position().top + "px");
+          clonedCellVisibleContainer.css("top", $pluginElement.parent().position().top + "px");
+        } else {
+          clonedTableVisibleContainer.css("top", $pluginElement.parent().offset().top + "px");
+          clonedCellVisibleContainer.css("top", $pluginElement.parent().offset().top + "px");
         }
       }
     }
@@ -390,12 +392,18 @@
     positionClones();
 
     $(mainScrollable).on('scroll', positionClones);
-
   }
-
 
   function drawHeader(plugin, skipCreation) {
     var $pluginElement = $(plugin.element);
+
+    if (! $pluginElement.is(':visible')) {
+      if (typeof $pluginElement.data('updateThWidthsInterval') !== 'undefined') {
+        window.clearInterval($pluginElement.data('updateThWidthsInterval'));
+      }
+      return;
+    }
+
     if (!$pluginElement.attr("id") && plugin.options.parentId) {
       $pluginElement.attr("id", "eT" + plugin.options.parentId);
     }
@@ -411,21 +419,43 @@
       clonedTableTHead.appendTo(clonedTable);
       var clonedTableTR = $pluginElement.find('thead>tr').clone();
       clonedTableTR.appendTo(clonedTableTHead);
-      $('<tbody>').appendTo(clonedTable)
+      $('<tbody>').appendTo(clonedTable);
 
-      clonedTable.find("thead>tr th").wrapInner('<span></span>');
+      var clonedThs = clonedTable.find("thead>tr th");
+      clonedThs.wrapInner('<span></span>');
 
+      if (typeof $pluginElement.data('updateThWidthsInterval') !== 'undefined') {
+        window.clearInterval($pluginElement.data('updateThWidthsInterval'));
+      }
+
+      var thMapping = [];
       $pluginElement.find("thead>tr th").each(function (i) {
         var originalTh = $(this);
         originalTh.removeAttr("data-bind");
-        clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF").click(function () {
+        var clonedTh = $(clonedThs[i]).css("background-color", "#FFFFFF").click(function () {
           originalTh.click();
           if (plugin.options.headerSorting) {
-            clonedTable.find("thead>tr th").attr("class", "sorting");
+            clonedThs.attr("class", "sorting");
           }
           $(this).attr("class", originalTh.attr("class"));
         });
+        thMapping.push({
+          original: originalTh,
+          clone: clonedTh
+        })
       });
+      $pluginElement.data('thMapping', thMapping);
+
+      var updateThWidths = function () {
+        $pluginElement.data('thMapping').forEach(function (mapping) {
+          if (mapping.clone.width() !== mapping.original.width()) {
+            mapping.clone.width(mapping.original.width())
+          }
+        });
+      };
+
+      updateThWidths();
+      $pluginElement.data('updateThWidthsInterval', window.setInterval(updateThWidths, 300));
 
       var clonedTableContainer = $("<div>").width($pluginElement.outerWidth());
       clonedTable.appendTo(clonedTableContainer);
@@ -433,8 +463,7 @@
       var topPosition;
       if (plugin.options.clonedContainerPosition == 'absolute') {
         topPosition = $pluginElement.parent().position().top - $(mainScrollable).scrollTop();
-      }
-      else {
+      } else {
         topPosition = $pluginElement.parent().offset().top - $(mainScrollable).scrollTop();
       }
       var clonedTableVisibleContainer = $("<div>").attr("id", $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($pluginElement.parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
@@ -452,8 +481,7 @@
             if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
               $(this).find('span').css('paddingLeft', -leftPosition);
             }
-          }
-          else {
+          } else {
             $(this).find('span').css('paddingLeft', 0);
           }
         });
@@ -472,20 +500,6 @@
       });
 
       clonedTableVisibleContainer.scrollLeft($pluginElement.parent().scrollLeft());
-
-      $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
-
-      window.clearInterval($pluginElement.data('header_interval'));
-      var headerInt = window.setInterval(function () {
-        if ($pluginElement.parent().width() != $pluginElement.parent().data("w")) {
-          clonedTableVisibleContainer.width($pluginElement.parent().width());
-          $pluginElement.parent().data("w", clonedTableVisibleContainer.width());
-          $pluginElement.find("thead>tr th").each(function (i) {
-            clonedTable.find("thead>tr th:eq(" + i + ")").width($(this).width()).css("background-color", "#FFFFFF");
-          });
-        }
-      }, 250);
-      $pluginElement.data('header_interval', headerInt);
 
       $pluginElement.parent().resize(function () {
         clonedTableVisibleContainer.width($(this).width());
@@ -514,8 +528,7 @@
       positionClones();
 
       $(mainScrollable).on('scroll', positionClones);
-    }
-    else {
+    } else {
       $("#" + $pluginElement.attr("id") + "jHueTableExtenderClonedContainer").children('div').width($pluginElement.outerWidth());
       $pluginElement.find("thead>tr th").each(function (i) {
         var originalTh = $(this);
@@ -540,8 +553,7 @@
     return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
         $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
-      }
-      else {
+      } else {
         $.data(this, 'plugin_' + pluginName).resetSource();
         $.data(this, 'plugin_' + pluginName).setOptions(options);
       }
