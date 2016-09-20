@@ -462,6 +462,7 @@ from metadata.conf import has_navigator
 
       var hidePopover = function () {
         if (! preventHide) {
+          huePubSub.publish('sql.context.popover.dispose');
           $('#sqlContextPopover').remove();
           $(document).off('click', hideOnClickOutside);
           while (intervals.length > 0) {
@@ -470,7 +471,6 @@ from metadata.conf import has_navigator
           while (pubSubs.length > 0) {
             pubSubs.pop().remove();
           }
-          huePubSub.publish('sql.context.popover.dispose');
           huePubSub.publish('sql.context.popover.hidden');
         }
       };
@@ -611,10 +611,6 @@ from metadata.conf import has_navigator
             return;
           }
 
-          if ($t.data('plugin_jHueTableExtender')) {
-            $t.data('plugin_jHueTableExtender').drawHeader();
-            $t.data('plugin_jHueTableExtender').drawFirstColumn();
-          }
           $t.parents('.dataTables_wrapper').getNiceScroll().resize();
         }, 300));
 
@@ -698,15 +694,21 @@ from metadata.conf import has_navigator
 
           $t.parents('.dataTables_wrapper').css('height', '100%');
 
-          $t.jHueTableExtender({
+          $t.jHueTableExtender2({
             fixedHeader: true,
-            fixedFirstColumn: true,
+            fixedFirstColumn: false,
             fixedFirstColumnTopMargin: -1,
             headerSorting: false,
             includeNavigator: false,
             parentId: 'sampleTab',
             classToRemove: 'samples-table',
-            clonedContainerPosition: 'fixed'
+            clonedContainerPosition: 'absolute'
+          });
+
+          huePubSub.subscribeOnce('sql.context.popover.dispose', function () {
+            if ($t.data('plugin_jHueTableExtender2')) {
+              $t.data('plugin_jHueTableExtender2').destroy();
+            }
           });
 
           $t.parents('.dataTables_wrapper').niceScroll({
