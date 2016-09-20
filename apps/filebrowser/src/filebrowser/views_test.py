@@ -677,6 +677,23 @@ class TestFileBrowserWithHadoop(object):
     assert_true('FRANCE' in response.context['view']['contents'])
 
 
+  def test_view_parquet_snappy(self):
+    if not snappy_installed():
+      raise SkipTest
+
+    prefix = self.cluster.fs_prefix + '/test_view_parquet_snappy'
+    self.cluster.fs.mkdir(prefix)
+
+    with open('apps/filebrowser/src/filebrowser/test_data/parquet-snappy.parquet') as f:
+      hdfs = self.cluster.fs.open(prefix + '/test-parquet-snappy.parquet', "w")
+      hdfs.write(f.read())
+
+    # autodetect
+    response = self.c.get('/filebrowser/view=%s/test-parquet-snappy.parquet' % prefix)
+
+    assert_true('SR3_ndw_otlt_cmf_xref_INA' in response.context['view']['contents'], response.context['view']['contents'])
+
+
   def test_view_gz(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
