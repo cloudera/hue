@@ -87,6 +87,32 @@
     self.superuser = options.superuser;
 
     self.document = ko.observable();
+    self.selectedDocsWithDependents = ko.observable([]);
+
+    self.getSelectedDocsWithDependents = function() {
+      self.selectedDocsWithDependents([]);
+      var uuids = self.selectedEntries().map(function(entry) {
+        return entry.definition().uuid;
+      }).join(',');
+
+      var data = {
+        'uuids': uuids,
+        'data': 'false',
+        'dependencies': 'true'
+      }
+
+      $.get('/desktop/api2/doc/', data, function (response) {
+        var docsWithDependents = [];
+        if (response && response.data_list) {
+          for (var index = 0; index < response.data_list.length; index++) {
+            docsWithDependents.push({'name': response.data_list[index].document.name, 'dependents': response.data_list[index].dependents})
+          }
+        }
+        self.selectedDocsWithDependents(docsWithDependents);
+      }).fail(function (response) {
+        $(document).trigger("error", "Error getting document data: " + response.responseText);
+      });
+    }
 
     self.isTrash = ko.pureComputed(function () {
       return self.definition().name === '.Trash';
