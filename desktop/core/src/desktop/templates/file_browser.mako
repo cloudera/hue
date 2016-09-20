@@ -499,11 +499,29 @@ from desktop.views import _ko
         <h3>${ _('The trash is empty') }</h3>
         <!-- /ko -->
         <!-- ko if: entriesToDelete().length > 0 -->
-        <h3>${ _('Do you really want to delete') }
-          <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].definition().name"></span><!-- /ko -->
-          <!-- ko if: entriesToDelete().length > 1 --> <span data-bind="text: entriesToDelete().length"></span> ${ _('entries') }<!-- /ko -->
-        ?</h3>
+        <h3> ${ _('Do you really want to delete the following document(s)?') } </h3>
         <!-- /ko -->
+      </div>
+      <div class="modal-body">
+        <div class="fb-empty animated" style="display: none;" data-bind="visible: selectedDocsWithDependents().length === 0">
+          <i class="fa fa-spinner fa-spin fa-2x"></i>
+        </div>
+        <ul data-bind="foreach: selectedDocsWithDependents()">
+          <li>
+            <span data-bind="text: $data.name"></span>
+            <!-- ko if: $data.dependents.length > 0 -->
+              (${_('used by')}
+              <a class="pointer" data-bind="attr: { 'href': $data.dependents[0].absoluteUrl }, text: $data.dependents[0].name" target="_blank" ></a>
+              <!-- ko if: $data.dependents.length > 1 -->
+              ${_('and')} <a class="pointer" data-bind="attr: { 'href': $data.dependents[0].absoluteUrl }, text: $data.dependents[1].name" target="_blank" ></a>
+                <!-- ko if: $data.dependents.length > 2 -->
+                  ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
+                <!-- /ko -->
+              <!-- /ko -->
+              )
+            <!-- /ko -->
+          </li>
+        </ul>
       </div>
       <div class="modal-footer">
         <!-- ko if: entriesToDelete().length === 0 -->
@@ -583,7 +601,8 @@ from desktop.views import _ko
           <!-- /ko -->
           <div><a class="inactive-action fb-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
           <div><a class="inactive-action fb-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || (selectedEntry() != null && !selectedEntry().isDirectory()) }"><i class="fa fa-fw fa-edit"></i></a></div>
-          <div><a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation(), css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a></div>
+
+          <div><a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div><a class="inactive-action fb-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
           <!-- /ko -->
@@ -638,7 +657,7 @@ from desktop.views import _ko
             <div class="fb-row" data-bind="contextMenu: { scrollContainer: '.fb-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
-                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
                 <!-- ko if: isDirectory -->
@@ -646,7 +665,7 @@ from desktop.views import _ko
                 <!-- /ko -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-fw fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: ! $altDown() && !($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: ! $altDown() && !($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="visible: $altDown() || ($parent.sharedWithMeSelected() && $parent.superuser), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->

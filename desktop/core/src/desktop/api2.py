@@ -135,9 +135,23 @@ def get_document(request):
   """
   path = request.GET.get('path', '/')
   uuid = request.GET.get('uuid')
+  uuids = request.GET.get('uuids')
   with_data = request.GET.get('data', 'false').lower() == 'true'
   with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
 
+  if uuids:
+    response = {
+      'data_list': [_get_document_helper(request, uuid, with_data, with_dependencies, path) for uuid in uuids.split(',')],
+      'status': 0
+    }
+  else:
+    response = _get_document_helper(request, uuid, with_data, with_dependencies, path)
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def _get_document_helper(request, uuid, with_data, with_dependencies, path):
   if uuid:
     if uuid.isdigit():
       document = Document2.objects.document(user=request.user, doc_id=uuid)
@@ -197,7 +211,7 @@ def get_document(request):
     response['children'] = response.pop('documents')
     response['children'] = [doc.to_dict() for doc in response['children']]
 
-  return JsonResponse(response)
+  return response
 
 
 @api_error_handler
