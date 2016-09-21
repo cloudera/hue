@@ -192,6 +192,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
   <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
   <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
+  <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
   <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
   <script src="${ static('desktop/js/jquery.tour.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>

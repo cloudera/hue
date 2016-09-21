@@ -36,8 +36,12 @@
       } else {
         self.$table.find('tr').find('td:eq(' + index + '),th:eq(' + index + ')').show();
       }
-      self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
-    }
+      if (self.$table.data('plugin_jHueTableExtender')) {
+        self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
+      } else if (self.$table.data('plugin_jHueTableExtender2')) {
+        self.$table.data('plugin_jHueTableExtender2').redraw();
+      }
+    };
 
     self.fnToggleAllCols = function (visible) {
       var aoColumns = self.$table.data('aoColumns');
@@ -52,11 +56,14 @@
       } else {
         self.$table.find('th, td').show();
       }
-      self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
-    }
+      if (self.$table.data('plugin_jHueTableExtender')) {
+        self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
+      } else if (self.$table.data('plugin_jHueTableExtender2')) {
+        self.$table.data('plugin_jHueTableExtender2').redraw();
+      }
+    };
 
     self.fnSortColumn = function (obj, way) {
-      var $t = self.$table;
       var data = self.$table.data('data');
 
       var idx = obj.originalIndex;
@@ -278,6 +285,9 @@
             if ($t.data('plugin_jHueTableExtender')) {
               $t.data('plugin_jHueTableExtender').drawFirstColumn();
             }
+            if ($t.data('plugin_jHueTableExtender2')) {
+              $t.data('plugin_jHueTableExtender2').drawFirstColumn();
+            }
           }
           else {
             if (force) {
@@ -288,6 +298,9 @@
               appendable.html(appendable.html() + html);
               if ($t.data('plugin_jHueTableExtender')) {
                 $t.data('plugin_jHueTableExtender').drawFirstColumn();
+              }
+              if ($t.data('plugin_jHueTableExtender2')) {
+                $t.data('plugin_jHueTableExtender2').drawFirstColumn();
               }
             }
           }
@@ -338,12 +351,6 @@
             $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
             $t.data('plugin_jHueTableExtender').drawLockedRows();
           }
-
-          if (force) {
-            $t.data('plugin_jHueTableExtender').drawFirstColumn();
-            $t.data('plugin_jHueTableExtender').drawLockedRows();
-          }
-
         }
         $t.data('fnDraws', $t.data('fnDraws') + 1);
         if ($t.data('oInit')['fnDrawCallback']) {
@@ -354,7 +361,7 @@
 
         self.isDrawing = false;
       }
-    }
+    };
 
     self.fnAddData = function (mData, bRedraw) {
       var $t = self.$table;
