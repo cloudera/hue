@@ -1934,7 +1934,7 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="snippet-code-resizer">
-  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable', onStart: hideFixedHeaders }">
+  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable', onStart: hideFixedHeaders, onStop: redrawFixedHeaders }">
     <i class="fa fa-ellipsis-h"></i>
   </div>
 </script>
@@ -2942,6 +2942,8 @@ ${ hueIcons.symbols() }
               tableExtender.repositionHeader();
               tableExtender.drawLockedRows();
             }
+            $('.right-panel').data('lastScroll', $('.right-panel').scrollTop());
+            $('.right-panel').trigger('scroll');
           }
         });
         $(".jHueTableExtenderClonedContainer").show();
@@ -3630,14 +3632,14 @@ ${ hueIcons.symbols() }
       $(document).on("hideAutocomplete", function () {
         window.clearTimeout(hideTimeout);
         hideTimeout = window.setTimeout(function () {
-          $aceAutocomplete = $(".ace_editor.ace_autocomplete");
+          var $aceAutocomplete = $(".ace_editor.ace_autocomplete");
           if ($aceAutocomplete.is(":visible")) {
             $aceAutocomplete.hide();
           }
         }, 100);
       });
 
-      function forceChartDraws() {
+      function forceChartDraws(initial) {
         if (viewModel.selectedNotebook()) {
           viewModel.selectedNotebook().snippets().forEach(function (snippet) {
             if (snippet.result.data().length > 0) {
@@ -3646,7 +3648,7 @@ ${ hueIcons.symbols() }
               _elCheckerInterval = window.setInterval(function () {
                 if (_el.find(".resultTable").length > 0) {
                   try {
-                    resizeToggleResultSettings(snippet, true);
+                    resizeToggleResultSettings(snippet, initial);
                     resetResultsResizer(snippet);
                     $(document).trigger("forceChartDraw", snippet);
                   } catch (e) { }
@@ -3658,7 +3660,7 @@ ${ hueIcons.symbols() }
         }
       }
 
-      forceChartDraws();
+      forceChartDraws(true);
 
       var _resizeTimeout = -1;
       $(window).on("resize", function () {

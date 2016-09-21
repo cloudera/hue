@@ -39,9 +39,7 @@
       if (self.$table.data('plugin_jHueTableExtender')) {
         self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
       } else if (self.$table.data('plugin_jHueTableExtender2')) {
-        self.$table.data('plugin_jHueTableExtender2').drawHeader();
-        self.$table.data('plugin_jHueTableExtender2').drawLockedRows(true);
-        self.$table.data('plugin_jHueTableExtender2').repositionHeader();
+        self.$table.data('plugin_jHueTableExtender2').redraw();
       }
     };
 
@@ -61,9 +59,7 @@
       if (self.$table.data('plugin_jHueTableExtender')) {
         self.$table.data('plugin_jHueTableExtender').drawLockedRows(true);
       } else if (self.$table.data('plugin_jHueTableExtender2')) {
-        self.$table.data('plugin_jHueTableExtender2').drawHeader();
-        self.$table.data('plugin_jHueTableExtender2').drawLockedRows(true);
-        self.$table.data('plugin_jHueTableExtender2').repositionHeader();
+        self.$table.data('plugin_jHueTableExtender2').redraw();
       }
     };
 

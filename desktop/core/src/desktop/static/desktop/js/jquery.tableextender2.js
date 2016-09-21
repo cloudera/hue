@@ -47,14 +47,74 @@
     self.$element = $(element);
     self.$parent = self.$element.parent();
     self.$mainScrollable = $(self.options.mainScrollable);
+    self.lastHeaderWidth = 0;
 
     self.drawHeader(); // Sets self.headerRowContainer
     self.drawFirstColumn(); // Sets self.firstColumnInner, self.firstColumnTopCell and self.firstColumn
     self.drawLockedRows();
 
-    var lastHeight = -1;
-    var currentHeight;
+    var isFireFox = navigator.userAgent.toLowerCase().indexOf("firefox") > 0;
 
+    var firstCellWidth, leftPosition, th, thi;
+    var throttledHeaderPadding = function () {
+      firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
+      for (thi = 0; thi < self.thMapping.length; thi++) {
+        th = self.thMapping[thi];
+        if (!th.visible) {
+          continue;
+        }
+        leftPosition = th.clone.position().left - firstCellWidth;
+        if (leftPosition + th.clone.outerWidth() > 0 && leftPosition < 0) {
+          if (th.cloneSpan.width() - leftPosition < th.clone.outerWidth() - 20) { // 20 is the sorting css width
+            th.cloneSpan.css('paddingLeft', -leftPosition);
+          }
+        } else {
+          th.cloneSpan.css('paddingLeft', 0);
+        }
+      }
+    };
+
+    var scrollTimeout = -1;
+    var headerScroll = function () {
+      self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
+      window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+    };
+    self.$parent.on('scroll', headerScroll);
+    self.disposeFunctions.push(function () {
+      self.$parent.off('scroll', headerScroll);
+    });
+
+    self.$element.bind('headerpadding', function () {
+      window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+    });
+    self.disposeFunctions.push(function () {
+      self.$element.unbind('headerpadding');
+    });
+
+    var redrawSubscription = huePubSub.subscribe('table.extender.redraw', function (parentId) {
+      if (parentId == self.options.parentId) {
+        self.redraw();
+      }
+    });
+    self.disposeFunctions.push(function () {
+      redrawSubscription.remove();
+    });
+
+    var hideSubscription = huePubSub.subscribe('table.extender.hide', function (parentId) {
+      if (parentId == self.options.parentId) {
+        self.headerRowContainer.hide();
+        self.firstColumnInner.hide();
+        self.firstColumnTopCell.hide();
+        self.firstColumn.hide();
+      }
+    });
+    self.disposeFunctions.push(function () {
+      hideSubscription.remove();
+    });
+
+    var lastHeight = -1, currentHeight;
     var adjustSizes = function () {
       currentHeight = self.$parent.height();
       if (currentHeight != lastHeight) {
@@ -63,12 +123,25 @@
         lastHeight = currentHeight;
       }
 
-      self.headerRowContainer.width(self.$parent.width());
-      self.thMapping.forEach(function (mapping) {
-        if (mapping.clone.width() !== mapping.original.width()) {
-          mapping.clone.width(mapping.original.width())
+      if (self.lastHeaderWidth !== self.$parent.width()) {
+        self.lastHeaderWidth = self.$parent.width();
+        self.headerRowContainer.width(self.lastHeaderWidth);
+      }
+      for (thi = 0; thi < self.thMapping.length; thi++) {
+        th = self.thMapping[thi];
+        if (!th.visible) {
+          continue;
         }
-      });
+        if (th.clone.lastWidth !== th.original.width()) {
+          th.clone.lastWidth = th.original.width();
+          th.clone.width(th.clone.lastWidth)
+        }
+      }
+
+      if (self.headerRowContainer.scrollLeft() !== self.$parent.scrollLeft()) {
+        self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
+        throttledHeaderPadding();
+      }
     };
     adjustSizes();
     var sizeInterval = window.setInterval(adjustSizes, 300);
@@ -98,59 +171,38 @@
       self.$parent.off('dblclick', 'table tbody tr', dblClickHandler);
     });
 
-    self.repositionHeader();
 
-    var scrollFunction;
-    if (navigator.userAgent.toLowerCase().indexOf("firefox") > 0) {
-      var ffThrottle = -1;
-      var throttledPositionClones = function () {
-        window.clearTimeout(ffThrottle);
-        ffThrottle = window.setTimeout(self.repositionHeader.bind(self), 10);
-      };
-      scrollFunction = throttledPositionClones;
-    } else {
-      scrollFunction = self.repositionHeader.bind(self);
-    }
-    self.$mainScrollable.on('scroll', scrollFunction);
-    self.disposeFunctions.push(function () {
-      self.$mainScrollable.off('scroll', scrollFunction);
-    });
-
-    var firstCellWidth, leftPosition, $th;
-    var throttledHeaderPadding = function () {
-      firstCellWidth = self.options.fixedFirstColumn ? self.headerRowContainer.find("thead>tr th:eq(0)").outerWidth() : 0;
-      self.headerRowContainer.find("thead>tr th").each(function () {
-        $th = $(this);
-        leftPosition = $th.position().left - firstCellWidth;
-        if (leftPosition + $th.outerWidth() > 0 && leftPosition < 0) {
-          if ($th.find('span').width() - leftPosition < $th.outerWidth() - 20) { // 20 is the sorting css width
-            $th.find('span').css('paddingLeft', -leftPosition);
-          }
-        } else {
-          $th.find('span').css('paddingLeft', 0);
-        }
+    if (!self.options.disableTopPosition) {
+      self.repositionHeader();
+      var scrollFunction;
+      if (isFireFox) {
+        var ffThrottle = -1;
+        var throttledPositionClones = function () {
+          window.clearTimeout(ffThrottle);
+          ffThrottle = window.setTimeout(self.repositionHeader.bind(self), 10);
+        };
+        scrollFunction = throttledPositionClones;
+      } else {
+        scrollFunction = self.repositionHeader.bind(self);
+      }
+      self.$mainScrollable.on('scroll', scrollFunction);
+      self.disposeFunctions.push(function () {
+        self.$mainScrollable.off('scroll', scrollFunction);
       });
-    };
-
-    var scrollTimeout = -1;
-    var headerScroll = function () {
-      self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
-    };
-    self.$parent.on('scroll', headerScroll);
-    self.disposeFunctions.push(function () {
-      self.$parent.off('scroll', headerScroll);
-    });
-
-    self.$element.bind('headerpadding', function () {
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
-    });
-    self.disposeFunctions.push(function () {
-      self.$element.unbind('headerpadding');
-    });
+    }
   }
+
+  Plugin.prototype.redraw = function () {
+    var self = this;
+    self.drawHeader();
+    self.drawFirstColumn();
+    self.drawLockedRows(true);
+    self.repositionHeader();
+    window.setTimeout(function (){
+      self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
+      self.$element.trigger('headerpadding');
+    }, 300);
+  };
 
   Plugin.prototype.destroy = function () {
     var self = this;
@@ -177,6 +229,9 @@
 
   Plugin.prototype.repositionHeader = function () {
     var self = this;
+    if (self.options.disableTopPosition) {
+      return;
+    }
     var pos = self.options.stickToTopPosition;
     var topPos = 0;
     if (typeof pos === 'function'){
@@ -202,7 +257,6 @@
 
   Plugin.prototype.drawHeader = function () {
     var self = this;
-
     if (!self.$element.attr("id") && self.options.parentId) {
       self.$element.attr("id", "eT" + self.options.parentId);
     }
@@ -228,19 +282,25 @@
     var totalThWidth = 0;
     self.$element.find("thead>tr th").each(function (i) {
       var originalTh = $(this);
+      var visible = originalTh.is(':visible');
       originalTh.removeAttr("data-bind");
-      var clonedTh = $(clonedThs[i]).css("background-color", "#FFFFFF").click(function () {
-        originalTh.click();
-        if (self.options.headerSorting) {
-          clonedThs.attr("class", "sorting");
-        }
-        $(this).attr("class", originalTh.attr("class"));
-      });
+      var clonedTh = $(clonedThs[i]).css("background-color", "#FFFFFF");
+      if (visible) {
+        clonedTh.click(function () {
+          originalTh.click();
+          if (self.options.headerSorting) {
+            clonedThs.attr("class", "sorting");
+          }
+          $(this).attr("class", originalTh.attr("class"));
+        });
+      }
       clonedTh.width(originalTh.width());
       totalThWidth += originalTh.width();
       self.thMapping.push({
         original: originalTh,
-        clone: clonedTh
+        clone: clonedTh,
+        cloneSpan: clonedTh.children().first(),
+        visible: visible
       })
     });
 
@@ -254,8 +314,13 @@
       topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
     }
     var headerRowContainer = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainer")
-        .addClass("jHueTableExtenderClonedContainer").width(totalThWidth).css("overflow-x", "hidden").css("top", topPosition + "px");
+        .addClass("jHueTableExtenderClonedContainer").width(totalThWidth).css("overflow-x", "hidden")
+    if (!self.options.disableTopPosition) {
+      headerRowContainer.css("top", topPosition + "px");
+    }
     headerRowContainer.css("position", self.options.clonedContainerPosition || "fixed");
+    self.lastHeaderWidth = self.$parent.width();
+    headerRowContainer.width(self.lastHeaderWidth);
 
     headerRowDiv.appendTo(headerRowContainer);
     headerRowContainer.prependTo(self.$parent);
@@ -319,9 +384,21 @@
     var clonedTBody = clonedTable.find('tbody');
     var clones = self.$element.find("tbody>tr td:nth-child(1)").clone();
     var h = '';
+    var foundEmptyTh = false;
     clones.each(function(){
+      if ($(this).html() === '') {
+        foundEmptyTh = true;
+      }
       h+= '<tr><td>' + $(this).html() +'</td></tr>';
     });
+    if (foundEmptyTh) {
+      // In IE it's sometimes empty so we'll redraw in a bit
+      window.setTimeout(self.drawFirstColumn.bind(self), 200);
+      self.firstColumnInner = $();
+      self.firstColumnTopCell = $();
+      self.firstColumn = $();
+      return;
+    }
     clonedTBody.html(h);
     if (self.options.lockSelectedRow) {
       clonedTBody.find('td').each(function(){
