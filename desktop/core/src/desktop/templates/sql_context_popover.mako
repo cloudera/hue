@@ -701,8 +701,7 @@ from metadata.conf import has_navigator
             headerSorting: false,
             includeNavigator: false,
             parentId: 'sampleTab',
-            classToRemove: 'samples-table',
-            clonedContainerPosition: 'absolute'
+            classToRemove: 'samples-table'
           });
 
           huePubSub.subscribeOnce('sql.context.popover.dispose', function () {
@@ -755,6 +754,7 @@ from metadata.conf import has_navigator
 
         var originalMidX, originalWidth, originalRightX, originalLeftX, originalMidY, originalHeight, originalTopY, originalBottomY;
         var rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
+        var redrawHeaders = false;
 
         window.setTimeout(function () {
           var offset = $('.sql-context-popover').offset();
@@ -777,7 +777,11 @@ from metadata.conf import has_navigator
           preventHide = true;
         };
 
-        self.resizeStop = function () {
+        self.resizeStop = function (event, ui) {
+          if (redrawHeaders) {
+            huePubSub.publish('table.extender.redraw', 'sampleTab');
+            redrawHeaders = false;
+          }
           // Delay or it will close the popover when releasing at the window borders
           window.setTimeout(function () {
             preventHide = false;
@@ -809,6 +813,10 @@ from metadata.conf import has_navigator
         };
 
         var resizeLeftRightVertical = function (event, ui) {
+          if (!redrawHeaders && ui.originalPosition.top !== ui.position.top) {
+            redrawHeaders = true;
+            huePubSub.publish('table.extender.hide', 'sampleTab');
+          }
           topY = ui.position.top;
           bottomY = ui.position.top + ui.size.height;
 
