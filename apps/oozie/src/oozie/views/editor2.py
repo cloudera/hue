@@ -269,6 +269,9 @@ def add_node(request):
   _properties = dict(NODES[node['widgetType']].get_fields())
   _properties.update(dict([(_property['name'], _property['value']) for _property in properties]))
 
+  if node['widgetType'] == 'spark-widget':
+    _properties['files'] = [{'value': _properties['files']}]
+
   if copied_properties:
     _properties.update(copied_properties)
 
