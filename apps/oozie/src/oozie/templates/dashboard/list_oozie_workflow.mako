@@ -69,11 +69,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           % if parameters and len(parameters) <= 15:
             <li class="nav-header">${ _('Variables') }</li>
             % for var, value in parameters.iteritems():
-                % if utils.is_linkable(var, str(value)):
+                % if utils.is_linkable(var, unicode(value)):
                   <li rel="tooltip" title="${ var } : ${ str(value) }">
                     <a href="${ utils.hdfs_link_js(str(value)) }"><i class="fa fa-eye"></i> <span class="variable hide">${ var }</span></a>
                 % else:
-                  <li rel="tooltip" title="${ var } : ${ str(value) }" class="white">
+                  <li rel="tooltip" title="${ var } : ${ unicode(value) }" class="white">
                     <i class="fa fa-eye"></i> <span class="variable">${ var }</span>
                 % endif
                   </li>
