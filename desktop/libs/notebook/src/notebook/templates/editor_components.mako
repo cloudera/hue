@@ -1969,7 +1969,7 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="snippet-result-controls">
   <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
-      <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); huePubSub.publish('redraw.fixed.headers'); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
+      <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); huePubSub.publish('redraw.fixed.headers'); huePubSub.publish('table.extender.redraw'); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
         <i class="fa fa-fw fa-th"></i>
       </a>
     </div>
