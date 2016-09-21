@@ -1493,6 +1493,7 @@
           ui.offset.top = 0;
           ui.position.top = 0;
           $.totalStorage('hue.editor.editor.size', $target.height());
+          huePubSub.publish('redraw.fixed.headers');
           $(document).trigger("editorSizeChanged");
         }
       });

@@ -230,12 +230,7 @@ from desktop.views import _ko
               lastOffset.top = Math.min(Math.max(lastOffset.top, 10), $(window).height() - $popover.outerHeight());
               self.popoverTop(lastOffset.top);
               self.popoverLeft(lastOffset.left);
-              var $t = $('.samples-table');
-              if ($t.data('plugin_jHueTableExtender')) {
-                $t.data('plugin_jHueTableExtender').drawHeader();
-                $t.data('plugin_jHueTableExtender').drawFirstColumn();
-              }
-              $t.parents('.dataTables_wrapper').getNiceScroll().resize();
+              $('.samples-table').parents('.dataTables_wrapper').getNiceScroll().resize();
               if (self.popoverArrowTop() < 80) {
                 $popover.hide();
               } else {
@@ -264,6 +259,9 @@ from desktop.views import _ko
         });
 
         self.toggleStats = function (data, event) {
+          if($statsContainer.find('.samples-table').data('plugin_jHueTableExtender2')) {
+            $statsContainer.find('.samples-table').data('plugin_jHueTableExtender2').destroy();
+          };
           $statsContainer.empty();
           if (self.analysisStats()) {
             self.analysisStats(null);
@@ -280,14 +278,14 @@ from desktop.views import _ko
             }));
 
             var $popover = $('<div>');
-            $statsContainer.append($popover)
+            $statsContainer.append($popover);
 
             ko.renderTemplate('stats-popover', self, {
               afterRender: function(renderedElement) {
-
-                huePubSub.subscribe('sample.rendered', function (data) {
+                var subscription = huePubSub.subscribe('sample.rendered', function (data) {
                   window.setTimeout(function () {
-                    var $t = $('.samples-table');
+                    subscription.remove();
+                    var $t = $statsContainer.find('.samples-table');
                     if ($t.parent().hasClass('dataTables_wrapper')) {
                       if ($t.parent().data('scrollFnDt')) {
                         $t.parent().off('scroll', $t.parent().data('scrollFnDt'));
@@ -314,15 +312,16 @@ from desktop.views import _ko
                     });
 
                     $t.parents('.dataTables_wrapper').height(350);
-                    $t.jHueTableExtender({
+                    $t.jHueTableExtender2({
                       fixedHeader: true,
-                      fixedFirstColumn: true,
+                      fixedFirstColumn: false,
                       fixedFirstColumnTopMargin: -1,
                       headerSorting: false,
                       includeNavigator: false,
+                      mainScrollable: '.sample-scroll',
                       parentId: 'sampleTab',
-                      classToRemove: 'samples-table',
-                      clonedContainerPosition: 'fixed'
+                      disableTopPosition: true,
+                      classToRemove: 'samples-table'
                     });
 
                     $t.parents('.dataTables_wrapper').niceScroll({
