@@ -1172,6 +1172,14 @@ ${ sqlContextPopover.sqlContextPopover() }
 
 <script type="text/javascript" charset="utf-8">
 
+  function list_tags() {
+    $.post("${ url('metadata:list_tags') }", { // '/metadata/api/navigator/list_tags/'
+      // prefix: 'bla'
+    }, function(data) {
+      console.log(JSON.stringify(data));
+    });
+  }
+
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
     $(rawDatum.counts).each(function (cnt, item) {

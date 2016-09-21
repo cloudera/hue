@@ -86,6 +86,24 @@ def search_entities(request):
 
 
 @error_handler
+def list_tags(request):
+  api = NavigatorApi()
+
+  prefix = request.POST.get('prefix')
+  offset = request.POST.get('offset', 0)
+  limit = request.POST.get('limit', 100)
+
+  data = api.search_entities_interactive(facetFields=['tags'], facetPrefix=prefix, limit=0, offset=offset)
+
+  response = {
+    'tags': data['facets']['tags'],
+    'status': 0
+  }
+
+  return JsonResponse(response)
+
+
+@error_handler
 def find_entity(request):
   response = {'status': -1}
 
