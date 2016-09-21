@@ -178,8 +178,7 @@ class NavigatorApi(object):
     try:
       # TODO: Check permissions of entity
       data = json.dumps(metadata)
-      return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, allow_redirects=True,
-                            clear_cookies=True)
+      return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, allow_redirects=True, clear_cookies=True)
     except RestException, e:
       msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
       LOG.exception(msg)
