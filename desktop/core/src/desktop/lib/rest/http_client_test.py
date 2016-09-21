@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from requests.exceptions import HTTPError
 from requests import Response
+from requests.exceptions import HTTPError
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_false, assert_true
 
-from desktop.lib.rest.http_client import RestException
+from desktop.lib.rest.http_client import RestException, HttpClient
 
 
 def build_response(reason=None, status_code=200, headers={}):
@@ -31,7 +31,34 @@ def build_response(reason=None, status_code=200, headers={}):
 
 
 def test_http_error_rest_exception():
-  headers ={'my header': 'one value'}
+  headers = {'my header': 'one value'}
   response = build_response('Not found', 404, headers)
   exception = RestException(HTTPError(response=response))
   assert_equal(headers, exception._headers)
+
+
+class MockedSession():
+
+  def __init__(self, cookies=None):
+    self.cookies = cookies or {}
+
+  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False):
+    return MockedResponse()
+
+
+class MockedResponse():
+  def __init__(self, status_code=200, cookies=None):
+    self.status_code = status_code
+    self.cookies = cookies
+
+
+def test_clear_cookies():
+
+  client = HttpClient('gethue')
+  client._session = MockedSession({'hue': 'rocks'})
+
+  client.execute('put', '/path')
+  assert_true(client._session.cookies)
+
+  client.execute('put', '/path', clear_cookies=True)
+  assert_false(client._session.cookies)

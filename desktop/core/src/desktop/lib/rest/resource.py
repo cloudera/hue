@@ -63,8 +63,7 @@ class Resource(object):
     else:
       return resp.content
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False,
-             clear_cookies=False):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
