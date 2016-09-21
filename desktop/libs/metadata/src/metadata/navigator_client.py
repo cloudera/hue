@@ -20,14 +20,15 @@ import json
 import logging
 import re
 
-from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
+from desktop.lib.rest.http_client import HttpClient, RestException
 
 from hadoop.conf import HDFS_CLUSTERS
 
 from metadata.conf import NAVIGATOR
 
 
+_JSON_CONTENT_TYPE = 'application/json'
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'
 
@@ -57,7 +58,7 @@ class NavigatorApi(object):
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
-    self._root = resource.Resource(self._client)
+    self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
     self.__headers = {}
     self.__params = ()
@@ -65,13 +66,12 @@ class NavigatorApi(object):
 
   def search_entities(self, query_s, limit=100, offset=0, **filters):
     """
-    GET /api/v3/entities?query=()
-    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
+    Solr edismax query parser syntax.
+
     :param query_s: a query string of search terms (e.g. - sales quarterly);
       Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist
       of search_fields.
       TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
-    :param filters: TODO: IMPLEMENT ME, required to support property search
     """
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
     entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'OPERATION')
@@ -108,6 +108,36 @@ class NavigatorApi(object):
       return response
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % query_s
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
+
+  def search_entities_interactive(self, query=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None):
+    try:
+      pagination = {
+        'offset': offset,
+        'limit': limit,
+      }
+
+      body = {'query': query or '*'}
+
+      if facetFields is not None:
+        body['facetFields'] = facetFields
+      if facetPrefix is not None:
+        body['facetPrefix'] = facetPrefix
+      if facetRanges is not None:
+        body['facetRanges'] = query
+      if filterQueries is not None:
+        body['filterQueries'] = query
+      if firstClassEntitiesOnly is not None:
+        body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
+
+      print json.dumps(body)
+      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=json.dumps(body), contenttype=_JSON_CONTENT_TYPE)
+
+      return response
+    except RestException, e:
+      msg = 'Failed to search for entities with search query: %s' % body
       LOG.exception(msg)
       raise NavigatorApiException(msg)
 
