@@ -60,7 +60,7 @@
       firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
       for (thi = 0; thi < self.thMapping.length; thi++) {
         th = self.thMapping[thi];
-        if (!th.visible) {
+        if (!th.original.is(':visible')) {
           continue;
         }
         leftPosition = th.clone.position().left - firstCellWidth;
@@ -129,7 +129,7 @@
       }
       for (thi = 0; thi < self.thMapping.length; thi++) {
         th = self.thMapping[thi];
-        if (!th.visible) {
+        if (!th.original.is(':visible')) {
           continue;
         }
         if (th.clone.lastWidth !== th.original.width()) {
@@ -282,25 +282,21 @@
     var totalThWidth = 0;
     self.$element.find("thead>tr th").each(function (i) {
       var originalTh = $(this);
-      var visible = originalTh.is(':visible');
       originalTh.removeAttr("data-bind");
       var clonedTh = $(clonedThs[i]).css("background-color", "#FFFFFF");
-      if (visible) {
-        clonedTh.click(function () {
-          originalTh.click();
-          if (self.options.headerSorting) {
-            clonedThs.attr("class", "sorting");
-          }
-          $(this).attr("class", originalTh.attr("class"));
-        });
-      }
+      clonedTh.click(function () {
+        originalTh.click();
+        if (self.options.headerSorting) {
+          clonedThs.attr("class", "sorting");
+        }
+        $(this).attr("class", originalTh.attr("class"));
+      });
       clonedTh.width(originalTh.width());
       totalThWidth += originalTh.width();
       self.thMapping.push({
         original: originalTh,
         clone: clonedTh,
-        cloneSpan: clonedTh.children().first(),
-        visible: visible
+        cloneSpan: clonedTh.children().first()
       })
     });
 
@@ -314,7 +310,7 @@
       topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
     }
     var headerRowContainer = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainer")
-        .addClass("jHueTableExtenderClonedContainer").width(totalThWidth).css("overflow-x", "hidden")
+        .addClass("jHueTableExtenderClonedContainer").width(totalThWidth).css("overflow-x", "hidden");
     if (!self.options.disableTopPosition) {
       headerRowContainer.css("top", topPosition + "px");
     }
@@ -328,6 +324,7 @@
     headerRowContainer.scrollLeft(self.$parent.scrollLeft());
 
     self.headerRowContainer = headerRowContainer;
+    self.$mainScrollable.trigger('scroll');
   };
 
   Plugin.prototype.drawFirstColumn = function () {
