@@ -141,7 +141,7 @@
         <tr>
           <td>${ name }</td>
           <td>
-            ${ guess_hdfs_link(name, str(value)) }
+            ${ guess_hdfs_link(name, unicode(value)) }
           </td>
         </tr>
       % endfor
