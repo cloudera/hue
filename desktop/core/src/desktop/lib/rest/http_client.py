@@ -158,11 +158,12 @@ class HttpClient(object):
     if files:
       request_kwargs['files'] = files
 
+    if self._cookies and not clear_cookies:
+      request_kwargs['cookies'] = self._cookies
+
     if clear_cookies:
       self._session.cookies.clear()
 
-    if self._cookies:
-      request_kwargs['cookies'] = self._cookies
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
       if resp.status_code >= 300:
