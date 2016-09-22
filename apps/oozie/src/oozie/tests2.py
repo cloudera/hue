@@ -745,7 +745,7 @@ class TestExternalWorkflowGraph():
     </workflow-app>
     """
 
-    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+    workflow_data = Workflow.gen_workflow_data_from_xml('test', self.wf)
 
     assert_true(len(workflow_data['layout'][0]['rows']) == 10)
     assert_true(len(workflow_data['workflow']['nodes']) == 10)
