@@ -225,6 +225,29 @@ from metadata.conf import has_navigator
       color: #737373;
       text-align: center;
     }
+
+    .context-sample th {
+      border-right: 1px solid #e5e5e5;
+    }
+
+    .context-sample td {
+      border-right: 1px solid #e5e5e5;
+      white-space: nowrap;
+    }
+
+    .context-sample .fixed-first-column {
+      margin-top: -1px;
+    }
+
+    .context-sample .fixed-header-row {
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .context-sample .fixed-first-cell {
+      border-right: 1px solid #e5e5e5;
+      margin-top: -1px;
+      margin-left: -1px;
+    }
   </style>
 
   <script type="text/html" id="sql-context-footer">
@@ -256,7 +279,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="sql-context-table-and-column-sample">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData">
-      <div class="sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
+      <div class="context-sample sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
         <!-- ko if: rows.length == 0 -->
         <div class="alert">${ _('The selected table has no data.') }</div>
         <!-- /ko -->
@@ -476,7 +499,7 @@ from metadata.conf import has_navigator
       };
 
       var hideOnClickOutside = function (event) {
-        if (!$.contains($('#sqlContextPopover')[0], event.target)) {
+        if (jQuery.contains(document, event.target) && !$.contains($('#sqlContextPopover')[0], event.target)) {
           hidePopover();
         }
       };
@@ -696,12 +719,13 @@ from metadata.conf import has_navigator
 
           $t.jHueTableExtender2({
             fixedHeader: true,
-            fixedFirstColumn: false,
-            fixedFirstColumnTopMargin: -1,
+            fixedFirstColumn: true,
+            fixedFirstColumnTopMargin: -2,
             headerSorting: false,
             includeNavigator: false,
             parentId: 'sampleTab',
-            classToRemove: 'samples-table'
+            noSort: true,
+            mainScrollable: '.sample-scroll > .dataTables_wrapper'
           });
 
           huePubSub.subscribeOnce('sql.context.popover.dispose', function () {

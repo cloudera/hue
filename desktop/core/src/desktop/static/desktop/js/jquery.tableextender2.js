@@ -49,13 +49,16 @@
     self.$mainScrollable = $(self.options.mainScrollable);
     self.lastHeaderWidth = 0;
 
-    self.drawHeader(); // Sets self.headerRowContainer
+    self.drawHeader(); // Sets self.headerRowContainer, self.thMapping
     self.drawFirstColumn(); // Sets self.firstColumnInner, self.firstColumnTopCell and self.firstColumn
     self.drawLockedRows();
 
-    var isFireFox = navigator.userAgent.toLowerCase().indexOf("firefox") > 0;
+    var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > 0;
+    var manyColumns = self.thMapping.length > 20;
 
-    var firstCellWidth, leftPosition, th, thi;
+    var sortAdjustment = self.options.noSort ? 10 : 20; // 20 is the sorting css width
+
+    var firstCellWidth, leftPosition, th, thi, leftPadding;
     var throttledHeaderPadding = function () {
       firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
       for (thi = 0; thi < self.thMapping.length; thi++) {
@@ -65,9 +68,12 @@
         }
         leftPosition = th.clone.position().left - firstCellWidth;
         if (leftPosition + th.clone.outerWidth() > 0 && leftPosition < 0) {
-          if (th.cloneSpan.width() - leftPosition < th.clone.outerWidth() - 20) { // 20 is the sorting css width
-            th.cloneSpan.css('paddingLeft', -leftPosition);
+          if (th.cloneSpan.width() - leftPosition < th.clone.outerWidth() - sortAdjustment) {
+            leftPadding = -leftPosition;
+          } else {
+            leftPadding = th.clone.outerWidth() - sortAdjustment - th.cloneSpan.width();
           }
+          th.cloneSpan.css('paddingLeft', leftPadding);
         } else {
           th.cloneSpan.css('paddingLeft', 0);
         }
@@ -77,8 +83,12 @@
     var scrollTimeout = -1;
     var headerScroll = function () {
       self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
-      window.clearTimeout(scrollTimeout);
-      scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+      if (isFirefox || manyColumns) {
+        window.clearTimeout(scrollTimeout);
+        scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+      } else {
+        throttledHeaderPadding();
+      }
     };
     self.$parent.on('scroll', headerScroll);
     self.disposeFunctions.push(function () {
@@ -155,7 +165,7 @@
       } else {
         self.$parent.find('.selected').removeClass('selected');
         $(this).addClass('selected');
-        self.$parent.find('.jHueTableExtenderClonedContainerColumn table tbody tr:eq(' + $(this).index() + ')').addClass('selected');
+        self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ')').addClass('selected');
       }
     };
     self.$parent.on('click dblclick', 'table tbody tr', clickHandler);
@@ -175,7 +185,7 @@
     if (!self.options.disableTopPosition) {
       self.repositionHeader();
       var scrollFunction;
-      if (isFireFox) {
+      if (isFirefox) {
         var ffThrottle = -1;
         var throttledPositionClones = function () {
           window.clearTimeout(ffThrottle);
@@ -234,6 +244,7 @@
     }
     var pos = self.options.stickToTopPosition;
     var topPos = 0;
+    var firstColTopPos = 0;
     if (typeof pos === 'function'){
       pos = pos();
     }
@@ -243,16 +254,24 @@
       } else {
         topPos = self.$element.offset().top;
       }
-      self.firstColumn.css("top", self.$element.offset().top + "px");
+      firstColTopPos = self.$element.offset().top;
     } else if (self.options.clonedContainerPosition == 'absolute') {
       topPos = self.$parent.position().top;
-      self.firstColumn.css("top", topPos + "px");
+      firstColTopPos = topPos;
     } else {
       topPos = self.$parent.offset().top;
-      self.firstColumn.css("top", topPos + "px");
+      firstColTopPos = topPos;
     }
-    self.headerRowContainer.css("top", topPos + "px");
-    self.firstColumnTopCell.css("top", topPos + "px");
+    self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
+    if (self.lastFirstColTop !== firstColTopPos) {
+      self.lastFirstColTop = firstColTopPos;
+      self.firstColumn.css("top", firstColTopPos + "px");
+    }
+    if (self.lastTopPos !== topPos) {
+      self.lastTopPos = topPos;
+      self.headerRowContainer.css("top", topPos + "px");
+      self.firstColumnTopCell.css("top", topPos + "px");
+    }
   };
 
   Plugin.prototype.drawHeader = function () {
@@ -310,7 +329,7 @@
       topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
     }
     var headerRowContainer = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainer")
-        .addClass("jHueTableExtenderClonedContainer").width(totalThWidth).css("overflow-x", "hidden");
+        .addClass("fixed-header-row").width(totalThWidth).css("overflow-x", "hidden");
     if (!self.options.disableTopPosition) {
       headerRowContainer.css("top", topPosition + "px");
     }
@@ -368,7 +387,7 @@
 
     clonedCell.appendTo(clonedCellContainer);
 
-    var firstColumnTopCell = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerCell").addClass("jHueTableExtenderClonedContainerCell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
+    var firstColumnTopCell = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerCell").addClass("fixed-first-cell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
     firstColumnTopCell.css("position", self.options.clonedContainerPosition || "fixed");
 
     clonedCellContainer.appendTo(firstColumnTopCell);
@@ -411,7 +430,7 @@
     var firstColumnInner = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(self.$parent.get(0).scrollHeight);
     clonedTable.appendTo(firstColumnInner);
 
-    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("jHueTableExtenderClonedContainerColumn").width(originalTh.outerWidth()).height(self.$parent.height()).css("overflow", "hidden").css("top", topPosition + "px");
+    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("overflow", "hidden").css("top", topPosition + "px");
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
