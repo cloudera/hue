@@ -151,6 +151,21 @@ def find_entity(request):
 
 
 @error_handler
+def suggest(request):
+  response = {'status': -1}
+
+  api = NavigatorApi()
+  prefix = request.POST.get('prefix')
+
+  suggest = api.suggest(prefix)
+
+  response['suggest'] = suggest
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@error_handler
 def get_entity(request):
   response = {'status': -1}
 
