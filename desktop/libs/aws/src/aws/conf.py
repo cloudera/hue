@@ -73,7 +73,13 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         default=None,
         private=True,
         type=coerce_password_from_script,
-        help=_("Execute this script to produce the AWS secret access key.")),
+        help=_("Execute this script to produce the AWS secret access key.")
+      ),
+      SECURITY_TOKEN=Config(
+        key='security_token',
+        type=str,
+        private=True,
+      ),
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
         help='Allow to use environment sources of credentials (environment variables, EC2 profile).',
         key='allow_environment_credentials',
