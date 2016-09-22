@@ -25,9 +25,11 @@ HTTP_SOCKET_TIMEOUT_S = 60
 
 
 class Client(object):
-  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, region=None, timeout=HTTP_SOCKET_TIMEOUT_S):
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_security_token=None, region=None,
+               timeout=HTTP_SOCKET_TIMEOUT_S):
     self._access_key_id = aws_access_key_id
     self._secret_access_key = aws_secret_access_key
+    self._security_token = aws_security_token
     self._region = region.lower() if region else get_default_region()
     self._timeout = timeout
 
@@ -38,6 +40,7 @@ class Client(object):
   def from_config(cls, conf):
     access_key_id = conf.ACCESS_KEY_ID.get()
     secret_access_key = conf.SECRET_ACCESS_KEY.get()
+    security_token = conf.SECURITY_TOKEN.get()
     env_cred_allowed = conf.ALLOW_ENVIRONMENT_CREDENTIALS.get()
 
     if None in (access_key_id, secret_access_key) and not env_cred_allowed:
@@ -46,13 +49,15 @@ class Client(object):
     return cls(
       aws_access_key_id=access_key_id,
       aws_secret_access_key=secret_access_key,
+      aws_security_token=security_token,
       region=conf.REGION.get()
     )
 
   def get_s3_connection(self):
     connection = boto.s3.connect_to_region(self._region,
                                            aws_access_key_id=self._access_key_id,
-                                           aws_secret_access_key=self._secret_access_key)
+                                           aws_secret_access_key=self._secret_access_key,
+                                           security_token=self._security_token)
     if connection is None:
       raise ValueError('Can not construct S3 Connection for region %s' % self._region)
     return connection
