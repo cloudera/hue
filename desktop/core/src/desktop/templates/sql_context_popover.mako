@@ -686,6 +686,11 @@ from metadata.conf import has_navigator
         }));
       }
 
+      TableAndColumnContextTabs.prototype.refetchSamples = function () {
+        var self = this;
+        self.sample.fetch(self.initializeSamplesTable);
+      };
+
       TableAndColumnContextTabs.prototype.initializeSamplesTable = function (data) {
         window.setTimeout(function () {
           var $t = $('.samples-table');
@@ -1008,8 +1013,14 @@ from metadata.conf import has_navigator
 
       SqlContextPopoverViewModel.prototype.pin = function () {
         var self = this;
-        huePubSub.publish('sql.context.pin', self);
         hidePopover();
+        if (typeof self.contents.sample !== 'undefined') {
+          self.contents.sample.fetchedData(undefined);
+        }
+        huePubSub.publish('sql.context.pin', self);
+        if (self.contents.activeTab() === 'sample') {
+          self.contents.refetchSamples();
+        }
       };
 
       SqlContextPopoverViewModel.prototype.dispose = function () {
@@ -1037,7 +1048,6 @@ from metadata.conf import has_navigator
 
       function SqlColumnsTable(params) {
         var self = this;
-
         var columns = params.columns;
 
         self.searchInput = ko.observable('');
