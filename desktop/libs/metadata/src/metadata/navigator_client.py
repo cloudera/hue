@@ -126,9 +126,9 @@ class NavigatorApi(object):
       if facetPrefix is not None:
         body['facetPrefix'] = facetPrefix
       if facetRanges is not None:
-        body['facetRanges'] = query
+        body['facetRanges'] = facetRanges
       if filterQueries is not None:
-        body['filterQueries'] = query
+        body['filterQueries'] = filterQueries
       if firstClassEntitiesOnly is not None:
         body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 

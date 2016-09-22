@@ -115,6 +115,20 @@ class TestNavigatorApi(object):
     assert_equal(entity['properties'], json_resp['entity']['properties'])
 
 
+  def test_search_entities_interactive(self):
+    resp = self.client.post(reverse('metadata:list_tags'), self._format_json_body({'prefix': 'hue'}))
+    json_resp = json.loads(resp.content)
+    assert_true('tags' in json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+
+
+  def test_suggest(self):
+    resp = self.client.post(reverse('metadata:suggest'), self._format_json_body({'prefix': 'hue'}))
+    json_resp = json.loads(resp.content)
+    assert_true('prefix' in json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+
+
   def test_lineage(self):
     # TODO: write me
     pass
