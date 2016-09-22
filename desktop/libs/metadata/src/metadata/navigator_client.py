@@ -132,12 +132,20 @@ class NavigatorApi(object):
       if firstClassEntitiesOnly is not None:
         body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 
-      print json.dumps(body)
       response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=json.dumps(body), contenttype=_JSON_CONTENT_TYPE)
 
       return response
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % body
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
+
+
+  def suggest(self, prefix=None):
+    try:
+      return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
+    except RestException, e:
+      msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.exception(msg)
       raise NavigatorApiException(msg)
 
