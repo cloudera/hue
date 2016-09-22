@@ -1180,6 +1180,14 @@ ${ sqlContextPopover.sqlContextPopover() }
     });
   }
 
+  function suggest() {
+    $.post("${ url('metadata:suggest') }", { // '/metadata/api/navigator/suggest/'
+      prefix: 'blah'
+    }, function(data) {
+      console.log(JSON.stringify(data));
+    });
+  }
+
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
     $(rawDatum.counts).each(function (cnt, item) {
