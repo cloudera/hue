@@ -1528,7 +1528,7 @@
 
   [[navigator]]
     # For tagging tables, files and getting lineage of data.
-    # Navigator API URL with version (without version suffix)
+    # Navigator API URL (without version suffix)
     ## api_url=http://localhost:7187/api
 
     # Navigator API HTTP authentication username and password
@@ -1536,3 +1536,6 @@
     # e.g. Used for LDAP/PAM pass-through authentication.
     ## auth_username=hue
     ## auth_password=
+
+    # Execute this script to produce the auth password. This will be used when `auth_password` is not set.
+    ## auth_password_script=
