@@ -35,6 +35,7 @@ def get_auth_password():
     return password
   return DEFAULT_AUTH_PASSWORD.get()
 
+
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
   return get_config_root()
@@ -49,11 +50,14 @@ def default_navigator_url():
 def get_optimizer_url():
   return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
 
+
 def has_optimizer():
   return bool(get_optimizer_url())
 
+
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
+
 
 def has_navigator():
   return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get())

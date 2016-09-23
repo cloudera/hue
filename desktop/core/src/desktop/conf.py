@@ -30,6 +30,11 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
+from metadata.metadata_sites import get_navigator_server_url, get_navigator_audit_log_dir, \
+                                    get_navigator_audit_max_file_size
+
+
+LOG = logging.getLogger(__name__)
 
 
 def coerce_database(database):
@@ -1144,18 +1149,19 @@ MEMORY_PROFILER = Config(
   type=coerce_bool,
   default=False)
 
+
 AUDIT_EVENT_LOG_DIR = Config(
   key="audit_event_log_dir",
   help=_("The directory where to store the auditing logs. Auditing is disable if the value is empty."),
   type=str,
-  default=""
+  dynamic_default=get_navigator_audit_log_dir
 )
 
 AUDIT_LOG_MAX_FILE_SIZE = Config(
   key="audit_log_max_file_size",
   help=_("Size in KB/MB/GB for audit log to rollover."),
   type=str,
-  default="100MB"
+  dynamic_default=get_navigator_audit_max_file_size
 )
 
 DJANGO_SERVER_EMAIL = Config(
@@ -1247,7 +1253,6 @@ def validate_database():
 
   from django.db import connection
 
-  LOG = logging.getLogger(__name__)
   res = []
 
   if connection.vendor == 'mysql':
