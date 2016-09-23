@@ -539,7 +539,7 @@
       }
     });
 
-    function prepopulateChart() {
+    function prepopulateChart(newValue) {
       var type = self.chartType();
       if (type === ko.HUE_CHARTS.TYPES.MAP && self.chartMapLabel() === null && self.chartX() === null && self.result.cleanedNumericMeta().length === 2) {
         self.chartX(self.result.cleanedNumericMeta()[0].name);
@@ -556,6 +556,8 @@
       } else if (self.chartYSingle() === null && self.result.cleanedNumericMeta().length === 2 && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART)) {
         self.chartYSingle(self.result.cleanedNumericMeta()[1].name);
       }
+
+      logGA('chart/' + newValue);
     }
 
     self.showChart.subscribe(function (val) {
