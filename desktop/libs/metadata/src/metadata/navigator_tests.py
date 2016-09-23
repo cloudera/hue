@@ -94,7 +94,7 @@ class TestNavigatorApi(object):
     resp = self.client.post(reverse('metadata:delete_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(entity['tags'] , json_resp['entity']['tags'])
+    assert_equal(entity['tags'], json_resp['entity']['tags'])
 
 
   def test_api_properties(self):
@@ -125,7 +125,7 @@ class TestNavigatorApi(object):
   def test_suggest(self):
     resp = self.client.post(reverse('metadata:suggest'), self._format_json_body({'prefix': 'hue'}))
     json_resp = json.loads(resp.content)
-    assert_true('prefix' in json_resp)
+    assert_true('suggest' in json_resp)
     assert_equal(0, json_resp['status'], json_resp)
 
 
