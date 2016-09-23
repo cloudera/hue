@@ -531,6 +531,14 @@
             $.jHueNotify.error(err.message);
           }
         }
+
+        var previousMarkerLayer = $(element).data('_markerLayer');
+        if (previousMarkerLayer) {
+          window.setTimeout(function () {
+            previousMarkerLayer.removeLayers(previousMarkerLayer.getLayers());
+          }, 0);
+        }
+
         $(element).data('_map', _map);
         $(element).data('_markerLayer', _clusterGroup);
         if (_options.onComplete != null) {
