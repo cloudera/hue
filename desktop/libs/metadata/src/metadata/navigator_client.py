@@ -74,12 +74,14 @@ class NavigatorApi(object):
       TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
     """
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
-    entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION')
+    entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
 
     sources = filters.get('sources', [])
 
     if 'hive' in sources or 'impala' in sources:
       entity_types = ('TABLE', 'VIEW') # 'DATABASE', 'PARTITION', 'FIELD'
+    elif 'hdfs' in sources:
+      entity_types = ('FILE', 'DIRECTORY')
 
     try:
       params = self.__params

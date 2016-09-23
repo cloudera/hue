@@ -500,7 +500,7 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/html" id="assist-db-inner-panel">
+  <script type="text/html" id="assist-hive-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
         <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
@@ -596,6 +596,9 @@ from metadata.conf import has_navigator
         </div>
         <!-- /ko -->
       </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
     </div>
   </script>
 
@@ -830,6 +833,9 @@ from metadata.conf import has_navigator
     <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;">
       <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !searching() -->
+      <!-- ko if: searchResult().length == 0 -->
+        ${ _('No result found.') }
+      <!-- /ko -->
       <!-- ko foreach: searchResult -->
       <div class="result-entry">
         <div class="icon-col">
@@ -1250,7 +1256,7 @@ from metadata.conf import has_navigator
             }, params.sql)),
             apiHelper: self.apiHelper,
             name: '${ _("SQL") }',
-            type: 'db',
+            type: 'hive',
             icon: 'fa-database',
             minHeight: 75
           })
@@ -1307,7 +1313,7 @@ from metadata.conf import has_navigator
           $.post('/metadata/api/navigator/search_entities', {
             query_s: self.searchInput(),
             limit: 25,
-            sources: ko.mapping.toJSON($.map(self.availablePanels[0].panelData.sources(), function(source) { return source.sourceType; })) // type empty for some reason, using name
+            sources: ko.mapping.toJSON([self.visiblePanel().type])
           })
           .done(function (data) {
             data.entities.forEach(function (entity) {
@@ -1339,6 +1345,12 @@ from metadata.conf import has_navigator
         };
 
         self.visiblePanel = ko.observable(self.availablePanels[0]);
+        self.visiblePanel.subscribe(function() {
+          if (self.navigatorEnabled()) {
+            lastQuery = 'refresh';
+            self.performSearch();
+          }
+        });
       }
 
       ko.components.register('assist-panel', {
