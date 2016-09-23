@@ -836,6 +836,9 @@ from metadata.conf import has_navigator
           <!-- ko if: type === 'FILE' -->
           <i class="fa fa-fw fa-file-o valign-middle"></i>
           <!-- /ko -->
+          <!-- ko if: type === 'VIEW' -->
+          <i class="fa fa-fw fa-eye valign-middle"></i>
+          <!-- /ko -->
           <!-- ko if: type === 'DIRECTORY' -->
           <i class="fa fa-fw fa-folder-o valign-middle"></i>
           <!-- /ko -->
@@ -874,7 +877,7 @@ from metadata.conf import has_navigator
           <!-- ko if: type === 'DATABASE' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
           <!-- /ko -->
-          <!-- ko if: type === 'TABLE' -->
+          <!-- ko if: type === 'TABLE' || type === 'VIEW' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
           <div class="doc-desc" data-bind="text: parentPath"></div>
           <!-- /ko -->
@@ -1303,6 +1306,7 @@ from metadata.conf import has_navigator
 
           $.post('/metadata/api/navigator/search_entities', {
             query_s: self.searchInput(),
+            limit: 25,
             sources: ko.mapping.toJSON($.map(self.availablePanels[0].panelData.sources(), function(source) { return source.sourceType; })) // type empty for some reason, using name
           })
           .done(function (data) {
