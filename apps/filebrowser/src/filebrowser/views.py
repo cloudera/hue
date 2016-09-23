@@ -140,9 +140,18 @@ def download(request, path):
     size = stats['size']
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime, size):
         return HttpResponseNotModified()
-        # TODO(philip): Ideally a with statement would protect from leaks,
-    # but tricky to do here.
+        # TODO(philip): Ideally a with statement would protect from leaks, but tricky to do here.
     fh = request.fs.open(path)
+
+    # Verify read permissions on file first
+    try:
+        request.fs.read(path, offset=0, length=1)
+    except WebHdfsException, e:
+        if e.code == 403:
+            raise PopupException(_('User %s is not authorized to download file at path "%s"') %
+                                 (request.user.username, path))
+        else:
+            raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
     response = HttpResponse(_file_reader(fh), content_type=content_type)
     response["Last-Modified"] = http_date(stats['mtime'])

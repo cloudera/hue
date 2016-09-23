@@ -809,6 +809,14 @@ alert("XSS")
     assert_equal(200, response.status_code)
     assert_equal('attachment', response['Content-Disposition'])
 
+    # Download fails and displays exception because of missing permissions
+    self.cluster.fs.chmod(prefix + '/xss', 0700)
+
+    not_me = make_logged_in_client("not_me", is_superuser=False)
+    grant_access("not_me", "not_me", "filebrowser")
+    response = not_me.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=True)
+    assert_true('User not_me is not authorized to download' in response.context['message'], response.context['message'])
+
 
   def test_edit_i18n(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
