@@ -2527,6 +2527,12 @@ ${ hueIcons.symbols() }
     return _data;
   }
 
+  // The leaflet map can freeze the browser with numbers outside the map
+  var MIN_LAT = -85;
+  var MAX_LAT = 85;
+  var MIN_LNG = -180;
+  var MAX_LNG = 180;
+
   function leafletMapChartDataTransformer(rawDatum) {
     var _data = [];
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
@@ -2547,8 +2553,8 @@ ${ hueIcons.symbols() }
       if (rawDatum.snippet.chartMapLabel() != null) {
         $(rawDatum.counts()).each(function (cnt, item) {
           _data.push({
-            lat: item[_idxLat],
-            lng: item[_idxLng],
+            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
+            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
             label: hueUtils.html2text(item[_idxLabel]),
             obj: item
           });
@@ -2556,8 +2562,8 @@ ${ hueIcons.symbols() }
       } else {
         $(rawDatum.counts()).each(function (cnt, item) {
           _data.push({
-            lat: item[_idxLat],
-            lng: item[_idxLng],
+            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
+            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
             obj: item
           });
         });

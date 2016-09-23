@@ -500,24 +500,20 @@
 
     function prepopulateChart() {
       var type = self.chartType();
-      if (self.result.cleanedMeta().length > 0) {
-        if (self.chartX() == null && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP)) {
-          self.chartX(self.result.cleanedMeta()[0].name);
-        }
-        if (self.chartMapLabel() == null && type == ko.HUE_CHARTS.TYPES.MAP) {
-          self.chartMapLabel(self.result.cleanedMeta()[0].name);
-        }
+      if (type === ko.HUE_CHARTS.TYPES.MAP && self.chartMapLabel() === null && self.chartX() === null && self.result.cleanedNumericMeta().length === 2) {
+        self.chartX(self.result.cleanedNumericMeta()[0].name);
+        self.chartMapLabel(self.result.cleanedNumericMeta()[1].name);
+        return;
       }
-      if (self.result.cleanedNumericMeta().length > 0) {
-        if (self.chartX() == null && type != ko.HUE_CHARTS.TYPES.BARCHART && type != ko.HUE_CHARTS.TYPES.PIECHART && type != ko.HUE_CHARTS.TYPES.GRADIENTMAP) {
-          self.chartX(self.result.cleanedNumericMeta()[0].name);
-        }
-        if (self.chartYMulti().length == 0 && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.LINECHART)) {
-          self.chartYMulti.push(self.result.cleanedNumericMeta()[0].name);
-        }
-        if (self.chartYSingle() == null && (type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.MAP || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP || type == ko.HUE_CHARTS.TYPES.SCATTERCHART)) {
-          self.chartYSingle(type == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? self.result.cleanedMeta()[0].name : self.result.cleanedNumericMeta()[0].name);
-        }
+
+      if (self.chartX() === null && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) && (self.result.cleanedNumericMeta().length === 1 || self.result.cleanedNumericMeta().length === 2)) {
+        self.chartX(self.result.cleanedNumericMeta()[0].name);
+      }
+
+      if (self.chartYMulti().length === 0 && self.result.cleanedNumericMeta().length === 2 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
+        self.chartYMulti.push(self.result.cleanedNumericMeta()[1].name);
+      } else if (self.chartYSingle() === null && self.result.cleanedNumericMeta().length === 2 && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART)) {
+        self.chartYSingle(self.result.cleanedNumericMeta()[1].name);
       }
     }
 
