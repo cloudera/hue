@@ -618,6 +618,11 @@ class HiveServerClient:
 
 
   def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
+    (res, session) = self.call_return_result_and_session(fn, req, status, withMultipleSession)
+    return res
+
+
+  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
     session = Session.objects.get_session(self.user, self.query_server['server_name'])
 
     if session is None:
@@ -647,7 +652,7 @@ class HiveServerClient:
         message = ''
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
     else:
-      return res
+      return (res, session)
 
 
   def close_session(self, sessionHandle):
@@ -791,13 +796,14 @@ class HiveServerClient:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
-    res = self.call(self._client.ExecuteStatement, req)
+    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
                                  guid=res.operationHandle.operationId.guid,
                                  operation_type=res.operationHandle.operationType,
                                  has_result_set=res.operationHandle.hasResultSet,
-                                 modified_row_count=res.operationHandle.modifiedRowCount)
+                                 modified_row_count=res.operationHandle.modifiedRowCount,
+                                 session_guid=session.guid)
 
 
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):

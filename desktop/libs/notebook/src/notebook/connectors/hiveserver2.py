@@ -240,6 +240,7 @@ class HS2Api(Api):
       'has_result_set': handle.has_result_set,
       'modified_row_count': handle.modified_row_count,
       'log_context': handle.log_context,
+      'session_guid': handle.session_guid
     }
     response.update(statement)
 
