@@ -194,7 +194,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
   type=str,
   default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net *.mathjax.org data:;"+
-          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org data:;"+
+          "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline';"+
           "connect-src 'self';"+
           "child-src 'self' data:;"+
