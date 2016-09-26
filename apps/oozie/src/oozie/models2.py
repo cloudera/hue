@@ -3496,7 +3496,7 @@ class WorkflowBuilder():
 
     for document in documents:
       if document.type == 'query-java':
-        node = self.get_java_document_node(document, name)
+        node = self.get_java_document_node(document)
       elif document.type == 'query-hive':
         node = self.get_hive_document_node(document, user)
       elif document.type == 'query-spark2':
