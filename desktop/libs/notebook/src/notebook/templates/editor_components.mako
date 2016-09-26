@@ -1046,8 +1046,10 @@ ${ hueIcons.symbols() }
     <ul class="nav nav-tabs">
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
-      <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-      <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Instances')}</a></li>
+      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
+        <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
+        <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Instances')}</a></li>
+      <!-- /ko -->
       % endif
     </ul>
 
@@ -1970,18 +1972,18 @@ ${ hueIcons.symbols() }
     </a>
 
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }">
-      <!-- ko if: $parent.isBatchable() && wasBatchExecuted() -->
+      <!-- ko if: isBatchable() && wasBatchExecuted() -->
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }">
         <i class="fa fa-fw fa-send"></i>
       </a>
       <!-- /ko -->
-      <!-- ko if: ! $parent.isBatchable() || ! wasBatchExecuted() -->
+      <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
         <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
       </a>
       <!-- /ko -->
       % if ENABLE_BATCH_EXECUTE.get():
-      <!-- ko if: $parent.isBatchable() && status() != 'running' && status() != 'loading' -->
+      <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' -->
         <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '', 'blue': currentQueryTab() == 'queryExplain' }">
           <i class="fa fa-caret-down"></i>
         </a>

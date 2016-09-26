@@ -252,6 +252,11 @@
     self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
     self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
 
+    self.isBatchable = ko.computed(function() {
+      return self.type() == 'hive'
+    	  || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
+    });
+
     // Ace stuff
     self.ace = ko.observable(null);
     self.errors = ko.observableArray([]);
@@ -278,7 +283,6 @@
     };
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
-
     self.availableDatabases = ko.observableArray();
 
     var updateDatabases = function () {
@@ -301,7 +305,6 @@
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
-
     self.pinnedContextTabs = ko.observableArray(typeof snippet.pinnedContextTabs != "undefined" && snippet.pinnedContextTabs != null ? snippet.pinnedContextTabs : []);
 
     huePubSub.subscribe('sql.context.pin', function (contextData) {
@@ -1369,9 +1372,10 @@
     self.schedulerViewModel = null;
     self.schedulerViewerViewModel = ko.observable();
     self.isBatchable = ko.computed(function() {
-      return $.grep(self.snippets(), function (snippet) {
-        return snippet.type() == 'hive' || snippet.interface() == 'oozie';
-      }).length == self.snippets().length;
+      return self.snippets().length > 0
+        && $.each(self.snippets(), function (index, snippet) {
+          return snippet.isBatchable();
+        }).length == self.snippets().length;
     });
 
     self.retryModalConfirm = null;
@@ -1792,7 +1796,7 @@
     };
 
     self.loadScheduler = function () {
-      if (typeof vm.CoordinatorEditorViewModel !== 'undefined') {
+      if (typeof vm.CoordinatorEditorViewModel !== 'undefined' && self.isBatchable()) {
         var _action;
         if (self.coordinatorUuid()) {
           _action = 'edit';
@@ -1830,21 +1834,23 @@
     };
 
     self.refreshSchedulerParameters = function() {
-      $.post("/oozie/editor/workflow/action/refresh_parameters/", {
-        uuid: self.coordinatorUuid()
-      }, function(data) {
-        if (data.status == 0) {
-          if (data.changed) {
-            self.schedulerViewModel.coordinator.refreshParameters()
+      if (self.isBatchable()) {
+        $.post("/oozie/editor/workflow/action/refresh_parameters/", {
+          uuid: self.coordinatorUuid()
+        }, function(data) {
+          if (data.status == 0) {
+            if (data.changed) {
+              self.schedulerViewModel.coordinator.refreshParameters()
+            }
+          } else {
+            $(document).trigger("error", data.message);
           }
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      });
+        });
+      }
     }
 
     self.saveScheduler = function() {
-      if (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty()) {
+      if (self.isBatchable() && (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())) {
         self.schedulerViewModel.coordinator.isManaged(true);
         self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
@@ -1979,9 +1985,15 @@
     });
 
     self.sqlSourceTypes = [];
+    self.availableLanguages = [];
 
     if (options.languages && options.snippetViewSettings) {
       $.each(options.languages, function (idx, language) {
+    	self.availableLanguages.push({
+          type: language.type,
+          name: language.name,
+          interface: language.interface,
+    	});
         var viewSettings = options.snippetViewSettings[language.type];
         if (viewSettings && viewSettings.sqlDialect) {
           self.sqlSourceTypes.push({
@@ -1992,8 +2004,9 @@
       });
     }
 
-    if (self.sqlSourceTypes.length > 0) {
-      self.activeSqlSourceType = self.sqlSourceTypes[0].type;
+    var sqlSourceTypes = $.grep(self.sqlSourceTypes, function(language) { return language.type == self.editorType(); });
+    if (sqlSourceTypes.length > 0) {
+      self.activeSqlSourceType = sqlSourceTypes[0].type;
     } else {
       self.activeSqlSourceType = null;
     }
@@ -2200,7 +2213,7 @@
       }, function (data) {
         self.loadNotebook(data.notebook);
         if (self.editorMode()) {
-          self.selectedNotebook().newSnippet();
+          self.selectedNotebook().newSnippet(self.editorType());
           huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
           if (window.location.getParameter('new') == '') {
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));

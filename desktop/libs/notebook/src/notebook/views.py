@@ -100,7 +100,7 @@ def editor(request):
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
       'options_json': json.dumps({
-          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
+          'languages': get_interpreters(request.user),
           'mode': 'editor',
           'is_optimizer_enabled': has_optimizer(),
           'is_navigator_enabled': has_navigator(),
@@ -124,7 +124,7 @@ def browse(request, database, table):
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
-          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
+          'languages': get_interpreters(request.user),
           'mode': 'editor',
           'editor_type': editor_type
       }),
