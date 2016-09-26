@@ -1107,19 +1107,17 @@ ${ hueIcons.symbols() }
     <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
     <!-- ko with: $root.selectedNotebook() -->
     <div class="tab-pane" id="scheduleTab">
+      <!-- ko if: isSaved() -->
+        <a data-bind="click: showSubmitPopup">${ _('Start') }</a></br>
+        </br>
+        <div id="schedulerEditor">
+          <div id="schedulerEditor"></div>
+        </div>
+      <!-- /ko -->
 
-        <!-- ko if: isSaved() -->
-          ${ _('Query was changed and needs to be saved.') }
-          <a data-bind="click: showSubmitPopup">${ _('Start') }</a></br>
-          </br>
-          <div id="schedulerEditor">
-            <div id="schedulerEditor"></div>
-          </div>
-        <!-- /ko -->
-
-        <!-- ko ifnot: isSaved() -->
-          ${ _('Query needs to be saved first.') }
-        <!-- /ko -->
+      <!-- ko ifnot: isSaved() -->
+        ${ _('Query needs to be saved first.') }
+      <!-- /ko -->
     </div>
     <!-- /ko -->
     <!-- /ko -->
