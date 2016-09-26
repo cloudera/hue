@@ -204,26 +204,16 @@ break;
 case 656:
 this.$ = { identifierChain: $$[$0-1].identifierChain, alias: $$[$0] };
 break;
-case 659:
-
-     addColumnLocation(parser.yy.lastIdentifierChainLocation, $$[$0]);
-   
-break;
-case 660:
-
-     // TODO: Add table/column locations for identifiers before *
-   
-break;
 case 662:
 
      this.$ = [$$[$0]];
-     parser.yy.lastIdentifierChainLocation = _$[$0];
+     addUnknownLocation(_$[$0], [$$[$0]]);
    
 break;
 case 663:
 
      $$[$0-2].push($$[$0]);
-     parser.yy.lastIdentifierChainLocation = _$[$0];
+     addColumnLocation(_$[$0], $$[$0-2].concat());
    
 break;
 case 664: case 672:
@@ -4213,6 +4203,31 @@ var commitLocations = function () {
       }
     }
 
+    if (location.type === 'unknown') {
+      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length === 1 && parser.yy.latestTablePrimaries) {
+        var found = parser.yy.latestTablePrimaries.filter(function (primary) {
+          return primary.alias === location.identifierChain[0].name || (primary.identifierChain && primary.identifierChain[0].name === location.identifierChain[0].name);
+        });
+        if (found.length > 0) {
+          location.type = 'table';
+          expandIdentifierChain(location, true);
+        } else {
+          if (parser.yy.subQueries) {
+            found = parser.yy.subQueries.filter(function (subQuery) {
+              return subQuery.alias === location.identifierChain[0].name;
+            });
+            if (found.length > 0) {
+              location.type = 'subQuery';
+              location.identifierChain = [{ subQuery: found[0].alias }];
+            }
+          }
+        }
+      }
+    }
+
+    if (location.type === 'unknown') {
+      location.type = 'column';
+    }
     if (location.type === 'column') {
       if (isHive() && !location.linked) {
         location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
@@ -4461,7 +4476,12 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
   // Impala can have references to maps or array, i.e. FROM table t, t.map m
   // We need to replace those in the identifierChain
   if (isImpala()) {
+    var lengthBefore = identifierChain.length;
     identifierChain = parser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+    // Change type of any locations marked as table
+    if (wrapper.type === 'table' && identifierChain.length > lengthBefore) {
+      wrapper.type = 'column';
+    }
     wrapper.identifierChain = identifierChain;
   }
   // Expand exploded views in the identifier chain
@@ -4922,6 +4942,14 @@ var addTableLocation = function (location, identifierChain) {
 var addColumnLocation = function (location, identifierChain) {
   parser.yy.locations.push({
     type: 'column',
+    location: adjustLocationForCursor(location),
+    identifierChain: identifierChain
+  });
+};
+
+var addUnknownLocation = function (location, identifierChain) {
+  parser.yy.locations.push({
+    type: 'unknown',
     location: adjustLocationForCursor(location),
     identifierChain: identifierChain
   });

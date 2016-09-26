@@ -2736,7 +2736,7 @@
       $.extend(editorOptions, aceOptions);
 
       if (window.Worker) {
-        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js');
+        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?version=1');
         var workerIsReady = false;
         var AceRange = ace.require('ace/range').Range;
         aceSqlWorker.onmessage = function(e) {
