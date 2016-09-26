@@ -2871,10 +2871,13 @@ define([
             expectedResult: {
               locations: [
                 { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayA'}, {name: 'item'}] },
+                { type: 'column', location: { first_line: 3, last_line: 3, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testTable2' },{ name: 'testArrayB' },{ name: 'item'}]},
                 { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, identifierChain: [{ name: 'testTable2' }]},
                 { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 22 }, function: 'explode'},
+                { type: 'table', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'testTable2' }]},
                 { type: 'column', location: { first_line: 6, last_line: 6, first_column: 28, last_column: 38 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayA'}] },
                 { type: 'function', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 22 }, function: 'explode'},
+                { type: 'table', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'testTable2' }]},
                 { type: 'column', location: { first_line: 7, last_line: 7, first_column: 28, last_column: 38 }, identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB'}] }
               ],
               suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB' }, { name: 'item' }] }] },
@@ -3095,8 +3098,9 @@ define([
           dialect: 'impala',
           expectedResult: {
             locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column :26}, identifierChain: [{ name: 'testTable' }]},
-              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testTable' }, { name: 'testMap'}] }
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10}, identifierChain: [{ name: 'testTable' },{ name: 'testMap' }]},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column :26}, identifierChain: [{ name: 'testTable' }]},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testTable' }, { name: 'testMap'}] }
             ],
             suggestKeywords: ['*'],
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] },
@@ -3110,15 +3114,11 @@ define([
           beforeCursor: 'SELECT tm.a',
           afterCursor: ' FROM testTable t, t.testMap tm;',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] },
-            locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column :27}, identifierChain: [{ name: 'testTable' }]},
-              {type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column :40}, identifierChain: [{ name: 'testTable' }, { name: 'testMap'}]}
-            ]
-
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] }
           }
         });
       });
@@ -3133,11 +3133,10 @@ define([
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }] },
             locations: [
-              // TODO: Add locations properly before *
-              // { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' }, { name: 'testArray'}]},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 27 }, identifierChain: [{ name: 'testTable' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 42 }, identifierChain: [{ name: 'testTable' }, { name: 'testArray'}]}
-            ]
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 42 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 54 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]}            ]
           }
         });
       });
@@ -3228,6 +3227,7 @@ define([
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, identifierChain: [{ name: 'testTable' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 37}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' }]},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 47}, identifierChain: [{ name: 'testTable' },{ name: 'testMap' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' },{ name: 'field' }]}
             ],
             lowerCase: false,
@@ -6037,9 +6037,12 @@ define([
           containsKeywords: ['CASE'],
           expectedResult: {
             locations: [
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 }, identifierChain: [{ name: 'testTable1' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, identifierChain: [{ name: 'testTable1' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 42, last_column: 52}, identifierChain: [{ name: 'testTable2' }]},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 62, last_column: 72 }, identifierChain: [{ name: 'testTable1' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 73, last_column: 84}, identifierChain: [{ name: 'testTable1' }, { name: 'testColumn1'}] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 87, last_column: 97 }, identifierChain: [{ name: 'testTable2' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 98, last_column: 109}, identifierChain: [{ name: 'testTable2' }, { name: 'testColumn3'}] }
             ],
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
@@ -6048,10 +6051,9 @@ define([
             lowerCase: false
           }
         });
-
       });
 
-    it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', function() {
+      it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
           afterCursor: '',
@@ -6791,6 +6793,7 @@ define([
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 41}, identifierChain: [{ name: 't1' }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 43, last_column: 45}, identifierChain: [{ name: 't2' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 74, last_column: 76}, identifierChain: [{ name: 't3' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 77, last_column: 80}, identifierChain: [{ name: 't3' }, { name: 'foo'}]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 86, last_column: 88}, identifierChain: [{ name: 't3' }] }
             ]

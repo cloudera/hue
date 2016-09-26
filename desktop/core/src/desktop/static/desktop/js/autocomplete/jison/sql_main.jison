@@ -857,13 +857,7 @@ LocalOrSchemaQualifiedName_EDIT
 
 ColumnReference
  : BasicIdentifierChain
-   {
-     addColumnLocation(parser.yy.lastIdentifierChainLocation, $1);
-   }
  | BasicIdentifierChain AnyDot '*'
-   {
-     // TODO: Add table/column locations for identifiers before *
-   }
  ;
 
 ColumnReference_EDIT
@@ -874,12 +868,12 @@ BasicIdentifierChain
  : ColumnIdentifier
    {
      $$ = [$1];
-     parser.yy.lastIdentifierChainLocation = @1;
+     addUnknownLocation(@1, [$1]);
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
      $1.push($3);
-     parser.yy.lastIdentifierChainLocation = @3;
+     addColumnLocation(@3, $1.concat());
    }
  ;
 
