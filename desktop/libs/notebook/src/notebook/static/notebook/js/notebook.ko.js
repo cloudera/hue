@@ -1368,6 +1368,11 @@
 
     self.schedulerViewModel = null;
     self.schedulerViewerViewModel = ko.observable();
+    self.isBatchable = ko.computed(function() {
+      return $.grep(self.snippets(), function (snippet) {
+        return snippet.type() == 'hive' || snippet.interface() == 'oozie';
+      }).length == self.snippets().length;
+    });
 
     self.retryModalConfirm = null;
     self.retryModalCancel = null;
