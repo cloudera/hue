@@ -1341,7 +1341,7 @@
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.snippets = ko.observableArray();
-    self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
+    self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     self.creatingSessionLocks = ko.observableArray();
     self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : [], {
       create: function(value) {
