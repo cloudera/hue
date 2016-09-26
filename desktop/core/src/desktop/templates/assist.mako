@@ -456,12 +456,12 @@ from metadata.conf import has_navigator
         </a>
         <!-- /ko -->
         <!-- ko ifnot: expandable -->
-        <span style="cursor: default;" class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
+        <div style="cursor: default;" class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
           <!-- ko if: definition.isView -->
           <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
           <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
-        </span>
+        </div>
         <!-- /ko -->
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
         <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
