@@ -254,7 +254,7 @@
 
     self.isBatchable = ko.computed(function() {
       return self.type() == 'hive'
-    	  || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
+          || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
     });
 
     // Ace stuff
@@ -1373,7 +1373,7 @@
     self.schedulerViewerViewModel = ko.observable();
     self.isBatchable = ko.computed(function() {
       return self.snippets().length > 0
-        && $.each(self.snippets(), function (index, snippet) {
+        && $.grep(self.snippets(), function (snippet) {
           return snippet.isBatchable();
         }).length == self.snippets().length;
     });
@@ -1989,11 +1989,11 @@
 
     if (options.languages && options.snippetViewSettings) {
       $.each(options.languages, function (idx, language) {
-    	self.availableLanguages.push({
+        self.availableLanguages.push({
           type: language.type,
           name: language.name,
           interface: language.interface,
-    	});
+        });
         var viewSettings = options.snippetViewSettings[language.type];
         if (viewSettings && viewSettings.sqlDialect) {
           self.sqlSourceTypes.push({

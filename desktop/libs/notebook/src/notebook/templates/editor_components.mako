@@ -1104,11 +1104,9 @@ ${ hueIcons.symbols() }
     </div>
 
     % if ENABLE_QUERY_SCHEDULING.get():
-    <!-- ko if: editorMode() -->
+    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
+    <!-- ko with: $root.selectedNotebook() -->
     <div class="tab-pane" id="scheduleTab">
-
-      <!-- ko if: $root.selectedNotebook() -->
-      <!-- ko with: $root.selectedNotebook() -->
 
         <!-- ko if: isSaved() -->
           ${ _('Query was changed and needs to be saved.') }
@@ -1122,15 +1120,14 @@ ${ hueIcons.symbols() }
         <!-- ko ifnot: isSaved() -->
           ${ _('Query needs to be saved first.') }
         <!-- /ko -->
-
-      <!-- /ko -->
-      <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <!-- /ko -->
 
+    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
+    <!-- ko with: $root.selectedNotebook() -->
     ## To move to 'notification' panel
     <div class="tab-pane" id="scheduledJobsTab">
-      <!-- ko if: $root.selectedNotebook() -->
-      <!-- ko with: $root.selectedNotebook() -->
       <!-- ko if: $root.selectedNotebook().isSaved() -->
         <a class="pointer" data-bind="click: viewScheduler">Refresh</a>
 
@@ -1172,9 +1169,10 @@ ${ hueIcons.symbols() }
         </div>
         <!-- /ko -->
       <!-- /ko -->
-      <!-- /ko -->
-      <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <!-- /ko -->
+
     <!-- /ko -->
     % endif
 
