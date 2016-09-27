@@ -237,10 +237,10 @@
     self.isDrawing = false;
 
     self.fnDraw = function (force) {
-      if (!self.isDrawing) {
+      var aoColumns = self.$table.data('aoColumns');
+      if (!self.isDrawing && aoColumns) {
         self.isDrawing = true;
         var $t = self.$table;
-        var aoColumns = self.$table.data('aoColumns');
         var data = self.$table.data('data');
         var appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
         var startCol = -1;
@@ -334,11 +334,19 @@
           }
           if ($t.data('scrollAnimate')) {
             $t.parent().animate({
-              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
+              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - ($t.data('scrollInPopover') ? 0 : $t.parent().offset().left) - 30
             }, 300, function () {
               $t.parent().trigger('scroll');
             });
-            $t.data('scrollAnimate', null);
+            if ($t.data('scrollLastColPosLeft') == null || $t.data('scrollLastColPosLeft') != colSel.position().left) {
+              $t.data('scrollLastColPosLeft', colSel.position().left);
+              $t.data('scrollLastParentLeft', $t.parent().scrollLeft());
+            }
+            else {
+              $t.data('scrollAnimate', null);
+              $t.data('scrollLastColPosLeft', null);
+              $t.data('scrollLastParentLeft', null);
+            }
           }
           if ($t.data('scrollToRow') == null) {
             colSel.addClass("columnSelected");

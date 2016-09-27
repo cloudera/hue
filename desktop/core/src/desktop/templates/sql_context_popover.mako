@@ -654,6 +654,7 @@ from metadata.conf import has_navigator
                 _t.data('scrollToCol', _col.index());
                 _t.data('scrollToRow', null);
                 _t.data('scrollAnimate', true);
+                _t.data('scrollInPopover', true);
                 _t.parent().trigger('scroll');
               });
             }
