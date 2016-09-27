@@ -4147,19 +4147,35 @@
           var tok = new Tokenizer(new Rules().getRules());
           var lines = value.split('\n');
 
+          var renderSimpleLine = function(txt, stringBuilder, tokens) {
+            var screenColumn = 0;
+            var token = tokens[0];
+            var value = token.value;
+            if (value) {
+              screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+            }
+            for (var i = 1; i < tokens.length; i++) {
+              token = tokens[i];
+              value = token.value;
+              try {
+                screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+              }
+              catch (e) {
+                if (console && console.warn) {
+                  console.warn(value, 'This token has some parsing errors and it has been rendered without highlighting.');
+                }
+                stringBuilder.push(value);
+                screenColumn = screenColumn + value.length;
+              }
+            }
+          };
+
           lines.forEach(function (line) {
             var renderedTokens = [];
             var tokens = tok.getLineTokens(line);
 
             if (tokens && tokens.tokens.length) {
-              try {
-                new Text(document.createElement('div')).$renderSimpleLine(renderedTokens, tokens.tokens);
-              }
-              catch (e) {
-                if (console && console.warn) {
-                  console.warn(line, 'This line has some parsing errors and it has been skipped.');
-                }
-              }
+              renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
             }
 
             res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + '&nbsp;</div>');
