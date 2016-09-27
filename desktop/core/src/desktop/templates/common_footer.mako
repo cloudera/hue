@@ -221,6 +221,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-40351920-1', 'auto');
+      ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
 
       // We collect only 2 path levels: not hostname, no IDs, no anchors...
       var _pathName = location.pathname;
@@ -233,6 +234,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
       function trackOnGA(path) {
         if (typeof ga != "undefined" && ga != null) {
+          ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
           ga('send', 'pageview', {
             'page': '/remote/${ version }/' + path
           });
