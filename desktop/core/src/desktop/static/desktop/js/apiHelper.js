@@ -33,6 +33,8 @@
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
+  var NAV_LIST_TAGS_API = '/metadata/api/navigator/list_tags';
+  var NAV_FIND_ENTITY_API = '/metadata/api/navigator/find_entity';
 
   /**
    * @param {Object} i18n
@@ -1060,6 +1062,65 @@
       url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: fieldCacheCondition
+    }));
+  };
+
+  /**
+   * Fetches a navigator entity for the given identifierChain
+   *
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.identifierChain.name
+   * @param {string} options.defaultDatabase
+   */
+  ApiHelper.prototype.fetchNavEntity = function (options) {
+    var self = this;
+
+    var clonedIdentifierChain = options.identifierChain.concat();
+
+    var database = options.defaultDatabase;
+    if (typeof self.lastKnownDatabases[clonedIdentifierChain[0].name] !== 'undefined') {
+      database = clonedIdentifierChain.shift().name;
+    }
+    var url = NAV_FIND_ENTITY_API + '?type=database&name=' + database;
+
+    if (clonedIdentifierChain.length > 0) {
+      var table = clonedIdentifierChain.shift().name;
+      url = NAV_FIND_ENTITY_API + '?type=table&database=' + database + '&name=' + table;
+      if (clonedIdentifierChain.length > 0) {
+        url = NAV_FIND_ENTITY_API + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
+      }
+    }
+
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: url,
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: function (data) {
+        return data.status === 0 && typeof data.entity !== 'undefined';
+      }
+    }));
+  };
+
+  /**
+   * Lists all available navigator tags
+   *
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.listNavTags = function (options) {
+    var self = this;
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: NAV_LIST_TAGS_API,
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: function (data) {
+        return (data.status === 0 && typeof data.tags !== 'undefined' && Object.keys(data.tags).length > 0);
+      }
     }));
   };
 

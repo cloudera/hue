@@ -277,6 +277,12 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-table-and-column-tags">
+    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
+      <!-- ko component: { name: 'sql-nav-tags', params: { entity: entity } } --><!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-table-and-column-sample">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData">
       <div class="context-sample sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
@@ -382,41 +388,6 @@ from metadata.conf import has_navigator
           </tr>
         </tbody>
       </table>
-    </div>
-  </script>
-
-  <script type="text/html" id="sql-columns-table-template">
-    <div class="sql-context-flex">
-      <div class="sql-context-flex-header">
-        <div style="margin: 10px 5px 0 10px;">
-          <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
-          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
-          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
-        </div>
-      </div>
-      <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-        <table style="width: 100%" class="table table-striped table-condensed table-nowrap">
-          <thead>
-            <tr data-bind="visible: filteredColumns().length !== 0">
-              <th width="6%">&nbsp;</th>
-              <th width="60%">${_('Name')}</th>
-              <th width="34%">${_('Type')}</th>
-              <th width="6%">&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'sql.context.popover.dispose' }">
-            <tr>
-              <td data-bind="text: $index()+$indexOffset()+1"></td>
-              <td style="overflow: hidden;">
-                <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
-              </td>
-              <td><span data-bind="text: type, attr: { 'title': extendedType }, tooltip: { placement: 'bottom' }"></span></td>
-              <td><i class="snippet-icon fa fa-question-circle" data-bind="visible: comment, attr: { 'title': comment }, tooltip: { placement: 'bottom' }"></i></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="sql-context-empty-columns" data-bind="visible: filteredColumns().length === 0">${_('No columns found')}</div>
-      </div>
     </div>
   </script>
 
@@ -569,6 +540,7 @@ from metadata.conf import has_navigator
         var apiHelper = ApiHelper.getInstance();
 
         self.details = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.tags = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchNavEntity);
         self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
         self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
         self.partitions = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
@@ -583,6 +555,17 @@ from metadata.conf import has_navigator
           errorText: '${ _("There was a problem loading the details.") }',
           isColumn: isColumn
         });
+
+        %if has_navigator():
+        self.tabs.push({
+          id: 'tags',
+          label: '${ _("Tags") }',
+          template: 'sql-context-table-and-column-tags',
+          templateData: self.tags,
+          errorText: '${ _("There was a problem loading the tags.") }',
+          isColumn: isColumn
+        });
+        %endif
 
         self.tabs.push({
           id: 'sample',
@@ -618,6 +601,8 @@ from metadata.conf import has_navigator
         self.activeTab.subscribe(function (newValue) {
           if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
             self.sample.fetch(self.initializeSamplesTable);
+          } else if (newValue === 'tags' && typeof self.tags.fetchedData() === 'undefined') {
+            self.tags.fetch();
           } else if (newValue === 'analysis' && typeof self.analysis.fetchedData() === 'undefined') {
             self.analysis.fetch();
           } else if (newValue === 'partitions' && typeof self.partitions.fetchedData() === 'undefined') {
@@ -1045,7 +1030,119 @@ from metadata.conf import has_navigator
           $(document).on('click', hideOnClickOutside);
         }, 0);
       });
+    }));
+  </script>
 
+  <script type="text/html" id="sql-nav-tags-template">
+    <div class="sql-context-flex">
+      <div class="sql-context-flex-header">
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
+          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
+          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter tags...') }">
+        </div>
+      </div>
+      <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+        <div style="margin: 10px">
+          <!-- ko foreach: filteredTags -->
+          <span class="label label-info" data-bind="text: $data"></span>
+          <!-- /ko -->
+          <div class="sql-context-empty-columns" data-bind="visible: filteredTags().length === 0">${_('No tags found')}</div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require([
+          'knockout'
+        ], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+
+      function SqlNavTags(params) {
+        var self = this;
+        var tags = params.entity.tags;
+
+        self.searchInput = ko.observable('');
+        self.searchVisible = ko.observable(false);
+        self.searchFocus = ko.observable(false);
+
+        self.searchVisible.subscribe(function (newValue) {
+          if (newValue) {
+            self.searchFocus(true);
+          }
+        });
+
+        self.filteredTags = ko.pureComputed(function () {
+          if (self.searchInput() === '') {
+            return tags;
+          }
+          var query = self.searchInput().toLowerCase();
+          return tags.filter(function (tag) {
+            return tag.toLowerCase().indexOf(query) != -1;
+          })
+        });
+
+        // TODO: Have this one fetch the tags based on params instead
+      }
+
+      ko.components.register('sql-nav-tags', {
+        viewModel: SqlNavTags,
+        template: { element: 'sql-nav-tags-template' }
+      });
+    }));
+  </script>
+
+  <script type="text/html" id="sql-columns-table-template">
+    <div class="sql-context-flex">
+      <div class="sql-context-flex-header">
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
+          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
+          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
+        </div>
+      </div>
+      <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+        <table style="width: 100%" class="table table-striped table-condensed table-nowrap">
+          <thead>
+          <tr data-bind="visible: filteredColumns().length !== 0">
+            <th width="6%">&nbsp;</th>
+            <th width="60%">${_('Name')}</th>
+            <th width="34%">${_('Type')}</th>
+            <th width="6%">&nbsp;</th>
+          </tr>
+          </thead>
+          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'sql.context.popover.dispose' }">
+          <tr>
+            <td data-bind="text: $index()+$indexOffset()+1"></td>
+            <td style="overflow: hidden;">
+              <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+            </td>
+            <td><span data-bind="text: type, attr: { 'title': extendedType }, tooltip: { placement: 'bottom' }"></span></td>
+            <td><i class="snippet-icon fa fa-question-circle" data-bind="visible: comment, attr: { 'title': comment }, tooltip: { placement: 'bottom' }"></i></td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="sql-context-empty-columns" data-bind="visible: filteredColumns().length === 0">${_('No columns found')}</div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require([
+          'knockout'
+        ], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
 
       function SqlColumnsTable(params) {
         var self = this;
