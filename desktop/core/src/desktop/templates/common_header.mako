@@ -518,7 +518,7 @@ if USE_NEW_EDITOR.get():
        %>
        % if query_apps[1] > 1:
        <li class="dropdown oozie">
-         <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Query Editors <b class="caret"></b></a>
+         <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-terminal inline-block hideMoreThan950"></i><span class="hide950">Query Editors</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
@@ -554,7 +554,7 @@ if USE_NEW_EDITOR.get():
          </ul>
        </li>
        % elif query_apps[1] == 1:
-          <li><a href="/${apps[query_apps[0]].display_name}">${apps[query_apps[0]].nice_name}</a></li>
+          <li><a href="/${apps[query_apps[0]].display_name}"><i class="fa fa-terminal hideMoreThan950"></i><span class="hide950">${apps[query_apps[0]].nice_name}</span></a></li>
        % endif
        % if 'beeswax' in apps:
         <%
@@ -565,12 +565,12 @@ if USE_NEW_EDITOR.get():
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
            <li>
-             <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }">${_('Notebooks')}</a>
+             <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }"><i class="fa fa-files-o hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span></a>
            </li>
          % else:
            <li class="dropdown">
              <a title="${_('Notebook')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
-               ${_('Notebooks')} <b class="caret"></b>
+               <i class="fa fa-files-o inline-block hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
                <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
@@ -593,7 +593,7 @@ if USE_NEW_EDITOR.get():
        %>
        % if data_apps[1] > 1:
        <li class="dropdown">
-         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Data Browsers <b class="caret"></b></a>
+         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-database inline-block hideMoreThan950"></i><span class="hide950">Data Browsers</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
              <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon"/> ${_('Metastore Tables')}</a></li>
@@ -614,7 +614,7 @@ if USE_NEW_EDITOR.get():
        % endif
        % if 'oozie' in apps:
        <li class="dropdown oozie">
-         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Workflows <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-random inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
              <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${_('Dashboards')}</a>
@@ -660,7 +660,7 @@ if USE_NEW_EDITOR.get():
          % else:
            <li class="dropdown">
              <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
-               ${_('Search')} <b class="caret"></b>
+               <i class="fa fa-search inline-block hideMoreThan950"></i><span class="hide950">${_('Search')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
                % if 'indexer' in apps or 'search' in apps:
@@ -693,24 +693,24 @@ if USE_NEW_EDITOR.get():
        % if 'security' in apps:
          <% from security.conf import HIVE_V1, HIVE_V2, SOLR_V2 %>
          <li class="dropdown">
-           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Security <b class="caret"></b></a>
+           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-unlock inline-block hideMoreThan950"></i><span class="hide950">Security</span> <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">
              % if HIVE_V1.get():
-             <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"></img>&nbsp;&nbsp;${_('Hive Tables')}</a></li>
+             <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"> ${_('Hive Tables')}</a></li>
              % endif
              % if HIVE_V2.get():
-             <li><a href="${ url('security:hive2') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"></img>&nbsp;&nbsp;${_('Hive Tables v2')}</a></li>
+             <li><a href="${ url('security:hive2') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"> ${_('Hive Tables v2')}</a></li>
              % endif
              % if SOLR_V2.get():
-             <li><a href="${ url('security:solr') }">&nbsp;<i class="fa fa-database"></i>&nbsp;&nbsp;${_('Solr Collections')}</a></li>
+             <li><a href="${ url('security:solr') }">&nbsp;<i class="fa fa-database"></i>&nbsp;${_('Solr Collections')}</a></li>
              % endif
-             <li><a href="${ url('security:hdfs') }">&nbsp;<i class="fa fa-file"></i>&nbsp;&nbsp;${_('File ACLs')}</a></li>
+             <li><a href="${ url('security:hdfs') }">&nbsp;<i class="fa fa-file"></i>&nbsp;${_('File ACLs')}</a></li>
            </ul>
          </li>
        % endif
        % if other_apps:
        <li class="dropdown">
-         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
+         <a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-tasks inline-block hideMoreThan950"></i><span class="hide950">${_('Other apps')}</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % for other in other_apps:
              <li><a href="/${ other.display_name }"><img src="${ static(other.icon_path) }" class="app-icon"/> ${ other.nice_name }</a></li>

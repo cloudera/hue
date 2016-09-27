@@ -1564,15 +1564,24 @@ a#advanced-btn:hover {
   }
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
   .brand {
     display: none;
   }
+}
+
+@media (max-width: 950px) {
   .hide950 {
     display: none;
   }
   .hideMoreThan950 {
     display: block;
+  }
+}
+
+@media (min-width: 951px) {
+  .hideMoreThan950 {
+    display: none!important;
   }
 }
 

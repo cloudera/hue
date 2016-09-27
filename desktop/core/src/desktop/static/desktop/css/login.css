@@ -149,13 +149,10 @@
 
 @media screen and (max-width: 800px) {
   body {
-    padding-top: 20px!important;
+    padding-top: 40px!important;
   }
   .login-box {
     width: 300px;
-  }
-  .navigator {
-    display: none;
   }
   .login-container form {
     margin-left: 10px;
