@@ -169,12 +169,6 @@ class NavigatorApi(object):
       for key, value in filters.items():
         query_filters[key] = value
 
-      # TODO: Uncomment following block after demo, b/c we really want the entities that current Hue knows about in HDFS
-      # hadoop_fs = get_filesystem_host()
-      hadoop_fs = re.search(r"^(http|https)://(?P<host>[a-z0-9\.-]+):.*", self._api_url).group('host')
-      if hadoop_fs:
-        query_filters['fileSystemPath'] = '*%(path)s*' % {'path': hadoop_fs}
-
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
 
       params += (
