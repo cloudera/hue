@@ -3214,7 +3214,7 @@
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
           if (draggableMeta.table && ! draggableMeta.column && /.*;|^\s*$/.test(before)) {
-            menu.show(event);
+            menu.show(e);
           } else {
             if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
               text = " " + text;
