@@ -3043,9 +3043,12 @@
         }
       });
 
+      editor.on("click", function (e) {
+        editor.clearErrors();
+      });
+
       editor.on("change", function (e) {
         snippet.statement_raw(removeUnicodes(editor.getValue()));
-        editor.clearErrors();
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
         if (currentSize != editor.previousSize && currentSize >= editorOptions.minLines && currentSize <= editorOptions.maxLines){
