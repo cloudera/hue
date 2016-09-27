@@ -2654,47 +2654,51 @@ ${ hueIcons.symbols() }
 
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
       var _plottedSerie = 0;
-      rawDatum.snippet.chartYMulti().forEach(function (col) {
-        var _idxValue = -1;
-        var _idxLabel = -1;
-        var _isXDate = false;
-        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
-          if (icol.name == rawDatum.snippet.chartX()) {
-            _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
-            _idxLabel = idx;
-          }
-          if (icol.name == col) {
-            _idxValue = idx;
-          }
-        });
 
-        if (_idxValue > -1) {
-          var _data = [];
-          var colors = HueColors.cuiD3Scale();
-          $(rawDatum.counts()).each(function (cnt, item) {
-            _data.push({
-              series: _plottedSerie,
-              x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-              y: item[_idxValue]*1,
-              color: colors[cnt % colors.length],
-              obj: item
-            });
+      rawDatum.snippet.result.meta().forEach(function (meta) {
+        if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
+          var col = meta.name;
+          var _idxValue = -1;
+          var _idxLabel = -1;
+          var _isXDate = false;
+          rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+            if (icol.name == rawDatum.snippet.chartX()) {
+              _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
+              _idxLabel = idx;
+            }
+            if (icol.name == col) {
+              _idxValue = idx;
+            }
           });
-          if (rawDatum.sorting == "asc") {
-            _data.sort(function (a, b) {
-              return a.y - b.y
+
+          if (_idxValue > -1) {
+            var _data = [];
+            var colors = HueColors.cuiD3Scale();
+            $(rawDatum.counts()).each(function (cnt, item) {
+              _data.push({
+                series: _plottedSerie,
+                x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                y: item[_idxValue] * 1,
+                color: colors[cnt % colors.length],
+                obj: item
+              });
             });
-          }
-          if (rawDatum.sorting == "desc") {
-            _data.sort(function (a, b) {
-              return b.y - a.y
+            if (rawDatum.sorting == "asc") {
+              _data.sort(function (a, b) {
+                return a.y - b.y
+              });
+            }
+            if (rawDatum.sorting == "desc") {
+              _data.sort(function (a, b) {
+                return b.y - a.y
+              });
+            }
+            _datum.push({
+              key: col,
+              values: _data
             });
+            _plottedSerie++;
           }
-          _datum.push({
-            key: col,
-            values: _data
-          });
-          _plottedSerie++;
         }
       });
     }

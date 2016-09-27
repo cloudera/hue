@@ -65,6 +65,7 @@ nv.models.growingDiscreteBar = function() {
       data.forEach(function(series, i) {
         series.values.forEach(function(point) {
           point.series = i;
+          point.seriesKey = series.key;
         });
       });
 
