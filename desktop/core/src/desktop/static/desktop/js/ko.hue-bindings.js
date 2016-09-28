@@ -22,6 +22,30 @@
   }
 }(function (ko) {
 
+  ko.bindingHandlers.tagEditor = {
+    init: function (element, valueAccessor) {
+      var options = valueAccessor();
+
+      options = $.extend({
+        plugins: ['restore_on_backspace', 'remove_button'],
+        options: $.map(options.initialTags, function (value) { return { value: value, text: value } }),
+        delimiter: ',',
+        items: options.initialTags,
+        closeAfterSelect: true,
+        persist: true,
+        preload: true,
+        create: function(input) {
+          return {
+            value: input.replace(/\s/g, '-'),
+            text: input.replace(/\s/g, '-')
+          }
+        }
+      }, options);
+
+      $(element).selectize(options)[0].selectize;
+    }
+  };
+
   ko.bindingHandlers.toggleOverflow = {
     render: function ($element) {
       if (hueUtils.isOverflowing($element.find('.toggle-overflow'))) {

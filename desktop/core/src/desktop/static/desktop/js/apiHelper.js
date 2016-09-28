@@ -33,6 +33,8 @@
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
+  var NAV_ADD_TAGS_API = '/metadata/api/navigator/add_tags';
+  var NAV_DELETE_TAGS_API = '/metadata/api/navigator/delete_tags';
   var NAV_LIST_TAGS_API = '/metadata/api/navigator/list_tags';
   var NAV_FIND_ENTITY_API = '/metadata/api/navigator/find_entity';
 
@@ -1096,13 +1098,25 @@
       }
     }
 
-    fetchAssistData.bind(self)($.extend({}, options, {
+    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
       url: url,
       errorCallback: self.assistErrorCallback(options),
-      cacheCondition: function (data) {
-        return data.status === 0 && typeof data.entity !== 'undefined';
-      }
+      noCache: true
     }));
+  };
+
+  ApiHelper.prototype.addNavTags = function (entityId, tags) {
+    return $.post(NAV_ADD_TAGS_API, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
+    });
+  };
+
+  ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
+    return $.post(NAV_DELETE_TAGS_API, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
+    });
   };
 
   /**
@@ -1115,12 +1129,10 @@
    */
   ApiHelper.prototype.listNavTags = function (options) {
     var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
+    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
       url: NAV_LIST_TAGS_API,
       errorCallback: self.assistErrorCallback(options),
-      cacheCondition: function (data) {
-        return (data.status === 0 && typeof data.tags !== 'undefined' && Object.keys(data.tags).length > 0);
-      }
+      noCache: true
     }));
   };
 
@@ -1128,6 +1140,7 @@
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.url
+   * @param {boolean} [options.noCache]
    * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
@@ -1140,10 +1153,12 @@
       return
     }
 
-    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
-    if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp)) {
-      options.successCallback(cachedData[options.url].data);
-      return;
+    if (!options.noCache) {
+      var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+      if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp)) {
+        options.successCallback(cachedData[options.url].data);
+        return;
+      }
     }
     if (typeof options.editor !== 'undefined' && options.editor !== null) {
       options.editor.showSpinner();
@@ -1182,7 +1197,7 @@
       timeout: options.timeout
     }).success(function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
-      if (data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
+      if (!options.noCache && data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
         cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
         cachedData[options.url] = {
           timestamp: (new Date()).getTime(),
