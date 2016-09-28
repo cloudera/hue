@@ -71,26 +71,65 @@
         idx = 0;
       }
 
+      var sortType = 'alpha';
+      if (obj.cssClass && obj.cssClass === 'sort-numeric'){
+        sortType = 'numeric';
+      }
+
       if (way === -1 || way === 0) {
         data.sort(function (a, b) {
-          if (a[idx] > b[idx]) {
-            return 1;
+          if (sortType === 'numeric'){
+            if (a[idx] === 'NULL'){
+              return -1;
+            }
+            if (b[idx] === 'NULL'){
+              return 1;
+            }
+            if (a[idx]*1 > b[idx]*1) {
+              return 1;
+            }
+            if (a[idx]*1 < b[idx]*1) {
+              return -1;
+            }
+            return 0;
           }
-          if (a[idx] < b[idx]) {
-            return -1;
+          else {
+            if (a[idx] > b[idx]) {
+              return 1;
+            }
+            if (a[idx] < b[idx]) {
+              return -1;
+            }
+            return 0;
           }
-          return 0;
         });
       }
       else {
         data.sort(function (a, b) {
-          if (a[idx] > b[idx]) {
-            return -1;
+          if (sortType === 'numeric'){
+            if (a[idx] === 'NULL'){
+              return 1;
+            }
+            if (b[idx] === 'NULL'){
+              return -1;
+            }
+            if (a[idx]*1 > b[idx]*1) {
+              return -1;
+            }
+            if (a[idx]*1 < b[idx]*1) {
+              return 1;
+            }
+            return 0;
           }
-          if (a[idx] < b[idx]) {
-            return 1;
+          else {
+            if (a[idx] > b[idx]) {
+              return -1;
+            }
+            if (a[idx] < b[idx]) {
+              return 1;
+            }
+            return 0;
           }
-          return 0;
         });
       }
 
@@ -296,12 +335,6 @@
                 html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
               appendable.html(appendable.html() + html);
-              if ($t.data('plugin_jHueTableExtender')) {
-                $t.data('plugin_jHueTableExtender').drawFirstColumn();
-              }
-              if ($t.data('plugin_jHueTableExtender2')) {
-                $t.data('plugin_jHueTableExtender2').drawFirstColumn();
-              }
             }
           }
 
@@ -325,7 +358,16 @@
             appendable.children().eq(i).html(html);
           }
 
+          if (force) {
+            if ($t.data('plugin_jHueTableExtender')) {
+              $t.data('plugin_jHueTableExtender').drawFirstColumn();
+            }
+            if ($t.data('plugin_jHueTableExtender2')) {
+              $t.data('plugin_jHueTableExtender2').drawFirstColumn();
+            }
           }
+
+        }
         if ($t.data('scrollToCol')) {
           $t.find('.columnSelected').removeClass('columnSelected');
           var colSel = $t.find("tr th:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
@@ -333,17 +375,24 @@
             colSel = $t.find("tr td:nth-child(" + ($t.data('scrollToCol') + 1) + ")");
           }
           if ($t.data('scrollAnimate')) {
-            $t.parent().animate({
-              scrollLeft: colSel.position().left + $t.parent().scrollLeft() - ($t.data('scrollInPopover') ? 0 : $t.parent().offset().left) - 30
-            }, 300, function () {
+            if ($t.data('scrollAnimateDirect')){
+              $t.parent().scrollLeft(colSel.position().left + $t.parent().scrollLeft() - ($t.data('scrollInPopover') ? 0 : $t.parent().offset().left) - 30);
               $t.parent().trigger('scroll');
-            });
+            }
+            else {
+              $t.parent().animate({
+                scrollLeft: colSel.position().left + $t.parent().scrollLeft() - ($t.data('scrollInPopover') ? 0 : $t.parent().offset().left) - 30
+              }, 300, function () {
+                $t.parent().trigger('scroll');
+              });
+            }
             if ($t.data('scrollLastColPosLeft') == null || $t.data('scrollLastColPosLeft') != colSel.position().left) {
               $t.data('scrollLastColPosLeft', colSel.position().left);
               $t.data('scrollLastParentLeft', $t.parent().scrollLeft());
             }
             else {
               $t.data('scrollAnimate', null);
+              $t.data('scrollAnimateDirect', null);
               $t.data('scrollLastColPosLeft', null);
               $t.data('scrollLastParentLeft', null);
             }
@@ -436,8 +485,12 @@
       self.$table.data('fnDraws', 0);
       self.$table.wrap('<div class="dataTables_wrapper"></div>');
 
+      self.$table.unbind('sort');
       self.$table.bind('sort', function (e, obj) {
         self.$table.find('thead tr th:not(:eq(' + obj.originalIndex + '))').removeClass('sorting_desc').removeClass('sorting_asc');
+        self.$table.data('scrollToCol', obj.originalIndex);
+        self.$table.data('scrollAnimate', true);
+        self.$table.data('scrollAnimateDirect', true);
         var $cell = self.$table.find('thead tr th:eq(' + obj.originalIndex + ')');
         if ($cell.hasClass('sorting_desc')) {
           $cell.removeClass('sorting_desc');
