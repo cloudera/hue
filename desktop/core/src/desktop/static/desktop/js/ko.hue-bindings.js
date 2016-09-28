@@ -1727,7 +1727,7 @@
       }
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-      if (!$(element).is(':focus')) {
+      if (!$(element).is(':focus') || ko.unwrap(valueAccessor()) !== $(element).val()) {
         $(element).val(ko.unwrap(valueAccessor()));
       }
       if ($(element).val() === '') {
