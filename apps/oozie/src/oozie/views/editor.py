@@ -43,7 +43,7 @@ from liboozie.submittion import Submission
 from filebrowser.lib.archives import archive_factory
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
-from oozie.conf import ENABLE_CRON_SCHEDULING
+from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.importlib.workflows import import_workflow as _import_workflow
 from oozie.importlib.coordinators import import_coordinator as _import_coordinator
 from oozie.management.commands import oozie_setup
@@ -143,6 +143,9 @@ def create_workflow(request):
 
 
 def import_workflow(request):
+  if ENABLE_V2.get():
+    raise PopupException('/oozie/import_workflow is deprecated in the version 2 of Editor')
+
   workflow = Workflow.objects.new_workflow(request.user)
 
   if request.method == 'POST':
