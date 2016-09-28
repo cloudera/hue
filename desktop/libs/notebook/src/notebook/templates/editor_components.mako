@@ -2113,7 +2113,7 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
-<div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
+<div id="chooseFile" class="modal hide fade" style="z-index: 10000;" tabindex="-1">
   <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3>${_('Choose a file')}</h3>
