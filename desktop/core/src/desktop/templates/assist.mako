@@ -1314,8 +1314,7 @@ from metadata.conf import has_navigator
             query_s: self.searchInput(),
             limit: 25,
             sources: ko.mapping.toJSON([self.visiblePanel().type])
-          })
-          .done(function (data) {
+          }, function (data) {
             data.entities.forEach(function (entity) {
               if (entity.type === 'DATABASE') {
                 entity.click = function () {
@@ -1341,7 +1340,10 @@ from metadata.conf import has_navigator
             });
             self.searchResult(data.entities);
             self.searching(false);
-          })
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+            self.searching(false);
+          });
         };
 
         self.visiblePanel = ko.observable(self.availablePanels[0]);
