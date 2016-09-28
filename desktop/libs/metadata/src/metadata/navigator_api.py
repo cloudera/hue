@@ -64,7 +64,7 @@ def error_handler(view_fn):
 def search_entities(request):
   api = NavigatorApi()
 
-  query_s = request.POST.get('query_s')
+  query_s = request.POST.get('query_s', '')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 100)
   sources = json.loads(request.POST.get('sources')) or []
@@ -86,14 +86,52 @@ def search_entities(request):
 
 
 @error_handler
+def search_entities_interactive(request):
+  api = NavigatorApi()
+
+  query_s = request.POST.get('query_s', '')
+  prefix = request.POST.get('prefix')
+  offset = request.POST.get('offset', 0)
+  limit = request.POST.get('limit', 25)
+  sources = json.loads(request.POST.get('sources')) or []
+
+  fqs = []
+  fq_type = []
+
+  if 'hive' in sources or 'impala' in sources:
+    fq_type.append('TABLE')
+    fq_type.append('VIEW') # 'DATABASE', 'PARTITION', 'FIELD'
+  elif 'hdfs' in sources:
+    fq_type.append('FILE')
+    fq_type.append('DIRECTORY')
+
+  fqs += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+
+  response = api.search_entities_interactive(
+      query=query_s,
+      limit=limit,
+      offset=offset,
+      facetFields=None,
+      facetPrefix=prefix,
+      facetRanges=None,
+      filterQueries=fqs,
+      firstClassEntitiesOnly=None
+  )
+
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@error_handler
 def list_tags(request):
   api = NavigatorApi()
 
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
-  limit = request.POST.get('limit', 100)
+  limit = request.POST.get('limit', 25)
 
-  data = api.search_entities_interactive(facetFields=['tags'], facetPrefix=prefix, limit=0, offset=offset)
+  data = api.search_entities_interactive(facetFields=['tags'], facetPrefix=prefix, limit=limit, offset=offset)
 
   response = {
     'tags': data['facets']['tags'],
