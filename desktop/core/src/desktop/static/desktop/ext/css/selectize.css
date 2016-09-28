@@ -154,6 +154,36 @@
   border-radius: 3px;
 }
 
+.selectize-read-only.multi .selectize-input {
+  cursor: default;
+  border-color: transparent;
+}
+
+.selectize-actions {
+  z-index: 10000;
+  font-size: 15px;
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.selectize-actions i {
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s linear;
+  margin-left: 2px;
+}
+
+.selectize-actions i:hover {
+  color: #338BB8;
+}
+
+.selectize-actions-visible {
+  opacity: 1;
+}
+
 .selectize-control.multi .selectize-input.has-items {
   padding: 6px 8px 3px;
   box-shadow: none;
@@ -192,16 +222,20 @@
   cursor: pointer;
   margin: 0 3px 3px 0;
   padding: 2px 6px;
-  background: #DBE8F1;
-  color: #338BB8;
-  border: 0 solid #DBE8F1;
+  background: #338BB8;
+  color: #FFF;
+  border: 0 solid #338BB8;
   border-radius: 5px
 }
 
+.selectize-read-only.multi .selectize-input > div {
+  cursor: default;
+}
+
 .selectize-control.multi .selectize-input > div.active {
-  background: #338BB8;
-  color: #DBE8F1;
-  border: 0 solid #DBE8F1;
+  background: #DBE8F1;
+  color: #338BB8;
+  border: 0 solid #338BB8;
 }
 
 .selectize-control.multi .selectize-input.disabled > div,
