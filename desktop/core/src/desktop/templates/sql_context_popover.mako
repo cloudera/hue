@@ -1033,21 +1033,18 @@ from metadata.conf import has_navigator
     }));
   </script>
 
+  <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
+
   <script type="text/html" id="sql-nav-tags-template">
     <div class="sql-context-flex">
       <div class="sql-context-flex-header">
         <div style="margin: 10px 5px 0 10px;">
           <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
-          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
-          <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter tags...') }">
         </div>
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <div style="margin: 10px">
-          <!-- ko foreach: filteredTags -->
-          <span class="label label-info" data-bind="text: $data"></span>
-          <!-- /ko -->
-          <div class="sql-context-empty-columns" data-bind="visible: filteredTags().length === 0">${_('No tags found')}</div>
+          <textarea style="width: 100%" data-bind="tagEditor: { placeholder: '${_ko('Enter tags...')}', initialTags: currentTags, onItemAdd: onTagAdd, onItemRemove: onTagRemove, load: loadTags  }"></textarea>
         </div>
       </div>
     </div>
@@ -1057,38 +1054,43 @@ from metadata.conf import has_navigator
     (function (factory) {
       if(typeof require === "function") {
         require([
-          'knockout'
+          'knockout',
+          'desktop/js/apiHelper'
         ], factory);
       } else {
-        factory(ko);
+        factory(ko, ApiHelper);
       }
-    }(function (ko) {
+    }(function (ko, ApiHelper) {
 
       function SqlNavTags(params) {
         var self = this;
-        var tags = params.entity.tags;
+        var apiHelper = ApiHelper.getInstance();
 
-        self.searchInput = ko.observable('');
-        self.searchVisible = ko.observable(false);
-        self.searchFocus = ko.observable(false);
+        self.currentTags = params.entity.tags;
+        self.allTags = ko.observableArray();
 
-        self.searchVisible.subscribe(function (newValue) {
-          if (newValue) {
-            self.searchFocus(true);
-          }
-        });
+        var fetchAllTags = function () {
+          apiHelper.listNavTags({
+            successCallback: function (data) {
+              self.allTags(Object.keys(data.tags))
+            },
+            silenceErrors: true
+          });
+        };
+        fetchAllTags();
 
-        self.filteredTags = ko.pureComputed(function () {
-          if (self.searchInput() === '') {
-            return tags;
-          }
-          var query = self.searchInput().toLowerCase();
-          return tags.filter(function (tag) {
-            return tag.toLowerCase().indexOf(query) != -1;
-          })
-        });
+        self.loadTags = function (query, callback) {
+          console.log(self.allTags());
+          callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
+        };
 
-        // TODO: Have this one fetch the tags based on params instead
+        self.onTagAdd = function (value) {
+          apiHelper.addNavTags(params.entity.identity, [value]);
+        };
+
+        self.onTagRemove = function (value) {
+          apiHelper.deleteNavTags(params.entity.identity, [value]);
+        };
       }
 
       ko.components.register('sql-nav-tags', {
