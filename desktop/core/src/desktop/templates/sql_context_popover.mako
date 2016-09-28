@@ -1044,7 +1044,7 @@ from metadata.conf import has_navigator
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <div style="margin: 10px">
-          <textarea style="width: 100%" data-bind="tagEditor: { placeholder: '${_ko('Enter tags...')}', initialTags: currentTags, onItemAdd: onTagAdd, onItemRemove: onTagRemove, load: loadTags  }"></textarea>
+          <textarea style="width: 100%" data-bind="tagEditor: { placeholder: '${_ko('Enter tags...')}', setTags: currentTags, onSave: onSave, load: loadTags  }"></textarea>
         </div>
       </div>
     </div>
@@ -1066,7 +1066,7 @@ from metadata.conf import has_navigator
         var self = this;
         var apiHelper = ApiHelper.getInstance();
 
-        self.currentTags = params.entity.tags;
+        self.currentTags = ko.observableArray(params.entity.tags);
         self.allTags = ko.observableArray();
 
         var fetchAllTags = function () {
@@ -1080,16 +1080,37 @@ from metadata.conf import has_navigator
         fetchAllTags();
 
         self.loadTags = function (query, callback) {
-          console.log(self.allTags());
           callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
         };
 
-        self.onTagAdd = function (value) {
-          apiHelper.addNavTags(params.entity.identity, [value]);
-        };
+        self.onSave = function (value) {
+          var newTags = value.split(',');
+          var tagsToRemove = [];
+          var tagsToAdd = [];
+          var tagIndex = {};
+          self.currentTags().forEach(function (tag) {
+            tagIndex[tag] = false;
+          });
+          newTags.forEach(function (newTag) {
+            if (typeof tagIndex[newTag] !== 'undefined') {
+              tagIndex[newTag] = true;
+            } else {
+              tagsToAdd.push(newTag);
+            }
+          });
+          Object.keys(tagIndex).forEach(function (oldTag) {
+            if (! tagIndex[oldTag]) {
+              tagsToRemove.push(oldTag);
+            }
+          });
 
-        self.onTagRemove = function (value) {
-          apiHelper.deleteNavTags(params.entity.identity, [value]);
+          if (tagsToAdd.length > 0) {
+            apiHelper.addNavTags(params.entity.identity, tagsToAdd);
+          }
+          if (tagsToRemove.length > 0) {
+            apiHelper.deleteNavTags(params.entity.identity, tagsToRemove);
+          }
+          self.currentTags(newTags);
         };
       }
 

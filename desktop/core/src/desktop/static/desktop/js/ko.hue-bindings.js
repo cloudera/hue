@@ -25,12 +25,13 @@
   ko.bindingHandlers.tagEditor = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
+      var $element = $(element);
 
       options = $.extend({
-        plugins: ['restore_on_backspace', 'remove_button'],
-        options: $.map(options.initialTags, function (value) { return { value: value, text: value } }),
+        plugins: ['remove_button'],
+        options: $.map(options.setTags(), function (value) { return { value: value, text: value } }),
         delimiter: ',',
-        items: options.initialTags,
+        items: options.setTags(),
         closeAfterSelect: true,
         persist: true,
         preload: true,
@@ -42,7 +43,68 @@
         }
       }, options);
 
-      $(element).selectize(options)[0].selectize;
+      var $readOnlyContainer = $('<div>').hide().addClass('selectize-control selectize-read-only multi').attr('style', $element.attr('style')).insertAfter($(element));
+
+      $readOnlyContainer.on('mouseover', function () {
+        $readOnlyContainer.find('.selectize-actions').addClass('selectize-actions-visible');
+      });
+
+      $readOnlyContainer.on('mouseout', function () {
+        $readOnlyContainer.find('.selectize-actions').removeClass('selectize-actions-visible');
+      });
+
+      $element.hide();
+
+      var currentSelectize;
+
+      var showEdit = function () {
+        options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } }),
+        currentSelectize = $element.selectize(options)[0].selectize;
+        $readOnlyContainer.hide();
+        $element.next().find('.selectize-input').css('padding-right', '25px');
+        $element.next().find('input').focus();
+        var $editActions = $('<div>').addClass('selectize-actions selectize-actions-visible').appendTo($element.next());
+        $('<i>').addClass('fa fa-check').click(function () {
+          options.onSave(currentSelectize.getValue());
+          showReadOnly();
+        }).appendTo($editActions);
+        $('<i>').addClass('fa fa-close').click(function () {
+          showReadOnly();
+        }).appendTo($editActions);
+
+        $element.next().on('mouseover', function () {
+          $editActions.addClass('selectize-actions-visible');
+        });
+
+        $element.next().on('mouseout', function () {
+          $editActions.removeClass('selectize-actions-visible');
+        });
+      };
+
+      var showReadOnly = function () {
+        if (currentSelectize) {
+          currentSelectize.destroy();
+          $element.hide();
+        }
+        $readOnlyContainer.empty();
+        var $readOnlyInner = $('<div>').addClass('selectize-input items not-full has-options has-items').appendTo($readOnlyContainer);
+        if (options.setTags().length > 0) {
+          options.setTags().forEach(function (tag) {
+            $('<div>').addClass('item-read-only').text(tag).appendTo($readOnlyInner);
+          });
+        } else {
+          $('<input type="text">').attr('placeholder', options.placeholder).appendTo($readOnlyInner);
+        }
+
+        var $readOnlyActions = $('<div>').addClass('selectize-actions').appendTo($readOnlyContainer);
+        $readOnlyContainer.show();
+
+        $('<i>').addClass('fa fa-edit').click(function () {
+          showEdit();
+        }).appendTo($readOnlyActions);
+      };
+
+      showReadOnly();
     }
   };
 
