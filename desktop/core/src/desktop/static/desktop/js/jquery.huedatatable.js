@@ -105,7 +105,7 @@
           'right': '70px',
           'opacity': 0.85
         }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
-        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times"></i>');
+        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
 
         search.find('.fa-times').on('click', function () {
           search.hide();
@@ -125,7 +125,7 @@
 
         search.find('input').jHueDelayedInput(function () {
           self.fnSearch(search.find('input').val());
-        }, 300, true);
+        }, 600, true);
 
         search.find('input').keydown(function (e) {
           if ([13, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
@@ -159,8 +159,8 @@
 
       if (what !== '') {
         $('.hue-datatable-search').find('span').text('');
-        $('.hue-datatable-search').find('.fa-chevron-down').addClass('muted');
-        $('.hue-datatable-search').find('.fa-chevron-up').addClass('muted');
+        $('.hue-datatable-search').find('.fa-chevron-down').addClass('muted').removeClass('inactive-action');
+        $('.hue-datatable-search').find('.fa-chevron-up').addClass('muted').removeClass('inactive-action');
         var coords = [];
         $t.data('searchCoords', []);
         $t.data('searchCoordHighlighted', 0);
@@ -178,8 +178,8 @@
         $t.data('searchCoords', coords);
         if (coords.length > 0) {
           if ($('.hue-datatable-search').find('input').val() !== '') {
-            $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted');
-            $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted');
+            $('.hue-datatable-search').find('.fa-chevron-down').removeClass('muted').addClass('inactive-action');
+            $('.hue-datatable-search').find('.fa-chevron-up').removeClass('muted').addClass('inactive-action');
           }
           if (typeof avoidScroll === 'undefined' || !avoidScroll) {
             self.fnScrollTo(coords[0].row, coords[0].col);
