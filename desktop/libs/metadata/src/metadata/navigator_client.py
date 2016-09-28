@@ -121,7 +121,7 @@ class NavigatorApi(object):
         'limit': limit,
       }
 
-      body = {'query': query.strip() or '*'}
+      body = {'query': query and query.strip() or '*'}
 
       body['facetFields'] = facetFields or [] # Currently mandatory
       if facetPrefix:

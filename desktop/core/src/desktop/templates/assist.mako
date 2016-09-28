@@ -834,7 +834,7 @@ from metadata.conf import has_navigator
       <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !searching() -->
       <!-- ko if: searchResult().length == 0 -->
-        ${ _('No result found.') }
+        <div class="result-entry">${ _('No result found.') }</div>
       <!-- /ko -->
       <!-- ko foreach: searchResult -->
       <div class="result-entry">
@@ -875,7 +875,11 @@ from metadata.conf import has_navigator
         </div>
         <div class="doc-col">
           <!-- ko if: typeof click !== 'undefined' -->
-          <a class="pointer" data-bind="click: click, text: originalName" target="_blank" ></a>
+          <a class="pointer" data-bind="click: click" target="_blank" >
+            <span data-bind="text: parentPath"></span>
+            <span data-bind="text: originalName"></span>
+          </a>
+          <span data-bind="text: tags" class="badge badge-info"></span>
           <!-- /ko -->
           <!-- ko if: typeof click === 'undefined' -->
           <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
@@ -885,15 +889,12 @@ from metadata.conf import has_navigator
           <!-- /ko -->
           <!-- ko if: type === 'TABLE' || type === 'VIEW' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <div class="doc-desc" data-bind="text: parentPath"></div>
           <!-- /ko -->
           <!-- ko if: type === 'FIELD' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <div class="doc-desc" data-bind="text: parentPath"></div>
           <!-- /ko -->
           <!-- ko if: type === 'PARTITION' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <div class="doc-desc" data-bind="text: parentPath"></div>
           <!-- /ko -->
           <!-- ko if: type === 'SUB_OPERATION' -->
           <div class="doc-desc" data-bind="text: metaClassName"></div>
