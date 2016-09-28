@@ -1263,6 +1263,10 @@ a#advanced-btn:hover {
   margin: 0;
 }
 
+.hueAnchor .inactive-action {
+  color: #FFF;
+}
+
 #jHueScrollUpAnchor {
   bottom: 20px;
   right: 20px;
