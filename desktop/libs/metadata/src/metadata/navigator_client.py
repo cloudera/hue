@@ -121,24 +121,25 @@ class NavigatorApi(object):
         'limit': limit,
       }
 
-      body = {'query': query or '*'}
+      body = {'query': query.strip() or '*'}
 
-      if facetFields is not None:
-        body['facetFields'] = facetFields
-      if facetPrefix is not None:
+      body['facetFields'] = facetFields or [] # Currently mandatory
+      if facetPrefix:
         body['facetPrefix'] = facetPrefix
-      if facetRanges is not None:
+      if facetRanges:
         body['facetRanges'] = facetRanges
-      if filterQueries is not None:
+      if filterQueries:
         body['filterQueries'] = filterQueries
-      if firstClassEntitiesOnly is not None:
+      if firstClassEntitiesOnly:
         body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 
-      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=json.dumps(body), contenttype=_JSON_CONTENT_TYPE)
+      data = json.dumps(body)
+      LOG.info(data)
+      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE)
 
       return response
-    except RestException, e:
-      msg = 'Failed to search for entities with search query: %s' % body
+    except RestException:
+      msg = 'Failed to search for entities with search query %s' % json.dumps(body)
       LOG.exception(msg)
       raise NavigatorApiException(msg)
 
