@@ -344,6 +344,21 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-database-details">
+    <div class="sql-context-flex-fill">
+      <div class="sql-context-flex">
+        <div class="sql-context-flex-header">
+          <div style="margin: 10px 5px 0 10px;">
+            <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
+          </div>
+        </div>
+        <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-function-details">
     <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
       <div style="padding: 8px">
@@ -542,12 +557,13 @@ from metadata.conf import has_navigator
         });
       };
 
-      function TagsTab (identifierChain, defaultDatabase) {
+      function TagsTab (identifierChain, sourceType, defaultDatabase) {
         var self = this;
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
         self.identifierChain = identifierChain;
         self.defaultDatabase = defaultDatabase;
+        self.sourceType = sourceType;
       }
 
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn) {
@@ -557,7 +573,7 @@ from metadata.conf import has_navigator
         var apiHelper = ApiHelper.getInstance();
 
         self.details = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
-        self.tags = new TagsTab(data.identifierChain, defaultDatabase);
+        self.tags = new TagsTab(data.identifierChain, sourceType, defaultDatabase);
         self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
         self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
         self.partitions = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
@@ -764,6 +780,14 @@ from metadata.conf import has_navigator
           }
         }, 0);
       };
+
+      function DatabaseContextTabs(data, sourceType) {
+        var self = this;
+        self.tabs = [
+          { id: 'tags', label: '${ _("Tags") }', template: 'sql-context-database-details', templateData: new TagsTab(data.identifierChain, sourceType, data.identifierChain[0].name) }
+        ];
+        self.activeTab = ko.observable('tags');
+      }
 
       function FunctionContextTabs(data, sourceType) {
         var self = this;
@@ -989,11 +1013,17 @@ from metadata.conf import has_navigator
             self.left(params.source.left - self.width());
         }
 
+
+        self.isDatabase = params.data.type === 'database';
         self.isTable = params.data.type === 'table';
         self.isColumn = params.data.type === 'column';
         self.isFunction = params.data.type === 'function';
 
-        if (self.isTable) {
+        if (self.isDatabase) {
+          self.contents = new DatabaseContextTabs(self.data, self.sourceType);
+          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          self.iconClass = 'fa-database';
+        } else if (self.isTable) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-table'

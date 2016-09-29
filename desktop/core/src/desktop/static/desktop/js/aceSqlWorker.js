@@ -19,7 +19,7 @@ importScripts('/static/desktop/ext/js/require.js');
 // TODO: Figure out how to deal with this nicely, param needs to be updated for any changes
 // to sql.js and sqlFunctions.js to prevent caching issues.
 require.config({
-  urlArgs: "version=1"
+  urlArgs: "version=2"
 });
 
 require([

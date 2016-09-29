@@ -55,6 +55,7 @@ from metadata.conf import has_navigator
 
       /**
        * @param {object} params
+       * @param {String} sourceType
        * @param {String} defaultDatabase
        * @param {object[]} [params.identifierChain]
        * @param {String} [params.database]
@@ -88,6 +89,7 @@ from metadata.conf import has_navigator
         self.allTags = ko.observableArray();
 
         apiHelper.fetchNavEntity({
+          sourceType: ko.unwrap(params.sourceType),
           identifierChain: identifierChain,
           defaultDatabase: ko.unwrap(params.defaultDatabase),
           silenceErrors: true,

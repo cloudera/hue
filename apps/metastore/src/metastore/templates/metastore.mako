@@ -396,7 +396,8 @@ ${ assist.assistPanel() }
         <!-- /ko -->
 
         <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-          defaultDatabase: db_name
+          sourceType: 'hive',
+          database: db_name
         } }"></div>
       </div>
       <!-- /ko -->
@@ -590,7 +591,8 @@ ${ assist.assistPanel() }
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
       <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-        defaultDatabase: database.name,
+        sourceType: 'hive'
+        database: database.name,
         table: name
       } }"></div>
     </div>

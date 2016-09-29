@@ -463,6 +463,7 @@ define([
           expectedResult: {
             lowerCase: false,
             locations: [
+              {type: 'database', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 12 }, identifierChain: [{ name: 'db' }]},
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16}, identifierChain: [{ name: 'db' }, { name: 'tbl' }] }
             ]
           }

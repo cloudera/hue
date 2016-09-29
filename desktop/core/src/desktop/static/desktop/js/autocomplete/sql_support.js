@@ -285,14 +285,29 @@ var commitLocations = function () {
       }
     }
 
+    if (location.type === 'database' && parser.yy.latestTablePrimaries) {
+      var foundAlias = parser.yy.latestTablePrimaries.filter(function (primary) {
+        return primary.alias === location.identifierChain[0].name;
+      });
+      if (foundAlias.length > 0) {
+        // Impala complex reference in FROM clause, i.e. FROM testTable t, t.testMap tm
+        location.type = 'table';
+        expandIdentifierChain(location, true);
+      }
+    }
+
     if (location.type === 'unknown') {
-      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length === 1 && parser.yy.latestTablePrimaries) {
+      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
         var found = parser.yy.latestTablePrimaries.filter(function (primary) {
           return primary.alias === location.identifierChain[0].name || (primary.identifierChain && primary.identifierChain[0].name === location.identifierChain[0].name);
         });
         if (found.length > 0) {
-          location.type = 'table';
-          expandIdentifierChain(location, true);
+          if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && found[0].identifierChain[0].name === location.identifierChain[0].name) {
+            location.type = 'database';
+          } else {
+            location.type = 'table';
+            expandIdentifierChain(location, true);
+          }
         } else {
           if (parser.yy.subQueries) {
             found = parser.yy.subQueries.filter(function (subQuery) {
@@ -1009,8 +1024,12 @@ var addFunctionLocation = function (location, functionName) {
   });
 };
 
-var addDatabaseLocation = function (location, database) {
-  parser.yy.locations.push({type: 'database', location: adjustLocationForCursor(location), database: database});
+var addDatabaseLocation = function (location, identifierChain) {
+  parser.yy.locations.push({
+    type: 'database',
+    location: adjustLocationForCursor(location),
+    identifierChain: identifierChain
+  });
 };
 
 var addTableLocation = function (location, identifierChain) {

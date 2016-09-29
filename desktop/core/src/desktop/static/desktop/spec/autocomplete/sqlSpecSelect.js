@@ -640,6 +640,7 @@ define([
             suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'database one' }, { name: 'test table' }] }] },
             locations: [
+              { type: 'database', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 28}, identifierChain: [{ name: 'database one' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 29, last_column: 41}, identifierChain: [{ name: 'database one' }, { name: 'test table' }] }
             ]
           }
@@ -3100,6 +3101,7 @@ define([
             locations: [
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10}, identifierChain: [{ name: 'testTable' },{ name: 'testMap' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column :26}, identifierChain: [{ name: 'testTable' }]},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 31}, identifierChain: [{ name: 'testTable' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testTable' }, { name: 'testMap'}] }
             ],
             suggestKeywords: ['*'],
@@ -3130,13 +3132,15 @@ define([
           afterCursor: '',
           dialect: 'impala',
           expectedResult: {
-            lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }] },
             locations: [
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 27 }, identifierChain: [{ name: 'testTable' }]},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 32 }, identifierChain: [{ name: 'testTable' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 42 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 54 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]}            ]
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 54 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]}
+            ],
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }] },
+            lowerCase: false
           }
         });
       });
@@ -3226,6 +3230,7 @@ define([
           expectedResult: {
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, identifierChain: [{ name: 'testTable' }]},
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29}, identifierChain: [{ name: 'testTable' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 37}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 47}, identifierChain: [{ name: 'testTable' },{ name: 'testMap' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' },{ name: 'field' }]}
