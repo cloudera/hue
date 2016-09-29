@@ -95,18 +95,18 @@ class NavigatorApi(object):
           query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
         else:
           name, val = term.split(':')
-          if val:
+          if val and (name != 'type' or val in entity_types): # Manual filter allowed
             user_filters.append(term) # e.g. type:VIEW ca
-      if user_filters and not query_clauses:
-        query_clauses.append('*') # e.g. type:VIEW
 
-      filter_query = '(originalName:*.*)'
-      if search_terms:
+      filter_query = '*'
+
+      if query_clauses:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
-      type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in entity_types])
       if user_filters:
-        type_filter_clause = '(%s) AND (%s)' % ('OR'.join(user_filters), type_filter_clause)
+        type_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters])
+      else:
+        type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
       filter_query = '%s AND (%s)' % (filter_query, type_filter_clause)
 
       params += (
