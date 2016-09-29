@@ -922,13 +922,26 @@
     }));
   };
 
-  ApiHelper.prototype.identifierChainToPath = function (identifierChain, defaultDatabase) {
+  ApiHelper.prototype.containsDatabase = function (sourceType, databaseName) {
+    var self = this;
+    return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName) > -1;
+  };
+
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Object[]} options.identifierChain
+   * @param {string} options.identifierChain.name
+   * @param {string} options.defaultDatabase
+   */
+  ApiHelper.prototype.identifierChainToPath = function (options) {
     var self = this;
     var path = [];
-    if (typeof self.lastKnownDatabases[identifierChain[0].name] === 'undefined') {
-      path.push(defaultDatabase);
+    if (! self.containsDatabase(options.sourceType, options.identifierChain[0].name)) {
+      path.push(options.defaultDatabase);
     }
-    return path.concat($.map(identifierChain, function (identifier) { return identifier.name }));
+    return path.concat($.map(options.identifierChain, function (identifier) { return identifier.name }));
   };
 
   /**
@@ -946,7 +959,7 @@
    */
   ApiHelper.prototype.fetchAutocomplete = function (options) {
     var self = this;
-    var path = self.identifierChainToPath(options.identifierChain, options.defaultDatabase);
+    var path = self.identifierChainToPath(options);
 
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
@@ -970,7 +983,7 @@
    */
   ApiHelper.prototype.fetchSamples = function (options) {
     var self = this;
-    var path = self.identifierChainToPath(options.identifierChain, options.defaultDatabase);
+    var path = self.identifierChainToPath(options);
     fetchAssistData.bind(self)($.extend({}, options, {
       url: SAMPLE_API_PREFIX + path.join('/'),
       errorCallback: self.assistErrorCallback(options),
@@ -999,7 +1012,7 @@
     var clonedIdentifierChain = options.identifierChain.concat();
 
     var hierarchy = '';
-    if (typeof self.lastKnownDatabases[options.identifierChain[0].name] === 'undefined') {
+    if (! self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
       hierarchy = options.defaultDatabase;
     } else {
       hierarchy = clonedIdentifierChain.shift().name
@@ -1071,24 +1084,22 @@
    * Fetches a navigator entity for the given identifierChain
    *
    * @param {Object} options
+   * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
    * @param {Object[]} options.identifierChain
    * @param {string} options.identifierChain.name
-   * @param {string} options.defaultDatabase
+   * @param {string} [options.defaultDatabase]
    */
   ApiHelper.prototype.fetchNavEntity = function (options) {
     var self = this;
 
     var clonedIdentifierChain = options.identifierChain.concat();
 
-    var database = options.defaultDatabase;
-    // TODO: Fix with proper source type
-    // if (typeof self.lastKnownDatabases[clonedIdentifierChain[0].name] !== 'undefined') {
-    //   database = clonedIdentifierChain.shift().name;
-    // }
+    var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
+
     var url = NAV_FIND_ENTITY_API + '?type=database&name=' + database;
 
     if (clonedIdentifierChain.length > 0) {

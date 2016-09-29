@@ -691,6 +691,7 @@ SchemaQualifiedTableIdentifier
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
+     addDatabaseLocation(@1, [ { name: $1 } ]);
      addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
    }
@@ -827,6 +828,7 @@ RegularOrBackTickedSchemaQualifiedName
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
+     addDatabaseLocation(@1, [ { name: $1 } ]);
      addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
    }
@@ -857,6 +859,9 @@ LocalOrSchemaQualifiedName_EDIT
 
 ColumnReference
  : BasicIdentifierChain
+   {
+     parser.yy.locations[parser.yy.locations.length - 1].type = 'column';
+   }
  | BasicIdentifierChain AnyDot '*'
  ;
 
@@ -873,7 +878,7 @@ BasicIdentifierChain
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
      $1.push($3);
-     addColumnLocation(@3, $1.concat());
+     addUnknownLocation(@3, $1.concat());
    }
  ;
 
@@ -1066,7 +1071,7 @@ HiveDescribeStatement
    }
  | '<hive>DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier
    {
-     addDatabaseLocation(@4, $4);
+     addDatabaseLocation(@4, [{ name: $4 }]);
    }
  | '<hive>DESCRIBE' '<hive>FUNCTION' OptionalExtended RegularIdentifier
  ;

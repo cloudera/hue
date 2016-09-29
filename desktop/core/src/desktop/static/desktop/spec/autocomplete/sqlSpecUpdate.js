@@ -144,6 +144,7 @@ define([
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           locations: [
+            {type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }]},
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'bar'}, { name: 'foo' }]}
           ]
         }
@@ -158,6 +159,7 @@ define([
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           locations: [
+            {type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }]},
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'bar'}, { name: 'foo' }]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 22}, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'id' }]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 31}, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'bla' }]}
@@ -176,6 +178,7 @@ define([
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           suggestKeywords: ['EXISTS', 'NOT EXISTS'],
           locations: [
+            {type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }]},
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'bar'}, { name: 'foo' }]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23}, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'bla' }]}
           ]
@@ -190,6 +193,7 @@ define([
         containsKeywords: ['CASE'],
         expectedResult: {
           locations: [
+            {type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }]},
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'bla'}]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 40 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'id'}]}
@@ -215,6 +219,7 @@ define([
           suggestFunctions: {},
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           locations: [
+            {type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }]},
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'bla'}]},
             {type: 'column', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 40 }, identifierChain: [{ name: 'bar'}, { name: 'foo' }, { name: 'id'}]}

@@ -121,6 +121,7 @@ case 614: case 651:
 break;
 case 615: case 652:
 
+     addDatabaseLocation(_$[$0-2], [ { name: $$[$0-2] } ]);
      addTableLocation(_$[$0], [ { name: $$[$0-2] }, { name: $$[$0] } ]);
      this.$ = { identifierChain: [ { name: $$[$0-2] }, { name: $$[$0] } ] };
    
@@ -204,6 +205,11 @@ break;
 case 656:
 this.$ = { identifierChain: $$[$0-1].identifierChain, alias: $$[$0] };
 break;
+case 659:
+
+     parser.yy.locations[parser.yy.locations.length - 1].type = 'column';
+   
+break;
 case 662:
 
      this.$ = [$$[$0]];
@@ -213,7 +219,7 @@ break;
 case 663:
 
      $$[$0-2].push($$[$0]);
-     addColumnLocation(_$[$0], $$[$0-2].concat());
+     addUnknownLocation(_$[$0], $$[$0-2].concat());
    
 break;
 case 664: case 672:
@@ -318,7 +324,7 @@ case 717: case 728: case 1666: case 1751: case 1754: case 1786: case 1790: case 
 break;
 case 718:
 
-     addDatabaseLocation(_$[$0], $$[$0]);
+     addDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
    
 break;
 case 721: case 1547: case 1775: case 1795: case 1804: case 2319: case 2329: case 2352: case 2357: case 2358: case 2363: case 2474: case 2483: case 2484: case 2603: case 2604: case 2616:
@@ -4203,14 +4209,29 @@ var commitLocations = function () {
       }
     }
 
+    if (location.type === 'database' && parser.yy.latestTablePrimaries) {
+      var foundAlias = parser.yy.latestTablePrimaries.filter(function (primary) {
+        return primary.alias === location.identifierChain[0].name;
+      });
+      if (foundAlias.length > 0) {
+        // Impala complex reference in FROM clause, i.e. FROM testTable t, t.testMap tm
+        location.type = 'table';
+        expandIdentifierChain(location, true);
+      }
+    }
+
     if (location.type === 'unknown') {
-      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length === 1 && parser.yy.latestTablePrimaries) {
+      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
         var found = parser.yy.latestTablePrimaries.filter(function (primary) {
           return primary.alias === location.identifierChain[0].name || (primary.identifierChain && primary.identifierChain[0].name === location.identifierChain[0].name);
         });
         if (found.length > 0) {
-          location.type = 'table';
-          expandIdentifierChain(location, true);
+          if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && found[0].identifierChain[0].name === location.identifierChain[0].name) {
+            location.type = 'database';
+          } else {
+            location.type = 'table';
+            expandIdentifierChain(location, true);
+          }
         } else {
           if (parser.yy.subQueries) {
             found = parser.yy.subQueries.filter(function (subQuery) {
@@ -4927,8 +4948,12 @@ var addFunctionLocation = function (location, functionName) {
   });
 };
 
-var addDatabaseLocation = function (location, database) {
-  parser.yy.locations.push({type: 'database', location: adjustLocationForCursor(location), database: database});
+var addDatabaseLocation = function (location, identifierChain) {
+  parser.yy.locations.push({
+    type: 'database',
+    location: adjustLocationForCursor(location),
+    identifierChain: identifierChain
+  });
 };
 
 var addTableLocation = function (location, identifierChain) {
