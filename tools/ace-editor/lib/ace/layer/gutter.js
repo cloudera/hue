@@ -219,14 +219,12 @@ var Gutter = function(parentEl) {
         var gutterWidth = gutterRenderer 
             ? gutterRenderer.getWidth(session, lastLineNumber, config)
             : lastLineNumber.toString().length * config.characterWidth;
-        
-        var padding = this.$padding || this.$computePadding();
-        gutterWidth += padding.left + padding.right;
-        if (gutterWidth !== this.gutterWidth && !isNaN(gutterWidth)) {
-            this.gutterWidth = gutterWidth;
-            this.element.style.width = Math.ceil(this.gutterWidth) + "px";
-            this._emit("changeGutterWidth", gutterWidth);
-        }
+
+        gutterWidth += 6; // add some padding
+
+        this.gutterWidth = gutterWidth;
+        this.element.style.width = Math.ceil(this.gutterWidth) + "px";
+        this._emit("changeGutterWidth", gutterWidth);
     };
 
     this.$fixedWidth = false;
