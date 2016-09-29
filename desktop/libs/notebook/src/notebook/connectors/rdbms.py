@@ -155,7 +155,7 @@ class RdbmsApi(Api):
 
   @query_error_handler
   def get_select_star_query(self, snippet, database, table):
-    return "SELECT * FROM `%s`.`%s`" % (database, table)
+    return "SELECT * FROM `%s`.`%s` LIMIT 1000" % (database, table)
 
 
 class Assist():
