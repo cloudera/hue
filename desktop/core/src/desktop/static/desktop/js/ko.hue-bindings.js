@@ -3267,7 +3267,7 @@
       });
 
       $tableDropMenu.find('.editor-drop-select').click(function () {
-        setFromDropMenu('SELECT * FROM ' + lastMeta.table + ';');
+        setFromDropMenu('SELECT * FROM ' + lastMeta.table + ' LIMIT 100;');
         $tableDropMenu.hide();
       });
 
@@ -3279,8 +3279,8 @@
         setFromDropMenu('UPDATE ' + lastMeta.table + ' SET ');
       });
 
-      $tableDropMenu.find('.editor-drop-delete').click(function () {
-        setFromDropMenu('DELETE FROM ' + lastMeta.table + ' WHERE ');
+      $tableDropMenu.find('.editor-drop-drop').click(function () {
+        setFromDropMenu('DROP TABLE ' + lastMeta.table + ';');
       });
 
       var draggableMeta = {};

@@ -639,7 +639,7 @@ class HS2Api(Api):
   def get_select_star_query(self, snippet, database, table):
     db = self._get_db(snippet)
     table = db.get_table(database, table)
-    return db.get_select_star_query(database, table)
+    return db.get_select_star_query(database, table, limit=1000)
 
 
   def _get_handle(self, snippet):
