@@ -198,6 +198,7 @@ var Autocomplete = function() {
             } else {
                 this.editor.execCommand("insertstring", data.value || data);
             }
+            this.editor.renderer.scrollCursorIntoView();
         }
         this.detach();
     };
