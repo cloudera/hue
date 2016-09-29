@@ -28,7 +28,6 @@ from desktop.views import commonheader, commonfooter, _ko
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 <%namespace name="require" file="/require.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
@@ -36,7 +35,6 @@ ${ components.menubar() }
 ${ require.config() }
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
@@ -397,9 +395,9 @@ ${ sqlContextPopover.sqlContextPopover() }
         </div>
         <!-- /ko -->
 
-      <!-- ko if: $root.navigatorEnabled() && $root.database().navigatorStats() && $root.database().navigatorStats().tags -->
-        <!-- ko template: { name: 'metastore-databases-tags', data: $root.database() }--><!-- /ko -->
-      <!-- /ko -->
+        <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
+          defaultDatabase: db_name
+        } }"></div>
       </div>
       <!-- /ko -->
 
@@ -530,28 +528,6 @@ ${ sqlContextPopover.sqlContextPopover() }
   </div>
 </script>
 
-
-<script type="text/html" id="metastore-databases-tags">
-  <div>
-      <h4>${ _('Tagging') }</h4>
-      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
-        <!-- ko foreach: $data.navigatorStats().tags() -->
-          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
-        <!-- /ko -->
-
-        <!-- ko if: $data.navigatorStats().tags().length == 0 -->
-          ${ _('No tags') }
-        <!-- /ko -->
-        <div data-bind="visible: $data.showAddTagName">
-          <input type="text" data-bind="value: $data.addTagName, valueUpdate:'afterkeydown'">
-          <i class="fa fa-save pointer" data-bind="click: $data.addTags, visible: $data.addTagName" title="${ _('Save tag') }"></i>
-        </div>
-        <i class="fa fa-plus pointer" data-bind="click: function() { $data.showAddTagName(true); }, visible: ! $data.showAddTagName()" title="${ _('Add a tag') }"></i>
-      </div>
-  </div>
-</script>
-
-
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
@@ -613,20 +589,10 @@ ${ sqlContextPopover.sqlContextPopover() }
     <!-- ko if: $root.navigatorEnabled() && navigatorStats() -->
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
-      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i>
-        <!-- ko foreach: navigatorStats().tags() -->
-          <span class="badge badge-info" data-bind="text: $data"></span> <i class="fa fa-minus pointer" data-bind="click: $parent.deleteTags"></i>
-        <!-- /ko -->
-
-        <!-- ko if: navigatorStats().tags().length == 0 -->
-          ${ _('No tags') }
-        <!-- /ko -->
-        <div data-bind="visible: showAddTagName">
-          <input type="text" data-bind="value: addTagName, valueUpdate:'afterkeydown'">
-          <i class="fa fa-save pointer" data-bind="click: addTags, visible: addTagName" title="${ _('Save tag') }"></i>
-        </div>
-        <i class="fa fa-plus pointer" data-bind="click: function() { showAddTagName(true); }, visible: ! showAddTagName()" title="${ _('Add a tag') }"></i>
-      </div>
+      <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
+        defaultDatabase: database.name,
+        table: name
+      } }"></div>
     </div>
     <!-- /ko -->
   </div>
@@ -1171,14 +1137,6 @@ ${ sqlContextPopover.sqlContextPopover() }
 </div>
 
 <script type="text/javascript" charset="utf-8">
-
-  function list_tags() {
-    $.post("${ url('metadata:list_tags') }", { // '/metadata/api/navigator/list_tags/'
-      // prefix: 'bla'
-    }, function(data) {
-      console.log(JSON.stringify(data));
-    });
-  }
 
   function suggest() {
     $.post("${ url('metadata:suggest') }", { // '/metadata/api/navigator/suggest/'

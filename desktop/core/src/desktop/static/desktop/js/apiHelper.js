@@ -1085,9 +1085,10 @@
     var clonedIdentifierChain = options.identifierChain.concat();
 
     var database = options.defaultDatabase;
-    if (typeof self.lastKnownDatabases[clonedIdentifierChain[0].name] !== 'undefined') {
-      database = clonedIdentifierChain.shift().name;
-    }
+    // TODO: Fix with proper source type
+    // if (typeof self.lastKnownDatabases[clonedIdentifierChain[0].name] !== 'undefined') {
+    //   database = clonedIdentifierChain.shift().name;
+    // }
     var url = NAV_FIND_ENTITY_API + '?type=database&name=' + database;
 
     if (clonedIdentifierChain.length > 0) {
@@ -1253,17 +1254,11 @@
   return {
 
     /**
-     * @param {Object} options
-     * @param {Object} options.i18n
-     * @param {string} options.i18n.errorLoadingDatabases
-     * @param {string} options.i18n.errorLoadingTablePreview
-     * @param {string} options.user
-     *
      * @returns {ApiHelper}
      */
-    getInstance: function (options) {
+    getInstance: function () {
       if (instance === null) {
-        instance = new ApiHelper(options.i18n, options.user);
+        instance = new ApiHelper(ApiHelperGlobals.i18n, ApiHelperGlobals.user);
       }
       return instance;
     }

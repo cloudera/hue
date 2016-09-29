@@ -1953,9 +1953,8 @@
   };
 
 
-  function EditorViewModel(editor_id, notebooks, options, i18n, CoordinatorEditorViewModel, RunningCoordinatorModel) {
+  function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     var self = this;
-    self.i18n = i18n;
     self.user = options.user;
     self.userId = options.userId;
     self.editorType = ko.observable(options.editor_type);

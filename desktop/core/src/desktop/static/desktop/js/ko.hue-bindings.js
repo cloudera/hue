@@ -174,10 +174,6 @@
    *
    * Example:
    *
-   * <!-- ko hueSpinner: loading --><!-- /ko -->
-   *
-   * Or with options:
-   *
    * <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
    *
    */

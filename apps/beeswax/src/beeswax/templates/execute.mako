@@ -26,7 +26,6 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="dashboard" file="common_dashboard.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${ layout.menubar(section='query') }
@@ -878,7 +877,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 
 <style type="text/css">
   h1 {

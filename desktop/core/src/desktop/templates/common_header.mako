@@ -155,6 +155,13 @@ if USE_NEW_EDITOR.get():
       attribution: '${ leaflet['attribution'] |n,unicode }'
     };
 
+    ApiHelperGlobals = {
+      i18n: {
+        errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
+        errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
+      },
+      user: '${ user.username }'
+    }
   </script>
 
   <!--[if lt IE 9]>

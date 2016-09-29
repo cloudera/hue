@@ -3208,13 +3208,10 @@ ${ hueIcons.symbols() }
 
 
     $(document).ready(function () {
-      var i18n = {
-        errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
-      }
       % if ENABLE_QUERY_SCHEDULING.get():
-      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n, CoordinatorEditorViewModel, RunningCoordinatorModel);
+      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, CoordinatorEditorViewModel, RunningCoordinatorModel);
       % else:
-      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
+      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
       % endif
       ko.applyBindings(viewModel);
       viewModel.init();

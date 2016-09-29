@@ -22,7 +22,6 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 <%namespace name="require" file="/require.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
@@ -30,7 +29,6 @@ ${ components.menubar() }
 ${ require.config() }
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
