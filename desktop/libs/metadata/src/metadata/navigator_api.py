@@ -93,7 +93,8 @@ def search_entities_interactive(request):
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 25)
-  sources = json.loads(request.POST.get('sources')) or []
+  field_facets = json.loads(request.POST.get('field_facets') or '[]')
+  sources = json.loads(request.POST.get('sources') or '[]')
 
   fqs = []
   fq_type = []
@@ -111,7 +112,7 @@ def search_entities_interactive(request):
       query=query_s,
       limit=limit,
       offset=offset,
-      facetFields=None,
+      facetFields=field_facets,
       facetPrefix=prefix,
       facetRanges=None,
       filterQueries=fqs,

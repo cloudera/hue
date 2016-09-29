@@ -86,18 +86,28 @@ class NavigatorApi(object):
     try:
       params = self.__params
 
-      search_terms = [term.lower() for term in query_s.strip().split()]
+      search_terms = [term for term in query_s.strip().split()]
 
       query_clauses = []
+      user_filters = []
       for term in search_terms:
-        query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+        if ':' not in term:
+          query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+        else:
+          name, val = term.split(':')
+          if val:
+            user_filters.append(term) # e.g. type:VIEW ca
+      if user_filters and not query_clauses:
+        query_clauses.append('*') # e.g. type:VIEW
 
       filter_query = '(originalName:*.*)'
       if search_terms:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
       type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in entity_types])
-      filter_query = '%sAND(%s)' % (filter_query, type_filter_clause)
+      if user_filters:
+        type_filter_clause = '(%s) AND (%s)' % ('OR'.join(user_filters), type_filter_clause)
+      filter_query = '%s AND (%s)' % (filter_query, type_filter_clause)
 
       params += (
         ('query', filter_query),
@@ -105,6 +115,7 @@ class NavigatorApi(object):
         ('limit', limit),
       )
 
+      LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
 
       return response
