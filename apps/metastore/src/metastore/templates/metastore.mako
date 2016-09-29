@@ -1140,14 +1140,6 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
 
-  function suggest() {
-    $.post("${ url('metadata:suggest') }", { // '/metadata/api/navigator/suggest/'
-      prefix: 'blah'
-    }, function(data) {
-      console.log(JSON.stringify(data));
-    });
-  }
-
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
     $(rawDatum.counts).each(function (cnt, item) {
