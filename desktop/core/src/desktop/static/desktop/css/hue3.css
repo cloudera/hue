@@ -2932,3 +2932,12 @@ input[type='password']::-ms-reveal {
   right: -5px;
   top: -5px;
 }
+
+.small-search {
+  border-radius: 9px !important;
+  min-height: 17px !important;
+  height: 17px !important;
+  margin-right: 5px;
+  margin-left: -5px;
+  padding-right: 18px !important;
+}

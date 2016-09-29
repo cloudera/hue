@@ -196,6 +196,59 @@
         }
         $.totalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
         _parent.previousPath = path;
+
+        var $search = $('<div>').html('<i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding-left: 20px">').css({
+          'position': 'absolute',
+          'right': '20px',
+          'background-color': '#FFF',
+          'top': '2px'
+        });
+
+        function slideOutInput() {
+          $search.find('input').animate({
+            'width': '0'
+          }, 100, function(){
+            $search.find('input').hide();
+          });
+        }
+
+        var $searchInput = $search.find('input');
+        function tog(v) {
+          return v ? "addClass" : "removeClass";
+        }
+        $searchInput.addClass("clearable");
+        $searchInput.on("input", function () {
+          $searchInput[tog(this.value)]("x");
+        })
+        .on("mousemove", function (e) {
+          $searchInput[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
+        })
+        .on("click", function (e) {
+          if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
+            $searchInput.removeClass("x onX").val("");
+          }
+        })
+        .on("blur", function (e) {
+          if ($searchInput.val() === ''){
+            slideOutInput();
+          }
+        });
+
+        $search.find('i').on('click', function(){
+          if ($searchInput.is(':visible')){
+            slideOutInput();
+          }
+          else {
+            $searchInput.show().animate({
+              'width': '100px'
+            }, 100, function(){
+              $searchInput.focus();
+            });
+          }
+        });
+
+        $search.appendTo($(_parent.element).find('.filechooser-tree'));
+
         var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css({
           'padding': '0',
           'marginLeft': '0',
@@ -267,6 +320,9 @@
               else {
                 _flink.text(" " + (file.name != "" ? file.name : ".."));
               }
+              if (_flink.text() !== ' ..') {
+                _f.addClass('file-list-item');
+              }
               _flink.appendTo(_f);
               if (file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1) {
                 $("<i class='fa fa-cloud'></i>").prependTo(_flink);
@@ -280,6 +336,7 @@
               });
             }
             if (file.type == "file" && !_parent.options.displayOnlyFolders) {
+              _f.addClass('file-list-item');
               _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
               $("<i class='fa fa-file-o'></i>").prependTo(_flink);
               _f.click(function () {
@@ -289,7 +346,27 @@
             _f.appendTo(_flist);
           }
         });
+
         _flist.appendTo($(_parent.element).find('.filechooser-tree'));
+
+        $searchInput.jHueDelayedInput(function () {
+          var filter = $searchInput.val().toLowerCase();
+          var results = 0;
+          $(_parent.element).find('.filechooser-tree .no-results').hide();
+          $(_parent.element).find('.filechooser-tree .file-list-item').each(function(){
+            if ($(this).text().toLowerCase().indexOf(filter) > -1) {
+              $(this).show();
+              results++;
+            }
+            else {
+              $(this).hide();
+            }
+          });
+          if (results == 0){
+            $(_parent.element).find('.filechooser-tree .no-results').show();
+          }
+        }, 300);
+
         var _actions = $("<div>").addClass("jHueFilechooserActions");
         var _showActions = false;
         var _uploadFileBtn;
