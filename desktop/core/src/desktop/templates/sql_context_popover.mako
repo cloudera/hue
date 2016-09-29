@@ -278,8 +278,17 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-and-column-tags">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
-      <!-- ko component: { name: 'sql-nav-tags', params: { entity: entity } } --><!-- /ko -->
+    <div class="sql-context-flex-fill">
+      <div class="sql-context-flex">
+        <div class="sql-context-flex-header">
+          <div style="margin: 10px 5px 0 10px;">
+            <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
+          </div>
+        </div>
+        <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
+        </div>
+      </div>
     </div>
   </script>
 
@@ -533,6 +542,14 @@ from metadata.conf import has_navigator
         });
       };
 
+      function TagsTab (identifierChain, defaultDatabase) {
+        var self = this;
+        self.loading = ko.observable(false);
+        self.hasErrors = ko.observable(false);
+        self.identifierChain = identifierChain;
+        self.defaultDatabase = defaultDatabase;
+      }
+
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn) {
         var self = this;
         self.tabs = ko.observableArray();
@@ -540,7 +557,7 @@ from metadata.conf import has_navigator
         var apiHelper = ApiHelper.getInstance();
 
         self.details = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
-        self.tags = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchNavEntity);
+        self.tags = new TagsTab(data.identifierChain, defaultDatabase);
         self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
         self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
         self.partitions = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
@@ -601,8 +618,6 @@ from metadata.conf import has_navigator
         self.activeTab.subscribe(function (newValue) {
           if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
             self.sample.fetch(self.initializeSamplesTable);
-          } else if (newValue === 'tags' && typeof self.tags.fetchedData() === 'undefined') {
-            self.tags.fetch();
           } else if (newValue === 'analysis' && typeof self.analysis.fetchedData() === 'undefined') {
             self.analysis.fetch();
           } else if (newValue === 'partitions' && typeof self.partitions.fetchedData() === 'undefined') {
@@ -1029,94 +1044,6 @@ from metadata.conf import has_navigator
         window.setTimeout(function() {
           $(document).on('click', hideOnClickOutside);
         }, 0);
-      });
-    }));
-  </script>
-
-  <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
-
-  <script type="text/html" id="sql-nav-tags-template">
-    <div class="sql-context-flex">
-      <div class="sql-context-flex-header">
-        <div style="margin: 10px 5px 0 10px;">
-          <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
-        </div>
-      </div>
-      <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-        <div style="margin: 10px">
-          <textarea style="width: 100%" data-bind="tagEditor: { placeholder: '${_ko('Enter tags...')}', setTags: currentTags, onSave: onSave, load: loadTags  }"></textarea>
-        </div>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require([
-          'knockout',
-          'desktop/js/apiHelper'
-        ], factory);
-      } else {
-        factory(ko, ApiHelper);
-      }
-    }(function (ko, ApiHelper) {
-
-      function SqlNavTags(params) {
-        var self = this;
-        var apiHelper = ApiHelper.getInstance();
-
-        self.currentTags = ko.observableArray(params.entity.tags);
-        self.allTags = ko.observableArray();
-
-        var fetchAllTags = function () {
-          apiHelper.listNavTags({
-            successCallback: function (data) {
-              self.allTags(Object.keys(data.tags))
-            },
-            silenceErrors: true
-          });
-        };
-        fetchAllTags();
-
-        self.loadTags = function (query, callback) {
-          callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
-        };
-
-        self.onSave = function (value) {
-          var newTags = value.split(',');
-          var tagsToRemove = [];
-          var tagsToAdd = [];
-          var tagIndex = {};
-          self.currentTags().forEach(function (tag) {
-            tagIndex[tag] = false;
-          });
-          newTags.forEach(function (newTag) {
-            if (typeof tagIndex[newTag] !== 'undefined') {
-              tagIndex[newTag] = true;
-            } else {
-              tagsToAdd.push(newTag);
-            }
-          });
-          Object.keys(tagIndex).forEach(function (oldTag) {
-            if (! tagIndex[oldTag]) {
-              tagsToRemove.push(oldTag);
-            }
-          });
-
-          if (tagsToAdd.length > 0) {
-            apiHelper.addNavTags(params.entity.identity, tagsToAdd);
-          }
-          if (tagsToRemove.length > 0) {
-            apiHelper.deleteNavTags(params.entity.identity, tagsToRemove);
-          }
-          self.currentTags(newTags);
-        };
-      }
-
-      ko.components.register('sql-nav-tags', {
-        viewModel: SqlNavTags,
-        template: { element: 'sql-nav-tags-template' }
       });
     }));
   </script>

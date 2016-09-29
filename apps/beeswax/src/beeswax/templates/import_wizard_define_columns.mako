@@ -23,7 +23,6 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="require" file="/require.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 <%namespace name="util" file="util.mako" />
 
 

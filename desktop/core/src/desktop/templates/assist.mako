@@ -23,8 +23,16 @@ from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
 %>
 
+
 <%def name="assistPanel()">
+  <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+  <%namespace name="nav_components" file="/nav_components.mako" />
+
+  ${ sqlContextPopover.sqlContextPopover() }
+  ${ nav_components.nav_tags() }
+
   <style>
+
 
     .assist-icon {
       width: 16px;

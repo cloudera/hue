@@ -23,7 +23,6 @@
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_('Notebook'), app_name, user, "68px") | n,unicode }
 
@@ -49,7 +48,6 @@ ${ editorComponents.topBar() }
 </%editorComponents:commonHTML>
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }

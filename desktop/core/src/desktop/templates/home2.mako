@@ -21,14 +21,12 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="fileBrowser" file="/file_browser.mako" />
 <%namespace name="require" file="/require.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 ${ require.config() }
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 ${ fileBrowser.fileBrowser() }
 
 <style type="text/css">

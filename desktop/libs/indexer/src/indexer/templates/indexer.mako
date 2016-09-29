@@ -23,14 +23,12 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="require" file="/require.mako" />
-<%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
 
 ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 ${ require.config() }
 
 ${ assist.assistPanel() }
-${ sqlContextPopover.sqlContextPopover() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
