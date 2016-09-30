@@ -486,7 +486,7 @@
         });
       }
 
-     if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
+      if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
         self.variables.sort(function (left, right) {
           var leftIndex = newVal.indexOf(left.name());
           var rightIndex = newVal.indexOf(right.name());
@@ -1614,12 +1614,11 @@
                 'last_modified': data.last_modified
               });
             }
-            // if (! self.schedulerViewModel) {
-            // self.loadScheduler();
-           //} else {
+
             if (self.coordinatorUuid()) {
              self.saveScheduler();
-             //self.refreshSchedulerParameters(); todo
+             //self.refreshSchedulerParameters();        if (notebook.schedulerViewModel != null) {
+             self.schedulerViewModel.coordinator.refreshParameters();
             }
 
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
@@ -1844,7 +1843,7 @@
         }, function(data) {
           if (data.status == 0) {
             if (data.changed) {
-              self.schedulerViewModel.coordinator.refreshParameters()
+              self.schedulerViewModel.coordinator.refreshParameters();
             }
           } else {
             $(document).trigger("error", data.message);

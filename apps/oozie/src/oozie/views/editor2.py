@@ -328,8 +328,16 @@ def workflow_parameters(request):
   response = {'status': -1}
 
   try:
-    workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid'))
-    workflow = Workflow(document=workflow_doc, user=request.user)
+    #workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=request.GET.get('uuid'))
+    workflow_doc = Document2.objects.get(uuid=request.GET.get('uuid') or request.GET.get('document'))
+
+    if workflow_doc.type == 'oozie-workflow2':
+      workflow = Workflow(document=workflow_doc, user=request.user)
+    else:
+      wf_doc = WorkflowBuilder().create_workflow(document=workflow_doc, user=request.user, managed=True)
+      workflow = Workflow(data=wf_doc.data)
+      print wf_doc.data
+      wf_doc.delete()
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
