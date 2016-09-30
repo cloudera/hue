@@ -388,10 +388,17 @@ class Workflow(Job):
       for param in find_json_parameters(self.sla):
         params.add(param)
 
-    for node in self.nodes:
-      params.update(node.find_parameters())
+    parameters = dict([(param, '') for param in list(params)]) 
 
-    return dict([(param, '') for param in list(params)])
+    for node in self.nodes:
+      print '===='
+      if 'document' in node.data['type']:
+        parameters.update(node.data['type'])
+        params.update(node.find_parameters())
+      return 
+      print node.find_parameters()
+      
+    return parameters
 
   def get_json(self):
     _data = self.get_data()
@@ -3616,7 +3623,7 @@ class WorkflowBuilder():
     node = self._get_hive_node(document.uuid, user, is_document_node=True)
 
     notebook = Notebook(document=document)
-    parameters = find_dollar_braced_variables(notebook.get_str())
+    parameters = find_dollar_braced_variables(notebook.get_str()) # TODO just pick them from snippet 1
     node['parameters'] = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters] #Todo check if need properties
     node['properties']['uuid'] = document.uuid
 
