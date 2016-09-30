@@ -690,16 +690,22 @@ from metadata.conf import has_navigator
           }
         }));
 
+        var path = apiHelper.identifierChainToPath({
+          sourceType: sourceType,
+          defaultDatabase: defaultDatabase,
+          identifierChain: data.identifierChain
+        });
+
         pubSubs.push(huePubSub.subscribe('sql.context.popover.show.in.assist', function () {
           huePubSub.publish('assist.db.highlight', {
             sourceType: sourceType,
-            path: apiHelper.identifierChainToPath(data.identifierChain, defaultDatabase)
+            path: path
           });
           huePubSub.publish('sql.context.popover.hide')
         }));
 
         pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
-          window.open('/metastore/table/' + apiHelper.identifierChainToPath(data.identifierChain, defaultDatabase).join('/'), '_blank');
+          window.open('/metastore/table/' + path.join('/'), '_blank');
         }));
       }
 
