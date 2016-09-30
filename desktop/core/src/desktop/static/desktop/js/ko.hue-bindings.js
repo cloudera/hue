@@ -22,6 +22,27 @@
   }
 }(function (ko) {
 
+  ko.bindingHandlers.autocomplete = {
+    init: function (element, valueAccessor) {
+      var options = valueAccessor();
+      var $element = $(element);
+
+      options = $.extend({
+      }, options);
+
+      if (typeof $().hueAutocomplete === 'undefined') {
+        $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
+          _renderItemData: function( ul, item ) {
+            var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')
+                .appendTo(ul).data( "ui-autocomplete-item", item );
+            ko.applyBindings(item.data, $li[0]);
+          }
+        });
+      }
+      $element.hueAutocomplete(options);
+    }
+  };
+
   ko.bindingHandlers.tagEditor = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
