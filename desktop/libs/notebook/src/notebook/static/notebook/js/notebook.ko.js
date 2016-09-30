@@ -1614,11 +1614,12 @@
                 'last_modified': data.last_modified
               });
             }
-            if (! self.schedulerViewModel) {
-              self.loadScheduler();
-            } else {
-              self.saveScheduler();
-              self.refreshSchedulerParameters();
+            // if (! self.schedulerViewModel) {
+            // self.loadScheduler();
+           //} else {
+            if (self.coordinatorUuid()) {
+             self.saveScheduler();
+             //self.refreshSchedulerParameters(); todo
             }
 
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
@@ -1812,8 +1813,9 @@
         }, function (data) {
           if ($("#schedulerEditor").length > 0) {
             $("#schedulerEditor").html(data.layout);
+            
             self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
-
+            
             ko.cleanNode($("#schedulerEditor")[0]);
             ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
@@ -1824,8 +1826,12 @@
             self.schedulerViewModel.isEditing(true);
 
             if (_action == 'new') {
-              self.saveScheduler();
+              self.coordinatorUuid(UUID());
+              self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());             
+      		//self.schedulerViewModel.coordinator.properties.workflow('aa');
             }
+
+
           }
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
@@ -1833,9 +1839,9 @@
       }
     };
 
-    self.refreshSchedulerParameters = function() {
+    self.refreshSchedulerParameters = function() { // dup of 0/oozie/editor/workflow/parameters/?uuid=uui ?
       if (self.isBatchable()) {
-        $.post("/oozie/editor/workflow/action/refresh_parameters/", {
+        $.post("/oozie/editor/workflow/action/refresh_document_parameters/", {
           uuid: self.coordinatorUuid()
         }, function(data) {
           if (data.status == 0) {
@@ -1853,7 +1859,7 @@
       if (self.isBatchable() && (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())) {
         self.schedulerViewModel.coordinator.isManaged(true);
         self.schedulerViewModel.save(function(data) {
-          self.coordinatorUuid(data.uuid);
+          self.coordinatorUuid(data.uuid); // bewarre
         });
       }
     };
@@ -2163,7 +2169,7 @@
         }
 
         if (notebook.isSaved()) {
-          notebook.loadScheduler();
+            //notebook.loadScheduler(); // load only if schedule id there
           notebook.snippets()[0].currentQueryTab('savedQueries');
           if (notebook.snippets()[0].queries().length === 0) {
             notebook.snippets()[0].fetchQueries(); // Subscribe not updating yet

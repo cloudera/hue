@@ -1111,7 +1111,7 @@ ${ hueIcons.symbols() }
         <a data-bind="click: showSubmitPopup">${ _('Start') }</a></br>
         </br>
         <div id="schedulerEditor">
-          <div id="schedulerEditor"></div>
+          ## <div id="schedulerEditor"></div>
         </div>
       <!-- /ko -->
 
@@ -3568,7 +3568,11 @@ ${ hueIcons.symbols() }
       });
 
       $(document).on('shown', 'a[href="#scheduleTab"]', function(){
-        huePubSub.publish('render.jqcron');
+        if (viewModel.selectedNotebook().schedulerViewModel == null) {
+          viewModel.selectedNotebook().loadScheduler();
+        }
+                                                                   
+// huePubSub.publish('render.jqcron');
       });
 
       huePubSub.subscribe('render.jqcron', function(){
