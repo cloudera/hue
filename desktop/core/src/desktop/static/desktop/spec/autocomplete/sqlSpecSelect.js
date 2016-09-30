@@ -5161,7 +5161,8 @@ define([
             beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC ',
             afterCursor: '',
             dialect: 'hive',
-            containsKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT'],
+            containsKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'LIMIT'],
+            doesNotContainKeywords: ['SORT BY'],
             hasLocations: true,
             expectedResult: {
               lowerCase: false

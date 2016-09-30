@@ -645,7 +645,10 @@ case 799:
 break;
 case 801:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-7], $$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = getKeywordsForOptionalsLR(
+       [$$[$0-7], $$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
+       [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
+       [true, true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      if (keywords.length > 0) {
        this.$ = { suggestKeywords: keywords, empty: !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] }
      }
@@ -653,7 +656,10 @@ case 801:
 break;
 case 810:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = getKeywordsForOptionalsLR(
+       [$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
+       [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
+       [true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      if ($$[$0-8].suggestKeywords) {
        keywords = keywords.concat(createWeightedKeywords($$[$0-8].suggestKeywords, 1));
      }
@@ -666,7 +672,10 @@ case 810:
 break;
 case 811:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = getKeywordsForOptionalsLR(
+       [$$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
+       [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
+       [true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      if ($$[$0-7].suggestKeywords) {
        keywords = keywords.concat(createWeightedKeywords($$[$0-7].suggestKeywords, 8));
      }
@@ -679,7 +688,10 @@ case 811:
 break;
 case 812:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isHive(), true, isImpala()]);
+     var keywords = getKeywordsForOptionalsLR(
+       [$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
+       [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
+       [isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
    
 break;
@@ -691,7 +703,7 @@ case 813:
 break;
 case 814:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]);
+     var keywords = getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]);
      if ($$[$0-4].suggestKeywords) {
        keywords = keywords.concat(createWeightedKeywords($$[$0-4].suggestKeywords, 5));
      }
