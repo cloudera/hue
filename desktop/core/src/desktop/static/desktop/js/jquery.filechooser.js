@@ -249,9 +249,23 @@
 
         $search.appendTo($(_parent.element).find('.filechooser-tree'));
 
-        var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css({
+        var $homeBreadcrumb = $("<ul>").addClass("hueBreadcrumb").css({
           'padding': '0',
           'marginLeft': '0',
+          'float': 'left',
+          'white-space': 'nowrap'
+        });
+
+        var $scrollingBreadcrumbs = $("<ul>").addClass("hueBreadcrumb").css({
+          'padding': '0',
+          'marginLeft': '10px',
+          'marginBottom': '0',
+          'paddingRight': '10px',
+          'float': 'left',
+          'width': '370px',
+          'height': '30px',
+          'overflow-x': 'scroll',
+          'overflow-y': 'hidden',
           'white-space': 'nowrap'
         });
 
@@ -263,7 +277,7 @@
 
         $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
         if (_parent.options.fsSelected !== 's3a') {
-          _home.appendTo(_breadcrumbs);
+          _home.appendTo($homeBreadcrumb);
         }
 
         if (_parent.options.showExtraHome) {
@@ -273,7 +287,7 @@
           });
           _extraHomelink.appendTo(_extraHome);
           $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_extraHome);
-          _extraHome.appendTo(_breadcrumbs);
+          _extraHome.appendTo($scrollingBreadcrumbs);
         }
 
         if (typeof data.breadcrumbs != "undefined" && data.breadcrumbs != null) {
@@ -296,10 +310,30 @@
               _parent.options.onFolderChange(_url);
               _parent.navigateTo(_url);
             });
-            _crumb.appendTo(_breadcrumbs);
+            _crumb.appendTo($scrollingBreadcrumbs);
           });
         }
-        _breadcrumbs.appendTo($(_parent.element).find('.filechooser-tree'));
+        $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
+        $scrollingBreadcrumbs.appendTo($(_parent.element).find('.filechooser-tree'));
+        $scrollingBreadcrumbs.animate({
+          'scrollLeft': $scrollingBreadcrumbs.width()
+        });
+        $('<div>').addClass('clearfix').appendTo($(_parent.element).find('.filechooser-tree'));
+
+        if (typeof $.nicescroll !== 'undefined') {
+          $scrollingBreadcrumbs.niceScroll({
+            cursorcolor: "#CCC",
+            cursorborder: "1px solid #CCC",
+            cursoropacitymin: 0,
+            cursoropacitymax: 0.75,
+            scrollspeed: 100,
+            mousescrollstep: 60,
+            railhoffset: {
+              top: 2
+            }
+          });
+          $scrollingBreadcrumbs.parents('.modal').find('.nicescroll-rails-vr').remove();
+        }
 
         $(data.files).each(function (cnt, file) {
           var _addFile = true;
@@ -330,7 +364,7 @@
               else {
                 $("<i class='fa fa-folder'></i>").prependTo(_flink);
               }
-              _f.click(function () {
+              _flink.click(function () {
                 _parent.options.onFolderChange(file.path);
                 _parent.navigateTo(file.path);
               });
@@ -339,7 +373,7 @@
               _f.addClass('file-list-item');
               _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
               $("<i class='fa fa-file-o'></i>").prependTo(_flink);
-              _f.click(function () {
+              _flink.click(function () {
                 _parent.options.onFileChoose(file.path);
               });
             }
