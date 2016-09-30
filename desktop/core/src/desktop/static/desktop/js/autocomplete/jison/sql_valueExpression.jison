@@ -532,78 +532,56 @@ ValueExpression_EDIT
 // ------------------  LIKE, RLIKE and REGEXP ------------------
 
 ValueExpression
- : ValueExpression 'NOT' 'LIKE' ValueExpression
+ : ValueExpression LikeRightPart          -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'NOT' LikeRightPart    -> { types: [ 'BOOLEAN' ] }
+ ;
+
+LikeRightPart
+ : 'LIKE' ValueExpression    -> { suggestKeywords: ['NOT'] }
+ | 'RLIKE' ValueExpression   -> { suggestKeywords: ['NOT'] }
+ | 'REGEXP' ValueExpression  -> { suggestKeywords: ['NOT'] }
+ ;
+
+LikeRightPart_EDIT
+ : 'LIKE' ValueExpression_EDIT
+ | 'RLIKE' ValueExpression_EDIT
+ | 'REGEXP' ValueExpression_EDIT
+ | 'LIKE' PartialBacktickedOrCursor
    {
-     // verifyType($1, 'STRING');
-     $$ = { types: [ 'BOOLEAN' ] };
+     suggestFunctions({ types: [ 'STRING' ] });
+     suggestColumns({ types: [ 'STRING' ] });
+     $$ = { types: ['BOOLEAN'] }
    }
- | ValueExpression 'LIKE' ValueExpression
+ | 'RLIKE' PartialBacktickedOrCursor
    {
-     // verifyType($1, 'STRING');
-     $$ = { types: [ 'BOOLEAN' ] };
+     suggestFunctions({ types: [ 'STRING' ] });
+     suggestColumns({ types: [ 'STRING' ] });
+     $$ = { types: ['BOOLEAN'] }
    }
- | ValueExpression 'RLIKE' ValueExpression
+ | 'REGEXP' PartialBacktickedOrCursor
    {
-     // verifyType($1, 'STRING');
-     $$ = { types: [ 'BOOLEAN' ] };
-   }
- | ValueExpression 'REGEXP' ValueExpression
-   {
-     // verifyType($1, 'STRING');
-     $$ = { types: [ 'BOOLEAN' ] };
+     suggestFunctions({ types: [ 'STRING' ] });
+     suggestColumns({ types: [ 'STRING' ] });
+     $$ = { types: ['BOOLEAN'] }
    }
  ;
 
 ValueExpression_EDIT
- : ValueExpression_EDIT 'NOT' 'LIKE' ValueExpression         -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'LIKE' ValueExpression               -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'RLIKE' ValueExpression              -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'REGEXP' ValueExpression             -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'NOT' 'LIKE' ValueExpression_EDIT         -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'LIKE' ValueExpression_EDIT               -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'RLIKE' ValueExpression_EDIT              -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'REGEXP' ValueExpression_EDIT             -> { types: [ 'BOOLEAN' ] }
- | 'CURSOR' 'NOT' 'LIKE' ValueExpression
+ : ValueExpression_EDIT LikeRightPart               -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' LikeRightPart         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression LikeRightPart_EDIT               -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'NOT' LikeRightPart_EDIT         -> { types: [ 'BOOLEAN' ] }
+ | 'CURSOR' LikeRightPart
+   {
+     valueExpressionSuggest(undefined, $2);
+     applyTypeToSuggestions([ 'STRING' ]);
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true };
+   }
+ | 'CURSOR' 'NOT' LikeRightPart
    {
      valueExpressionSuggest(undefined, $2 + ' ' + $3);
      applyTypeToSuggestions([ 'STRING' ]);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true };
-   }
- | 'CURSOR' 'LIKE' ValueExpression
-   {
-     valueExpressionSuggest(undefined, $2);
-     applyTypeToSuggestions([ 'STRING' ]);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true };
-   }
- | 'CURSOR' 'RLIKE' ValueExpression
-   {
-     valueExpressionSuggest(undefined, $2);
-     applyTypeToSuggestions([ 'STRING' ]);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true };
-   }
- | 'CURSOR' 'REGEXP' ValueExpression
-   {
-     valueExpressionSuggest(undefined, $2);
-     applyTypeToSuggestions([ 'STRING' ]);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true };
-   }
- | ValueExpression 'LIKE' PartialBacktickedOrCursor
-   {
-     suggestFunctions({ types: [ 'STRING' ] });
-     suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
-   }
- | ValueExpression 'RLIKE' PartialBacktickedOrCursor
-   {
-     suggestFunctions({ types: [ 'STRING' ] });
-     suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
-   }
- | ValueExpression 'REGEXP' PartialBacktickedOrCursor
-   {
-     suggestFunctions({ types: [ 'STRING' ] });
-     suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
    }
  ;
 

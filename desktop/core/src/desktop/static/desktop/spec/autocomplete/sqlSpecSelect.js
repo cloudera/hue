@@ -241,6 +241,18 @@ define([
     });
 
     describe('Complete Statements', function () {
+      it ('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; ',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest columns "SELECT IF(baa, boo, bee) AS b, | FROM testTable;"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT IF(baa, boo, bee) AS b, ',
