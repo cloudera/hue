@@ -296,7 +296,7 @@ class Submission(object):
     create_directories(self.fs)
 
     # Case of a shared job
-    if self.user != self.job.document.owner:
+    if self.job.document and self.user != self.job.document.owner:
       path = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', self.user.username).replace('$TIME', str(time.time())).replace('$JOBID', str(self.job.id))
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):

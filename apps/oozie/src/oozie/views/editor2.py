@@ -490,6 +490,7 @@ def list_editor_coordinators(request):
 @check_document_access_permission()
 def edit_coordinator(request):
   coordinator_id = request.GET.get('coordinator', request.GET.get('uuid'))
+  #scheduled_doc_uuid = request.GET.get('document')
   doc = None
   workflow_uuid = None
 
@@ -520,9 +521,11 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   if USE_NEW_EDITOR.get():
-    document = Document2.objects.get(uuid=coordinator.data['properties']['workflow'] or coordinator.data['properties']['document'])
-    if not document.can_read(request.user):
-      raise PopupException(_('You don\'t have access to the workflow or document of this coordinator.'))
+    scheduled_uuid = coordinator.data['properties']['workflow'] or coordinator.data['properties']['document']
+    if scheduled_uuid:
+      document = Document2.objects.get(uuid=scheduled_uuid) #  or scheduled_doc_uuid
+      if not document.can_read(request.user):
+        raise PopupException(_('You don\'t have access to the workflow or document of this coordinator.'))
   else:
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
@@ -644,7 +647,7 @@ def save_coordinator(request):
   response['status'] = 0
   response['id'] = coordinator_doc.id
   response['uuid'] = coordinator_doc.uuid
-  response['message'] = _('Saved !')
+  response['message'] = _('Saved!') if coordinator_data.get('id') else _('Updated!')
 
   return JsonResponse(response)
 
@@ -721,8 +724,17 @@ def submit_coordinator(request, doc_id):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_doc = Document2.objects.get_by_uuid(user=request.user, uuid=coordinator.data['properties']['workflow'])
-    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
+#     if coordinator.data['properties']['workflow']:
+#       wf_doc = Document2.objects.get_by_uuid(user=request.user, uuid=coordinator.data['properties']['workflow'])
+#       wf = Workflow(document=wf_doc)
+#     else:
+#       print 111
+#       document = Document2.objects.get_by_uuid(user=request.user, uuid=coordinator.data['properties']['document'])
+#       wf_doc = WorkflowBuilder().create_workflow(document=document, user=request.user, managed=True)
+    wf = coordinator.workflow
+      
+      #wf_doc.delete() or set to History
+    wf_dir = Submission(request.user, wf, request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)

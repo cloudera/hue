@@ -1856,6 +1856,7 @@
     self.saveScheduler = function() {
       if (self.isBatchable() && (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())) {
         self.schedulerViewModel.coordinator.isManaged(true);
+        self.schedulerViewModel.coordinator.properties.document(self.uuid()); console.log(self.uuid());
         self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
         });
@@ -1871,7 +1872,6 @@
         $(document).trigger("error", xhr.responseText);
       });
     };
-
 
     self.viewSchedulerId = ko.observable(typeof notebook.viewSchedulerId != "undefined" && notebook.viewSchedulerId != null ? notebook.viewSchedulerId : '');
     self.viewSchedulerId.subscribe(function(newVal) {
