@@ -799,10 +799,14 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="nav-search-autocomp-item">
+    <a><i class="fa" data-bind="css: icon"></i> <span data-bind="text: label"></span></a>
+  </script>
+
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="searchbar">
-        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="hasFocus: searchHasFocus, textinput: searchInput, valueUpdate: 'afterkeydown'">
+        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="autocomplete: { source: navAutocompleteSource, itemTemplate: 'nav-search-autocomp-item' }, hasFocus: searchHasFocus, textinput: searchInput, valueUpdate: 'afterkeydown'">
           <button class="btn btn-primary add-on" data-bind="enabled: ! searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }">
             <i class="fa" data-bind="css: { 'fa-search': searchInput() === '', 'fa-times' : searchInput() !== '' }"></i>
           </button>
@@ -1239,6 +1243,11 @@ from metadata.conf import has_navigator
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
+
+        self.navAutocompleteSource = function (request, callback) {
+          var term = request.term;
+          callback([{ data: { label: 'a', icon: 'fa-beer' }, value: 'a' }, { data: { label: 'b', icon: 'fa-bullhorn' }, value: 'b' }]);
+        };
 
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
