@@ -450,7 +450,7 @@ class Workflow(Job):
     return force_unicode(xml.strip())
 
   def get_absolute_url(self):
-    return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
+    return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id if self.document else ''
 
   def override_subworkflow_id(self, sub_wf_action, workflow_id):
     _data = self.get_data()
