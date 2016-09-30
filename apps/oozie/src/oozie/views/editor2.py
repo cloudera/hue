@@ -520,14 +520,15 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   if USE_NEW_EDITOR.get():
-    workflows = [dict([('uuid', d.uuid), ('name', d.name)])
-                      for d in Document2.objects.documents(request.user, include_managed=True).search_documents(types=['oozie-workflow2'])]
+    document = Document2.objects.get(uuid=coordinator.data['properties']['workflow'] or coordinator.data['properties']['document'])
+    if not document.can_read(request.user):
+      raise PopupException(_('You don\'t have access to the workflow or document of this coordinator.'))
   else:
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
-  if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows): # In Hue 4, use dependencies instead
-    raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
+    if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
+      raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
   if USE_NEW_EDITOR.get(): # In Hue 4, merge with above
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
@@ -624,13 +625,14 @@ def save_coordinator(request):
 #     workflow_uuid = workflow_doc.uuid
 #     coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
 
-  if coordinator_data['properties']['workflow']:
-    workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
-    workflow_doc.doc.get().can_read_or_exception(request.user)
-    coordinator_doc.dependencies = [workflow_doc]
-    scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=False)
-    for action in scheduled_doc.all():
-      coordinator_doc.dependencies.add(action)
+  scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']
+  if scheduled_id:
+    scheduled_doc = Document2.objects.get(uuid=scheduled_id)
+    scheduled_doc.can_read_or_exception(request.user)
+    coordinator_doc.dependencies = [scheduled_doc]
+#     scheduled_doc = workflow_doc.dependencies.filter(type__startswith='query-', owner=request.user, is_managed=False)
+#     for action in scheduled_doc.all():
+#       coordinator_doc.dependencies.add(action)
 
   coordinator_doc1 = coordinator_doc.doc.get()
   coordinator_doc.update_data(coordinator_data)

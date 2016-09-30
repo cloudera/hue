@@ -1828,10 +1828,8 @@
             if (_action == 'new') {
               self.coordinatorUuid(UUID());
               self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());             
-      		//self.schedulerViewModel.coordinator.properties.workflow('aa');
+      		  self.schedulerViewModel.coordinator.properties.document(self.uuid());
             }
-
-
           }
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
@@ -1859,7 +1857,7 @@
       if (self.isBatchable() && (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())) {
         self.schedulerViewModel.coordinator.isManaged(true);
         self.schedulerViewModel.save(function(data) {
-          self.coordinatorUuid(data.uuid); // bewarre
+          self.coordinatorUuid(data.uuid);
         });
       }
     };

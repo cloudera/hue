@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
       </div>
       %endif
 
-      <div class="card card-home" data-bind="visible: coordinator.properties.workflow" style="margin-top: 20px">
+      <div class="card card-home" data-bind="visible: coordinator.properties.workflow() || coordinator.properties.document()" style="margin-top: 20px">
         <h1 class="card-heading simple">${ _('How often?') }
         </h1>
 
@@ -169,7 +169,7 @@ from django.utils.translation import ugettext as _
       </div>
 
 
-      <div class="card card-home" data-bind="visible: coordinator.properties.workflow()" style="margin-top: 20px; margin-bottom: 20px">
+      <div class="card card-home" data-bind="visible: coordinator.properties.workflow() || coordinator.properties.document()" style="margin-top: 20px; margin-bottom: 20px">
         <h1 class="card-heading simple">${ _('Parameters') }</h1>
 
         <div class="card-body">
