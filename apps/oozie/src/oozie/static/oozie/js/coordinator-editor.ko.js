@@ -97,6 +97,7 @@ var Coordinator = function (vm, coordinator) {
   self.refreshParameters = function() {
     $.get("/oozie/editor/workflow/parameters/", {
       "uuid": self.properties.workflow(),
+      "document": self.properties.document(),
     }, function (data) {
       self.workflowParameters(data.parameters);
 

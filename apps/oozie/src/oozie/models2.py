@@ -3031,6 +3031,7 @@ class Coordinator(Job):
               'start': '${start_date}',
               'end': '${end_date}',
               'workflow': None,
+              'document': None,
               'timeout': None,
               'concurrency': None,
               'execution': None,
@@ -3083,6 +3084,9 @@ class Coordinator(Job):
 
     if self.document is not None:
       self._data['id'] = self.document.id
+
+    if 'document' not in self._data['properties']:
+      self._data['properties']['document'] = None
 
     return self._data
 
