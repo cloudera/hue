@@ -108,7 +108,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
-        <th>${ _('Last Modified') }</th>
+        <th width="10%">${ _('Last Modified') }</th>
       </tr>
     </thead>
     <tbody data-bind="foreach: { data: jobs }">
