@@ -238,7 +238,6 @@
       .replace(/ FROM /ig, "~::~FROM ")
       .replace(/ GROUP\s{1,}BY /ig, "~::~GROUP BY ")
       .replace(/ HAVING /ig, "~::~HAVING ")
-      //.replace(/ SET /ig," SET~::~")
       .replace(/ IN /ig, " IN ")
 
       .replace(/ JOIN /ig, "~::~JOIN ")
@@ -263,9 +262,6 @@
       .replace(/ WITH /ig, "~::~WITH ")
       .replace(/ LIMIT /ig, "~::~LIMIT ")
 
-      //.replace(/\,\s{0,}\(/ig,",~::~( ")
-      //.replace(/\,/ig,",~::~"+tab+tab+"")
-
       .replace(/ ALL /ig, " ALL ")
       .replace(/ AS /ig, " AS ")
       .replace(/ ASC /ig, " ASC ")
@@ -275,8 +271,6 @@
       .replace(/ NOT /ig, " NOT ")
       .replace(/ NULL /ig, " NULL ")
       .replace(/ LIKE /ig, " LIKE ")
-      .replace(/\s{0,}SELECT /ig, "SELECT ")
-      .replace(/\s{0,}UPDATE /ig, "UPDATE ")
       .replace(/ SET /ig, " SET ")
 
       .replace(/~::~{1,}/g, "~::~")
