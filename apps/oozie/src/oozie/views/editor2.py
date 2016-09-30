@@ -341,29 +341,32 @@ def workflow_parameters(request):
 
 @check_editor_access_permission
 @check_document_access_permission()
-def refresh_action_parameters(request):
+def refresh_document_parameters(request):
   response = {'status': -1}
 
   try:
-    coord_uuid = request.POST.get('uuid')
-    workflow_doc = Document2.objects.get(type='oozie-workflow2', owner=request.user, is_managed=True, dependents__uuid__in=[coord_uuid])
+    notebook_uuid = request.POST.get('uuid')
+    current_parameters = json.loads(request.POST.get('parameters')) # hive_node['properties']['parameters']
+    
+    #workflow_doc = Document2.objects.get(type='oozie-workflow2', owner=request.user, is_managed=True, dependents__uuid__in=[coord_uuid])
 
     # Refresh the action parameters of a document action in case the document changed
-    workflow = Workflow(document=workflow_doc, user=request.user)
+#     workflow = Workflow(document=workflow_doc, user=request.user)
 
-    _data = workflow.get_data()
-    hive_node = _data['workflow']['nodes'][3]
-    query_document = Document2.objects.get_by_uuid(user=request.user, uuid=hive_node['properties']['uuid'])
+#     _data = workflow.get_data()
+#     hive_node = _data['workflow']['nodes'][3]
+#     query_document = Document2.objects.get_by_uuid(user=request.user, uuid=hive_node['properties']['uuid'])
+    query_document = Document2.objects.get_by_uuid(user=request.user, uuid=notebook_uuid)
     parameters = WorkflowBuilder().get_document_parameters(query_document)
 
-    changed = set([p['value'] for p in parameters]) != set([p['value'] for p in hive_node['properties']['parameters']])
+    changed = set([p['value'] for p in parameters]) != set([p['value'] for p in current_parameters])
 
-    if changed:
-      hive_node['properties']['parameters'] = parameters
-      workflow.data = json.dumps(_data)
+#     if changed:
+#       hive_node['properties']['parameters'] = parameters
+#       workflow.data = json.dumps(_data)
 
-      workflow_doc.update_data({'workflow': _data['workflow']})
-      workflow_doc.save()
+#       workflow_doc.update_data({'workflow': _data['workflow']})
+#       workflow_doc.save()
 
     response['status'] = 0
     response['parameters'] = parameters
@@ -502,22 +505,7 @@ def edit_coordinator(request):
     coordinator = Coordinator()
     coordinator.set_workspace(request.user)
 
-  # Automatically create the workflow of a scheduled document
-  # To move to save coordinator
-  document_uuid = request.GET.get('document')
-  if document_uuid:
-    # Has already a workflow managing the query for this user?
-    workflows = Document2.objects.filter(type='oozie-workflow2', owner=request.user, is_managed=True, dependencies__uuid__in=[document_uuid])
-    if workflows.exists():
-      workflow_doc = workflows.get()
-    else:
-      document = Document2.objects.get_by_uuid(user=request.user, uuid=document_uuid)
-      workflow_doc = WorkflowBuilder().create_workflow(document=document, user=request.user, managed=True)
-      if doc:
-        doc.dependencies.add(workflow_doc)
-    workflow_uuid = workflow_doc.uuid
-    coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
-  elif request.GET.get('workflow'):
+  if request.GET.get('workflow'):
     workflow_uuid = request.GET.get('workflow')
 
   if workflow_uuid:
@@ -620,6 +608,21 @@ def save_coordinator(request):
   else:
     coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user, is_managed=coordinator_data.get('isManaged'))
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
+
+# Automatically create the workflow of a scheduled document
+#   document_uuid = request.GET.get('document')
+#   if document_uuid:
+#     # Has already a workflow managing the query for this user?
+#     workflows = Document2.objects.filter(type='oozie-workflow2', owner=request.user, is_managed=True, dependencies__uuid__in=[document_uuid])
+#     if workflows.exists():
+#       workflow_doc = workflows.get()
+#     else:
+#       document = Document2.objects.get_by_uuid(user=request.user, uuid=document_uuid)
+#       workflow_doc = WorkflowBuilder().create_workflow(document=document, user=request.user, managed=True)
+#       if doc:
+#         doc.dependencies.add(workflow_doc)
+#     workflow_uuid = workflow_doc.uuid
+#     coordinator.data['name'] = _('Schedule of %s') % workflow_doc.name
 
   if coordinator_data['properties']['workflow']:
     workflow_doc = Document2.objects.get(type='oozie-workflow2', uuid=coordinator_data['properties']['workflow'])
