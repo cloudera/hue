@@ -81,10 +81,9 @@ urlpatterns += patterns(
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
   url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
   url(r'^editor/workflow/action/parameters/$', 'action_parameters', name='action_parameters'),
-  url(r'^editor/workflow/refresh_document_parameters/$', 'refresh_document_parameters', name='refresh_document_parameters'),
   url(r'^editor/workflow/gen_xml/$', 'gen_xml_workflow', name='gen_xml_workflow'),
   url(r'^editor/workflow/open_v1/$', 'open_old_workflow', name='open_old_workflow'),
-  
+
   url(r'^editor/coordinator/list/$', 'list_editor_coordinators', name='list_editor_coordinators'),
   url(r'^editor/coordinator/edit/$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^editor/coordinator/new/$', 'new_coordinator', name='new_coordinator'),
@@ -95,7 +94,7 @@ urlpatterns += patterns(
   url(r'^editor/coordinator/gen_xml/$', 'gen_xml_coordinator', name='gen_xml_coordinator'),
   url(r'^editor/coordinator/open_v1/$', 'open_old_coordinator', name='open_old_coordinator'),
   url(r'^editor/coordinator/parameters/$', 'coordinator_parameters', name='coordinator_parameters'),
-  
+
   url(r'^editor/bundle/list/$', 'list_editor_bundles', name='list_editor_bundles'),
   url(r'^editor/bundle/edit/$', 'edit_bundle', name='edit_bundle'),
   url(r'^editor/bundle/new/$', 'new_bundle', name='new_bundle'),

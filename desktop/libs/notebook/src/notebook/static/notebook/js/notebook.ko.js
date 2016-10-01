@@ -1617,7 +1617,6 @@
 
             if (self.coordinatorUuid()) {
              self.saveScheduler();
-             //self.refreshSchedulerParameters();        if (notebook.schedulerViewModel != null) {
              self.schedulerViewModel.coordinator.refreshParameters();
             }
 
@@ -1812,9 +1811,9 @@
         }, function (data) {
           if ($("#schedulerEditor").length > 0) {
             $("#schedulerEditor").html(data.layout);
-            
+
             self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
-            
+
             ko.cleanNode($("#schedulerEditor")[0]);
             ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
 
@@ -1826,8 +1825,8 @@
 
             if (_action == 'new') {
               self.coordinatorUuid(UUID());
-              self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());             
-      		  self.schedulerViewModel.coordinator.properties.document(self.uuid());
+              self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());
+              self.schedulerViewModel.coordinator.properties.document(self.uuid());
             }
           }
         }).fail(function (xhr) {
@@ -1836,26 +1835,10 @@
       }
     };
 
-    self.refreshSchedulerParameters = function() { // dup of 0/oozie/editor/workflow/parameters/?uuid=uui ?
-      if (self.isBatchable()) {
-        $.post("/oozie/editor/workflow/action/refresh_document_parameters/", {
-          uuid: self.coordinatorUuid()
-        }, function(data) {
-          if (data.status == 0) {
-            if (data.changed) {
-              self.schedulerViewModel.coordinator.refreshParameters();
-            }
-          } else {
-            $(document).trigger("error", data.message);
-          }
-        });
-      }
-    }
-
     self.saveScheduler = function() {
       if (self.isBatchable() && (! self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())) {
         self.schedulerViewModel.coordinator.isManaged(true);
-        self.schedulerViewModel.coordinator.properties.document(self.uuid()); console.log(self.uuid());
+        self.schedulerViewModel.coordinator.properties.document(self.uuid());
         self.schedulerViewModel.save(function(data) {
           self.coordinatorUuid(data.uuid);
         });
@@ -2166,7 +2149,6 @@
         }
 
         if (notebook.isSaved()) {
-            //notebook.loadScheduler(); // load only if schedule id there
           notebook.snippets()[0].currentQueryTab('savedQueries');
           if (notebook.snippets()[0].queries().length === 0) {
             notebook.snippets()[0].fetchQueries(); // Subscribe not updating yet

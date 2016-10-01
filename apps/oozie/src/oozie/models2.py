@@ -388,16 +388,18 @@ class Workflow(Job):
       for param in find_json_parameters(self.sla):
         params.add(param)
 
-    parameters = dict([(param, '') for param in list(params)]) 
+    parameters = dict([(param, '') for param in list(params)])
 
     for node in self.nodes:
-      print '===='
       if 'document' in node.data['type']:
-        parameters.update(node.data['type'])
-        params.update(node.find_parameters())
-      return 
-      print node.find_parameters()
-      
+        for param in node.data['properties']['parameters']:
+          name, val = param['value'].split('=')
+          parameters[name] = val
+      else:
+        extra = node.find_parameters()
+        if extra:
+          parameters.update(dict([(param, '') for param in list(extra)]))
+
     return parameters
 
   def get_json(self):
@@ -3223,8 +3225,6 @@ class Coordinator(Job):
       wf_doc = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['workflow'])
       return Workflow(document=wf_doc)
 
-    #return Workflow(document=wf_doc)
-
   def get_absolute_url(self):
     return reverse('oozie:edit_coordinator') + '?coordinator=%s' % self.id
 
@@ -3613,9 +3613,8 @@ class WorkflowBuilder():
   def get_hive_snippet_node(self, snippet, user):
     node = self._get_hive_node(snippet['id'], user)
 
-    node['properties']['parameters'] = []
+    node['properties']['parameters'] = [{'value': '%(name)s=%(value)s' % v} for v in snippet['variables']]
     node['properties']['statements'] = 'USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'])
-    node['properties']['parameters'] = []
 
     return node
 
@@ -3623,8 +3622,7 @@ class WorkflowBuilder():
     node = self._get_hive_node(document.uuid, user, is_document_node=True)
 
     notebook = Notebook(document=document)
-    parameters = find_dollar_braced_variables(notebook.get_str()) # TODO just pick them from snippet 1
-    node['parameters'] = [{u'value': u'%s=${%s}' % (p, p)} for p in parameters] #Todo check if need properties
+    node['properties']['parameters'] = [{'value': '%(name)s=%(value)s' % v} for v in notebook.get_data()['snippets'][0]['variables']]
     node['properties']['uuid'] = document.uuid
 
     return node
