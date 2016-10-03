@@ -799,14 +799,37 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <style>
+    .nav-autocomplete {
+      min-width: 200px;
+    }
+    .nav-autocomplete-item .ui-state-focus {
+      border: 1px solid #DBE8F1;
+      background-color: #DBE8F1 !important;
+    }
+  </style>
   <script type="text/html" id="nav-search-autocomp-item">
-    <a><i class="fa" data-bind="css: icon"></i> <span data-bind="text: label"></span></a>
+    <a>
+      <div style="height: 38px; max-width: 200px; overflow-x:hidden;">
+        <div style="vertical-align: top; padding: 8px; display:inline-block;"><i style="color: #338bb8" class="fa" data-bind="css: icon"></i></div>
+        <div style="vertical-align: top; display:inline-block;">
+          <span style="font-size: 14px; color: #338bb8" data-bind="html: label"></span>
+          <br/><div style="display:inline-block; width: 170px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="text: description"></div>
+        </div>
+      </div>
+    </a>
   </script>
 
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="searchbar">
-        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="autocomplete: { source: navAutocompleteSource, itemTemplate: 'nav-search-autocomp-item' }, hasFocus: searchHasFocus, textinput: searchInput, valueUpdate: 'afterkeydown'">
+        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="autocomplete: {
+            source: navAutocompleteSource,
+            itemTemplate: 'nav-search-autocomp-item',
+            classes: {
+              'ui-autocomplete': 'nav-autocomplete'
+            }
+          }, hasFocus: searchHasFocus, textinput: searchInput, valueUpdate: 'afterkeydown'">
           <button class="btn btn-primary add-on" data-bind="enabled: ! searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }">
             <i class="fa" data-bind="css: { 'fa-search': searchInput() === '', 'fa-times' : searchInput() !== '' }"></i>
           </button>
@@ -1253,7 +1276,7 @@ from metadata.conf import has_navigator
               if (typeof data.facets !== 'undefined') {
                 Object.keys(data.facets).forEach(function (facet) {
                   if (facet === 'tags') {
-                    values.push({ data: { label: 'tags:', icon: 'fa-tags' }, value: 'tags:'});
+                    values.push({ data: { label: 'tags:', icon: 'fa-tags', description: Object.keys(data.facets[facet]).join(', ') }, value: 'tags:'});
                   }
                 });
               }
@@ -1268,10 +1291,12 @@ from metadata.conf import has_navigator
                       icon = 'fa-eye';
                       break;
                   }
-                  if (data.highlting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
-                    values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon }, value: result.originalName });
+                  var description = result.parentPath;
+
+                  if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
+                    values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: result.originalName });
                   } else {
-                    values.push({ data: { label: result.originalName, icon: icon }, value: result.originalName });
+                    values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: result.originalName });
                   }
                 });
                 callback(values);
