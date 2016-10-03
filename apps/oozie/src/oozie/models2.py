@@ -685,7 +685,7 @@ def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy):
     join_node = None
     children = []
     for key in adj_list[curr_node].keys():
-      if key.startswith('path'):
+      if key.startswith('path') or key == 'default':
         child = []
         return_node = _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node][key], child)
         join_node = return_node if not join_node else join_node
