@@ -591,7 +591,7 @@ ${ assist.assistPanel() }
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
       <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-        sourceType: 'hive'
+        sourceType: 'hive',
         database: database.name,
         table: name
       } }"></div>
