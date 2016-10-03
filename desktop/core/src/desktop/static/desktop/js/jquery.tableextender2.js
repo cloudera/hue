@@ -168,17 +168,17 @@
         self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ')').addClass('selected');
       }
     };
-    self.$parent.on('click dblclick', 'table tbody tr', clickHandler);
+    self.$parent.children('table').on('click dblclick', 'tbody tr', clickHandler);
     self.disposeFunctions.push(function () {
-      self.$parent.off('click dblclick', 'table tbody tr', clickHandler);
+      self.$parent.children('table').off('click dblclick', 'tbody tr', clickHandler);
     });
 
     var dblClickHandler = function () {
       huePubSub.publish('table.row.dblclick', {idx: $(this).index(), table: $(this).parents('table')});
     };
-    self.$parent.on('dblclick', 'table tbody tr', dblClickHandler);
+    self.$parent.children('table').on('dblclick', 'tbody tr', dblClickHandler);
     self.disposeFunctions.push(function () {
-      self.$parent.off('dblclick', 'table tbody tr', dblClickHandler);
+      self.$parent.children('table').off('dblclick', 'tbody tr', dblClickHandler);
     });
 
 
