@@ -1148,6 +1148,22 @@
     }));
   };
 
+  ApiHelper.prototype.navSearchAutocomplete = function (options) {
+    var self = this;
+    $.post('/metadata/api/navigator/search_entities_interactive', {
+      query_s: options.query,
+      limit: 5,
+      sources: '["hive"]',
+      field_facets: '["tags"]'
+    }).done(function (data) {
+      if (data.status === 0 && !self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    }).fail(self.assistErrorCallback(options));
+  };
+
   /**
    * @param {Object} options
    * @param {string} options.sourceType

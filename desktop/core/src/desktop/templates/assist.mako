@@ -1246,7 +1246,43 @@ from metadata.conf import has_navigator
 
         self.navAutocompleteSource = function (request, callback) {
           var term = request.term;
-          callback([{ data: { label: 'a', icon: 'fa-beer' }, value: 'a' }, { data: { label: 'b', icon: 'fa-bullhorn' }, value: 'b' }]);
+          self.apiHelper.navSearchAutocomplete({
+            query:  term + '*',
+            successCallback: function (data) {
+              var values = [];
+              if (typeof data.facets !== 'undefined') {
+                Object.keys(data.facets).forEach(function (facet) {
+                  if (facet === 'tags') {
+                    values.push({ data: { label: 'tags:', icon: 'fa-tags' }, value: 'tags:'});
+                  }
+                });
+              }
+              if (typeof data.results !== 'undefined') {
+                data.results.forEach(function (result) {
+                  var icon = '';
+                  switch (result.type) {
+                    case 'TABLE':
+                      icon = 'fa-table';
+                      break;
+                    case 'VIEW':
+                      icon = 'fa-eye';
+                      break;
+                  }
+                  if (data.highlting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
+                    values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon }, value: result.originalName });
+                  } else {
+                    values.push({ data: { label: result.originalName, icon: icon }, value: result.originalName });
+                  }
+                });
+                callback(values);
+              }
+            },
+            silenceErrors: true,
+            errorCallback: function () {
+              callback([]);
+            }
+          });
+
         };
 
         self.searchHasFocus = ko.observable(false);
@@ -1257,12 +1293,6 @@ from metadata.conf import has_navigator
         });
 
         var lastQuery = -1;
-
-        self.searchHasFocus.subscribe(function (newValue) {
-          if (newValue && lastQuery !== self.searchInput()) {
-            window.setTimeout(self.performSearch, 200);
-          }
-        });
 
         self.loading = ko.observable(false);
 
