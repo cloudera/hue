@@ -1108,7 +1108,13 @@ ${ hueIcons.symbols() }
     <!-- ko with: $root.selectedNotebook() -->
     <div class="tab-pane" id="scheduleTab">
       <!-- ko if: isSaved() -->
-        <a data-bind="click: showSubmitPopup">${ _('Start') }</a></br>
+        <!-- ko if: coordinatorUuid() && schedulerViewModel.coordinator.isDirty() --> 
+          <a data-bind="click: $root.saveNotebook">${ _('Changes not saved') }</a>
+        <!-- /ko -->
+        <!-- ko if: coordinatorUuid() && ! schedulerViewModel.coordinator.isDirty() --> 
+          <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
+        <!-- /ko -->
+        </br>
         </br>
         <div id="schedulerEditor">
         </div>
