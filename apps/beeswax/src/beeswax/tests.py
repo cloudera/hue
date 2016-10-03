@@ -56,6 +56,7 @@ from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_export_csvxls import _read_xls_sheet_data
 from hadoop.fs.hadoopfs import Hdfs
 
+from hadoop import ssl_client_site
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 import desktop.conf as desktop_conf
@@ -3421,11 +3422,19 @@ def test_hiveserver2_jdbc_url():
     url = hiveserver2_jdbc_url()
     assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/path/to/truststore.jks;trustStorePassword=password')
 
+    beeswax.hive_site.reset()
+    beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_USE_SSL] = 'TRUE'
+    hadoop.ssl_client_site.reset()
+    hadoop.ssl_client_site.get_conf()[ssl_client_site._CNF_TRUSTORE_LOCATION] = '/etc/ssl-conf/CA_STANDARD/truststore.jks'
+    url = hiveserver2_jdbc_url() # Pick-up trustore from ssl-client.xml
+    assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default;ssl=true;sslTrustStore=/etc/ssl-conf/CA_STANDARD/truststore.jks')
+
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_USE_SSL] = 'FALSE'
     url = hiveserver2_jdbc_url()
     assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default')
   finally:
     beeswax.hive_site.reset()
+    hadoop.ssl_client_site.reset()
     for reset in resets:
         reset()
 
