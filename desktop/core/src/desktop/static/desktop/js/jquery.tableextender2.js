@@ -263,15 +263,9 @@
       firstColTopPos = topPos;
     }
     self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
-    if (self.lastFirstColTop !== firstColTopPos) {
-      self.lastFirstColTop = firstColTopPos;
-      self.firstColumn.css("top", firstColTopPos + "px");
-    }
-    if (self.lastTopPos !== topPos) {
-      self.lastTopPos = topPos;
-      self.headerRowContainer.css("top", topPos + "px");
-      self.firstColumnTopCell.css("top", topPos + "px");
-    }
+    self.firstColumn.css("top", firstColTopPos + "px");
+    self.headerRowContainer.css("top", topPos + "px");
+    self.firstColumnTopCell.css("top", topPos + "px");
   };
 
   Plugin.prototype.drawHeader = function () {
