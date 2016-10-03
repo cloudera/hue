@@ -34,6 +34,7 @@
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
           _renderItemData: function( ul, item ) {
             var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')
+                .addClass('nav-autocomplete-item')
                 .appendTo(ul).data( "ui-autocomplete-item", item );
             ko.applyBindings(item.data, $li[0]);
           }
