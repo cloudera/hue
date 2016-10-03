@@ -1616,8 +1616,8 @@
             }
 
             if (self.coordinatorUuid()) {
-             self.saveScheduler();
-             self.schedulerViewModel.coordinator.refreshParameters();
+              self.saveScheduler();
+              self.schedulerViewModel.coordinator.refreshParameters();
             }
 
             hueUtils.changeURL('/notebook/editor?editor=' + data.id);
