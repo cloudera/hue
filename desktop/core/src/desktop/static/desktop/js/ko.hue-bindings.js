@@ -80,12 +80,12 @@
       var currentSelectize;
 
       var showEdit = function () {
-        options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } }),
+        options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } });
         currentSelectize = $element.selectize(options)[0].selectize;
         $readOnlyContainer.hide();
-        $element.next().find('.selectize-input').css('padding-right', '25px');
+        $element.next().find('.selectize-input').css('padding-right', '38px');
         $element.next().find('input').focus();
-        var $editActions = $('<div>').addClass('selectize-actions selectize-actions-visible').appendTo($element.next());
+        var $editActions = $('<div>').addClass('selectize-actions').appendTo($element.next());
         $('<i>').addClass('fa fa-check').click(function () {
           options.onSave(currentSelectize.getValue());
           showReadOnly();
@@ -93,14 +93,6 @@
         $('<i>').addClass('fa fa-close').click(function () {
           showReadOnly();
         }).appendTo($editActions);
-
-        $element.next().on('mouseover', function () {
-          $editActions.addClass('selectize-actions-visible');
-        });
-
-        $element.next().on('mouseout', function () {
-          $editActions.removeClass('selectize-actions-visible');
-        });
       };
 
       var showReadOnly = function () {
@@ -114,16 +106,13 @@
           options.setTags().forEach(function (tag) {
             $('<div>').addClass('item-read-only').text(tag).appendTo($readOnlyInner);
           });
-        } else {
-          $('<input type="text">').attr('placeholder', options.placeholder).appendTo($readOnlyInner);
         }
 
-        var $readOnlyActions = $('<div>').addClass('selectize-actions').appendTo($readOnlyContainer);
-        $readOnlyContainer.show();
-
-        $('<i>').addClass('fa fa-edit').click(function () {
+        $('<i>').addClass('fa fa-edit selectize-edit').click(function () {
           showEdit();
-        }).appendTo($readOnlyActions);
+        }).appendTo($readOnlyInner);
+
+        $readOnlyContainer.show();
       };
 
       showReadOnly();
