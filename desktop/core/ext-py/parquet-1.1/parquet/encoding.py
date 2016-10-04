@@ -1,4 +1,5 @@
 """encoding.py - methods for reading parquet encoded data blocks."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -10,6 +11,7 @@ import logging
 import math
 import os
 import struct
+import sys
 
 import thriftpy
 
@@ -17,6 +19,10 @@ THRIFT_FILE = os.path.join(os.path.dirname(__file__), "parquet.thrift")
 parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  # pylint: disable=invalid-name
 
 logger = logging.getLogger("parquet")  # pylint: disable=invalid-name
+
+PY3 = sys.version_info.major > 2
+
+ARRAY_BYTE_STR = u'B' if PY3 else b'B'
 
 
 def read_plain_boolean(file_obj, count):
@@ -32,14 +38,14 @@ def read_plain_int32(file_obj, count):
     length = 4 * count
     data = file_obj.read(length)
     if len(data) != length:
-        raise EOFError("Expected {} bytes but got {0} bytes".format(length, len(data)))
-    res = struct.unpack(b"<{0}i".format(count), data)
+        raise EOFError("Expected {0} bytes but got {1} bytes".format(length, len(data)))
+    res = struct.unpack(b"<{0}i".format(count).encode("utf-8"), data)
     return res
 
 
 def read_plain_int64(file_obj, count):
     """Read `count` 64-bit ints using the plain encoding."""
-    return struct.unpack(b"<{0}q".format(count), file_obj.read(8 * count))
+    return struct.unpack(b"<{0}q".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
 def read_plain_int96(file_obj, count):
@@ -51,12 +57,12 @@ def read_plain_int96(file_obj, count):
 
 def read_plain_float(file_obj, count):
     """Read `count` 32-bit floats using the plain encoding."""
-    return struct.unpack(b"<{0}f".format(count), file_obj.read(4 * count))
+    return struct.unpack(b"<{0}f".format(count).encode("utf-8"), file_obj.read(4 * count))
 
 
 def read_plain_double(file_obj, count):
     """Read `count` 64-bit float (double) using the plain encoding."""
-    return struct.unpack(b"<{0}d".format(count), file_obj.read(8 * count))
+    return struct.unpack(b"<{0}d".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
 def read_plain_byte_array(file_obj, count):
@@ -103,8 +109,7 @@ def read_unsigned_var_int(file_obj):
 
 
 def read_rle(file_obj, header, bit_width, debug_logging):
-    """Read a run-length encoded run from the given fo with the given header
-    and bit_width.
+    """Read a run-length encoded run from the given fo with the given header and bit_width.
 
     The count is determined from the header and the width is used to grab the
     value that's repeated. Yields the value repeated count times.
@@ -143,7 +148,7 @@ def read_bitpacked(file_obj, header, width, debug_logging):
     if debug_logging:
         logger.debug("Reading a bit-packed run with: %s groups, count %s, bytes %s",
                      num_groups, count, byte_count)
-    raw_bytes = array.array(str('B'), file_obj.read(byte_count)).tolist()
+    raw_bytes = array.array(ARRAY_BYTE_STR, file_obj.read(byte_count)).tolist()
     current_byte = 0
     data = raw_bytes[current_byte]
     mask = _mask_for_bits(width)
@@ -176,7 +181,7 @@ def read_bitpacked(file_obj, header, width, debug_logging):
 
 def read_bitpacked_deprecated(file_obj, byte_count, count, width, debug_logging):
     """Read `count` values from `fo` using the deprecated bitpacking encoding."""
-    raw_bytes = array.array(str('B'), file_obj.read(byte_count)).tolist()
+    raw_bytes = array.array(ARRAY_BYTE_STR, file_obj.read(byte_count)).tolist()
 
     mask = _mask_for_bits(width)
     index = 0

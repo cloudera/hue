@@ -353,7 +353,7 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
 
     elif daph.encoding == parquet_thrift.Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
-        bit_width = struct.unpack("<B", io_obj.read(1))[0]
+        bit_width = struct.unpack(b"<B", io_obj.read(1))[0]
         if debug_logging:
             logger.debug("bit_width: %d", bit_width)
 

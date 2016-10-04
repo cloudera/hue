@@ -16,28 +16,28 @@ class TestPlain(unittest.TestCase):
         self.assertEqual(
             999,
             parquet.encoding.read_plain_int32(
-                io.BytesIO(struct.pack("<i", 999)), 1)[0])
+                io.BytesIO(struct.pack(b"<i", 999)), 1)[0])
 
     def test_int64(self):
         """Test reading bytes containing int64 data."""
         self.assertEqual(
             999,
             parquet.encoding.read_plain_int64(
-                io.BytesIO(struct.pack("<q", 999)), 1)[0])
+                io.BytesIO(struct.pack(b"<q", 999)), 1)[0])
 
     def test_int96(self):
         """Test reading bytes containing int96 data."""
         self.assertEqual(
             999,
             parquet.encoding.read_plain_int96(
-                io.BytesIO(struct.pack("<qi", 0, 999)), 1)[0])
+                io.BytesIO(struct.pack(b"<qi", 0, 999)), 1)[0])
 
     def test_float(self):
         """Test reading bytes containing float data."""
         self.assertAlmostEquals(
             9.99,
             parquet.encoding.read_plain_float(
-                io.BytesIO(struct.pack("<f", 9.99)), 1)[0],
+                io.BytesIO(struct.pack(b"<f", 9.99)), 1)[0],
             2)
 
     def test_double(self):
@@ -45,7 +45,7 @@ class TestPlain(unittest.TestCase):
         self.assertEqual(
             9.99,
             parquet.encoding.read_plain_double(
-                io.BytesIO(struct.pack("<d", 9.99)), 1)[0])
+                io.BytesIO(struct.pack(b"<d", 9.99)), 1)[0])
 
     def test_fixed(self):
         """Test reading bytes containing fixed bytes data."""
@@ -72,7 +72,7 @@ class TestPlain(unittest.TestCase):
     def test_boolean(self):
         """Test reading bytes containing boolean data."""
         data = 0b1101
-        fo = io.BytesIO(struct.pack("<i", data))
+        fo = io.BytesIO(struct.pack(b"<i", data))
         self.assertEqual(
             [True, False, True, True],
             parquet.encoding.read_plain_boolean(fo, 1)[:4]
@@ -84,7 +84,7 @@ class TestRle(unittest.TestCase):
 
     def testFourByteValue(self):
         """Test reading a run with a single four-byte value."""
-        fo = io.BytesIO(struct.pack("<i", 1 << 30))
+        fo = io.BytesIO(struct.pack(b"<i", 1 << 30))
         out = parquet.encoding.read_rle(fo, 2 << 1, 30, True)
         self.assertEqual([1 << 30] * 2, list(out))
 
@@ -94,13 +94,13 @@ class TestVarInt(unittest.TestCase):
 
     def testSingleByte(self):
         """Test reading a single byte value."""
-        fo = io.BytesIO(struct.pack("<B", 0x7F))
+        fo = io.BytesIO(struct.pack(b"<B", 0x7F))
         out = parquet.encoding.read_unsigned_var_int(fo)
         self.assertEqual(0x7F, out)
 
     def testFourByte(self):
         """Test reading a four byte value."""
-        fo = io.BytesIO(struct.pack("<BBBB", 0xFF, 0xFF, 0xFF, 0x7F))
+        fo = io.BytesIO(struct.pack(b"<BBBB", 0xFF, 0xFF, 0xFF, 0x7F))
         out = parquet.encoding.read_unsigned_var_int(fo)
         self.assertEqual(0x0FFFFFFF, out)
 
