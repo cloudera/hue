@@ -228,3 +228,15 @@ class TestDefinitionLevel(unittest.TestCase):
             [{"foo": "bar"}, {"foo": None}],
             actual_data
         )
+
+    def test_null_plain_dictionary(self):
+        """Test reading a file that contains null records for a plain dictionary column."""
+        with open(os.path.join(TEST_DATA, "test-null-dictionary.parquet"), "rb") as parquet_fo:
+            actual_data = list(parquet.DictReader(parquet_fo))
+
+        self.assertListEqual(
+            # this is the contents of test-null-dictionary.parquet. 7 records.
+            # The first record is null, and the rest alternate between values of 'bar' and 'baz.'
+            [{"foo": None}] + [{"foo": "bar"}, {"foo": "baz"}] * 3,
+            actual_data
+        )

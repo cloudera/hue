@@ -350,6 +350,7 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
             vals.extend(read_values)
         if debug_logging:
             logger.debug("  Values: %s, nulls: %s", len(vals), num_nulls)
+
     elif daph.encoding == parquet_thrift.Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
@@ -387,18 +388,20 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
     return vals
 
 
-def _read_dictionary_page(file_obj, page_header, column_metadata):
+def _read_dictionary_page(file_obj, schema_helper, page_header, column_metadata):
     """Read a page containing dictionary data.
-
     Consumes data using the plain encoding and returns an array of values.
     """
     raw_bytes = _read_page(file_obj, page_header, column_metadata)
     io_obj = io.BytesIO(raw_bytes)
-    return encoding.read_plain(
+    values = encoding.read_plain(
         io_obj,
         column_metadata.type,
         page_header.dictionary_page_header.num_values
     )
+    # convert the values once, if the dictionary is associated with a converted_type.
+    schema_element = schema_helper.schema_element(column_metadata.path_in_schema[-1])
+    return convert_column(values, schema_element) if schema_element.converted_type is not None else values
 
 
 def DictReader(file_obj, columns=None):  # pylint: disable=invalid-name
@@ -475,7 +478,7 @@ def reader(file_obj, columns=None):
                     if debug_logging:
                         logger.debug(page_header)
                     assert dict_items == []
-                    dict_items = _read_dictionary_page(file_obj, page_header, cmd)
+                    dict_items = _read_dictionary_page(file_obj, schema_helper, page_header, cmd)
                     if debug_logging:
                         logger.debug("Dictionary: %s", str(dict_items))
                 else:
