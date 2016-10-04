@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,125 +17,208 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/jobbrowser/api.py:248
+msgid "Mapreduce Proxy API did not return JSON response, check if the job is running."
+msgstr "Mapreduce Proxy API は、JSON 応答を返しませんでした。ジョブが実行中であることを確認してください。"
+
+#: src/jobbrowser/api.py:272
+#, python-format
+msgid "Job %s could not be found in Resource Manager: %s"
+msgstr "Job %s が Resource Manager %s で見つかりませんでした"
+
+#: src/jobbrowser/api.py:274
+#, python-format
+msgid "Application is not running: %s"
+msgstr "アプリケーション %s が実行されていません"
+
+#: src/jobbrowser/api.py:276
+#, python-format
+msgid "Job %s could not be found: %s"
+msgstr "Job %s が見つかりませんでした：%s"
+
 #: src/jobbrowser/conf.py:26
 msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "サブミットしたジョブの情報をすべてのユーザーと共有します。false に設定した場合、サブミットしたジョブはその所有者と管理者のみが表示できます。"
 
-#: src/jobbrowser/models.py:103
+#: src/jobbrowser/conf.py:33
+msgid "Disable the job kill button for all users in the job browser."
+msgstr "Job Browser ですべてのユーザーのジョブ強制終了ボタンを無効にします。"
+
+#: src/jobbrowser/conf.py:39
+msgid "Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB)."
+msgstr "バイト数で指定するオフセットです。この位置で、負のオフセットは、指定されたログファイルの最後の N バイトをフェッチします（デフォルト値 1MB）。"
+
+#: src/jobbrowser/models.py:120
 #, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "ID が %(jobid)s のジョブが見つかりませんでした。"
+msgstr "ID %(jobid)s でジョブが見つかりませんでした。"
 
-#: src/jobbrowser/models.py:441
+#: src/jobbrowser/models.py:458
 #, python-format
 msgid "Cannot look up TaskTracker %(id)s."
 msgstr "TaskTracker %(id)s をルックアップできません。"
 
-#: src/jobbrowser/models.py:465
+#: src/jobbrowser/models.py:482
 #, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
 msgstr "TaskTracker %(id)s からログを取得できません。"
 
-#: src/jobbrowser/models.py:473
+#: src/jobbrowser/models.py:490
 #, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
 msgstr "'%s' からのログの取得中に Hue でエラーが発生しました。"
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 #, python-format
 msgid "Job %s has expired."
 msgstr "ジョブ %s が期限切れになりました。"
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 msgid "Cannot be found on the History Server."
 msgstr "履歴サーバーに見つかりません。"
 
-#: src/jobbrowser/views.py:65
-#, python-format
-msgid "Could not find job %s."
-msgstr "ジョブ %s が見つかりませんでした。"
-
-#: src/jobbrowser/views.py:69
+#: src/jobbrowser/views.py:89
 #, python-format
 msgid "You don't have permission to access job %(id)s."
 msgstr "ジョブ %(id)s にアクセスするパーミッションがありません。"
 
-#: src/jobbrowser/views.py:85
+#: src/jobbrowser/views.py:105
 #, python-format
 msgid "Error polling job %s: %s"
 msgstr "ジョブ %s のポーリングでエラーが発生しました：%s"
 
-#: src/jobbrowser/views.py:104
+#: src/jobbrowser/views.py:125
 msgid "Resource Manager cannot be contacted or might be down."
 msgstr "Resource Manager に接続できないかダウンしている可能性があります。"
 
-#: src/jobbrowser/views.py:106
-
+#: src/jobbrowser/views.py:127
 msgid "Job Tracker cannot be contacted or might be down."
 msgstr "Job Tracker に接続できないかダウンしている可能性があります。"
 
-#: src/jobbrowser/views.py:130 src/jobbrowser/views.py:131
-#: src/jobbrowser/templates/job.mako:531 src/jobbrowser/templates/job.mako:535
-#: src/jobbrowser/templates/job.mako:538 src/jobbrowser/templates/job.mako:542
-#: src/jobbrowser/templates/job.mako:547 src/jobbrowser/templates/jobs.mako:239
-#: src/jobbrowser/templates/jobs.mako:240
+#: src/jobbrowser/views.py:154 src/jobbrowser/views.py:155
+#: src/jobbrowser/templates/job.mako:656 src/jobbrowser/templates/job.mako:663
+#: src/jobbrowser/templates/job.mako:672 src/jobbrowser/templates/jobs.mako:242
 #: src/jobbrowser/templates/jobs.mako:243
+#: src/jobbrowser/templates/jobs.mako:246
 msgid "N/A"
 msgstr "N/A"
 
-#: src/jobbrowser/views.py:224
+#: src/jobbrowser/views.py:248
 #, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
 msgstr "kill_job は POST（%(method)s の取得）でのみ呼び出し可能です。"
 
-#: src/jobbrowser/views.py:227
+#: src/jobbrowser/views.py:251
 msgid "Insufficient permission"
 msgstr "パーミッションが不十分です"
 
-#: src/jobbrowser/views.py:228
+#: src/jobbrowser/views.py:252
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
 msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを削除できません。"
 
-#: src/jobbrowser/views.py:247
+#: src/jobbrowser/views.py:278
 msgid "Job did not appear as killed within 15 seconds."
-msgstr "ジョブは、15秒以内に強制終了されたため、表示されませんでした。"
+msgstr "ジョブが強制終了したことが 15 秒以内に表示されませんでした。"
 
-#: src/jobbrowser/views.py:266
+#: src/jobbrowser/views.py:311
 #, python-format
 msgid "Cannot find job attempt '%(id)s'."
-msgstr "ジョブ試行 '%(id)s' が見つかりません。"
+msgstr "ジョブ試行 %(id)s が見つかりません。"
 
-#: src/jobbrowser/views.py:279 src/jobbrowser/yarn_models.py:342
+#: src/jobbrowser/views.py:313
+#, python-format
+msgid "Failed to get application for job %s: %s"
+msgstr "ジョブ %s：%s のアプリケーションの取得に失敗しました"
+
+#: src/jobbrowser/views.py:331 src/jobbrowser/yarn_models.py:456
 #, python-format
 msgid "Failed to retrieve log: %s"
 msgstr "ログの取得に失敗しました：%s"
 
-#: src/jobbrowser/views.py:311
+#: src/jobbrowser/views.py:370
 #, python-format
 msgid "No tasks found for job %(id)s."
-msgstr "ジョブ %(id)s のタスクが見つかりません。"
+msgstr "ジョブ %(id)s に対してタスクが見つかりません。"
 
-#: src/jobbrowser/views.py:379 src/jobbrowser/views.py:398
+#: src/jobbrowser/views.py:440 src/jobbrowser/views.py:459
 #, python-format
 msgid "Cannot find attempt '%(id)s' in task"
-msgstr "試行 '%(id)s' がタスク内に見つかりません"
-
-#: src/jobbrowser/views.py:417
-msgid "Failed to retrieve log. TaskTracker not found."
-msgstr "ログを取得できませんでした。TaskTrackerが見つかりません。"
-
-#: src/jobbrowser/views.py:419
-msgid "Failed to retrieve log. TaskTracker not ready."
-msgstr "ログを取得できませんでした。TaskTrackerの準備ができていません。"
+msgstr "タスクで試行 %(id)s が見つかりません"
 
 #: src/jobbrowser/views.py:478
-msgid "The tracker could not be contacted."
-msgstr "TaskTrackerに接続できませんでした。"
+msgid "Failed to retrieve log. TaskTracker not found."
+msgstr "ログを取得できませんでした。TaskTracker が見つかりません。"
 
-#: src/jobbrowser/views.py:488
+#: src/jobbrowser/views.py:480
+msgid "Failed to retrieve log. TaskTracker not ready."
+msgstr "ログを取得できませんでした。TaskTracker の準備ができていません。"
+
+#: src/jobbrowser/views.py:542
+msgid "The tracker could not be contacted."
+msgstr "Tracker に接続できませんでした。"
+
+#: src/jobbrowser/views.py:552
 msgid "The container disappears as soon as the job finishes."
 msgstr "コンテナはジョブが終了するとすぐに表示されなくなります。"
+
+#: src/jobbrowser/yarn_models.py:145
+msgid "Executor Id"
+msgstr "エグゼキューター ID"
+
+#: src/jobbrowser/yarn_models.py:146
+msgid "Address"
+msgstr "アドレス"
+
+#: src/jobbrowser/yarn_models.py:147
+msgid "RDD Blocks"
+msgstr "RDD ブロック"
+
+#: src/jobbrowser/yarn_models.py:148
+msgid "Storage Memory"
+msgstr "ストレージメモリ"
+
+#: src/jobbrowser/yarn_models.py:149
+msgid "Disk Used"
+msgstr "使用済みディスク"
+
+#: src/jobbrowser/yarn_models.py:150
+msgid "Active Tasks"
+msgstr "アクティブなタスク"
+
+#: src/jobbrowser/yarn_models.py:151 src/jobbrowser/templates/job.mako:331
+msgid "Failed Tasks"
+msgstr "失敗したタスク"
+
+#: src/jobbrowser/yarn_models.py:152
+msgid "Complete Tasks"
+msgstr "タスクを完了"
+
+#: src/jobbrowser/yarn_models.py:153
+msgid "Task Time"
+msgstr "タスクの時間"
+
+#: src/jobbrowser/yarn_models.py:154
+msgid "Input"
+msgstr "入力"
+
+#: src/jobbrowser/yarn_models.py:155
+msgid "Shuffle Read"
+msgstr "シャッフルの読み取り"
+
+#: src/jobbrowser/yarn_models.py:156
+msgid "Shuffle Write"
+msgstr "書き込みをシャッフル"
+
+#: src/jobbrowser/yarn_models.py:157 src/jobbrowser/templates/attempt.mako:68
+#: src/jobbrowser/templates/attempt_logs.mako:62
+#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:117
+#: src/jobbrowser/templates/job.mako:118 src/jobbrowser/templates/job.mako:240
+#: src/jobbrowser/templates/job.mako:241 src/jobbrowser/templates/job.mako:301
+#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
+#: src/jobbrowser/templates/tasks.mako:68
+msgid "Logs"
+msgstr "ログ"
 
 #: src/jobbrowser/templates/attempt.mako:22
 #: src/jobbrowser/templates/attempt.mako:60
@@ -151,7 +234,7 @@ msgstr "タスク試行：%(attemptId)s"
 #: src/jobbrowser/templates/job_attempt_logs.mako:31
 #: src/jobbrowser/templates/task.mako:66
 msgid "Attempt ID"
-msgstr "試行ID"
+msgstr "試行 ID"
 
 #: src/jobbrowser/templates/attempt.mako:34
 #: src/jobbrowser/templates/attempt_logs.mako:32
@@ -168,93 +251,82 @@ msgstr "ジョブ"
 
 #: src/jobbrowser/templates/attempt.mako:41
 #: src/jobbrowser/templates/attempt_logs.mako:37
-#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:215
-#: src/jobbrowser/templates/job.mako:361 src/jobbrowser/templates/jobs.mako:68
-#: src/jobbrowser/templates/task.mako:36 src/jobbrowser/templates/task.mako:131
-#: src/jobbrowser/templates/tasks.mako:76
+#: src/jobbrowser/templates/job.mako:115 src/jobbrowser/templates/job.mako:238
+#: src/jobbrowser/templates/job.mako:388 src/jobbrowser/templates/job.mako:455
+#: src/jobbrowser/templates/jobs.mako:69 src/jobbrowser/templates/task.mako:36
+#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/tasks.mako:72
 msgid "Status"
 msgstr "ステータス"
 
 #: src/jobbrowser/templates/attempt.mako:65
 #: src/jobbrowser/templates/attempt_logs.mako:60
-#: src/jobbrowser/templates/job.mako:131 src/jobbrowser/templates/job.mako:263
-#: src/jobbrowser/templates/task.mako:56
+#: src/jobbrowser/templates/job.mako:133 src/jobbrowser/templates/job.mako:290
+#: src/jobbrowser/templates/job.mako:477 src/jobbrowser/templates/task.mako:56
 msgid "Metadata"
 msgstr "メタデータ"
 
 #: src/jobbrowser/templates/attempt.mako:66
 #: src/jobbrowser/templates/attempt_logs.mako:61
-#: src/jobbrowser/templates/job.mako:265 src/jobbrowser/templates/task.mako:57
+#: src/jobbrowser/templates/job.mako:292 src/jobbrowser/templates/task.mako:57
 msgid "Counters"
 msgstr "カウンタ"
 
-#: src/jobbrowser/templates/attempt.mako:68
-#: src/jobbrowser/templates/attempt_logs.mako:62
-#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:115
-#: src/jobbrowser/templates/job.mako:116 src/jobbrowser/templates/job.mako:217
-#: src/jobbrowser/templates/job.mako:218 src/jobbrowser/templates/job.mako:274
-#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
-#: src/jobbrowser/templates/tasks.mako:72
-msgid "Logs"
-msgstr "ログ"
-
 #: src/jobbrowser/templates/attempt.mako:77
-#: src/jobbrowser/templates/job.mako:140 src/jobbrowser/templates/job.mako:324
-#: src/jobbrowser/templates/job.mako:370
+#: src/jobbrowser/templates/job.mako:142 src/jobbrowser/templates/job.mako:351
+#: src/jobbrowser/templates/job.mako:397 src/jobbrowser/templates/job.mako:483
 #: src/jobbrowser/templates/jobbrowser_components.mako:81
 #: src/jobbrowser/templates/jobbrowser_components.mako:122
-#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:109
+#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:117
 #: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Name"
 msgstr "名前"
 
 #: src/jobbrowser/templates/attempt.mako:78
-#: src/jobbrowser/templates/job.mako:141 src/jobbrowser/templates/job.mako:187
-#: src/jobbrowser/templates/job.mako:325 src/jobbrowser/templates/job.mako:371
+#: src/jobbrowser/templates/job.mako:143 src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:398 src/jobbrowser/templates/job.mako:484
 #: src/jobbrowser/templates/jobbrowser_components.mako:30
 #: src/jobbrowser/templates/jobbrowser_components.mako:56
-#: src/jobbrowser/templates/task.mako:110
+#: src/jobbrowser/templates/task.mako:118
 msgid "Value"
 msgstr "値"
 
 #: src/jobbrowser/templates/attempt.mako:87
-#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:73
+#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:69
 msgid "Task ID"
-msgstr "タスクID"
+msgstr "タスク ID"
 
 #: src/jobbrowser/templates/attempt.mako:89
-#: src/jobbrowser/templates/attempt_logs.mako:33
-#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:731
 msgid "View this task"
 msgstr "このタスクを表示"
 
 #: src/jobbrowser/templates/attempt.mako:92
 msgid "Task Type"
-msgstr "タスクタイプ"
+msgstr "タスクのタイプ"
 
 #: src/jobbrowser/templates/attempt.mako:96
-#: src/jobbrowser/templates/task.mako:123
+#: src/jobbrowser/templates/task.mako:131
 msgid "JobId"
-msgstr "ジョブID"
+msgstr "ジョブ ID"
 
 #: src/jobbrowser/templates/attempt.mako:98
-#: src/jobbrowser/templates/attempt_logs.mako:36
 #: src/jobbrowser/templates/job_attempt_logs.mako:40
-#: src/jobbrowser/templates/jobs.mako:235
-#: src/jobbrowser/templates/task.mako:124
+#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/task.mako:132
 msgid "View this job"
 msgstr "このジョブを表示"
 
 #: src/jobbrowser/templates/attempt.mako:101
 #: src/jobbrowser/templates/container.mako:46
-#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:127
-#: src/jobbrowser/templates/tasks.mako:77
+#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:135
+#: src/jobbrowser/templates/tasks.mako:73
 msgid "State"
 msgstr "状態"
 
 #: src/jobbrowser/templates/attempt.mako:105
-#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:135
-#: src/jobbrowser/templates/tasks.mako:78
+#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/tasks.mako:74
 msgid "Start Time"
 msgstr "開始時間"
 
@@ -263,51 +335,70 @@ msgid "Finish Time"
 msgstr "終了時間"
 
 #: src/jobbrowser/templates/attempt.mako:113
-#: src/jobbrowser/templates/job.mako:117 src/jobbrowser/templates/task.mako:67
-#: src/jobbrowser/templates/task.mako:147
-#: src/jobbrowser/templates/tasks.mako:75
+#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:463
+#: src/jobbrowser/templates/task.mako:67 src/jobbrowser/templates/task.mako:155
+#: src/jobbrowser/templates/tasks.mako:71
 msgid "Progress"
 msgstr "進行状況"
 
 #: src/jobbrowser/templates/attempt.mako:117
 #: src/jobbrowser/templates/task.mako:69
 msgid "Task Tracker"
-msgstr "TaskTracker"
+msgstr "Task Tracker"
 
 #: src/jobbrowser/templates/attempt.mako:128
-#: src/jobbrowser/templates/task.mako:73
+#: src/jobbrowser/templates/task.mako:75
 msgid "Phase"
 msgstr "フェーズ"
 
 #: src/jobbrowser/templates/attempt.mako:132
-#: src/jobbrowser/templates/task.mako:72
 msgid "Output Size"
 msgstr "出力サイズ"
 
-#: src/jobbrowser/templates/attempt.mako:169
-#: src/jobbrowser/templates/attempt.mako:185
+#: src/jobbrowser/templates/attempt.mako:137
+#: src/jobbrowser/templates/task.mako:77
+msgid "Shuffle Finish"
+msgstr "シャッフルの完了"
+
+#: src/jobbrowser/templates/attempt.mako:141
+#: src/jobbrowser/templates/task.mako:78
+msgid "Sort Finish"
+msgstr "ソートの完了"
+
+#: src/jobbrowser/templates/attempt.mako:145
+#: src/jobbrowser/templates/task.mako:79
+msgid "Map Finish"
+msgstr "Map の完了"
+
+#: src/jobbrowser/templates/attempt.mako:151
+#: src/jobbrowser/templates/task.mako:73
+msgid "Node Address"
+msgstr "ノードアドレス"
+
+#: src/jobbrowser/templates/attempt.mako:189
+#: src/jobbrowser/templates/attempt.mako:205
 #: src/jobbrowser/templates/attempt_logs.mako:142
 #: src/jobbrowser/templates/attempt_logs.mako:158
-#: src/jobbrowser/templates/job.mako:449 src/jobbrowser/templates/job.mako:481
-#: src/jobbrowser/templates/jobs.mako:132
-#: src/jobbrowser/templates/task.mako:181
-#: src/jobbrowser/templates/task.mako:197
-#: src/jobbrowser/templates/task.mako:213
-#: src/jobbrowser/templates/tasks.mako:123
+#: src/jobbrowser/templates/job.mako:574 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/jobs.mako:134
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/task.mako:205
+#: src/jobbrowser/templates/task.mako:221
+#: src/jobbrowser/templates/tasks.mako:133
 #: src/jobbrowser/templates/tasktrackers.mako:82
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/jobbrowser/templates/attempt.mako:170
-#: src/jobbrowser/templates/attempt.mako:186
+#: src/jobbrowser/templates/attempt.mako:190
+#: src/jobbrowser/templates/attempt.mako:206
 #: src/jobbrowser/templates/attempt_logs.mako:143
 #: src/jobbrowser/templates/attempt_logs.mako:159
-#: src/jobbrowser/templates/job.mako:450 src/jobbrowser/templates/job.mako:482
-#: src/jobbrowser/templates/jobs.mako:133
-#: src/jobbrowser/templates/task.mako:182
-#: src/jobbrowser/templates/task.mako:198
-#: src/jobbrowser/templates/task.mako:214
-#: src/jobbrowser/templates/tasks.mako:124
+#: src/jobbrowser/templates/job.mako:575 src/jobbrowser/templates/job.mako:607
+#: src/jobbrowser/templates/jobs.mako:135
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/task.mako:206
+#: src/jobbrowser/templates/task.mako:222
+#: src/jobbrowser/templates/tasks.mako:134
 #: src/jobbrowser/templates/tasktrackers.mako:83
 msgid "No matching records"
 msgstr "一致するレコードがありません"
@@ -339,10 +430,10 @@ msgstr "コンテナ：%(trackerId)s"
 #: src/jobbrowser/templates/container.mako:33
 #, python-format
 msgid "Container at %(trackerHost)s on port %(trackerPort)s"
-msgstr "ポート %(trackerPort)s 上の %(trackerHost)s のコンテナ"
+msgstr "ポート %(trackerPort)s 上の  %(trackerHost)s のコンテナ"
 
 #: src/jobbrowser/templates/container.mako:36
-#: src/jobbrowser/templates/job.mako:329 src/jobbrowser/templates/jobs.mako:66
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:66
 #: src/jobbrowser/templates/tasktracker.mako:36
 msgid "ID"
 msgstr "ID"
@@ -354,22 +445,23 @@ msgstr "メモリ測定値"
 
 #: src/jobbrowser/templates/container.mako:44
 msgid "Node Id"
-msgstr "ノードID"
+msgstr "ノード ID"
 
 #: src/jobbrowser/templates/container.mako:48
-#: src/jobbrowser/templates/job.mako:111 src/jobbrowser/templates/job.mako:213
-#: src/jobbrowser/templates/job.mako:333 src/jobbrowser/templates/jobs.mako:69
+#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:232
+#: src/jobbrowser/templates/job.mako:360 src/jobbrowser/templates/job.mako:453
+#: src/jobbrowser/templates/jobs.mako:70
 msgid "User"
 msgstr "ユーザー"
 
 #: src/jobbrowser/templates/container.mako:50
-#: src/jobbrowser/templates/job.mako:177
+#: src/jobbrowser/templates/job.mako:181 src/jobbrowser/templates/job.mako:527
 msgid "Diagnostics"
 msgstr "診断"
 
 #: src/jobbrowser/templates/container.mako:52
 msgid "Total Memory Needed in MB"
-msgstr "必要な合計メモリ(MB)"
+msgstr "必要な合計メモリ (MB)"
 
 #: src/jobbrowser/templates/container.mako:54
 msgid "Exit Code"
@@ -380,189 +472,189 @@ msgstr "終了コード"
 msgid "Back"
 msgstr "戻る"
 
-#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:259
-#: src/jobbrowser/templates/job.mako:261
+#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:286
+#: src/jobbrowser/templates/job.mako:288
 msgid "Tasks"
 msgstr "タスク"
 
-#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/task.mako:119
-#: src/jobbrowser/templates/tasks.mako:74
+#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/job.mako:111
+#: src/jobbrowser/templates/job.mako:230 src/jobbrowser/templates/job.mako:451
+#: src/jobbrowser/templates/task.mako:127
+#: src/jobbrowser/templates/tasks.mako:70
 msgid "Type"
 msgstr "タイプ"
 
-#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:252
+#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:278
 #, python-format
 msgid "Job: %(jobId)s"
 msgstr "ジョブ：%(jobId)s"
 
-#: src/jobbrowser/templates/job.mako:109
-
+#: src/jobbrowser/templates/job.mako:109 src/jobbrowser/templates/job.mako:449
 msgid "App ID"
-msgstr "アプリID"
+msgstr "アプリケーション ID"
 
-#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:225
-#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:74
+#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:248
+#: src/jobbrowser/templates/job.mako:383 src/jobbrowser/templates/job.mako:465
+#: src/jobbrowser/templates/jobs.mako:75
 msgid "Duration"
 msgstr "期間"
 
-#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:245
+#: src/jobbrowser/templates/job.mako:123 src/jobbrowser/templates/job.mako:268
+#: src/jobbrowser/templates/job.mako:467
 msgid "Actions"
 msgstr "アクション"
 
-#: src/jobbrowser/templates/job.mako:133
-
+#: src/jobbrowser/templates/job.mako:135
 msgid "Metrics"
 msgstr "測定値"
 
-#: src/jobbrowser/templates/job.mako:145
+#: src/jobbrowser/templates/job.mako:147 src/jobbrowser/templates/job.mako:490
 msgid "Jobs"
 msgstr "ジョブ"
 
-#: src/jobbrowser/templates/job.mako:149
+#: src/jobbrowser/templates/job.mako:152 src/jobbrowser/templates/job.mako:497
 #: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Host"
 msgstr "ホスト"
 
-#: src/jobbrowser/templates/job.mako:153
+#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:503
 msgid "Queue Name"
 msgstr "キュー名"
 
-#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:347
+#: src/jobbrowser/templates/job.mako:161 src/jobbrowser/templates/job.mako:374
+#: src/jobbrowser/templates/job.mako:507
 msgid "Started"
 msgstr "開始"
 
-#: src/jobbrowser/templates/job.mako:161
-
+#: src/jobbrowser/templates/job.mako:165 src/jobbrowser/templates/job.mako:511
 msgid "Finished"
 msgstr "終了"
 
-#: src/jobbrowser/templates/job.mako:165
+#: src/jobbrowser/templates/job.mako:169 src/jobbrowser/templates/job.mako:515
 msgid "Pre-empted Resource VCores"
-msgstr "プリエンプトされたリソースVCore"
+msgstr "プリエンプトされたリソース VCore"
 
-#: src/jobbrowser/templates/job.mako:169
+#: src/jobbrowser/templates/job.mako:173 src/jobbrowser/templates/job.mako:519
 msgid "VCore seconds"
-msgstr "VCore秒"
+msgstr "VCore 秒"
 
-#: src/jobbrowser/templates/job.mako:173
-
+#: src/jobbrowser/templates/job.mako:177 src/jobbrowser/templates/job.mako:523
 msgid "Memory seconds"
 msgstr "メモリ秒"
 
-#: src/jobbrowser/templates/job.mako:186
-
-msgid "Metric"
-msgstr "測定値"
-
-#: src/jobbrowser/templates/job.mako:192
-msgid "header"
-msgstr "ヘッダー"
-
-#: src/jobbrowser/templates/job.mako:211
+#: src/jobbrowser/templates/job.mako:228
 #: src/jobbrowser/templates/job_not_assigned.mako:36
 msgid "Job ID"
-msgstr "ジョブID"
+msgstr "ジョブ ID"
 
-#: src/jobbrowser/templates/job.mako:220 src/jobbrowser/templates/job.mako:338
-#: src/jobbrowser/templates/jobs.mako:70
-msgid "Maps"
-msgstr "Map"
+#: src/jobbrowser/templates/job.mako:235
+msgid "Proxy User"
+msgstr "プロキシユーザー"
 
-#: src/jobbrowser/templates/job.mako:222 src/jobbrowser/templates/job.mako:342
+#: src/jobbrowser/templates/job.mako:243 src/jobbrowser/templates/job.mako:365
 #: src/jobbrowser/templates/jobs.mako:71
-msgid "Reduces"
-msgstr "Reduce"
+msgid "Maps"
+msgstr "マップ"
 
-#: src/jobbrowser/templates/job.mako:234
+#: src/jobbrowser/templates/job.mako:245 src/jobbrowser/templates/job.mako:369
+#: src/jobbrowser/templates/jobs.mako:72
+msgid "Reduces"
+msgstr "Reduces"
+
+#: src/jobbrowser/templates/job.mako:257
 msgid "Output"
 msgstr "出力"
 
-#: src/jobbrowser/templates/job.mako:258 src/jobbrowser/templates/task.mako:55
-#: src/jobbrowser/templates/tasks.mako:105
+#: src/jobbrowser/templates/job.mako:285 src/jobbrowser/templates/task.mako:55
+#: src/jobbrowser/templates/tasks.mako:101
 msgid "Attempts"
 msgstr "試行"
 
-#: src/jobbrowser/templates/job.mako:275
+#: src/jobbrowser/templates/job.mako:302
 msgid "Id"
 msgstr "ID"
 
-#: src/jobbrowser/templates/job.mako:276
+#: src/jobbrowser/templates/job.mako:303
 msgid "Container"
 msgstr "コンテナ"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "This jobs is "
 msgstr "このジョブは "
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "retired"
 msgstr "リタイア"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid " and so has little information available."
 msgstr " なので、情報はほとんどありません。"
 
-#: src/jobbrowser/templates/job.mako:303
+#: src/jobbrowser/templates/job.mako:330
 msgid "View All Failed Tasks"
 msgstr "失敗したすべてのタスクを表示"
 
-#: src/jobbrowser/templates/job.mako:304
-msgid "Failed Tasks"
-msgstr "失敗したタスク"
-
-#: src/jobbrowser/templates/job.mako:310
+#: src/jobbrowser/templates/job.mako:337
 msgid "View All Tasks"
 msgstr "すべてのタスクを表示"
 
-#: src/jobbrowser/templates/job.mako:311
+#: src/jobbrowser/templates/job.mako:338
 msgid "Recent Tasks"
 msgstr "最近のタスク"
 
-#: src/jobbrowser/templates/job.mako:320 src/jobbrowser/templates/tasks.mako:57
+#: src/jobbrowser/templates/job.mako:347 src/jobbrowser/templates/tasks.mako:57
 msgid "Text Filter"
 msgstr "テキストフィルタ"
 
-#: src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:379
 msgid "Ended"
 msgstr "終了"
 
-#: src/jobbrowser/templates/job.mako:367
+#: src/jobbrowser/templates/job.mako:394
 msgid "Raw configuration:"
 msgstr "未処理の設定："
 
-#: src/jobbrowser/templates/job.mako:420 src/jobbrowser/templates/jobs.mako:88
+#: src/jobbrowser/templates/job.mako:459 src/jobbrowser/templates/job.mako:460
+msgid "Tracking URL"
+msgstr "追跡用 URL"
+
+#: src/jobbrowser/templates/job.mako:545 src/jobbrowser/templates/jobs.mako:89
 msgid "Confirm Kill"
 msgstr "強制終了を確認"
 
-#: src/jobbrowser/templates/job.mako:423 src/jobbrowser/templates/jobs.mako:91
+#: src/jobbrowser/templates/job.mako:548 src/jobbrowser/templates/jobs.mako:92
 msgid "Are you sure you want to kill this job?"
 msgstr "このジョブを強制終了してもよろしいですか？"
 
-#: src/jobbrowser/templates/job.mako:426 src/jobbrowser/templates/jobs.mako:94
+#: src/jobbrowser/templates/job.mako:551 src/jobbrowser/templates/jobs.mako:95
 msgid "No"
 msgstr "いいえ"
 
-#: src/jobbrowser/templates/job.mako:427 src/jobbrowser/templates/jobs.mako:95
+#: src/jobbrowser/templates/job.mako:552 src/jobbrowser/templates/jobs.mako:96
 msgid "Yes"
 msgstr "はい"
 
-#: src/jobbrowser/templates/job.mako:492
+#: src/jobbrowser/templates/job.mako:617
 msgid "There was a problem communicating with the server. Refresh the page."
 msgstr "サーバーとの通信で問題が発生しました。ページを更新します。"
 
-#: src/jobbrowser/templates/job.mako:520 src/jobbrowser/templates/job.mako:521
-#: src/jobbrowser/templates/jobs.mako:230
-#: src/jobbrowser/templates/jobs.mako:263
+#: src/jobbrowser/templates/job.mako:645 src/jobbrowser/templates/job.mako:646
+#: src/jobbrowser/templates/jobs.mako:232
+#: src/jobbrowser/templates/jobs.mako:266
 msgid "Kill this job"
 msgstr "このジョブを強制終了"
 
-#: src/jobbrowser/templates/job.mako:528
+#: src/jobbrowser/templates/job.mako:653
 #: src/jobbrowser/templates/jobbrowser_components.mako:188
-#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/jobs.mako:240
 msgid "Retired"
 msgstr "リタイア"
 
-#: src/jobbrowser/templates/job.mako:632 src/jobbrowser/templates/jobs.mako:359
+#: src/jobbrowser/templates/job.mako:660 src/jobbrowser/templates/job.mako:667
+msgid "0/0"
+msgstr "0/0"
+
+#: src/jobbrowser/templates/job.mako:757 src/jobbrowser/templates/jobs.mako:362
 msgid "There was a problem killing this job."
 msgstr "このジョブの強制終了時に問題が発生しました。"
 
@@ -582,7 +674,7 @@ msgstr "読み込み中..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
 msgid "The application might not be running yet or there is no Node Manager or Container available."
-msgstr "アプリケーションがまだ実行されていないか、使用可能な Node Manager またはコンテナがありません。"
+msgstr "アプリケーションがまだ実行されていないか、Node Manager またはコンテナが利用できません。"
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48
 msgid "This page will be automatically refreshed."
@@ -612,6 +704,10 @@ msgstr "合計"
 msgid "Job Browser"
 msgstr "Job Browser"
 
+#: src/jobbrowser/templates/jobbrowser_components.mako:246
+msgid "Hive jobs are running as the 'hive' user"
+msgstr "Hive ジョブは、hive ユーザーとして実行中です。"
+
 #: src/jobbrowser/templates/jobs.mako:35
 msgid "Username"
 msgstr "ユーザー名"
@@ -630,7 +726,7 @@ msgstr "テキストを検索"
 
 #: src/jobbrowser/templates/jobs.mako:48
 msgid "Show retired jobs"
-msgstr "リタイアジョブを表示"
+msgstr "リタイアになったジョブを表示"
 
 #: src/jobbrowser/templates/jobs.mako:52
 msgid "Succeeded"
@@ -652,25 +748,28 @@ msgstr "強制終了"
 msgid "There are no jobs that match your search criteria."
 msgstr "指定された検索条件に一致するジョブがありません。"
 
-#: src/jobbrowser/templates/jobs.mako:72
+#: src/jobbrowser/templates/jobs.mako:68
+msgid "Application Type"
+msgstr "アプリケーションタイプ"
+
+#: src/jobbrowser/templates/jobs.mako:73
 msgid "Queue"
 msgstr "キュー"
 
-#: src/jobbrowser/templates/jobs.mako:73
+#: src/jobbrowser/templates/jobs.mako:74
 msgid "Priority"
 msgstr "優先度"
 
-#: src/jobbrowser/templates/jobs.mako:75
+#: src/jobbrowser/templates/jobs.mako:76
 msgid "Submitted"
 msgstr "送信済み"
 
-#: src/jobbrowser/templates/jobs.mako:140
-
+#: src/jobbrowser/templates/jobs.mako:142
 msgid "There was a problem communicating with the server: "
 msgstr "サーバーとの通信で問題が発生しました： "
 
-#: src/jobbrowser/templates/jobs.mako:231
-#: src/jobbrowser/templates/jobs.mako:264
+#: src/jobbrowser/templates/jobs.mako:233
+#: src/jobbrowser/templates/jobs.mako:267
 msgid "Kill"
 msgstr "強制終了"
 
@@ -679,35 +778,23 @@ msgstr "強制終了"
 msgid "Job Task: %(taskId)s"
 msgstr "ジョブタスク：%(taskId)s"
 
-#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:79
+#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:75
 msgid "End Time"
 msgstr "終了時間"
 
-#: src/jobbrowser/templates/task.mako:74
-msgid "Shuffle Finish"
-msgstr "シャッフルの終了"
-
-#: src/jobbrowser/templates/task.mako:75
-msgid "Sort Finish"
-msgstr "ソートの終了"
-
-#: src/jobbrowser/templates/task.mako:76
-msgid "Map Finish"
-msgstr "Mapの終了"
-
-#: src/jobbrowser/templates/task.mako:83
+#: src/jobbrowser/templates/task.mako:87
 msgid "View this attempt"
 msgstr "この試行を表示"
 
-#: src/jobbrowser/templates/task.mako:115
+#: src/jobbrowser/templates/task.mako:123
 msgid "Task id"
-msgstr "タスクID"
+msgstr "タスク ID"
 
-#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/task.mako:147
 msgid "Execution Start Time"
 msgstr "実行開始時間"
 
-#: src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/task.mako:151
 msgid "Execution Finish Time"
 msgstr "実行終了時間"
 
@@ -719,7 +806,7 @@ msgstr "タスク表示：ジョブ：%(jobId)s"
 
 #: src/jobbrowser/templates/tasks.mako:39
 msgid "Filter tasks:"
-msgstr "タスクをフィルタする："
+msgstr "タスクのフィル処理："
 
 #: src/jobbrowser/templates/tasks.mako:41
 msgid "All states"
@@ -735,7 +822,7 @@ msgstr "実行中"
 
 #: src/jobbrowser/templates/tasks.mako:44
 msgid "failed"
-msgstr "失敗"
+msgstr "失敗しました"
 
 #: src/jobbrowser/templates/tasks.mako:45
 msgid "killed"
@@ -769,18 +856,38 @@ msgstr "セットアップ"
 msgid "Text filter"
 msgstr "テキストフィルタ"
 
-#: src/jobbrowser/templates/tasks.mako:67
-msgid "There were no tasks that match your search criteria."
-msgstr "指定された検索条件に一致するタスクがありません。"
-
-#: src/jobbrowser/templates/tasks.mako:80
+#: src/jobbrowser/templates/tasks.mako:76
 msgid "View Attempts"
 msgstr "試行を表示"
 
-#: src/jobbrowser/templates/tasks.mako:98
+#: src/jobbrowser/templates/tasks.mako:94
 #, python-format
 msgid "Show only %(state)s tasks"
-msgstr "%(state)s のタスクのみを表示"
+msgstr "%(state)s タスクのみを表示"
+
+#: src/jobbrowser/templates/tasks.mako:135
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "_TOTAL_ 件のエントリの _START_ から _END_ までを表示"
+
+#: src/jobbrowser/templates/tasks.mako:136
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "0 件のエントリの 0 から 0 までを表示"
+
+#: src/jobbrowser/templates/tasks.mako:138
+msgid "First"
+msgstr "先頭"
+
+#: src/jobbrowser/templates/tasks.mako:139
+msgid "Last"
+msgstr "末尾"
+
+#: src/jobbrowser/templates/tasks.mako:140
+msgid "Next"
+msgstr "次"
+
+#: src/jobbrowser/templates/tasks.mako:141
+msgid "Previous"
+msgstr "前"
 
 #: src/jobbrowser/templates/tasktracker.mako:23
 #, python-format
@@ -790,7 +897,7 @@ msgstr "Tracker：%(trackerId)s"
 #: src/jobbrowser/templates/tasktracker.mako:33
 #, python-format
 msgid "Tracker at %(trackerHost)s on port %(trackerPort)s"
-msgstr "ポート %(trackerPort)s 上の %(trackerHost)s でのTracker"
+msgstr "ポート %(trackerPort)s 上の  %(trackerHost)s での Tracker"
 
 #: src/jobbrowser/templates/tasktracker.mako:38
 msgid "Last heard from at"
@@ -810,28 +917,28 @@ msgstr "空き容量："
 
 #: src/jobbrowser/templates/tasktracker.mako:55
 msgid "Map and Reduce"
-msgstr "MapおよびReduce"
+msgstr "Map および Reduce"
 
 #: src/jobbrowser/templates/tasktracker.mako:58
 msgid "Map count:"
-msgstr "Mapカウント："
+msgstr "Map カウント："
 
 #: src/jobbrowser/templates/tasktracker.mako:60
 msgid "Reduce count:"
-msgstr "Reduceカウント："
+msgstr "Reduce カウント："
 
 #: src/jobbrowser/templates/tasktracker.mako:62
 msgid "Max map tasks:"
-msgstr "最大Mapタスク："
+msgstr "最大 Map タスク："
 
 #: src/jobbrowser/templates/tasktracker.mako:64
 msgid "Max reduce tasks:"
-msgstr "最大Reduceタスク："
+msgstr "最大 Reduce タスク："
 
 #: src/jobbrowser/templates/tasktrackers.mako:22
 #: src/jobbrowser/templates/tasktrackers.mako:28
 msgid "Task Trackers"
-msgstr "TaskTracker"
+msgstr "Task Tracker"
 
 #: src/jobbrowser/templates/tasktrackers.mako:37
 msgid "Port"
@@ -839,7 +946,7 @@ msgstr "ポート"
 
 #: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Last Seen"
-msgstr "前回確認"
+msgstr "最後の表示"
 
 #: src/jobbrowser/templates/tasktrackers.mako:39
 msgid "Available Space"
@@ -851,29 +958,33 @@ msgstr "失敗カウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:41
 msgid "Map Count"
-msgstr "Mapカウント"
+msgstr "マップカウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:42
 msgid "Reduce Count"
-msgstr "Reduceカウント"
+msgstr "Reduce カウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:43
 msgid "Max Map Tasks"
-msgstr "最大Mapタスク"
+msgstr "最大 Map タスク"
 
 #: src/jobbrowser/templates/tasktrackers.mako:44
 msgid "Max Reduce Tasks"
-msgstr "最大Reduceタスク"
+msgstr "最大 Reduce タスク"
 
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
 msgstr "時間なし"
 
-#~ msgid "Maps:"
-#~ msgstr "Map："
-#~ msgid "Reduces:"
-#~ msgstr "Reduce："
-#~ msgid "Duration:"
-#~ msgstr "期間："
-#~ msgid "Date"
-#~ msgstr "日付"
+#~ msgid "Could not find job %s."
+#~ msgstr "ジョブ %s が見つかりませんでした。"
+
+#~ msgid "Metric"
+#~ msgstr "測定値"
+
+#~ msgid "header"
+#~ msgstr "ヘッダー"
+
+#~ msgid "There were no tasks that match your search criteria."
+#~ msgstr "指定された検索条件に一致するタスクがありません。"
+

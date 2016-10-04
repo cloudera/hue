@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"POT-Creation-Date: 2016-07-19 17:49-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
-#: src/liboauth/backend.py:158 src/liboauth/backend.py:171
-#: src/liboauth/backend.py:180 src/liboauth/backend.py:254
+#: src/liboauth/backend.py:109 src/liboauth/backend.py:155
+#: src/liboauth/backend.py:163 src/liboauth/backend.py:176
+#: src/liboauth/backend.py:185 src/liboauth/backend.py:269
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "Réponse non valide du fournisseur OAuth : %s"
@@ -125,27 +125,39 @@ msgstr "Hue - Inscription"
 msgid "Hue - Sign in"
 msgstr "Hue - Connexion"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Visit gethue.com"
 msgstr "Visitez le site gethue.com"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "Envie d'une petite sieste ? Visitez plutôt notre site à l'adresse gethue.com."
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Error!"
 msgstr "Erreur !"
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Invalid username or password."
 msgstr "Nom d'utilisateur ou mot de passe non valide."
 
-#: src/liboauth/templates/oauth-login.mako:177
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "This is your first time logging in."
 msgstr "Il s'agit de votre première connexion."
 
-#: src/liboauth/templates/oauth-login.mako:178
+#: src/liboauth/templates/oauth-login.mako:180
 msgid "You will become Hue superuser."
 msgstr "Vous deviendrez un superutilisateur Hue."
+
+#: src/liboauth/templates/oauth-login.mako:182
+msgid "Sign Up via"
+msgstr "S'inscrire par"
+
+#: src/liboauth/templates/oauth-login.mako:185
+msgid "Sign In via"
+msgstr "Se connecter par"
+
+#: src/liboauth/templates/oauth-login.mako:214
+msgid "The oauth app is not configured with any provider."
+msgstr "L'application oauth n'est configurée auprès d'aucun fournisseur."
 
