@@ -108,7 +108,8 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          },
          'name': name,
          'database': database,
-         'result': {}
+         'result': {},
+         'variables': []
       }
     ]
   }
@@ -174,7 +175,8 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
          'properties': _snippet['properties'],
          'name': name,
          'database': _snippet.get('database'),
-         'result': {}
+         'result': {},
+         'variables': []
       } for _snippet in _snippets
     ]
   }
