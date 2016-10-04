@@ -644,7 +644,10 @@ class HS2Api(Api):
 
 
   def _get_handle(self, snippet):
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    try:
+      snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    except KeyError, ex:
+      raise Exception('Operation has no valid handle attached')
 
     for key in snippet['result']['handle'].keys():
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
