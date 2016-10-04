@@ -281,12 +281,12 @@ def _read_data(file_obj, fo_encoding, value_count, bit_width):
 
 
 def read_data_page(file_obj, schema_helper, page_header, column_metadata,
-                   dictionary):
-    """Read the data page from the given file-like object based upon the parameters.
+                       dictionary):
 
+
+    """Read the data page from the given file-like object based upon the parameters.
     Metadata in the the schema_helper, page_header, column_metadata, and (optional) dictionary
     are used for parsing data.
-
     Returns a list of values.
     """
     daph = page_header.data_page_header
@@ -355,16 +355,32 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
         if debug_logging:
             logger.debug("bit_width: %d", bit_width)
-        total_seen = 0
+
         dict_values_bytes = io_obj.read()
         dict_values_io_obj = io.BytesIO(dict_values_bytes)
-        while total_seen < daph.num_values:
-            values = encoding.read_rle_bit_packed_hybrid(
-                dict_values_io_obj, bit_width, len(dict_values_bytes))
-            if len(values) + total_seen > daph.num_values:
-                values = values[0: daph.num_values - total_seen]
-            vals += [dictionary[v] for v in values]
-            total_seen += len(values)
+        # read_values stores the bit-packed values. If there are definition levels and the data contains nulls,
+        # the size of read_values will be less than daph.num_values
+        read_values = []
+        while dict_values_io_obj.tell() < len(dict_values_bytes):
+            read_values.extend(encoding.read_rle_bit_packed_hybrid(
+                dict_values_io_obj, bit_width, len(dict_values_bytes)))
+
+        if definition_levels:
+            itr = iter(read_values)
+            # add the nulls into a new array, values, but using the definition_levels data.
+            values = [dictionary[next(itr)] if level == max_definition_level else None for level in definition_levels]
+        else:
+            values = [dictionary[v] for v in read_values]
+
+        # there can be extra values on the end of the array because the last bit-packed chunk may be zero-filled.
+        if len(values) > daph.num_values:
+            values = values[0: daph.num_values]
+        vals.extend(values)
+
+        if debug_logging:
+            logger.debug("  Read %s values using PLAIN_DICTIONARY encoding and definition levels show %s nulls",
+                         len(vals), num_nulls)
+
     else:
         raise ParquetFormatException("Unsupported encoding: %s",
                                      _get_name(parquet_thrift.Encoding, daph.encoding))
