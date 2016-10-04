@@ -339,8 +339,10 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
 
     # NOTE: The repetition levels aren't yet used.
     if daph.encoding == parquet_thrift.Encoding.PLAIN:
-        read_values = \
-            encoding.read_plain(io_obj, column_metadata.type, daph.num_values - num_nulls)
+        read_values = encoding.read_plain(io_obj, column_metadata.type, daph.num_values - num_nulls)
+        schema_element = schema_helper.schema_element(column_metadata.path_in_schema[-1])
+        read_values = convert_column(read_values, schema_element) \
+            if schema_element.converted_type is not None else read_values
         if definition_levels:
             itr = iter(read_values)
             vals.extend([next(itr) if level == max_definition_level else None for level in definition_levels])
@@ -451,9 +453,7 @@ def reader(file_obj, columns=None):
                 if page_header.type == parquet_thrift.PageType.DATA_PAGE:
                     values = read_data_page(file_obj, schema_helper, page_header, cmd,
                                             dict_items)
-                    schema_element = schema_helper.schema_element(cmd.path_in_schema[-1])
-                    res[".".join(cmd.path_in_schema)] += convert_column(values, schema_element) \
-                        if schema_element.converted_type else values
+                    res[".".join(cmd.path_in_schema)] += values
                     values_seen += page_header.data_page_header.num_values
                 elif page_header.type == parquet_thrift.PageType.DICTIONARY_PAGE:
                     if debug_logging:

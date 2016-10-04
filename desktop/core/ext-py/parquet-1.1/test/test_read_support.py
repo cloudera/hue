@@ -217,3 +217,14 @@ class TestDefinitionLevel(unittest.TestCase):
             [{"foo": 1, "bar": 2}, {"foo": 1, "bar": None}],
             actual_data
         )
+
+    def test_converted_type_null(self):
+        """Test reading a file that contains null records for a plain column that is converted to utf-8."""
+        with open(os.path.join(TEST_DATA, "test-converted-type-null.parquet"), "rb") as parquet_fo:
+            actual_data = list(parquet.DictReader(parquet_fo))
+
+        self.assertListEqual(
+            # this is the contents of test-converted-type-null.parquet. 2 records.
+            [{"foo": "bar"}, {"foo": None}],
+            actual_data
+        )
