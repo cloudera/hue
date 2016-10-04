@@ -1,9 +1,12 @@
+"""setup.py - build script for parquet-python."""
+
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-setup(name='parquet',
+setup(
+    name='parquet',
     version='1.1',
     description='Python support for Parquet file format',
     author='Joe Crobak',
@@ -24,7 +27,7 @@ setup(name='parquet',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    packages=[ 'parquet' ],
+    packages=['parquet'],
     install_requires=[
         'thriftpy>=0.3.6',
     ],
