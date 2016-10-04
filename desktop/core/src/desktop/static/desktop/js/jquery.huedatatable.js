@@ -513,7 +513,7 @@
           self.$table.data('isScrollAttached', true);
           var scrollFn = function () {
             window.clearTimeout(drawTimeout);
-            drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns').length, 500)));
+            drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns') ? self.$table.data('aoColumns').length : 500, 500)));
           }
           self.$table.parents(oInit['scrollable']).data('scrollFnDt', scrollFn);
           self.$table.parents(oInit['scrollable']).on('scroll', scrollFn);
