@@ -1370,6 +1370,7 @@
     });
 
     self.schedulerViewModel = null;
+    self.schedulerViewModelIsLoaded = ko.observable(false);
     self.schedulerViewerViewModel = ko.observable();
     self.isBatchable = ko.computed(function() {
       return self.snippets().length > 0
@@ -1822,6 +1823,8 @@
             self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
             self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
             self.schedulerViewModel.isEditing(true);
+
+            self.schedulerViewModelIsLoaded(true);
 
             if (_action == 'new') {
               self.coordinatorUuid(UUID());
