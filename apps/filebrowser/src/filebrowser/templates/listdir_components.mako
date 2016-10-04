@@ -1751,9 +1751,7 @@ from django.utils.translation import ugettext as _
               });
             },
             totaluploadprogress: function (progress) {
-              $('#progressStatusBar div').animate({
-                "width": progress.toFixed() + "%"
-              }, 100);
+              $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
               $.jHueNotify.info("${_('Upload has been canceled')}");
