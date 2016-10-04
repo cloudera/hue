@@ -1186,7 +1186,7 @@ class Document2(models.Model):
 
   def validate(self):
     # Validate document name
-    invalid_chars = re.findall(re.compile(r"[<>/{}[\]~`]"), self.name)
+    invalid_chars = re.findall(re.compile(r"[<>/~`]"), self.name)
     if invalid_chars:
       raise FilesystemException(_('Document %s contains some special characters: %s') % (self.name, invalid_chars))
 
