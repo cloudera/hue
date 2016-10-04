@@ -20,6 +20,7 @@ except ImportError:
 import thriftpy
 from thriftpy.protocol.compact import TCompactProtocolFactory
 
+from .converted_types import convert_column
 from .thrift_filetransport import TFileTransport
 from . import encoding
 from . import schema
@@ -395,6 +396,8 @@ def reader(fo, columns=None):
     :param columns: the columns to include. If None (default), all columns
                     are included. Nested values are referenced with "." notation
     """
+    if hasattr(fo, 'mode') and 'b' not in fo.mode:
+        logger.error("parquet.reader requires the fileobj to be opened in binary mode!")
     footer = _read_footer(fo)
     schema_helper = schema.SchemaHelper(footer.schema)
     keys = columns if columns else [s.name for s in
@@ -429,7 +432,9 @@ def reader(fo, columns=None):
                 if ph.type == parquet_thrift.PageType.DATA_PAGE:
                     values = read_data_page(fo, schema_helper, ph, cmd,
                                             dict_items)
-                    res[".".join(cmd.path_in_schema)] += values
+                    schema_element = schema_helper.schema_element(cmd.path_in_schema[-1])
+                    res[".".join(cmd.path_in_schema)] += convert_column(values,
+                                                                        schema_element) if schema_element.converted_type else values
                     values_seen += ph.data_page_header.num_values
                 elif ph.type == parquet_thrift.PageType.DICTIONARY_PAGE:
                     if debug_logging:
