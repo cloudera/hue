@@ -395,6 +395,12 @@ class SessionManager(models.Manager):
     except Session.DoesNotExist, e:
       return None
 
+  def get_n_sessions(self, user, n, application='beeswax', filter_open=True):
+    q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
+    if filter_open:
+      q = q.filter(status_code=0)
+    return q.order_by("-last_used")[0:n]
+
 
 class Session(models.Model):
   """
