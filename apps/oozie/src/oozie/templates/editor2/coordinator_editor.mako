@@ -148,6 +148,7 @@ ${ scheduler.import_sla_cron(coordinator_json) }
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
   viewModel.coordinator.tracker().markCurrentStateAsClean();
+  viewModel.coordinator.refreshParameters();
 
 
   var shareViewModel = initSharing("#documentShareModal");

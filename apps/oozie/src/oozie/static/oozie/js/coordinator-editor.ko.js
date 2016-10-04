@@ -102,19 +102,27 @@ var Coordinator = function (vm, coordinator) {
       self.workflowParameters(data.parameters);
 
       // Remove Uncommon params
-      prev_variables = self.variables.slice();
+      var prev_variables = self.variables.slice();
+      var removed_variables = [];
       $.each(prev_variables, function (index, variable) {
-        if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable() }).length == 0) {
+        if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable(); }).length == 0) {
           self.variables.remove(variable);
+          removed_variables.push(variable);
         }
       });
 
-      // Append the new variables
+      // Append the new variables, reuse past variables in case of rename
       prev_variables = self.variables.slice();
       $.each(data.parameters, function (index, param) {
-        if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable() }).length == 0) {
-          self.addVariable();
-          self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+        if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable(); }).length == 0) {
+          var newVar;
+          if (removed_variables.length > 0) {
+            newVar = removed_variables.shift();
+            self.variables.push(newVar);
+          } else {
+            newVar = self.addVariable();
+          }
+          newVar.workflow_variable(param['name']);
         }
       });
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -171,6 +179,7 @@ var Coordinator = function (vm, coordinator) {
       }
     }
     self.variables.push(_koVar);
+    return _koVar;
   };
 }
 
@@ -239,7 +248,7 @@ var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, w
             cb(data);
           }
           else {
-        	  $(document).trigger("info", data.message);
+            $(document).trigger("info", data.message);
           }
           if (window.location.search.indexOf("coordinator") == -1) {
             window.location.hash = '#coordinator=' + data.id;
