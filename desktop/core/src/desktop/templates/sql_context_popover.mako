@@ -253,8 +253,8 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-footer">
     <div class="sql-context-flex-bottom-links">
       <div class="sql-context-link-row">
-        <a class="inactive-action pointer" data-bind="visible: isTable || isColumn, click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="Show in Assist..." class="fa fa-search"></i> ${ _("Assist") }</a>
-        <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="Open in Metastore..." class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        <a class="inactive-action pointer" data-bind="visible: isTable || isColumn, click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }</a>
+        <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
       </div>
     </div>
   </script>
