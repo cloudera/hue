@@ -812,6 +812,8 @@ from metadata.conf import has_navigator
       function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
 
+        var apiHelper = ApiHelper.getInstance();
+
         var originalMidX, originalWidth, originalRightX, originalLeftX, originalMidY, originalHeight, originalTopY, originalBottomY;
         var rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
         var redrawHeaders = false;
@@ -833,6 +835,13 @@ from metadata.conf import has_navigator
           originalBottomY = offset.top + originalHeight;
         }, 0);
 
+        self.saveSize = function () {
+          apiHelper.setInTotalStorage('assist', 'popover.size', {
+            width: $('.sql-context-popover').width(),
+            height: $('.sql-context-popover').height()
+          });
+        }
+
         self.resizeStart = function (event, ui) {
           preventHide = true;
         };
@@ -846,6 +855,8 @@ from metadata.conf import has_navigator
           window.setTimeout(function () {
             preventHide = false;
           }, 300);
+
+          self.saveSize();
         };
 
         var resizeTopBottomHorizontal = function (event, ui) {
@@ -940,10 +951,20 @@ from metadata.conf import has_navigator
 
       function SqlContextPopoverViewModel(params) {
         var self = this;
+
+        var apiHelper = ApiHelper.getInstance();
+
         self.left = ko.observable(0);
         self.top = ko.observable(0);
-        self.width = ko.observable(450);
-        self.height = ko.observable(400);
+
+        var popoverSize = apiHelper.getFromTotalStorage('assist', 'popover.size', {
+          width: 450,
+          height: 400
+        });
+
+        self.width = ko.observable(popoverSize.width);
+        self.height = ko.observable(popoverSize.height);
+
         self.leftAdjust = ko.observable(0);
         self.topAdjust = ko.observable(0);
         self.data = params.data;
