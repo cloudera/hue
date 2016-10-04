@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,71 +17,104 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
+#: src/impala/api.py:51
+msgid "Successfully invalidated metadata"
+msgstr "Metadatos invalidados correctamente"
+
+#: src/impala/api.py:66
+#, python-format
+msgid "Successfully refreshed metadata for `%s`.`%s`"
+msgstr "Metadatos actualizados correctamente para `%s`.`%s`"
+
+#: src/impala/api.py:81
+msgid "get_exec_summary requires a valid query_history_id"
+msgstr "get_exec_summary requiere un query_history_id válido"
+
+#: src/impala/api.py:103
+msgid "get_runtime_profile requires a valid query_history_id"
+msgstr "get_runtime_profile requiere un query_history_id válido"
+
+#: src/impala/conf.py:35
 msgid "Host of the Impala Server."
 msgstr "Host del servidor Impala."
 
-#: src/impala/conf.py:34
+#: src/impala/conf.py:40
 msgid "Port of the Impala Server."
 msgstr "Puerto del servidor Impala."
 
-#: src/impala/conf.py:40
+#: src/impala/conf.py:46
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
 
-#: src/impala/conf.py:46
+#: src/impala/conf.py:52
 msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Activar/desactivar mecanismo de suplantación al hablar con Impala."
 
-#: src/impala/conf.py:52
+#: src/impala/conf.py:58
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
 msgstr "Número de filas iniciales de un conjunto de resultados que se le solicitará a Impala que almacene en caché para poder volver a capturarlos y descargarlos. Se establece en 0 para desactivar la opción y tener compatibilidad con versiones anteriores."
 
-#: src/impala/conf.py:62
+#: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
 msgstr "Tiempo de espera en segundos para llamadas de Thrift."
 
-#: src/impala/conf.py:66
+#: src/impala/conf.py:72
 msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
 msgstr "Hue tratará de cerrar la consulta de Impala cuando el usuario abandone la página de editor. Así liberará todos los recursos de consulta de Impala, pero no se podrá acceder a sus resultados."
 
-#: src/impala/conf.py:74
+#: src/impala/conf.py:80
 msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
 msgstr "Si QUERY_TIMEOUT_S > 0, se superará el tiempo de espera de la consulta (es decir, se cancelará) si Impala no realiza ninguna acción (calcula o devuelve resultados) para esa consulta en el plazo de QUERY_TIMEOUT_S segundos."
 
-#: src/impala/conf.py:82
+#: src/impala/conf.py:88
+msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
+msgstr "Si SESSION_TIMEOUT_S > 0, se superará el tiempo de espera de la sesión (es decir, se cancelará) si Impala no realiza ninguna acción (calcula o devuelve resultados) para esa sesión en el plazo de QUERY_TIMEOUT_S segundos."
+
+#: src/impala/conf.py:98
+msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
+msgstr "Una lista separada por comas de propiedades de configuración de lista blanca de Impala que los usuarios están autorizados a establecer."
+
+#: src/impala/conf.py:103
 msgid "SSL configuration for the server."
 msgstr "Configuración de SSL para el servidor."
 
-#: src/impala/conf.py:86
+#: src/impala/conf.py:107
 msgid "SSL communication enabled for this server."
 msgstr "Comunicación de SSL activada para este servidor."
 
-#: src/impala/conf.py:93
+#: src/impala/conf.py:114
 msgid "Path to Certificate Authority certificates."
 msgstr "Ruta a los certificados de la autoridad certificadora."
 
-#: src/impala/conf.py:100
-msgid "Path to the private key file."
-msgstr "Ruta al archivo de clave privada."
+#: src/impala/conf.py:121
+msgid "Path to the private key file, e.g. /etc/hue/key.pem"
+msgstr "Ruta al archivo de clave privada, p. ej., /etc/hue/key.pem"
 
-#: src/impala/conf.py:107
-msgid "Path to the public certificate file."
-msgstr "Ruta al archivo de certificado público."
+#: src/impala/conf.py:128
+msgid "Path to the public certificate file, e.g. /etc/hue/cert.pem"
+msgstr "Ruta al archivo de certificado público, p. ej., /etc/hue/cert.pem"
 
-#: src/impala/conf.py:114
+#: src/impala/conf.py:135
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "Elija si Hue debe validar los certificados que reciba del servidor."
 
-#: src/impala/conf.py:134
-msgid "No available Impalad to send queries to."
-msgstr "No hay ningún Impalad disponible al que enviar las consultas."
+#: src/impala/conf.py:148
+msgid "Auth username of the hue user used for authentications."
+msgstr "Nombre de usuario de autenticación del usuario de Hue que se utiliza para las autenticaciones."
 
-#: src/impala/dashboards.py:201
+#: src/impala/conf.py:162
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr "Contraseña de LDAP/PAM del usuario de Hue que se utiliza para las autenticaciones."
+
+#: src/impala/conf.py:168
+msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgstr "Ejecute esta secuencia de comandos para generar la contraseña de autenticación. Se utilizará cuando `auth_password` no esté definido."
+
+#: src/impala/dashboards.py:213
 msgid "Page saved !"
 msgstr "¡Página guardada!"
 
-#: src/impala/dashboards.py:203
+#: src/impala/dashboards.py:215
 msgid "There is no dashboard to search."
 msgstr "No hay panel para buscar."
 
@@ -190,11 +223,14 @@ msgstr "de"
 msgid "to"
 msgstr "a"
 
-#: src/impala/templates/dashboard.mako:611
+#: src/impala/templates/dashboard.mako:609
 msgid "Oops, no database found!"
 msgstr "No se ha encontrado ninguna base de datos."
 
-#: src/impala/templates/dashboard.mako:635
+#: src/impala/templates/dashboard.mako:633
 msgid "Oops, no table found!"
 msgstr "No se ha encontrado ninguna tabla."
+
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "No hay ningún Impalad disponible al que enviar las consultas."
 

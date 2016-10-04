@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"POT-Creation-Date: 2016-07-19 17:49-0700\n"
 "PO-Revision-Date: 2012-11-07 13:05-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,159 +17,186 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hadoop/conf.py:66
+#: src/hadoop/conf.py:63
 msgid "NameNode logical name."
 msgstr "Nom logique du NameNode."
 
-#: src/hadoop/conf.py:105
+#: src/hadoop/conf.py:104
 msgid "JobTracker logical name."
 msgstr "Nom logique du JobTracker."
 
-#: src/hadoop/conf.py:134
-
+#: src/hadoop/conf.py:133
 msgid "Resource Manager logical name."
 msgstr "Nom logique du gestionnaire de ressources."
 
-#: src/hadoop/fs/hadoopfs.py:281
+#: src/hadoop/fs/hadoopfs.py:287
 #, python-format
 msgid "%(remote_dst)s already exists. Skipping."
 msgstr "%(remote_dst)s existe déjà. Ignorer."
 
-#: src/hadoop/fs/hadoopfs.py:284
+#: src/hadoop/fs/hadoopfs.py:290
 #, python-format
 msgid "%(remote_dst)s does not exist. Trying to copy."
 msgstr "%(remote_dst)s n'existe pas. Tentative de copie en cours."
 
-#: src/hadoop/fs/hadoopfs.py:294
+#: src/hadoop/fs/hadoopfs.py:300
 #, python-format
 msgid "Copied %s -> %s."
 msgstr "Copié %s -> %s"
 
-#: src/hadoop/fs/hadoopfs.py:296
+#: src/hadoop/fs/hadoopfs.py:302
 #, python-format
 msgid "Copying %s -> %s failed."
 msgstr "Echec de la copie %s -> %s."
 
-#: src/hadoop/fs/hadoopfs.py:301
+#: src/hadoop/fs/hadoopfs.py:307
 #, python-format
 msgid "Skipping %s (not a file)."
 msgstr "%s ignoré (pas un fichier)."
 
-#: src/hadoop/fs/hadoopfs.py:337 src/hadoop/fs/hadoopfs.py:340
 #: src/hadoop/fs/hadoopfs.py:343 src/hadoop/fs/hadoopfs.py:346
 #: src/hadoop/fs/hadoopfs.py:349 src/hadoop/fs/hadoopfs.py:352
-#: src/hadoop/fs/hadoopfs.py:355
+#: src/hadoop/fs/hadoopfs.py:355 src/hadoop/fs/hadoopfs.py:358
+#: src/hadoop/fs/hadoopfs.py:361
 #, python-format
 msgid "%(function)s has not been implemented."
 msgstr "%(function)s n'a pas été implémentée."
 
-#: src/hadoop/fs/webhdfs.py:222 src/hadoop/fs/webhdfs.py:255
+#: src/hadoop/fs/webhdfs.py:239 src/hadoop/fs/webhdfs.py:275
 #, python-format
 msgid "File %s not found"
 msgstr "Fichier %s introuvable"
 
-#: src/hadoop/fs/webhdfs.py:258
+#: src/hadoop/fs/webhdfs.py:278
 #, python-format
 msgid "File %s is a directory"
 msgstr "Le fichier %s est un répertoire"
 
-#: src/hadoop/fs/webhdfs.py:261
+#: src/hadoop/fs/webhdfs.py:281
 #, python-format
 msgid "File %s is already trashed"
 msgstr "Le fichier %s est déjà placé dans la corbeille"
 
-#: src/hadoop/fs/webhdfs.py:288
+#: src/hadoop/fs/webhdfs.py:308
 #, python-format
 msgid "Delete failed: %s"
 msgstr "Echec de la suppression : %s"
 
-#: src/hadoop/fs/webhdfs.py:317
+#: src/hadoop/fs/webhdfs.py:337
 #, python-format
 msgid "File %s is not in trash"
 msgstr "Le fichier %s n'est pas dans la corbeille"
 
-#: src/hadoop/fs/webhdfs.py:331
+#: src/hadoop/fs/webhdfs.py:351
 #, python-format
 msgid "Path %s already exists."
 msgstr "Le chemin d'accès %s existe déjà."
 
-#: src/hadoop/fs/webhdfs.py:359
+#: src/hadoop/fs/webhdfs.py:379
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Echec de la commande Mkdir : %s"
 
-#: src/hadoop/fs/webhdfs.py:373
+#: src/hadoop/fs/webhdfs.py:393
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "Echec du changement de nom : %s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:379 src/hadoop/fs/webhdfs.py:383
+#: src/hadoop/fs/webhdfs.py:399 src/hadoop/fs/webhdfs.py:403
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "\"%s\" n'est pas un répertoire"
 
-#: src/hadoop/fs/webhdfs.py:552
+#: src/hadoop/fs/webhdfs.py:572
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "La copie src \"%s\" n'existe pas"
 
-#: src/hadoop/fs/webhdfs.py:554
+#: src/hadoop/fs/webhdfs.py:574
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "La copie src \"%s\" est un répertoire"
 
-#: src/hadoop/fs/webhdfs.py:556
+#: src/hadoop/fs/webhdfs.py:576
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "La copie dst \"%s\" est un répertoire"
 
-#: src/hadoop/fs/webhdfs.py:633
+#: src/hadoop/fs/webhdfs.py:653
 #, python-format
 msgid "File not found: %s"
 msgstr "Fichier introuvable : %s"
 
-#: src/hadoop/fs/webhdfs.py:649
+#: src/hadoop/fs/webhdfs.py:669
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "Le fichier de destination %s existe et n'est pas un répertoire."
 
-#: src/hadoop/fs/webhdfs.py:692
+#: src/hadoop/fs/webhdfs.py:711
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "Echec de la création de \"%s\". HDFS n'a pas renvoyé de redirection"
 
-#: src/hadoop/fs/webhdfs.py:769
+#: src/hadoop/fs/webhdfs.py:777
+msgid "Failed to upload file. WebHdfs requires a valid username to upload files."
+msgstr "Echec du chargement du fichier. WebHdfs requiert un nom d'utilisateur valable pour charger des fichiers."
+
+#: src/hadoop/fs/webhdfs.py:801
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "Est un répertoire : \"%s\""
 
-#: src/hadoop/fs/webhdfs.py:787
+#: src/hadoop/fs/webhdfs.py:819
 msgid "Invalid argument to seek for whence"
 msgstr "Argument non valide à rechercher"
 
-#: src/hadoop/fs/webhdfs.py:807
+#: src/hadoop/fs/webhdfs.py:839
 msgid "File not open for writing"
 msgstr "Fichier non ouvert pour l'écriture"
 
-#: src/hadoop/fs/webhdfs.py:853
-msgid "Filesystem root '/' should be owned by 'hdfs'"
-msgstr "La racine du système de fichiers \"/\" ne doit pas être détenue par \"hdfs\""
+#: src/hadoop/fs/webhdfs.py:885
+#, python-format
+msgid "Filesystem root '/' should be owned by '%s'"
+msgstr "La racine du système de fichiers '/' ne doit pas être détenue par '%s'"
 
-#: src/hadoop/fs/webhdfs.py:856
+#: src/hadoop/fs/webhdfs.py:888
 msgid "Failed to access filesystem root"
 msgstr "Echec de l'accès à la racine du système de fichiers"
 
-#: src/hadoop/fs/webhdfs.py:865
+#: src/hadoop/fs/webhdfs.py:896
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "Echec de la création du fichier temporaire \"%s\""
 
-#: src/hadoop/fs/webhdfs.py:882
+#: src/hadoop/fs/webhdfs.py:912
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "Echec de la suppression du fichier temporaire \"%s\""
 
-#: src/hadoop/yarn/resource_manager_api.py:50
+#: src/hadoop/yarn/history_server_api.py:46
+msgid "YARN cluster is not available."
+msgstr "Le cluster YARN n'est pas disponible."
+
+#: src/hadoop/yarn/mapreduce_api.py:47
+#: src/hadoop/yarn/resource_manager_api.py:51
 msgid "No Resource Manager are available."
 msgstr "Aucun gestionnaire de ressources n'est disponible."
+
+#: src/hadoop/yarn/resource_manager_api.py:137
+msgid "YARN did not return any token field."
+msgstr "YARN n'a renvoyé aucun champ de jeton."
+
+#: src/hadoop/yarn/resource_manager_api.py:175
+#, python-format
+msgid "Failed to resolve YARN RM: %s"
+msgstr "Impossible de résoudre le gestionnaire de ressources YARN : %s"
+
+#: src/hadoop/yarn/resource_manager_api.py:177
+#, python-format
+msgid "YARN RM returned a failed response: %s"
+msgstr "Le gestionnaire de ressources YARN a renvoyé une réponse d'échec : %s"
+
+#: src/hadoop/yarn/spark_history_server_api.py:47
+msgid "No Spark History Server is available."
+msgstr "Aucun serveur d'historique de Spark n'est disponible."
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"POT-Creation-Date: 2016-07-19 17:49-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
-#: src/liboauth/backend.py:158 src/liboauth/backend.py:171
-#: src/liboauth/backend.py:180 src/liboauth/backend.py:254
+#: src/liboauth/backend.py:109 src/liboauth/backend.py:155
+#: src/liboauth/backend.py:163 src/liboauth/backend.py:176
+#: src/liboauth/backend.py:185 src/liboauth/backend.py:269
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "OAuth 제공자의 응답이 올바르지 않음: %s"
@@ -125,27 +125,39 @@ msgstr "Hue - 등록"
 msgid "Hue - Sign in"
 msgstr "Hue - 로그인"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Visit gethue.com"
 msgstr "gethue.com 방문"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "작동하지 않습니까? gethue.com을 방문하십시오!"
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Error!"
 msgstr "오류!"
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Invalid username or password."
 msgstr "사용자 이름 또는 암호가 올바르지 않습니다."
 
-#: src/liboauth/templates/oauth-login.mako:177
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "This is your first time logging in."
 msgstr "첫 번째 로그인입니다."
 
-#: src/liboauth/templates/oauth-login.mako:178
+#: src/liboauth/templates/oauth-login.mako:180
 msgid "You will become Hue superuser."
 msgstr "Hue 수퍼 사용자가 될 예정입니다."
+
+#: src/liboauth/templates/oauth-login.mako:182
+msgid "Sign Up via"
+msgstr "등록 수단"
+
+#: src/liboauth/templates/oauth-login.mako:185
+msgid "Sign In via"
+msgstr "로그인 수단"
+
+#: src/liboauth/templates/oauth-login.mako:214
+msgid "The oauth app is not configured with any provider."
+msgstr "oauth 앱에 제공자가 구성되지 않았습니다."
 

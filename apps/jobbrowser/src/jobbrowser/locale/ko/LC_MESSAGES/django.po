@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,125 +17,208 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/jobbrowser/api.py:248
+msgid "Mapreduce Proxy API did not return JSON response, check if the job is running."
+msgstr "Mapreduce 프록시 API가 JSON 응답을 반환하지 않습니다. Job이 실행 중인지 확인하십시오."
+
+#: src/jobbrowser/api.py:272
+#, python-format
+msgid "Job %s could not be found in Resource Manager: %s"
+msgstr "Job %s을(를) Resource Manager에서 찾을 수 없음: %s"
+
+#: src/jobbrowser/api.py:274
+#, python-format
+msgid "Application is not running: %s"
+msgstr "애플리케이션이 실행 중이 아님: %s"
+
+#: src/jobbrowser/api.py:276
+#, python-format
+msgid "Job %s could not be found: %s"
+msgstr "Job %s을(를) 찾을 수 없음: %s"
+
 #: src/jobbrowser/conf.py:26
 msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "모든 사용자와 제출된 Job 정보를 공유합니다. FALSE로 설정되면 소유자와 관리자만 제출된 Job을 볼 수 있습니다."
 
-#: src/jobbrowser/models.py:103
+#: src/jobbrowser/conf.py:33
+msgid "Disable the job kill button for all users in the job browser."
+msgstr "Job Browser에서 모든 사용자에 대해 Job 중지 버튼을 해제합니다."
+
+#: src/jobbrowser/conf.py:39
+msgid "Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB)."
+msgstr "음수 오프셋인 경우 지정된 로그 파일에서 마지막 N 바이트를 가져오는 오프셋(바이트)입니다(기본값: 1MB)."
+
+#: src/jobbrowser/models.py:120
 #, python-format
 msgid "Could not find job with id %(jobid)s."
 msgstr "ID가 %(jobid)s인 Job을 찾을 수 없습니다."
 
-#: src/jobbrowser/models.py:441
+#: src/jobbrowser/models.py:458
 #, python-format
 msgid "Cannot look up TaskTracker %(id)s."
 msgstr "TaskTracker %(id)s을(를) 조회할 수 없습니다."
 
-#: src/jobbrowser/models.py:465
+#: src/jobbrowser/models.py:482
 #, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
 msgstr "TaskTracker %(id)s에서 로그를 검색할 수 없습니다."
 
-#: src/jobbrowser/models.py:473
+#: src/jobbrowser/models.py:490
 #, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
 msgstr "'%s'에서 로그를 검색하는 동안 Hue에 오류가 발생했습니다."
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 #, python-format
 msgid "Job %s has expired."
 msgstr "%s Job이 만료되었습니다."
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 msgid "Cannot be found on the History Server."
 msgstr "History Server를 찾을 수 없습니다."
 
-#: src/jobbrowser/views.py:65
-#, python-format
-msgid "Could not find job %s."
-msgstr "Job %s을(를) 찾을 수 없습니다."
-
-#: src/jobbrowser/views.py:69
+#: src/jobbrowser/views.py:89
 #, python-format
 msgid "You don't have permission to access job %(id)s."
 msgstr "Job %(id)s에 액세스할 수 있는 권한이 없습니다."
 
-#: src/jobbrowser/views.py:85
+#: src/jobbrowser/views.py:105
 #, python-format
 msgid "Error polling job %s: %s"
 msgstr "작업 %s을(를) 폴링하는 중 오류 발생: %s"
 
-#: src/jobbrowser/views.py:104
+#: src/jobbrowser/views.py:125
 msgid "Resource Manager cannot be contacted or might be down."
 msgstr "Resource Manager에 연결할 수 없거나 작동하지 않을 수 있습니다."
 
-#: src/jobbrowser/views.py:106
-
+#: src/jobbrowser/views.py:127
 msgid "Job Tracker cannot be contacted or might be down."
 msgstr "Job Tracker에 연결할 수 없거나 작동하지 않을 수 있습니다."
 
-#: src/jobbrowser/views.py:130 src/jobbrowser/views.py:131
-#: src/jobbrowser/templates/job.mako:531 src/jobbrowser/templates/job.mako:535
-#: src/jobbrowser/templates/job.mako:538 src/jobbrowser/templates/job.mako:542
-#: src/jobbrowser/templates/job.mako:547 src/jobbrowser/templates/jobs.mako:239
-#: src/jobbrowser/templates/jobs.mako:240
+#: src/jobbrowser/views.py:154 src/jobbrowser/views.py:155
+#: src/jobbrowser/templates/job.mako:656 src/jobbrowser/templates/job.mako:663
+#: src/jobbrowser/templates/job.mako:672 src/jobbrowser/templates/jobs.mako:242
 #: src/jobbrowser/templates/jobs.mako:243
+#: src/jobbrowser/templates/jobs.mako:246
 msgid "N/A"
 msgstr "해당 없음"
 
-#: src/jobbrowser/views.py:224
+#: src/jobbrowser/views.py:248
 #, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
 msgstr "kill_job은 POST(%(method)s 수신)와 함께 호출해야 합니다."
 
-#: src/jobbrowser/views.py:227
+#: src/jobbrowser/views.py:251
 msgid "Insufficient permission"
 msgstr "권한 부족"
 
-#: src/jobbrowser/views.py:228
+#: src/jobbrowser/views.py:252
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
 msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 삭제할 수 없습니다."
 
-#: src/jobbrowser/views.py:247
+#: src/jobbrowser/views.py:278
 msgid "Job did not appear as killed within 15 seconds."
 msgstr "Job이 15초 내에 중지됨으로 나타나지 않았습니다."
 
-#: src/jobbrowser/views.py:266
+#: src/jobbrowser/views.py:311
 #, python-format
 msgid "Cannot find job attempt '%(id)s'."
 msgstr "Job 시도 '%(id)s'을(를) 찾을 수 없습니다."
 
-#: src/jobbrowser/views.py:279 src/jobbrowser/yarn_models.py:342
+#: src/jobbrowser/views.py:313
+#, python-format
+msgid "Failed to get application for job %s: %s"
+msgstr "Job %s에 대한 애플리케이션을 가져올 수 없음: %s"
+
+#: src/jobbrowser/views.py:331 src/jobbrowser/yarn_models.py:456
 #, python-format
 msgid "Failed to retrieve log: %s"
 msgstr "로그: %s을(를) 검색하지 못함"
 
-#: src/jobbrowser/views.py:311
+#: src/jobbrowser/views.py:370
 #, python-format
 msgid "No tasks found for job %(id)s."
 msgstr "Job %(id)s에 대한 작업이 없습니다."
 
-#: src/jobbrowser/views.py:379 src/jobbrowser/views.py:398
+#: src/jobbrowser/views.py:440 src/jobbrowser/views.py:459
 #, python-format
 msgid "Cannot find attempt '%(id)s' in task"
 msgstr "작업에서 시도 '%(id)s'을(를) 찾을 수 없음"
 
-#: src/jobbrowser/views.py:417
+#: src/jobbrowser/views.py:478
 msgid "Failed to retrieve log. TaskTracker not found."
 msgstr "로그를 검색하지 못했습니다. TaskTracker를 찾을 수 없습니다."
 
-#: src/jobbrowser/views.py:419
+#: src/jobbrowser/views.py:480
 msgid "Failed to retrieve log. TaskTracker not ready."
 msgstr "로그를 검색하지 못했습니다. TaskTracker가 준비되지 않았습니다."
 
-#: src/jobbrowser/views.py:478
+#: src/jobbrowser/views.py:542
 msgid "The tracker could not be contacted."
 msgstr "트래커에 연결할 수 없습니다."
 
-#: src/jobbrowser/views.py:488
+#: src/jobbrowser/views.py:552
 msgid "The container disappears as soon as the job finishes."
 msgstr "Job이 완료되면 바로 컨테이너가 사라집니다."
+
+#: src/jobbrowser/yarn_models.py:145
+msgid "Executor Id"
+msgstr "실행기 ID"
+
+#: src/jobbrowser/yarn_models.py:146
+msgid "Address"
+msgstr "주소"
+
+#: src/jobbrowser/yarn_models.py:147
+msgid "RDD Blocks"
+msgstr "RDD 블록"
+
+#: src/jobbrowser/yarn_models.py:148
+msgid "Storage Memory"
+msgstr "저장 메모리"
+
+#: src/jobbrowser/yarn_models.py:149
+msgid "Disk Used"
+msgstr "사용한 디스크"
+
+#: src/jobbrowser/yarn_models.py:150
+msgid "Active Tasks"
+msgstr "활성 작업"
+
+#: src/jobbrowser/yarn_models.py:151 src/jobbrowser/templates/job.mako:331
+msgid "Failed Tasks"
+msgstr "실패한 작업"
+
+#: src/jobbrowser/yarn_models.py:152
+msgid "Complete Tasks"
+msgstr "완료 작업"
+
+#: src/jobbrowser/yarn_models.py:153
+msgid "Task Time"
+msgstr "작업 시간"
+
+#: src/jobbrowser/yarn_models.py:154
+msgid "Input"
+msgstr "입력"
+
+#: src/jobbrowser/yarn_models.py:155
+msgid "Shuffle Read"
+msgstr "셔플 읽기"
+
+#: src/jobbrowser/yarn_models.py:156
+msgid "Shuffle Write"
+msgstr "셔플 쓰기"
+
+#: src/jobbrowser/yarn_models.py:157 src/jobbrowser/templates/attempt.mako:68
+#: src/jobbrowser/templates/attempt_logs.mako:62
+#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:117
+#: src/jobbrowser/templates/job.mako:118 src/jobbrowser/templates/job.mako:240
+#: src/jobbrowser/templates/job.mako:241 src/jobbrowser/templates/job.mako:301
+#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
+#: src/jobbrowser/templates/tasks.mako:68
+msgid "Logs"
+msgstr "로그"
 
 #: src/jobbrowser/templates/attempt.mako:22
 #: src/jobbrowser/templates/attempt.mako:60
@@ -168,63 +251,53 @@ msgstr "Job"
 
 #: src/jobbrowser/templates/attempt.mako:41
 #: src/jobbrowser/templates/attempt_logs.mako:37
-#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:215
-#: src/jobbrowser/templates/job.mako:361 src/jobbrowser/templates/jobs.mako:68
-#: src/jobbrowser/templates/task.mako:36 src/jobbrowser/templates/task.mako:131
-#: src/jobbrowser/templates/tasks.mako:76
+#: src/jobbrowser/templates/job.mako:115 src/jobbrowser/templates/job.mako:238
+#: src/jobbrowser/templates/job.mako:388 src/jobbrowser/templates/job.mako:455
+#: src/jobbrowser/templates/jobs.mako:69 src/jobbrowser/templates/task.mako:36
+#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/tasks.mako:72
 msgid "Status"
 msgstr "상태"
 
 #: src/jobbrowser/templates/attempt.mako:65
 #: src/jobbrowser/templates/attempt_logs.mako:60
-#: src/jobbrowser/templates/job.mako:131 src/jobbrowser/templates/job.mako:263
-#: src/jobbrowser/templates/task.mako:56
+#: src/jobbrowser/templates/job.mako:133 src/jobbrowser/templates/job.mako:290
+#: src/jobbrowser/templates/job.mako:477 src/jobbrowser/templates/task.mako:56
 msgid "Metadata"
 msgstr "메타데이터"
 
 #: src/jobbrowser/templates/attempt.mako:66
 #: src/jobbrowser/templates/attempt_logs.mako:61
-#: src/jobbrowser/templates/job.mako:265 src/jobbrowser/templates/task.mako:57
+#: src/jobbrowser/templates/job.mako:292 src/jobbrowser/templates/task.mako:57
 msgid "Counters"
 msgstr "카운터"
 
-#: src/jobbrowser/templates/attempt.mako:68
-#: src/jobbrowser/templates/attempt_logs.mako:62
-#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:115
-#: src/jobbrowser/templates/job.mako:116 src/jobbrowser/templates/job.mako:217
-#: src/jobbrowser/templates/job.mako:218 src/jobbrowser/templates/job.mako:274
-#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
-#: src/jobbrowser/templates/tasks.mako:72
-msgid "Logs"
-msgstr "로그"
-
 #: src/jobbrowser/templates/attempt.mako:77
-#: src/jobbrowser/templates/job.mako:140 src/jobbrowser/templates/job.mako:324
-#: src/jobbrowser/templates/job.mako:370
+#: src/jobbrowser/templates/job.mako:142 src/jobbrowser/templates/job.mako:351
+#: src/jobbrowser/templates/job.mako:397 src/jobbrowser/templates/job.mako:483
 #: src/jobbrowser/templates/jobbrowser_components.mako:81
 #: src/jobbrowser/templates/jobbrowser_components.mako:122
-#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:109
+#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:117
 #: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Name"
 msgstr "이름"
 
 #: src/jobbrowser/templates/attempt.mako:78
-#: src/jobbrowser/templates/job.mako:141 src/jobbrowser/templates/job.mako:187
-#: src/jobbrowser/templates/job.mako:325 src/jobbrowser/templates/job.mako:371
+#: src/jobbrowser/templates/job.mako:143 src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:398 src/jobbrowser/templates/job.mako:484
 #: src/jobbrowser/templates/jobbrowser_components.mako:30
 #: src/jobbrowser/templates/jobbrowser_components.mako:56
-#: src/jobbrowser/templates/task.mako:110
+#: src/jobbrowser/templates/task.mako:118
 msgid "Value"
 msgstr "값"
 
 #: src/jobbrowser/templates/attempt.mako:87
-#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:73
+#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:69
 msgid "Task ID"
 msgstr "작업 ID"
 
 #: src/jobbrowser/templates/attempt.mako:89
-#: src/jobbrowser/templates/attempt_logs.mako:33
-#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:731
 msgid "View this task"
 msgstr "이 작업 보기"
 
@@ -233,28 +306,27 @@ msgid "Task Type"
 msgstr "작업 유형"
 
 #: src/jobbrowser/templates/attempt.mako:96
-#: src/jobbrowser/templates/task.mako:123
+#: src/jobbrowser/templates/task.mako:131
 msgid "JobId"
 msgstr "Job ID"
 
 #: src/jobbrowser/templates/attempt.mako:98
-#: src/jobbrowser/templates/attempt_logs.mako:36
 #: src/jobbrowser/templates/job_attempt_logs.mako:40
-#: src/jobbrowser/templates/jobs.mako:235
-#: src/jobbrowser/templates/task.mako:124
+#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/task.mako:132
 msgid "View this job"
 msgstr "이 Job 보기"
 
 #: src/jobbrowser/templates/attempt.mako:101
 #: src/jobbrowser/templates/container.mako:46
-#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:127
-#: src/jobbrowser/templates/tasks.mako:77
+#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:135
+#: src/jobbrowser/templates/tasks.mako:73
 msgid "State"
 msgstr "상태"
 
 #: src/jobbrowser/templates/attempt.mako:105
-#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:135
-#: src/jobbrowser/templates/tasks.mako:78
+#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/tasks.mako:74
 msgid "Start Time"
 msgstr "시작 시간"
 
@@ -263,9 +335,9 @@ msgid "Finish Time"
 msgstr "완료 시간"
 
 #: src/jobbrowser/templates/attempt.mako:113
-#: src/jobbrowser/templates/job.mako:117 src/jobbrowser/templates/task.mako:67
-#: src/jobbrowser/templates/task.mako:147
-#: src/jobbrowser/templates/tasks.mako:75
+#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:463
+#: src/jobbrowser/templates/task.mako:67 src/jobbrowser/templates/task.mako:155
+#: src/jobbrowser/templates/tasks.mako:71
 msgid "Progress"
 msgstr "진행률"
 
@@ -275,39 +347,58 @@ msgid "Task Tracker"
 msgstr "TaskTracker"
 
 #: src/jobbrowser/templates/attempt.mako:128
-#: src/jobbrowser/templates/task.mako:73
+#: src/jobbrowser/templates/task.mako:75
 msgid "Phase"
 msgstr "단계"
 
 #: src/jobbrowser/templates/attempt.mako:132
-#: src/jobbrowser/templates/task.mako:72
 msgid "Output Size"
 msgstr "출력 크기"
 
-#: src/jobbrowser/templates/attempt.mako:169
-#: src/jobbrowser/templates/attempt.mako:185
+#: src/jobbrowser/templates/attempt.mako:137
+#: src/jobbrowser/templates/task.mako:77
+msgid "Shuffle Finish"
+msgstr "셔플 완료"
+
+#: src/jobbrowser/templates/attempt.mako:141
+#: src/jobbrowser/templates/task.mako:78
+msgid "Sort Finish"
+msgstr "정렬 완료"
+
+#: src/jobbrowser/templates/attempt.mako:145
+#: src/jobbrowser/templates/task.mako:79
+msgid "Map Finish"
+msgstr "Map 완료"
+
+#: src/jobbrowser/templates/attempt.mako:151
+#: src/jobbrowser/templates/task.mako:73
+msgid "Node Address"
+msgstr "노드 주소"
+
+#: src/jobbrowser/templates/attempt.mako:189
+#: src/jobbrowser/templates/attempt.mako:205
 #: src/jobbrowser/templates/attempt_logs.mako:142
 #: src/jobbrowser/templates/attempt_logs.mako:158
-#: src/jobbrowser/templates/job.mako:449 src/jobbrowser/templates/job.mako:481
-#: src/jobbrowser/templates/jobs.mako:132
-#: src/jobbrowser/templates/task.mako:181
-#: src/jobbrowser/templates/task.mako:197
-#: src/jobbrowser/templates/task.mako:213
-#: src/jobbrowser/templates/tasks.mako:123
+#: src/jobbrowser/templates/job.mako:574 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/jobs.mako:134
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/task.mako:205
+#: src/jobbrowser/templates/task.mako:221
+#: src/jobbrowser/templates/tasks.mako:133
 #: src/jobbrowser/templates/tasktrackers.mako:82
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/jobbrowser/templates/attempt.mako:170
-#: src/jobbrowser/templates/attempt.mako:186
+#: src/jobbrowser/templates/attempt.mako:190
+#: src/jobbrowser/templates/attempt.mako:206
 #: src/jobbrowser/templates/attempt_logs.mako:143
 #: src/jobbrowser/templates/attempt_logs.mako:159
-#: src/jobbrowser/templates/job.mako:450 src/jobbrowser/templates/job.mako:482
-#: src/jobbrowser/templates/jobs.mako:133
-#: src/jobbrowser/templates/task.mako:182
-#: src/jobbrowser/templates/task.mako:198
-#: src/jobbrowser/templates/task.mako:214
-#: src/jobbrowser/templates/tasks.mako:124
+#: src/jobbrowser/templates/job.mako:575 src/jobbrowser/templates/job.mako:607
+#: src/jobbrowser/templates/jobs.mako:135
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/task.mako:206
+#: src/jobbrowser/templates/task.mako:222
+#: src/jobbrowser/templates/tasks.mako:134
 #: src/jobbrowser/templates/tasktrackers.mako:83
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
@@ -342,7 +433,7 @@ msgid "Container at %(trackerHost)s on port %(trackerPort)s"
 msgstr "포트 %(trackerPort)s의 %(trackerHost)s에 있는 컨테이너"
 
 #: src/jobbrowser/templates/container.mako:36
-#: src/jobbrowser/templates/job.mako:329 src/jobbrowser/templates/jobs.mako:66
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:66
 #: src/jobbrowser/templates/tasktracker.mako:36
 msgid "ID"
 msgstr "ID"
@@ -354,16 +445,17 @@ msgstr "메모리 메트릭"
 
 #: src/jobbrowser/templates/container.mako:44
 msgid "Node Id"
-msgstr "노드 Id"
+msgstr "노드 ID"
 
 #: src/jobbrowser/templates/container.mako:48
-#: src/jobbrowser/templates/job.mako:111 src/jobbrowser/templates/job.mako:213
-#: src/jobbrowser/templates/job.mako:333 src/jobbrowser/templates/jobs.mako:69
+#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:232
+#: src/jobbrowser/templates/job.mako:360 src/jobbrowser/templates/job.mako:453
+#: src/jobbrowser/templates/jobs.mako:70
 msgid "User"
 msgstr "사용자"
 
 #: src/jobbrowser/templates/container.mako:50
-#: src/jobbrowser/templates/job.mako:177
+#: src/jobbrowser/templates/job.mako:181 src/jobbrowser/templates/job.mako:527
 msgid "Diagnostics"
 msgstr "진단"
 
@@ -380,189 +472,189 @@ msgstr "종료 코드"
 msgid "Back"
 msgstr "뒤로"
 
-#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:259
-#: src/jobbrowser/templates/job.mako:261
+#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:286
+#: src/jobbrowser/templates/job.mako:288
 msgid "Tasks"
 msgstr "작업"
 
-#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/task.mako:119
-#: src/jobbrowser/templates/tasks.mako:74
+#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/job.mako:111
+#: src/jobbrowser/templates/job.mako:230 src/jobbrowser/templates/job.mako:451
+#: src/jobbrowser/templates/task.mako:127
+#: src/jobbrowser/templates/tasks.mako:70
 msgid "Type"
 msgstr "유형"
 
-#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:252
+#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:278
 #, python-format
 msgid "Job: %(jobId)s"
 msgstr "Job: %(jobId)s"
 
-#: src/jobbrowser/templates/job.mako:109
-
+#: src/jobbrowser/templates/job.mako:109 src/jobbrowser/templates/job.mako:449
 msgid "App ID"
 msgstr "앱 ID"
 
-#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:225
-#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:74
+#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:248
+#: src/jobbrowser/templates/job.mako:383 src/jobbrowser/templates/job.mako:465
+#: src/jobbrowser/templates/jobs.mako:75
 msgid "Duration"
 msgstr "소요 시간"
 
-#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:245
+#: src/jobbrowser/templates/job.mako:123 src/jobbrowser/templates/job.mako:268
+#: src/jobbrowser/templates/job.mako:467
 msgid "Actions"
 msgstr "작업"
 
-#: src/jobbrowser/templates/job.mako:133
-
+#: src/jobbrowser/templates/job.mako:135
 msgid "Metrics"
 msgstr "메트릭"
 
-#: src/jobbrowser/templates/job.mako:145
+#: src/jobbrowser/templates/job.mako:147 src/jobbrowser/templates/job.mako:490
 msgid "Jobs"
 msgstr "Job"
 
-#: src/jobbrowser/templates/job.mako:149
+#: src/jobbrowser/templates/job.mako:152 src/jobbrowser/templates/job.mako:497
 #: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Host"
 msgstr "호스트"
 
-#: src/jobbrowser/templates/job.mako:153
+#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:503
 msgid "Queue Name"
 msgstr "대기열 이름"
 
-#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:347
+#: src/jobbrowser/templates/job.mako:161 src/jobbrowser/templates/job.mako:374
+#: src/jobbrowser/templates/job.mako:507
 msgid "Started"
 msgstr "시작됨"
 
-#: src/jobbrowser/templates/job.mako:161
-
+#: src/jobbrowser/templates/job.mako:165 src/jobbrowser/templates/job.mako:511
 msgid "Finished"
 msgstr "완료됨"
 
-#: src/jobbrowser/templates/job.mako:165
+#: src/jobbrowser/templates/job.mako:169 src/jobbrowser/templates/job.mako:515
 msgid "Pre-empted Resource VCores"
 msgstr "사전에 비워놓은 리소스 VCores"
 
-#: src/jobbrowser/templates/job.mako:169
+#: src/jobbrowser/templates/job.mako:173 src/jobbrowser/templates/job.mako:519
 msgid "VCore seconds"
 msgstr "VCore 초"
 
-#: src/jobbrowser/templates/job.mako:173
-
+#: src/jobbrowser/templates/job.mako:177 src/jobbrowser/templates/job.mako:523
 msgid "Memory seconds"
 msgstr "메모리 초"
 
-#: src/jobbrowser/templates/job.mako:186
-
-msgid "Metric"
-msgstr "메트릭"
-
-#: src/jobbrowser/templates/job.mako:192
-msgid "header"
-msgstr "헤더"
-
-#: src/jobbrowser/templates/job.mako:211
+#: src/jobbrowser/templates/job.mako:228
 #: src/jobbrowser/templates/job_not_assigned.mako:36
 msgid "Job ID"
 msgstr "Job ID"
 
-#: src/jobbrowser/templates/job.mako:220 src/jobbrowser/templates/job.mako:338
-#: src/jobbrowser/templates/jobs.mako:70
+#: src/jobbrowser/templates/job.mako:235
+msgid "Proxy User"
+msgstr "프록시 사용자"
+
+#: src/jobbrowser/templates/job.mako:243 src/jobbrowser/templates/job.mako:365
+#: src/jobbrowser/templates/jobs.mako:71
 msgid "Maps"
 msgstr "Map"
 
-#: src/jobbrowser/templates/job.mako:222 src/jobbrowser/templates/job.mako:342
-#: src/jobbrowser/templates/jobs.mako:71
+#: src/jobbrowser/templates/job.mako:245 src/jobbrowser/templates/job.mako:369
+#: src/jobbrowser/templates/jobs.mako:72
 msgid "Reduces"
 msgstr "Reduce"
 
-#: src/jobbrowser/templates/job.mako:234
+#: src/jobbrowser/templates/job.mako:257
 msgid "Output"
 msgstr "출력"
 
-#: src/jobbrowser/templates/job.mako:258 src/jobbrowser/templates/task.mako:55
-#: src/jobbrowser/templates/tasks.mako:105
+#: src/jobbrowser/templates/job.mako:285 src/jobbrowser/templates/task.mako:55
+#: src/jobbrowser/templates/tasks.mako:101
 msgid "Attempts"
 msgstr "시도"
 
-#: src/jobbrowser/templates/job.mako:275
+#: src/jobbrowser/templates/job.mako:302
 msgid "Id"
 msgstr "ID"
 
-#: src/jobbrowser/templates/job.mako:276
+#: src/jobbrowser/templates/job.mako:303
 msgid "Container"
 msgstr "컨테이너"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "This jobs is "
 msgstr "이 Job은 "
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "retired"
 msgstr "폐기됨"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid " and so has little information available."
 msgstr " 이므로 정보가 거의 없습니다."
 
-#: src/jobbrowser/templates/job.mako:303
+#: src/jobbrowser/templates/job.mako:330
 msgid "View All Failed Tasks"
 msgstr "실패한 작업 모두 보기"
 
-#: src/jobbrowser/templates/job.mako:304
-msgid "Failed Tasks"
-msgstr "실패한 작업"
-
-#: src/jobbrowser/templates/job.mako:310
+#: src/jobbrowser/templates/job.mako:337
 msgid "View All Tasks"
 msgstr "모든 작업 보기"
 
-#: src/jobbrowser/templates/job.mako:311
+#: src/jobbrowser/templates/job.mako:338
 msgid "Recent Tasks"
 msgstr "최근 작업"
 
-#: src/jobbrowser/templates/job.mako:320 src/jobbrowser/templates/tasks.mako:57
+#: src/jobbrowser/templates/job.mako:347 src/jobbrowser/templates/tasks.mako:57
 msgid "Text Filter"
 msgstr "텍스트 필터"
 
-#: src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:379
 msgid "Ended"
 msgstr "종료됨"
 
-#: src/jobbrowser/templates/job.mako:367
+#: src/jobbrowser/templates/job.mako:394
 msgid "Raw configuration:"
 msgstr "원시 구성:"
 
-#: src/jobbrowser/templates/job.mako:420 src/jobbrowser/templates/jobs.mako:88
+#: src/jobbrowser/templates/job.mako:459 src/jobbrowser/templates/job.mako:460
+msgid "Tracking URL"
+msgstr "추적 URL"
+
+#: src/jobbrowser/templates/job.mako:545 src/jobbrowser/templates/jobs.mako:89
 msgid "Confirm Kill"
 msgstr "중지 확인"
 
-#: src/jobbrowser/templates/job.mako:423 src/jobbrowser/templates/jobs.mako:91
+#: src/jobbrowser/templates/job.mako:548 src/jobbrowser/templates/jobs.mako:92
 msgid "Are you sure you want to kill this job?"
 msgstr "이 Job을 중지하시겠습니까?"
 
-#: src/jobbrowser/templates/job.mako:426 src/jobbrowser/templates/jobs.mako:94
+#: src/jobbrowser/templates/job.mako:551 src/jobbrowser/templates/jobs.mako:95
 msgid "No"
 msgstr "아니요"
 
-#: src/jobbrowser/templates/job.mako:427 src/jobbrowser/templates/jobs.mako:95
+#: src/jobbrowser/templates/job.mako:552 src/jobbrowser/templates/jobs.mako:96
 msgid "Yes"
 msgstr "예"
 
-#: src/jobbrowser/templates/job.mako:492
+#: src/jobbrowser/templates/job.mako:617
 msgid "There was a problem communicating with the server. Refresh the page."
 msgstr "서버와 통신하는 중에 문제가 발생했습니다. 페이지를 새로 고치십시오."
 
-#: src/jobbrowser/templates/job.mako:520 src/jobbrowser/templates/job.mako:521
-#: src/jobbrowser/templates/jobs.mako:230
-#: src/jobbrowser/templates/jobs.mako:263
+#: src/jobbrowser/templates/job.mako:645 src/jobbrowser/templates/job.mako:646
+#: src/jobbrowser/templates/jobs.mako:232
+#: src/jobbrowser/templates/jobs.mako:266
 msgid "Kill this job"
 msgstr "이 Job 중지"
 
-#: src/jobbrowser/templates/job.mako:528
+#: src/jobbrowser/templates/job.mako:653
 #: src/jobbrowser/templates/jobbrowser_components.mako:188
-#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/jobs.mako:240
 msgid "Retired"
 msgstr "사용 중지됨"
 
-#: src/jobbrowser/templates/job.mako:632 src/jobbrowser/templates/jobs.mako:359
+#: src/jobbrowser/templates/job.mako:660 src/jobbrowser/templates/job.mako:667
+msgid "0/0"
+msgstr "0/0"
+
+#: src/jobbrowser/templates/job.mako:757 src/jobbrowser/templates/jobs.mako:362
 msgid "There was a problem killing this job."
 msgstr "이 Job을 중지하는 중에 문제가 발생했습니다."
 
@@ -582,7 +674,7 @@ msgstr "로드 중..."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:47
 msgid "The application might not be running yet or there is no Node Manager or Container available."
-msgstr "애플리케이션이 아직 실행되고 있지 않거나, 노드 관리자 또는 컨테이너를 사용할 수 없습니다."
+msgstr "애플리케이션이 아직 실행되고 있지 않거나 사용 가능한 노드 관리자 또는 컨테이너가 없습니다."
 
 #: src/jobbrowser/templates/job_not_assigned.mako:48
 msgid "This page will be automatically refreshed."
@@ -612,6 +704,10 @@ msgstr "합계"
 msgid "Job Browser"
 msgstr "Job Browser"
 
+#: src/jobbrowser/templates/jobbrowser_components.mako:246
+msgid "Hive jobs are running as the 'hive' user"
+msgstr "Hive Job이 'hive' 사용자로 실행 중임"
+
 #: src/jobbrowser/templates/jobs.mako:35
 msgid "Username"
 msgstr "사용자 이름"
@@ -630,7 +726,7 @@ msgstr "텍스트 검색"
 
 #: src/jobbrowser/templates/jobs.mako:48
 msgid "Show retired jobs"
-msgstr "폐기된 Job 표시"
+msgstr "사용 중지된 Job 표시"
 
 #: src/jobbrowser/templates/jobs.mako:52
 msgid "Succeeded"
@@ -652,25 +748,28 @@ msgstr "중지됨"
 msgid "There are no jobs that match your search criteria."
 msgstr "검색 기준과 일치하는 작업이 없습니다."
 
-#: src/jobbrowser/templates/jobs.mako:72
+#: src/jobbrowser/templates/jobs.mako:68
+msgid "Application Type"
+msgstr "애플리케이션 유형"
+
+#: src/jobbrowser/templates/jobs.mako:73
 msgid "Queue"
 msgstr "대기열"
 
-#: src/jobbrowser/templates/jobs.mako:73
+#: src/jobbrowser/templates/jobs.mako:74
 msgid "Priority"
 msgstr "우선 순위"
 
-#: src/jobbrowser/templates/jobs.mako:75
+#: src/jobbrowser/templates/jobs.mako:76
 msgid "Submitted"
 msgstr "제출됨"
 
-#: src/jobbrowser/templates/jobs.mako:140
-
+#: src/jobbrowser/templates/jobs.mako:142
 msgid "There was a problem communicating with the server: "
 msgstr "서버와 통신하는 중에 문제가 발생했습니다. 페이지를 새로 고치십시오. "
 
-#: src/jobbrowser/templates/jobs.mako:231
-#: src/jobbrowser/templates/jobs.mako:264
+#: src/jobbrowser/templates/jobs.mako:233
+#: src/jobbrowser/templates/jobs.mako:267
 msgid "Kill"
 msgstr "중지"
 
@@ -679,35 +778,23 @@ msgstr "중지"
 msgid "Job Task: %(taskId)s"
 msgstr "Job 작업: %(taskId)s"
 
-#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:79
+#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:75
 msgid "End Time"
 msgstr "종료 시간"
 
-#: src/jobbrowser/templates/task.mako:74
-msgid "Shuffle Finish"
-msgstr "셔플 완료"
-
-#: src/jobbrowser/templates/task.mako:75
-msgid "Sort Finish"
-msgstr "정렬 완료"
-
-#: src/jobbrowser/templates/task.mako:76
-msgid "Map Finish"
-msgstr "Map 완료"
-
-#: src/jobbrowser/templates/task.mako:83
+#: src/jobbrowser/templates/task.mako:87
 msgid "View this attempt"
 msgstr "이 시도 보기"
 
-#: src/jobbrowser/templates/task.mako:115
+#: src/jobbrowser/templates/task.mako:123
 msgid "Task id"
 msgstr "작업 ID"
 
-#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/task.mako:147
 msgid "Execution Start Time"
 msgstr "실행 시작 시간"
 
-#: src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/task.mako:151
 msgid "Execution Finish Time"
 msgstr "실행 완료 시간"
 
@@ -769,18 +856,38 @@ msgstr "설정"
 msgid "Text filter"
 msgstr "텍스트 필터"
 
-#: src/jobbrowser/templates/tasks.mako:67
-msgid "There were no tasks that match your search criteria."
-msgstr "검색 기준과 일치하는 작업이 없습니다."
-
-#: src/jobbrowser/templates/tasks.mako:80
+#: src/jobbrowser/templates/tasks.mako:76
 msgid "View Attempts"
 msgstr "시도 보기"
 
-#: src/jobbrowser/templates/tasks.mako:98
+#: src/jobbrowser/templates/tasks.mako:94
 #, python-format
 msgid "Show only %(state)s tasks"
 msgstr "%(state)s 작업만 표시"
+
+#: src/jobbrowser/templates/tasks.mako:135
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
+
+#: src/jobbrowser/templates/tasks.mako:136
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "0~0개(전체 0개 중) 항목 표시"
+
+#: src/jobbrowser/templates/tasks.mako:138
+msgid "First"
+msgstr "처음"
+
+#: src/jobbrowser/templates/tasks.mako:139
+msgid "Last"
+msgstr "마지막"
+
+#: src/jobbrowser/templates/tasks.mako:140
+msgid "Next"
+msgstr "다음"
+
+#: src/jobbrowser/templates/tasks.mako:141
+msgid "Previous"
+msgstr "이전"
 
 #: src/jobbrowser/templates/tasktracker.mako:23
 #, python-format
@@ -839,7 +946,7 @@ msgstr "포트"
 
 #: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Last Seen"
-msgstr "마지막 표시"
+msgstr "마지막 조회"
 
 #: src/jobbrowser/templates/tasktrackers.mako:39
 msgid "Available Space"
@@ -869,11 +976,15 @@ msgstr "최대 Reduce 작업"
 msgid "No time"
 msgstr "시간 없음"
 
-#~ msgid "Maps:"
-#~ msgstr "Map:"
-#~ msgid "Reduces:"
-#~ msgstr "Reduce:"
-#~ msgid "Duration:"
-#~ msgstr "소요 시간:"
-#~ msgid "Date"
-#~ msgstr "날짜"
+#~ msgid "Could not find job %s."
+#~ msgstr "Job %s을(를) 찾을 수 없습니다."
+
+#~ msgid "Metric"
+#~ msgstr "메트릭"
+
+#~ msgid "header"
+#~ msgstr "헤더"
+
+#~ msgid "There were no tasks that match your search criteria."
+#~ msgstr "검색 기준과 일치하는 작업이 없습니다."
+

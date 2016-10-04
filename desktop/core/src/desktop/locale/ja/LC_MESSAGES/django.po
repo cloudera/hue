@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"POT-Creation-Date: 2016-07-19 17:48-0700\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,518 +17,730 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/desktop/api.py:238 src/desktop/api.py:255 src/desktop/api.py:272
-#: src/desktop/api.py:288 src/desktop/api.py:309
-msgid "POST request only"
-msgstr "POST 要求のみ"
+#: src/desktop/api.py:201
+#, python-format
+msgid "get_document requires an id integer parameter: %s"
+msgstr "get_document には id 整数パラメーター %s が必要です"
 
-#: src/desktop/api.py:278 src/desktop/api.py:294
-#: src/desktop/templates/500.mako:23 src/desktop/templates/error.mako:23
+#: src/desktop/api.py:250 src/desktop/api.py:267 src/desktop/api.py:284
+#: src/desktop/api.py:300 src/desktop/api.py:321
+#, python-format
+msgid "Form is missing %s field"
+msgstr "フォームに %s フィールドがありません"
+
+#: src/desktop/api.py:293 src/desktop/api.py:309
+#: src/desktop/templates/error.mako:23
 msgid "Error"
 msgstr "エラー"
 
-#: src/desktop/api.py:283
+#: src/desktop/api.py:297
 msgid "Project removed!"
 msgstr "プロジェクトが削除されました。"
 
-#: src/desktop/api.py:302
+#: src/desktop/api.py:317
 msgid "Permissions updated!"
 msgstr "パーミッションが更新されました。"
+
+#: src/desktop/api2.py:95
+msgid "Invalid value for perms, acceptable values are: owned, shared, both."
+msgstr "perms の値が無効です。有効な値は、owned、shared、これらの両方です。"
+
+#: src/desktop/api2.py:220
+msgid "move_document requires source_doc_uuid and destination_doc_uuid"
+msgstr "move_document には、source_doc_uuid と destination_doc_uuid が必要です"
+
+#: src/desktop/api2.py:240
+msgid "create_directory requires parent_uuid and name"
+msgstr "create_directory には、parent_uuid および name が必要です"
+
+#: src/desktop/api2.py:258
+msgid "update_document requires uuid"
+msgstr "update_document には uuid が必要です"
+
+#: src/desktop/api2.py:293
+msgid "delete_document requires uuid"
+msgstr "delete_document には uuid が必要です"
+
+#: src/desktop/api2.py:319
+msgid "share_document requires uuid and perms_dict"
+msgstr "share_document には uuid と perms_dict が必要です"
+
+#: src/desktop/api2.py:540
+#, python-format
+msgid "Cannot import document, dependency with UUID: %s not found."
+msgstr "ドキュメントをインポートできません。UUID %s との依存関係が見つかりません。"
 
 #: src/desktop/appmanager.py:240
 msgid "load_apps has already been called."
 msgstr "load_apps はすでに呼び出されています。"
 
-#: src/desktop/conf.py:57
+#: src/desktop/conf.py:79
 msgid "HTTP host to bind to."
 msgstr "バインド先の HTTP ホストです。"
 
-#: src/desktop/conf.py:63
+#: src/desktop/conf.py:85
 msgid "HTTP port to bind to."
 msgstr "バインド先の HTTP ポートです。"
 
-#: src/desktop/conf.py:69
+#: src/desktop/conf.py:91
 msgid "HTTP methods the server will be allowed to service."
 msgstr "サーバーで処理できる HTTP メソッドです。"
 
-#: src/desktop/conf.py:76
+#: src/desktop/conf.py:98
+msgid "X-Frame-Options HTTP header value."
+msgstr "X-Frame オプションの HTTP ヘッダー値です。"
+
+#: src/desktop/conf.py:104
 msgid "Filename of SSL Certificate"
 msgstr "SSL 証明書のファイル名"
 
-#: src/desktop/conf.py:81
+#: src/desktop/conf.py:110
 msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 秘密鍵のファイル名"
 
-#: src/desktop/conf.py:86
+#: src/desktop/conf.py:116
+msgid "Filename of SSL Certificate Chain"
+msgstr "SSL 証明書チェーンのファイル名"
+
+#: src/desktop/conf.py:122
 msgid "List of allowed and disallowed ciphers"
 msgstr "使用できる暗号と使用できない暗号のリスト"
 
-#: src/desktop/conf.py:91
+#: src/desktop/conf.py:144
+msgid "SSL password of the certificate"
+msgstr "証明書の SSL パスワード"
 
+#: src/desktop/conf.py:149
+msgid "Execute this script to produce the SSL password. This will be used when `ssl_password` is not set."
+msgstr "このスクリプトを実行して SSL パスワードを作成します。これは ssl_password が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:155
+msgid "Path to default Certificate Authority certificates."
+msgstr "デフォルトの認証局証明書へのパスです。"
+
+#: src/desktop/conf.py:161
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "サーバーから受け取った証明書を Hue で検証するかどうかを選択します。"
+
+#: src/desktop/conf.py:168
 msgid "LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."
 msgstr "LDAP 認証で使用する Hue ユーザーの LDAP パスワードです。たとえば、HiveServer2／Impala の LDAP 認証で使用します。"
 
-#: src/desktop/conf.py:97
+#: src/desktop/conf.py:175
+msgid "Execute this script to produce the LDAP password. This will be used when `ldap_password` is not set."
+msgstr "このスクリプトを実行して LDAP パスワードを作成します。これは ldap_password が設定されていない場合に利用されます。"
 
+#: src/desktop/conf.py:183
 msgid "LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."
 msgstr "LDAP 認証で使用する Hue ユーザーの LDAP ユーザー名です。たとえば、HiveServer2／Impala の LDAP 認証で使用します。"
 
-#: src/desktop/conf.py:103
+#: src/desktop/conf.py:193
+msgid "Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."
+msgstr "認証で使用する Hue ユーザーの Auth ユーザー名です。たとえば、HiveServer2/Impala の LDAP 認証で使用します。"
+
+#: src/desktop/conf.py:219
+msgid "LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. For example for LDAP Authentication with HiveServer2/Impala."
+msgstr "認証で使用する Hue ユーザーの LDAP/PAM/.. パスワードです。空の場合、アクティブになりません。たとえば、HiveServer2／Impala の LDAP 認証で使用します。"
+
+#: src/desktop/conf.py:225
+msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgstr "このスクリプトを実行して認証パスワードを作成します。これは auth_password が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:232
 msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
 msgstr "false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache を使用している場合に使用されます。"
 
-#: src/desktop/conf.py:109
+#: src/desktop/conf.py:238
 msgid "Number of threads used by the CherryPy web server."
 msgstr "CherryPy Web サーバーで使用するスレッドの数です。"
 
-#: src/desktop/conf.py:115
+#: src/desktop/conf.py:244
 msgid "Used in hashing algorithms for sessions."
 msgstr "セッションのハッシュアルゴリズムで使用します。"
 
-#: src/desktop/conf.py:120
+#: src/desktop/conf.py:249
+msgid "Execute this script to produce the Django secret key. This will be used when `secret_key` is not set."
+msgstr "このスクリプトを実行して Django 秘密鍵を作成します。これは secret_key が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:256
 msgid "Number of user access to remember per view per user."
 msgstr "ユーザーごとのビュー単位で記録されるユーザーアクセス数です。"
 
-#: src/desktop/conf.py:126
+#: src/desktop/conf.py:262
 msgid "Help improve Hue with anonymous usage analytics.Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."
 msgstr "匿名の使用分析によって Hue の品質向上にご協力ください。Hue では Google Analytics を使用して、アプリケーションやアプリケーションの特定のセクションが何回使用されているかを把握します。それ以上のことはありません。"
 
-#: src/desktop/conf.py:133
+#: src/desktop/conf.py:269
+msgid "Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer"
+msgstr "Leaflet Map チャートのタイルレイヤーサーバー URL です。詳細は、http://leafletjs.com/reference.html#tilelayer にアクセスしてください。"
+
+#: src/desktop/conf.py:275
+msgid "The copyright message for the specified Leaflet maps Tile Layer"
+msgstr "指定された Leaflet Maps タイルレイヤーの著作権メッセージ"
+
+#: src/desktop/conf.py:281
 msgid "Use poll(2) in Hue thrift pool."
 msgstr "Hue Thrift プールで poll(2) を使用します。"
 
-#: src/desktop/conf.py:140
+#: src/desktop/conf.py:288
 msgid "Comma-separated list of Django middleware classes to use. See https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on middlewares in Django."
 msgstr "使用する Django Middleware クラスのカンマ区切りのリストです。Django の Middleware の詳細については、https://docs.djangoproject.com/en/1.4/ref/middleware/ を参照してください。"
 
-#: src/desktop/conf.py:148
+#: src/desktop/conf.py:296
 msgid "Comma-separated list of regular expressions, which match the redirect URL.For example, to restrict to your local domain and FQDN, the following value can be used:  ^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
 msgstr "リダイレクト URL に一致する正規表現のカンマ区切りのリストです。たとえば、ローカルドメインとFQDNに制限する場合、「^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$」という値を使用できます。"
 
-#: src/desktop/conf.py:156
+#: src/desktop/conf.py:304
+msgid "Enable X-Forwarded-Host header if the load balancer requires it."
+msgstr "ロードバランサーで必要とされる場合、 X-Forwarded-Host ヘッダーを有効化します。"
+
+#: src/desktop/conf.py:310
 msgid "Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."
 msgstr "SECURE_PROXY_SSL_HEADER を使用したロードバランサレベルで HTTPS 終端をサポートします。"
 
-#: src/desktop/conf.py:164
+#: src/desktop/conf.py:318
 msgid "Comma separated list of apps to not load at server startup."
 msgstr "サーバー起動時にロードしないアプリのカンマ区切りのリストです。"
 
-#: src/desktop/conf.py:169
+#: src/desktop/conf.py:323
 msgid "To set to true in combination when using Hue demo backend."
 msgstr "Hue デモバックエンドの使用時に組み合わせて true に設定する方法。"
 
-#: src/desktop/conf.py:176
+#: src/desktop/conf.py:330
 msgid "Use this file to parse and redact log message."
 msgstr "このファイルを使用してログメッセージを解析および編集します。"
 
-#: src/desktop/conf.py:182
-msgid "Use this string to parse and redact log message."
-msgstr "この文字列を使用して、ログメッセージを解析および編集します。"
+#: src/desktop/conf.py:338
+msgid "Comma separated list of strings representing the host/domain names that the Hue server can serve."
+msgstr "Hue Server が対応できるホスト／ドメイン名を表す文字列のカンマ区切りリストです。"
 
-#: src/desktop/conf.py:217
+#: src/desktop/conf.py:392
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "外部 SMTP サーバーに接続するための設定オプションです。"
 
-#: src/desktop/conf.py:221
+#: src/desktop/conf.py:396
 msgid "The SMTP server for email notification delivery."
 msgstr "電子メール通知配信用の SMTP サーバーです。"
 
-#: src/desktop/conf.py:228
+#: src/desktop/conf.py:403
 msgid "The SMTP server port."
-msgstr "SMTP サーバーのポートです。"
+msgstr "SMTP サーバーポートです。"
 
-#: src/desktop/conf.py:235
+#: src/desktop/conf.py:410
 msgid "The username for the SMTP host."
 msgstr "SMTP ホストのユーザー名です。"
 
-#: src/desktop/conf.py:242
+#: src/desktop/conf.py:417
 msgid "The password for the SMTP user."
 msgstr "SMTP ユーザーのパスワードです。"
 
-#: src/desktop/conf.py:250
+#: src/desktop/conf.py:425
+msgid "Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."
+msgstr "このスクリプトを実行して SMTP ユーザーパスワードを作成します。これは SMTP の password が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:433
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr "SMTP サーバーとの送受信で TLS（セキュア）接続を使用するかどうかの指定です。"
 
-#: src/desktop/conf.py:257
+#: src/desktop/conf.py:440
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr "Hue からのさまざまな自動通知で使用するデフォルトの電子メールアドレスです。"
 
-#: src/desktop/conf.py:266
+#: src/desktop/conf.py:449
+msgid "Configuration options for metrics"
+msgstr "測定値の設定オプション"
 
+#: src/desktop/conf.py:453
+msgid "Enable metrics URL \"desktop/metrics\""
+msgstr "測定値 URL \"desktop/metrics\" を有効にします"
+
+#: src/desktop/conf.py:458
+msgid "If specified, Hue will write metrics to this file"
+msgstr "指定されている場合、Hue は測定値をこのファイルに書き込みます。"
+
+#: src/desktop/conf.py:462
+msgid "Time in milliseconds on how frequently to collect metrics"
+msgstr "測定値を収集する周期をミリ秒で示した時間"
+
+#: src/desktop/conf.py:470
 msgid "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
 msgstr "Desktop セッションを指定する設定オプションです。\n"
 "          詳細については、http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine を参照してください。"
 
-#: src/desktop/conf.py:271
+#: src/desktop/conf.py:475
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "postgresql_psycopg2、mysql、sqlite3 などのデータベースエンジンです。"
 
-#: src/desktop/conf.py:277
+#: src/desktop/conf.py:481
 msgid "Database name, or path to DB if using sqlite3."
 msgstr "データベース名。splite3 を使用している場合は DB へのパスです。"
 
-#: src/desktop/conf.py:283
+#: src/desktop/conf.py:487
 msgid "Database username."
 msgstr "データベースのユーザー名です。"
 
-#: src/desktop/conf.py:289
+#: src/desktop/conf.py:493
 msgid "Database password."
 msgstr "データベースのパスワードです。"
 
-#: src/desktop/conf.py:296
+#: src/desktop/conf.py:500
+msgid "Execute this script to produce the database password. This will be used when `password` is not set."
+msgstr "このスクリプトを実行してデータベースパスワードを作成します。これは password が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:507
 msgid "Database host."
 msgstr "データベースのホストです。"
 
-#: src/desktop/conf.py:302
+#: src/desktop/conf.py:513
 msgid "Database port."
 msgstr "データベースのポートです。"
 
-#: src/desktop/conf.py:308
+#: src/desktop/conf.py:519
 msgid "Database options to send to the server when connecting."
 msgstr "接続時にサーバーに送信するデータベースオプションです。"
 
-#: src/desktop/conf.py:317
-
+#: src/desktop/conf.py:528
 msgid "Configuration options for specifying the Desktop session.\n"
 "          For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
 msgstr "Desktop セッションを指定する設定オプションです。\n"
 "          詳細については、https://docs.djangoproject.com/en/1.4/topics/http/sessions/ を参照してください。"
 
-#: src/desktop/conf.py:322
+#: src/desktop/conf.py:533
 msgid "The cookie containing the users' session ID will expire after this amount of time in seconds."
-msgstr "ユーザーのセッション ID を保持する cookie は、この時間（秒）後に期限切れになります。"
+msgstr "ユーザーのセッション ID を保持する cookie は、所定の時間（秒）で期限切れになります。"
 
-#: src/desktop/conf.py:328
+#: src/desktop/conf.py:539
 msgid "The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."
 msgstr "ユーザーのセッション ID を保持する cookie はセキュリティ保護されます。これは必ず HTTPS のみで使用可能にする必要があります。"
 
-#: src/desktop/conf.py:334
+#: src/desktop/conf.py:545
 msgid "The cookie containing the users' session ID will use the HTTP only flag."
-msgstr "ユーザーのセッション ID を保持する cookie は HTTP only フラグを使用します。"
+msgstr "ユーザーのセッション ID を保持する cookie は、HTTP 専用フラグを使用します。"
 
-#: src/desktop/conf.py:340
+#: src/desktop/conf.py:551
 msgid "Use session-length cookies. Logs out the user when she closes the browser window."
 msgstr "セッションの長さの cookie を使用します。ユーザーがブラウザウィンドウを閉じたらログアウトさせます。"
 
-#: src/desktop/conf.py:349
-
+#: src/desktop/conf.py:560
 msgid "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr "セキュアな Hadoop クラスタに向けて Hue の Kerberos 統合を指定する\n"
 "           設定オプションです。"
 
-#: src/desktop/conf.py:354
+#: src/desktop/conf.py:565
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr "Hue のサービス資格情報を保存している Kerberos keytab ファイルのパスです。"
 
-#: src/desktop/conf.py:359
+#: src/desktop/conf.py:570
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr "Hue の Kerberos プリンシパル名。普通は 'hue/hostname.foo.com' です。"
 
-#: src/desktop/conf.py:364
+#: src/desktop/conf.py:575
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue がその keytab を更新する時間間隔です（単位は秒）。"
 
-#: src/desktop/conf.py:369
+#: src/desktop/conf.py:580
 msgid "Path to keep Kerberos credentials cached."
 msgstr "キャッシュされている Kerberos 資格情報を維持するパスです。"
 
-#: src/desktop/conf.py:376
+#: src/desktop/conf.py:587
 msgid "Path to Kerberos 'kinit' command."
-msgstr "Kerberos の 'kinit' コマンドへのパスです。"
+msgstr "Kerberos の kinit コマンドへのパスです。"
 
-#: src/desktop/conf.py:386
+#: src/desktop/conf.py:597
 msgid "Time zone name."
 msgstr "タイムゾーン名です。"
 
-#: src/desktop/conf.py:393
+#: src/desktop/conf.py:604
 msgid "Default system-wide unicode encoding."
 msgstr "システム規模でのデフォルトの Unicode エンコードです。"
 
-#: src/desktop/conf.py:400
+#: src/desktop/conf.py:611
 msgid "Username to run servers as."
 msgstr "サーバーを実行するユーザー名です。"
 
-#: src/desktop/conf.py:406
+#: src/desktop/conf.py:617
 msgid "Group to run servers as."
 msgstr "サーバーを実行するグループです。"
 
-#: src/desktop/conf.py:412
+#: src/desktop/conf.py:623
 msgid "This should be the user running hue webserver"
-msgstr "これは、Hue Web サーバーを実行しているユーザーにする必要があります。"
+msgstr "これは、Hue Web サーバーを実行しているユーザーにする必要があります"
 
-#: src/desktop/conf.py:418
+#: src/desktop/conf.py:629
 msgid "This should be the hdfs super user"
-msgstr "これは、hdfs スーパーユーザーにする必要があります。"
+msgstr "HDFS スーパーユーザーであることが必要です"
 
-#: src/desktop/conf.py:424
+#: src/desktop/conf.py:635
 msgid "Customizations to the UI."
 msgstr "UI のカスタマイズです。"
 
-#: src/desktop/conf.py:428
+#: src/desktop/conf.py:639
 msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
 msgstr "トップバナー HTML コードです。このコードはナビゲーションバーに配置され、ページ上部の固定位置に常駐するようになります。共通値の 1 つは `<img src=\"http://www.example.com/example.gif\" />` です。"
 
-#: src/desktop/conf.py:435
+#: src/desktop/conf.py:644
+msgid "The login splash HTML code. This code will be placed in the login page, useful for security warning messages."
+msgstr "ログインスプラッシュ HTML コードです。このコードはログインページに配置され、セキュリティ警告メッセージのために役立ちます。"
+
+#: src/desktop/conf.py:649
+msgid "The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache."
+msgstr "assist/autocomplete/etc コールのためのキャッシュ TTL（ミリ秒）です。0 に設定すると、キャッシュが無効になります。"
+
+#: src/desktop/conf.py:654
 msgid "Configuration options for user authentication into the web application."
-msgstr "Web アプリケーションに対するユーザー認証の設定オプションです。"
+msgstr "Web アプリケーションへのユーザー認証の設定オプション"
 
-#: src/desktop/conf.py:439
-msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
-msgstr "認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は Django およびユーザーマネージャを使用）です。 "
+#: src/desktop/conf.py:659
+msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). Multiple Authentication backends are supported by specifying a comma-separated list in order of priority."
+msgstr "認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は Django およびユーザーマネージャを使用）です。カンマ区切りリストを指定して優先度を示すことで、複数の認証バックエンドがサポートされます。"
 
-#: src/desktop/conf.py:445
+#: src/desktop/conf.py:666
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "User オブジェクトに対する余計なアクセサメソッドを定義するクラスです。"
 
-#: src/desktop/conf.py:448
+#: src/desktop/conf.py:669
 msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
-msgstr "PAM をクエリする際に使用するサービスです。このサービスは、/etc/pam.d 内の単一のファイル名に通常は対応します。"
+msgstr "PAM のクエリ時に使用するサービスです。このサービスは、通常、/etc/pam.d で 1 つのファイル名に対応しています"
 
-#: src/desktop/conf.py:452
+#: src/desktop/conf.py:673
 msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
-msgstr "desktop.auth.backend.RemoteUserDjangoBackend を使用する際に、リモートユーザーを含むヘッダーの正規化名がこれによって設定されます。すべての文字を大文字に変換し、ハイフンをアンダースコアで置換して、HTTP_ プレフィックスを名前に追加することにより、要求の HTTP ヘッダーはキーに変換されます。そのため、ヘッダーがたとえば Remote-User と呼ばれる場合、これは HTTP_REMOTE_USER と設定されます。"
+msgstr "desktop.auth.backend.RemoteUserDjangoBackend を使用する場合、これはリモートユーザーを含むヘッダーの正規名を設定します。要求内の HTTP ヘッダーは、すべての文字を大文字に変換し、ハイフンをアンダースコアに置換し、HTTP_ プレフィックスを名前に追加する方法で、キーに変換されます。したがって、たとえば、ヘッダーが、Remote-User である場合、HTTP_REMOTE_USER として設定されます。"
 
-#: src/desktop/conf.py:459 src/desktop/conf.py:490
+#: src/desktop/conf.py:680 src/desktop/conf.py:767
 msgid "Ignore the case of usernames when searching for existing users in Hue."
 msgstr "Hue で既存のユーザーを検索する場合、ユーザー名の大／小文字を無視します。"
 
-#: src/desktop/conf.py:463 src/desktop/conf.py:494
-msgid "Force usernames to lowercase when creating new users from LDAP."
-msgstr "LDAP から新規ユーザーを作成する場合、ユーザー名を強制的に小文字にします。"
+#: src/desktop/conf.py:684
+msgid "Force usernames to lowercase when creating new users."
+msgstr "新規ユーザーを作成する場合、ユーザー名を強制的に小文字にします。"
 
-#: src/desktop/conf.py:467
+#: src/desktop/conf.py:688
+msgid "Force usernames to uppercase when creating new users."
+msgstr "新規ユーザーを作成する場合、ユーザー名を強制的に大文字にします。"
+
+#: src/desktop/conf.py:692
 msgid "Users will expire after they have not logged in for 'n' amount of seconds.A negative number means that users will never expire."
 msgstr "ユーザーが 'n' 秒間ログインしないと有効期限が切れます。負の数値はユーザーの有効期限が切れないことを意味します。"
 
-#: src/desktop/conf.py:472
+#: src/desktop/conf.py:697
 msgid "Apply 'expires_after' to superusers."
 msgstr "'expires_after' をスーパーユーザーに適用します。"
 
-#: src/desktop/conf.py:479
-msgid "Configuration options for LDAP connectivity."
-msgstr "LDAP 接続性の設定オプションです。"
+#: src/desktop/conf.py:701
+msgid "Users will automatically be logged out after 'n' seconds of inactivity.A negative number means that idle sessions will not be timed out."
+msgstr "n 秒間操作がないと、ユーザーは自動的にログアウトされます。負の数値は、アイドルセッションがタイムアウトしないことを表します。"
 
-#: src/desktop/conf.py:482
+#: src/desktop/conf.py:707
+msgid "When set to true this will allow you to specify a password for the user when you create the user and then force them to change their password upon first login.  The default is false."
+msgstr "true に設定されている場合、管理者は、ユーザーの作成時にユーザーのパスワードを指定し、初回ログイン時にパスワードの変更をユーザーに強制できるようになります。デフォルト値は false です。"
+
+#: src/desktop/conf.py:715
+msgid "Number of login attempts allowed before a record is created for failed logins"
+msgstr "失敗したログインの記録を作成するまで許容されるログイン試行回数"
+
+#: src/desktop/conf.py:721
+msgid "After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?"
+msgstr "許容されるログイン試行回数を超えたら、この IP をロックアウトし、必要に応じてユーザーエージェントもロックアウトしますか？"
+
+#: src/desktop/conf.py:727
+msgid "If set, defines period of inactivity in seconds after which failed logins will be forgotten"
+msgstr "設定する場合、失敗したログイン回数をリセットするまでの、操作がない秒数を定義します。"
+
+#: src/desktop/conf.py:734
+msgid "If True, lock out based on IP and browser user agent"
+msgstr "True の場合、IP およびブラウザーユーザーエージェントに基づいてロックアウトします"
+
+#: src/desktop/conf.py:740
+msgid "If True, lock out based on an IP address AND a user agent.This means requests from different user agents but from the same IP are treated differently."
+msgstr "True である場合、IP アドレスとユーザーエージェントに基づいてロックされます。つまり、同じ IP からの要求であっても、異なるユーザーエージェントからの要求であった場合、この要求は異なるものとして処理されます。"
+
+#: src/desktop/conf.py:747
+msgid "If True, lock out based on IP and user"
+msgstr "True の場合、IP およびユーザーに基づいてロックアウトします"
+
+#: src/desktop/conf.py:756
+msgid "Configuration options for LDAP connectivity."
+msgstr "LDAP 接続の設定オプションです。"
+
+#: src/desktop/conf.py:759
 msgid "Create users when they login with their LDAP credentials."
 msgstr "各自の LDAP 資格情報を使用してログインする場合は、ユーザーを作成します。"
 
-#: src/desktop/conf.py:486
+#: src/desktop/conf.py:763
 msgid "Synchronize a users groups when they login."
 msgstr "ユーザーグループをログイン時に同期します。"
 
-#: src/desktop/conf.py:499
+#: src/desktop/conf.py:771
+msgid "Force usernames to lowercase when creating new users from LDAP."
+msgstr "LDAP から新規ユーザーを作成する場合、ユーザー名を強制的に小文字にします。"
+
+#: src/desktop/conf.py:775
+msgid "Force usernames to uppercase when creating new users from LDAP."
+msgstr "LDAP から新規ユーザーを作成する場合、ユーザー名を強制的に大文字にします。"
+
+#: src/desktop/conf.py:779
 msgid "Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."
-msgstr "使用するサブグループの種類を選択します：ネストまたは下位（非推奨）。"
+msgstr "使用するサブグループの種類（ネストまたは従属（非推奨））を選択します。"
 
-#: src/desktop/conf.py:503
+#: src/desktop/conf.py:783
 msgid "Define the number of levels to search for nested members."
-msgstr "ネストされたメンバーの検索レベルの数を定義します。"
+msgstr "ネストされたメンバーを検索するためにレベル数を定義します。"
 
-#: src/desktop/conf.py:509
+#: src/desktop/conf.py:787 src/desktop/conf.py:846
+msgid "Whether or not to follow referrals."
+msgstr "参照に従うかどうか。"
+
+#: src/desktop/conf.py:794 src/desktop/conf.py:853
+msgid "Set to a value to enable python-ldap debugging."
+msgstr "値を設定して python-ldap デバッグを有効にします。"
+
+#: src/desktop/conf.py:798 src/desktop/conf.py:857
+msgid "Sets the debug level within the underlying LDAP C lib."
+msgstr "基本 LDAP C lib 内のデバッグレベルを設定します。"
+
+#: src/desktop/conf.py:802 src/desktop/conf.py:861
+msgid "Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls."
+msgstr "trace_level の有効値は 0（ログを記録しない）、1（引数があるメソッドコールのみをログに記録する）、2（引数があり、完全な結果があるメソッドコールを記録する）、9（メソッドコールのトレースバックも記録する）です。"
+
+#: src/desktop/conf.py:807
 msgid "LDAP server record."
 msgstr "LDAP サーバーレコードです。"
 
-#: src/desktop/conf.py:514 src/desktop/conf.py:578
+#: src/desktop/conf.py:812 src/desktop/conf.py:899
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "LDAP 検索で使用する基本的な LDAP 識別名です。"
 
-#: src/desktop/conf.py:517 src/desktop/conf.py:581
+#: src/desktop/conf.py:815 src/desktop/conf.py:902
 msgid "The NT domain used for LDAP authentication."
-msgstr "LDAP 認証に使用される NT ドメインです。"
+msgstr "LDAP 認証に使用する NT ドメインです。"
 
-#: src/desktop/conf.py:520 src/desktop/conf.py:584
+#: src/desktop/conf.py:818 src/desktop/conf.py:905
 msgid "The LDAP URL to connect to."
-msgstr "接続先の LDAP の URL です。"
+msgstr "接続先の LDAP URL。"
 
-#: src/desktop/conf.py:524 src/desktop/conf.py:588
+#: src/desktop/conf.py:822 src/desktop/conf.py:909
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "LDAP サーバーとの通信時に StartTLS を使用します。"
 
-#: src/desktop/conf.py:527 src/desktop/conf.py:591
+#: src/desktop/conf.py:825 src/desktop/conf.py:912
 msgid "A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html."
 msgstr "TLS 経由での認証で Hue が信頼する CA の証明書を格納している PEM 形式のファイルです。これらの証明書に、LDAP サーバー証明書に署名した CA の証明書を含める必要があります。詳細については、http://www.openldap.org/doc/admin24/tls.html を参照してください。"
 
-#: src/desktop/conf.py:530 src/desktop/conf.py:594
+#: src/desktop/conf.py:828 src/desktop/conf.py:915
 msgid "A pattern to use for constructing LDAP usernames."
-msgstr "LDAP ユーザー名の作成に使用するパターンです。"
+msgstr "LDAP ユーザー名の設定時に利用するパターンです。"
 
-#: src/desktop/conf.py:533 src/desktop/conf.py:597
+#: src/desktop/conf.py:831 src/desktop/conf.py:918
 msgid "The distinguished name to bind as, when importing from LDAP."
-msgstr "LDAP からのインポートでバインドに使用する識別名です。"
+msgstr "LDAP からインポートするときに、バインドする識別名です。"
 
-#: src/desktop/conf.py:537 src/desktop/conf.py:601
+#: src/desktop/conf.py:835 src/desktop/conf.py:922
 msgid "The password for the bind user."
 msgstr "バインドユーザーのパスワードです。"
 
-#: src/desktop/conf.py:541 src/desktop/conf.py:605
+#: src/desktop/conf.py:840 src/desktop/conf.py:927
+msgid "Execute this script to produce the LDAP bind user password. This will be used when `bind_password` is not set."
+msgstr "このスクリプトを実行して LDAP バインドユーザーパスワードを作成します。これは bind_password が設定されていない場合に利用されます。"
+
+#: src/desktop/conf.py:844 src/desktop/conf.py:931
 msgid "Use search bind authentication."
 msgstr "検索バインド認証を使用します。"
 
-#: src/desktop/conf.py:545 src/desktop/conf.py:609
+#: src/desktop/conf.py:866 src/desktop/conf.py:935
 msgid "Configuration for LDAP user schema and search."
-msgstr "LDAP ユーザーのスキーマと検索の設定です。"
+msgstr "LDAP ユーザースキーマと検索の設定です。"
 
-#: src/desktop/conf.py:549 src/desktop/conf.py:613
+#: src/desktop/conf.py:870 src/desktop/conf.py:939
 msgid "A base filter for use when searching for users."
-msgstr "ユーザーを検索するときに使用する基本フィルタです。"
+msgstr "ユーザーの検索時に使用する基本フィルターです。"
 
-#: src/desktop/conf.py:552 src/desktop/conf.py:616
+#: src/desktop/conf.py:873 src/desktop/conf.py:942
 msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
-msgstr "LDAP スキーマでのユーザー名属性。多くの場合、AD では 'sAMAccountName'、他の LDAP システムでは 'uid' です。"
+msgstr "LDAP スキーマのユーザー名属性です。一般的にこの値は、AD の場合は 'sAMAccountName' であり、その他の LDAP システムの場合は 'uid' です。"
 
-#: src/desktop/conf.py:560 src/desktop/conf.py:623
+#: src/desktop/conf.py:881 src/desktop/conf.py:949
 msgid "Configuration for LDAP group schema and search."
-msgstr "LDAP グループのスキーマと検索の設定です。"
+msgstr "LDAP グループスキーマと検索の設定です。"
 
-#: src/desktop/conf.py:564 src/desktop/conf.py:627
+#: src/desktop/conf.py:885 src/desktop/conf.py:953
 msgid "A base filter for use when searching for groups."
-msgstr "グループを検索するときに使用する基本フィルタです。"
+msgstr "グループの検索時に使用する基本フィルターです。"
 
-#: src/desktop/conf.py:567 src/desktop/conf.py:630
+#: src/desktop/conf.py:888 src/desktop/conf.py:956
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
-msgstr "LDAP スキーマでのグループ名属性。多くの場合は 'cn' です。"
+msgstr "LDAP スキーマのグループ名属性です。一般的にこれは 'cn' です。"
 
-#: src/desktop/conf.py:571 src/desktop/conf.py:634
+#: src/desktop/conf.py:892 src/desktop/conf.py:960
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "グループのメンバーを指定する LDAP 属性です。"
 
-#: src/desktop/conf.py:641
+#: src/desktop/conf.py:967
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Oauth 1.0 認証の設定オプション"
 
-#: src/desktop/conf.py:645
+#: src/desktop/conf.py:971
 msgid "The Consumer key of the application."
 msgstr "アプリケーションのコンシューマキーです。"
 
-#: src/desktop/conf.py:652
+#: src/desktop/conf.py:978
 msgid "The Consumer secret of the application."
 msgstr "アプリケーションのコンシューマシークレットです。"
 
-#: src/desktop/conf.py:659
+#: src/desktop/conf.py:985
 msgid "The Request token URL."
 msgstr "要求トークンの URL です。"
 
-#: src/desktop/conf.py:666
+#: src/desktop/conf.py:992
 msgid "The Access token URL."
 msgstr "アクセストークンの URL です。"
 
-#: src/desktop/conf.py:673
+#: src/desktop/conf.py:999
 msgid "The Authorize URL."
 msgstr "認証の URL です。"
 
-#: src/desktop/conf.py:683
+#: src/desktop/conf.py:1010
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "ユーザーが参照できるローカルファイルシステム上のパスです。"
 
-#: src/desktop/conf.py:688
+#: src/desktop/conf.py:1015
 msgid "The path on the local filesystem."
 msgstr "ローカルファイルシステム上のパスです。"
 
-#: src/desktop/conf.py:697
+#: src/desktop/conf.py:1024
 msgid "Link for 'feedback' tab."
-msgstr "[フィードバック] タブのリンクです。"
+msgstr "［フィードバック］タブへのリンクです。"
 
-#: src/desktop/conf.py:704
+#: src/desktop/conf.py:1031
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "JavaScript からサーバーのログにデバッグメッセージを送信するかどうかの指定です。"
 
-#: src/desktop/conf.py:711
-msgid "If true, log all database requests."
-msgstr "true の場合は、すべてのデータベース要求がログに記録されます。"
+#: src/desktop/conf.py:1038
+msgid "Enable or disable database debug mode."
+msgstr "データベースのデバッグモードを有効または無効にします。"
 
-#: src/desktop/conf.py:717
+#: src/desktop/conf.py:1045
 msgid "Administrators that should receive error emails."
-msgstr "エラーに関する電子メールを受信する必要がある管理者です。"
+msgstr "エラー電子メールを受信する管理者です。"
 
-#: src/desktop/conf.py:722
+#: src/desktop/conf.py:1050
 msgid "The full name of the admin."
-msgstr "管理者の氏名です。"
+msgstr "管理者の姓名です。"
 
-#: src/desktop/conf.py:725
+#: src/desktop/conf.py:1053
 msgid "The email address of the admin."
 msgstr "管理者の電子メールアドレスです。"
 
-#: src/desktop/conf.py:729
+#: src/desktop/conf.py:1057
 msgid "Enable or disable Django debug mode."
 msgstr "Django のデバッグモードを有効化または無効化します。"
 
-#: src/desktop/conf.py:736
+#: src/desktop/conf.py:1064
 msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
 msgstr "500 の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode が true の場合は、この設定が自動的に有効になります。"
 
-#: src/desktop/conf.py:745
+#: src/desktop/conf.py:1073
 msgid "Enable or disable memory profiling."
-msgstr "メモリのプロファイリングを有効化または無効化します。"
+msgstr "メモリプロファイルを有効化または無効化します。"
 
-#: src/desktop/conf.py:751
+#: src/desktop/conf.py:1079
 msgid "The directory where to store the auditing logs. Auditing is disable if the value is empty."
-msgstr "監査ログを保存するディレクトリです。値が空の場合、監査は無効になります。"
+msgstr "監査ログを格納するディレクトリです。値が空の場合、監査は無効になります。"
 
-#: src/desktop/conf.py:758
+#: src/desktop/conf.py:1086
 msgid "Size in KB/MB/GB for audit log to rollover."
 msgstr "ロールオーバーする監査ログのサイズ（KB／MB／GB 単位）です。"
 
-#: src/desktop/conf.py:765
+#: src/desktop/conf.py:1093
 msgid "Email address that internal error messages should send as."
-msgstr "内部エラーメッセージの送信元として使用する電子メールアドレスです。"
+msgstr "内部エラーメッセージが送信する電子メールアドレス。"
 
-#: src/desktop/conf.py:771
+#: src/desktop/conf.py:1099
 msgid "The email backend to use."
 msgstr "使用する電子メールバックエンドです。"
 
-#: src/desktop/conf.py:784
+#: src/desktop/conf.py:1108
+msgid "Enable the new editor SQL autocompleter"
+msgstr "新しいエディターの SQL オートコンプリート機能を有効化"
+
+#: src/desktop/conf.py:1115
+msgid "Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled"
+msgstr "列、テーブル、値などのオートコンプリートのタイムアウト値（ミリ秒）。0 = 無効"
+
+#: src/desktop/conf.py:1122
+msgid "Choose whether to show the new SQL editor."
+msgstr "新しい SQL エディターを表示するかどうかを選択します。"
+
+#: src/desktop/conf.py:1129
+msgid "Enable saved default configurations for Hive, Impala, Spark, and Oozie."
+msgstr "Hive、Impala、Spark、および Oozie を対象として、保存済みのデフォルト設定を有効化します。"
+
+#: src/desktop/conf.py:1143
 msgid "If you set bind_password, then you must set bind_dn."
 msgstr "bind_password を設定する場合は、bind_dn を設定する必要があります。"
 
-#: src/desktop/conf.py:787
+#: src/desktop/conf.py:1146
 msgid "If you set bind_dn, then you must set bind_password."
 msgstr "bind_dn を設定する場合は、bind_password を設定する必要があります。"
 
-#: src/desktop/conf.py:793
+#: src/desktop/conf.py:1152
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
-msgstr "LDAP の設定は部分的です。LDAP の URL を指定する必要があります。"
+msgstr "LDAP の設定は部分的です。LDAP URL を指定する必要があります。"
 
-#: src/desktop/conf.py:799
+#: src/desktop/conf.py:1158
 msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
 msgstr "LDAP の設定は部分的です。NT ドメインまたはユーザー名の検索パターンを指定する必要があります。"
 
-#: src/desktop/conf.py:805
+#: src/desktop/conf.py:1164
 msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
-msgstr "LDAP ユーザー名のパターンは、認証のための特別な <username> 置換文字列を含んでいる必要があります。"
+msgstr "LDAP ユーザー名パターンには、認証のために特殊な <username> 置換文字列を含める必要があります。"
 
-#: src/desktop/conf.py:832
+#: src/desktop/conf.py:1192
+msgid "We recommend MySQL InnoDB engine over\n"
+"                                                        MyISAM which does not support transactions."
+msgstr "MySQL InnoDB エンジンをお勧めします\n"
+"                                                        トランザクションをサポートしない MyISAM です。"
+
+#: src/desktop/conf.py:1196
 msgid "All tables in the database must be of the same\n"
 "                                                        storage engine type (preferably InnoDB)."
 msgstr "データベース内のすべてのテーブルは同じストレージエンジンタイプ（可能な場合は InnoDB）である必要があります。"
 
-#: src/desktop/conf.py:850
-msgid "Secret key should be configured as a random string."
-msgstr "秘密鍵はランダムな文字列として設定する必要があります。"
+#: src/desktop/conf.py:1201
+msgid "SQLite is only recommended for development environments. It might cause the \"Database is locked\" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended."
+msgstr "SQLite は、開発環境に限定して推奨されています。「データベースがロックされました」エラーを引き起こす可能性があります。MySQL、Oracle、または PostgreSQL に移行することを強くお勧めします。"
 
-#: src/desktop/conf.py:856
+#: src/desktop/conf.py:1216
+msgid "Secret key should be configured as a random string. All sessions will be lost on restart"
+msgstr "秘密鍵はランダムな文字列として設定する必要があります。再起動時にすべてのセッションが失われます"
+
+#: src/desktop/conf.py:1222
 msgid "SSL private key file should be set to enable HTTPS."
-msgstr "SSL 秘密鍵ファイルは HTTPS を有効化するように設定する必要があります。"
+msgstr "HTTPS を有効化するには、SSL 秘密鍵ファイルを設定する必要があります。"
 
-#: src/desktop/conf.py:862
+#: src/desktop/conf.py:1228
 msgid "Encoding not supported."
 msgstr "サポートされていないエンコードです。"
 
-#: src/desktop/conf.py:871
+#: src/desktop/conf.py:1237
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "keytab には 0600 のパーミッションが必要です（%o を持つこと）。"
 
-#: src/desktop/decorators.py:40
+#: src/desktop/decorators.py:46
 #, python-format
 msgid "Permission denied (%(action)s/%(app)s)."
 msgstr "パーミッションが拒否されました（%(action)s/%(app)s）。"
 
-#: src/desktop/middleware.py:123
+#: src/desktop/decorators.py:55
+msgid "You must be a superuser to perform this operation."
+msgstr "この操作を実行するには、スーパーユーザーであることが必要です。"
+
+#: src/desktop/decorators.py:75
 #, python-format
-msgid "Cannot find HDFS called \"%(fs_ref)s\"."
-msgstr "\"%(fs_ref)s\"という HDFS が見つかりません。"
+msgid "Job %(id)s does not exist"
+msgstr "ジョブ %(id)s が存在しません"
 
 #: src/desktop/middleware.py:231
 #, python-format
@@ -555,100 +767,197 @@ msgstr "AppSpecificMiddleware モジュール \"%(module)s\" には、実行不�
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "%(app_name)s アプリケーションにアクセスするパーミッションがありません。"
 
-#: src/desktop/middleware.py:635
+#: src/desktop/middleware.py:649
 #, python-format
 msgid "Redirect to %s is not allowed."
 msgstr "%s にはリダイレクトできません。"
 
-#: src/desktop/models.py:69 src/desktop/models.py:102
+#: src/desktop/models.py:124
+msgid "App that this configuration belongs to."
+msgstr "この設定の制御が及ぶアプリ。"
+
+#: src/desktop/models.py:125
+msgid "JSON-formatted default properties values."
+msgstr "JSON 形式のデフォルトのプロパティ値です。"
+
+#: src/desktop/models.py:176 src/desktop/models.py:204
 #, python-format
 msgid "Can't add %s: it is a reserved tag."
 msgstr "%s を追加できません：予約済みのタグです。"
 
-#: src/desktop/models.py:114 src/desktop/models.py:125
+#: src/desktop/models.py:217 src/desktop/models.py:227
 #, python-format
 msgid "Can't remove %s: it is a reserved tag."
 msgstr "%s を削除できません：予約済みのタグです。"
 
-#: src/desktop/models.py:231
+#: src/desktop/models.py:341
 #, python-format
 msgid "Permission denied. %(username)s does not have the permissions required to access document %(id)s"
-msgstr "パーミッションが拒否されました。%(username)s には、ドキュメント %(id)s へのアクセスに必要なパーミッションがありません"
+msgstr "パーミッションが拒否されました。%(username)s はドキュメント %(id)s へのアクセスに必要なパーミッションを持っていません"
 
-#: src/desktop/models.py:236
+#: src/desktop/models.py:346
 #, python-format
 msgid "Document %(id)s does not exist"
-msgstr "ドキュメント %(id)s は存在しません"
+msgstr "ドキュメント %(id)s が存在しません"
 
-#: src/desktop/models.py:353 src/desktop/models.py:621
+#: src/desktop/models.py:573 src/desktop/models.py:1020
+#: src/desktop/templates/assist.mako:599
+#: src/desktop/templates/file_browser.mako:589
 msgid "Owner"
 msgstr "所有者"
 
-#: src/desktop/models.py:353
+#: src/desktop/models.py:573
 msgid "User who can own the job."
 msgstr "ジョブを所有できるユーザーです。"
 
-#: src/desktop/models.py:357
+#: src/desktop/models.py:577
 msgid "Last modified"
 msgstr "前回の変更"
 
-#: src/desktop/models.py:358
+#: src/desktop/models.py:578
 msgid "Schema version"
 msgstr "スキーマバージョン"
 
-#: src/desktop/models.py:423
-#, python-format
-msgid "Only superusers and %s are allowed to read this document."
-msgstr "スーパーユーザーと %s のみが、このドキュメントを読み取ることができます。"
+#: src/desktop/models.py:645 src/desktop/models.py:651
+#: src/desktop/models.py:1228 src/desktop/models.py:1239
+msgid "Document does not exist or you don't have the permission to access it."
+msgstr "ドキュメントが存在しないか、ダッシュボードにアクセスするパーミッションがありません。"
 
-#: src/desktop/models.py:429
-#, python-format
-msgid "Only superusers and %s are allowed to write this document."
-msgstr "スーパーユーザーと %s のみが、このドキュメントを変更できます。"
+#: src/desktop/models.py:677
+msgid "Document copy method requires a content_object argument."
+msgstr "ドキュメントコピーメソッドには、content_object argument が必要です。"
 
-#: src/desktop/models.py:524
+#: src/desktop/models.py:770
 #, python-format
 msgid "Only %s permissions are supported, not %s."
 msgstr "%s パーミッションのみがサポートされています。%s はサポートされていません。"
 
-#: src/desktop/models.py:621
+#: src/desktop/models.py:943
+#, python-format
+msgid "Document with UUID %s not found."
+msgstr "UUID %s のドキュメントが見つかりません。"
+
+#: src/desktop/models.py:976
+#, python-format
+msgid "Requested invalid path for user %s: %s"
+msgstr "ユーザー %s：%s の無効なパスを要求しました"
+
+#: src/desktop/models.py:978
+#, python-format
+msgid "Duplicate documents found for user %s at path: %s"
+msgstr "パス %s でユーザー %s に対して重複ドキュメントが見つかりました"
+
+#: src/desktop/models.py:1020
 msgid "Creator."
 msgstr "作成者。"
 
-#: src/desktop/models.py:625
+#: src/desktop/models.py:1024
 msgid "Type of document, e.g. Hive query, Oozie workflow, Search Dashboard..."
 msgstr "ドキュメントのタイプ（Hive クエリ、Oozie Workflow、検索ダッシュボードなど）"
 
-#: src/desktop/models.py:630
+#: src/desktop/models.py:1028
+msgid "Searchable text for the document."
+msgstr "ドキュメントの検索可能なテキストです。"
 
+#: src/desktop/models.py:1031
 msgid "Time last modified"
-msgstr "前回の変更"
+msgstr "最終変更時刻"
 
-#: src/desktop/models.py:631
-
+#: src/desktop/models.py:1032
 msgid "Document version"
-msgstr "ドキュメントのバージョン"
+msgstr "ドキュメントバージョン"
 
-#: src/desktop/views.py:82 src/desktop/views.py:97 src/desktop/views.py:207
-#: src/desktop/views.py:234 src/desktop/views.py:249 src/desktop/views.py:451
+#: src/desktop/models.py:1034
+msgid "If managed under the cover by Hue and never by the user"
+msgstr "ユーザーではなく、Hue の制御下で管理されている場合"
+
+#: src/desktop/models.py:1183
+#, python-format
+msgid "Document %s contains an invalid character."
+msgstr "ドキュメント %s に無効な文字が含まれています。"
+
+#: src/desktop/models.py:1188
+#, python-format
+msgid "Cannot create or modify directory with name: %s"
+msgstr "名前 %s でディレクトリを作成または変更できません"
+
+#: src/desktop/models.py:1192
+#, python-format
+msgid "Cannot save document %s under parent directory %s due to circular dependency"
+msgstr "循環依存のために、親ディレクトリ %s の下にドキュメント %s を保存できません"
+
+#: src/desktop/models.py:1205
+#, python-format
+msgid "Target with UUID %s is not a directory"
+msgstr "UUID %s のターゲットは、ディレクトリではありません"
+
+#: src/desktop/models.py:1263
+#, python-format
+msgid "Invalid permission type: %s"
+msgstr "無効なパーミッションタイプ：%s"
+
+#: src/desktop/settings.py:84
+msgid "German"
+msgstr "ドイツ"
+
+#: src/desktop/settings.py:85
+msgid "English"
+msgstr "英語"
+
+#: src/desktop/settings.py:86
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: src/desktop/settings.py:87
+msgid "French"
+msgstr "フランス語"
+
+#: src/desktop/settings.py:88
+msgid "Japanese"
+msgstr "日本語"
+
+#: src/desktop/settings.py:89
+msgid "Korean"
+msgstr "韓国語"
+
+#: src/desktop/settings.py:90
+msgid "Portuguese"
+msgstr "ポルトガル語"
+
+#: src/desktop/settings.py:91
+msgid "Brazilian Portuguese"
+msgstr "ポルトガル語（ブラジル）"
+
+#: src/desktop/settings.py:92
+msgid "Simplified Chinese"
+msgstr "簡体字中国語"
+
+#: src/desktop/settings.py:469
+#, python-format
+msgid "SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s"
+msgstr "REQUESTS_CA_BUNDLE で指定された SSL 証明書が存在していません：%s"
+
+#: src/desktop/views.py:103 src/desktop/views.py:119 src/desktop/views.py:229
+#: src/desktop/views.py:248 src/desktop/views.py:259 src/desktop/views.py:503
+#: src/desktop/views.py:538 src/desktop/views.py:548
 msgid "You must be a superuser."
 msgstr "スーパーユーザーであることが必要です。"
 
-#: src/desktop/views.py:89
+#: src/desktop/views.py:111
 msgid "No logs found!"
 msgstr "ログが見つかりません。"
 
-#: src/desktop/views.py:130
+#: src/desktop/views.py:152
 msgid "No logs found."
 msgstr "ログが見つかりません。"
 
-#: src/desktop/views.py:252
+#: src/desktop/views.py:262
 msgid "You must enable the memory profiler via the memory_profiler config in the hue.ini."
 msgstr "hue.ini で memory_profiler コンフィグを使用してメモリプロファイラを有効にする必要があります。"
 
 #: src/desktop/auth/forms.py:44
-msgid "Invalid username or password."
-msgstr "無効なユーザー名またはパスワードです。"
+msgid "Invalid username or password"
+msgstr "無効なユーザー名またはパスワード"
 
 #: src/desktop/auth/forms.py:45
 msgid "Account deactivated. Please contact an administrator."
@@ -658,83 +967,128 @@ msgstr "アカウントが非アクティブ化されました。管理者に連
 msgid "Username"
 msgstr "ユーザー名"
 
-#: src/desktop/auth/forms.py:49 src/desktop/auth/forms.py:115
+#: src/desktop/auth/forms.py:49 src/desktop/auth/forms.py:118
 msgid "Password"
 msgstr "パスワード"
 
-#: src/desktop/auth/forms.py:71
+#: src/desktop/auth/forms.py:74
 #, python-format
 msgid "Account deactivated. Please contact an <a href=\"mailto:%s\">administrator</a>."
 msgstr "アカウントが非アクティブ化されました。<a href=\"mailto:%s\">管理者</a>に連絡してください。"
 
-#: src/desktop/auth/views.py:118 src/desktop/auth/views.py:119
+#: src/desktop/auth/views.py:132 src/desktop/auth/views.py:133
 msgid "Could not create home directory."
 msgstr "ホームディレクトリを作成できませんでした。"
 
-#: src/desktop/auth/views.py:188 src/desktop/auth/views.py:205
+#: src/desktop/auth/views.py:232 src/desktop/auth/views.py:249
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "OAuth プロバイダーからの無効な応答：%s"
 
-#: src/desktop/lib/django_util.py:400
+#: src/desktop/configuration/api.py:79 src/desktop/configuration/api.py:125
+#, python-format
+msgid "%s method is not supported"
+msgstr "%s メソッドはサポートされていません"
+
+#: src/desktop/configuration/api.py:91
+msgid "app_configuration_for_user requires app and user_id"
+msgstr "app_configuration_for_user には app と user_id が必要です"
+
+#: src/desktop/configuration/api.py:96
+#, python-format
+msgid "Could not find user with User ID: %s"
+msgstr "次のユーザー ID でユーザーが見つかりませんでした：%s"
+
+#: src/desktop/configuration/api.py:110
+msgid "app_configuration_for_user requires app, user_id, and properties"
+msgstr "app_configuration_for_user には、app、user_id、および properties が必要です"
+
+#: src/desktop/configuration/api.py:115
+#, python-format
+msgid "Could not find user with ID: %s"
+msgstr "ユーザー ID %s でユーザーが見つかりませんでした"
+
+#: src/desktop/configuration/api.py:136
+msgid "delete_default_configuration requires id of configuration."
+msgstr "delete_default_configuration には設定の ID が必要です。"
+
+#: src/desktop/configuration/api.py:143
+#, python-format
+msgid "Could not find configuration with ID: %d"
+msgstr "ID %d で設定が見つかりませんでした"
+
+#: src/desktop/configuration/api.py:147
+msgid "Successfully deleted the default configuration."
+msgstr "デフォルトの設定を正常に削除しました。"
+
+#: src/desktop/configuration/api.py:223
+#, python-format
+msgid "Could not find one or more groups with IDs: %s"
+msgstr "ID %s で 1 つ以上のグループが見つかりませんでした"
+
+#: src/desktop/configuration/api.py:230
+msgid "_save_configuration requires app, properties, and is_default, groups or user_id"
+msgstr "_save_configuration には app、properties、is_default、groups、または user_id が必要です"
+
+#: src/desktop/lib/django_util.py:404
 msgid "year"
 msgid_plural "years"
 msgstr[0] "年"
 
-#: src/desktop/lib/django_util.py:401
+#: src/desktop/lib/django_util.py:405
 msgid "month"
 msgid_plural "months"
 msgstr[0] "月"
 
-#: src/desktop/lib/django_util.py:402
+#: src/desktop/lib/django_util.py:406
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "週"
 
-#: src/desktop/lib/django_util.py:403
+#: src/desktop/lib/django_util.py:407
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
 
-#: src/desktop/lib/django_util.py:404
+#: src/desktop/lib/django_util.py:408
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "時"
 
-#: src/desktop/lib/django_util.py:405
+#: src/desktop/lib/django_util.py:409
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "分"
 
-#: src/desktop/lib/django_util.py:406
+#: src/desktop/lib/django_util.py:410
 msgid "second"
 msgid_plural "seconds"
 msgstr[0] "秒"
 
-#: src/desktop/lib/django_util.py:427
+#: src/desktop/lib/django_util.py:431
 msgid "s"
 msgstr "s"
 
-#: src/desktop/lib/django_util.py:429
+#: src/desktop/lib/django_util.py:433
 msgid "seconds"
 msgstr "秒"
 
-#: src/desktop/lib/django_util.py:435
+#: src/desktop/lib/django_util.py:439
 #, python-format
 msgid "%(number)d%(type)s"
 msgstr "%(number)d %(type)s"
 
-#: src/desktop/lib/django_util.py:437
+#: src/desktop/lib/django_util.py:441
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: src/desktop/lib/django_util.py:444
+#: src/desktop/lib/django_util.py:448
 #, python-format
 msgid "%(separator)s %(number)d%(type)s"
 msgstr "%(separator)s %(number)d 個の%(type)s"
 
-#: src/desktop/lib/django_util.py:446
+#: src/desktop/lib/django_util.py:450
 #, python-format
 msgid "%(separator)s %(number)d %(type)s"
 msgstr "%(separator)s %(number)d 個の%(type)s"
@@ -762,8 +1116,8 @@ msgstr "設定をダンプしています..."
 
 #: src/desktop/management/commands/config_dump.py:60
 #: src/desktop/management/commands/config_dump.py:70
-#: src/desktop/templates/dump_config.mako:143
-#: src/desktop/templates/dump_config.mako:153
+#: src/desktop/templates/dump_config.mako:129
+#: src/desktop/templates/dump_config.mako:144
 msgid "No help available."
 msgstr "ヘルプがありません。"
 
@@ -773,7 +1127,7 @@ msgstr "mapping ファイルを使用して Hue の設定をアップグレー�
 
 #: src/desktop/management/commands/config_upgrade.py:41
 msgid "Location of the mapping file."
-msgstr "mapping ファイルの保存場所です。"
+msgstr "mapping ファイルの場所です。"
 
 #: src/desktop/management/commands/config_upgrade.py:49
 #, python-format
@@ -808,7 +1162,7 @@ msgstr "App テンプレートディレクトリがありません：%(template)
 #: src/desktop/management/commands/create_proxy_app.py:54
 #, python-format
 msgid "The template path, %(path)r, does not exist."
-msgstr "テンプレートパス %(path)r は存在しません。"
+msgstr "テンプレートパス %(path)r が存在しません。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #: src/desktop/management/commands/create_proxy_app.py:57
@@ -829,21 +1183,28 @@ msgstr "予期される引数：app_name app_web_url [app_dir]"
 msgid "Created fs in: %(dir)s"
 msgstr "%(dir)s に fs を作成しました"
 
-#: src/desktop/management/commands/runcherrypyserver.py:48
-msgid "CherryPy Server for Desktop."
-msgstr "CherryPy Server for Desktop。"
+#: src/desktop/management/commands/create_user_directories.py:43
+msgid "Creates home and Trash directories for users as needed, or specific user if username is provided."
+msgstr "複数のユーザーのために、またユーザー名が指定されている場合は、特定のユーザーのために、ホームとゴミ箱のディレクトリを必要に応じて作成します。"
 
-#: src/desktop/management/commands/runcherrypyserver.py:110
+#: src/desktop/management/commands/create_user_directories.py:46
+msgid "Username of user to create directories for."
+msgstr "ディレクトリを作成するユーザーのユーザー名です。"
+
+#: src/desktop/management/commands/runcherrypyserver.py:52
+msgid "CherryPy Server for Desktop."
+msgstr "Desktop 向けの CherryPy Server です。"
+
+#: src/desktop/management/commands/runcherrypyserver.py:121
 #, python-format
-msgid "starting server with options %(options)s"
-msgstr "%(options)s オプションでサーバーを起動"
+msgid "starting server with options:"
+msgstr "次のオプションでサーバーを起動中："
 
 #: src/desktop/management/commands/runcpserver.py:33
 msgid "Web server for Hue."
 msgstr "Hue の Web サーバーです。"
 
 #: src/desktop/management/commands/runpylint.py:28
-
 msgid "\n"
 "  Runs pylint on desktop and app code.\n"
 "\n"
@@ -859,88 +1220,124 @@ msgid "\n"
 "  "
 msgstr "\n"
 "  デスクトップおよびアプリコードで pylint を実行します。\n"
-" \n"
-"   引数を指定しなかった場合、および \"all\" を指定した場合、インストールされた\n"
-"   すべてのアプリケーションで pylint が実行されます。それ以外の場合は、実行\n"
-"   するモジュール、および pylint への他のパラメータを指定します。pylint の引数\n"
-"   セクションの前に \"--\" を付けると、Django の manage.py はその引数を伝えます。\n"
-" \n"
-"   例：\n"
-"     python core/manage.py runpylint all -- -f parseable\n"
-"     python core/manage.py runpylint filebrowser\n"
-"     python core/manage.py runpylint\n"
+"\n"
+"  引数がない場合、または \"all\" である場合、インストール済みの全アプリで\n"
+"  pylint が実行されます。それ以外の場合、実行するモジュールと pylint の\n"
+"  その他のパラメーターを指定します。Django の manage.py で一緒に渡すため、\n"
+"  \"--\" に続けて pylint 引数セクションを指定できることに注意してください。\n"
+"\n"
+"  例：\n"
+"    python core/manage.py runpylint all -- -f parseable\n"
+"    python core/manage.py runpylint filebrowser\n"
+"    python core/manage.py runpylint\n"
 "  "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
 msgid "Cannot find pylint at '%(path)s'. Please install pylint first."
-msgstr "'%(path)s' に pylint が見つかりません。pylint をインストールしてください。"
+msgstr "'%(path)s' に pylint が見つかりません。最初に pylint をインストールしてください。"
+
+#: src/desktop/templates/403.mako:21
+msgid "403 - Access forbidden"
+msgstr "403 - アクセス禁止"
+
+#: src/desktop/templates/403.mako:33
+msgid "Access forbidden."
+msgstr "アクセス禁止です。"
+
+#: src/desktop/templates/403.mako:35
+#, python-format
+msgid "Sorry, you don't have permissions to access the page, or your session has expired."
+msgstr "申し訳ありません。ページにアクセスするパーミッションがないか、セッションが期限切れになりました。"
+
+#: src/desktop/templates/403.mako:37 src/desktop/templates/404.mako:36
+msgid "Go to My documents"
+msgstr "［マイドキュメント］に移動"
+
+#: src/desktop/templates/403_csrf.mako:21
+msgid "403 - CSRF error"
+msgstr "403 - CSRF エラー"
+
+#: src/desktop/templates/403_csrf.mako:33
+msgid "CSRF error."
+msgstr "CSRF エラーです。"
+
+#: src/desktop/templates/403_csrf.mako:35
+msgid "Sorry, your session is invalid or has expired. Please go back, refresh the page, and try your submission again."
+msgstr "申し訳ありません。セッションが無効であるか、期限切れになっています。戻ってページを更新し、サブミッションを再試行しください。"
+
+#: src/desktop/templates/403_csrf.mako:37
+#: src/desktop/templates/popup_error.mako:81
+msgid "Go back"
+msgstr "戻る"
 
 #: src/desktop/templates/404.mako:20
-msgid "Not Found"
-msgstr "見つかりません"
+msgid "404 - Page not found"
+msgstr "404 - ページが見つかりません"
 
-#: src/desktop/templates/404.mako:26
+#: src/desktop/templates/404.mako:32
 msgid "Page not found."
 msgstr "ページが見つかりません。"
 
-#: src/desktop/templates/404.mako:27
+#: src/desktop/templates/404.mako:34
 msgid "We're sorry, but the requested page could not be found:"
-msgstr "申し訳ありませんが、要求されたページが見つかりませんでした。"
+msgstr "申し訳ありません。要求されたページが見つかりませんでした。"
 
-#: src/desktop/templates/500.mako:29
-msgid "Server Error (500)"
-msgstr "サーバーエラー（500）"
+#: src/desktop/templates/500.mako:23
+msgid "500 - Server error"
+msgstr "500 - サーバーエラー"
 
-#: src/desktop/templates/500.mako:30
+#: src/desktop/templates/500.mako:42
+msgid "Server error."
+msgstr "サーバーエラーです。"
+
+#: src/desktop/templates/500.mako:44
 msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
-msgstr "申し訳ありません。エラーが発生しました。管理者に電子メールが送信されました。お待たせしました。"
+msgstr "申し訳ありません。エラーが発生しました。管理者に電子メールが送信されました。ご協力いただき、ありがとうございます。"
 
-#: src/desktop/templates/500.mako:33
+#: src/desktop/templates/500.mako:48
 msgid "See the stacktrace"
-msgstr "スタックトレースを参照してください"
+msgstr "stacktrace を参照してください"
 
-#: src/desktop/templates/500.mako:33 src/desktop/templates/popup_error.mako:44
-msgid "More Info"
-msgstr "詳細情報"
+#: src/desktop/templates/500.mako:48
+msgid "More info..."
+msgstr "詳細情報..."
 
-#: src/desktop/templates/500.mako:36 src/desktop/templates/500.mako:62
+#: src/desktop/templates/500.mako:50 src/desktop/templates/500.mako:73
 msgid "View server logs"
-msgstr "サーバーログの表示"
+msgstr "サーバーログを表示"
 
-#: src/desktop/templates/500.mako:36 src/desktop/templates/500.mako:62
-#: src/desktop/templates/popup_error.mako:47
-#: src/desktop/templates/popup_error.mako:73
-msgid "View Logs"
-msgstr "ログの表示"
+#: src/desktop/templates/500.mako:50 src/desktop/templates/500.mako:73
+msgid "View logs"
+msgstr "ログを表示"
 
-#: src/desktop/templates/500.mako:44 src/desktop/templates/popup_error.mako:55
+#: src/desktop/templates/500.mako:55 src/desktop/templates/popup_error.mako:55
 msgid "File Name"
 msgstr "ファイル名"
 
-#: src/desktop/templates/500.mako:45 src/desktop/templates/popup_error.mako:56
+#: src/desktop/templates/500.mako:56 src/desktop/templates/popup_error.mako:56
 msgid "Line Number"
 msgstr "行番号"
 
-#: src/desktop/templates/500.mako:46 src/desktop/templates/popup_error.mako:57
+#: src/desktop/templates/500.mako:57 src/desktop/templates/popup_error.mako:57
 msgid "Function Name"
 msgstr "関数名"
 
-#: src/desktop/templates/about_layout.mako:39
-#: src/desktop/templates/common_header.mako:355
+#: src/desktop/templates/about_layout.mako:36
+#: src/desktop/templates/common_header.mako:506
 msgid "About Hue"
 msgstr "Hue のバージョン情報"
 
-#: src/desktop/templates/about_layout.mako:43
+#: src/desktop/templates/about_layout.mako:40
 msgid "Quick start"
 msgstr "クイックスタート"
 
-#: src/desktop/templates/about_layout.mako:44
+#: src/desktop/templates/about_layout.mako:41
 #: src/desktop/templates/dump_config.mako:25
 msgid "Configuration"
 msgstr "設定"
 
-#: src/desktop/templates/about_layout.mako:45
+#: src/desktop/templates/about_layout.mako:42
 #: src/desktop/templates/logs.mako:27
 msgid "Server Logs"
 msgstr "サーバーログ"
@@ -949,356 +1346,631 @@ msgstr "サーバーログ"
 msgid "Search..."
 msgstr "検索..."
 
-#: src/desktop/templates/check_config.mako:20
-#: src/desktop/templates/dump_config.mako:47
-msgid "Configuration files located in"
-msgstr "設定ファイルの保存場所："
+#: src/desktop/templates/assist.mako:393
+msgid "The database has no tables"
+msgstr "データベースにテーブルがありません"
 
-#: src/desktop/templates/check_config.mako:24
+#: src/desktop/templates/assist.mako:401
+msgid "The table has no columns"
+msgstr "テーブルに列がありません"
+
+#: src/desktop/templates/assist.mako:418 src/desktop/templates/assist.mako:426
+#: src/desktop/templates/file_browser.mako:621
+msgid "Open"
+msgstr "開く"
+
+#: src/desktop/templates/assist.mako:437 src/desktop/templates/assist.mako:740
+msgid "No results found"
+msgstr "結果が見つかりません"
+
+#: src/desktop/templates/assist.mako:466
+msgid "Error loading columns."
+msgstr "列のロード中にエラーが発生しました。"
+
+#: src/desktop/templates/assist.mako:516
+msgid "Size"
+msgstr "サイズ"
+
+#: src/desktop/templates/assist.mako:518
+msgid "User"
+msgstr "ユーザー"
+
+#: src/desktop/templates/assist.mako:519
+#: src/desktop/templates/common_share.mako:35
+#: src/desktop/templates/common_share.mako:46
+#: src/desktop/templates/common_share2.mako:35
+#: src/desktop/templates/common_share2.mako:46
+#: src/desktop/templates/file_browser.mako:366
+#: src/desktop/templates/file_browser.mako:381
+msgid "Group"
+msgstr "グループ"
+
+#: src/desktop/templates/assist.mako:521
+msgid "Permissions"
+msgstr "パーミッション"
+
+#: src/desktop/templates/assist.mako:522
+msgid "Date"
+msgstr "日付"
+
+#: src/desktop/templates/assist.mako:533
+msgid "Manual refresh"
+msgstr "手動更新"
+
+#: src/desktop/templates/assist.mako:563 src/desktop/templates/assist.mako:634
+msgid "Details"
+msgstr "詳細"
+
+#: src/desktop/templates/assist.mako:580 src/desktop/templates/assist.mako:650
+msgid "Empty directory"
+msgstr "空のディレクトリ"
+
+#: src/desktop/templates/assist.mako:586 src/desktop/templates/assist.mako:657
+msgid "Error loading contents."
+msgstr "コンテンツのロード中にエラーが発生しました。"
+
+#: src/desktop/templates/assist.mako:597 src/desktop/templates/home.mako:191
+msgid "Description"
+msgstr "説明"
+
+#: src/desktop/templates/assist.mako:598
+msgid "Modified"
+msgstr "変更済み"
+
+#: src/desktop/templates/assist.mako:674
+msgid "Sources"
+msgstr "ソース"
+
+#: src/desktop/templates/assist.mako:693
+msgid "Clear cache"
+msgstr "キャッシュをクリア"
+
+#: src/desktop/templates/assist.mako:697
+msgid "Perform incremental metadata update"
+msgstr "増分メタデータ更新を実行"
+
+#: src/desktop/templates/assist.mako:699
+msgid "This will sync missing tables in Hive."
+msgstr "この処理は、Hive に不足しているテーブルを同期します。"
+
+#: src/desktop/templates/assist.mako:702
+msgid "Invalidate all metadata and rebuild index"
+msgstr "すべてのメタデータを無効化して、インデックスを再作成します"
+
+#: src/desktop/templates/assist.mako:704
+msgid "WARNING: This can be both resource and time-intensive."
+msgstr "警告：この処理では、リソースと時間の両方がかなり必要になる可能性があります。"
+
+#: src/desktop/templates/assist.mako:705
+msgid "Refresh"
+msgstr "更新"
+
+#: src/desktop/templates/assist.mako:712 src/desktop/templates/assist.mako:721
+#: src/desktop/templates/common_header.mako:652
+#: src/desktop/templates/common_header.mako:657
+#: src/desktop/templates/config_ko_components.mako:119
+#: src/desktop/templates/file_browser.mako:529
+msgid "Search"
+msgstr "検索"
+
+#: src/desktop/templates/assist.mako:714 src/desktop/templates/assist.mako:717
+#: src/desktop/templates/assist.mako:722
+msgid "Manually refresh the table list"
+msgstr "テーブルリストを手動で更新"
+
+#: src/desktop/templates/assist.mako:730
+msgid "Databases"
+msgstr "データベース"
+
+#: src/desktop/templates/assist.mako:735
+msgid "Database name..."
+msgstr "データベース名..."
+
+#: src/desktop/templates/assist.mako:754
+msgid "Error loading databases."
+msgstr "データベースのロード中にエラーが発生しました。"
+
+#: src/desktop/templates/assist.mako:757
+msgid "No databases found."
+msgstr "データベースが見つかりません。"
+
+#: src/desktop/templates/assist.mako:764
+msgid "Tables"
+msgstr "テーブル"
+
+#: src/desktop/templates/assist.mako:770
+msgid "Table name..."
+msgstr "テーブル名..."
+
+#: src/desktop/templates/assist.mako:779
+msgid "Error loading tables."
+msgstr "テーブルのロード中にエラーが発生しました。"
+
+#: src/desktop/templates/assist.mako:786
+msgid "Hide"
+msgstr "非表示"
+
+#: src/desktop/templates/assist.mako:786
+msgid "Show"
+msgstr "表示"
+
+#: src/desktop/templates/assist.mako:796
+msgid "Search everywhere..."
+msgstr "すべての場所を検索..."
+
+#: src/desktop/templates/assist.mako:815
+msgid "Select your assist contents above."
+msgstr "上のアシストコンテンツを選択します。"
+
+#: src/desktop/templates/assist.mako:1172
+msgid "There was a problem loading the databases"
+msgstr "データベースのロード中に問題が発生しました"
+
+#: src/desktop/templates/assist.mako:1173
+msgid "There was a problem loading the table preview."
+msgstr "テーブルプレビューをロード中に問題が発生しました。"
+
+#: src/desktop/templates/assist.mako:1175
+#: src/desktop/templates/file_browser.mako:536
+#: src/desktop/templates/file_browser.mako:668
+#: src/desktop/templates/home.mako:125
+msgid "Hive Query"
+msgstr "Hive クエリ"
+
+#: src/desktop/templates/assist.mako:1176
+msgid "Query"
+msgstr "クエリ"
+
+#: src/desktop/templates/assist.mako:1177
+#: src/desktop/templates/common_header.mako:562
+#: src/desktop/templates/common_header.mako:566
+#: src/desktop/templates/common_header.mako:570
+#: src/desktop/templates/file_browser.mako:548
+#: src/desktop/templates/file_browser.mako:664
+msgid "Notebook"
+msgstr "ノートブック"
+
+#: src/desktop/templates/assist.mako:1253
+msgid "SQL"
+msgstr "SQL"
+
+#: src/desktop/templates/assist.mako:1267
+msgid "HDFS"
+msgstr "HDFS"
+
+#: src/desktop/templates/assist.mako:1284
+msgid "Documents"
+msgstr "ドキュメント"
+
+#: src/desktop/templates/check_config.mako:19
+#: src/desktop/templates/dump_config.mako:40
+msgid "Configuration files located in"
+msgstr "設定ファイルが見つかった場所"
+
+#: src/desktop/templates/check_config.mako:23
 msgid "Potential misconfiguration detected. Fix and restart Hue."
 msgstr "誤設定があることが考えられます。修正後、Hue を再起動してください。"
 
-#: src/desktop/templates/check_config.mako:41
+#: src/desktop/templates/check_config.mako:36
 msgid "Current value:"
 msgstr "現在の値："
 
-#: src/desktop/templates/check_config.mako:49
+#: src/desktop/templates/check_config.mako:44
 msgid "All OK. Configuration check passed."
-msgstr "設定チェックで問題は見つかりませんでした。"
+msgstr "すべて OK です。設定の確認が正常に終了しました。"
 
-#: src/desktop/templates/common_dashboard.mako:42
+#: src/desktop/templates/common_dashboard.mako:47
 msgid "LAYOUT"
 msgstr "レイアウト"
 
-#: src/desktop/templates/common_dashboard.mako:63
+#: src/desktop/templates/common_dashboard.mako:68
 msgid "RESULTS"
-msgstr "RESULTS"
+msgstr "結果"
 
-#: src/desktop/templates/common_dashboard.mako:72
+#: src/desktop/templates/common_dashboard.mako:77
 msgid "WIDGETS"
 msgstr "ウィジェット"
 
-#: src/desktop/templates/common_dashboard.mako:84
+#: src/desktop/templates/common_dashboard.mako:89
 msgid "Click on the pencil to get started with your dashboard!"
 msgstr "鉛筆をクリックしてダッシュボードを開始します。"
 
-#: src/desktop/templates/common_dashboard.mako:89
+#: src/desktop/templates/common_dashboard.mako:94
 msgid "Pick an index and Click on a layout to start your dashboard!"
-msgstr "インデックスを選択し、レイアウトをクリックして、ダッシュボードを開始してください。"
+msgstr "インデックスを選択して、レイアウトをクリックしてダッシュボードを開始します。"
 
-#: src/desktop/templates/common_dashboard.mako:138
+#: src/desktop/templates/common_dashboard.mako:104
+msgid "Two columns layout"
+msgstr "2 列のレイアウト"
+
+#: src/desktop/templates/common_dashboard.mako:109
+msgid "One column layout"
+msgstr "1 列のレイアウト"
+
+#: src/desktop/templates/common_dashboard.mako:120
+msgid "Grid results"
+msgstr "グリッドの結果"
+
+#: src/desktop/templates/common_dashboard.mako:136
+msgid "Reload this definition"
+msgstr "この定義を再ロード"
+
+#: src/desktop/templates/common_dashboard.mako:136
+msgid "Update the definition"
+msgstr "定義を更新"
+
+#: src/desktop/templates/common_dashboard.mako:163
 msgid "Drag any of the widgets inside your empty row"
 msgstr "いずれかのウィジェットを空の行内にドラッグ"
 
-#: src/desktop/templates/common_dashboard.mako:143
+#: src/desktop/templates/common_dashboard.mako:168
 msgid "Row"
 msgstr "行"
 
-#: src/desktop/templates/common_dashboard.mako:217
-#: src/desktop/templates/common_dashboard.mako:223
-
+#: src/desktop/templates/common_dashboard.mako:242
+#: src/desktop/templates/common_dashboard.mako:248
 msgid "Start"
 msgstr "開始"
 
-#: src/desktop/templates/common_dashboard.mako:218
-#: src/desktop/templates/common_dashboard.mako:223
-
+#: src/desktop/templates/common_dashboard.mako:243
+#: src/desktop/templates/common_dashboard.mako:248
 msgid "End"
 msgstr "終了"
 
-#: src/desktop/templates/common_dashboard.mako:219
-#: src/desktop/templates/common_dashboard.mako:223
+#: src/desktop/templates/common_dashboard.mako:244
+#: src/desktop/templates/common_dashboard.mako:248
 msgid "Interval"
 msgstr "間隔"
 
-#: src/desktop/templates/common_dashboard.mako:220
+#: src/desktop/templates/common_dashboard.mako:245
 msgid "Custom Format"
 msgstr "カスタムフォーマット"
 
-#: src/desktop/templates/common_dashboard.mako:221
+#: src/desktop/templates/common_dashboard.mako:246
 msgid "Date Pickers"
-msgstr "日付ピッカー"
+msgstr "日付の選択機能"
 
-#: src/desktop/templates/common_dashboard.mako:222
+#: src/desktop/templates/common_dashboard.mako:247
 msgid "e.g."
 msgstr "例"
 
-#: src/desktop/templates/common_dashboard.mako:223
-
+#: src/desktop/templates/common_dashboard.mako:248
 msgid "Read more..."
 msgstr "詳細を読み取り..."
 
-#: src/desktop/templates/common_header.mako:94
+#: src/desktop/templates/common_footer.mako:86
+msgid "You have signed in successfully!"
+msgstr "正常にサインインしました。"
+
+#: src/desktop/templates/common_header.mako:117
 #: src/desktop/templates/error.mako:40
 msgid "Back"
 msgstr "戻る"
 
-#: src/desktop/templates/common_header.mako:95
+#: src/desktop/templates/common_header.mako:118
 msgid "Select this folder"
-msgstr "このフォルダを選択"
+msgstr "このフォルダーを選択"
 
-#: src/desktop/templates/common_header.mako:96
-#: src/desktop/templates/common_header.mako:108
+#: src/desktop/templates/common_header.mako:119
+#: src/desktop/templates/common_header.mako:131
 msgid "Create folder"
-msgstr "フォルダを作成"
+msgstr "フォルダーを作成"
 
-#: src/desktop/templates/common_header.mako:97
-#: src/desktop/templates/common_header.mako:109
+#: src/desktop/templates/common_header.mako:120
+#: src/desktop/templates/common_header.mako:132
 msgid "Folder name"
-msgstr "フォルダ名"
+msgstr "フォルダー名"
 
-#: src/desktop/templates/common_header.mako:98
-#: src/desktop/templates/common_header.mako:110
-#: src/desktop/templates/home.mako:274 src/desktop/templates/home.mako:314
+#: src/desktop/templates/common_header.mako:121
+#: src/desktop/templates/common_header.mako:133
+#: src/desktop/templates/common_import_export.mako:38
+#: src/desktop/templates/file_browser.mako:442
+#: src/desktop/templates/file_browser.mako:465
+#: src/desktop/templates/file_browser.mako:491
+#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/desktop/templates/common_header.mako:99
+#: src/desktop/templates/common_header.mako:122
 msgid "The file has not been found"
 msgstr "ファイルが見つかりません"
 
-#: src/desktop/templates/common_header.mako:100
+#: src/desktop/templates/common_header.mako:123
 msgid "Upload a file"
 msgstr "ファイルをアップロード"
 
-#: src/desktop/templates/common_header.mako:101
+#: src/desktop/templates/common_header.mako:124
 msgid "Failed"
 msgstr "失敗しました"
 
-#: src/desktop/templates/common_header.mako:116
+#: src/desktop/templates/common_header.mako:139
 msgid "Go to column:"
 msgstr "列に移動："
 
-#: src/desktop/templates/common_header.mako:117
+#: src/desktop/templates/common_header.mako:140
 msgid "column name..."
 msgstr "列名..."
 
-#: src/desktop/templates/common_header.mako:123
+#: src/desktop/templates/common_header.mako:141
+msgid "Click to lock this row"
+msgstr "クリックしてこの行をロックします"
+
+#: src/desktop/templates/common_header.mako:142
+msgid "Click to unlock this row"
+msgstr "クリックしてこの行をロック解除します"
+
+#: src/desktop/templates/common_header.mako:148
 msgid "Available tours"
 msgstr "使用可能なツアー"
 
-#: src/desktop/templates/common_header.mako:124
+#: src/desktop/templates/common_header.mako:149
 msgid "None for this page."
 msgstr "このページにはありません。"
 
-#: src/desktop/templates/common_header.mako:125
+#: src/desktop/templates/common_header.mako:150
 msgid "Read more about it..."
 msgstr "詳細..."
 
-#: src/desktop/templates/common_header.mako:126
+#: src/desktop/templates/common_header.mako:151
 msgid "Demo tutorials"
 msgstr "デモチュートリアル"
 
-#: src/desktop/templates/common_header.mako:328
+#: src/desktop/templates/common_header.mako:430
 msgid "Manage HDFS"
 msgstr "HDFS を管理"
 
-#: src/desktop/templates/common_header.mako:328
+#: src/desktop/templates/common_header.mako:431
 msgid "File Browser"
 msgstr "File Browser"
 
-#: src/desktop/templates/common_header.mako:331
+#: src/desktop/templates/common_header.mako:436
+#: src/desktop/templates/common_header.mako:437
+msgid "File Browsers"
+msgstr "File Browser"
+
+#: src/desktop/templates/common_header.mako:441
+#: src/desktop/templates/common_header.mako:450
+msgid "HDFS Browser"
+msgstr "HDFS Browser"
+
+#: src/desktop/templates/common_header.mako:444
+#: src/desktop/templates/common_header.mako:456
+msgid "S3 Browser"
+msgstr "S3 Browser"
+
+#: src/desktop/templates/common_header.mako:463
 msgid "Manage jobs"
 msgstr "ジョブを管理"
 
-#: src/desktop/templates/common_header.mako:331
+#: src/desktop/templates/common_header.mako:463
+#: src/desktop/templates/common_header.mako:464
 msgid "Job Browser"
 msgstr "Job Browser"
 
-#: src/desktop/templates/common_header.mako:334
+#: src/desktop/templates/common_header.mako:470
 msgid "Administration"
 msgstr "管理"
 
-#: src/desktop/templates/common_header.mako:336
+#: src/desktop/templates/common_header.mako:481
+msgid "View Profile"
+msgstr "プロファイルを表示"
+
+#: src/desktop/templates/common_header.mako:483
 msgid "Edit Profile"
 msgstr "プロファイルを編集"
 
-#: src/desktop/templates/common_header.mako:338
-
+#: src/desktop/templates/common_header.mako:488
 msgid "Manage Users"
 msgstr "ユーザーを管理"
 
-#: src/desktop/templates/common_header.mako:343
+#: src/desktop/templates/common_header.mako:494
 msgid "Documentation"
 msgstr "ドキュメンテーション"
 
-#: src/desktop/templates/common_header.mako:346
+#: src/desktop/templates/common_header.mako:497
 msgid "Sign out"
 msgstr "サインアウト"
 
-#: src/desktop/templates/common_header.mako:358
-#: src/desktop/templates/home.mako:91
+#: src/desktop/templates/common_header.mako:509
+#: src/desktop/templates/file_browser.mako:504
+#: src/desktop/templates/file_browser.mako:512
+#: src/desktop/templates/home.mako:94 src/desktop/templates/home2.mako:164
 msgid "My documents"
 msgstr "マイドキュメント"
 
-#: src/desktop/templates/common_header.mako:364
-#: src/desktop/templates/home.mako:519
+#: src/desktop/templates/common_header.mako:515
+#: src/desktop/templates/home.mako:564 src/desktop/templates/home2.mako:322
 msgid "Query data"
 msgstr "クエリデータ"
 
-#: src/desktop/templates/common_header.mako:364
-msgid "Query Editors"
-msgstr "Query Editor"
-
-#: src/desktop/templates/common_header.mako:367
+#: src/desktop/templates/common_header.mako:519
+#: src/desktop/templates/common_header.mako:521
 msgid "Hive"
 msgstr "Hive"
 
-#: src/desktop/templates/common_header.mako:370
+#: src/desktop/templates/common_header.mako:526
+#: src/desktop/templates/common_header.mako:528
 msgid "Impala"
 msgstr "Impala"
 
-#: src/desktop/templates/common_header.mako:373
+#: src/desktop/templates/common_header.mako:533
+#: src/desktop/templates/common_header.mako:535
 msgid "DB Query"
 msgstr "DB クエリ"
 
-#: src/desktop/templates/common_header.mako:376
+#: src/desktop/templates/common_header.mako:540
+#: src/desktop/templates/common_header.mako:542
 msgid "Pig"
 msgstr "Pig"
 
-#: src/desktop/templates/common_header.mako:379
+#: src/desktop/templates/common_header.mako:546
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/desktop/templates/common_header.mako:382
-msgid "Spark"
-msgstr "Spark"
+#: src/desktop/templates/common_header.mako:562
+#: src/desktop/templates/common_header.mako:567
+#: src/desktop/templates/common_header.mako:571
+msgid "Notebooks"
+msgstr "ノートブック"
 
-#: src/desktop/templates/common_header.mako:394
+#: src/desktop/templates/common_header.mako:590
 msgid "Manage data"
 msgstr "データを管理"
 
-#: src/desktop/templates/common_header.mako:394
-msgid "Data Browsers"
-msgstr "Data Browser"
-
-#: src/desktop/templates/common_header.mako:397
+#: src/desktop/templates/common_header.mako:593
 msgid "Metastore Tables"
 msgstr "Metastore テーブル"
 
-#: src/desktop/templates/common_header.mako:400
+#: src/desktop/templates/common_header.mako:596
 msgid "HBase"
 msgstr "HBase"
 
-#: src/desktop/templates/common_header.mako:403
+#: src/desktop/templates/common_header.mako:599
 msgid "Sqoop Transfer"
 msgstr "Sqoop による転送"
 
-#: src/desktop/templates/common_header.mako:406
+#: src/desktop/templates/common_header.mako:602
 msgid "ZooKeeper"
 msgstr "ZooKeeper"
 
-#: src/desktop/templates/common_header.mako:415
+#: src/desktop/templates/common_header.mako:611
 msgid "Schedule with Oozie"
-msgstr "Oozie とのスケジュール"
+msgstr "Oozie でスケジュール"
 
-#: src/desktop/templates/common_header.mako:415
-#: src/desktop/templates/common_header.mako:420
-#: src/desktop/templates/common_header.mako:430
-#: src/desktop/templates/common_header.mako:439
-msgid "Workflows"
-msgstr "Workflow"
-
-#: src/desktop/templates/common_header.mako:418
-
+#: src/desktop/templates/common_header.mako:614
+#: src/desktop/templates/common_header.mako:663
 msgid "Dashboards"
 msgstr "ダッシュボード"
 
-#: src/desktop/templates/common_header.mako:421
-#: src/desktop/templates/common_header.mako:431
-#: src/desktop/templates/common_header.mako:440
+#: src/desktop/templates/common_header.mako:616
+#: src/desktop/templates/common_header.mako:627
+#: src/desktop/templates/common_header.mako:636
+msgid "Workflows"
+msgstr "Workflow"
 
+#: src/desktop/templates/common_header.mako:617
+#: src/desktop/templates/common_header.mako:628
+#: src/desktop/templates/common_header.mako:637
 msgid "Coordinators"
 msgstr "Coordinator"
 
-#: src/desktop/templates/common_header.mako:422
-#: src/desktop/templates/common_header.mako:432
-#: src/desktop/templates/common_header.mako:441
-
+#: src/desktop/templates/common_header.mako:618
+#: src/desktop/templates/common_header.mako:629
+#: src/desktop/templates/common_header.mako:638
 msgid "Bundles"
 msgstr "Bundle"
 
-#: src/desktop/templates/common_header.mako:428
-#: src/desktop/templates/common_header.mako:437
-
+#: src/desktop/templates/common_header.mako:625
+#: src/desktop/templates/common_header.mako:634
 msgid "Editors"
 msgstr "エディタ"
 
-#: src/desktop/templates/common_header.mako:453
-#: src/desktop/templates/common_header.mako:457
+#: src/desktop/templates/common_header.mako:652
+#: src/desktop/templates/common_header.mako:656
+#: src/desktop/templates/file_browser.mako:556
 msgid "Solr Search"
 msgstr "Solr 検索"
 
-#: src/desktop/templates/common_header.mako:457
-msgid "Search"
-msgstr "検索"
+#: src/desktop/templates/common_header.mako:662
+msgid "Dashboard"
+msgstr "ダッシュボード"
 
-#: src/desktop/templates/common_header.mako:464
+#: src/desktop/templates/common_header.mako:666
 msgid "Indexes"
 msgstr "インデックス"
 
-#: src/desktop/templates/common_header.mako:472
+#: src/desktop/templates/common_header.mako:684
 msgid "Hadoop Security"
 msgstr "Hadoop セキュリティ"
 
-#: src/desktop/templates/common_header.mako:472
-msgid "Security"
-msgstr "セキュリティ"
+#: src/desktop/templates/common_header.mako:687
+msgid "Hive Tables"
+msgstr "Hive テーブル"
 
-#: src/desktop/templates/common_header.mako:474
-msgid "Sentry Tables"
-msgstr "Sentry テーブル"
+#: src/desktop/templates/common_header.mako:690
+msgid "Hive Tables v2"
+msgstr "Hive テーブル v2"
 
-#: src/desktop/templates/common_header.mako:475
+#: src/desktop/templates/common_header.mako:693
+msgid "Solr Collections"
+msgstr "Solr コレクション"
+
+#: src/desktop/templates/common_header.mako:695
 msgid "File ACLs"
-msgstr "ファイルの ACL"
+msgstr "ファイル ACL"
 
-#: src/desktop/templates/common_header.mako:481
+#: src/desktop/templates/common_header.mako:701
 msgid "Other apps"
 msgstr "その他のアプリケーション"
 
-#: src/desktop/templates/common_header.mako:496
+#: src/desktop/templates/common_header.mako:717
 msgid "Feedback"
 msgstr "フィードバック"
 
+#: src/desktop/templates/common_import_export.mako:33
+#: src/desktop/templates/file_browser.mako:424
+msgid "Import Hue documents"
+msgstr "Hue ドキュメントをインポート"
+
+#: src/desktop/templates/common_import_export.mako:39
+#: src/desktop/templates/file_browser.mako:443
+msgid "Import"
+msgstr "インポート"
+
+#: src/desktop/templates/common_import_export.mako:43
+#: src/desktop/templates/file_browser.mako:429
+msgid "Select json file"
+msgstr "JSON ファイルを選択"
+
+#: src/desktop/templates/common_import_export.mako:44
+msgid "Change"
+msgstr "変更"
+
 #: src/desktop/templates/common_share.mako:24
+#: src/desktop/templates/common_share2.mako:24
 msgid "Sharing settings"
 msgstr "共有設定"
 
 #: src/desktop/templates/common_share.mako:29
 #: src/desktop/templates/common_share.mako:61
+#: src/desktop/templates/common_share2.mako:29
+#: src/desktop/templates/common_share2.mako:61
+#: src/desktop/templates/file_browser.mako:357
+#: src/desktop/templates/file_browser.mako:397
+#: src/desktop/templates/file_browser.mako:400
 msgid "Read"
 msgstr "読み取り"
 
 #: src/desktop/templates/common_share.mako:30
+#: src/desktop/templates/common_share2.mako:30
+#: src/desktop/templates/file_browser.mako:358
 msgid "The document is not shared for read."
-msgstr "ドキュメントは読み取り用に共有されていません。"
-
-#: src/desktop/templates/common_share.mako:35
-#: src/desktop/templates/common_share.mako:46
-msgid "Group"
-msgstr "グループ"
+msgstr "ドキュメントは、閲覧目的では共有されていません。"
 
 #: src/desktop/templates/common_share.mako:40
 #: src/desktop/templates/common_share.mako:62
+#: src/desktop/templates/common_share2.mako:40
+#: src/desktop/templates/common_share2.mako:62
 msgid "Read and Modify"
-msgstr "読み取りおよび変更"
+msgstr "読み取りと変更"
 
 #: src/desktop/templates/common_share.mako:41
+#: src/desktop/templates/common_share2.mako:41
 msgid "The document is not shared for read and modify."
-msgstr "ドキュメントは読み取りおよび変更用に共有されていません。"
+msgstr "ドキュメントは、閲覧および変更目的では共有されていません。"
 
 #: src/desktop/templates/common_share.mako:54
-
+#: src/desktop/templates/common_share2.mako:54
+#: src/desktop/templates/file_browser.mako:395
 msgid "Type a username or a group name"
-msgstr "ユーザー名またはグループを入力してください"
+msgstr "ユーザー名またはグループ名を入力します"
 
 #: src/desktop/templates/common_share.mako:69
+#: src/desktop/templates/common_share2.mako:69
 msgid "Done"
 msgstr "完了"
 
 #: src/desktop/templates/common_tree.mako:54
-
 msgid "Show more..."
 msgstr "さらに表示..."
 
@@ -1306,19 +1978,69 @@ msgstr "さらに表示..."
 msgid "Misconfiguration detected"
 msgstr "誤設定が見つかりました"
 
-#: src/desktop/templates/dump_config.mako:51
+#: src/desktop/templates/config_ko_components.mako:100
+msgid "Remove"
+msgstr "削除"
+
+#: src/desktop/templates/config_ko_components.mako:120
+msgid "Select all"
+msgstr "すべて選択"
+
+#: src/desktop/templates/config_ko_components.mako:347
+#: src/desktop/templates/config_ko_components.mako:455
+#: src/desktop/templates/config_ko_components.mako:460
+msgid "Key"
+msgstr "キー"
+
+#: src/desktop/templates/config_ko_components.mako:382
+msgid "Choose a file"
+msgstr "ファイルを選択"
+
+#: src/desktop/templates/config_ko_components.mako:394
+msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue"
+msgstr "ファイルへのパス。hdfs://localhost:8020/user/hue など"
+
+#: src/desktop/templates/config_ko_components.mako:462
+#: src/desktop/templates/config_ko_components.mako:542
+msgid "Value"
+msgstr "値"
+
+#: src/desktop/templates/config_ko_components.mako:535
+#: src/desktop/templates/config_ko_components.mako:540
+#: src/desktop/templates/file_browser.mako:586
+#: src/desktop/templates/home.mako:190
+msgid "Name"
+msgstr "名前"
+
+#: src/desktop/templates/config_ko_components.mako:614
+msgid "Name, e.g. foo"
+msgstr "名前。foo など"
+
+#: src/desktop/templates/config_ko_components.mako:615
+msgid "Class, e.g. org.hue.Bar"
+msgstr "クラス。org.hue.Bar など"
+
+#: src/desktop/templates/config_ko_components.mako:676
+msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
+msgstr "ファイルへのパス。hdfs://localhost:8020/user/hue/file.hue など"
+
+#: src/desktop/templates/dump_config.mako:42
+msgid "Configuration Sections and Variables"
+msgstr "設定セクションと変数"
+
+#: src/desktop/templates/dump_config.mako:65
 msgid "Installed Applications"
 msgstr "インストール済みアプリケーション"
 
-#: src/desktop/templates/dump_config.mako:68
-msgid "Configuration Sections and Variables"
-msgstr "設定のセクションと変数"
+#: src/desktop/templates/dump_config.mako:71
+msgid "This app does not have a UI"
+msgstr "このアプリには UI がありません"
 
-#: src/desktop/templates/dump_config.mako:154
+#: src/desktop/templates/dump_config.mako:146
 msgid "Default:"
 msgstr "デフォルト："
 
-#: src/desktop/templates/error.mako:29 src/desktop/templates/login.mako:242
+#: src/desktop/templates/error.mako:29
 #: src/desktop/templates/popup_error.mako:29
 msgid "Error!"
 msgstr "エラーが発生しました。"
@@ -1327,519 +2049,853 @@ msgstr "エラーが発生しました。"
 msgid "Home"
 msgstr "ホーム"
 
-#: src/desktop/templates/home.mako:21
-msgid "Welcome Home"
-msgstr "ホームへようこそ"
-
-#: src/desktop/templates/home.mako:105
-msgid "Actions"
-msgstr "アクション"
-
-#: src/desktop/templates/home.mako:107
-msgid "New document"
-msgstr "新しいドキュメント"
-
-#: src/desktop/templates/home.mako:110
-msgid "Hive Query"
-msgstr "Hive クエリ"
-
-#: src/desktop/templates/home.mako:113
-msgid "Impala Query"
-msgstr "Impala クエリ"
-
-#: src/desktop/templates/home.mako:116
-msgid "Pig Script"
-msgstr "Pig スクリプト"
-
-#: src/desktop/templates/home.mako:119
-msgid "Spark Job"
-msgstr "Spark ジョブ"
-
-#: src/desktop/templates/home.mako:123
-msgid "Oozie Scheduler"
-msgstr "Oozie スケジューラ"
-
-#: src/desktop/templates/home.mako:125
-msgid "Workflow"
-msgstr "Workflow"
-
-#: src/desktop/templates/home.mako:126
-msgid "Coordinator"
-msgstr "Coordinator"
-
-#: src/desktop/templates/home.mako:127
-msgid "Bundle"
-msgstr "Bundle"
-
-#: src/desktop/templates/home.mako:138
-msgid "My Projects"
-msgstr "マイプロジェクト"
-
-#: src/desktop/templates/home.mako:140 src/desktop/templates/home.mako:264
-msgid "Create project"
-msgstr "プロジェクトを作成"
-
-#: src/desktop/templates/home.mako:142
-msgid "Remove selected project"
-msgstr "選択したプロジェクトを削除"
-
-#: src/desktop/templates/home.mako:149
-msgid "You currently own no projects. Click here to add one now!"
-msgstr "現在所有しているプロジェクトはありません。ここをクリックして今すぐ追加できます。"
-
-#: src/desktop/templates/home.mako:153
-msgid "Shared with me"
-msgstr "自分と共有"
-
-#: src/desktop/templates/home.mako:158
-msgid "There are currently no projects shared with you."
-msgstr "現在共有しているプロジェクトはありません。"
-
-#: src/desktop/templates/home.mako:177
-msgid "Name"
-msgstr "名前"
-
-#: src/desktop/templates/home.mako:178
-msgid "Description"
-msgstr "説明"
-
-#: src/desktop/templates/home.mako:179
-msgid "Last Modified"
-msgstr "前回の変更"
-
-#: src/desktop/templates/home.mako:180
-msgid "Project"
-msgstr "プロジェクト"
-
-#: src/desktop/templates/home.mako:181
+#: src/desktop/templates/file_browser.mako:351
+#: src/desktop/templates/home.mako:194
 msgid "Sharing"
 msgstr "共有"
 
-#: src/desktop/templates/home.mako:190
-msgid "Page"
-msgstr "ページ"
+#: src/desktop/templates/file_browser.mako:372
+#: src/desktop/templates/file_browser.mako:397
+#: src/desktop/templates/file_browser.mako:401
+msgid "Modify"
+msgstr "変更"
 
-#: src/desktop/templates/home.mako:190
-msgid "of"
-msgstr "／"
+#: src/desktop/templates/file_browser.mako:373
+msgid "The document is not shared for modify."
+msgstr "ドキュメントは、変更目的では共有されていません。"
 
-#: src/desktop/templates/home.mako:194
-msgid "Previous"
-msgstr "前"
+#: src/desktop/templates/file_browser.mako:391
+msgid "There was an error loading the document."
+msgstr "ドキュメントのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/home.mako:195
-msgid "Next"
-msgstr "次"
-
-#: src/desktop/templates/home.mako:203
-msgid "There are currently no documents in this project or tag."
-msgstr "現在このプロジェクトまたはタグにはドキュメントがありません。"
-
-#: src/desktop/templates/home.mako:243
-msgid "Change project for"
-msgstr "次のプロジェクトを変更"
-
-#: src/desktop/templates/home.mako:252
-msgid "Share"
-msgstr "共有"
-
-#: src/desktop/templates/home.mako:269
-msgid "Project name"
-msgstr "プロジェクト名"
-
-#: src/desktop/templates/home.mako:275
+#: src/desktop/templates/file_browser.mako:409
+#: src/desktop/templates/home.mako:318
 msgid "Add"
 msgstr "追加"
 
-#: src/desktop/templates/home.mako:283
-msgid "Confirm Delete"
-msgstr "削除を確認"
+#: src/desktop/templates/file_browser.mako:412
+#: src/desktop/templates/file_browser.mako:446
+#: src/desktop/templates/file_browser.mako:488
+msgid "Close"
+msgstr "閉じる"
 
-#: src/desktop/templates/home.mako:286
-msgid "Are you sure you want to delete the project"
-msgstr "プロジェクトを削除してもよろしいですか？"
+#: src/desktop/templates/file_browser.mako:434
+msgid "Import complete!"
+msgstr "インポートが完了しました。"
 
-#: src/desktop/templates/home.mako:286
-msgid "All its documents will be moved to the default tag."
-msgstr "そのすべてのドキュメントはデフォルトタグに移動されます。"
+#: src/desktop/templates/file_browser.mako:435
+msgid "Import failed!"
+msgstr "インポートに失敗しました。"
 
-#: src/desktop/templates/home.mako:289
-msgid "No"
-msgstr "いいえ"
+#: src/desktop/templates/file_browser.mako:459
+msgid "Create Directory"
+msgstr "ディレクトリの作成"
 
-#: src/desktop/templates/home.mako:290
+#: src/desktop/templates/file_browser.mako:462
+msgid "Directory name"
+msgstr "ディレクトリ名"
+
+#: src/desktop/templates/file_browser.mako:466
+msgid "Create"
+msgstr "作成"
+
+#: src/desktop/templates/file_browser.mako:477
+#: src/desktop/templates/file_browser.mako:599
+msgid "The trash is empty"
+msgstr "ゴミ箱は空です"
+
+#: src/desktop/templates/file_browser.mako:480
+msgid "Do you really want to delete"
+msgstr "削除してよろしいですか"
+
+#: src/desktop/templates/file_browser.mako:482
+msgid "entries"
+msgstr "エントリ"
+
+#: src/desktop/templates/file_browser.mako:492
+#: src/desktop/templates/home.mako:333
 msgid "Yes"
 msgstr "はい"
 
-#: src/desktop/templates/home.mako:297
-msgid "Move to a project"
-msgstr "プロジェクトに移動"
-
-#: src/desktop/templates/home.mako:301
-msgid "Select the project you want to move this document to"
-msgstr "このドキュメントの移動先のプロジェクトを選択してください"
-
-#: src/desktop/templates/home.mako:386
-msgid "Project created"
-msgstr "プロジェクトが作成されました"
-
-#: src/desktop/templates/home.mako:419 src/desktop/templates/home.mako:444
-msgid "There was an error processing your action: "
-msgstr "アクションの処理中にエラーが発生しました： "
-
-#: src/desktop/templates/home.mako:447
-msgid "Project updated successfully."
-msgstr "プロジェクトが正常に更新されました。"
-
-#: src/desktop/templates/home.mako:512
-msgid "Did you know?"
-msgstr "便利な使い方"
-
-#: src/desktop/templates/home.mako:518
-msgid "Step 1:"
-msgstr "手順 1："
-
-#: src/desktop/templates/home.mako:518
-msgid "Add data"
-msgstr "データを追加"
-
-#: src/desktop/templates/home.mako:519
-msgid "Step 2:"
-msgstr "手順 2："
-
-#: src/desktop/templates/home.mako:520
-msgid "Step 3:"
-msgstr "手順 3："
-
-#: src/desktop/templates/home.mako:520
-msgid "Do more!"
-msgstr "さらに実行。"
-
-#: src/desktop/templates/home.mako:529
-msgid "With"
-msgstr "次を使用"
-
-#: src/desktop/templates/home.mako:530
-msgid "and the apps in the"
-msgstr "およびアプリ"
-
-#: src/desktop/templates/home.mako:530
-msgid "section, upload, view your data and create tables."
-msgstr "セクション、データをアップロードおよび表示し、テーブルを作成します。"
-
-#: src/desktop/templates/home.mako:533
-msgid "Pre-installed samples are also already there."
-msgstr "プリインストールされたサンプルもすでにあります。"
-
-#: src/desktop/templates/home.mako:542
-msgid "Then query and visualize the data with the"
-msgstr "その後、次を使用してデータをクエリおよび視覚化します"
-
-#: src/desktop/templates/home.mako:543
-msgid "and"
-msgstr "および"
-
-#: src/desktop/templates/home.mako:553
-msgid "Tours were created to guide you around."
-msgstr "ツアーは概要を紹介するために作成されています。"
-
-#: src/desktop/templates/home.mako:554
-msgid "You can see the list of tours by clicking on the checkered flag icon"
-msgstr "格子柄のフラグのアイコンをクリックして、ツアーのリストを表示できます"
-
-#: src/desktop/templates/home.mako:559
-msgid "Additional documentation is available at"
-msgstr "その他のドキュメントを次の場所で入手できます"
-
-#: src/desktop/templates/home.mako:566
-msgid "Do not show this dialog again"
-msgstr "このダイアログを再び表示しない"
-
-#: src/desktop/templates/home.mako:567
-msgid "Got it, prof!"
-msgstr "わかりました。"
-
-#: src/desktop/templates/login.mako:197
-msgid "Create your Hue account"
-msgstr "Hue アカウントを作成してください"
-
-#: src/desktop/templates/login.mako:199
-msgid "Sign in to continue to Hue"
-msgstr "サインインして Hue を続行"
-
-#: src/desktop/templates/login.mako:204
-msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
-msgstr "初回のログインのため、任意のユーザー名とパスワードを選んでください。この情報は忘れないでください。"
-
-#: src/desktop/templates/login.mako:205
-msgid "they will become your Hue superuser credentials."
-msgstr "Hue スーパーユーザーの資格情報になるからです。"
-
-#: src/desktop/templates/login.mako:252
-msgid "Create account"
-msgstr "アカウントを作成"
-
-#: src/desktop/templates/login.mako:254
-msgid "Sign in"
-msgstr "サインイン"
-
-#: src/desktop/templates/login.mako:268
-msgid "Oops, no database found!"
-msgstr "データベースが見つかりません。"
-
-#: src/desktop/templates/logs.mako:68
-msgid "Search in the logs"
-msgstr "ログを検索"
-
-#: src/desktop/templates/logs.mako:71
-msgid "Wrap logs"
-msgstr "ログをラップ"
-
-#: src/desktop/templates/logs.mako:72
-msgid "Download entire log as zip"
-msgstr "ログ全体を zip としてダウンロード"
-
-#: src/desktop/templates/popup_error.mako:81
-msgid "Go back"
-msgstr "戻る"
-
-#: src/desktop/templates/tours.mako:25
-msgid "The Hue Blog"
-msgstr "Hue ブログ"
-
-#: src/desktop/templates/tours.mako:30
-msgid "Get started!"
-msgstr "始めましょう。"
-
-#: src/desktop/templates/tours.mako:31
-msgid "Your new home."
-msgstr "新しいホームです。"
-
-#: src/desktop/templates/tours.mako:31
-msgid "This is where you can access all your documents and you can tag them per project. Your home is always reachable from any part of Hue, just click on the house icon on the top navigator bar."
-msgstr "ここではすべてのドキュメントにアクセスでき、プロジェクトごとにそれらのドキュメントにタグ付けできます。Hue のどのような場所からでも、上部ナビゲーションバーのハウスアイコンをクリックするたけでホームにアクセスできます。"
-
-#: src/desktop/templates/tours.mako:32
-msgid "Actions and projects"
-msgstr "アクションとプロジェクト"
-
-#: src/desktop/templates/tours.mako:32
-msgid "From here you can create new documents or see a specific project or any trashed document for instance."
-msgstr "ここから、たとえば新規のドキュメントを作成したり、特定のプロジェクトやゴミ箱に移動したドキュメントを表示できます。"
-
-#: src/desktop/templates/tours.mako:33
-msgid "Organize!"
-msgstr "整理。"
-
-#: src/desktop/templates/tours.mako:33
-msgid "You can organize your documents in projects and filter them out in this area. It's a smart and fast way to focus on a specific project you are currently tackling."
-msgstr "この領域では、プロジェクトのドキュメントを整理し、フィルタで除外できます。現在取り組んでいる特定のプロジェクトに注力するための賢く迅速な方法です。"
-
-#: src/desktop/templates/tours.mako:34
-msgid "Your documents"
-msgstr "ドキュメント"
-
-#: src/desktop/templates/tours.mako:34
-msgid "You can always have a glance at your hard work. This is the list of all your documents, The first column tells you the kind of document that is, then you can find its name, a description and some other fields."
-msgstr "取り組んでいる仕事をいつでも一目で確認できます。これは自分の全ドキュメントのリストです。最初の列にドキュメントの種類が表示され、名前、説明、その他のフィールドも確認できます。"
-
-#: src/desktop/templates/tours.mako:35
-msgid "Projects"
-msgstr "プロジェクト"
-
-#: src/desktop/templates/tours.mako:35
-msgid "You can assign one or more projects to a document just by clicking in this cell."
-msgstr "このセルをクリックするだけで、1 つまたは複数のプロジェクトをドキュメントに割り当てできます。"
-
-#: src/desktop/templates/tours.mako:36
-msgid "Share your documents"
-msgstr "ドキュメントを共有"
-
-#: src/desktop/templates/tours.mako:36
-msgid "You can also share a document you have worked on with a specific user or a group of users. Just click on the icon in this column on every document you want to share and choose users and groups from the popup."
-msgstr "自分が作業したドキュメントを、特定のユーザーやユーザーグループと共有することもできます。共有するドキュメントごとにこの列のアイコンをクリックして、ポップアップからユーザーやグループを選択するだけです。"
-
-#: src/desktop/templates/tours.mako:37
-msgid "Search your documents"
-msgstr "ドキュメントを検索"
-
-#: src/desktop/templates/tours.mako:37
-msgid "You can always filter out the documents by name, description or even owner. Enjoy your new home!"
-msgstr "ドキュメントを名前、説明、または所有者を基準に、いつでもフィルタ処理できます。新しいホームをぜひ活用してください。"
-
-#: src/desktop/templates/tours.mako:42
-msgid "Create Hive tables and load quoted"
-msgstr "Hive テーブルを作成し、引用符付き"
-
-#: src/desktop/templates/tours.mako:42
-msgid "CSV data"
-msgstr "CSV データをロード"
-
-#: src/desktop/templates/tours.mako:49
-msgid "Submit any Oozie jobs directly"
-msgstr "Oozie ジョブを"
-
-#: src/desktop/templates/tours.mako:49
-msgid "from HDFS"
-msgstr "HDFS から直接サブミット"
-
-#: src/desktop/templates/tours.mako:56
-msgid "ZooKeeper Browser"
-msgstr "ZooKeeper Browser"
-
-#: src/desktop/templates/tours.mako:63
-msgid "Query your Databases"
-msgstr "データベースのクエリ"
-
-#: src/desktop/templates/tours.mako:70
-msgid "Graphical facets"
-msgstr "グラフィカルファセット"
-
-#: src/desktop/templates/tours.mako:77
-msgid "Use Impala with Sentry"
-msgstr "Impala で Sentry を使用"
-
-#: src/desktop/templates/tours.mako:84
-msgid "Submit Oozie jobs directly from HDFS"
-msgstr "Oozie ジョブを HDFS から直接サブミット"
-
-#: src/desktop/templates/tours.mako:91
-msgid "A Job Browser for Yarn"
-msgstr "YARN 用 Job Browser"
-
-#: src/desktop/templates/tours.mako:98
-msgid "Security with Yarn"
-msgstr "Yarn でセキュリティ保護"
-
-#: src/desktop/templates/tours.mako:105
-msgid "Hive Query editor with HiveServer2"
-msgstr "HiveServer2 を使用した Hive クエリエディタ"
-
-#: src/desktop/templates/tours.mako:105
-msgid "and Sentry"
-msgstr "および Sentry"
-
-#: src/desktop/templates/tours.mako:112
-msgid "Integrate external Web applications in"
-msgstr "任意の言語の外部 Web アプリケーションを"
-
-#: src/desktop/templates/tours.mako:112
-msgid "any language"
-msgstr "統合"
-
-#: src/desktop/templates/tours.mako:119
-msgid "Season 2 of Hadoop Video Tutorials"
-msgstr "Hadoop ビデオチュートリアルのシーズン 2"
-
-#: src/desktop/templates/tours.mako:126
-msgid "Analyze Twitter data"
-msgstr "Twitter データを分析"
-
-#: src/desktop/templates/tours.mako:133
-msgid "Preparing Yelp data for analysis with"
-msgstr "次による分析用の Yelp データを準備"
-
-#: src/desktop/templates/tours.mako:133
-msgid "Pig and Python UDF"
-msgstr "Pig および Python UDF"
-
-#: src/desktop/templates/tours.mako:140
-msgid "What's new in Hue 3.5"
-msgstr "Hue 3.5 の新機能"
-
-#: src/desktop/templates/tours.mako:147
-msgid "SSO with SAML"
-msgstr "SAML を使用した SSO"
-
-#: src/desktop/templates/tours.mako:154
-msgid "Integrating your company with LDAP: How To"
-msgstr "会社と LDAP の統合：方法"
-
-#: src/desktop/templates/tours.mako:161
-msgid "A new Spark UI"
-msgstr "新しい Spark UI"
-
-#: src/desktop/templates/tours.mako:168
-msgid "Fast SQL with Impala"
-msgstr "Impala を使用した Fast SQL"
-
-#: src/desktop/templates/tours.mako:175
-msgid "The Pig Editor"
-msgstr "Pig Editor"
-
-#: src/desktop/templates/tours.mako:182
-msgid "Build and use Hive UDF in 1 minute!"
-msgstr "Hive UDF を 1 分で構築して使用する"
-
-#: src/desktop/templates/tours.mako:189
-msgid "How to use HCatalog in Hue with Pig"
-msgstr "Pig を使用して Hue で HCatalog を使用する方法"
-
-#: src/desktop/templates/tours.mako:196
-msgid "HBase Browser"
-msgstr "HBase Browser"
-
-#: src/desktop/templates/tours.mako:203
-msgid "Create HBase tables"
-msgstr "HBase テーブルの作成"
-
-#: src/desktop/templates/tours.mako:210
+#: src/desktop/templates/file_browser.mako:508
+msgid "Result for"
+msgstr "次の結果"
+
+#: src/desktop/templates/file_browser.mako:512
+#: src/desktop/templates/file_browser.mako:516
+msgid "Trash"
+msgstr "ゴミ箱"
+
+#: src/desktop/templates/file_browser.mako:533
+#: src/desktop/templates/home.mako:122
+msgid "New document"
+msgstr "新しいドキュメント"
+
+#: src/desktop/templates/file_browser.mako:539
+#: src/desktop/templates/file_browser.mako:669
+#: src/desktop/templates/home.mako:128
+msgid "Impala Query"
+msgstr "Impala クエリ"
+
+#: src/desktop/templates/file_browser.mako:542
+#: src/desktop/templates/file_browser.mako:662
+#: src/desktop/templates/home.mako:131
+msgid "Pig Script"
+msgstr "Pig スクリプト"
+
+#: src/desktop/templates/file_browser.mako:551
+#: src/desktop/templates/file_browser.mako:667
 msgid "Oozie Workflow"
 msgstr "Oozie Workflow"
 
-#: src/desktop/templates/tours.mako:217
+#: src/desktop/templates/file_browser.mako:552
+#: src/desktop/templates/file_browser.mako:666
 msgid "Oozie Coordinator"
 msgstr "Oozie Coordinator"
 
-#: src/desktop/templates/tours.mako:224
-msgid "The search app with Solr"
-msgstr "Solr を使用した検索アプリ"
+#: src/desktop/templates/file_browser.mako:553
+#: src/desktop/templates/file_browser.mako:665
+msgid "Oozie Bundle"
+msgstr "Oozie Bundle"
 
-#: src/desktop/templates/tours.mako:231
-msgid "HDFS File Operations Made Easy"
-msgstr "HDFS ファイル操作を容易にする"
+#: src/desktop/templates/file_browser.mako:556
+#: src/desktop/templates/file_browser.mako:670
+msgid "Search Dashboard"
+msgstr "検索ダッシュボード"
 
-#: src/desktop/templates/tours.mako:238
-msgid "High availability in Hue"
-msgstr "Hue の高可用性"
+#: src/desktop/templates/file_browser.mako:562
+msgid "New folder"
+msgstr "新規フォルダー"
 
-#: src/desktop/templates/tours.mako:245
-msgid "What's new in Hue 2.5"
-msgstr "Hue 2.5 の新機能"
+#: src/desktop/templates/file_browser.mako:563
+#: src/desktop/templates/file_browser.mako:624
+msgid "Delete forever"
+msgstr "完全に削除"
 
-#: src/desktop/templates/tours.mako:252
-msgid "Manage users and group permissions"
-msgstr "ユーザーおよびグループのパーミッションを管理"
+#: src/desktop/templates/file_browser.mako:563
+#: src/desktop/templates/file_browser.mako:623
+msgid "Move to trash"
+msgstr "ゴミ箱に移動"
 
-#: src/desktop/templates/tours.mako:259
-msgid "Transfering data with Sqoop"
-msgstr "Sqoop を使用したデータ転送"
+#: src/desktop/templates/file_browser.mako:565
+#: src/desktop/templates/file_browser.mako:625
+msgid "Share"
+msgstr "共有"
 
-#: src/desktop/templates/tours.mako:266
-msgid "New Impala and Hive Editors"
-msgstr "新しい Impala および Hive エディタ"
+#: src/desktop/templates/file_browser.mako:567
+#: src/desktop/templates/file_browser.mako:622
+msgid "Download"
+msgstr "ダウンロード"
 
-#: src/desktop/templates/tours.mako:273
-msgid "Oozie SLAs"
-msgstr "Oozie SLA"
+#: src/desktop/templates/file_browser.mako:568
+msgid "Upload"
+msgstr "アップロード"
 
-#: src/desktop/templates/tours.mako:280
-msgid "The new Oozie Crontab"
-msgstr "新しい Oozie Crontab"
+#: src/desktop/templates/file_browser.mako:571
+msgid "Show trash"
+msgstr "ゴミ箱を表示"
 
-#: src/desktop/templates/tours.mako:287
-msgid "Secure your YARN cluster"
-msgstr "YARN クラスタをセキュリティ保護"
+#: src/desktop/templates/file_browser.mako:575
+msgid "Empty trash"
+msgstr "ゴミ箱を空にする"
 
-#: src/desktop/templates/tours.mako:294
-msgid "MR2 and YARN alternative Job Browser"
-msgstr "MR2 および YARN の代替 Job Browser"
+#: src/desktop/templates/file_browser.mako:588
+msgid "Type"
+msgstr "タイプ"
+
+#: src/desktop/templates/file_browser.mako:590
+#: src/desktop/templates/home.mako:192
+msgid "Last Modified"
+msgstr "前回の変更"
+
+#: src/desktop/templates/file_browser.mako:596
+msgid "The current folder is empty, you can add a new file or folder form the top right menu"
+msgstr "現在のフォルダーは空であり、新しいファイルまたはフォルダーを右上のメニューから追加できます"
+
+#: src/desktop/templates/file_browser.mako:602
+msgid "No documents found matching your query"
+msgstr "クエリに一致するドキュメントが見つかりません"
+
+#: src/desktop/templates/file_browser.mako:605
+msgid "There was an error loading the documents"
+msgstr "ドキュメントのロード中にエラーが発生しました"
+
+#: src/desktop/templates/file_browser.mako:618
+msgid "Delete"
+msgstr "削除"
+
+#: src/desktop/templates/file_browser.mako:661
+msgid "Directory"
+msgstr "ディレクトリ"
+
+#: src/desktop/templates/file_browser.mako:663
+msgid "Job Design"
+msgstr "ジョブ設計"
+
+#: src/desktop/templates/file_browser.mako:824
+#: src/desktop/templates/file_browser.mako:827
+msgid "selected"
+msgstr "選択済み"
+
+#: src/desktop/templates/file_browser.mako:824
+msgid "shared ignored"
+msgstr "共有が無視されました"
+
+#: src/desktop/templates/home.mako:24 src/desktop/templates/home2.mako:26
+msgid "Welcome Home"
+msgstr "お帰りなさい"
+
+#: src/desktop/templates/home.mako:105
+msgid "New Home"
+msgstr "新しいホーム"
+
+#: src/desktop/templates/home.mako:120
+msgid "Actions"
+msgstr "アクション"
+
+#: src/desktop/templates/home.mako:134
+msgid "Spark Job"
+msgstr "Spark Job"
+
+#: src/desktop/templates/home.mako:138
+msgid "Oozie Scheduler"
+msgstr "Oozie スケジューラ"
+
+#: src/desktop/templates/home.mako:140
+msgid "Workflow"
+msgstr "Workflow"
+
+#: src/desktop/templates/home.mako:141
+msgid "Coordinator"
+msgstr "Coordinator"
+
+#: src/desktop/templates/home.mako:142
+msgid "Bundle"
+msgstr "Bundle"
+
+#: src/desktop/templates/home.mako:151
+msgid "My Projects"
+msgstr "マイプロジェクト"
+
+#: src/desktop/templates/home.mako:153 src/desktop/templates/home.mako:304
+msgid "Create project"
+msgstr "プロジェクトを作成"
+
+#: src/desktop/templates/home.mako:155
+msgid "Remove selected project"
+msgstr "選択されたプロジェクトを削除"
+
+#: src/desktop/templates/home.mako:162
+msgid "You currently own no projects. Click here to add one now!"
+msgstr "現在所有しているプロジェクトはありません。ここをクリックして今すぐ追加してください。"
+
+#: src/desktop/templates/home.mako:166
+msgid "Shared with me"
+msgstr "自分と共有"
+
+#: src/desktop/templates/home.mako:171
+msgid "There are currently no projects shared with you."
+msgstr "現在共有しているプロジェクトはありません。"
+
+#: src/desktop/templates/home.mako:193
+msgid "Project"
+msgstr "プロジェクト"
+
+#: src/desktop/templates/home.mako:203
+msgid "Page"
+msgstr "ページ"
+
+#: src/desktop/templates/home.mako:203
+msgid "of"
+msgstr "／"
+
+#: src/desktop/templates/home.mako:207
+msgid "Previous"
+msgstr "前"
+
+#: src/desktop/templates/home.mako:208
+msgid "Next"
+msgstr "次"
+
+#: src/desktop/templates/home.mako:216
+msgid "There are currently no documents in this project or tag."
+msgstr "このプロジェクトまたはタグには、現在、ドキュメントがありません。"
+
+#: src/desktop/templates/home.mako:230
+msgid "Move to a project"
+msgstr "プロジェクトに移動"
+
+#: src/desktop/templates/home.mako:234
+msgid "Select the project you want to move this document to"
+msgstr "このドキュメントの移動先のプロジェクトを選択します"
+
+#: src/desktop/templates/home.mako:309
+msgid "Project name"
+msgstr "プロジェクト名"
+
+#: src/desktop/templates/home.mako:326
+msgid "Confirm Delete"
+msgstr "削除を確認"
+
+#: src/desktop/templates/home.mako:329
+msgid "Are you sure you want to delete the project"
+msgstr "プロジェクトを削除してもよろしいですか"
+
+#: src/desktop/templates/home.mako:329
+msgid "All its documents will be moved to the default tag."
+msgstr "すべてのドキュメントがデフォルトのタグに移動されます。"
+
+#: src/desktop/templates/home.mako:332
+msgid "No"
+msgstr "いいえ"
+
+#: src/desktop/templates/home.mako:401
+#, python-format
+msgid "File name is required."
+msgstr "ファイル名が必要です。"
+
+#: src/desktop/templates/home.mako:412
+msgid "project name already exists"
+msgstr "プロジェクト名はすでに存在します"
+
+#: src/desktop/templates/home.mako:420
+msgid "Project created"
+msgstr "プロジェクトが作成されました"
+
+#: src/desktop/templates/home.mako:424 src/desktop/templates/home.mako:460
+#: src/desktop/templates/home.mako:464 src/desktop/templates/home.mako:487
+#: src/desktop/templates/home.mako:496
+msgid "There was an error processing your action: "
+msgstr "アクションの処理中にエラーが発生しました。 "
+
+#: src/desktop/templates/home.mako:490
+msgid "Project updated successfully."
+msgstr "プロジェクトが正常に更新されました。"
+
+#: src/desktop/templates/home.mako:557 src/desktop/templates/home2.mako:317
+msgid "Did you know?"
+msgstr "便利な使い方"
+
+#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:321
+msgid "Step 1:"
+msgstr "手順 1："
+
+#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:321
+msgid "Add data"
+msgstr "データを追加"
+
+#: src/desktop/templates/home.mako:564 src/desktop/templates/home2.mako:322
+msgid "Step 2:"
+msgstr "手順 2："
+
+#: src/desktop/templates/home.mako:565 src/desktop/templates/home2.mako:323
+msgid "Step 3:"
+msgstr "手順 3："
+
+#: src/desktop/templates/home.mako:565 src/desktop/templates/home2.mako:323
+msgid "Do more!"
+msgstr "さらに実行。"
+
+#: src/desktop/templates/home.mako:574 src/desktop/templates/home2.mako:331
+msgid "With"
+msgstr "次を使用"
+
+#: src/desktop/templates/home.mako:575 src/desktop/templates/home2.mako:332
+msgid "and the apps in the"
+msgstr "およびアプリ"
+
+#: src/desktop/templates/home.mako:575 src/desktop/templates/home2.mako:332
+msgid "section, upload, view your data and create tables."
+msgstr "セクション、データをアップロードおよび表示し、テーブルを作成します。"
+
+#: src/desktop/templates/home.mako:578 src/desktop/templates/home2.mako:335
+msgid "Pre-installed samples are also already there."
+msgstr "またインストール済みサンプルがすでに存在します。"
+
+#: src/desktop/templates/home.mako:587 src/desktop/templates/home2.mako:344
+msgid "Then query and visualize the data with the"
+msgstr "次を使用してデータをクエリして、視覚化します"
+
+#: src/desktop/templates/home.mako:588 src/desktop/templates/home2.mako:345
+msgid "and"
+msgstr "および"
+
+#: src/desktop/templates/home.mako:598 src/desktop/templates/home2.mako:355
+msgid "Tours were created to guide you around."
+msgstr "ツアーは概要を紹介するために作成されています。"
+
+#: src/desktop/templates/home.mako:599 src/desktop/templates/home2.mako:356
+msgid "You can see the list of tours by clicking on the checkered flag icon"
+msgstr "チェッカーフラッグのアイコンをクリックして、ツアーのリストを表示できます"
+
+#: src/desktop/templates/home.mako:604 src/desktop/templates/home2.mako:361
+msgid "Additional documentation is available at"
+msgstr "その他のドキュメントを次の場所で入手できます"
+
+#: src/desktop/templates/home.mako:611 src/desktop/templates/home2.mako:368
+msgid "Do not show this dialog again"
+msgstr "このダイアログを再び表示しない"
+
+#: src/desktop/templates/home.mako:612
+msgid "Got it, prof!"
+msgstr "わかりました。"
+
+#: src/desktop/templates/home2.mako:182
+msgid "Toggle Assist"
+msgstr "アシストを切り替え"
+
+#: src/desktop/templates/home2.mako:249
+msgid "An error occurred fetching the table details. Please try again."
+msgstr "テーブルの詳細をフェッチ中にエラーが発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:250
+msgid "An error occurred fetching the table fields. Please try again."
+msgstr "テーブルのフィールドをフェッチ中にエラーが発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:251
+msgid "An error occurred fetching the table sample. Please try again."
+msgstr "テーブルのサンプルをフェッチ中にエラーが発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:252
+msgid "An error occurred refreshing the table stats. Please try again."
+msgstr "テーブルの統計を更新中にエラーが発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:253
+msgid "There was a problem loading the databases. Please try again."
+msgstr "データベースのロード中に問題が発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:254
+msgid "There was a problem loading the table preview. Please try again."
+msgstr "テーブルプレビューをロード中に問題が発生しました。再試行してください。"
+
+#: src/desktop/templates/home2.mako:369
+msgid "Got it!"
+msgstr "わかりました。"
+
+#: src/desktop/templates/login.mako:24
+msgid "Welcome to Hue"
+msgstr "Hue へようこそ"
+
+#: src/desktop/templates/login.mako:39
+msgid "Go to gethue.com"
+msgstr "gethue.com へ移動"
+
+#: src/desktop/templates/login.mako:56
+msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
+msgstr "今回は初回ログインであるため、ユーザー名とパスワードを指定してください。これらの値は、決して忘れないようにしてください。なぜなら、"
+
+#: src/desktop/templates/login.mako:57
+msgid "they will become your Hue superuser credentials."
+msgstr "これらの値は、Hue スーパーユーザーの資格情報になるからです。"
+
+#: src/desktop/templates/login.mako:105
+msgid "Create Account"
+msgstr "アカウントを作成"
+
+#: src/desktop/templates/login.mako:107
+#: src/desktop/templates/login_modal.mako:75
+msgid "Sign In"
+msgstr "サインイン"
+
+#: src/desktop/templates/login.mako:122
+msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
+msgstr "Hue および Hue のロゴは Cloudera, Inc. の商標です。"
+
+#: src/desktop/templates/login_modal.mako:33
+msgid "You have been logged out, please sign in again"
+msgstr "ログアウトされました。もう一度サインインしてください。"
+
+#: src/desktop/templates/login_modal.mako:72
+msgid "Sign in failed. Please try again."
+msgstr "サインインに失敗しました。再試行してください。"
+
+#: src/desktop/templates/logs.mako:68
+msgid "Search in the logs"
+msgstr "ログでの検索"
+
+#: src/desktop/templates/logs.mako:71
+msgid "Host"
+msgstr "ホスト"
+
+#: src/desktop/templates/logs.mako:73
+msgid "Force DEBUG level"
+msgstr "DEBUG レベルを強制"
+
+#: src/desktop/templates/logs.mako:76
+msgid "Wrap logs"
+msgstr "ログをラップ"
+
+#: src/desktop/templates/logs.mako:79
+msgid "Download entire log as zip"
+msgstr "ログ全体を zip としてダウンロード"
+
+#: src/desktop/templates/popup_error.mako:44
+msgid "More Info"
+msgstr "詳細情報"
+
+#: src/desktop/templates/popup_error.mako:47
+#: src/desktop/templates/popup_error.mako:73
+msgid "View Logs"
+msgstr "ログを表示"
+
+#: src/desktop/templates/table_stats.mako:55
+msgid "Prefix filter..."
+msgstr "プレフィックスフィルター..."
+
+#: src/desktop/templates/table_stats.mako:59
+msgid "Column stats are currently not supported for columns of type:"
+msgstr "次のタイプの列では、現在、列の統計がサポートされません："
+
+#: src/desktop/templates/table_stats.mako:70
+msgid "There are no terms to be shown"
+msgstr "表示する単語はありません"
+
+#: src/desktop/templates/table_stats.mako:92
+msgid " table"
+msgstr " テーブル"
+
+#: src/desktop/templates/table_stats.mako:95
+msgid " column"
+msgstr " 列"
+
+#: src/desktop/templates/table_stats.mako:101
+msgid "Sample"
+msgstr "サンプル"
+
+#: src/desktop/templates/table_stats.mako:104
+msgid "The column stats for this table are not accurate"
+msgstr "このテーブルの列の統計は正確ではありません"
+
+#: src/desktop/templates/table_stats.mako:104
+msgid "Analysis"
+msgstr "分析"
+
+#: src/desktop/templates/table_stats.mako:109
+msgid "View more..."
+msgstr "詳細を表示..."
+
+#: src/desktop/templates/table_stats.mako:121
+msgid "The selected table has no data."
+msgstr "選択したテーブルにデータがありません。"
+
+#: src/desktop/templates/table_stats.mako:154
+msgid "There is no analysis available"
+msgstr "分析が利用できません"
+
+#: src/desktop/templates/table_stats.mako:156
+msgid "Column analysis is currently not supported for columns of type:"
+msgstr "次のタイプの列では、現在、列分析がサポートされません："
+
+#: src/desktop/templates/table_stats.mako:168
+msgid "View statistics"
+msgstr "統計を表示"
+
+#: src/desktop/templates/table_stats.mako:191
+msgid "There was a problem loading the stats."
+msgstr "統計のロード中に問題が発生しました。"
+
+#: src/desktop/templates/table_stats.mako:192
+msgid "There was a problem refreshing the stats."
+msgstr "統計の更新中に問題が発生しました。"
+
+#: src/desktop/templates/table_stats.mako:193
+msgid "There was a problem loading the terms."
+msgstr "単語をロード中に問題が発生しました。"
+
+#: src/desktop/templates/table_stats.mako:289
+msgid "No data available"
+msgstr "利用可能なデータがありません"
+
+#: src/desktop/templates/table_stats.mako:290
+msgid "No matching records"
+msgstr "一致するレコードがありません"
+
+#: src/desktop/templates/tours.mako:23
+msgid "Get started!"
+msgstr "始めましょう。"
+
+#: src/desktop/templates/tours.mako:24
+msgid "Your new home."
+msgstr "新しいホームです。"
+
+#: src/desktop/templates/tours.mako:24
+msgid "This is where you can access all your documents and you can tag them per project. Your home is always reachable from any part of Hue, just click on the house icon on the top navigator bar."
+msgstr "ここではすべてのドキュメントにアクセスでき、プロジェクトごとにそれらのドキュメントにタグ付けできます。Hue のどのような場所からでも、上部ナビゲーションバーのハウスアイコンをクリックするだけで、いつでもホームにアクセスできます。"
+
+#: src/desktop/templates/tours.mako:25
+msgid "Actions and projects"
+msgstr "アクションとプロジェクト"
+
+#: src/desktop/templates/tours.mako:25
+msgid "From here you can create new documents or see a specific project or any trashed document for instance."
+msgstr "ここから、たとえば、新規のドキュメントを作成したり、特定のプロジェクトやゴミ箱に移動したドキュメントを表示したりできます。"
+
+#: src/desktop/templates/tours.mako:26
+msgid "Organize!"
+msgstr "整理。"
+
+#: src/desktop/templates/tours.mako:26
+msgid "You can organize your documents in projects and filter them out in this area. It's a smart and fast way to focus on a specific project you are currently tackling."
+msgstr "この領域では、プロジェクトのドキュメントを整理し、フィルターで除外できます。現在取り組んでいる特定のプロジェクトに注力するための賢く迅速な方法です。"
+
+#: src/desktop/templates/tours.mako:27
+msgid "Your documents"
+msgstr "ドキュメント"
+
+#: src/desktop/templates/tours.mako:27
+msgid "You can always have a glance at your hard work. This is the list of all your documents, The first column tells you the kind of document that is, then you can find its name, a description and some other fields."
+msgstr "取り組んでいる仕事をいつでも一目で確認できます。これは自分の全ドキュメントのリストです。最初の列にドキュメントの種類が表示され、名前、説明、その他のフィールドも確認できます。"
+
+#: src/desktop/templates/tours.mako:28
+msgid "Projects"
+msgstr "プロジェクト"
+
+#: src/desktop/templates/tours.mako:28
+msgid "You can assign one or more projects to a document just by clicking in this cell."
+msgstr "このセルをクリックするだけで、1 つまたは複数のプロジェクトをドキュメントに割り当てることができます。"
+
+#: src/desktop/templates/tours.mako:29
+msgid "Share your documents"
+msgstr "ドキュメントを共有"
+
+#: src/desktop/templates/tours.mako:29
+msgid "You can also share a document you have worked on with a specific user or a group of users. Just click on the icon in this column on every document you want to share and choose users and groups from the popup."
+msgstr "自分が作業したドキュメントを、特定のユーザーやユーザーグループと共有することもできます。共有するドキュメントごとにこの列のアイコンをクリックして、ポップアップからユーザーやグループを選択するだけです。"
+
+#: src/desktop/templates/tours.mako:30
+msgid "Search your documents"
+msgstr "ドキュメントを検索"
+
+#: src/desktop/templates/tours.mako:30
+msgid "You can always filter out the documents by name, description or even owner. Enjoy your new home!"
+msgstr "ドキュメントを名前、説明、または所有者を基準に、いつでもフィルター処理できます。新しいホームをぜひ活用してください。"
+
+#: src/desktop/templates/tours.mako:35
+msgid "Read more on the Hue blog"
+msgstr "Hue ブログで詳細を参照"
+
+#: src/desktop/templates/tours.mako:42
+msgid "Hue blog: Hive"
+msgstr "Hue ブログ：Hive"
+
+#: src/desktop/templates/tours.mako:49
+msgid "Hue blog: Impala"
+msgstr "Hue ブログ：Impala"
+
+#: src/desktop/templates/tours.mako:56
+msgid "Hue blog: DB Query"
+msgstr "Hue ブログ：DB クエリ"
+
+#: src/desktop/templates/tours.mako:63
+msgid "Hue blog: Pig"
+msgstr "Hue ブログ：Pig"
+
+#: src/desktop/templates/tours.mako:70
+msgid "Hue blog: Spark"
+msgstr "Hue ブログ：Spark"
+
+#: src/desktop/templates/tours.mako:77
+msgid "Hue blog: HBase"
+msgstr "Hue ブログ：HBase"
+
+#: src/desktop/templates/tours.mako:84
+msgid "Hue blog: Sqoop"
+msgstr "Hue ブログ：Sqoop"
+
+#: src/desktop/templates/tours.mako:91
+msgid "Hue blog: Zookeeper"
+msgstr "Hue ブログ：Zookeeper"
+
+#: src/desktop/templates/tours.mako:98
+msgid "Hue blog: Oozie"
+msgstr "Hue ブログ：Oozie"
+
+#: src/desktop/templates/tours.mako:105
+msgid "Hue blog: Search"
+msgstr "Hue ブログ：検索"
+
+#: src/desktop/templates/tours.mako:112
+msgid "Hue blog: Security"
+msgstr "Hue ブログ：Security"
+
+#: src/desktop/templates/tours.mako:119
+msgid "Hue blog: HDFS"
+msgstr "Hue ブログ：HDFS"
+
+#: src/desktop/templates/tours.mako:126
+msgid "Hue blog: Job Browser"
+msgstr "Hue ブログ：Job Browser"
 
 #: src/desktop/templates/unsupported.mako:23
 msgid "Hue - Unsupported browser"
-msgstr "Hue - サポートされていないブラウザ"
+msgstr "Hue：サポートされていないブラウザ"
 
 #: src/desktop/templates/unsupported.mako:91
 msgid "It looks like you are running an older browser. What about upgrading to the latest"
-msgstr "古いブラウザが実行されていると思われます。最新のブラウザにアップグレードすることをお勧めします"
+msgstr "古いブラウザが実行されている可能性があります。最新のブラウザにアップグレードすることをお勧めします"
+
+#~ msgid "POST request only"
+#~ msgstr "POST 要求のみ"
+
+#~ msgid "Use this string to parse and redact log message."
+#~ msgstr "この文字列を使用して、ログメッセージを解析および編集します。"
+
+#~ msgid "If true, log all database requests."
+#~ msgstr "true の場合は、すべてのデータベース要求がログに記録されます。"
+
+#~ msgid "Cannot find HDFS called \"%(fs_ref)s\"."
+#~ msgstr "\"%(fs_ref)s\"という HDFS が見つかりません。"
+
+#~ msgid "Only superusers and %s are allowed to read this document."
+#~ msgstr "スーパーユーザーと %s のみが、このドキュメントを読み取ることができます。"
+
+#~ msgid "Only superusers and %s are allowed to write this document."
+#~ msgstr "スーパーユーザーと %s のみが、このドキュメントを変更できます。"
+
+#~ msgid "Not Found"
+#~ msgstr "見つかりません"
+
+#~ msgid "Server Error (500)"
+#~ msgstr "サーバーエラー（500）"
+
+#~ msgid "Query Editors"
+#~ msgstr "Query Editor"
+
+#~ msgid "Spark"
+#~ msgstr "Spark"
+
+#~ msgid "Data Browsers"
+#~ msgstr "Data Browser"
+
+#~ msgid "Security"
+#~ msgstr "セキュリティ"
+
+#~ msgid "Change project for"
+#~ msgstr "次のプロジェクトを変更"
+
+#~ msgid "Create your Hue account"
+#~ msgstr "Hue アカウントを作成してください"
+
+#~ msgid "Sign in to continue to Hue"
+#~ msgstr "サインインして Hue を続行"
+
+#~ msgid "The Hue Blog"
+#~ msgstr "Hue ブログ"
+
+#~ msgid "Create Hive tables and load quoted"
+#~ msgstr "Hive テーブルを作成し、引用符付き"
+
+#~ msgid "CSV data"
+#~ msgstr "CSV データをロード"
+
+#~ msgid "Submit any Oozie jobs directly"
+#~ msgstr "Oozie ジョブを"
+
+#~ msgid "from HDFS"
+#~ msgstr "HDFS から直接サブミット"
+
+#~ msgid "ZooKeeper Browser"
+#~ msgstr "ZooKeeper Browser"
+
+#~ msgid "Query your Databases"
+#~ msgstr "データベースのクエリ"
+
+#~ msgid "Graphical facets"
+#~ msgstr "グラフィカルファセット"
+
+#~ msgid "Use Impala with Sentry"
+#~ msgstr "Impala で Sentry を使用"
+
+#~ msgid "Submit Oozie jobs directly from HDFS"
+#~ msgstr "Oozie ジョブを HDFS から直接サブミット"
+
+#~ msgid "A Job Browser for Yarn"
+#~ msgstr "YARN 用 Job Browser"
+
+#~ msgid "Security with Yarn"
+#~ msgstr "Yarn でセキュリティ保護"
+
+#~ msgid "Hive Query editor with HiveServer2"
+#~ msgstr "HiveServer2 を使用した Hive クエリエディタ"
+
+#~ msgid "and Sentry"
+#~ msgstr "および Sentry"
+
+#~ msgid "Integrate external Web applications in"
+#~ msgstr "任意の言語の外部 Web アプリケーションを"
+
+#~ msgid "any language"
+#~ msgstr "統合"
+
+#~ msgid "Season 2 of Hadoop Video Tutorials"
+#~ msgstr "Hadoop ビデオチュートリアルのシーズン 2"
+
+#~ msgid "Analyze Twitter data"
+#~ msgstr "Twitter データを分析"
+
+#~ msgid "Preparing Yelp data for analysis with"
+#~ msgstr "次による分析用の Yelp データを準備"
+
+#~ msgid "Pig and Python UDF"
+#~ msgstr "Pig および Python UDF"
+
+#~ msgid "What's new in Hue 3.5"
+#~ msgstr "Hue 3.5 の新機能"
+
+#~ msgid "SSO with SAML"
+#~ msgstr "SAML を使用した SSO"
+
+#~ msgid "Integrating your company with LDAP: How To"
+#~ msgstr "会社と LDAP の統合：方法"
+
+#~ msgid "A new Spark UI"
+#~ msgstr "新しい Spark UI"
+
+#~ msgid "Fast SQL with Impala"
+#~ msgstr "Impala を使用した Fast SQL"
+
+#~ msgid "The Pig Editor"
+#~ msgstr "Pig Editor"
+
+#~ msgid "Build and use Hive UDF in 1 minute!"
+#~ msgstr "Hive UDF を 1 分で構築して使用する"
+
+#~ msgid "How to use HCatalog in Hue with Pig"
+#~ msgstr "Pig を使用して Hue で HCatalog を使用する方法"
+
+#~ msgid "Create HBase tables"
+#~ msgstr "HBase テーブルの作成"
+
+#~ msgid "The search app with Solr"
+#~ msgstr "Solr を使用した検索アプリ"
+
+#~ msgid "HDFS File Operations Made Easy"
+#~ msgstr "HDFS ファイル操作を容易にする"
+
+#~ msgid "High availability in Hue"
+#~ msgstr "Hue の高可用性"
+
+#~ msgid "What's new in Hue 2.5"
+#~ msgstr "Hue 2.5 の新機能"
+
+#~ msgid "Manage users and group permissions"
+#~ msgstr "ユーザーおよびグループのパーミッションを管理"
+
+#~ msgid "Transfering data with Sqoop"
+#~ msgstr "Sqoop を使用したデータ転送"
+
+#~ msgid "New Impala and Hive Editors"
+#~ msgstr "新しい Impala および Hive エディタ"
+
+#~ msgid "Oozie SLAs"
+#~ msgstr "Oozie SLA"
+
+#~ msgid "The new Oozie Crontab"
+#~ msgstr "新しい Oozie Crontab"
+
+#~ msgid "Secure your YARN cluster"
+#~ msgstr "YARN クラスタをセキュリティ保護"
+
+#~ msgid "MR2 and YARN alternative Job Browser"
+#~ msgstr "MR2 および YARN の代替 Job Browser"
 

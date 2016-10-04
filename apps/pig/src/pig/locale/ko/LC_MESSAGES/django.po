@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:246 src/pig/templates/app.mako:767
+#: src/pig/api.py:248 src/pig/templates/app.mako:763
 msgid "Unsaved script"
 msgstr "저장 안 된 스크립트"
 
@@ -54,29 +54,29 @@ msgstr "문서가 제출된 Job이 아니라 실제 쿼리, 스크립트, workfl
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "superuser 및 %s만 이 문서를 수정할 수 있습니다."
 
-#: src/pig/views.py:73 src/pig/views.py:99 src/pig/views.py:118
-#: src/pig/views.py:149 src/pig/views.py:191
+#: src/pig/views.py:71 src/pig/views.py:97 src/pig/views.py:116
+#: src/pig/views.py:147 src/pig/views.py:193
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/pig/views.py:110
+#: src/pig/views.py:108
 msgid "Error stopping Pig script."
 msgstr "Pig 스크립트를 중지하는 중 오류가 발생했습니다."
 
-#: src/pig/views.py:157
+#: src/pig/views.py:160
 msgid " (Copy)"
 msgstr " (복사)"
 
-#: src/pig/views.py:241
+#: src/pig/views.py:244
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/pig/management/commands/pig_setup.py:48
+#: src/pig/management/commands/pig_setup.py:49
 #, python-format
 msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "예제 %(local_dir)s을(를) %(remote_data_dir)s(으)로 복사\n"
 
-#: src/pig/management/commands/pig_setup.py:55
+#: src/pig/management/commands/pig_setup.py:56
 #, python-format
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "데이터 %(local_dir)s을(를) %(remote_data_dir)s(으)로 복사\n"
@@ -102,7 +102,7 @@ msgid "Search for script name or content"
 msgstr "스크립트 이름 또는 콘텐츠 검색"
 
 #: src/pig/templates/app.mako:55 src/pig/templates/app.mako:187
-#: src/pig/templates/app.mako:344
+#: src/pig/templates/app.mako:345
 msgid "Run this script"
 msgstr "이 스크립트 실행"
 
@@ -138,9 +138,9 @@ msgstr "새 스크립트"
 msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
 msgstr "현재 정의된 스크립트가 없습니다. \"새 스크립트\"를 클릭하여 새 스크립트를 추가하십시오."
 
-#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:380
-#: src/pig/templates/app.mako:429 src/pig/templates/app.mako:552
-#: src/pig/templates/app.mako:576
+#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
+#: src/pig/templates/app.mako:431 src/pig/templates/app.mako:554
+#: src/pig/templates/app.mako:578
 msgid "Name"
 msgstr "이름"
 
@@ -164,12 +164,11 @@ msgstr "속성"
 msgid "Save the script"
 msgstr "스크립트 저장"
 
-#: src/pig/templates/app.mako:124 src/pig/templates/app.mako:724
+#: src/pig/templates/app.mako:124 src/pig/templates/app.mako:726
 msgid "Save"
 msgstr "저장"
 
 #: src/pig/templates/app.mako:129
-
 msgid "Share the script"
 msgstr "스크립트 공유"
 
@@ -201,7 +200,7 @@ msgstr "중지"
 msgid "Show Logs"
 msgstr "로그 표시"
 
-#: src/pig/templates/app.mako:150 src/pig/templates/app.mako:637
+#: src/pig/templates/app.mako:150 src/pig/templates/app.mako:639
 msgid "Logs"
 msgstr "로그"
 
@@ -225,8 +224,8 @@ msgstr "편집기에서 Ctrl + Enter 또는 Ctrl + .를 눌러 현재 스크립�
 msgid "Unsaved"
 msgstr "미저장"
 
-#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:345
-#: src/pig/templates/app.mako:518
+#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:346
+#: src/pig/templates/app.mako:520
 msgid "Stop this script"
 msgstr "이 스크립트 중지"
 
@@ -234,241 +233,241 @@ msgstr "이 스크립트 중지"
 msgid "Show the assist"
 msgstr "지원 표시"
 
-#: src/pig/templates/app.mako:199
+#: src/pig/templates/app.mako:200
 msgid "Hide the assist"
 msgstr "지원 숨기기"
 
-#: src/pig/templates/app.mako:200
+#: src/pig/templates/app.mako:201
 msgid "Double click on function to insert it in the editor"
 msgstr "편집기에서 함수를 두 번 클릭하여 삽입"
 
-#: src/pig/templates/app.mako:201
+#: src/pig/templates/app.mako:202
 msgid "Assist"
 msgstr "지원"
 
-#: src/pig/templates/app.mako:204
+#: src/pig/templates/app.mako:205
 msgid "Function name..."
 msgstr "함수 이름..."
 
-#: src/pig/templates/app.mako:350 src/pig/templates/app.mako:717
+#: src/pig/templates/app.mako:352 src/pig/templates/app.mako:719
 msgid "Script name"
 msgstr "스크립트 이름"
 
-#: src/pig/templates/app.mako:357
+#: src/pig/templates/app.mako:359
 msgid "Pig parameters"
 msgstr "Pig 매개변수"
 
-#: src/pig/templates/app.mako:370
+#: src/pig/templates/app.mako:372
 msgid "There are currently no defined parameters."
 msgstr "현재 정의된 매개변수가 없습니다."
 
-#: src/pig/templates/app.mako:372 src/pig/templates/app.mako:400
-#: src/pig/templates/app.mako:421 src/pig/templates/app.mako:449
-#: src/pig/templates/app.mako:470 src/pig/templates/app.mako:507
+#: src/pig/templates/app.mako:374 src/pig/templates/app.mako:402
+#: src/pig/templates/app.mako:423 src/pig/templates/app.mako:451
+#: src/pig/templates/app.mako:472 src/pig/templates/app.mako:509
 msgid "Add"
 msgstr "추가"
 
-#: src/pig/templates/app.mako:381 src/pig/templates/app.mako:430
-#: src/pig/templates/app.mako:479
+#: src/pig/templates/app.mako:383 src/pig/templates/app.mako:432
+#: src/pig/templates/app.mako:481
 msgid "Value"
 msgstr "값"
 
-#: src/pig/templates/app.mako:394 src/pig/templates/app.mako:443
-#: src/pig/templates/app.mako:500
+#: src/pig/templates/app.mako:396 src/pig/templates/app.mako:445
+#: src/pig/templates/app.mako:502
 msgid "Remove"
 msgstr "제거"
 
-#: src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:410
 msgid "Hadoop properties"
 msgstr "Hadoop 속성"
 
-#: src/pig/templates/app.mako:419
+#: src/pig/templates/app.mako:421
 msgid "There are currently no defined Hadoop properties."
 msgstr "현재 정의된 Hadoop 속성이 없습니다."
 
-#: src/pig/templates/app.mako:458
+#: src/pig/templates/app.mako:460
 msgid "Resources"
 msgstr "리소스"
 
-#: src/pig/templates/app.mako:461
+#: src/pig/templates/app.mako:463
 msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
 msgstr "실행 중인 스크립트의 작업 영역에 추가할 HDFS 파일 또는 zip 파일에 대한 경로"
 
-#: src/pig/templates/app.mako:468
+#: src/pig/templates/app.mako:470
 msgid "There are currently no defined resources."
 msgstr "현재 정의된 리소스가 없습니다."
 
-#: src/pig/templates/app.mako:478
+#: src/pig/templates/app.mako:480
 msgid "Type"
 msgstr "유형"
 
-#: src/pig/templates/app.mako:488
+#: src/pig/templates/app.mako:490
 msgid "File"
 msgstr "파일"
 
-#: src/pig/templates/app.mako:489
+#: src/pig/templates/app.mako:491
 msgid "Archive"
 msgstr "아카이브"
 
-#: src/pig/templates/app.mako:525
+#: src/pig/templates/app.mako:527
 msgid "Status:"
 msgstr "상태:"
 
-#: src/pig/templates/app.mako:527
+#: src/pig/templates/app.mako:529
 msgid "Progress:"
 msgstr "진행률:"
 
-#: src/pig/templates/app.mako:527
+#: src/pig/templates/app.mako:529
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:533
+#: src/pig/templates/app.mako:535
 msgid "No available logs."
 msgstr "사용할 수 있는 로그가 없습니다."
 
-#: src/pig/templates/app.mako:543 src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1126
 msgid "Running"
 msgstr "실행 중"
 
-#: src/pig/templates/app.mako:547
+#: src/pig/templates/app.mako:549
 msgid "There are currently no running scripts."
 msgstr "현재 실행 중인 스크립트가 없습니다."
 
-#: src/pig/templates/app.mako:553
+#: src/pig/templates/app.mako:555
 msgid "Progress"
 msgstr "진행률"
 
-#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:578
+#: src/pig/templates/app.mako:556 src/pig/templates/app.mako:580
 msgid "Created on"
 msgstr "생성 위치"
 
-#: src/pig/templates/app.mako:567
+#: src/pig/templates/app.mako:569
 msgid "Completed"
 msgstr "완료됨"
 
-#: src/pig/templates/app.mako:571
+#: src/pig/templates/app.mako:573
 msgid "There are currently no completed scripts."
 msgstr "현재 완료된 스크립트가 없습니다."
 
-#: src/pig/templates/app.mako:577
+#: src/pig/templates/app.mako:579
 msgid "Status"
 msgstr "상태"
 
-#: src/pig/templates/app.mako:591
+#: src/pig/templates/app.mako:593
 msgid "Click to edit"
 msgstr "편집하려면 클릭"
 
-#: src/pig/templates/app.mako:605
+#: src/pig/templates/app.mako:607
 msgid "Click to view"
 msgstr "보려면 클릭"
 
-#: src/pig/templates/app.mako:622
+#: src/pig/templates/app.mako:624
 msgid "Confirm Delete"
 msgstr "삭제 확인"
 
-#: src/pig/templates/app.mako:625
+#: src/pig/templates/app.mako:627
 msgid "Are you sure you want to delete this script?"
 msgstr "이 스크립트를 삭제하시겠습니까?"
 
-#: src/pig/templates/app.mako:626
+#: src/pig/templates/app.mako:628
 msgid "Are you sure you want to delete these scripts?"
 msgstr "이 스크립트를 삭제하시겠습니까?"
 
-#: src/pig/templates/app.mako:629 src/pig/templates/app.mako:663
-#: src/pig/templates/app.mako:674 src/pig/templates/app.mako:703
+#: src/pig/templates/app.mako:631 src/pig/templates/app.mako:665
+#: src/pig/templates/app.mako:676 src/pig/templates/app.mako:705
 msgid "No"
 msgstr "아니요"
 
-#: src/pig/templates/app.mako:630 src/pig/templates/app.mako:664
-#: src/pig/templates/app.mako:675 src/pig/templates/app.mako:704
+#: src/pig/templates/app.mako:632 src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:677 src/pig/templates/app.mako:706
 msgid "Yes"
 msgstr "예"
 
-#: src/pig/templates/app.mako:644
+#: src/pig/templates/app.mako:646
 msgid "Close"
 msgstr "닫기"
 
-#: src/pig/templates/app.mako:651
+#: src/pig/templates/app.mako:653
 msgid "Run Script"
 msgstr "스크립트 실행"
 
-#: src/pig/templates/app.mako:651 src/pig/templates/app.mako:671
+#: src/pig/templates/app.mako:653 src/pig/templates/app.mako:673
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:654
+#: src/pig/templates/app.mako:656
 msgid "Script variables"
 msgstr "스크립트 변수"
 
-#: src/pig/templates/app.mako:671
+#: src/pig/templates/app.mako:673
 msgid "Stop Script"
 msgstr "스크립트 중지"
 
-#: src/pig/templates/app.mako:682
+#: src/pig/templates/app.mako:684
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/pig/templates/app.mako:695
+#: src/pig/templates/app.mako:697
 msgid "Are you sure?"
 msgstr "계속하시겠습니까?"
 
-#: src/pig/templates/app.mako:699
+#: src/pig/templates/app.mako:701
 msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
 msgstr "현재 스크립트에 저장되지 않은 변경 내용이 있습니다. 변경 내용을 무시하시겠습니까?"
 
-#: src/pig/templates/app.mako:711
+#: src/pig/templates/app.mako:713
 msgid "Save script"
 msgstr "스크립트 저장"
 
-#: src/pig/templates/app.mako:715
+#: src/pig/templates/app.mako:717
 msgid "Give a meaningful name to this script."
 msgstr "이 스크립트에 의미 있는 이름을 지정하십시오."
 
-#: src/pig/templates/app.mako:723
+#: src/pig/templates/app.mako:725
 msgid "Cancel"
 msgstr "취소"
 
-#: src/pig/templates/app.mako:763
+#: src/pig/templates/app.mako:759
 msgid "The Pig job could not be killed."
 msgstr "Pig 작업을 중지할 수 없습니다."
 
-#: src/pig/templates/app.mako:764
+#: src/pig/templates/app.mako:760
 msgid "Run this Pig script."
 msgstr "이 Pig 스크립트를 실행합니다."
 
-#: src/pig/templates/app.mako:765
+#: src/pig/templates/app.mako:761
 msgid "Stop execution."
 msgstr "실행을 중지합니다."
 
-#: src/pig/templates/app.mako:766
+#: src/pig/templates/app.mako:762
 msgid "Saved"
 msgstr "저장됨"
 
-#: src/pig/templates/app.mako:1110
+#: src/pig/templates/app.mako:1119
 msgid "Saving"
 msgstr "저장하는 중"
 
-#: src/pig/templates/app.mako:1121
+#: src/pig/templates/app.mako:1130
 msgid "has been saved correctly."
 msgstr "저장되었습니다."
 
-#: src/pig/templates/app.mako:1375
+#: src/pig/templates/app.mako:1395
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/pig/templates/app.mako:1382
+#: src/pig/templates/app.mako:1402
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig 매개변수와 옵션 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1389
+#: src/pig/templates/app.mako:1409
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop 속성 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1396
+#: src/pig/templates/app.mako:1416
 msgid "Include files or compressed files"
 msgstr "파일 또는 압축 파일 포함"
 
-#: src/pig/templates/app.mako:1405
+#: src/pig/templates/app.mako:1425
 msgid "You have unsaved changes in this pig script."
 msgstr "이 pig 스크립트에 저장되지 않은 변경 내용이 있습니다."
 

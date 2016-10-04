@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSION DU PROJET\n"
 "Report-Msgid-Bugs-To: ADRESSE@MAIL\n"
-"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"POT-Creation-Date: 2016-07-19 17:49-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOM COMPLET <ADRESSE@MAIL>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,313 +17,87 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metadata/conf.py:40
-msgid "Configuration options for Navigator API"
-msgstr ""
-
-#: src/metadata/conf.py:44
-msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
-msgstr ""
-
-#: src/metadata/conf.py:48
-msgid "Auth username of the hue user used for authentications."
-msgstr ""
-
 #: src/metadata/conf.py:53
+msgid "Configuration options for Optimizer API"
+msgstr "Options de configuration pour l'API Optimizer"
+
+#: src/metadata/conf.py:57
+msgid "Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)"
+msgstr "URL de base de l'API Optimizer (par ex. https://alpha.optimizer.cloudera.com/)"
+
+#: src/metadata/conf.py:62
+msgid "The name of the product or group which will have API access to the emails associated with it."
+msgstr "Nom du produit ou du groupe qui a accès par l'API aux courriels qui lui sont associés."
+
+#: src/metadata/conf.py:67 src/metadata/conf.py:78
+msgid "A secret passphrase associated with the productName."
+msgstr "Phrase de passe secrète associée au productName."
+
+#: src/metadata/conf.py:72 src/metadata/conf.py:83
+msgid "Execute this script to produce the product secret. This will be used when `product_secret` is not set."
+msgstr "Exécutez ce script pour générer la phrase secrète du produit. Elle sera utilisée si 'product_secret' n'est pas défini."
+
+#: src/metadata/conf.py:90
+msgid "The email of the Optimizer account you want to associate with the Product."
+msgstr "Adresse électronique du compte Optimizer que vous voulez associer au produit."
+
+#: src/metadata/conf.py:95
+msgid "The password associated with the Optimizer account you to associate with the Product."
+msgstr "Mot de passe du compte Optimizer que vous voulez associer au produit."
+
+#: src/metadata/conf.py:100
+msgid "Execute this script to produce the email password. This will be used when `email_password` is not set."
+msgstr "Exécutez ce script pour générer le mot de passe de courriel. Il sera utilisé si 'email_password' n'est pas défini."
+
+#: src/metadata/conf.py:107
+msgid "In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"
+msgstr "En mode sécurisé (HTTPS), si les certificats SSL d'Optimizer doivent être vérifié par l'autorité de certification"
+
+#: src/metadata/conf.py:114
+msgid "Use mock data"
+msgstr "Utiliser des données simulées"
+
+#: src/metadata/conf.py:124
+msgid "Configuration options for Navigator API"
+msgstr "Options de configuration pour l'API de navigateur"
+
+#: src/metadata/conf.py:128
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api)"
+msgstr "URL de base vers l'API de navigateur (par ex. http://localhost:7187/api)"
+
+#: src/metadata/conf.py:132
+msgid "Auth username of the hue user used for authentications."
+msgstr "Nom d'authentification de l'utilisateur Hue utilisé pour les authentifications."
+
+#: src/metadata/conf.py:137
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
-msgstr ""
+msgstr "Mot de passe LDAP/PAM.. de l'utilisateur Hue utilisé pour les authentifications."
 
-#: src/metadata/conf.py:58
-msgid ""
-"Execute this script to produce the auth password. This will be used when "
-"`auth_password` is not set."
-msgstr ""
+#: src/metadata/conf.py:142
+msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgstr "Exécutez ce script pour générer le mot de passe d'authentification. Il sera utilisé si 'auth_password' n'est pas défini."
 
-#~ msgid "Notebook saved !"
-#~ msgstr "Carnet enregistré !"
+#: src/metadata/navigator_api.py:162 src/metadata/navigator_api.py:180
+msgid "add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags"
+msgstr "add_tags requiert un paramètre 'id' et un paramètre 'tags' constitué d'une liste d'étiquettes non vide"
 
-#~ msgid "Notebook closed !"
-#~ msgstr "Carnet fermé !"
+#: src/metadata/navigator_api.py:198
+msgid "update_properties requires an 'id' parameter and 'properties' parameter that is a non-empty dict"
+msgstr "update_properties requiert un paramètre 'id' et un paramètre 'properties' constitué d'un dictionnaire non vide"
 
-#~ msgid "URL of the Spark Job Server."
-#~ msgstr "URL du serveur de job Spark."
+#: src/metadata/navigator_api.py:216
+msgid "update_properties requires an 'id' parameter and 'keys' parameter that is a non-empty list"
+msgstr "update_properties requiert un paramètre 'id' et un paramètre 'keys' constitué d'une liste non vide"
 
-#~ msgid "List of available types of snippets."
-#~ msgstr "Liste des types d'extrait disponibles."
+#: src/metadata/optimizer_client.py:80 src/metadata/optimizer_client.py:93
+#: src/metadata/optimizer_client.py:104 src/metadata/optimizer_client.py:115
+#: src/metadata/optimizer_client.py:126 src/metadata/optimizer_client.py:145
+#: src/metadata/optimizer_client.py:159 src/metadata/optimizer_client.py:174
+#: src/metadata/optimizer_client.py:191 src/metadata/optimizer_client.py:207
+#: src/metadata/optimizer_client.py:224
+msgid "Error while accessing Optimizer"
+msgstr "Erreur lors de l'accès à Optimizer"
 
-#~ msgid "The app won't work without a running Job Server"
+#~ msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
 #~ msgstr ""
-#~ "Sans un serveur Job Server en "
-#~ "cours d'exécution, l'application ne "
-#~ "fonctionnera pas."
-
-#~ msgid "Example: 1 + 1, or press CTRL + space"
-#~ msgstr "Exemple : 1 + 1, ou appuyer sur Ctrl + Espace"
-
-#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
-#~ msgstr "Exemple : SELECT * FROM nom_de_table ou appuyez sur CTRL + espace"
-
-#~ msgid "<h2>This is a text snippet</h2>Type your text here"
-#~ msgstr "<h2>Voici un extrait de texte</h2>Saisir votre texte ici"
-
-#~ msgid "Query"
-#~ msgstr "Requête"
-
-#~ msgid "Execute all snippets"
-#~ msgstr "Exécuter tous les extraits"
-
-#~ msgid "Clear all results"
-#~ msgstr "Effacer tous les résultats"
-
-#~ msgid "Edit"
-#~ msgstr "Modifier"
-
-#~ msgid "Save"
-#~ msgstr "Enregistrer"
-
-#~ msgid "Saving..."
-#~ msgstr "Enregistrement en cours..."
-
-#~ msgid "Brand New"
-#~ msgstr "Nouveau"
-
-#~ msgid "Notebooks"
-#~ msgstr "Carnets"
-
-#~ msgid "Add a new notebook"
-#~ msgstr "Ajouter un nouveau carnet"
-
-#~ msgid "Toggle Assist"
-#~ msgstr "Activer/Désactiver l'aide"
-
-#~ msgid "Data sample for"
-#~ msgstr "Echantillon de données pour"
-
-#~ msgid "Ok"
-#~ msgstr "OK"
-
-#~ msgid "Manually refresh the table list"
-#~ msgstr "Actualiser manuellement la liste de tables"
-
-#~ msgid "database"
-#~ msgstr "base de données"
-
-#~ msgid "Choose a database..."
-#~ msgstr "Choisir une base de données..."
-
-#~ msgid "Table name..."
-#~ msgstr "Nom de la table..."
-
-#~ msgid "The selected database has no tables."
-#~ msgstr "La base de données sélectionnée n'a pas de tables."
-
-#~ msgid "The database list cannot be loaded."
-#~ msgstr "La liste de bases de données ne peut pas être chargée."
-
-#~ msgid "Add a snippet to start your new notebook"
-#~ msgstr "Ajouter un extrait pour commencer votre nouveau carnet"
-
-#~ msgid "Add a new snippet"
-#~ msgstr "Ajouter un nouvel extrait"
-
-#~ msgid "Text"
-#~ msgstr "Texte"
-
-#~ msgid "Creating session"
-#~ msgstr "Création d'une session"
-
-#~ msgid "CTRL + ENTER"
-#~ msgstr "CTRL + ENTREE"
-
-#~ msgid "Cancel"
-#~ msgstr "Annuler"
-
-#~ msgid "Grid"
-#~ msgstr "Grille"
-
-#~ msgid "Bars"
-#~ msgstr "Barres"
-
-#~ msgid "Lines"
-#~ msgstr "Lignes"
-
-#~ msgid "Pie"
-#~ msgstr "Diagramme"
-
-#~ msgid "Scatter"
-#~ msgstr "Dispersion"
-
-#~ msgid "Marker Map"
-#~ msgstr "Map Marker"
-
-#~ msgid "Gradient Map"
-#~ msgstr "Carte de dégradés"
-
-#~ msgid "Show Logs"
-#~ msgstr "Afficher les journaux"
-
-#~ msgid "Download first rows as CSV"
-#~ msgstr "Télécharger les premières lignes au format CSV"
-
-#~ msgid "CSV"
-#~ msgstr "CSV"
-
-#~ msgid "Download first rows as XLS"
-#~ msgstr "Télécharger les premières lignes au format XLS"
-
-#~ msgid "Excel"
-#~ msgstr "Excel"
-
-#~ msgid "Loading..."
-#~ msgstr "Chargement en cours..."
-
-#~ msgid "Success."
-#~ msgstr "Réussite."
-
-#~ msgid "Success but empty results."
-#~ msgstr "L'opération a réussi, mais les résultats sont vides."
-
-#~ msgid "Hide columns"
-#~ msgstr "Masquer les colonnes"
-
-#~ msgid "columns"
-#~ msgstr "colonnes"
-
-#~ msgid "Show columns"
-#~ msgstr "Afficher les colonnes"
-
-#~ msgid "Hide"
-#~ msgstr "Masquer"
-
-#~ msgid "Hide settings"
-#~ msgstr "Masquer les paramètres"
-
-#~ msgid "x-axis"
-#~ msgstr "Axe des abscisses"
-
-#~ msgid "region"
-#~ msgstr "région"
-
-#~ msgid "latitude"
-#~ msgstr "latitude"
-
-#~ msgid "legend"
-#~ msgstr "légende"
-
-#~ msgid "Choose a column..."
-#~ msgstr "Choisir une colonne..."
-
-#~ msgid "y-axis"
-#~ msgstr "Axe des ordonnées"
-
-#~ msgid "value"
-#~ msgstr "valeur"
-
-#~ msgid "longitude"
-#~ msgstr "longitude"
-
-#~ msgid "label"
-#~ msgstr "étiquette"
-
-#~ msgid "scatter group"
-#~ msgstr "groupe de dispersion"
-
-#~ msgid "scatter size"
-#~ msgstr "taille de dispersion"
-
-#~ msgid "sorting"
-#~ msgstr "tri"
-
-#~ msgid "No sorting"
-#~ msgstr "Aucun tri"
-
-#~ msgid "Sort ascending"
-#~ msgstr "Tri ascendant"
-
-#~ msgid "Sort descending"
-#~ msgstr "Tri descendant"
-
-#~ msgid "Show settings"
-#~ msgstr "Afficher les paramètres"
-
-#~ msgid "Paste or type a link"
-#~ msgstr "Coller ou entrer un lien"
-
-#~ msgid "Open in new window"
-#~ msgstr "Ouvrir dans une nouvelle fenêtre"
-
-#~ msgid "No data available"
-#~ msgstr "Aucune donnée disponible"
-
-#~ msgid "No matching records"
-#~ msgstr "Aucun enregistrement correspondant"
-
-#~ msgid "Distribution"
-#~ msgstr "Distribution"
-
-#~ msgid "There was a problem loading the table preview."
-#~ msgstr "Un problème est survenu lors du chargement de l'aperçu de la table."
-
-#~ msgid "Spark Editor"
-#~ msgstr "Editeur Spark"
-
-#~ msgid "Search for name, description, etc..."
-#~ msgstr "Rechercher un nom, une description, etc."
-
-#~ msgid "Submit"
-#~ msgstr "Envoyer"
-
-#~ msgid "Share"
-#~ msgstr "Partager"
-
-#~ msgid "Copy"
-#~ msgstr "Copier"
-
-#~ msgid "Delete"
-#~ msgstr "Supprimer"
-
-#~ msgid "Create"
-#~ msgstr "Créer"
-
-#~ msgid "Name"
-#~ msgstr "Nom"
-
-#~ msgid "Description"
-#~ msgstr "Description"
-
-#~ msgid "Owner"
-#~ msgstr "Propriétaire"
-
-#~ msgid "Last Modified"
-#~ msgstr "Dernière modification"
-
-#~ msgid "Delete the selected notebook(s)?"
-#~ msgstr "Supprimer le ou les carnets sélectionnés ?"
-
-#~ msgid "No"
-#~ msgstr "Non"
-
-#~ msgid "Yes"
-#~ msgstr "Oui"
-
-#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-#~ msgstr "Affichage des entrées _START_ to _END_ of _TOTAL_"
-
-#~ msgid "Showing 0 to 0 of 0 entries"
-#~ msgstr "Affichage des entrées 0 à 0 sur 0"
-
-#~ msgid "(filtered from _MAX_ total entries)"
-#~ msgstr "(filtrées à partir des entrées totales _MAX_)"
-
-#~ msgid "First"
-#~ msgstr "Premier"
-
-#~ msgid "Last"
-#~ msgstr "Dernier"
-
-#~ msgid "Next"
-#~ msgstr "Suivant"
-
-#~ msgid "Previous"
-#~ msgstr "Précédent"
 
