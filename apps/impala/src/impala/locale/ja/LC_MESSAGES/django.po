@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,71 +17,104 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
+#: src/impala/api.py:51
+msgid "Successfully invalidated metadata"
+msgstr "正常に無効化されたメタデータ"
+
+#: src/impala/api.py:66
+#, python-format
+msgid "Successfully refreshed metadata for `%s`.`%s`"
+msgstr "`%s`.`%s` のメタデータが正常に更新されました"
+
+#: src/impala/api.py:81
+msgid "get_exec_summary requires a valid query_history_id"
+msgstr "get_exec_summary には有効な query_history_id が必要です"
+
+#: src/impala/api.py:103
+msgid "get_runtime_profile requires a valid query_history_id"
+msgstr "get_runtime_profile には有効な query_history_id が必要です"
+
+#: src/impala/conf.py:35
 msgid "Host of the Impala Server."
 msgstr "Impala Server のホストです。"
 
-#: src/impala/conf.py:34
+#: src/impala/conf.py:40
 msgid "Port of the Impala Server."
 msgstr "Impala Server のポートです。"
 
-#: src/impala/conf.py:40
+#: src/impala/conf.py:46
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala の Kerberos プリンシパル名。普通は 'impala/hostname.foo.com' です。"
 
-#: src/impala/conf.py:46
+#: src/impala/conf.py:52
 msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Impala に通信する際の偽装メカニズムをオン／オフにします。"
 
-#: src/impala/conf.py:52
+#: src/impala/conf.py:58
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
 msgstr "ダウンロード用に行の再フェッチをサポートできるよう、Impala にキャッシュさせる結果セットの最初の行数です。オプションおよび下位互換性を無効にするには 0 に設定します。"
 
-#: src/impala/conf.py:62
+#: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
 msgstr "Thrift コールのタイムアウト時間（秒）です。"
 
-#: src/impala/conf.py:66
+#: src/impala/conf.py:72
 msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
 msgstr "ユーザーがエディタページを移動すると、Hue は Impala クエリを閉じようとします。これにより、Impala のクエリリソースがすべて解放されますが、結果にもアクセスできなくなります。"
 
-#: src/impala/conf.py:74
+#: src/impala/conf.py:80
 msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
 msgstr "QUERY_TIMEOUT_S > 0 の場合に、QUERY_TIMEOUT_S 秒以内に Impala がそのクエリの処理（計算または結果の送信）を実行しない場合、クエリはタイムアウトになります（つまりキャンセルされます）。"
 
-#: src/impala/conf.py:82
+#: src/impala/conf.py:88
+msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
+msgstr "SESSION_TIMEOUT_S > 0 の場合、QUERY_TIMEOUT_S 秒以内に Impala がそのセッションの処理（計算または結果の送信）を実行しないと、セッションはタイムアウトになります（つまりキャンセルされます）。"
+
+#: src/impala/conf.py:98
+msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
+msgstr "ユーザーに設定を許可する Impala 設定プロパティのホワイトリスト（カンマ区切りリスト）です。"
+
+#: src/impala/conf.py:103
 msgid "SSL configuration for the server."
 msgstr "サーバーの SSL 設定です。"
 
-#: src/impala/conf.py:86
+#: src/impala/conf.py:107
 msgid "SSL communication enabled for this server."
-msgstr "このサーバーの SSL 通信は有効です。"
+msgstr "このサーバーに対して、SSL 通信が有効になっています。"
 
-#: src/impala/conf.py:93
+#: src/impala/conf.py:114
 msgid "Path to Certificate Authority certificates."
 msgstr "認証局証明書へのパスです。"
 
-#: src/impala/conf.py:100
-msgid "Path to the private key file."
-msgstr "秘密鍵ファイルへのパスです。"
+#: src/impala/conf.py:121
+msgid "Path to the private key file, e.g. /etc/hue/key.pem"
+msgstr "/etc/hue/key.pem など、秘密鍵ファイルへのパスです。"
 
-#: src/impala/conf.py:107
-msgid "Path to the public certificate file."
-msgstr "公開証明書ファイルへのパスです。"
+#: src/impala/conf.py:128
+msgid "Path to the public certificate file, e.g. /etc/hue/cert.pem"
+msgstr "/etc/hue/cert.pem など、公開証明書ファイルへのパスです"
 
-#: src/impala/conf.py:114
+#: src/impala/conf.py:135
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "サーバーから受け取った証明書を Hue で検証するかどうかを選択します。"
 
-#: src/impala/conf.py:134
-msgid "No available Impalad to send queries to."
-msgstr "クエリの送信先の Impalad がありません。"
+#: src/impala/conf.py:148
+msgid "Auth username of the hue user used for authentications."
+msgstr "認証に使用する Hue ユーザーの認証ユーザー名"
 
-#: src/impala/dashboards.py:201
+#: src/impala/conf.py:162
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr "認証に使用する Hue ユーザーの LDAP/PAM/.. パスワードです。"
+
+#: src/impala/conf.py:168
+msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgstr "このスクリプトを実行して認証パスワードを作成します。これは auth_password が設定されていない場合に利用されます。"
+
+#: src/impala/dashboards.py:213
 msgid "Page saved !"
 msgstr "ページが保存されました。"
 
-#: src/impala/dashboards.py:203
+#: src/impala/dashboards.py:215
 msgid "There is no dashboard to search."
 msgstr "検索するダッシュボードがありません。"
 
@@ -171,7 +204,7 @@ msgstr "この値を除外"
 
 #: src/impala/templates/dashboard.mako:377
 msgid "There are currently no filters applied."
-msgstr "現在適用されているフィルタはありません。"
+msgstr "現在適用されているフィルターはありません。"
 
 #: src/impala/templates/dashboard.mako:382
 #: src/impala/templates/dashboard.mako:392
@@ -190,11 +223,14 @@ msgstr "元"
 msgid "to"
 msgstr "先"
 
-#: src/impala/templates/dashboard.mako:611
+#: src/impala/templates/dashboard.mako:609
 msgid "Oops, no database found!"
 msgstr "データベースが見つかりません。"
 
-#: src/impala/templates/dashboard.mako:635
+#: src/impala/templates/dashboard.mako:633
 msgid "Oops, no table found!"
 msgstr "テーブルが見つかりません。"
+
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "クエリの送信先の Impalad がありません。"
 

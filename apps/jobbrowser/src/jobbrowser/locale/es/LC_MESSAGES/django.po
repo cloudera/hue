@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,125 +17,208 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/jobbrowser/api.py:248
+msgid "Mapreduce Proxy API did not return JSON response, check if the job is running."
+msgstr "La API del proxy de MapReduce no devolvió una respuesta de JSON. Compruebe que el job se está ejecutando."
+
+#: src/jobbrowser/api.py:272
+#, python-format
+msgid "Job %s could not be found in Resource Manager: %s"
+msgstr "El job %s no se ha encontrado en Resource Manager: %s"
+
+#: src/jobbrowser/api.py:274
+#, python-format
+msgid "Application is not running: %s"
+msgstr "La aplicación no está en ejecución: %s"
+
+#: src/jobbrowser/api.py:276
+#, python-format
+msgid "Job %s could not be found: %s"
+msgstr "El job %s no se ha encontrado: %s"
+
 #: src/jobbrowser/conf.py:26
 msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "Compartir información de trabajos enviados con todos los usuarios. Si se establece en false, los trabajos enviados solo están visibles para el propietario y los administradores."
 
-#: src/jobbrowser/models.py:103
+#: src/jobbrowser/conf.py:33
+msgid "Disable the job kill button for all users in the job browser."
+msgstr "Desactive el botón de eliminación del job para todos los usuarios en Job Browser."
+
+#: src/jobbrowser/conf.py:39
+msgid "Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB)."
+msgstr "La desincronización en bytes, donde una desincronización negativa recuperará los últimos N bytes del archivo de registro en cuestión (el valor predeterminado es 1 MB)."
+
+#: src/jobbrowser/models.py:120
 #, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "No se ha encontrado el trabajo con el ID %(jobid)s."
+msgstr "No se ha encontrado el job con el ID %(jobid)s."
 
-#: src/jobbrowser/models.py:441
+#: src/jobbrowser/models.py:458
 #, python-format
 msgid "Cannot look up TaskTracker %(id)s."
 msgstr "No se puede buscar TaskTracker %(id)s."
 
-#: src/jobbrowser/models.py:465
+#: src/jobbrowser/models.py:482
 #, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
 msgstr "No se pueden recuperar registros de TaskTracker %(id)s."
 
-#: src/jobbrowser/models.py:473
+#: src/jobbrowser/models.py:490
 #, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
 msgstr "Hue ha encontrado un error al recuperar los registros de '%s'."
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 #, python-format
 msgid "Job %s has expired."
 msgstr "El job %s ha caducado."
 
-#: src/jobbrowser/views.py:63
+#: src/jobbrowser/views.py:81
 msgid "Cannot be found on the History Server."
 msgstr "No se encuentra en el servidor de Historial."
 
-#: src/jobbrowser/views.py:65
-#, python-format
-msgid "Could not find job %s."
-msgstr "No se ha podido encontrar el job %s."
-
-#: src/jobbrowser/views.py:69
+#: src/jobbrowser/views.py:89
 #, python-format
 msgid "You don't have permission to access job %(id)s."
 msgstr "No tiene permiso para acceder al job %(id)s."
 
-#: src/jobbrowser/views.py:85
+#: src/jobbrowser/views.py:105
 #, python-format
 msgid "Error polling job %s: %s"
 msgstr "Error al encuestar el job %s: %s"
 
-#: src/jobbrowser/views.py:104
+#: src/jobbrowser/views.py:125
 msgid "Resource Manager cannot be contacted or might be down."
 msgstr "Es posible que ResourceManager esté inactivo o no se pueda contactar con él."
 
-#: src/jobbrowser/views.py:106
-
+#: src/jobbrowser/views.py:127
 msgid "Job Tracker cannot be contacted or might be down."
 msgstr "Es posible que JobTracker esté inactivo o no se pueda contactar con él."
 
-#: src/jobbrowser/views.py:130 src/jobbrowser/views.py:131
-#: src/jobbrowser/templates/job.mako:531 src/jobbrowser/templates/job.mako:535
-#: src/jobbrowser/templates/job.mako:538 src/jobbrowser/templates/job.mako:542
-#: src/jobbrowser/templates/job.mako:547 src/jobbrowser/templates/jobs.mako:239
-#: src/jobbrowser/templates/jobs.mako:240
+#: src/jobbrowser/views.py:154 src/jobbrowser/views.py:155
+#: src/jobbrowser/templates/job.mako:656 src/jobbrowser/templates/job.mako:663
+#: src/jobbrowser/templates/job.mako:672 src/jobbrowser/templates/jobs.mako:242
 #: src/jobbrowser/templates/jobs.mako:243
+#: src/jobbrowser/templates/jobs.mako:246
 msgid "N/A"
 msgstr "N/D"
 
-#: src/jobbrowser/views.py:224
+#: src/jobbrowser/views.py:248
 #, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
 msgstr "kill_job solo se puede llamar con POST (se ha obtenido %(method)s)."
 
-#: src/jobbrowser/views.py:227
+#: src/jobbrowser/views.py:251
 msgid "Insufficient permission"
 msgstr "Permiso insuficiente"
 
-#: src/jobbrowser/views.py:228
+#: src/jobbrowser/views.py:252
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
 msgstr "Permiso denegado. El usuario %(username)s no puede eliminar el trabajo del usuario %(user)s."
 
-#: src/jobbrowser/views.py:247
+#: src/jobbrowser/views.py:278
 msgid "Job did not appear as killed within 15 seconds."
 msgstr "El job no ha aparecido como eliminado en un plazo de 15 segundos."
 
-#: src/jobbrowser/views.py:266
+#: src/jobbrowser/views.py:311
 #, python-format
 msgid "Cannot find job attempt '%(id)s'."
 msgstr "No se encuentra el intento '%(id)s' del job."
 
-#: src/jobbrowser/views.py:279 src/jobbrowser/yarn_models.py:342
+#: src/jobbrowser/views.py:313
+#, python-format
+msgid "Failed to get application for job %s: %s"
+msgstr "Error al obtener la aplicación del job %s: %s"
+
+#: src/jobbrowser/views.py:331 src/jobbrowser/yarn_models.py:456
 #, python-format
 msgid "Failed to retrieve log: %s"
 msgstr "Error al recuperar el registro: %s"
 
-#: src/jobbrowser/views.py:311
+#: src/jobbrowser/views.py:370
 #, python-format
 msgid "No tasks found for job %(id)s."
 msgstr "No se ha encontrado ninguna tarea para el job %(id)s."
 
-#: src/jobbrowser/views.py:379 src/jobbrowser/views.py:398
+#: src/jobbrowser/views.py:440 src/jobbrowser/views.py:459
 #, python-format
 msgid "Cannot find attempt '%(id)s' in task"
 msgstr "No se encuentra el intento '%(id)s en la tarea"
 
-#: src/jobbrowser/views.py:417
+#: src/jobbrowser/views.py:478
 msgid "Failed to retrieve log. TaskTracker not found."
 msgstr "Error al recuperar el registro. TaskTracker no encontrado."
 
-#: src/jobbrowser/views.py:419
+#: src/jobbrowser/views.py:480
 msgid "Failed to retrieve log. TaskTracker not ready."
 msgstr "Error al recuperar el registro. TaskTracker no está listo."
 
-#: src/jobbrowser/views.py:478
+#: src/jobbrowser/views.py:542
 msgid "The tracker could not be contacted."
 msgstr "No se ha podido contactar con el seguidor."
 
-#: src/jobbrowser/views.py:488
+#: src/jobbrowser/views.py:552
 msgid "The container disappears as soon as the job finishes."
 msgstr "El contenedor desaparece en cuanto termina el job."
+
+#: src/jobbrowser/yarn_models.py:145
+msgid "Executor Id"
+msgstr "ID de ejecutor"
+
+#: src/jobbrowser/yarn_models.py:146
+msgid "Address"
+msgstr "Dirección"
+
+#: src/jobbrowser/yarn_models.py:147
+msgid "RDD Blocks"
+msgstr "Bloques RDD"
+
+#: src/jobbrowser/yarn_models.py:148
+msgid "Storage Memory"
+msgstr "Memoria de almacenamiento"
+
+#: src/jobbrowser/yarn_models.py:149
+msgid "Disk Used"
+msgstr "Disco usado"
+
+#: src/jobbrowser/yarn_models.py:150
+msgid "Active Tasks"
+msgstr "Tareas activas"
+
+#: src/jobbrowser/yarn_models.py:151 src/jobbrowser/templates/job.mako:331
+msgid "Failed Tasks"
+msgstr "Tareas erróneas"
+
+#: src/jobbrowser/yarn_models.py:152
+msgid "Complete Tasks"
+msgstr "Tareas completadas"
+
+#: src/jobbrowser/yarn_models.py:153
+msgid "Task Time"
+msgstr "Tiempo de tarea"
+
+#: src/jobbrowser/yarn_models.py:154
+msgid "Input"
+msgstr "Entrada"
+
+#: src/jobbrowser/yarn_models.py:155
+msgid "Shuffle Read"
+msgstr "Lectura aleatoria"
+
+#: src/jobbrowser/yarn_models.py:156
+msgid "Shuffle Write"
+msgstr "Escritura aleatoria"
+
+#: src/jobbrowser/yarn_models.py:157 src/jobbrowser/templates/attempt.mako:68
+#: src/jobbrowser/templates/attempt_logs.mako:62
+#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:117
+#: src/jobbrowser/templates/job.mako:118 src/jobbrowser/templates/job.mako:240
+#: src/jobbrowser/templates/job.mako:241 src/jobbrowser/templates/job.mako:301
+#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
+#: src/jobbrowser/templates/tasks.mako:68
+msgid "Logs"
+msgstr "Registros"
 
 #: src/jobbrowser/templates/attempt.mako:22
 #: src/jobbrowser/templates/attempt.mako:60
@@ -168,63 +251,53 @@ msgstr "Job"
 
 #: src/jobbrowser/templates/attempt.mako:41
 #: src/jobbrowser/templates/attempt_logs.mako:37
-#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:215
-#: src/jobbrowser/templates/job.mako:361 src/jobbrowser/templates/jobs.mako:68
-#: src/jobbrowser/templates/task.mako:36 src/jobbrowser/templates/task.mako:131
-#: src/jobbrowser/templates/tasks.mako:76
+#: src/jobbrowser/templates/job.mako:115 src/jobbrowser/templates/job.mako:238
+#: src/jobbrowser/templates/job.mako:388 src/jobbrowser/templates/job.mako:455
+#: src/jobbrowser/templates/jobs.mako:69 src/jobbrowser/templates/task.mako:36
+#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/tasks.mako:72
 msgid "Status"
 msgstr "Estado"
 
 #: src/jobbrowser/templates/attempt.mako:65
 #: src/jobbrowser/templates/attempt_logs.mako:60
-#: src/jobbrowser/templates/job.mako:131 src/jobbrowser/templates/job.mako:263
-#: src/jobbrowser/templates/task.mako:56
+#: src/jobbrowser/templates/job.mako:133 src/jobbrowser/templates/job.mako:290
+#: src/jobbrowser/templates/job.mako:477 src/jobbrowser/templates/task.mako:56
 msgid "Metadata"
 msgstr "Metadatos"
 
 #: src/jobbrowser/templates/attempt.mako:66
 #: src/jobbrowser/templates/attempt_logs.mako:61
-#: src/jobbrowser/templates/job.mako:265 src/jobbrowser/templates/task.mako:57
+#: src/jobbrowser/templates/job.mako:292 src/jobbrowser/templates/task.mako:57
 msgid "Counters"
 msgstr "Contadores"
 
-#: src/jobbrowser/templates/attempt.mako:68
-#: src/jobbrowser/templates/attempt_logs.mako:62
-#: src/jobbrowser/templates/job.mako:32 src/jobbrowser/templates/job.mako:115
-#: src/jobbrowser/templates/job.mako:116 src/jobbrowser/templates/job.mako:217
-#: src/jobbrowser/templates/job.mako:218 src/jobbrowser/templates/job.mako:274
-#: src/jobbrowser/templates/jobs.mako:65 src/jobbrowser/templates/task.mako:65
-#: src/jobbrowser/templates/tasks.mako:72
-msgid "Logs"
-msgstr "Registros"
-
 #: src/jobbrowser/templates/attempt.mako:77
-#: src/jobbrowser/templates/job.mako:140 src/jobbrowser/templates/job.mako:324
-#: src/jobbrowser/templates/job.mako:370
+#: src/jobbrowser/templates/job.mako:142 src/jobbrowser/templates/job.mako:351
+#: src/jobbrowser/templates/job.mako:397 src/jobbrowser/templates/job.mako:483
 #: src/jobbrowser/templates/jobbrowser_components.mako:81
 #: src/jobbrowser/templates/jobbrowser_components.mako:122
-#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:109
+#: src/jobbrowser/templates/jobs.mako:67 src/jobbrowser/templates/task.mako:117
 #: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Name"
 msgstr "Nombre"
 
 #: src/jobbrowser/templates/attempt.mako:78
-#: src/jobbrowser/templates/job.mako:141 src/jobbrowser/templates/job.mako:187
-#: src/jobbrowser/templates/job.mako:325 src/jobbrowser/templates/job.mako:371
+#: src/jobbrowser/templates/job.mako:143 src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:398 src/jobbrowser/templates/job.mako:484
 #: src/jobbrowser/templates/jobbrowser_components.mako:30
 #: src/jobbrowser/templates/jobbrowser_components.mako:56
-#: src/jobbrowser/templates/task.mako:110
+#: src/jobbrowser/templates/task.mako:118
 msgid "Value"
 msgstr "Valor"
 
 #: src/jobbrowser/templates/attempt.mako:87
-#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:73
+#: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:69
 msgid "Task ID"
 msgstr "ID de tarea"
 
 #: src/jobbrowser/templates/attempt.mako:89
-#: src/jobbrowser/templates/attempt_logs.mako:33
-#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/job.mako:48 src/jobbrowser/templates/job.mako:731
 msgid "View this task"
 msgstr "Ver esta tarea"
 
@@ -233,28 +306,27 @@ msgid "Task Type"
 msgstr "Tipo de tarea"
 
 #: src/jobbrowser/templates/attempt.mako:96
-#: src/jobbrowser/templates/task.mako:123
+#: src/jobbrowser/templates/task.mako:131
 msgid "JobId"
 msgstr "ID de trabajo"
 
 #: src/jobbrowser/templates/attempt.mako:98
-#: src/jobbrowser/templates/attempt_logs.mako:36
 #: src/jobbrowser/templates/job_attempt_logs.mako:40
-#: src/jobbrowser/templates/jobs.mako:235
-#: src/jobbrowser/templates/task.mako:124
+#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/task.mako:132
 msgid "View this job"
 msgstr "Ver este trabajo"
 
 #: src/jobbrowser/templates/attempt.mako:101
 #: src/jobbrowser/templates/container.mako:46
-#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:127
-#: src/jobbrowser/templates/tasks.mako:77
+#: src/jobbrowser/templates/task.mako:68 src/jobbrowser/templates/task.mako:135
+#: src/jobbrowser/templates/tasks.mako:73
 msgid "State"
 msgstr "Estado"
 
 #: src/jobbrowser/templates/attempt.mako:105
-#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:135
-#: src/jobbrowser/templates/tasks.mako:78
+#: src/jobbrowser/templates/task.mako:70 src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/tasks.mako:74
 msgid "Start Time"
 msgstr "Hora de inicio"
 
@@ -263,9 +335,9 @@ msgid "Finish Time"
 msgstr "Hora de finalización"
 
 #: src/jobbrowser/templates/attempt.mako:113
-#: src/jobbrowser/templates/job.mako:117 src/jobbrowser/templates/task.mako:67
-#: src/jobbrowser/templates/task.mako:147
-#: src/jobbrowser/templates/tasks.mako:75
+#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:463
+#: src/jobbrowser/templates/task.mako:67 src/jobbrowser/templates/task.mako:155
+#: src/jobbrowser/templates/tasks.mako:71
 msgid "Progress"
 msgstr "Progreso"
 
@@ -275,39 +347,58 @@ msgid "Task Tracker"
 msgstr "TaskTracker"
 
 #: src/jobbrowser/templates/attempt.mako:128
-#: src/jobbrowser/templates/task.mako:73
+#: src/jobbrowser/templates/task.mako:75
 msgid "Phase"
 msgstr "Fase"
 
 #: src/jobbrowser/templates/attempt.mako:132
-#: src/jobbrowser/templates/task.mako:72
 msgid "Output Size"
 msgstr "Tamaño de resultado"
 
-#: src/jobbrowser/templates/attempt.mako:169
-#: src/jobbrowser/templates/attempt.mako:185
+#: src/jobbrowser/templates/attempt.mako:137
+#: src/jobbrowser/templates/task.mako:77
+msgid "Shuffle Finish"
+msgstr "Finalización de orden aleatorio"
+
+#: src/jobbrowser/templates/attempt.mako:141
+#: src/jobbrowser/templates/task.mako:78
+msgid "Sort Finish"
+msgstr "Finalización de clasificación"
+
+#: src/jobbrowser/templates/attempt.mako:145
+#: src/jobbrowser/templates/task.mako:79
+msgid "Map Finish"
+msgstr "Finalización de asignación"
+
+#: src/jobbrowser/templates/attempt.mako:151
+#: src/jobbrowser/templates/task.mako:73
+msgid "Node Address"
+msgstr "Dirección de nodo"
+
+#: src/jobbrowser/templates/attempt.mako:189
+#: src/jobbrowser/templates/attempt.mako:205
 #: src/jobbrowser/templates/attempt_logs.mako:142
 #: src/jobbrowser/templates/attempt_logs.mako:158
-#: src/jobbrowser/templates/job.mako:449 src/jobbrowser/templates/job.mako:481
-#: src/jobbrowser/templates/jobs.mako:132
-#: src/jobbrowser/templates/task.mako:181
-#: src/jobbrowser/templates/task.mako:197
-#: src/jobbrowser/templates/task.mako:213
-#: src/jobbrowser/templates/tasks.mako:123
+#: src/jobbrowser/templates/job.mako:574 src/jobbrowser/templates/job.mako:606
+#: src/jobbrowser/templates/jobs.mako:134
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/task.mako:205
+#: src/jobbrowser/templates/task.mako:221
+#: src/jobbrowser/templates/tasks.mako:133
 #: src/jobbrowser/templates/tasktrackers.mako:82
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/jobbrowser/templates/attempt.mako:170
-#: src/jobbrowser/templates/attempt.mako:186
+#: src/jobbrowser/templates/attempt.mako:190
+#: src/jobbrowser/templates/attempt.mako:206
 #: src/jobbrowser/templates/attempt_logs.mako:143
 #: src/jobbrowser/templates/attempt_logs.mako:159
-#: src/jobbrowser/templates/job.mako:450 src/jobbrowser/templates/job.mako:482
-#: src/jobbrowser/templates/jobs.mako:133
-#: src/jobbrowser/templates/task.mako:182
-#: src/jobbrowser/templates/task.mako:198
-#: src/jobbrowser/templates/task.mako:214
-#: src/jobbrowser/templates/tasks.mako:124
+#: src/jobbrowser/templates/job.mako:575 src/jobbrowser/templates/job.mako:607
+#: src/jobbrowser/templates/jobs.mako:135
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/task.mako:206
+#: src/jobbrowser/templates/task.mako:222
+#: src/jobbrowser/templates/tasks.mako:134
 #: src/jobbrowser/templates/tasktrackers.mako:83
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
@@ -342,7 +433,7 @@ msgid "Container at %(trackerHost)s on port %(trackerPort)s"
 msgstr "Contenedor en %(trackerHost)s en el puerto %(trackerPort)s"
 
 #: src/jobbrowser/templates/container.mako:36
-#: src/jobbrowser/templates/job.mako:329 src/jobbrowser/templates/jobs.mako:66
+#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:66
 #: src/jobbrowser/templates/tasktracker.mako:36
 msgid "ID"
 msgstr "ID"
@@ -357,13 +448,14 @@ msgid "Node Id"
 msgstr "ID de nodo"
 
 #: src/jobbrowser/templates/container.mako:48
-#: src/jobbrowser/templates/job.mako:111 src/jobbrowser/templates/job.mako:213
-#: src/jobbrowser/templates/job.mako:333 src/jobbrowser/templates/jobs.mako:69
+#: src/jobbrowser/templates/job.mako:113 src/jobbrowser/templates/job.mako:232
+#: src/jobbrowser/templates/job.mako:360 src/jobbrowser/templates/job.mako:453
+#: src/jobbrowser/templates/jobs.mako:70
 msgid "User"
 msgstr "Usuario"
 
 #: src/jobbrowser/templates/container.mako:50
-#: src/jobbrowser/templates/job.mako:177
+#: src/jobbrowser/templates/job.mako:181 src/jobbrowser/templates/job.mako:527
 msgid "Diagnostics"
 msgstr "Diagnóstico"
 
@@ -380,189 +472,189 @@ msgstr "Código de salida"
 msgid "Back"
 msgstr "Volver"
 
-#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:259
-#: src/jobbrowser/templates/job.mako:261
+#: src/jobbrowser/templates/job.mako:33 src/jobbrowser/templates/job.mako:286
+#: src/jobbrowser/templates/job.mako:288
 msgid "Tasks"
 msgstr "Tareas"
 
-#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/task.mako:119
-#: src/jobbrowser/templates/tasks.mako:74
+#: src/jobbrowser/templates/job.mako:34 src/jobbrowser/templates/job.mako:111
+#: src/jobbrowser/templates/job.mako:230 src/jobbrowser/templates/job.mako:451
+#: src/jobbrowser/templates/task.mako:127
+#: src/jobbrowser/templates/tasks.mako:70
 msgid "Type"
 msgstr "Tipo"
 
-#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:252
+#: src/jobbrowser/templates/job.mako:86 src/jobbrowser/templates/job.mako:278
 #, python-format
 msgid "Job: %(jobId)s"
 msgstr "Job: %(jobId)s"
 
-#: src/jobbrowser/templates/job.mako:109
-
+#: src/jobbrowser/templates/job.mako:109 src/jobbrowser/templates/job.mako:449
 msgid "App ID"
 msgstr "ID de aplicación"
 
-#: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:225
-#: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:74
+#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:248
+#: src/jobbrowser/templates/job.mako:383 src/jobbrowser/templates/job.mako:465
+#: src/jobbrowser/templates/jobs.mako:75
 msgid "Duration"
 msgstr "Duración"
 
-#: src/jobbrowser/templates/job.mako:121 src/jobbrowser/templates/job.mako:245
+#: src/jobbrowser/templates/job.mako:123 src/jobbrowser/templates/job.mako:268
+#: src/jobbrowser/templates/job.mako:467
 msgid "Actions"
 msgstr "Acciones"
 
-#: src/jobbrowser/templates/job.mako:133
-
+#: src/jobbrowser/templates/job.mako:135
 msgid "Metrics"
 msgstr "Métricas"
 
-#: src/jobbrowser/templates/job.mako:145
+#: src/jobbrowser/templates/job.mako:147 src/jobbrowser/templates/job.mako:490
 msgid "Jobs"
 msgstr "Jobs"
 
-#: src/jobbrowser/templates/job.mako:149
+#: src/jobbrowser/templates/job.mako:152 src/jobbrowser/templates/job.mako:497
 #: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Host"
 msgstr "Host"
 
-#: src/jobbrowser/templates/job.mako:153
+#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:503
 msgid "Queue Name"
 msgstr "Nombre de cola"
 
-#: src/jobbrowser/templates/job.mako:157 src/jobbrowser/templates/job.mako:347
+#: src/jobbrowser/templates/job.mako:161 src/jobbrowser/templates/job.mako:374
+#: src/jobbrowser/templates/job.mako:507
 msgid "Started"
 msgstr "Iniciadas"
 
-#: src/jobbrowser/templates/job.mako:161
-
+#: src/jobbrowser/templates/job.mako:165 src/jobbrowser/templates/job.mako:511
 msgid "Finished"
 msgstr "Finalizado"
 
-#: src/jobbrowser/templates/job.mako:165
+#: src/jobbrowser/templates/job.mako:169 src/jobbrowser/templates/job.mako:515
 msgid "Pre-empted Resource VCores"
 msgstr "VCores de recursos anticipados"
 
-#: src/jobbrowser/templates/job.mako:169
+#: src/jobbrowser/templates/job.mako:173 src/jobbrowser/templates/job.mako:519
 msgid "VCore seconds"
 msgstr "Segundos de VCore"
 
-#: src/jobbrowser/templates/job.mako:173
-
+#: src/jobbrowser/templates/job.mako:177 src/jobbrowser/templates/job.mako:523
 msgid "Memory seconds"
 msgstr "Segundos de memoria"
 
-#: src/jobbrowser/templates/job.mako:186
-
-msgid "Metric"
-msgstr "Métrica"
-
-#: src/jobbrowser/templates/job.mako:192
-msgid "header"
-msgstr "encabezado"
-
-#: src/jobbrowser/templates/job.mako:211
+#: src/jobbrowser/templates/job.mako:228
 #: src/jobbrowser/templates/job_not_assigned.mako:36
 msgid "Job ID"
 msgstr "ID de job"
 
-#: src/jobbrowser/templates/job.mako:220 src/jobbrowser/templates/job.mako:338
-#: src/jobbrowser/templates/jobs.mako:70
+#: src/jobbrowser/templates/job.mako:235
+msgid "Proxy User"
+msgstr "Usuario de proxy"
+
+#: src/jobbrowser/templates/job.mako:243 src/jobbrowser/templates/job.mako:365
+#: src/jobbrowser/templates/jobs.mako:71
 msgid "Maps"
 msgstr "Maps"
 
-#: src/jobbrowser/templates/job.mako:222 src/jobbrowser/templates/job.mako:342
-#: src/jobbrowser/templates/jobs.mako:71
+#: src/jobbrowser/templates/job.mako:245 src/jobbrowser/templates/job.mako:369
+#: src/jobbrowser/templates/jobs.mako:72
 msgid "Reduces"
 msgstr "Reduces"
 
-#: src/jobbrowser/templates/job.mako:234
+#: src/jobbrowser/templates/job.mako:257
 msgid "Output"
 msgstr "Resultado"
 
-#: src/jobbrowser/templates/job.mako:258 src/jobbrowser/templates/task.mako:55
-#: src/jobbrowser/templates/tasks.mako:105
+#: src/jobbrowser/templates/job.mako:285 src/jobbrowser/templates/task.mako:55
+#: src/jobbrowser/templates/tasks.mako:101
 msgid "Attempts"
 msgstr "Intentos"
 
-#: src/jobbrowser/templates/job.mako:275
+#: src/jobbrowser/templates/job.mako:302
 msgid "Id"
 msgstr "ID"
 
-#: src/jobbrowser/templates/job.mako:276
+#: src/jobbrowser/templates/job.mako:303
 msgid "Container"
 msgstr "Contenedor"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "This jobs is "
 msgstr "Este job es "
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid "retired"
 msgstr "retirado"
 
-#: src/jobbrowser/templates/job.mako:298
+#: src/jobbrowser/templates/job.mako:325
 msgid " and so has little information available."
 msgstr " y, por lo tanto, tiene poca información disponible."
 
-#: src/jobbrowser/templates/job.mako:303
+#: src/jobbrowser/templates/job.mako:330
 msgid "View All Failed Tasks"
 msgstr "Ver todas mis tareas erróneas"
 
-#: src/jobbrowser/templates/job.mako:304
-msgid "Failed Tasks"
-msgstr "Tareas erróneas"
-
-#: src/jobbrowser/templates/job.mako:310
+#: src/jobbrowser/templates/job.mako:337
 msgid "View All Tasks"
 msgstr "Ver todas las tareas"
 
-#: src/jobbrowser/templates/job.mako:311
+#: src/jobbrowser/templates/job.mako:338
 msgid "Recent Tasks"
 msgstr "Tareas recientes"
 
-#: src/jobbrowser/templates/job.mako:320 src/jobbrowser/templates/tasks.mako:57
+#: src/jobbrowser/templates/job.mako:347 src/jobbrowser/templates/tasks.mako:57
 msgid "Text Filter"
 msgstr "Filtro de texto"
 
-#: src/jobbrowser/templates/job.mako:352
+#: src/jobbrowser/templates/job.mako:379
 msgid "Ended"
 msgstr "Finalizadas"
 
-#: src/jobbrowser/templates/job.mako:367
+#: src/jobbrowser/templates/job.mako:394
 msgid "Raw configuration:"
 msgstr "Configuración sin procesar:"
 
-#: src/jobbrowser/templates/job.mako:420 src/jobbrowser/templates/jobs.mako:88
+#: src/jobbrowser/templates/job.mako:459 src/jobbrowser/templates/job.mako:460
+msgid "Tracking URL"
+msgstr "URL de seguimiento"
+
+#: src/jobbrowser/templates/job.mako:545 src/jobbrowser/templates/jobs.mako:89
 msgid "Confirm Kill"
 msgstr "Confirmar eliminación"
 
-#: src/jobbrowser/templates/job.mako:423 src/jobbrowser/templates/jobs.mako:91
+#: src/jobbrowser/templates/job.mako:548 src/jobbrowser/templates/jobs.mako:92
 msgid "Are you sure you want to kill this job?"
 msgstr "¿Está seguro de que desea eliminar este trabajo?"
 
-#: src/jobbrowser/templates/job.mako:426 src/jobbrowser/templates/jobs.mako:94
+#: src/jobbrowser/templates/job.mako:551 src/jobbrowser/templates/jobs.mako:95
 msgid "No"
 msgstr "No"
 
-#: src/jobbrowser/templates/job.mako:427 src/jobbrowser/templates/jobs.mako:95
+#: src/jobbrowser/templates/job.mako:552 src/jobbrowser/templates/jobs.mako:96
 msgid "Yes"
 msgstr "Sí"
 
-#: src/jobbrowser/templates/job.mako:492
+#: src/jobbrowser/templates/job.mako:617
 msgid "There was a problem communicating with the server. Refresh the page."
 msgstr "Se ha producido un problema de comunicación con el servidor. Actualice la página."
 
-#: src/jobbrowser/templates/job.mako:520 src/jobbrowser/templates/job.mako:521
-#: src/jobbrowser/templates/jobs.mako:230
-#: src/jobbrowser/templates/jobs.mako:263
+#: src/jobbrowser/templates/job.mako:645 src/jobbrowser/templates/job.mako:646
+#: src/jobbrowser/templates/jobs.mako:232
+#: src/jobbrowser/templates/jobs.mako:266
 msgid "Kill this job"
 msgstr "Eliminar este job"
 
-#: src/jobbrowser/templates/job.mako:528
+#: src/jobbrowser/templates/job.mako:653
 #: src/jobbrowser/templates/jobbrowser_components.mako:188
-#: src/jobbrowser/templates/jobs.mako:237
+#: src/jobbrowser/templates/jobs.mako:240
 msgid "Retired"
 msgstr "Retirado"
 
-#: src/jobbrowser/templates/job.mako:632 src/jobbrowser/templates/jobs.mako:359
+#: src/jobbrowser/templates/job.mako:660 src/jobbrowser/templates/job.mako:667
+msgid "0/0"
+msgstr "0/0"
+
+#: src/jobbrowser/templates/job.mako:757 src/jobbrowser/templates/jobs.mako:362
 msgid "There was a problem killing this job."
 msgstr "Se ha producido un problema al eliminar este job."
 
@@ -612,6 +704,10 @@ msgstr "Total"
 msgid "Job Browser"
 msgstr "Job Browser"
 
+#: src/jobbrowser/templates/jobbrowser_components.mako:246
+msgid "Hive jobs are running as the 'hive' user"
+msgstr "Los jobs de Hive se están ejecutando como el usuario de 'hive'"
+
 #: src/jobbrowser/templates/jobs.mako:35
 msgid "Username"
 msgstr "Nombre de usuario"
@@ -652,25 +748,28 @@ msgstr "Eliminado"
 msgid "There are no jobs that match your search criteria."
 msgstr "No hay ningún job que coincida con los criterios de búsqueda."
 
-#: src/jobbrowser/templates/jobs.mako:72
+#: src/jobbrowser/templates/jobs.mako:68
+msgid "Application Type"
+msgstr "Tipo de aplicación"
+
+#: src/jobbrowser/templates/jobs.mako:73
 msgid "Queue"
 msgstr "Cola"
 
-#: src/jobbrowser/templates/jobs.mako:73
+#: src/jobbrowser/templates/jobs.mako:74
 msgid "Priority"
 msgstr "Prioridad"
 
-#: src/jobbrowser/templates/jobs.mako:75
+#: src/jobbrowser/templates/jobs.mako:76
 msgid "Submitted"
 msgstr "Enviado"
 
-#: src/jobbrowser/templates/jobs.mako:140
-
+#: src/jobbrowser/templates/jobs.mako:142
 msgid "There was a problem communicating with the server: "
 msgstr "Se ha producido un problema de comunicación con el servidor: "
 
-#: src/jobbrowser/templates/jobs.mako:231
-#: src/jobbrowser/templates/jobs.mako:264
+#: src/jobbrowser/templates/jobs.mako:233
+#: src/jobbrowser/templates/jobs.mako:267
 msgid "Kill"
 msgstr "Eliminar"
 
@@ -679,35 +778,23 @@ msgstr "Eliminar"
 msgid "Job Task: %(taskId)s"
 msgstr "Tarea de job: %(taskId)s"
 
-#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:79
+#: src/jobbrowser/templates/task.mako:71 src/jobbrowser/templates/tasks.mako:75
 msgid "End Time"
 msgstr "Hora de finalización"
 
-#: src/jobbrowser/templates/task.mako:74
-msgid "Shuffle Finish"
-msgstr "Finalización de orden aleatorio"
-
-#: src/jobbrowser/templates/task.mako:75
-msgid "Sort Finish"
-msgstr "Finalización de clasificación"
-
-#: src/jobbrowser/templates/task.mako:76
-msgid "Map Finish"
-msgstr "Finalización de asignación"
-
-#: src/jobbrowser/templates/task.mako:83
+#: src/jobbrowser/templates/task.mako:87
 msgid "View this attempt"
 msgstr "Ver este intento"
 
-#: src/jobbrowser/templates/task.mako:115
+#: src/jobbrowser/templates/task.mako:123
 msgid "Task id"
 msgstr "ID de tarea"
 
-#: src/jobbrowser/templates/task.mako:139
+#: src/jobbrowser/templates/task.mako:147
 msgid "Execution Start Time"
 msgstr "Hora de inicio de ejecución"
 
-#: src/jobbrowser/templates/task.mako:143
+#: src/jobbrowser/templates/task.mako:151
 msgid "Execution Finish Time"
 msgstr "Hora de finalización de ejecución"
 
@@ -769,18 +856,38 @@ msgstr "configuraciones"
 msgid "Text filter"
 msgstr "Filtro de texto"
 
-#: src/jobbrowser/templates/tasks.mako:67
-msgid "There were no tasks that match your search criteria."
-msgstr "No hay ninguna tarea que coincida con los criterios de búsqueda."
-
-#: src/jobbrowser/templates/tasks.mako:80
+#: src/jobbrowser/templates/tasks.mako:76
 msgid "View Attempts"
 msgstr "Ver intentos"
 
-#: src/jobbrowser/templates/tasks.mako:98
+#: src/jobbrowser/templates/tasks.mako:94
 #, python-format
 msgid "Show only %(state)s tasks"
 msgstr "Mostrar solo tareas %(state)s"
+
+#: src/jobbrowser/templates/tasks.mako:135
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "Mostrando de _START_ a _END_ entradas de _TOTAL_"
+
+#: src/jobbrowser/templates/tasks.mako:136
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "Mostrando de 0 a 0 entradas de 0"
+
+#: src/jobbrowser/templates/tasks.mako:138
+msgid "First"
+msgstr "Primero"
+
+#: src/jobbrowser/templates/tasks.mako:139
+msgid "Last"
+msgstr "Último"
+
+#: src/jobbrowser/templates/tasks.mako:140
+msgid "Next"
+msgstr "Siguiente"
+
+#: src/jobbrowser/templates/tasks.mako:141
+msgid "Previous"
+msgstr "Anterior"
 
 #: src/jobbrowser/templates/tasktracker.mako:23
 #, python-format
@@ -814,7 +921,7 @@ msgstr "Map y Reduce"
 
 #: src/jobbrowser/templates/tasktracker.mako:58
 msgid "Map count:"
-msgstr "Recuento de maps:"
+msgstr "Recuento de map:"
 
 #: src/jobbrowser/templates/tasktracker.mako:60
 msgid "Reduce count:"
@@ -851,29 +958,33 @@ msgstr "Recuento de errores"
 
 #: src/jobbrowser/templates/tasktrackers.mako:41
 msgid "Map Count"
-msgstr "Recuento de maps"
+msgstr "Recuento de map"
 
 #: src/jobbrowser/templates/tasktrackers.mako:42
 msgid "Reduce Count"
-msgstr "Recuento de reduces"
+msgstr "Recuento de Reduce"
 
 #: src/jobbrowser/templates/tasktrackers.mako:43
 msgid "Max Map Tasks"
-msgstr "Tareas map máximas:"
+msgstr "Tareas map máximas"
 
 #: src/jobbrowser/templates/tasktrackers.mako:44
 msgid "Max Reduce Tasks"
-msgstr "Tareas reduce máximas"
+msgstr "Tareas Reduce máximas"
 
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
 msgstr "Sin tiempo"
 
-#~ msgid "Maps:"
-#~ msgstr "Maps:"
-#~ msgid "Reduces:"
-#~ msgstr "Reduces:"
-#~ msgid "Duration:"
-#~ msgstr "Duración:"
-#~ msgid "Date"
-#~ msgstr "Fecha"
+#~ msgid "Could not find job %s."
+#~ msgstr "No se ha podido encontrar el job %s."
+
+#~ msgid "Metric"
+#~ msgstr "Métrica"
+
+#~ msgid "header"
+#~ msgstr "encabezado"
+
+#~ msgid "There were no tasks that match your search criteria."
+#~ msgstr "No hay ninguna tarea que coincida con los criterios de búsqueda."
+

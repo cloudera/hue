@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:46-0800\n"
+"POT-Creation-Date: 2016-07-19 17:49-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboauth/backend.py:105 src/liboauth/backend.py:150
-#: src/liboauth/backend.py:158 src/liboauth/backend.py:171
-#: src/liboauth/backend.py:180 src/liboauth/backend.py:254
+#: src/liboauth/backend.py:109 src/liboauth/backend.py:155
+#: src/liboauth/backend.py:163 src/liboauth/backend.py:176
+#: src/liboauth/backend.py:185 src/liboauth/backend.py:269
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "来自 OAuth 提供程序的响应无效：%s"
@@ -125,27 +125,39 @@ msgstr "Hue - 注册"
 msgid "Hue - Sign in"
 msgstr "Hue - 登录"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Visit gethue.com"
 msgstr "访问 gethue.com"
 
-#: src/liboauth/templates/oauth-login.mako:155
+#: src/liboauth/templates/oauth-login.mako:157
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "感觉昏昏欲睡？不如访问 gethue.com 提提神吧！"
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Error!"
 msgstr "错误！"
 
-#: src/liboauth/templates/oauth-login.mako:170
+#: src/liboauth/templates/oauth-login.mako:172
 msgid "Invalid username or password."
 msgstr "用户名或密码无效。"
 
-#: src/liboauth/templates/oauth-login.mako:177
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "This is your first time logging in."
 msgstr "这是您第一次登录。"
 
-#: src/liboauth/templates/oauth-login.mako:178
+#: src/liboauth/templates/oauth-login.mako:180
 msgid "You will become Hue superuser."
 msgstr "您将成为 Hue 超级用户。"
+
+#: src/liboauth/templates/oauth-login.mako:182
+msgid "Sign Up via"
+msgstr "通过以下项签约"
+
+#: src/liboauth/templates/oauth-login.mako:185
+msgid "Sign In via"
+msgstr "通过以下项注册"
+
+#: src/liboauth/templates/oauth-login.mako:214
+msgid "The oauth app is not configured with any provider."
+msgstr "未通过提供程序配置 oauth 应用程序。"
 

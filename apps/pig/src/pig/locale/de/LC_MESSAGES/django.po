@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0PROJEKTVERSION\n"
+"Project-Id-Version:  0PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:246 src/pig/templates/app.mako:767
+#: src/pig/api.py:248 src/pig/templates/app.mako:763
 msgid "Unsaved script"
 msgstr "Nicht gespeichertes Skript"
 
@@ -54,29 +54,29 @@ msgstr "Wenn das Dokument kein übermittelter Job, sondern ein/e reale/r/s Anfra
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "Nur Superuser und %s dürfen dieses Dokument verändern."
 
-#: src/pig/views.py:73 src/pig/views.py:99 src/pig/views.py:118
-#: src/pig/views.py:149 src/pig/views.py:191
+#: src/pig/views.py:71 src/pig/views.py:97 src/pig/views.py:116
+#: src/pig/views.py:147 src/pig/views.py:193
 msgid "POST request required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 
-#: src/pig/views.py:110
+#: src/pig/views.py:108
 msgid "Error stopping Pig script."
 msgstr "Fehler beim Anhalten des Pig-Skripts."
 
-#: src/pig/views.py:157
+#: src/pig/views.py:160
 msgid " (Copy)"
 msgstr " (Kopieren)"
 
-#: src/pig/views.py:241
+#: src/pig/views.py:244
 msgid "A POST request is required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 
-#: src/pig/management/commands/pig_setup.py:48
+#: src/pig/management/commands/pig_setup.py:49
 #, python-format
 msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "Kopieren von Beispielen %(local_dir)s nach %(remote_data_dir)s\n"
 
-#: src/pig/management/commands/pig_setup.py:55
+#: src/pig/management/commands/pig_setup.py:56
 #, python-format
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "Kopieren von Daten %(local_dir)s nach %(remote_data_dir)s\n"
@@ -102,7 +102,7 @@ msgid "Search for script name or content"
 msgstr "Nach Skriptnamen oder -inhalt suchen"
 
 #: src/pig/templates/app.mako:55 src/pig/templates/app.mako:187
-#: src/pig/templates/app.mako:344
+#: src/pig/templates/app.mako:345
 msgid "Run this script"
 msgstr "Dieses Skript ausführen"
 
@@ -138,9 +138,9 @@ msgstr "Neues Skript"
 msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
 msgstr "Es sind derzeit keine Skripte definiert. Fügen Sie ein neues Skript ein, indem Sie auf \"Neues Skript\" klicken."
 
-#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:380
-#: src/pig/templates/app.mako:429 src/pig/templates/app.mako:552
-#: src/pig/templates/app.mako:576
+#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
+#: src/pig/templates/app.mako:431 src/pig/templates/app.mako:554
+#: src/pig/templates/app.mako:578
 msgid "Name"
 msgstr "Name"
 
@@ -164,12 +164,11 @@ msgstr "Eigenschaften"
 msgid "Save the script"
 msgstr "Skript speichern"
 
-#: src/pig/templates/app.mako:124 src/pig/templates/app.mako:724
+#: src/pig/templates/app.mako:124 src/pig/templates/app.mako:726
 msgid "Save"
 msgstr "Speichern"
 
 #: src/pig/templates/app.mako:129
-
 msgid "Share the script"
 msgstr "Das Skript freigeben"
 
@@ -201,7 +200,7 @@ msgstr "Anhalten"
 msgid "Show Logs"
 msgstr "Protokolle anzeigen"
 
-#: src/pig/templates/app.mako:150 src/pig/templates/app.mako:637
+#: src/pig/templates/app.mako:150 src/pig/templates/app.mako:639
 msgid "Logs"
 msgstr "Protokolle"
 
@@ -225,8 +224,8 @@ msgstr "Sie können das aktuelle Skript ausführen, indem Sie im Editor STRG + E
 msgid "Unsaved"
 msgstr "Ungespeichert"
 
-#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:345
-#: src/pig/templates/app.mako:518
+#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:346
+#: src/pig/templates/app.mako:520
 msgid "Stop this script"
 msgstr "Dieses Skript anhalten"
 
@@ -234,241 +233,241 @@ msgstr "Dieses Skript anhalten"
 msgid "Show the assist"
 msgstr "Unterstützung anzeigen"
 
-#: src/pig/templates/app.mako:199
+#: src/pig/templates/app.mako:200
 msgid "Hide the assist"
 msgstr "Unterstützung ausblenden"
 
-#: src/pig/templates/app.mako:200
+#: src/pig/templates/app.mako:201
 msgid "Double click on function to insert it in the editor"
 msgstr "Auf die Funktion doppelklicken, um sie in den Editor einzufügen"
 
-#: src/pig/templates/app.mako:201
+#: src/pig/templates/app.mako:202
 msgid "Assist"
 msgstr "Unterstützung"
 
-#: src/pig/templates/app.mako:204
+#: src/pig/templates/app.mako:205
 msgid "Function name..."
 msgstr "Funktionsname..."
 
-#: src/pig/templates/app.mako:350 src/pig/templates/app.mako:717
+#: src/pig/templates/app.mako:352 src/pig/templates/app.mako:719
 msgid "Script name"
 msgstr "Skriptname"
 
-#: src/pig/templates/app.mako:357
+#: src/pig/templates/app.mako:359
 msgid "Pig parameters"
 msgstr "Pig-Parameter"
 
-#: src/pig/templates/app.mako:370
+#: src/pig/templates/app.mako:372
 msgid "There are currently no defined parameters."
 msgstr "Derzeit sind keine definierten Eingaben vorhanden."
 
-#: src/pig/templates/app.mako:372 src/pig/templates/app.mako:400
-#: src/pig/templates/app.mako:421 src/pig/templates/app.mako:449
-#: src/pig/templates/app.mako:470 src/pig/templates/app.mako:507
+#: src/pig/templates/app.mako:374 src/pig/templates/app.mako:402
+#: src/pig/templates/app.mako:423 src/pig/templates/app.mako:451
+#: src/pig/templates/app.mako:472 src/pig/templates/app.mako:509
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: src/pig/templates/app.mako:381 src/pig/templates/app.mako:430
-#: src/pig/templates/app.mako:479
+#: src/pig/templates/app.mako:383 src/pig/templates/app.mako:432
+#: src/pig/templates/app.mako:481
 msgid "Value"
 msgstr "Wert"
 
-#: src/pig/templates/app.mako:394 src/pig/templates/app.mako:443
-#: src/pig/templates/app.mako:500
+#: src/pig/templates/app.mako:396 src/pig/templates/app.mako:445
+#: src/pig/templates/app.mako:502
 msgid "Remove"
 msgstr "Entfernen"
 
-#: src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:410
 msgid "Hadoop properties"
 msgstr "Hadoop-Eigenschaften"
 
-#: src/pig/templates/app.mako:419
+#: src/pig/templates/app.mako:421
 msgid "There are currently no defined Hadoop properties."
 msgstr "Derzeit sind keine definierten Hadoop-Eigenschaften vorhanden."
 
-#: src/pig/templates/app.mako:458
+#: src/pig/templates/app.mako:460
 msgid "Resources"
 msgstr "Ressourcen"
 
-#: src/pig/templates/app.mako:461
+#: src/pig/templates/app.mako:463
 msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
 msgstr "Pfad zu einer HDFS-Datei oder Zip-Datei, die in den Workspace des aktiven Skripts eingefügt werden soll"
 
-#: src/pig/templates/app.mako:468
+#: src/pig/templates/app.mako:470
 msgid "There are currently no defined resources."
 msgstr "Derzeit sind keine definierten Ressourcen vorhanden."
 
-#: src/pig/templates/app.mako:478
+#: src/pig/templates/app.mako:480
 msgid "Type"
 msgstr "Typ"
 
-#: src/pig/templates/app.mako:488
+#: src/pig/templates/app.mako:490
 msgid "File"
 msgstr "Datei"
 
-#: src/pig/templates/app.mako:489
+#: src/pig/templates/app.mako:491
 msgid "Archive"
 msgstr "Archivieren"
 
-#: src/pig/templates/app.mako:525
+#: src/pig/templates/app.mako:527
 msgid "Status:"
 msgstr "Status:"
 
-#: src/pig/templates/app.mako:527
+#: src/pig/templates/app.mako:529
 msgid "Progress:"
 msgstr "Fortschritt:"
 
-#: src/pig/templates/app.mako:527
+#: src/pig/templates/app.mako:529
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:533
+#: src/pig/templates/app.mako:535
 msgid "No available logs."
 msgstr "Keine verfügbaren Protokolle."
 
-#: src/pig/templates/app.mako:543 src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1126
 msgid "Running"
 msgstr "Aktiv"
 
-#: src/pig/templates/app.mako:547
+#: src/pig/templates/app.mako:549
 msgid "There are currently no running scripts."
 msgstr "Es sind derzeit keine Skripte aktiv."
 
-#: src/pig/templates/app.mako:553
+#: src/pig/templates/app.mako:555
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:578
+#: src/pig/templates/app.mako:556 src/pig/templates/app.mako:580
 msgid "Created on"
 msgstr "Erstellt am"
 
-#: src/pig/templates/app.mako:567
+#: src/pig/templates/app.mako:569
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-#: src/pig/templates/app.mako:571
+#: src/pig/templates/app.mako:573
 msgid "There are currently no completed scripts."
 msgstr "Es sind derzeit keine fertiggestellten Skripte vorhanden."
 
-#: src/pig/templates/app.mako:577
+#: src/pig/templates/app.mako:579
 msgid "Status"
 msgstr "Status"
 
-#: src/pig/templates/app.mako:591
+#: src/pig/templates/app.mako:593
 msgid "Click to edit"
 msgstr "Zum Bearbeiten klicken"
 
-#: src/pig/templates/app.mako:605
+#: src/pig/templates/app.mako:607
 msgid "Click to view"
 msgstr "Zum Anzeigen klicken"
 
-#: src/pig/templates/app.mako:622
+#: src/pig/templates/app.mako:624
 msgid "Confirm Delete"
 msgstr "Löschen bestätigen"
 
-#: src/pig/templates/app.mako:625
+#: src/pig/templates/app.mako:627
 msgid "Are you sure you want to delete this script?"
 msgstr "Möchten Sie dieses Skript wirklich löschen?"
 
-#: src/pig/templates/app.mako:626
+#: src/pig/templates/app.mako:628
 msgid "Are you sure you want to delete these scripts?"
 msgstr "Möchten Sie diese Skripte wirklich löschen?"
 
-#: src/pig/templates/app.mako:629 src/pig/templates/app.mako:663
-#: src/pig/templates/app.mako:674 src/pig/templates/app.mako:703
+#: src/pig/templates/app.mako:631 src/pig/templates/app.mako:665
+#: src/pig/templates/app.mako:676 src/pig/templates/app.mako:705
 msgid "No"
 msgstr "Nein"
 
-#: src/pig/templates/app.mako:630 src/pig/templates/app.mako:664
-#: src/pig/templates/app.mako:675 src/pig/templates/app.mako:704
+#: src/pig/templates/app.mako:632 src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:677 src/pig/templates/app.mako:706
 msgid "Yes"
 msgstr "Ja"
 
-#: src/pig/templates/app.mako:644
+#: src/pig/templates/app.mako:646
 msgid "Close"
 msgstr "Schließen"
 
-#: src/pig/templates/app.mako:651
+#: src/pig/templates/app.mako:653
 msgid "Run Script"
 msgstr "Skript ausführen"
 
-#: src/pig/templates/app.mako:651 src/pig/templates/app.mako:671
+#: src/pig/templates/app.mako:653 src/pig/templates/app.mako:673
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:654
+#: src/pig/templates/app.mako:656
 msgid "Script variables"
 msgstr "Skriptvariablen"
 
-#: src/pig/templates/app.mako:671
+#: src/pig/templates/app.mako:673
 msgid "Stop Script"
 msgstr "Skript stoppen"
 
-#: src/pig/templates/app.mako:682
+#: src/pig/templates/app.mako:684
 msgid "Choose a file"
 msgstr "Datei auswählen"
 
-#: src/pig/templates/app.mako:695
+#: src/pig/templates/app.mako:697
 msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
 
-#: src/pig/templates/app.mako:699
+#: src/pig/templates/app.mako:701
 msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
 msgstr "Das aktuelle Skript enthält nicht gespeicherte Änderungen. Möchten Sie die Änderungen wirklich verwerfen?"
 
-#: src/pig/templates/app.mako:711
+#: src/pig/templates/app.mako:713
 msgid "Save script"
 msgstr "Skript speichern"
 
-#: src/pig/templates/app.mako:715
+#: src/pig/templates/app.mako:717
 msgid "Give a meaningful name to this script."
 msgstr "Geben Sie diesem Skript einen eindeutigen Namen."
 
-#: src/pig/templates/app.mako:723
+#: src/pig/templates/app.mako:725
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/pig/templates/app.mako:763
+#: src/pig/templates/app.mako:759
 msgid "The Pig job could not be killed."
 msgstr "Der Pig-Job konnte nicht abgebrochen werden."
 
-#: src/pig/templates/app.mako:764
+#: src/pig/templates/app.mako:760
 msgid "Run this Pig script."
 msgstr "Dieses Pig-Skript ausführen."
 
-#: src/pig/templates/app.mako:765
+#: src/pig/templates/app.mako:761
 msgid "Stop execution."
 msgstr "Ausführung stoppen."
 
-#: src/pig/templates/app.mako:766
+#: src/pig/templates/app.mako:762
 msgid "Saved"
 msgstr "Gespeichert"
 
-#: src/pig/templates/app.mako:1110
+#: src/pig/templates/app.mako:1119
 msgid "Saving"
 msgstr "Es wird gespeichert"
 
-#: src/pig/templates/app.mako:1121
+#: src/pig/templates/app.mako:1130
 msgid "has been saved correctly."
 msgstr "wurde korrekt gespeichert."
 
-#: src/pig/templates/app.mako:1375
+#: src/pig/templates/app.mako:1395
 msgid "Did you know?"
 msgstr "Wussten Sie schon?"
 
-#: src/pig/templates/app.mako:1382
+#: src/pig/templates/app.mako:1402
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Namen und Werte von Pig-Parametern und -Optionen, z. B."
 
-#: src/pig/templates/app.mako:1389
+#: src/pig/templates/app.mako:1409
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Namen und Werte von Hadoop-Eigenschaften, z. B."
 
-#: src/pig/templates/app.mako:1396
+#: src/pig/templates/app.mako:1416
 msgid "Include files or compressed files"
 msgstr "Dateien oder komprimierte Dateien einfügen"
 
-#: src/pig/templates/app.mako:1405
+#: src/pig/templates/app.mako:1425
 msgid "You have unsaved changes in this pig script."
 msgstr "Sie haben nicht gespeicherte Änderungen in diesem Pig-Skript."
 

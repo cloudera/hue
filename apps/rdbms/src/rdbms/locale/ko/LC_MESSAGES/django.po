@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-04 18:47-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/rdbms/api.py:129 src/rdbms/api.py:174 src/rdbms/api.py:257
+#: src/rdbms/api.py:138 src/rdbms/api.py:183 src/rdbms/api.py:266
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/rdbms/api.py:161 src/rdbms/api.py:199
+#: src/rdbms/api.py:170 src/rdbms/api.py:208
 msgid "There was an error with your query."
 msgstr "쿼리에 오류가 있습니다."
 
-#: src/rdbms/api.py:284
+#: src/rdbms/api.py:293
 msgid "A GET request is required."
 msgstr "GET 요청이 필요합니다."
 
-#: src/rdbms/api.py:325
+#: src/rdbms/api.py:334
 msgid "Server specified doesn't exist."
 msgstr "지정된 서버가 존재하지 않습니다."
 
-#: src/rdbms/api.py:331
+#: src/rdbms/api.py:340
 msgid "No databases are available. Permissions could be missing."
 msgstr "데이터베이스를 사용할 수 없습니다. 권한이 없습니다."
 
@@ -87,7 +87,6 @@ msgid "Manually refresh the table list"
 msgstr "테이블 목록을 수동으로 새로 고침"
 
 #: src/rdbms/templates/execute.mako:43
-
 msgid "server"
 msgstr "서버"
 
@@ -96,7 +95,6 @@ msgid "Choose a database..."
 msgstr "데이터베이스 선택..."
 
 #: src/rdbms/templates/execute.mako:49
-
 msgid "database"
 msgstr "데이터베이스"
 
@@ -108,113 +106,110 @@ msgstr "테이블 이름..."
 msgid "The selected database has no tables."
 msgstr "선택한 데이터베이스에 테이블이 없습니다."
 
-#: src/rdbms/templates/execute.mako:79
-msgid "Share"
-msgstr "공유"
-
-#: src/rdbms/templates/execute.mako:88 src/rdbms/templates/execute.mako:787
+#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
 msgid "Query name"
 msgstr "쿼리 이름"
 
-#: src/rdbms/templates/execute.mako:96
+#: src/rdbms/templates/execute.mako:104
 msgid "Query description"
 msgstr "쿼리 설명"
 
-#: src/rdbms/templates/execute.mako:107
+#: src/rdbms/templates/execute.mako:115
 msgid "Your query has the following error(s):"
 msgstr "쿼리에 다음 오류가 있습니다."
 
-#: src/rdbms/templates/execute.mako:116
+#: src/rdbms/templates/execute.mako:124
 msgid "Execute"
 msgstr "실행"
 
-#: src/rdbms/templates/execute.mako:117 src/rdbms/templates/execute.mako:192
+#: src/rdbms/templates/execute.mako:125 src/rdbms/templates/execute.mako:199
 msgid "Save"
 msgstr "저장"
 
-#: src/rdbms/templates/execute.mako:118
+#: src/rdbms/templates/execute.mako:126
 msgid "Save as..."
 msgstr "다른 이름으로 저장..."
 
-#: src/rdbms/templates/execute.mako:119
+#: src/rdbms/templates/execute.mako:127
 msgid "Explain"
 msgstr "설명"
 
-#: src/rdbms/templates/execute.mako:120
+#: src/rdbms/templates/execute.mako:128
 msgid "or create a"
 msgstr "또는 생성"
 
-#: src/rdbms/templates/execute.mako:120
+#: src/rdbms/templates/execute.mako:128
 msgid "New query"
 msgstr "새 쿼리"
 
-#: src/rdbms/templates/execute.mako:146
+#: src/rdbms/templates/execute.mako:154
 msgid "The server returned no results."
 msgstr "서버에서 반환된 결과가 없습니다."
 
-#: src/rdbms/templates/execute.mako:172
+#: src/rdbms/templates/execute.mako:179
 msgid "Save your query"
 msgstr "쿼리 저장"
 
-#: src/rdbms/templates/execute.mako:177
+#: src/rdbms/templates/execute.mako:184
 msgid "Name"
 msgstr "이름"
 
-#: src/rdbms/templates/execute.mako:183
+#: src/rdbms/templates/execute.mako:190
 msgid "Description"
 msgstr "설명"
 
-#: src/rdbms/templates/execute.mako:191
+#: src/rdbms/templates/execute.mako:198
 msgid "Cancel"
 msgstr "취소"
 
-#: src/rdbms/templates/execute.mako:357
+#: src/rdbms/templates/execute.mako:395
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 
-#: src/rdbms/templates/execute.mako:550
+#: src/rdbms/templates/execute.mako:584
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/rdbms/templates/execute.mako:636
+#: src/rdbms/templates/execute.mako:670
 msgid "No query provided to save."
 msgstr "저장할 쿼리를 제공하지 않았습니다."
 
-#: src/rdbms/templates/execute.mako:658
+#: src/rdbms/templates/execute.mako:692
 msgid "Oops, no server found!"
 msgstr "서버를 찾을 수 없습니다!"
 
-#: src/rdbms/templates/execute.mako:664
+#: src/rdbms/templates/execute.mako:698
 msgid "Oops, no database found!"
 msgstr "데이터베이스가 없습니다!"
 
-#: src/rdbms/templates/execute.mako:781
+#: src/rdbms/templates/execute.mako:815
 msgid "This field is required."
 msgstr "이 필드는 필수 항목입니다."
 
-#: src/rdbms/templates/execute.mako:794
+#: src/rdbms/templates/execute.mako:828
 msgid "Empty description"
 msgstr "설명 없음"
 
-#: src/rdbms/templates/execute.mako:800
+#: src/rdbms/templates/execute.mako:834
 msgid "Query saved successfully!"
 msgstr "쿼리가 저장되었습니다!"
 
-#: src/rdbms/templates/execute.mako:836
+#: src/rdbms/templates/execute.mako:880
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/rdbms/templates/execute.mako:837
+#: src/rdbms/templates/execute.mako:881
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
-#: src/rdbms/templates/execute.mako:875
+#: src/rdbms/templates/execute.mako:919
 msgid "Server error occured: "
 msgstr "서버 오류 발생: "
 
-#: src/rdbms/templates/execute.mako:878
+#: src/rdbms/templates/execute.mako:922
 msgid "Unmanageable server error occured: "
 msgstr "관리할 수 없는 서버 오류 발생: "
 
-#~ msgid "Navigator"
-#~ msgstr "탐색 창"
+#~ msgid "Share"
+#~ msgstr "공유"
+

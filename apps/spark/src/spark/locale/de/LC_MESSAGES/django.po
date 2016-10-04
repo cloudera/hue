@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0PROJEKTVERSION\n"
+"Project-Id-Version:  0PROJEKTVERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2015-02-04 18:48-0800\n"
+"POT-Creation-Date: 2016-07-19 17:50-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,311 +17,371 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/spark/api.py:152 src/spark/api.py:165
+#: src/spark/api.py:159 src/spark/api.py:173
 msgid "Notebook saved !"
-msgstr "Notizbuch gesperrt!"
+msgstr "Notizbuch gespeichert!"
 
-#: src/spark/api.py:182
+#: src/spark/api.py:191
 msgid "Notebook closed !"
 msgstr "Notizbuch geschlossen!"
 
-#: src/spark/conf.py:34
-msgid "URL of the Spark Job Server."
-msgstr "URL des Spark-Job-Servers."
+#: src/spark/conf.py:33
+msgid "Path to livy-assembly.jar"
+msgstr "Pfad zu livy-assembly.jar"
 
-#: src/spark/conf.py:40
-msgid "List of available types of snippets."
-msgstr "Liste der verfügbaren Arten von Snippets"
+#: src/spark/conf.py:39
+msgid "Host address of the Livy Server."
+msgstr "Hostadresse des Livy-Servers."
+
+#: src/spark/conf.py:44
+msgid "Port of the Livy Server."
+msgstr "Port des Livy-Servers."
+
+#: src/spark/conf.py:49
+msgid "Configure livy to start in local 'process' mode, or 'yarn' workers."
+msgstr "Konfigurieren Sie Livy so, dass das Starten im lokalen \"process\"-Modus oder mit \"yarn\"-Arbeitern erfolgt."
+
+#: src/spark/conf.py:54
+msgid "Path to livy-assembly.jar inside HDFS"
+msgstr "Pfad zu livy-assembly.jar in HDFS"
+
+#: src/spark/conf.py:59
+msgid "Use impersonation when submitting livy jobs"
+msgstr "Identitätswechsel beim Senden von Livy-Jobs verwenden"
+
+#: src/spark/conf.py:65
+msgid "Experimental option to launch livy"
+msgstr "Experimentelle Option für den Start von Livy"
 
 #: src/spark/conf.py:73
-msgid "The app won't work without a running Job Server"
-msgstr "Die Anwendung funktioniert nicht, wenn kein Job-Server aktiv ist"
+msgid "Host where SparkSQL server is running."
+msgstr "Der Host, auf dem der SparkSQL-Server ausgeführt wird."
 
-#: src/spark/views.py:46 src/spark/views.py:47
-msgid "Example: 1 + 1, or press CTRL + space"
-msgstr "Beispiel: 1 + 1 oder drücken Sie STRG + Leerzeichen"
+#: src/spark/conf.py:78
+msgid "Port the SparkSQL server runs on."
+msgstr "Der Port, auf dem der SparkSQL-Server ausgeführt wird."
 
-#: src/spark/views.py:48 src/spark/views.py:49
-msgid "Example: SELECT * FROM tablename, or press CTRL + space"
-msgstr "Beispiel: \"SELECT * FROM Tabellenname\", oder STRG + Leerzeichen drücken"
+#: src/spark/conf.py:106
+msgid "The app won't work without a running Livy Spark Server"
+msgstr "Die App funktioniert nicht, wenn kein Livy-Spark-Server aktiv ist"
 
-#: src/spark/views.py:50
-msgid "<h2>This is a text snippet</h2>Type your text here"
-msgstr "<h2>Dies ist ein Text-Snippet</h2>Geben Sie Ihren Text hier ein"
+#: src/spark/decorators.py:48
+#, python-format
+msgid "Document %(id)s does not exist"
+msgstr "Dokument %(id)s ist nicht vorhanden"
 
-#: src/spark/templates/editor.mako:22
+#: src/spark/decorators.py:65
+#, python-format
+msgid "Job %(id)s does not exist"
+msgstr "Job %(id)s ist nicht vorhanden"
+
+#: src/spark/templates/editor.mako:23
 msgid "Query"
 msgstr "Abfrage"
 
-#: src/spark/templates/editor.mako:122
+#: src/spark/templates/editor.mako:134
 msgid "Execute all snippets"
 msgstr "Alle Snippets ausführen"
 
-#: src/spark/templates/editor.mako:127
+#: src/spark/templates/editor.mako:139
 msgid "Clear all results"
 msgstr "Alle Ergebnisse entfernen"
 
-#: src/spark/templates/editor.mako:135
-
+#: src/spark/templates/editor.mako:147
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: src/spark/templates/editor.mako:141
+#: src/spark/templates/editor.mako:153
 msgid "Save"
 msgstr "Speichern"
 
-#: src/spark/templates/editor.mako:141
+#: src/spark/templates/editor.mako:153
 msgid "Saving..."
 msgstr "Es wird gespeichert..."
 
-#: src/spark/templates/editor.mako:148
+#: src/spark/templates/editor.mako:160
 msgid "Brand New"
 msgstr "Völlig neu"
 
-#: src/spark/templates/editor.mako:152 src/spark/templates/notebooks.mako:22
+#: src/spark/templates/editor.mako:164 src/spark/templates/notebooks.mako:23
 msgid "Notebooks"
 msgstr "Notizbücher"
 
-#: src/spark/templates/editor.mako:165
-msgid "Add a new notebook"
-msgstr "Neues Notizbuch hinzufügen"
+#: src/spark/templates/editor.mako:184
+msgid "Add a description..."
+msgstr "Beschreibung hinzufügen..."
 
-#: src/spark/templates/editor.mako:171 src/spark/templates/editor.mako:209
+#: src/spark/templates/editor.mako:195 src/spark/templates/editor.mako:233
 msgid "Toggle Assist"
 msgstr "Hilfe umschalten"
 
-#: src/spark/templates/editor.mako:190
+#: src/spark/templates/editor.mako:214
 msgid "Data sample for"
-msgstr "Datenmuster für"
+msgstr "Datenbeispiel für"
 
-#: src/spark/templates/editor.mako:200
+#: src/spark/templates/editor.mako:224
 msgid "Ok"
 msgstr "OK"
 
-#: src/spark/templates/editor.mako:212
+#: src/spark/templates/editor.mako:236
 msgid "Manually refresh the table list"
 msgstr "Tabellenliste manuell aktualisieren"
 
-#: src/spark/templates/editor.mako:216
+#: src/spark/templates/editor.mako:240
 msgid "database"
 msgstr "Datenbank"
 
-#: src/spark/templates/editor.mako:219
+#: src/spark/templates/editor.mako:243
 msgid "Choose a database..."
 msgstr "Datenbank auswählen..."
 
-#: src/spark/templates/editor.mako:220
-
+#: src/spark/templates/editor.mako:244
 msgid "Table name..."
 msgstr "Tabellenname..."
 
-#: src/spark/templates/editor.mako:221
+#: src/spark/templates/editor.mako:245
 msgid "The selected database has no tables."
 msgstr "Die ausgewählte Datenbank enthält keine Tabellen."
 
-#: src/spark/templates/editor.mako:242
+#: src/spark/templates/editor.mako:266
 msgid "The database list cannot be loaded."
 msgstr "Die Datenbankliste kann nicht geladen werden."
 
-#: src/spark/templates/editor.mako:255
+#: src/spark/templates/editor.mako:279
 msgid "Add a snippet to start your new notebook"
 msgstr "Snippet hinzufügen, um das neue Notizbuch zu starten"
 
-#: src/spark/templates/editor.mako:261
+#: src/spark/templates/editor.mako:285
 msgid "Add a new snippet"
 msgstr "Neues Snippet hinzufügen"
 
-#: src/spark/templates/editor.mako:285
-
+#: src/spark/templates/editor.mako:297
 msgid "Text"
 msgstr "Text"
 
-#: src/spark/templates/editor.mako:331
+#: src/spark/templates/editor.mako:379
 msgid "Creating session"
 msgstr "Sitzung wird erstellt"
 
-#: src/spark/templates/editor.mako:333
+#: src/spark/templates/editor.mako:382
 msgid "CTRL + ENTER"
 msgstr "STRG + EINGABETASTE"
 
-#: src/spark/templates/editor.mako:336
+#: src/spark/templates/editor.mako:385
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/spark/templates/editor.mako:345
+#: src/spark/templates/editor.mako:394
 msgid "Grid"
 msgstr "Raster"
 
-#: src/spark/templates/editor.mako:363
+#: src/spark/templates/editor.mako:412
 msgid "Bars"
 msgstr "Leisten"
 
-#: src/spark/templates/editor.mako:368
+#: src/spark/templates/editor.mako:417
 msgid "Lines"
 msgstr "Zeilen"
 
-#: src/spark/templates/editor.mako:373
+#: src/spark/templates/editor.mako:422
 msgid "Pie"
 msgstr "Kreis"
 
-#: src/spark/templates/editor.mako:378
+#: src/spark/templates/editor.mako:427
 msgid "Scatter"
 msgstr "Punkt"
 
-#: src/spark/templates/editor.mako:383
+#: src/spark/templates/editor.mako:432
 msgid "Marker Map"
 msgstr "Markierungskarte"
 
-#: src/spark/templates/editor.mako:388
+#: src/spark/templates/editor.mako:437
 msgid "Gradient Map"
 msgstr "Verlaufskarte"
 
-#: src/spark/templates/editor.mako:399
+#: src/spark/templates/editor.mako:448
 msgid "Show Logs"
 msgstr "Protokolle anzeigen"
 
-#: src/spark/templates/editor.mako:418
+#: src/spark/templates/editor.mako:467
 msgid "Download first rows as CSV"
 msgstr "Erste Zeilen als CSV herunterladen"
 
-#: src/spark/templates/editor.mako:419
+#: src/spark/templates/editor.mako:468
 msgid "CSV"
 msgstr "CSV"
 
-#: src/spark/templates/editor.mako:423
+#: src/spark/templates/editor.mako:472
 msgid "Download first rows as XLS"
 msgstr "Erste Zeilen als XLS herunterladen"
 
-#: src/spark/templates/editor.mako:424
+#: src/spark/templates/editor.mako:473
 msgid "Excel"
 msgstr "Excel"
 
-#: src/spark/templates/editor.mako:435 src/spark/templates/editor.mako:452
+#: src/spark/templates/editor.mako:484 src/spark/templates/editor.mako:501
 msgid "Loading..."
 msgstr "Wird geladen..."
 
-#: src/spark/templates/editor.mako:444
+#: src/spark/templates/editor.mako:493
 msgid "Success."
 msgstr "Erfolg."
 
-#: src/spark/templates/editor.mako:448
+#: src/spark/templates/editor.mako:497
 msgid "Success but empty results."
 msgstr "Erfolg, aber leere Ergebnisse."
 
-#: src/spark/templates/editor.mako:465
+#: src/spark/templates/editor.mako:514
 msgid "Hide columns"
 msgstr "Spalten ausblenden"
 
-#: src/spark/templates/editor.mako:465
+#: src/spark/templates/editor.mako:514
 msgid "columns"
 msgstr "Spalten"
 
-#: src/spark/templates/editor.mako:477
+#: src/spark/templates/editor.mako:526
 msgid "Show columns"
 msgstr "Spalten anzeigen"
 
-#: src/spark/templates/editor.mako:480
+#: src/spark/templates/editor.mako:529
 msgid "Hide"
 msgstr "Ausblenden"
 
-#: src/spark/templates/editor.mako:501
+#: src/spark/templates/editor.mako:550
 msgid "Hide settings"
 msgstr "Einstellungen ausblenden"
 
-#: src/spark/templates/editor.mako:507
+#: src/spark/templates/editor.mako:556
 msgid "x-axis"
 msgstr "X-Achse"
 
-#: src/spark/templates/editor.mako:508
+#: src/spark/templates/editor.mako:557
 msgid "region"
 msgstr "Region"
 
-#: src/spark/templates/editor.mako:509
+#: src/spark/templates/editor.mako:558
 msgid "latitude"
 msgstr "Breite"
 
-#: src/spark/templates/editor.mako:510
+#: src/spark/templates/editor.mako:559
 msgid "legend"
 msgstr "Legende"
 
-#: src/spark/templates/editor.mako:513 src/spark/templates/editor.mako:529
-#: src/spark/templates/editor.mako:536 src/spark/templates/editor.mako:543
-#: src/spark/templates/editor.mako:550
+#: src/spark/templates/editor.mako:562 src/spark/templates/editor.mako:578
+#: src/spark/templates/editor.mako:585 src/spark/templates/editor.mako:592
+#: src/spark/templates/editor.mako:599
 msgid "Choose a column..."
 msgstr "Spalte auswählen..."
 
-#: src/spark/templates/editor.mako:517
+#: src/spark/templates/editor.mako:566
 msgid "y-axis"
 msgstr "Y-Achse"
 
-#: src/spark/templates/editor.mako:518 src/spark/templates/editor.mako:520
-
+#: src/spark/templates/editor.mako:567 src/spark/templates/editor.mako:569
 msgid "value"
 msgstr "Wert"
 
-#: src/spark/templates/editor.mako:519
+#: src/spark/templates/editor.mako:568
 msgid "longitude"
 msgstr "Länge"
 
-#: src/spark/templates/editor.mako:533
+#: src/spark/templates/editor.mako:582
 msgid "label"
 msgstr "Kennzeichnung"
 
-#: src/spark/templates/editor.mako:540
+#: src/spark/templates/editor.mako:589
 msgid "scatter group"
 msgstr "Punktgruppe"
 
-#: src/spark/templates/editor.mako:547
+#: src/spark/templates/editor.mako:596
 msgid "scatter size"
 msgstr "Punktgröße"
 
-#: src/spark/templates/editor.mako:554
+#: src/spark/templates/editor.mako:603
 msgid "sorting"
 msgstr "Sortieren"
 
-#: src/spark/templates/editor.mako:557
+#: src/spark/templates/editor.mako:606
 msgid "No sorting"
 msgstr "Keine Sortierung"
 
-#: src/spark/templates/editor.mako:558
+#: src/spark/templates/editor.mako:607
 msgid "Sort ascending"
 msgstr "Aufsteigend sortieren"
 
-#: src/spark/templates/editor.mako:559
+#: src/spark/templates/editor.mako:608
 msgid "Sort descending"
 msgstr "Absteigend sortieren"
 
-#: src/spark/templates/editor.mako:566
+#: src/spark/templates/editor.mako:615
 msgid "Show settings"
 msgstr "Einstellungen anzeigen"
 
+#: src/spark/templates/editor.mako:650 src/spark/templates/editor.mako:654
+msgid "Path"
+msgstr "Pfad"
+
 #: src/spark/templates/editor.mako:651
+msgid "Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar"
+msgstr "Pfad zur Anwendungs-JAR, z. B. hdfs://localhost:8020/user/hue/oozie-examples.jar"
+
+#: src/spark/templates/editor.mako:655
+msgid "Path to python file, e.g. script.py"
+msgstr "Pfad zur Python-Datei, z. B. script.py"
+
+#: src/spark/templates/editor.mako:658
+msgid "Class"
+msgstr "Klasse"
+
+#: src/spark/templates/editor.mako:659
+msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
+msgstr "Klassenname der Anwendung, z. B. org.apache.oozie.example.SparkFileCopy"
+
+#: src/spark/templates/editor.mako:662
+msgid "Arguments"
+msgstr "Argumente"
+
+#: src/spark/templates/editor.mako:666
+msgid "e.g. 1000, market"
+msgstr "z. B. 1000, market"
+
+#: src/spark/templates/editor.mako:673
+msgid "Add argument"
+msgstr "Argument hinzufügen"
+
+#: src/spark/templates/editor.mako:680
+msgid "Submit"
+msgstr "Übermitteln"
+
+#: src/spark/templates/editor.mako:692
+msgid "Choose a file"
+msgstr "Datei auswählen"
+
+#: src/spark/templates/editor.mako:746
 msgid "Paste or type a link"
 msgstr "Link einfügen oder eingeben"
 
-#: src/spark/templates/editor.mako:652
+#: src/spark/templates/editor.mako:747
 msgid "Open in new window"
 msgstr "In neuem Fenster öffnen"
 
-#: src/spark/templates/editor.mako:1168 src/spark/templates/notebooks.mako:228
+#: src/spark/templates/editor.mako:1275 src/spark/templates/notebooks.mako:217
 msgid "No data available"
 msgstr "Keine Daten verfügbar"
 
-#: src/spark/templates/editor.mako:1169 src/spark/templates/notebooks.mako:232
+#: src/spark/templates/editor.mako:1276 src/spark/templates/notebooks.mako:221
 msgid "No matching records"
 msgstr "Keine übereinstimmenden Datensätze"
 
-#: src/spark/templates/editor.mako:1484
-
+#: src/spark/templates/editor.mako:1591
 msgid "Distribution"
 msgstr "Verteilung"
 
-#: src/spark/templates/editor.mako:1511
+#: src/spark/templates/editor.mako:1618
 msgid "There was a problem loading the table preview."
 msgstr "Beim Laden der Tabellenvorschau ist ein Problem aufgetreten."
 
-#: src/spark/templates/notebooks.mako:28
-
+#: src/spark/templates/notebooks.mako:29
 msgid "Spark Editor"
 msgstr "Spark-Editor"
 
@@ -329,199 +389,95 @@ msgstr "Spark-Editor"
 msgid "Search for name, description, etc..."
 msgstr "Nach Namen, Beschreibung, usw. suchen"
 
-#: src/spark/templates/notebooks.mako:39
-msgid "Submit"
-msgstr "Übermitteln"
-
-#: src/spark/templates/notebooks.mako:45 src/spark/templates/notebooks.mako:47
+#: src/spark/templates/notebooks.mako:39 src/spark/templates/notebooks.mako:41
 msgid "Share"
 msgstr "Freigeben"
 
-#: src/spark/templates/notebooks.mako:51
+#: src/spark/templates/notebooks.mako:45
 msgid "Copy"
 msgstr "Kopieren"
 
-#: src/spark/templates/notebooks.mako:55
+#: src/spark/templates/notebooks.mako:49
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/spark/templates/notebooks.mako:60
+#: src/spark/templates/notebooks.mako:56
 msgid "Create"
 msgstr "Erstellen"
 
-#: src/spark/templates/notebooks.mako:67
+#: src/spark/templates/notebooks.mako:65
 msgid "Name"
 msgstr "Name"
 
-#: src/spark/templates/notebooks.mako:68
+#: src/spark/templates/notebooks.mako:66
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/spark/templates/notebooks.mako:69
+#: src/spark/templates/notebooks.mako:67
 msgid "Owner"
 msgstr "Eigentümer"
 
-#: src/spark/templates/notebooks.mako:70
+#: src/spark/templates/notebooks.mako:68
 msgid "Last Modified"
 msgstr "Zuletzt geändert"
 
-#: src/spark/templates/notebooks.mako:107
-
+#: src/spark/templates/notebooks.mako:105
 msgid "Delete the selected notebook(s)?"
 msgstr "Ausgewählte Notizbücher löschen?"
 
-#: src/spark/templates/notebooks.mako:110
+#: src/spark/templates/notebooks.mako:108
 msgid "No"
 msgstr "Nein"
 
-#: src/spark/templates/notebooks.mako:111
+#: src/spark/templates/notebooks.mako:109
 msgid "Yes"
 msgstr "Ja"
 
-#: src/spark/templates/notebooks.mako:229
+#: src/spark/templates/notebooks.mako:218
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "_START_ bis _END_ von _TOTAL_ Einträge werden angezeigt"
 
-#: src/spark/templates/notebooks.mako:230
+#: src/spark/templates/notebooks.mako:219
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "0 bis 0 von 0 Einträgen werden angezeigt"
 
-#: src/spark/templates/notebooks.mako:231
+#: src/spark/templates/notebooks.mako:220
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(gefiltert von _MAX_ gesamten Einträgen)"
 
-#: src/spark/templates/notebooks.mako:234
+#: src/spark/templates/notebooks.mako:223
 msgid "First"
 msgstr "Erster"
 
-#: src/spark/templates/notebooks.mako:235
+#: src/spark/templates/notebooks.mako:224
 msgid "Last"
 msgstr "Letzter"
 
-#: src/spark/templates/notebooks.mako:236
-
+#: src/spark/templates/notebooks.mako:225
 msgid "Next"
 msgstr "Weiter"
 
-#: src/spark/templates/notebooks.mako:237
+#: src/spark/templates/notebooks.mako:226
 msgid "Previous"
 msgstr "Zurück"
 
-#~ msgid "Requires a POST"
-#~ msgstr "Erfordert POST"
-#~ msgid "Requires a DELETE"
-#~ msgstr "Erfordert DELETE"
-#~ msgid "A POST request is required."
-#~ msgstr "Eine POST-Anforderung ist erforderlich."
-#~ msgid "There was an error with your query: %s"
-#~ msgstr "Bei Ihrer Anfrage ist ein Fehler aufgetreten: %s"
-#~ msgid "A GET request is required."
-#~ msgstr "Eine GET-Anforderung ist erforderlich."
-#~ msgid "Missing application jar list."
-#~ msgstr "Anwendungs-JAR-Liste fehlt."
-#~ msgid "An error happened with the Spark Server"
-#~ msgstr "Es ist ein Fehler mit dem Spark-Server aufgetreten."
-#~ msgid "Script parameters"
-#~ msgstr "Skriptparameter"
-#~ msgid "Class path"
-#~ msgstr "Klassenpfad"
-#~ msgid "Delete context(s)?"
-#~ msgstr "Kontext löschen?"
-#~ msgid "Applications"
-#~ msgstr "Anwendungen"
-#~ msgid "Dashboard"
-#~ msgstr "Dashboard"
-#~ msgid "Contexts"
-#~ msgstr "Kontexte"
-#~ msgid "Uploads"
-#~ msgstr "Uploads"
-#~ msgid "Create context"
-#~ msgstr "Kontext erstellen"
-#~ msgid "Num cpu cores"
-#~ msgstr "Num-CPU-Kerne"
-#~ msgid "Memory per node"
-#~ msgstr "Speicher pro Knoten"
-#~ msgid "Upload application"
-#~ msgstr "Upload-Anwendung"
-#~ msgid "One class of the jar should implement SparkJob."
-#~ msgstr "Eine Klasse der Jar-Datei muss Spark-Job implementieren."
-#~ msgid "Local jar file"
-#~ msgstr "Lokale Jar-Datei"
-#~ msgid "App name"
-#~ msgstr "Anwendungsname"
-#~ msgid "Upload"
-#~ msgstr "Hochladen"
-#~ msgid "Application name"
-#~ msgstr "Anwendungsname"
-#~ msgid "Application description"
-#~ msgstr "Anwendungsbeschreibung"
-#~ msgid "Upload app"
-#~ msgstr "Anwendung hochladen"
-#~ msgid "Missing, add one?"
-#~ msgstr "Fehlt, eine hinzufügen?"
-#~ msgid "Automatic"
-#~ msgstr "Automatisch"
-#~ msgid "Create one?"
-#~ msgstr "Neu erstellen?"
-#~ msgid "Parameters"
-#~ msgstr "Parameter"
-#~ msgid "Your application has the following error(s):"
-#~ msgstr "Ihre Anwendung enthält folgende(n) Fehler:"
-#~ msgid "No parameters defined yet."
-#~ msgstr "Noch keine Parameter definiert."
-#~ msgid "Add"
-#~ msgstr "Hinzufügen"
-#~ msgid "Executing..."
-#~ msgstr "Ausführung läuft..."
-#~ msgid "Execute"
-#~ msgstr "Ausführen"
-#~ msgid "or create a"
-#~ msgstr "oder erstellen Sie eine"
-#~ msgid "New application"
-#~ msgstr "Neue Anwendung"
-#~ msgid "Download"
-#~ msgstr "Herunterladen"
-#~ msgid "Key"
-#~ msgstr "Schlüssel"
-#~ msgid "The server returned no results."
-#~ msgstr "Der Server gab keine Ergebnisse aus."
-#~ msgid "Save your query"
-#~ msgstr "Abfrage speichern"
-#~ msgid "Choose a file"
-#~ msgstr "Datei auswählen"
-#~ msgid "Did you know?"
-#~ msgstr "Wussten Sie schon?"
-#~ msgid "This field is required."
-#~ msgstr "Dieses Feld ist erforderlich."
-#~ msgid "Empty description"
-#~ msgstr "Leere Beschreibung"
-#~ msgid "Application saved successfully!"
-#~ msgstr "Anwendung erfolgreich gespeichert!"
-#~ msgid "Server error occured: "
-#~ msgstr "Serverfehler aufgetreten: "
-#~ msgid "Unmanageable server error occured: "
-#~ msgstr "Unlösbarer Serverfehler: "
-#~ msgid "Search for name"
-#~ msgstr "Nach Namen suchen"
-#~ msgid "Upload time"
-#~ msgstr "Zeit hochladen"
-#~ msgid "Click to open and execute"
-#~ msgstr "Zum Öffnen und Ausführen hier klicken"
-#~ msgid "Delete forever"
-#~ msgstr "Dauerhaft löschen"
-#~ msgid "Delete selected"
-#~ msgstr "Auswahl löschen"
-#~ msgid "Confirm action"
-#~ msgstr "Aktion bestätigen"
-#~ msgid "Jobs"
-#~ msgstr "Jobs"
-#~ msgid "Status"
-#~ msgstr "Status"
-#~ msgid "Job id"
-#~ msgstr "Job-ID"
-#~ msgid "Start time"
-#~ msgstr "Startzeit"
-#~ msgid "Duration"
-#~ msgstr "Dauer"
-#~ msgid "Click to open"
-#~ msgstr "Zum Öffnen hier klicken"
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "URL des Spark-Job-Servers."
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "Liste der verfügbaren Arten von Snippets"
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "Beispiel: 1 + 1 oder drücken Sie STRG + Leerzeichen"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr ""
+#~ "Beispiel: \"SELECT * FROM Tabellenname\", "
+#~ "oder STRG + Leerzeichen drücken"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>Dies ist ein Text-Snippet</h2>Geben Sie Ihren Text hier ein"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "Neues Notizbuch hinzufügen"
+
