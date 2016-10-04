@@ -1109,7 +1109,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex">
       <div class="sql-context-flex-header">
         <div style="margin: 10px 5px 0 10px;">
-          <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
+          <span style="font-size: 15px; font-weight: 300;">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</span>
           <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
           <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
         </div>

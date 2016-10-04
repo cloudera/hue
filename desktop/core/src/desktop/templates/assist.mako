@@ -926,8 +926,12 @@ from metadata.conf import has_navigator
           <!-- ko if: type === 'DATABASE' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
           <!-- /ko -->
-          <!-- ko if: type === 'TABLE' || type === 'VIEW' -->
+          <!-- ko if: type === 'TABLE' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <!-- /ko -->
+          <!-- ko if:  type === 'VIEW' -->
+          <div class="doc-desc" data-bind="text: originalDescription"></div>
+          <div class="doc-desc" data-bind="text: queryText.substring(0, 150)"></div>
           <!-- /ko -->
           <!-- ko if: type === 'FIELD' -->
           <div class="doc-desc" data-bind="text: originalDescription"></div>
