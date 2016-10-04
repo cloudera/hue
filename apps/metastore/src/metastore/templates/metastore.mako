@@ -361,9 +361,8 @@ ${ assist.assistPanel() }
       %endif
        tile">
 
-        <h4>${ _('Stats') }</h4>
-        <div class="row-fluid">
-          <div class="span6">
+          <div class="span6 tile">
+            <h4>${ _('Properties') }</h4>
             <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
               <!-- ko if: comment -->
               <span data-bind="text: comment"></span>
@@ -371,19 +370,22 @@ ${ assist.assistPanel() }
               <!-- ko ifnot: comment -->
               <i>${_('No comment.')}</i>
               <!-- /ko -->
+              <div title="${ _('Owner') }">
+                <i class="fa fa-fw fa-user muted"></i>
+                <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
+                </br>
+                <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+              </div>
             </div>
           </div>
-          <div class="span3">
-            <div title="${ _('Owner') }">
-              <i class="fa fa-fw fa-user muted"></i>
-              <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
-            </div>
-          </div>
-          <div class="span3">
-            <div>
-              <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
-            </div>
-          </div>
+          <div class="span3 tile">
+            <!-- ko if: $root.navigatorEnabled()  -->
+            <h4>${ _('Tagging') }</h4>
+            <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
+              sourceType: 'hive',
+              database: db_name
+              } }"></div>
+            <!-- /ko -->
         </div>
         <!-- ko with: parameters -->
         <div class="row-fluid">
@@ -394,11 +396,6 @@ ${ assist.assistPanel() }
           </div>
         </div>
         <!-- /ko -->
-
-        <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-          sourceType: 'hive',
-          database: db_name
-        } }"></div>
       </div>
       <!-- /ko -->
 
@@ -441,8 +438,8 @@ ${ assist.assistPanel() }
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
             <th>&nbsp;</th>
-            <th>${ _('Table Name') }</th>
-            <th width="50%">${ _('Comment') }</th>
+            <th width="30%">${ _('Table Name') }</th>
+            <th width="48%">${ _('Comment') }</th>
             <!-- ko if: $root.optimizerEnabled  -->
             <th width="10%">${ _('Popularity') }</th>
             <th width="10%">${ _('Columns') }</th>
