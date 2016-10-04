@@ -119,7 +119,7 @@ from metadata.conf import has_navigator
         };
 
         self.onSave = function (value) {
-          var newTags = value.split(',');
+          var newTags = value.length > 0 ? value.split(',') : [];
           var tagsToRemove = [];
           var tagsToAdd = [];
           var tagIndex = {};
