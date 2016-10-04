@@ -398,6 +398,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
+      mapping['email_checkbox'] = request.POST.get('email_checkbox') == 'on'
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
@@ -412,14 +413,22 @@ def _submit_workflow_helper(request, workflow, submit_action):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
+
     popup = render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
                      'action': submit_action,
-                     'show_dryrun': True
+                     'show_dryrun': True,
+                     'email_id': request.user.email,
+                     'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user)
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
+
+def _is_oozie_mail_enabled(user):
+  api = get_oozie(user)
+  oozie_conf = api.get_configuration()
+  return oozie_conf.get('oozie.email.smtp.host') != 'localhost'
 
 def _submit_workflow(user, fs, jt, workflow, mapping):
   try:

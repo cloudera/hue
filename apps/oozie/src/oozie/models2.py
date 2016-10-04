@@ -30,7 +30,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
@@ -851,6 +850,18 @@ class Node():
       'workflow_mapping': workflow_mapping
     }
 
+    if mapping.get('email_checkbox'):
+      if self.data['type'] == KillAction.TYPE and not self.data['properties'].get('enableMail'):
+        self.data['properties']['enableMail'] = True
+        self.data['properties']['to'] = self.user.email
+        self.data['properties']['subject'] = _("${wf:name()} execution failure")
+        self.data['properties']['body'] = _("Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]")
+
+      if self.data['type'] == EndNode.TYPE:
+        self.data['properties']['enableMail'] = True
+        self.data['properties']['to'] = self.user.email
+        self.data['properties']['subject'] = _("${wf:name()} execution successful")
+
     return django_mako.render_to_string(self.get_template_name(), data)
 
   @property
@@ -915,6 +926,11 @@ def _upgrade_older_node(node):
     node['properties']['cc'] = ''
     node['properties']['subject'] = ''
     node['properties']['body'] = ''
+
+  if node['type'] in ('end', 'end-widget') and 'to' not in node['properties']:
+    node['properties']['enableMail'] = False
+    node['properties']['to'] = ''
+    node['properties']['subject'] = ''
 
   if node['type'] == 'email-widget' and 'bcc' not in node['properties']:
     node['properties']['bcc'] = ''

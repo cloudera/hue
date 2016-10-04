@@ -79,6 +79,21 @@
            <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job?') }
          </label>
       % endif
+      % if is_oozie_mail_enabled:
+        </br>
+        <label class="checkbox" style="display: inline-block; margin-top: 5px">
+          <input type="checkbox" name="email_checkbox"
+          % if not email_id:
+            disabled
+          % endif
+          />
+        % if email_id:
+          ${_('Email notification to ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${email_id} </a>
+        % else:
+          ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${_('profile.')} </a>
+        % endif
+        </label>
+        %endif
       % if return_json:
         <input type="hidden" name="format" value="json">
       % endif
