@@ -2853,6 +2853,7 @@
               }
             });
           }
+          huePubSub.publish('editor.active.locations', e.data.locations);
           e.data.locations.forEach(function (location) {
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
             if (token !== null) {

@@ -113,8 +113,22 @@
     var nestedFilter = {
       query: ko.observable("").extend({ rateLimit: { timeout: 250, method: 'notifyWhenChangesStop' } }),
       showTables: ko.observable(true),
-      showViews: ko.observable(true)
+      enableActiveFilter: typeof window.Worker !== 'undefined',
+      showActive: ko.observable(false),
+      showViews: ko.observable(true),
+      activeEditorTables: ko.observableArray([])
     };
+
+    huePubSub.subscribe('editor.active.locations', function (locations) {
+      var activeTables = [];
+      locations.forEach(function (location) {
+        if (location.type === 'table') {
+          activeTables.push(location.identifierChain.length == 2 ? { table: location.identifierChain[1].name, db: location.identifierChain[0].name} : { table: location.identifierChain[0].name });
+        }
+      });
+      nestedFilter.activeEditorTables(activeTables);
+    });
+
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
       self.databases($.map(names, function(name) {
