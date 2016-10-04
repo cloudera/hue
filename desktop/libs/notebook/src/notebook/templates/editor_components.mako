@@ -977,6 +977,7 @@ ${ hueIcons.symbols() }
             sourceTypes: sqlSourceTypes,
             activeSourceType: activeSqlSourceType,
             navigationSettings: {
+              enableActiveFilter: editorMode(),
               openDatabase: false,
               openItem: false,
               showStats: true,
