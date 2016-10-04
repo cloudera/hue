@@ -637,6 +637,8 @@ class HiveServerClient:
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
         re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
       LOG.info('Retrying with a new session because for %s of %s' % (self.user, res))
+      session.status_code = TStatusCode.INVALID_HANDLE_STATUS
+      session.save()
 
       session = self.open_session(self.user)
       req.sessionHandle = session.get_handle()
