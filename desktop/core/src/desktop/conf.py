@@ -1331,6 +1331,12 @@ def config_validator(user):
   # Validate MYSQL storage engine of all tables
   res.extend(validate_database())
 
+  # Validate if oozie email server is active
+  from oozie.views.editor2 import _is_oozie_mail_enabled
+
+  if not _is_oozie_mail_enabled(user):
+    res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+
   return res
 
 def get_redaction_policy():
