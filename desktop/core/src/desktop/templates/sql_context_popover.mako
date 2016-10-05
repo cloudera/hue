@@ -260,13 +260,13 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-details">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData, nicescroll">
       <!-- ko component: { name: 'sql-columns-table', params: { columns: extended_columns } } --><!-- /ko -->
     </div>
   </script>
 
   <script type="text/html" id="sql-context-column-details">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData, nicescroll">
       <div style="margin: 15px;">
         <a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
         <!-- ko if: comment -->
@@ -278,7 +278,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-and-column-tags">
-    <div class="sql-context-flex-fill">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }">
       <div class="sql-context-flex">
         <div class="sql-context-flex-header">
           <div style="margin: 10px 5px 0 10px;">
@@ -293,7 +293,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-and-column-sample">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData">
       <div class="context-sample sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
         <!-- ko if: rows.length == 0 -->
         <div class="alert">${ _('The selected table has no data.') }</div>
@@ -317,7 +317,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-analysis">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData, niceScroll">
       <!-- ko if: stats.length > 0 -->
         <table class="table table-striped">
           <tbody data-bind="foreach: stats">
@@ -332,7 +332,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-column-analysis">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData, niceScroll">
       <table class="table table-condensed">
         <tbody data-bind="foreach: stats">
           <tr>
@@ -345,7 +345,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-database-details">
-    <div class="sql-context-flex-fill">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }">
       <div class="sql-context-flex">
         <div class="sql-context-flex-header">
           <div style="margin: 10px 5px 0 10px;">
@@ -360,7 +360,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-function-details">
-    <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: details, niceScroll">
       <div style="padding: 8px">
         <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
         <p><span data-bind="text: description"></span></p>
@@ -369,7 +369,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-partitions">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="sql-context-flex-fill" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, with: fetchedData, niceScroll">
       <div style="margin: 10px 5px 0 10px;">
         <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
       </div>
@@ -436,7 +436,7 @@ from metadata.conf import has_navigator
         </li>
       </ul>
       <div class="sql-context-tab-container" data-bind="foreach: tabs">
-        <div class="tab-pane" id="sampleTab" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="height: 100%; overflow: hidden; display: none;">
+        <div class="tab-pane" id="sampleTab" data-bind="matchParentHeight: { refreshPubSubId: 'context.popover.resize' }, visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }" style="height: 100%; overflow: hidden; display: none;">
           <div class="sql-context-flex">
             <!-- ko with: templateData -->
             <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
@@ -480,14 +480,17 @@ from metadata.conf import has_navigator
 
       var hidePopover = function () {
         if (! preventHide) {
-          huePubSub.publish('sql.context.popover.dispose');
-          $('#sqlContextPopover').remove();
-          $(document).off('click', hideOnClickOutside);
-          while (intervals.length > 0) {
-            window.clearInterval(intervals.pop());
-          }
-          while (pubSubs.length > 0) {
-            pubSubs.pop().remove();
+          if ($('#sqlContextPopover').length > 0) {
+            ko.cleanNode($('#sqlContextPopover')[0]);
+            huePubSub.publish('sql.context.popover.dispose');
+            $('#sqlContextPopover').remove();
+            $(document).off('click', hideOnClickOutside);
+            while (intervals.length > 0) {
+              window.clearInterval(intervals.pop());
+            }
+            while (pubSubs.length > 0) {
+              pubSubs.pop().remove();
+            }
           }
           huePubSub.publish('sql.context.popover.hidden');
         }
@@ -840,7 +843,7 @@ from metadata.conf import has_navigator
             width: $('.sql-context-popover').width(),
             height: $('.sql-context-popover').height()
           });
-        }
+        };
 
         self.resizeStart = function (event, ui) {
           preventHide = true;
@@ -926,6 +929,8 @@ from metadata.conf import has_navigator
               if (ui.size.width < 260) {
                 ui.size.width = 260;
                 $('.sql-context-popover').css('width', 260 + 'px');
+              } else {
+                huePubSub.publish('context.popover.resize')
               }
             };
             break;
@@ -936,6 +941,8 @@ from metadata.conf import has_navigator
               if (ui.size.height < 200) {
                 ui.size.height = 200;
                 $('.sql-context-popover').css('height', 200 + 'px');
+              } else {
+                huePubSub.publish('context.popover.resize')
               }
             };
             break;
@@ -1079,10 +1086,6 @@ from metadata.conf import has_navigator
         if (self.contents.activeTab() === 'sample') {
           self.contents.refetchSamples();
         }
-      };
-
-      SqlContextPopoverViewModel.prototype.dispose = function () {
-        hidePopover();
       };
 
       ko.components.register('sql-context-popover', {
