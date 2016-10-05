@@ -1308,6 +1308,33 @@
     }
   };
 
+  ko.bindingHandlers.assistInnerPanelResizer = {
+    init: function (element, valueAccessor) {
+      var $element = $(element);
+      var $parent = $element.parent();
+
+      var lastParentHeight = -1;
+      var setHeightToParentHeight = function () {
+        if (lastParentHeight !== $parent.height()) {
+          lastParentHeight = $parent.height();
+          $element.css('height', lastParentHeight + 'px');
+        }
+      };
+
+      setHeightToParentHeight();
+
+      $(window).on('resize', setHeightToParentHeight);
+      var pubSub = huePubSub.subscribe('assist.forceRender', setHeightToParentHeight);
+      var interval = window.setInterval(setHeightToParentHeight, 500);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        $(window).off('resize', setHeightToParentHeight);
+        pubSub.remove();
+        window.clearInterval(interval);
+      });
+    }
+  };
+
   ko.bindingHandlers.assistVerticalResizer = {
     init: function (element, valueAccessor) {
       var $container = $(element);
