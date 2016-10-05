@@ -659,7 +659,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(0, data['status'], data)
     assert_true('result' in data)
     assert_true('rows' in data['result'])
-    assert_true(data['result']['rows'] > 0)
+    assert_equal(823, data['result']['rows'])
 
     # Assert that a query with multiple jobs returns rows
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
@@ -674,7 +674,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(0, data['status'], data)
     assert_true('result' in data)
     assert_true('rows' in data['result'])
-    assert_true(data['result']['rows'] > 0)
+    assert_equal(23, data['result']['rows'])
 
 
   def test_fetch_result_size_spark(self):
@@ -721,5 +721,27 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_true('result' in data)
     assert_true('rows' in data['result'])
     assert_true('size' in data['result'])
-    assert_true(data['result']['rows'] > 0)
+    assert_equal(23, data['result']['rows'])
     assert_true(data['result']['size'] > 0)
+
+
+  def test_fetch_result_size_impala(self):
+    if not is_live_cluster():
+      raise SkipTest
+
+    # Assert that a query that runs a job will return rows
+    statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
+    doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+
+    response = self.client.post(reverse('notebook:fetch_result_size'),
+                              {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_true('result' in data)
+    assert_true('rows' in data['result'])
+    assert_true('size' in data['result'])
+    assert_equal(23, data['result']['rows'])
+    assert_equal(None, data['result']['size'])

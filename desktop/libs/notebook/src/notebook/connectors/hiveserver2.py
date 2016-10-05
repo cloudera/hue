@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import copy
 import logging
 import re
 import StringIO
+import struct
 import time
 
 from django.core.urlresolvers import reverse
@@ -30,6 +32,7 @@ from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
@@ -39,12 +42,12 @@ LOG = logging.getLogger(__name__)
 
 
 try:
-  from beeswax import data_export
+  from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_CELL_LIMIT
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
-  from beeswax import conf as beeswax_conf
+  from beeswax.hive_site import hiveserver2_use_ssl
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -56,6 +59,7 @@ except ImportError, e:
 try:
   from impala import api   # Force checking if Impala is enabled
   from impala.conf import CONFIG_WHITELIST as impala_settings
+  from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
   impala_settings = None
@@ -183,8 +187,7 @@ class HS2Api(Api):
     response['properties'] = properties
 
     if lang == 'impala':
-      impala_settings = session.get_formatted_properties()
-      http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+      http_addr = self._get_impala_server_url(session)
       response['http_addr'] = http_addr
 
     return response
@@ -294,43 +297,16 @@ class HS2Api(Api):
       'message': ''
     }
 
-    total_records_match = None
-    total_size_match = None
-
     if snippet.get('status') != 'available':
       raise QueryError(_('Result status is not available'))
 
-    if snippet['type'] != 'hive':
+    if snippet['type'] not in ('hive', 'impala'):
       raise OperationNotSupported(_('Cannot fetch result metadata for snippet type: %s') % snippet['type'])
 
-    engine = self._get_hive_execution_engine(notebook, snippet).lower()
-    logs = self.get_log(notebook, snippet, startFrom=0)
-
-    if engine == 'mr':
-      jobs = self.get_jobs(notebook, snippet, logs)
-      if jobs:
-        last_job_id = jobs[-1].get('name')
-        LOG.info("Hive query executed %d jobs, last job is: %s" % (len(jobs), last_job_id))
-
-        # Attempt to fetch last task's syslog and parse the total records
-        task_syslog = self._get_syslog(last_job_id)
-        if task_syslog:
-          total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
-          total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
-        else:
-          raise QueryError(_('Failed to get task syslog for Hive query with job: %s')  % last_job_id)
-      else:
-        resp['message'] = _('Hive query did not execute any jobs.')
-    elif engine == 'spark':
-      total_records_re = "RECORDS_OUT_0: (?P<total_records>\d+)"
-      total_size_re = "Spark Job\[[a-z0-9-]+\] Metrics[A-Za-z0-9:\s]+ResultSize: (?P<total_size>\d+)"
-      total_records_match = re.search(total_records_re, logs, re.MULTILINE)
-      total_size_match = re.search(total_size_re, logs, re.MULTILINE)
-
-    if total_records_match:
-      resp['rows'] = int(total_records_match.group('total_records'))
-    if total_size_match:
-      resp['size'] = int(total_size_match.group('total_size'))
+    if snippet['type'] == 'hive':
+      resp['rows'], resp['size'], resp['message'] = self._get_hive_result_size(notebook, snippet)
+    else:  # Impala
+      resp['rows'], resp['size'], resp['message'] = self._get_impala_result_size(notebook, snippet)
 
     return resp
 
@@ -684,3 +660,91 @@ class HS2Api(Api):
       attempts += 1
 
     return syslog
+
+
+  def _get_hive_result_size(self, notebook, snippet):
+    total_records_match, total_size_match = None, None
+    total_records, total_size, msg = None, None, None
+    engine = self._get_hive_execution_engine(notebook, snippet).lower()
+    logs = self.get_log(notebook, snippet, startFrom=0)
+
+    if engine == 'mr':
+      jobs = self.get_jobs(notebook, snippet, logs)
+      if jobs:
+        last_job_id = jobs[-1].get('name')
+        LOG.info("Hive query executed %d jobs, last job is: %s" % (len(jobs), last_job_id))
+
+        # Attempt to fetch last task's syslog and parse the total records
+        task_syslog = self._get_syslog(last_job_id)
+        if task_syslog:
+          total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
+          total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
+        else:
+          raise QueryError(_('Failed to get task syslog for Hive query with job: %s') % last_job_id)
+      else:
+        msg = _('Hive query did not execute any jobs.')
+    elif engine == 'spark':
+      total_records_re = "RECORDS_OUT_0: (?P<total_records>\d+)"
+      total_size_re = "Spark Job\[[a-z0-9-]+\] Metrics[A-Za-z0-9:\s]+ResultSize: (?P<total_size>\d+)"
+      total_records_match = re.search(total_records_re, logs, re.MULTILINE)
+      total_size_match = re.search(total_size_re, logs, re.MULTILINE)
+
+    if total_records_match:
+      total_records = int(total_records_match.group('total_records'))
+    if total_size_match:
+      total_size = int(total_size_match.group('total_size'))
+
+    return total_records, total_size, msg
+
+
+  def _get_impala_result_size(self, notebook, snippet):
+    total_records_match = None
+    total_records, total_size, msg = None, None, None
+
+    query_id = self._get_impala_query_id(snippet)
+    session = Session.objects.get_session(self.user, application='impala')
+    protocol = 'https' if hiveserver2_use_ssl() else 'http'
+    server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
+    if query_id:
+      LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
+      fragment = self._get_impala_query_profile(server_url, query_id=query_id)
+      total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: (?P<total_records>\d+).*?Averaged Fragment F\d\d"
+      total_records_match = re.search(total_records_re, fragment, re.MULTILINE | re.DOTALL)
+    if total_records_match:
+      total_records = int(total_records_match.group('total_records'))
+
+    return total_records, total_size, msg
+
+
+  def _get_impala_query_id(self, snippet):
+    guid = None
+    if 'result' in snippet and 'handle' in snippet['result'] and 'guid' in snippet['result']['handle']:
+      try:
+        decoded_guid = base64.decodestring(snippet['result']['handle']['guid'])
+        guid = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+      except Exception, e:
+        LOG.warn('Failed to decode operation handle guid: %s' % e)
+    else:
+      LOG.warn('Snippet does not contain a valid result handle, cannot extract Impala query ID.')
+    return guid
+
+
+  def _get_impala_server_url(self, session):
+    impala_settings = session.get_formatted_properties()
+    http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+    return http_addr
+
+
+  def _get_impala_query_profile(self, server_url, query_id):
+    api = get_impalad_api(user=self.user, url=server_url)
+
+    try:
+      query_profile = api.get_query_profile(query_id)
+      profile = query_profile.get('profile')
+    except (RestException, ImpalaDaemonApiException), e:
+      raise PopupException(_("Failed to get query profile from Impala Daemon server: %s") % e)
+
+    if not profile:
+      raise PopupException(_("Could not find profile in query profile response from Impala Daemon Server."))
+
+    return profile
