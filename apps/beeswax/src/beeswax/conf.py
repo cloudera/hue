@@ -121,7 +121,7 @@ CLOSE_QUERIES = Config(
 
 MAX_NUMBER_OF_SESSIONS = Config(
   key="max_number_of_sessions",
-  help=_t("Hue will use at most this many HiveServer2 sessions at a time"),
+  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"),
   type=int,
   default=1
 )
