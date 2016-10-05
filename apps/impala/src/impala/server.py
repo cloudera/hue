@@ -15,7 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
+import threading
+
+from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.resource import Resource
 
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerDataTable
@@ -25,8 +30,28 @@ from ImpalaService import ImpalaHiveServer2Service
 
 LOG = logging.getLogger(__name__)
 
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
+
+
+def get_api(user, url):
+  global  API_CACHE
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
+    try:
+      if API_CACHE is None:
+        API_CACHE = ImpalaDaemonApi(url)
+    finally:
+      API_CACHE_LOCK.release()
+  API_CACHE.set_user(user)
+  return API_CACHE
+
 
 class ImpalaServerClientException(Exception):
+  pass
+
+
+class ImpalaDaemonApiException(Exception):
   pass
 
 
@@ -100,3 +125,53 @@ class ImpalaServerClient(HiveServerClient):
       return summary_dict
     except Exception, e:
       raise ImpalaServerClientException('Failed to serialize the TExecSummary object: %s' % str(e))
+
+
+class ImpalaDaemonApi(object):
+
+  def __init__(self, server_url):
+    self._url = server_url
+    self._client = HttpClient(self._url, logger=LOG)
+    self._root = Resource(self._client)
+    self._security_enabled = False
+    self._thread_local = threading.local()
+
+
+  def __str__(self):
+    return "ImpalaDaemonApi at %s" % self._url
+
+
+  @property
+  def url(self):
+    return self._url
+
+
+  @property
+  def security_enabled(self):
+    return self._security_enabled
+
+
+  @property
+  def user(self):
+    return self._thread_local.user
+
+
+  def set_user(self, user):
+    if hasattr(user, 'username'):
+      self._thread_local.user = user.username
+    else:
+      self._thread_local.user = user
+
+
+  def get_query_profile(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+    profile = None
+    resp = self._root.get('query_profile', params=params)
+    try:
+      profile = json.loads(resp)
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON.')
+    return profile
