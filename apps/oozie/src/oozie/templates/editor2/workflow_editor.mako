@@ -334,14 +334,19 @@ ${ workflow.render() }
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
-          <select data-bind="options: type() == 'java' ? $root.javaQueries() : (type() == 'spark' ? $root.sparkApps() : (type() == 'pig' ? $root.pigScripts() : (type() == 'sqoop' ? $root.sqoopScripts() : (type() == 'distcp-doc' ? $root.distCpScripts() : (type() == 'shell-doc' ? $root.shellScripts() : (type() == 'mapreduce-doc' ? $root.mapReduceScripts() : $root.hiveQueries())))))), optionsText: 'name', optionsValue: 'uuid', value: value, select2Version4:{ placeholder: '${ _ko('Document name...')}'}"></select>
+          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
+            source: $root.documentsAutocompleteSource,
+            minLength: 0,
+            type: type,
+            select: function (event, ui) { ko.dataFor(event.target).value(ui.item.value); this.value = ui.item.label; return false;},
+            focus: function (event, ui) { this.value = ui.item.label; return false;},
+            itemTemplate: 'doc-search-autocomp-item'
+          }, valueUpdate: 'afterkeydown'">
           <!-- ko if: $root.getDocumentById(type(), value()) -->
             <!-- ko with: $root.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
-              </br>
-              <span data-bind='text: $data.description' class="muted"></span>
             <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->

@@ -72,7 +72,7 @@ function loadLayout(viewModel, json_layout) {
 
 // End dashboard lib
 
-var Node = function (node) {
+var Node = function (node, vm) {
   var self = this;
 
   var type = typeof node.widgetType != "undefined" ? node.widgetType : node.type;
@@ -83,6 +83,32 @@ var Node = function (node) {
 
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
+
+  self.associatedDocument = ko.observable();
+
+  function setAssociatedDocument(uuid) {
+    if (vm.documentStore[uuid]){
+      self.associatedDocument(vm.documentStore[uuid]);
+    }
+    $.get('/desktop/api2/doc/', {
+      uuid: uuid
+    }, function(data){
+      if (data && data.document){
+        self.associatedDocument(ko.mapping.fromJS(data.document));
+        vm.documentStore[uuid] = self.associatedDocument();
+      }
+    });
+  }
+
+  if (node.properties.uuid){
+    setAssociatedDocument(node.properties.uuid);
+  }
+
+  if (self.properties.uuid){
+    self.properties.uuid.subscribe(function(val){
+      setAssociatedDocument(val);
+    });
+  }
 
   self.actionParameters = ko.observableArray([]);
   self.actionParametersUI = ko.computed(function () {
@@ -183,7 +209,11 @@ var Workflow = function (vm, workflow) {
   self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
-  self.tracker = new ChangeTracker(self, ko); // from ko.common-dashboard.js
+  self.tracker = new ChangeTracker(self, ko, {
+    ignore: [
+      "associatedDocument"
+    ]
+  }); // from ko.common-dashboard.js
 
   self.isDirty = ko.computed(function () {
     return self.tracker().somethingHasChanged();
@@ -244,7 +274,7 @@ var Workflow = function (vm, workflow) {
   self.loadNodes = function (workflow) {
     var nodes = []
     $.each(workflow.nodes, function (index, node) {
-      var _node = new Node(node);
+      var _node = new Node(node, vm);
       nodes.push(_node);
     });
     self.nodes(nodes)
@@ -293,7 +323,7 @@ var Workflow = function (vm, workflow) {
           var node = self.movedNode;
           self.movedNode = null;
         } else {
-          var node = new Node(_node);
+          var node = new Node(_node, vm);
           node.fetch_parameters();
         }
 
@@ -309,8 +339,8 @@ var Workflow = function (vm, workflow) {
             vm.currentlyCreatedJoin.properties['fork_id'] = vm.currentlyCreatedFork.id;
             vm.currentlyCreatedFork.properties['join_id'] = vm.currentlyCreatedJoin.id;
 
-            var fork = new Node(vm.currentlyCreatedFork);
-            var join = new Node(vm.currentlyCreatedJoin);
+            var fork = new Node(vm.currentlyCreatedFork, vm);
+            var join = new Node(vm.currentlyCreatedJoin, vm);
 
             self.nodes.push(fork);
             self.nodes.push(join);
@@ -506,32 +536,52 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
-
-    self.getDocuments('query-hive', self.hiveQueries);
-    self.getDocuments('query-java', self.javaQueries);
-    self.getDocuments('query-spark2', self.sparkApps);
-    self.getDocuments('query-pig', self.pigScripts);
-    self.getDocuments('query-sqoop1', self.sqoopScripts);
-    self.getDocuments('query-distcp', self.distCpScripts);
-    self.getDocuments('query-shell', self.shellScripts);
-    self.getDocuments('query-mapreduce', self.mapReduceScripts);
   };
 
-  self.getDocuments = function(type, destination) {
-	$.get('/desktop/api2/docs/', {
-	    type: type,
-	    include_trashed: false,
-	    sort: '-last_modified',
-	    limit: 100
-	}, function(data) {
-	  if (data && data.documents) {
-	    var queries = [];
-	    $.each(data.documents, function(index, query) {
-	      queries.push(ko.mapping.fromJS(query));
-	    });
-	    destination(queries);
-	  }
-	});
+  self.documentStore = {};
+  self.documentsAutocompleteSource = function (request, callback) {
+    var TYPE_MAP = {
+      'hive': 'query-hive',
+      'impala': 'query-impala',
+      'java': 'query-java',
+      'spark': 'query-spark2',
+      'pig': 'query-pig',
+      'sqoop': 'query-sqoop1',
+      'distcp-doc': 'query-distcp',
+      'mapreduce-doc': 'query-mapreduce'
+    }
+    var type = 'query-hive';
+    if (this.options && typeof this.options.type === 'function') {
+      type = TYPE_MAP[this.options.type()] ? TYPE_MAP[this.options.type()] : this.options.type();
+    }
+    $.get('/desktop/api2/docs/', {
+      type: type,
+      text: request.term,
+      include_trashed: false,
+      limit: 100
+    }, function (data) {
+      if (data && data.documents) {
+        var docs = [];
+        if (data.documents.length > 0) {
+          $.each(data.documents, function (index, doc) {
+            docs.push({
+              data: {name: doc.name, type: doc.type, description: doc.description},
+              value: doc.uuid,
+              label: doc.name
+            });
+            self.documentStore[doc.uuid] = ko.mapping.fromJS(doc);
+          });
+        }
+        else {
+          docs.push({
+            data: {name: 'No matches found', description: ''},
+            label: 'No matches found',
+            value: ''
+          });
+        }
+        callback(docs);
+      }
+    });
   };
 
   self.addActionProperties = ko.observableArray([]);
@@ -557,42 +607,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
-  self.hiveQueries = ko.observableArray();
-  self.javaQueries = ko.observableArray();
-  self.sparkApps = ko.observableArray();
-  self.pigScripts = ko.observableArray();
-  self.sqoopScripts = ko.observableArray();
-  self.distCpScripts = ko.observableArray();
-  self.shellScripts = ko.observableArray();
-  self.mapReduceScripts = ko.observableArray();
   self.history = ko.mapping.fromJS(history_json);
 
   self.getDocumentById = function (type, uuid) {
-    var _query = null;
-    if (type.indexOf('java') != -1) {
-      data = self.javaQueries();
-    } else if (type.indexOf('spark') != -1) {
-      data = self.sparkApps();
-    } else if (type.indexOf('pig') != -1) {
-      data = self.pigScripts();
-    } else if (type.indexOf('sqoop1') != -1) {
-      data = self.sqoopScripts();
-    } else if (type.indexOf('distcp') != -1) {
-      data = self.distCpScripts();
-    } else if (type.indexOf('shell') != -1) {
-      data = self.shellScripts();
-    } else if (type.indexOf('mapreduce') != -1) {
-      data = self.mapReduceScripts();
-    } else {
-      data = self.hiveQueries();
-    }
-    $.each(data, function (index, query) {
-      if (query.uuid() == uuid) {
-        _query = query;
-        return false;
-      }
-    });
-    return _query;
+    var doc = self.documentStore[uuid];
+    return doc;
   };
 
   self.getSubWorkflow = function (uuid) {

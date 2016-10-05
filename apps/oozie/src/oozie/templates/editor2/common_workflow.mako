@@ -29,6 +29,15 @@
 
 <%def name="render()">
 
+<script type="text/html" id="doc-search-autocomp-item">
+  <a>
+    <div>
+      <strong style="font-size: 14px;" data-bind="html: name"></strong>
+      <div style="width: 190px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" class="muted" data-bind="text: description"></div>
+    </div>
+  </a>
+</script>
+
 <div data-bind="css: {'dashboard': true, 'readonly': ! isEditing()}">
   <!-- ko if: $root.workflow.properties.imported -->
     <div class="alert alert-warn" style="margin-top: 93px; margin-bottom: 0; border: none; text-align: center">
@@ -603,6 +612,42 @@
  <!-- /ko -->
 </script>
 
+<script type="text/html" id="common-document-widget">
+  <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko with: associatedDocument -->
+        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <br/>
+        <span data-bind='text: description' class="muted"></span>
+      <!-- /ko -->
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <!-- ko if: associatedDocument -->
+          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
+              source: $root.documentsAutocompleteSource,
+              minLength: 0,
+              type: associatedDocument().type,
+              create: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
+              select: function (event, ui) { ko.dataFor(event.target).properties.uuid(ui.item.value); this.value = ui.item.label; return false;},
+              focus: function (event, ui) { this.value = ui.item.label; return false;},
+              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
+              itemTemplate: 'doc-search-autocomp-item'
+            }, valueUpdate: 'afterkeydown'">
+          <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <i class="fa fa-external-link-square"></i>
+          </a>
+          <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+        <!-- /ko -->
+        <div class="row-fluid">
+          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
+          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
+        </div>
+      </div>
+    </div>
+
+</script>
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
@@ -817,35 +862,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.pigScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Pig program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -985,32 +1002,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById('spark2', properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById('spark2', properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.sparkApps, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Java program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1101,40 +1093,11 @@
   <!-- /ko -->
 </script>
 
-
 <script type="text/html" id="hive-document-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.hiveQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Hive query name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1179,35 +1142,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.javaQueries, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Java program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1396,36 +1331,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById('query-sqoop1', properties.uuid()) -->
-          <select data-bind="options: $root.sqoopScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Sqoop program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1565,36 +1471,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.mapReduceScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('MapReduce program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1774,35 +1651,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.shellScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('Shell program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -2346,36 +2195,7 @@
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
 
-    <div data-bind="visible: ! $root.isEditing()">
-      <span data-bind="template: { name: 'logs-icon' }"></span>
-      <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-      <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
-        <br/>
-        <span data-bind='text: description' class="muted"></span>
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
-        <!-- ko if: $root.getDocumentById(type(), properties.uuid()) -->
-        <!-- ko with: $root.getDocumentById(type(), properties.uuid()) -->
-          <select data-bind="options: $root.distCpScripts, optionsText: 'name', optionsValue: 'uuid', value: $parent.properties.uuid, select2Version4:{ placeholder: '${ _ko('DistCp program name...')}'}"></select>
-          <a href="#" data-bind="attr: { href: absoluteUrl() }" target="_blank" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <div data-bind='text: description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-
-        <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
-          <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
-        </div>
-
-      </div>
-    </div>
+    <span data-bind="template: { name: 'common-document-widget' }"></span>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
