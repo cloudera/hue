@@ -285,7 +285,7 @@ function setLayout(colSizes, vm) {
   $(document).trigger("setLayout");
 }
 
-function ChangeTracker(objectToTrack, ko) {
+function ChangeTracker(objectToTrack, ko, mappingOptions) {
   var hashFunction = typeof ko.mapping !== 'undefined' ? ko.mapping.toJSON : ko.toJSON;
   var lastCleanState = ko.observable(hashFunction(objectToTrack));
 
@@ -294,6 +294,8 @@ function ChangeTracker(objectToTrack, ko) {
       "isDirty"
     ]
   };
+
+  $.extend(MAPPING, mappingOptions);
 
   var result = {
     somethingHasChanged: ko.dependentObservable(function () {

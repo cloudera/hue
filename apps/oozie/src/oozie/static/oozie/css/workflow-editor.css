@@ -306,3 +306,7 @@ ul.unstyled li {
 .zoom-in {
   cursor: zoom-in;
 }
+
+.ui-autocomplete {
+  z-index: 4000;
+}
