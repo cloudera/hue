@@ -856,7 +856,7 @@ from metadata.conf import has_navigator
       </div>
       <!-- /ko -->
       <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }">
-        <div class="assist-inner-panel" data-bind="assistInnerPanelResizer, with: visiblePanel">
+        <div class="assist-inner-panel" data-bind="matchParentHeight: { resizeElement: window, refreshPubSubId: 'assist.forceRender' }, with: visiblePanel">
           <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
         </div>
       </div>
