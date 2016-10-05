@@ -721,7 +721,7 @@ from metadata.conf import has_navigator
     <div class="assist-db-header-actions">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <!-- ko if: sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
@@ -730,7 +730,7 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
-      <span style="color: #aaa;"><i class="fa fa-search" title="${_('Search')}"></i></span>
+      <span style="color: #aaa;"><i class="fa fa-filter" title="${_('Filter')}"></i></span>
       <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
     </div>
