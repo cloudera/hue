@@ -33,7 +33,7 @@ try:
 except ImportError:
     pass
 
-PY3 = sys.version_info.major > 2
+PY3 = sys.version_info > (3,)
 
 # define bytes->int for non 2, 4, 8 byte ints
 if PY3:

@@ -20,7 +20,7 @@ parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  
 
 logger = logging.getLogger("parquet")  # pylint: disable=invalid-name
 
-PY3 = sys.version_info.major > 2
+PY3 = sys.version_info > (3,)
 
 ARRAY_BYTE_STR = u'B' if PY3 else b'B'
 
