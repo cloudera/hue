@@ -1308,46 +1308,6 @@
     }
   };
 
-  /**
-   * This one has to be used when using flex for Safari, 100% height has no impact on flex: 1 1 100%
-   */
-  ko.bindingHandlers.matchParentHeight = {
-    init: function (element, valueAccessor) {
-      var $element = $(element);
-      var $parent = $element.parent();
-
-      var lastParentHeight = -1;
-      var random = Math.random();
-      var setHeightToParentHeight = function () {
-        if (lastParentHeight !== $parent.height()) {
-          lastParentHeight = $parent.height();
-          $element.css('height', lastParentHeight + 'px');
-        }
-      };
-
-      setHeightToParentHeight();
-
-      if (valueAccessor.resizeElement) {
-        $(valueAccessor().resizeElement).on('resize', setHeightToParentHeight);
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-          $(valueAccessor().resizeElement).off('resize', setHeightToParentHeight);
-        });
-      }
-
-      if (valueAccessor().refreshPubSubId) {
-        var pubSub = huePubSub.subscribe(valueAccessor().refreshPubSubId, setHeightToParentHeight);
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-          pubSub.remove();
-        });
-      }
-      var interval = window.setInterval(setHeightToParentHeight, 500);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        window.clearInterval(interval);
-      });
-    }
-  };
-
   ko.bindingHandlers.assistVerticalResizer = {
     init: function (element, valueAccessor) {
       var $container = $(element);
