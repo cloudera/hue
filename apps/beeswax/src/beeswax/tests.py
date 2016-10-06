@@ -21,9 +21,11 @@ import gzip
 import json
 import logging
 import os
+import random
 import re
 import shutil
 import socket
+import string
 import tempfile
 import threading
 
@@ -107,6 +109,8 @@ def _make_query(client, query, submission_type="Execute",
 
   return res
 
+def random_generator(size=8, chars=string.ascii_uppercase + string.digits):
+   return ''.join(random.choice(chars) for _ in range(size))
 
 def get_csv(client, result_response):
   """Get the csv for a query result"""
@@ -2966,7 +2970,6 @@ class TestDesign():
 def search_log_line(expected_log, all_logs):
   return re.compile('%(expected_log)s' % {'expected_log': expected_log}).search(all_logs)
 
-
 def test_hiveserver2_get_security():
   make_logged_in_client()
   user = User.objects.get(username='test')
@@ -3438,5 +3441,95 @@ def test_hiveserver2_jdbc_url():
     for reset in resets:
         reset()
 
+def test_sasl_auth_in_large_download():
+  db = None
+  failed = False
+  max_rows = 10000
 
+  if hive_site.get_hiveserver2_thrift_sasl_qop() != "auth-conf" or \
+     hive_site.get_hiveserver2_authentication() != 'KERBEROS':
+    raise SkipTest
 
+  client = make_logged_in_client(username="systest", groupname="systest", recreate=False, is_superuser=False)
+  user = User.objects.get(username='systest')
+  add_to_group('systest')
+  grant_access("systest", "systest", "beeswax")
+
+  desktop_conf.SASL_MAX_BUFFER.set_for_testing(2*1024*1024)
+
+  # Create a big table
+  table_info = {'db': 'default', 'table_name': 'dummy_'+random_generator().lower()}
+  drop_sql = "DROP TABLE IF EXISTS %(db)s.%(table_name)s" % table_info
+  create_sql = "CREATE TABLE IF NOT EXISTS %(db)s.%(table_name)s (w0 CHAR(8),w1 CHAR(8),w2 CHAR(8),w3 CHAR(8),w4 CHAR(8),w5 CHAR(8),w6 CHAR(8),w7 CHAR(8),w8 CHAR(8),w9 CHAR(8))" % table_info
+  hql = cStringIO.StringIO()
+  hql.write("INSERT INTO %(db)s.%(table_name)s VALUES " % (table_info))
+  for i in xrange(max_rows-1):
+    w = random_generator(size=7)
+    hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')," % (w,w,w,w,w,w,w,w,w,w))
+  w = random_generator(size=7)
+  hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')" % (w,w,w,w,w,w,w,w,w,w))
+
+  try:
+    db = dbms.get(user, get_query_server_config())
+    db.use(table_info['db'])
+    query = hql_query(drop_sql)
+    handle = db.execute_and_wait(query, timeout_sec=120)
+    query = hql_query(create_sql)
+    handle = db.execute_and_wait(query, timeout_sec=120)
+    query = hql_query(hql.getvalue())
+    handle = db.execute_and_wait(query, timeout_sec=300)
+    hql.close()
+  except Exception, ex:
+    failed = True
+
+  # Big table creation (data upload) is successful
+  assert_false(failed)
+
+  # Fetch large data set
+  hql = "SELECT w0,w1,w2,w3,w4,w5,w6,w7,w8,w9,w0,w1,w2,w3,w4,w5,w6,w7,w8,w9 FROM %(db)s.%(table_name)s" % table_info
+
+  # large rows
+  max_rows = 8745
+
+  try:
+    query = hql_query(hql)
+    handle = db.execute_and_wait(query)
+    results = db.fetch(handle, True, max_rows-20)
+  except QueryServerException, ex:
+    if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
+      failed = True
+  except:
+      failed = True
+
+  # Fetch large data set is successful because SASL_MAX_BUFFER > RESULT_DATA
+  assert_false(failed)
+
+  # Test case when SASL_MAX_BUFFER < RESULT_DATA
+  try:
+    query = hql_query(hql)
+    handle = db.execute_and_wait(query)
+    results = db.fetch(handle, True, max_rows)
+  except QueryServerException, ex:
+    if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
+      failed = True
+  except:
+      failed = True
+
+  # Fetch large data set fails because SASL_MAX_BUFFER < RESULT_DATA In your log file you will see following log lines
+  # thrift_util  INFO     Thrift exception; retrying: Error in sasl_decode (-1) SASL(-1): generic failure: Unable to find a callback: 32775
+  # thrift_util  INFO     Increase the SASL_MAX_BUFFER value in hue.ini
+  assert_true(failed)
+  failed = False
+
+  # Cleanup
+  hql = "DROP TABLE %(db)s.%(table_name)s" % table_info
+
+  try:
+    query = hql_query(hql)
+    handle = db.execute_and_wait(query)
+  except QueryServerException, ex:
+    if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
+      failed = True
+  except:
+      failed = True
+  assert_false(failed)
