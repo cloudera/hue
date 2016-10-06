@@ -32,6 +32,8 @@ from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
 from django.conf import settings
+from desktop.conf import SASL_MAX_BUFFER
+
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
@@ -283,6 +285,8 @@ def connect_to_thrift(conf):
       if conf.mechanism == 'PLAIN':
         saslc.setAttr("username", str(conf.username))
         saslc.setAttr("password", str(conf.password)) # Defaults to 'hue' for a non-empty string unless using LDAP
+      else:
+        saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
       saslc.init()
       return saslc
     transport = TSaslClientTransport(sasl_factory, conf.mechanism, mode)
@@ -459,6 +463,8 @@ class SuperClient(object):
           tries_left -= 1
           if tries_left:
             logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
+            if 'generic failure: Unable to find a callback: 32775' in str(e):
+              logging.warn("Increase the SASL_MAX_BUFFER value in hue.ini")
       logging.warn("Out of retries for thrift call: " + attr)
       raise
     return wrapper
