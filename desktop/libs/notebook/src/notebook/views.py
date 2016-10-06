@@ -182,6 +182,7 @@ def execute_and_watch(request):
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
+          'editor_type': editor_type,
           'success_url': success_url
       }),
       'editor_type': editor_type,
