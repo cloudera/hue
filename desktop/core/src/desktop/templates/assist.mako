@@ -738,7 +738,7 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
-      <span style="color: #aaa;"><i class="fa fa-filter" title="${_('Filter')}"></i></span>
+      <span style="color: #aaa;"><i class="fa fa-filter" title="${_('Filter tables')}"></i></span>
       <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
     </div>

@@ -162,7 +162,6 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
       } for _snippet in _snippets # Non unique types currently
     ],
     'selectedSnippet': _snippets[0]['type'],
-    'type': 'notebook',
     'showHistory': False,
     'isSaved': is_saved,
     'snippets': [
