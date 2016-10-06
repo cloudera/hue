@@ -1618,13 +1618,20 @@ ${ hueIcons.symbols() }
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
     </ul>
 
-    <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+    <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && ((chartType() == ko.HUE_CHARTS.TYPES.BARCHART && !chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
       <ul class="unstyled" data-bind="foreach: result.cleanedNumericMeta">
         <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
       </ul>
     </div>
-    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+    <div data-bind="visible: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART && chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
       <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle, dropdownAutoWidth: true}" class="input-medium"></select>
+    </div>
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() === ko.HUE_CHARTS.TYPES.BARCHART">
+      <li class="nav-header">${_('group')}</li>
+    </ul>
+    <div data-bind="visible: chartType() === ko.HUE_CHARTS.TYPES.BARCHART">
+      <select data-bind="options: result.cleanedMeta, value: chartXPivot, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column to pivot...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column to pivot...") }', update: chartXPivot, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
@@ -1776,7 +1783,7 @@ ${ hueIcons.symbols() }
                       transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                      transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+                      transformer: multiSerieDataTransformer, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined'},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
                 <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: multiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
@@ -2659,52 +2666,109 @@ ${ hueIcons.symbols() }
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
       var _plottedSerie = 0;
 
-      rawDatum.snippet.result.meta().forEach(function (meta) {
-        if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
-          var col = meta.name;
-          var _idxValue = -1;
-          var _idxLabel = -1;
-          var _isXDate = false;
-          rawDatum.snippet.result.meta().forEach(function (icol, idx) {
-            if (icol.name == rawDatum.snippet.chartX()) {
-              _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
-              _idxLabel = idx;
-            }
-            if (icol.name == col) {
-              _idxValue = idx;
-            }
-          });
+      if (typeof rawDatum.snippet.chartXPivot() !== 'undefined') {
+        var _idxValue = -1;
+        var _idxLabel = -1;
+        var _isXDate = false;
 
-          if (_idxValue > -1) {
-            var _data = [];
-            var colors = HueColors.cuiD3Scale();
-            $(rawDatum.counts()).each(function (cnt, item) {
-              _data.push({
-                series: _plottedSerie,
-                x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-                y: item[_idxValue] * 1,
-                color: colors[cnt % colors.length],
-                obj: item
-              });
-            });
-            if (rawDatum.sorting == "asc") {
-              _data.sort(function (a, b) {
-                return a.y - b.y
-              });
-            }
-            if (rawDatum.sorting == "desc") {
-              _data.sort(function (a, b) {
-                return b.y - a.y
-              });
-            }
-            _datum.push({
-              key: col,
-              values: _data
-            });
-            _plottedSerie++;
+        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+          if (icol.name == rawDatum.snippet.chartX()) {
+            _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
+            _idxLabel = idx;
           }
-        }
-      });
+          if (icol.name == rawDatum.snippet.chartYSingle()) {
+            _idxValue = idx;
+          }
+        });
+
+        rawDatum.snippet.result.meta().forEach(function (meta, cnt) {
+          if (rawDatum.snippet.chartXPivot() === meta.name) {
+            var _idxPivot = cnt;
+            var colors = HueColors.cuiD3Scale();
+            var pivotValues = $.map(rawDatum.counts(), function (p) {
+              return p[_idxPivot];
+            });
+            pivotValues = pivotValues.filter(function (item, pos) {
+              return pivotValues.indexOf(item) === pos;
+            });
+            pivotValues.forEach(function (val) {
+              var _data = [];
+              $(rawDatum.counts()).each(function (cnt, item) {
+                if (item[_idxPivot] === val) {
+                  _data.push({
+                    x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                    y: item[_idxValue] * 1,
+                    color: colors[cnt % colors.length],
+                    obj: item
+                  });
+                }
+              });
+              if (rawDatum.sorting == "asc") {
+                _data.sort(function (a, b) {
+                  return a.y - b.y
+                });
+              }
+              if (rawDatum.sorting == "desc") {
+                _data.sort(function (a, b) {
+                  return b.y - a.y
+                });
+              }
+              _datum.push({
+                key: val,
+                values: _data
+              });
+            });
+          }
+        });
+      }
+      else {
+        rawDatum.snippet.result.meta().forEach(function (meta) {
+          if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
+            var col = meta.name;
+            var _idxValue = -1;
+            var _idxLabel = -1;
+            var _isXDate = false;
+            rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+              if (icol.name == rawDatum.snippet.chartX()) {
+                _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
+                _idxLabel = idx;
+              }
+              if (icol.name == col) {
+                _idxValue = idx;
+              }
+            });
+
+            if (_idxValue > -1) {
+              var _data = [];
+              var colors = HueColors.cuiD3Scale();
+              $(rawDatum.counts()).each(function (cnt, item) {
+                _data.push({
+                  series: _plottedSerie,
+                  x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                  y: item[_idxValue] * 1,
+                  color: colors[cnt % colors.length],
+                  obj: item
+                });
+              });
+              if (rawDatum.sorting == "asc") {
+                _data.sort(function (a, b) {
+                  return a.y - b.y
+                });
+              }
+              if (rawDatum.sorting == "desc") {
+                _data.sort(function (a, b) {
+                  return b.y - a.y
+                });
+              }
+              _datum.push({
+                key: col,
+                values: _data
+              });
+              _plottedSerie++;
+            }
+          }
+        });
+      }
     }
     return _datum;
   }

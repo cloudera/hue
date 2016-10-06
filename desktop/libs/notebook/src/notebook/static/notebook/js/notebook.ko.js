@@ -613,6 +613,8 @@
     self.chartScope = ko.observable(typeof snippet.chartScope != "undefined" && snippet.chartScope != null ? snippet.chartScope : "world");
     self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
     self.chartX.extend({notify: 'always'});
+    self.chartXPivot = ko.observable(typeof snippet.chartXPivot != "undefined" && snippet.chartXPivot != null ? snippet.chartXPivot : null);
+    self.chartXPivot.extend({notify: 'always'});
     self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
     self.chartYMulti = ko.observableArray(typeof snippet.chartYMulti != "undefined" && snippet.chartYMulti != null ? snippet.chartYMulti : []);
     self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
