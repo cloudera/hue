@@ -39,6 +39,9 @@
       window.setTimeout(function(){
         var _options = valueAccessor();
         var _data = _options.transformer(_options.data);
+        _data = _data.filter(function (val) {
+          return val.value >= 0;
+        });
         $(element).css("marginLeft", "auto");
         $(element).css("marginRight", "auto");
         if (typeof _options.maxWidth != "undefined") {
@@ -129,6 +132,9 @@
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
       var _data = _options.transformer(_options.data);
+      _data = _data.filter(function (val) {
+        return val.value >= 0;
+      });
       var _chart = $(element).data("chart");
       if (_chart) {
         var _d3 = d3.select($(element).find("svg")[0]);
