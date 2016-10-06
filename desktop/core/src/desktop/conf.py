@@ -645,6 +645,13 @@ KERBEROS = ConfigSection(
   )
 )
 
+SASL_MAX_BUFFER = Config(
+  key="sasl_max_buffer",
+  help=_("This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication."),
+  default=2*1024*1024,  # 2 MB
+  type=int
+)
+
 # See python's documentation for time.tzset for valid values.
 TIME_ZONE = Config(
   key="time_zone",

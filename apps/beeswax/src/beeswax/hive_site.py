@@ -54,6 +54,8 @@ _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
 
+_CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
+
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -127,6 +129,9 @@ def get_metastore_warehouse_dir():
 
 def get_hiveserver2_authentication():
   return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
+
+def get_hiveserver2_thrift_sasl_qop():
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_SASL_QOP, 'NONE').lower()
 
 def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'TRUE').upper() == 'TRUE'
