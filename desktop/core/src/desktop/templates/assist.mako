@@ -806,18 +806,35 @@ from metadata.conf import has_navigator
 
   <style>
     .nav-autocomplete {
-      min-width: 200px;
+      background-color: #F8F8F8;
     }
+
     .nav-autocomplete-item .ui-state-focus {
       border: 1px solid #DBE8F1;
       background-color: #DBE8F1 !important;
     }
+
+    .nav-autocomplete-item-link {
+      height: 44px;
+      overflow:hidden;
+    }
+
+    .nav-autocomplete-item-link > div {
+      vertical-align: top;
+      display:inline-block;
+    }
+
+    .nav-autocomplete-divider {
+      height: 2px;
+      border-top: 1px solid #dddddd;
+    }
   </style>
+
   <script type="text/html" id="nav-search-autocomp-item">
     <a>
-      <div style="height: 38px; max-width: 200px; overflow-x:hidden;">
-        <div style="vertical-align: top; padding: 8px; display:inline-block;"><i style="color: #338bb8" class="fa" data-bind="css: icon"></i></div>
-        <div style="vertical-align: top; display:inline-block;">
+      <div class="nav-autocomplete-item-link">
+        <div style="padding: 8px;"><i style="color: #338bb8" class="fa" data-bind="css: icon"></i></div>
+        <div>
           <span style="font-size: 14px; color: #338bb8" data-bind="html: label"></span>
           <br/><div style="display:inline-block; width: 170px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="text: description"></div>
         </div>
@@ -832,9 +849,7 @@ from metadata.conf import has_navigator
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
             itemTemplate: 'nav-search-autocomp-item',
-            classes: {
-              'ui-autocomplete': 'nav-autocomplete'
-            }
+            classPrefix: 'nav-'
           },
           hasFocus: searchHasFocus,
           clearable: { value: searchInput, onClear: function () { huePubSub.publish('autocomplete.close'); } },
@@ -1278,40 +1293,66 @@ from metadata.conf import has_navigator
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
 
+        var facetIcons = {
+          'tags' : 'fa-tags',
+          'tag' : 'fa-tag'
+        };
+
         self.navAutocompleteSource = function (request, callback) {
-          var term = request.term;
+          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
+          var isFacet = facetMatch !== null;
+          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
+          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
+          var beforePartial = request.term.substring(0, request.term.length - partial.length);
+
           self.apiHelper.navSearchAutocomplete({
-            query:  term + '*',
+            query:  partial + '*',
             successCallback: function (data) {
               var values = [];
-              if (typeof data.facets !== 'undefined') {
-                Object.keys(data.facets).forEach(function (facet) {
-                  if (facet === 'tags') {
-                    values.push({ data: { label: 'tags:', icon: 'fa-tags', description: Object.keys(data.facets[facet]).join(', ') }, value: 'tags:'});
-                  }
-                });
-              }
-              if (typeof data.results !== 'undefined') {
-                data.results.forEach(function (result) {
-                  var icon = '';
-                  switch (result.type) {
-                    case 'TABLE':
-                      icon = 'fa-table';
-                      break;
-                    case 'VIEW':
-                      icon = 'fa-eye';
-                      break;
-                  }
-                  var description = result.parentPath;
+              if (isFacet && typeof data.facets !== 'undefined') {
+                var facetInQuery = facetMatch[1];
 
-                  if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
-                    values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: result.originalName });
-                  } else {
-                    values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: result.originalName });
-                  }
-                });
-                callback(values);
+                if (typeof data.facets[facetInQuery.toLowerCase()] !== 'undefined') {
+                  Object.keys(data.facets[facetInQuery.toLowerCase()]).forEach(function (facetValue) {
+                    if (partial === '' || facetValue.indexOf(partial) !== -1) {
+                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: facetIcons[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
+                    }
+                  });
+                }
+              } else {
+                if (typeof data.facets !== 'undefined') {
+                  Object.keys(data.facets).forEach(function (facet) {
+                    values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                  });
+                }
+                if (values.length > 0) {
+                  values.push({ divider: true });
+                }
+                if (typeof data.results !== 'undefined') {
+                  data.results.forEach(function (result) {
+                    var icon = '';
+                    switch (result.type) {
+                      case 'TABLE':
+                        icon = 'fa-table';
+                        break;
+                      case 'VIEW':
+                        icon = 'fa-eye';
+                        break;
+                    }
+                    var description = result.parentPath;
+
+                    if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
+                      values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: beforePartial + result.originalName });
+                    } else {
+                      values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: beforePartial + result.originalName });
+                    }
+                  });
+                }
               }
+              if (values.length > 0 && values[values.length - 1].divider) {
+                values.pop();
+              }
+              callback(values);
             },
             silenceErrors: true,
             errorCallback: function () {

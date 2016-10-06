@@ -28,16 +28,29 @@
       var $element = $(element);
 
       options = $.extend({
-        closeOnEnter: true
+        closeOnEnter: true,
+        classPrefix: 'hue-'
       }, options);
 
       if (typeof $().hueAutocomplete === 'undefined') {
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
           _renderItemData: function( ul, item ) {
-            var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')
-                .addClass('nav-autocomplete-item')
-                .appendTo(ul).data( "ui-autocomplete-item", item );
-            ko.applyBindings(item.data, $li[0]);
+            if (item.divider) {
+              $('<li/>').addClass(this.options.classPrefix + 'autocomplete-divider').appendTo(ul);
+            } else {
+              var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')
+                .addClass(this.options.classPrefix + 'autocomplete-item')
+                .appendTo(ul)
+                .data( "ui-autocomplete-item", item );
+              ko.applyBindings(item.data, $li[0]);
+            }
+          },
+          _renderMenu: function (ul, items) {
+            var self = this;
+            ul.addClass(this.options.classPrefix + 'autocomplete');
+            $.each(items, function (index, item) {
+              self._renderItemData(ul, item);
+            });
           }
         });
       }
