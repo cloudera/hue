@@ -886,7 +886,7 @@ class HiveServerClient:
 
     # We fetch N partitions then reverse the order later and get the max_parts. Use partition_spec to refine more the initial list.
     # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
-    partition_table = self.execute_query_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+    partition_table = self.execute_query_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
 
     if self.query_server['server_name'] == 'impala':
       try:
