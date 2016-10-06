@@ -28,6 +28,7 @@
       var $element = $(element);
 
       options = $.extend({
+        closeOnEnter: true
       }, options);
 
       if (typeof $().hueAutocomplete === 'undefined') {
@@ -40,6 +41,23 @@
           }
         });
       }
+
+      if (options.closeOnEnter) {
+        $element.keyup(function (e) {
+          if(e.which === 13) {
+            $element.hueAutocomplete('close');
+          }
+        });
+      }
+
+      var closeSubscription = huePubSub.subscribe('autocomplete.close', function () {
+        $element.hueAutocomplete('close');
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        closeSubscription.remove();
+      });
+
       $element.hueAutocomplete(options);
     }
   };
@@ -1781,53 +1799,66 @@
     update: function (element, valueAccessor, allBindingsAccessor) {
       ko.bindingHandlers.augmenthtml.render(element, valueAccessor, allBindingsAccessor, viewModel);
     }
-  }
+  };
 
   ko.bindingHandlers.clearable = {
+    after: ['textInput', 'value', 'valueUpdate'],
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-      var _el = $(element);
+      var $element = $(element);
+
+      var params = valueAccessor();
+      var valueObservable = ko.isObservable(params) ? params : params.value;
 
       function tog(v) {
         return v ? "addClass" : "removeClass";
       }
 
-      _el.addClass("clearable");
-      _el[tog(valueAccessor()())]("x");
-      _el
-          .on("input", function () {
-            _el[tog(this.value)]("x");
-          })
-          .on("change", function () {
-            valueAccessor()(_el.val());
-          })
-          .on("blur", function () {
-            valueAccessor()(_el.val());
-          })
-          .on("mousemove", function (e) {
-            _el[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
-          })
-          .on("click", function (e) {
-            if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
-              _el.removeClass("x onX").val("");
-              valueAccessor()("");
-            }
-          });
+      $element.addClass("clearable");
+      $element[tog(valueObservable())]("x");
 
-      if (allBindingsAccessor().valueUpdate != null && allBindingsAccessor().valueUpdate == "afterkeydown") {
-        _el.on("keyup", function () {
-          valueAccessor()(_el.val());
+      $element.on("input", function () {
+        $element[tog(this.value)]("x");
+      }).on("mousemove", function (e) {
+        $element[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]("onX");
+      })
+      .on("click", function (e) {
+        if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
+          $element.removeClass("x onX").val("");
+          valueObservable("");
+          if (typeof params.onClear === 'function') {
+            params.onClear();
+          }
+        }
+      });
+
+      if (!allBindingsAccessor()['textInput'] || !allBindingsAccessor()['value']) {
+        $element.on("change", function () {
+          valueObservable($element.val());
+        }).on("blur", function () {
+          valueObservable($element.val());
         });
+
+        if (allBindingsAccessor()['valueUpdate'] != null && allBindingsAccessor()['valueUpdate'] == "afterkeydown") {
+          $element.on("keyup", function () {
+            valueObservable($element.val());
+          });
+        }
       }
+
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-      if (!$(element).is(':focus') || ko.unwrap(valueAccessor()) !== $(element).val()) {
-        $(element).val(ko.unwrap(valueAccessor()));
+      var $element = $(element);
+      var params = valueAccessor();
+      var valueObservable = ko.isObservable(params) ? params : params.value;
+
+      if (!$element.is(':focus') || valueObservable() !== $element.val()) {
+        $element.val(valueObservable());
       }
-      if ($(element).val() === '') {
-        $(element).removeClass('x');
+      if ($element.val() === '') {
+        $element.removeClass('x');
       }
     }
-  }
+  };
 
   ko.bindingHandlers.blurHide = {
     init: function (element, valueAccessor) {
