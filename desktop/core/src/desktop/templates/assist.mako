@@ -72,10 +72,13 @@ from metadata.conf import has_navigator
     }
 
     .assist-inner-panel {
-      position: relative;
-      padding: 0 0 0 10px;
+      position: absolute;
       overflow: hidden;
-      margin-right: 1px;
+      padding-right: 3px;
+      top: 10px;
+      right: 0;
+      bottom: 2px;
+      left: 10px;
     }
 
     .assist-inner-header {
@@ -508,19 +511,21 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-hive-inner-panel">
-    <div class="assist-flex-panel">
-      <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-      <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-      <!-- ko with: selectedSource -->
-      <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-      <!-- ko with: selectedDatabase -->
-      <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
-      <!-- /ko -->
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+        <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+        <!-- ko with: selectedSource -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+        <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
-    <!-- ko with: $parents[1] -->
-    <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="hdfs-details-content">
@@ -548,61 +553,63 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-hdfs-inner-panel">
-    <div class="assist-flex-panel">
-      <!-- ko with: selectedHdfsEntry -->
-      <div class="assist-flex-header assist-breadcrumb" >
-        <!-- ko if: parent !== null -->
-        <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
-          <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-          <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-        </a>
-        <!-- /ko -->
-        <!-- ko if: parent === null -->
-        <div>
-          <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-        </div>
-        <!-- /ko -->
-        <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
-      </div>
-      <div class="assist-flex-fill assist-hdfs-scrollable">
-        <div data-bind="visible: ! loading() && ! hasErrors()">
-          <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-hdfs-scrollable' }">
-            <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-              <div class="assist-actions table-actions" style="opacity: 0;" >
-                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
-                  <i class='fa fa-info' title="${ _('Details') }"></i>
-                </a>
-              </div>
-
-              <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-                <!-- ko if: definition.type === 'dir' -->
-                <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-                <!-- /ko -->
-                <!-- ko if: definition.type === 'file' -->
-                <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                <!-- /ko -->
-                <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
-              </a>
-            </li>
-          </ul>
-          <!-- ko if: !loading() && entries().length === 0 -->
-          <ul class="assist-tables">
-            <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
-          </ul>
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedHdfsEntry -->
+        <div class="assist-flex-header assist-breadcrumb" >
+          <!-- ko if: parent !== null -->
+          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </a>
           <!-- /ko -->
+          <!-- ko if: parent === null -->
+          <div>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </div>
+          <!-- /ko -->
+          <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
         </div>
-        <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-        <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-          <span>${ _('Error loading contents.') }</span>
+        <div class="assist-flex-fill assist-hdfs-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()">
+            <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-hdfs-scrollable' }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+                <div class="assist-actions table-actions" style="opacity: 0;" >
+                  <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+                    <i class='fa fa-info' title="${ _('Details') }"></i>
+                  </a>
+                </div>
+
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <!-- ko if: definition.type === 'dir' -->
+                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko if: definition.type === 'file' -->
+                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
         </div>
+        <!-- /ko -->
       </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
-    <!-- ko with: $parents[1] -->
-    <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="file-details-content">
@@ -675,8 +682,10 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-documents-inner-panel">
-    <div class="assist-flex-panel">
-      <!-- ko template: 'assist-file-panel' --><!-- /ko -->
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko template: 'assist-file-panel' --><!-- /ko -->
+      </div>
     </div>
   </script>
 
@@ -855,10 +864,8 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- /ko -->
-      <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }">
-        <div class="assist-inner-panel" data-bind="matchParentHeight: { resizeElement: window, refreshPubSubId: 'assist.forceRender' }, with: visiblePanel">
-          <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
-        </div>
+      <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
+        <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       </div>
     </div>
   </script>
