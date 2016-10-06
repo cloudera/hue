@@ -1048,7 +1048,7 @@ class Document2(models.Model):
     unique_together = ('uuid', 'version', 'is_history')
     ordering = ["-last_modified", "name"]
 
-  def __str__(self):
+  def __unicode__(self):
     res = '%s - %s - %s - %s' % (force_unicode(self.name), self.owner, self.type, self.uuid)
     return force_unicode(res)
 
