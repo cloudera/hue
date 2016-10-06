@@ -670,6 +670,7 @@
 
     self.result.meta.subscribe(function (newValue) {
       self.chartX(guessMetaField(self.previousChartOptions.chartX));
+      self.chartXPivot(self.previousChartOptions.chartXPivot);
       self.chartYSingle(guessMetaField(self.previousChartOptions.chartYSingle));
       self.chartMapLabel(guessMetaField(self.previousChartOptions.chartMapLabel));
       self.chartYMulti(guessMetaFields(self.previousChartOptions.chartYMulti) || []);
@@ -783,6 +784,7 @@
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
+        chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
         chartMapLabel: typeof self.chartMapLabel() !== "undefined" ? self.chartMapLabel() : self.previousChartOptions.chartMapLabel,
         chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti,
@@ -2137,6 +2139,7 @@
 
           snippet.previousChartOptions = {
             chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
+            chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
             chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
             chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
             chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
