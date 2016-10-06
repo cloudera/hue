@@ -749,6 +749,26 @@ ${ dashboard.import_bindings() }
   $(document).ready(function(){
     renderChangeables();
 
+    function resizeToolbar() {
+      $('.draggable-widget').css('width', '');
+      $('.draggable-widget img').css({
+        'width': '',
+        'height': ''
+      });
+      $('.draggable-widget .draggable-icon').css('fontSize', '');
+      if ($('.card-toolbar').height() > 60) {
+        var width = $('.draggable-widget').width();
+        while ($('.card-toolbar').height() > 60) {
+          width -= 1;
+          $('.draggable-widget').width(width);
+          $('.draggable-widget img').width(width / 2).height(width / 2);
+          $('.draggable-widget .draggable-icon').css('fontSize', width / 2);
+        }
+      }
+    }
+
+    resizeToolbar();
+
     $(document).on("blur", "[validate]", function() {
       validateFields();
     });
@@ -768,6 +788,7 @@ ${ dashboard.import_bindings() }
       window.clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(function () {
         renderChangeables();
+        resizeToolbar();
       }, 200);
     });
 
