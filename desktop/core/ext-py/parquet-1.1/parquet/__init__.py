@@ -500,7 +500,7 @@ class JsonWriter(object):  # pylint: disable=too-few-public-methods
         """Write a single row."""
         json_text = json.dumps(row)
         if isinstance(json_text, bytes):
-            json_text = json_text.decode('utf-8')
+            json_text = json_text.decode('utf-8', errors='ignore')
         self._out.write(json_text)
         self._out.write(u'\n')
 
@@ -524,7 +524,7 @@ def _dump(file_obj, options, out=sys.stdout):
             writer.writeheader()
         if options.limit != -1 and total_count >= options.limit:
             return
-        row_unicode = dict((k, (v.decode("utf-8") if type(v) is bytes else v)) for k, v in row.items())
+        row_unicode = dict((k, (v.decode("utf-8", errors="ignore") if type(v) is bytes else v)) for k, v in row.items())
         writer.writerow(row_unicode)
         total_count += 1
 
