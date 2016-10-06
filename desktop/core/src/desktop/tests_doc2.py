@@ -366,6 +366,16 @@ class TestDocument2(object):
     assert_equal(-1, data['status'], data)
     assert_true('circular dependency' in data['message'], data)
 
+    # Test simple case where directory is saved to self as parent
+    dir = Directory.objects.create(name='dir', owner=self.user)
+    response = self.client.post('/desktop/api2/doc/move', {
+      'source_doc_uuid': json.dumps(dir.uuid),
+      'destination_doc_uuid': json.dumps(dir.uuid)
+    })
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_true('circular dependency' in data['message'], data)
+
 
   def test_api_get_data(self):
     doc_data = {'info': 'hello', 'is_history': False}

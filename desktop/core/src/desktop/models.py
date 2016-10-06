@@ -1328,6 +1328,10 @@ class Document2(models.Model):
     Uses Floyd's cycle-detection algorithm to detect a cycle (aka Tortoise and Hare)
     https://en.wikipedia.org/wiki/Cycle_detection#Tortoise_and_hare
     """
+    # Test base case where self.uuid == self.parent_directory.uuid first
+    if self.parent_directory is not None and self.parent_directory.uuid == self.uuid:
+      return True
+
     slow = self
     fast = self
     while True:
