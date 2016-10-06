@@ -57,6 +57,7 @@ from metadata.conf import has_navigator
     }
 
     .assist-header {
+      -ms-flex: 1;
       flex: 1;
       color: #338bb8;
       background-color: #f9f9f9;
@@ -352,8 +353,10 @@ from metadata.conf import has_navigator
     }
 
     .nav-assist-search {
+      display: -ms-flexbox;
       display: flex;
       position: relative;
+      -ms-flex: 1 1 29px;
       flex: 1 1 29px;
       padding: 10px;
     }
@@ -367,6 +370,7 @@ from metadata.conf import has_navigator
     }
 
     .nav-assist-search > input {
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
       height: 27px;
       box-shadow: none;
@@ -378,7 +382,7 @@ from metadata.conf import has_navigator
     .result-entry {
       clear: both;
       width: calc(100% - 20px);
-      margin: 0px 10px 15px 10px;
+      margin: 0 10px 15px 10px;
     }
 
     .result-entry .doc-desc {
@@ -850,7 +854,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div style="display: flex; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
+    <div style="display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
       <!-- ko if: availablePanels.length > 1 -->
       <div style="position: relative; flex: 0 0 29px;" class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
@@ -861,7 +865,7 @@ from metadata.conf import has_navigator
       </div>
       <!-- /ko -->
       <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
-      <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
+      <div style="position: relative; -ms-flex: 1 1 100%; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
         <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       </div>
     </div>

@@ -27,7 +27,9 @@ from metadata.conf import has_navigator
   <style>
     .sql-context-popover {
       position: absolute;
+      display: -ms-flexbox;
       display: flex;
+      -ms-flex-direction: column;
       flex-direction: column;
       top: 0;
       left: 0;
@@ -120,6 +122,7 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-popover-title {
+      -ms-flex: 0 1 auto;
       flex: 0 1 auto;
       padding: 6px 10px;
       margin: 0;
@@ -132,8 +135,11 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-popover-content {
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
+      display: -ms-flexbox;
       display: flex;
+      -ms-flex-direction: column;
       flex-direction: column;
       padding: 0;
       overflow: hidden;
@@ -156,6 +162,7 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-tabs {
+      -ms-flex: 0 1 auto;
       flex: 0 1 auto;
       border-bottom: 1px solid #ebebeb;
       margin-left: -1px;
@@ -165,6 +172,7 @@ from metadata.conf import has_navigator
 
     .sql-context-tab-container {
       position: relative;
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
       border: none;
       overflow: auto;
@@ -186,7 +194,9 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-flex {
+      display: -ms-flexbox;
       display: flex;
+      -ms-flex-flow: column nowrap;
       flex-flow: column nowrap;
       position: absolute;
       top: 0;
@@ -195,16 +205,19 @@ from metadata.conf import has_navigator
     }
 
     .sql-context-flex-header {
+      -ms-flex: 0 0 35px;
       flex: 0 0 35px;
     }
 
     .sql-context-flex-fill {
       overflow: hidden;
       position: relative;
+      -ms-flex: 1 1 100%;
       flex: 1 1 100%;
     }
 
     .sql-context-flex-bottom-links {
+      -ms-flex: 0 0 35px;
       flex: 0 0 35px;
       border-top: 1px solid #ebebeb;
       z-index: 100;
