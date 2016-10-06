@@ -351,33 +351,28 @@ from metadata.conf import has_navigator
       padding-left: 15px;
     }
 
-    .searchbar {
-      margin: 0 10px 10px 15px;
+    .nav-assist-search {
+      display: flex;
+      position: relative;
+      flex: 1 1 29px;
+      padding: 10px;
     }
 
-    .searchbar input {
-      min-height: 20px;
+    .nav-assist-search > i {
+      position: absolute;
+      top: 17px;
+      left: 17px;
+      font-size: 15px;
+      color: #ccc;
+    }
+
+    .nav-assist-search > input {
+      flex: 1 1 100%;
       height: 27px;
-      width: calc(100% - 65px);
-      margin: 0;
       box-shadow: none;
       border: 1px solid #DDD;
-      border-right: none;
-      border-bottom-left-radius: 2px;
-      border-top-left-radius: 2px;
-    }
-
-    .searchbar .add-on {
-      border-radius: 1.5em;
-      border-bottom-left-radius: 0;
-      border-top-left-radius: 0;
-      border-left: none;
-    }
-
-    .searchbar .add-on i {
-      margin-top: -2px;
-      margin-lefT: -2px;
-      font-size: 14px;
+      border-radius: 4px;
+      padding-left: 26px;
     }
 
     .result-entry {
@@ -523,7 +518,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -828,17 +823,19 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
-      <div class="searchbar">
-        <input id="appendedInput" placeholder="${ _('Search everywhere...') }" type="text" data-bind="autocomplete: {
+      <div class="nav-assist-search">
+        <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchInput() }"></i>
+        <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
             itemTemplate: 'nav-search-autocomp-item',
             classes: {
               'ui-autocomplete': 'nav-autocomplete'
             }
-          }, hasFocus: searchHasFocus, textinput: searchInput, valueUpdate: 'afterkeydown'">
-          <button class="btn btn-primary add-on" data-bind="enabled: ! searchSubmitted(), click: function () { if (searchInput() !== '') { searchInput(''); searchHasFocus(false); } else { searchHasFocus(true); window.setTimeout(performSearch, 200); } }">
-            <i class="fa" data-bind="css: { 'fa-search': searchInput() === '', 'fa-times' : searchInput() !== '' }"></i>
-          </button>
+          },
+          hasFocus: searchHasFocus,
+          clearable: { value: searchInput, onClear: function () { huePubSub.publish('autocomplete.close'); } },
+          textInput: searchInput,
+          valueUpdate: 'afterkeydown'">
       </div>
     <!-- /ko -->
   </script>
@@ -854,7 +851,6 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-panel-template">
     <div style="display: flex; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
-      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <!-- ko if: availablePanels.length > 1 -->
       <div style="position: relative; flex: 0 0 29px;" class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
@@ -864,6 +860,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- /ko -->
+      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
       <div style="position: relative; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
         <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       </div>
@@ -871,88 +868,88 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="nav-search-result">
-    <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;">
+    <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;" data-bind="niceScroll">
       <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !searching() -->
       <!-- ko if: searchResult().length == 0 -->
         <div class="result-entry">${ _('No result found.') }</div>
       <!-- /ko -->
-      <!-- ko foreach: searchResult -->
-      <div class="result-entry">
-        <div class="icon-col">
-          <!-- ko if: type === 'FILE' -->
-          <i class="fa fa-fw fa-file-o valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'VIEW' -->
-          <i class="fa fa-fw fa-eye valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'DIRECTORY' -->
-          <i class="fa fa-fw fa-folder-o valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'TABLE' -->
-          <i class="fa fa-fw fa-table valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'DATABASE' -->
-          <i class="fa fa-fw fa-database valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'SOURCE' -->
-          <i class="fa fa-fw fa-server valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'SUB_OPERATION' -->
-          <i class="fa fa-fw fa-code-fork valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'FIELD' -->
-          <i class="fa fa-fw fa-columns valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'OPERATION_EXECUTION' -->
-          <i class="fa fa-fw fa-cog valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'OPERATION' -->
-          <i class="fa fa-fw fa-cogs valign-middle"></i>
-          <!-- /ko -->
-          <!-- ko if: type === 'PARTITION' -->
-          <i class="fa fa-fw fa-th valign-middle"></i>
-          <!-- /ko -->
-        </div>
-        <div class="doc-col">
-          <!-- ko if: typeof click !== 'undefined' -->
-          <a class="pointer" data-bind="click: click" target="_blank" >
-            <span data-bind="text: parentPath"></span>
-            <span data-bind="text: originalName"></span>
-          </a>
-          <span data-bind="text: tags" class="badge badge-info"></span>
-          <!-- /ko -->
-          <!-- ko if: typeof click === 'undefined' -->
-          <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
-          <!-- /ko -->
-          <!-- ko if: type === 'DATABASE' -->
-          <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'TABLE' -->
-          <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <!-- /ko -->
-          <!-- ko if:  type === 'VIEW' -->
-          <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <div class="doc-desc" data-bind="text: queryText.substring(0, 150)"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'FIELD' -->
-          <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'PARTITION' -->
-          <div class="doc-desc" data-bind="text: originalDescription"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'SUB_OPERATION' -->
-          <div class="doc-desc" data-bind="text: metaClassName"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'SOURCE' -->
-          <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
-          <!-- /ko -->
-          <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
-          <div class="doc-desc" data-bind="text: parentPath"></div>
-          <!-- /ko -->
+      <div data-bind="foreach: searchResult" style="overflow-x:hidden">
+        <div class="result-entry">
+          <div class="icon-col">
+            <!-- ko if: type === 'FILE' -->
+            <i class="fa fa-fw fa-file-o valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'VIEW' -->
+            <i class="fa fa-fw fa-eye valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'DIRECTORY' -->
+            <i class="fa fa-fw fa-folder-o valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'TABLE' -->
+            <i class="fa fa-fw fa-table valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'DATABASE' -->
+            <i class="fa fa-fw fa-database valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'SOURCE' -->
+            <i class="fa fa-fw fa-server valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'SUB_OPERATION' -->
+            <i class="fa fa-fw fa-code-fork valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'FIELD' -->
+            <i class="fa fa-fw fa-columns valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'OPERATION_EXECUTION' -->
+            <i class="fa fa-fw fa-cog valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'OPERATION' -->
+            <i class="fa fa-fw fa-cogs valign-middle"></i>
+            <!-- /ko -->
+            <!-- ko if: type === 'PARTITION' -->
+            <i class="fa fa-fw fa-th valign-middle"></i>
+            <!-- /ko -->
+          </div>
+          <div class="doc-col">
+            <!-- ko if: typeof click !== 'undefined' -->
+            <a class="pointer" data-bind="click: click" target="_blank" >
+              <span data-bind="text: parentPath"></span>
+              <span data-bind="text: originalName"></span>
+            </a>
+            <span data-bind="text: tags" class="badge badge-info"></span>
+            <!-- /ko -->
+            <!-- ko if: typeof click === 'undefined' -->
+            <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+            <!-- /ko -->
+            <!-- ko if: type === 'DATABASE' -->
+            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'TABLE' -->
+            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <!-- /ko -->
+            <!-- ko if:  type === 'VIEW' -->
+            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <div class="doc-desc" data-bind="text: queryText.substring(0, 150)"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'FIELD' -->
+            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'PARTITION' -->
+            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'SUB_OPERATION' -->
+            <div class="doc-desc" data-bind="text: metaClassName"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'SOURCE' -->
+            <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
+            <!-- /ko -->
+            <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
+            <div class="doc-desc" data-bind="text: parentPath"></div>
+            <!-- /ko -->
+          </div>
         </div>
       </div>
-      <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
