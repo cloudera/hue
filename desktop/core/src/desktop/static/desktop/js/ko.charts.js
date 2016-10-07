@@ -999,6 +999,7 @@
 
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
+
         var _chart;
         if (isTimeline) {
           if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
@@ -1143,13 +1144,15 @@
           });
         }
 
-        var _resizeTimeout = -1;
-        nv.utils.windowResize(function () {
-          window.clearTimeout(_resizeTimeout);
-          _resizeTimeout = window.setTimeout(function () {
-            _chart.update();
-          }, 200);
-        });
+        if (!options.skipWindowResize) {
+          var _resizeTimeout = -1;
+          nv.utils.windowResize(function () {
+            window.clearTimeout(_resizeTimeout);
+            _resizeTimeout = window.setTimeout(function () {
+              _chart.update();
+            }, 200);
+          });
+        }
 
         $(element).on("forceUpdate", function () {
           _chart.update();
