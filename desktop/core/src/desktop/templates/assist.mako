@@ -239,6 +239,10 @@ from metadata.conf import has_navigator
       background-color: #FFF;
     }
 
+    .assist-db-header-actions > * {
+      margin-left: 2px;
+    }
+
     .assist-actions {
       position:absolute;
       top: 0;
