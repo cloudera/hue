@@ -158,6 +158,24 @@ class HiveServer2Dbms(object):
     return self.client.get_database(database)
 
 
+  def alter_database(self, database, properties):
+    hql = 'ALTER database `%s` SET DBPROPERTIES (' % database
+    hql += ', '.join(["'%s'='%s'" % (k, v) for k, v in properties.items()])
+    hql += ');'
+
+    timeout = SERVER_CONN_TIMEOUT.get()
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      self.close(handle)
+    else:
+      msg = _("Failed to execute alter database statement: %s") % hql
+      raise QueryServerException(msg)
+
+    return self.client.get_database(database)
+
+
   def get_tables_meta(self, database='default', table_names='*', table_types=None):
     if self.server_name == 'beeswax':
       identifier = self.to_matching_wildcard(table_names)

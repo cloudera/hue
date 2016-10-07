@@ -109,6 +109,31 @@ def drop_database(request):
     return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
+@check_has_write_access_permission
+@require_http_methods(["POST"])
+def alter_database(request, database):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'data': ''}
+  try:
+    properties = request.POST.get('properties')
+
+    if not properties:
+      raise PopupException(_("Alter database requires a properties value of key-value pairs."))
+
+    properties = json.loads(properties)
+    db.alter_database(database, properties=properties)
+
+    db_metadata = db.get_database(database)
+    db_metadata['hdfs_link'] = location_to_url(db_metadata['location'])
+    response['status'] = 0
+    response['data'] = db_metadata
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Failed to alter database `%s`: %s") % (database, ex)
+
+  return JsonResponse(response)
+
+
 def get_database_metadata(request, database):
   db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}

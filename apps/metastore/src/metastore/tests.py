@@ -355,6 +355,21 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     check(client, [200, 302]) # Ok
 
 
+  def test_alter_database(self):
+    resp = self.client.post(reverse("metastore:get_database_metadata", kwargs={'database': self.db_name}))
+    json_resp = json.loads(resp.content)
+    assert_true('data' in json_resp, json_resp)
+    assert_true('parameters' in json_resp['data'], json_resp)
+    assert_false('message=After Alter' in json_resp['data']['parameters'], json_resp)
+
+    # Alter message
+    resp = self.client.post(reverse("metastore:alter_database", kwargs={'database': self.db_name}),
+                            {'properties': json.dumps({'message': 'After Alter'})})
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal('{message=After Alter}', json_resp['data']['parameters'], json_resp)
+
+
   def test_alter_table(self):
     resp = _make_query(self.client, "CREATE TABLE test_alter_table (a int) COMMENT 'Before Alter';", database=self.db_name)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
