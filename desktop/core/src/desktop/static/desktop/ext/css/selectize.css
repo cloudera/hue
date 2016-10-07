@@ -401,3 +401,9 @@
   opacity: 0.5;
   background-color: #fafafa;
 }
+
+.selectize-no-tags {
+  color: #999;
+  margin-top: 4px;
+  margin-right: 4px;
+}

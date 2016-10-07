@@ -27,17 +27,17 @@ from metadata.conf import has_navigator
   <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
 
   <script type="text/html" id="nav-tags-template">
-    <!-- ko hueSpinner: { spin: loading } --><!-- /ko -->
-    <!-- ko ifnot: loading -->
-    <div style="width: 100%">
-      <textarea style="width: 100%" data-bind="tagEditor: {
-        placeholder: '${_ko('No tags found...')}',
-        setTags: currentTags,
-        onSave: onSave,
-        load: loadTags
-      }"></textarea>
-    </div>
-    <!-- /ko -->
+     <!-- ko if: loading -->
+     <div style="width: 100%; height: 20px; left: 6px; top: 8px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>
+     <!-- /ko -->
+     <div style="width: 100%" data-bind="ifnot: loading">
+       <textarea style="width: 100%" data-bind="tagEditor: {
+          placeholder: '${_ko('No tags found...')}',
+          setTags: currentTags,
+          onSave: onSave,
+          load: loadTags
+        }"></textarea>
+     </div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -105,12 +105,16 @@ from metadata.conf import has_navigator
         });
 
         var fetchAllTags = function () {
+          var fetchDeferral = $.Deferred();
           apiHelper.listNavTags({
             successCallback: function (data) {
-              self.allTags(Object.keys(data.tags))
+              self.allTags(Object.keys(data.tags));
+              fetchDeferral.resolve();
             },
-            silenceErrors: true
+            silenceErrors: true,
+            errorCallback: fetchDeferral.reject
           });
+          return fetchDeferral.promise();
         };
         fetchAllTags();
 
@@ -119,6 +123,7 @@ from metadata.conf import has_navigator
         };
 
         self.onSave = function (value) {
+          self.loading(true);
           var newTags = value.length > 0 ? value.split(',') : [];
           var tagsToRemove = [];
           var tagsToAdd = [];
@@ -139,14 +144,21 @@ from metadata.conf import has_navigator
             }
           });
 
+          var deferrals = [];
           if (tagsToAdd.length > 0) {
-            apiHelper.addNavTags(self.identity, tagsToAdd);
+            deferrals.push(apiHelper.addNavTags(self.identity, tagsToAdd));
           }
           if (tagsToRemove.length > 0) {
-            apiHelper.deleteNavTags(self.identity, tagsToRemove);
+            deferrals.push(apiHelper.deleteNavTags(self.identity, tagsToRemove));
           }
           self.currentTags(newTags);
-          fetchAllTags();
+          deferrals.push(fetchAllTags());
+
+          var doneLoading = function () {
+            self.loading(false);
+          };
+
+          $.when.apply($, deferrals).then(doneLoading, doneLoading);
         };
       }
 

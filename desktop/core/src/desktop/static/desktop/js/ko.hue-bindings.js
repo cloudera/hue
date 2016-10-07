@@ -135,13 +135,17 @@
         var $readOnlyInner = $('<div>').addClass('selectize-input items not-full has-options has-items').appendTo($readOnlyContainer);
         if (options.setTags().length > 0) {
           options.setTags().forEach(function (tag) {
-            $('<div>').addClass('item-read-only').text(tag).appendTo($readOnlyInner);
+            $('<div>').text(tag).appendTo($readOnlyInner);
           });
+        } else {
+          $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
         }
 
-        $('<i>').addClass('fa fa-edit selectize-edit').click(function () {
+        $('<i>').addClass('fa fa-edit selectize-edit').appendTo($readOnlyInner);
+
+        $readOnlyInner.click(function () {
           showEdit();
-        }).appendTo($readOnlyInner);
+        });
 
         $readOnlyContainer.show();
       };
