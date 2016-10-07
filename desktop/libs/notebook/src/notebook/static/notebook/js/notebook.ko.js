@@ -556,10 +556,12 @@
         self.chartX(self.result.cleanedNumericMeta()[0].name);
       }
 
-      if (self.chartYMulti().length === 0 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
-        self.chartYMulti.push(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length -1, 1)].name);
-      } else if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART || (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))) {
-        self.chartYSingle(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length -1, 1)].name);
+      if (self.result.cleanedNumericMeta().length > 0) {
+        if (self.chartYMulti().length === 0 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
+          self.chartYMulti.push(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)].name);
+        } else if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART || (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))) {
+          self.chartYSingle(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)].name);
+        }
       }
     }
 
