@@ -2691,14 +2691,14 @@ ${ hueIcons.symbols() }
             pivotValues = pivotValues.filter(function (item, pos) {
               return pivotValues.indexOf(item) === pos;
             });
-            pivotValues.forEach(function (val) {
+            pivotValues.forEach(function (val, pivotCnt) {
               var _data = [];
               $(rawDatum.counts()).each(function (cnt, item) {
                 if (item[_idxPivot] === val) {
                   _data.push({
                     x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
                     y: item[_idxValue] * 1,
-                    color: colors[cnt % colors.length],
+                    color: colors[pivotCnt % colors.length],
                     obj: item
                   });
                 }

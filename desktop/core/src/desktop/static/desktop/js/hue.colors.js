@@ -15,6 +15,65 @@
 // limitations under the License.
 
 var HueColors = {
+
+  CUIScaleColors: [
+    {
+      name: 'gray', colors: ['#F8F8F8', '#E7E7E7', '#E0E0E0', '#DCDCDC', '#C8C8C8', '#B4B4B4', '#A0A0A0', '#787878',
+      '#424242', '#212121']
+    },
+    {
+      name: 'blue-gray', colors: ['#ECEFF1', '#CFD8DC', '#B0BEC5', '#90A4AE', '#78909C', '#607D8B', '#546E7A',
+      '#455A64', '#36454F', '#232C34']
+    },
+    {
+      name: 'blue', colors: ['#E9F6FB', '#BEE4F5', '#A9DBF1', '#7ECAEB', '#53B8E4', '#29A7DE', '#2496C7', '#0B7FAD',
+      '#1C749B', '#186485']
+    },
+    {
+      name: 'steel', colors: ['#E8EEEE', '#C6D6D6', '#A0BABA', '#7A9F9F', '#5D8A8A', '#417575', '#3C6C6C', '#345E5E',
+      '#2D5252', '#274646']
+    },
+    {
+      name: 'teal', colors: ['#E0F6F5', '#B3EAE6', '#80DCD5', '#4DCEC4', '#26C3B7', '#00B9AA', '#00AA9D', '#009488',
+      '#008177', '#006F66']
+    },
+    {
+      name: 'green', colors: ['#E2F3EA', '#B7E2CD', '#87CEAB', '#57BB89', '#33AC6F', '#0F9D56', '#0E914F', '#0C7E45',
+      '#0A6E3C', '#095E34']
+    },
+    {
+      name: 'lime', colors: ['#EDF5E2', '#D2E6B9', '#B4D689', '#96C55A', '#7FB836', '#69AC13', '#619F12', '#548A0F',
+      '#49780D', '#3F670B']
+    },
+    {
+      name: 'yellow', colors: ['#FFFCE6', '#FFFACC', '#FFF599', '#FFF066', '#FFEB3B', '#FFE600', '#E6CF00', '#B3A100',
+      '#807300', '#4D4500']
+    },
+    {
+      name: 'orange', colors: ['#FBF1E1', '#FFE8AF', '#FFD466', '#EDB233', '#EBA81A', '#E99F01', '#D18F00', '#BA7F00',
+      '#A36F00', '#8B572A']
+    },
+    {
+      name: 'red', colors: ['#FFE5E5', '#FFCCCC', '#FFB2B2', '#E7808D', '#DE4D5F', '#D0021B', '#BB0118', '#A60115',
+      '#910112', '#7C0110']
+    },
+    {
+      name: 'pink', colors: ['#F2DEDE', '#F3BFD4', '#EC93B7', '#E4689A', '#DE4784', '#D8276F', '#C72466', '#AD1F59',
+      '#971B4D', '#821743']
+    },
+    {
+      name: 'purple', colors: ['#EFE9F5', '#D8C8E7', '#BDA3D6', '#A37EC6', '#8F62B9', '#7B46AD', '#71419F', '#62388A',
+      '#563179', '#4A2A68']
+    },
+    {
+      name: 'purple-gray', colors: ['#F1EFEF', '#D5CFD1', '#BAB0B3', '#ACA0A4', '#9F9095', '#977F86', '#837077',
+      '#766168', '#6A575D', '#5E4D53']
+    },
+    {
+      name: 'green-gray', colors: ['#E9E8E3', '#C8C6BA', '#B2AF9F', '#A7A391', '#9C9883', '#918D76', '#827E6A',
+      '#74705E', '#656252', '#575446']
+    }],
+
   hexToR: function (h) {
     return parseInt((this.cutHex(h)).substring(0, 2), 16)
   },
@@ -49,11 +108,57 @@ var HueColors = {
     }
     return _bands;
   },
+
+
+  /**
+   * Gets a palette of colors to be used in charts
+   * It can be used in several ways, e.g.
+   * getChartColor() >> the whole spectrum
+   * @return {array}                  A list of colors in the {'color': '#HEX_VALUE'} format
+   */
+  getCUIChartColors: function getChartColors(swatch, bands, reversed, distributed) {
+    var normalizedColors = {}, i;
+    this.CUIScaleColors.forEach(function (scaleDef) {
+      normalizedColors[scaleDef.name] = scaleDef.colors;
+    });
+
+    // optimal visual sequence by contrasting colors
+    var sequence = ['blue-gray', 'pink', 'blue', 'lime', 'steel', 'purple', 'teal', 'red', 'orange', 'green'],
+      wholeSpectrum = [],
+      sequenceHalfLength = sequence.length / 2;
+
+    function addMain(mainSwatch) {
+      wholeSpectrum.push({color: normalizedColors[mainSwatch][sequenceHalfLength]});
+    }
+
+    function addPlus(mainSwatch) {
+      wholeSpectrum.push({color: normalizedColors[mainSwatch][sequenceHalfLength + i]});
+    }
+
+    function addMinus(mainSwatch) {
+      wholeSpectrum.push({color: normalizedColors[mainSwatch][sequenceHalfLength - i]});
+    }
+
+    for (i = 1; i < sequenceHalfLength; i++) {
+      if (i === 1) {
+        sequence.forEach(addMain);
+      }
+
+      sequence.forEach(addPlus);
+      sequence.forEach(addMinus);
+    }
+
+    return wholeSpectrum;
+
+  },
+
   d3Scale: function () {
     return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
   },
   cuiD3Scale: function () {
-    return ['#29A7DE', '#417575', '#00B9AA', '#0F9D56', '#69AC13', '#E99F01', '#D0021B', '#D8276F', '#7B46AD', '#1C749B', '#2D5252', '#008177', '#0A6E3C', '#49780D', '#A36F00', '#910112', '#971B4D', '#62388A', '#A9DBF1', '#A0BABA', '#80DCD5', '#87CEAB', '#B4D689', '#EDC582', '#FFE5E5', '#EC93B7', '#BDA3D6'];
+    return this.getCUIChartColors().map(function (c) {
+      return c.color;
+    });
   },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
