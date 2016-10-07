@@ -2714,7 +2714,7 @@ ${ hueIcons.symbols() }
                 });
               }
               _datum.push({
-                key: val,
+                key: hueUtils.html2text(val),
                 values: _data
               });
             });
