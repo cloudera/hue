@@ -147,10 +147,10 @@ def execute_and_watch(request):
 
   if action == 'save_as_table':
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'insert_as_query':
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'index_query':
     sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
