@@ -368,11 +368,15 @@ class LdapBackend(object):
     self._backend = _LDAPBackend()
 
   def add_ldap_config(self, ldap_config):
-    if ldap_config.LDAP_URL.get() is None:
+    ldap_url = ldap_config.LDAP_URL.get()
+    if ldap_url is None:
       LOG.warn("Could not find LDAP URL required for authentication.")
       return None
     else:
       setattr(self._backend.settings, 'SERVER_URI', ldap_config.LDAP_URL.get())
+
+    if ldap_url.lower().startswith('ldaps') and ldap_config.USE_START_TLS.get():
+      LOG.warn("Cannot configure LDAP with SSL and enable STARTTLS.")
 
     if ldap_config.SEARCH_BIND_AUTHENTICATION.get():
       # New Search/Bind Auth
