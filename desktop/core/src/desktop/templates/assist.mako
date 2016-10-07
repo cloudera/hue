@@ -1322,7 +1322,15 @@ from metadata.conf import has_navigator
               } else {
                 if (typeof data.facets !== 'undefined') {
                   Object.keys(data.facets).forEach(function (facet) {
-                    values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                    if (partial.length > 0 && facet.indexOf(partial) !== -1) {
+                      values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                    } else if (partial.length > 0) {
+                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
+                        if (facetValue.indexOf(partial) !== -1) {
+                          values.push({ data: { label: facet + ':' + facetValue, icon: facetIcons[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                        }
+                      });
+                    }
                   });
                 }
                 if (values.length > 0) {
