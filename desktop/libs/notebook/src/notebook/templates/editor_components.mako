@@ -2826,7 +2826,7 @@ ${ hueIcons.symbols() }
         });
         if (_idxGroup > -1) {
           $(rawDatum.counts()).each(function (cnt, item) {
-            addToDatum(item[_idxGroup]);
+            addToDatum(hueUtils.html2text(item[_idxGroup]));
           });
         }
       } else {
