@@ -1153,7 +1153,7 @@
     $.post('/metadata/api/navigator/search_entities_interactive', {
       query_s: options.query,
       limit: 5,
-      sources: '["hive"]',
+      sources: '["' + options.source + '"]',
       field_facets: '["tags"]'
     }).done(function (data) {
       if (data.status === 0 && !self.successResponseIsError(data)) {

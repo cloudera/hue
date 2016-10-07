@@ -513,7 +513,7 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/html" id="assist-hive-inner-panel">
+  <script type="text/html" id="assist-sql-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
         <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
@@ -1302,78 +1302,6 @@ from metadata.conf import has_navigator
           'tag' : 'fa-tag'
         };
 
-        self.navAutocompleteSource = function (request, callback) {
-          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
-          var isFacet = facetMatch !== null;
-          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
-          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
-          var beforePartial = request.term.substring(0, request.term.length - partial.length);
-
-          self.apiHelper.navSearchAutocomplete({
-            query:  partial + '*',
-            successCallback: function (data) {
-              var values = [];
-              if (isFacet && typeof data.facets !== 'undefined') {
-                var facetInQuery = facetMatch[1];
-
-                if (typeof data.facets[facetInQuery.toLowerCase()] !== 'undefined') {
-                  Object.keys(data.facets[facetInQuery.toLowerCase()]).forEach(function (facetValue) {
-                    if (partial === '' || facetValue.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: facetIcons[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
-                    }
-                  });
-                }
-              } else {
-                if (typeof data.facets !== 'undefined') {
-                  Object.keys(data.facets).forEach(function (facet) {
-                    if (partial.length > 0 && facet.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
-                    } else if (partial.length > 0) {
-                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
-                        if (facetValue.indexOf(partial) !== -1) {
-                          values.push({ data: { label: facet + ':' + facetValue, icon: facetIcons[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
-                        }
-                      });
-                    }
-                  });
-                }
-                if (values.length > 0) {
-                  values.push({ divider: true });
-                }
-                if (typeof data.results !== 'undefined') {
-                  data.results.forEach(function (result) {
-                    var icon = '';
-                    switch (result.type) {
-                      case 'TABLE':
-                        icon = 'fa-table';
-                        break;
-                      case 'VIEW':
-                        icon = 'fa-eye';
-                        break;
-                    }
-                    var description = result.parentPath;
-
-                    if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
-                      values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: beforePartial + result.originalName });
-                    } else {
-                      values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: beforePartial + result.originalName });
-                    }
-                  });
-                }
-              }
-              if (values.length > 0 && values[values.length - 1].divider) {
-                values.pop();
-              }
-              callback(values);
-            },
-            silenceErrors: true,
-            errorCallback: function () {
-              callback([]);
-            }
-          });
-
-        };
-
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
 
@@ -1393,7 +1321,7 @@ from metadata.conf import has_navigator
             }, params.sql)),
             apiHelper: self.apiHelper,
             name: '${ _("SQL") }',
-            type: 'hive',
+            type: 'sql',
             icon: 'fa-database',
             minHeight: 75
           })
@@ -1490,6 +1418,80 @@ from metadata.conf import has_navigator
             self.performSearch();
           }
         });
+
+        self.navAutocompleteSource = function (request, callback) {
+          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
+          var isFacet = facetMatch !== null;
+          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
+          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
+          var beforePartial = request.term.substring(0, request.term.length - partial.length);
+
+
+          self.apiHelper.navSearchAutocomplete({
+            source: self.visiblePanel().type === 'sql' ?
+                (self.visiblePanel().panelData.selectedSource() ? self.visiblePanel().panelData.selectedSource().sourceType : 'hive') : self.visiblePanel().type,
+            query:  partial + '*',
+            successCallback: function (data) {
+              var values = [];
+              if (isFacet && typeof data.facets !== 'undefined') {
+                var facetInQuery = facetMatch[1];
+
+                if (typeof data.facets[facetInQuery.toLowerCase()] !== 'undefined') {
+                  Object.keys(data.facets[facetInQuery.toLowerCase()]).forEach(function (facetValue) {
+                    if (partial === '' || facetValue.indexOf(partial) !== -1) {
+                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: facetIcons[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
+                    }
+                  });
+                }
+              } else {
+                if (typeof data.facets !== 'undefined') {
+                  Object.keys(data.facets).forEach(function (facet) {
+                    if (partial.length > 0 && facet.indexOf(partial) !== -1) {
+                      values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                    } else if (partial.length > 0) {
+                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
+                        if (facetValue.indexOf(partial) !== -1) {
+                          values.push({ data: { label: facet + ':' + facetValue, icon: facetIcons[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                        }
+                      });
+                    }
+                  });
+                }
+                if (values.length > 0) {
+                  values.push({ divider: true });
+                }
+                if (typeof data.results !== 'undefined') {
+                  data.results.forEach(function (result) {
+                    var icon = '';
+                    switch (result.type) {
+                      case 'TABLE':
+                        icon = 'fa-table';
+                        break;
+                      case 'VIEW':
+                        icon = 'fa-eye';
+                        break;
+                    }
+                    var description = result.parentPath;
+
+                    if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
+                      values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: beforePartial + result.originalName });
+                    } else {
+                      values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: beforePartial + result.originalName });
+                    }
+                  });
+                }
+              }
+              if (values.length > 0 && values[values.length - 1].divider) {
+                values.pop();
+              }
+              callback(values);
+            },
+            silenceErrors: true,
+            errorCallback: function () {
+              callback([]);
+            }
+          });
+        };
       }
 
       ko.components.register('assist-panel', {
