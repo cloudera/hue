@@ -174,12 +174,15 @@ def import_wizard(request, database='default'):
       # Go to step 2: We've just picked the file. Preview it.
       #
       if do_s2_auto_delim:
-        if load_data == 'IMPORT':
-          if not request.fs.isfile(path):
-            raise PopupException(_('Path location must refer to a file if "Import Data" is selected.'))
-        elif load_data == 'EXTERNAL':
-          if not request.fs.isdir(path):
-            raise PopupException(_('Path location must refer to a directory if "Create External Table" is selected.'))
+        try:
+          if load_data == 'IMPORT':
+            if not request.fs.isfile(path):
+              raise PopupException(_('Path location must refer to a file if "Import Data" is selected.'))
+          elif load_data == 'EXTERNAL':
+            if not request.fs.isdir(path):
+              raise PopupException(_('Path location must refer to a directory if "Create External Table" is selected.'))
+        except IOError, e:
+          raise PopupException(_('Path location "%s" is invalid: %s') % (path, e))
 
         delim_is_auto = True
         fields_list, n_cols, s2_delim_form = _delim_preview(request.fs, s1_file_form, encoding, [reader.TYPE for reader in FILE_READERS], DELIMITERS)
