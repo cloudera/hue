@@ -556,10 +556,10 @@
         self.chartX(self.result.cleanedNumericMeta()[0].name);
       }
 
-      if (self.chartYMulti().length === 0 && self.result.cleanedNumericMeta().length === 2 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
-        self.chartYMulti.push(self.result.cleanedNumericMeta()[1].name);
-      } else if (self.chartYSingle() === null && self.result.cleanedNumericMeta().length === 2 && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART)) {
-        self.chartYSingle(self.result.cleanedNumericMeta()[1].name);
+      if (self.chartYMulti().length === 0 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
+        self.chartYMulti.push(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length -1, 1)].name);
+      } else if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART || (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))) {
+        self.chartYSingle(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length -1, 1)].name);
       }
     }
 
@@ -615,6 +615,7 @@
     self.chartX.extend({notify: 'always'});
     self.chartXPivot = ko.observable(typeof snippet.chartXPivot != "undefined" && snippet.chartXPivot != null ? snippet.chartXPivot : null);
     self.chartXPivot.extend({notify: 'always'});
+    self.chartXPivot.subscribe(prepopulateChart);
     self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
     self.chartYMulti = ko.observableArray(typeof snippet.chartYMulti != "undefined" && snippet.chartYMulti != null ? snippet.chartYMulti : []);
     self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
