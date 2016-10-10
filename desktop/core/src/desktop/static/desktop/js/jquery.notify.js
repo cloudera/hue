@@ -21,17 +21,17 @@
 (function ($, window, document, undefined) {
 
   var pluginName = "jHueNotify",
-      TYPES = {
-        INFO: "INFO",
-        ERROR: "ERROR",
-        GENERAL: "GENERAL"
-      },
-      defaults = {
-        level: TYPES.GENERAL,
-        message: "",
-        sticky: false,
-        css: null
-      };
+    TYPES = {
+      INFO: "INFO",
+      ERROR: "ERROR",
+      GENERAL: "GENERAL"
+    },
+    defaults = {
+      level: TYPES.GENERAL,
+      message: "",
+      sticky: false,
+      css: null
+    };
 
   function Plugin(options) {
     this.options = $.extend({}, defaults, options);
@@ -50,83 +50,85 @@
 
     _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
 
+    if ($.trim(_this.options.message) !== '') {
 
-    var el = $("#jHueNotify").clone();
-    el.removeAttr("id");
+      var el = $("#jHueNotify").clone();
+      el.removeAttr("id");
 
-    // stops all the current animations and resets the style
-    el.stop(true);
-    el.attr("class", "alert jHueNotify");
-    el.find(".close").hide();
+      // stops all the current animations and resets the style
+      el.stop(true);
+      el.attr("class", "alert jHueNotify");
+      el.find(".close").hide();
 
-    if ($(".jHueNotify").last().position() != null) {
-      el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN);
-    }
+      if ($(".jHueNotify").last().position() != null) {
+        el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN);
+      }
 
-    var scrollColor = '#f0c36d';
+      var scrollColor = '#f0c36d';
 
-    if (_this.options.level == TYPES.ERROR) {
-      el.addClass("alert-error");
-      scrollColor = '#b94a48';
-    }
-    else if (_this.options.level == TYPES.INFO) {
-      el.addClass("alert-info");
-      scrollColor = '#338bb8';
-    }
-    el.find(".message").html("<strong>" + _this.options.message + "</strong>");
+      if (_this.options.level == TYPES.ERROR) {
+        el.addClass("alert-error");
+        scrollColor = '#b94a48';
+      }
+      else if (_this.options.level == TYPES.INFO) {
+        el.addClass("alert-info");
+        scrollColor = '#338bb8';
+      }
+      el.find(".message").html("<strong>" + _this.options.message + "</strong>");
 
-    el.find(".message").niceScroll({
-      cursorcolor: scrollColor,
-      cursorborder: '1px solid ' + scrollColor,
-      cursoropacitymin: 0,
-      cursoropacitymax: 0.7,
-      scrollspeed: 100,
-      mousescrollstep: 60,
-      cursorminheight: 20,
-      horizrailenabled: false,
-      zindex: 14000,
-      railoffset: { left: 5 }
-    });
-
-    if (_this.options.css != null) {
-      el.attr("style", _this.options.css);
-    }
-
-    el.on('dblclick', function(){
-      el.toggleClass('expanded');
-      el.find('.message').getNiceScroll().resize();
-    });
-
-    if (_this.options.sticky) {
-      el.find(".close").click(function () {
-        el.fadeOut();
-        el.nextAll(".jHueNotify").animate({
-          top: '-=' + (el.outerHeight() + MARGIN)
-        }, 200);
-        el.remove();
-      }).show();
-      el.show();
-    }
-    else {
-      var t = window.setTimeout(function () {
-        el.fadeOut();
-        el.nextAll(".jHueNotify").animate({
-          top: '-=' + (el.outerHeight() + MARGIN)
-        }, 200);
-        el.remove();
-
-      }, 3000);
-      el.click(function () {
-        window.clearTimeout(t);
-        $(this).stop(true);
-        $(this).fadeOut();
-        $(this).nextAll(".jHueNotify").animate({
-          top: '-=' + ($(this).outerHeight() + MARGIN)
-        }, 200);
+      el.find(".message").niceScroll({
+        cursorcolor: scrollColor,
+        cursorborder: '1px solid ' + scrollColor,
+        cursoropacitymin: 0,
+        cursoropacitymax: 0.7,
+        scrollspeed: 100,
+        mousescrollstep: 60,
+        cursorminheight: 20,
+        horizrailenabled: false,
+        zindex: 14000,
+        railoffset: {left: 5}
       });
-      el.show();
+
+      if (_this.options.css != null) {
+        el.attr("style", _this.options.css);
+      }
+
+      el.on('dblclick', function () {
+        el.toggleClass('expanded');
+        el.find('.message').getNiceScroll().resize();
+      });
+
+      if (_this.options.sticky) {
+        el.find(".close").click(function () {
+          el.fadeOut();
+          el.nextAll(".jHueNotify").animate({
+            top: '-=' + (el.outerHeight() + MARGIN)
+          }, 200);
+          el.remove();
+        }).show();
+        el.show();
+      }
+      else {
+        var t = window.setTimeout(function () {
+          el.fadeOut();
+          el.nextAll(".jHueNotify").animate({
+            top: '-=' + (el.outerHeight() + MARGIN)
+          }, 200);
+          el.remove();
+
+        }, 3000);
+        el.click(function () {
+          window.clearTimeout(t);
+          $(this).stop(true);
+          $(this).fadeOut();
+          $(this).nextAll(".jHueNotify").animate({
+            top: '-=' + ($(this).outerHeight() + MARGIN)
+          }, 200);
+        });
+        el.show();
+      }
+      el.appendTo($("body"));
     }
-    el.appendTo($("body"));
   };
 
   $[pluginName] = function () {
