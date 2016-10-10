@@ -979,20 +979,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        define('assistPanel', [
-          'knockout',
-          'desktop/js/assist/assistDbSource',
-          'desktop/js/assist/assistHdfsEntry',
-          'desktop/js/apiHelper',
-          'desktop/js/fileBrowser/hueFileEntry'
-        ], factory);
-      } else {
-        factory(ko, AssistDbSource, AssistHdfsEntry, ApiHelper, HueFileEntry);
-      }
-    }(function (ko, AssistDbSource, AssistHdfsEntry, ApiHelper, HueFileEntry) {
-
+    (function () {
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;
@@ -1499,6 +1486,6 @@ from metadata.conf import has_navigator
         viewModel: AssistPanel,
         template: { element: 'assist-panel-template' }
       });
-    }));
+    })();
   </script>
 </%def>

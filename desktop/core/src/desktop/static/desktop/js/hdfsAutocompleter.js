@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define([], factory);
-  } else {
-    root.HdfsAutocompleter = factory();
-  }
-}(this, function () {
+var HdfsAutocompleter = (function () {
 
   var TIME_TO_LIVE_IN_MILLIS = 60000; // 1 minute
   var BASE_PATH = "/filebrowser/view=";
@@ -114,4 +108,4 @@
   };
 
   return HdfsAutocompleter;
-}));
+})();

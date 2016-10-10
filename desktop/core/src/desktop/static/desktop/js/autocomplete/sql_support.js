@@ -145,13 +145,13 @@ var getValueExpressionKeywords = function (valueExpression, extras) {
       }
     }
   }
-  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
+  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
     keywords = keywords.concat(['AND', 'OR']);
   }
-  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
+  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
     keywords = keywords.concat(['+', '-', '*', '/', '%']);
   }
-  if (parser.yy.sqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
+  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
     keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
   }
   return {suggestKeywords: keywords};
@@ -252,11 +252,11 @@ var findCaseType = function (whenThenList) {
 };
 
 findReturnTypes = function (functionName) {
-  return parser.yy.sqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
+  return SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
 };
 
 var applyArgumentTypesToSuggestions = function (functionName, position) {
-  var foundArguments = parser.yy.sqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
+  var foundArguments = SqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
   if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
     delete parser.yy.result.suggestColumns;
     delete parser.yy.result.suggestKeyValues;
@@ -1105,8 +1105,7 @@ var lexerModified = false;
 /**
  * Main parser function
  */
-parser.parseSql = function (beforeCursor, afterCursor, dialect, sqlFunctions, debug) {
-  parser.yy.sqlFunctions = sqlFunctions;
+parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
   parser.yy.result = {locations: []};
   parser.yy.lowerCase = false;
   parser.yy.locations = [];

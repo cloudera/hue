@@ -14,14 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assist/assistDbEntry'], factory);
-  } else {
-    root.AssistDbSource = factory(ko, AssistDbEntry);
-  }
-}(this, function (ko, AssistDbEntry) {
-
+var AssistDbSource = (function () {
   /**
    * @param {Object} options
    * @param {Object} options.i18n
@@ -269,4 +262,4 @@
   };
 
   return AssistDbSource;
-}));
+})();

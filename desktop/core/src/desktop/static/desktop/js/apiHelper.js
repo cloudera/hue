@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define(['knockout'], factory);
-  } else {
-    root.ApiHelper = factory(ko);
-  }
-}(this, function (ko) {
+var ApiHelper = (function () {
 
   var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl.override') || $.totalStorage('hue.cacheable.ttl'); // 1 day by default, configurable with desktop.custom.cacheable_ttl in the .ini or $.totalStorage('hue.cacheable.ttl.override', 1234567890)
 
@@ -1290,4 +1284,4 @@
       return instance;
     }
   };
-}));
+})();

@@ -14,14 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (factory) {
-  if(typeof define === "function") {
-    define("ko.hue-bindings", ["knockout"], factory);
-  } else {
-    factory(ko);
-  }
-}(function (ko) {
-
+(function () {
   ko.bindingHandlers.autocomplete = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
@@ -4430,5 +4423,4 @@
       $(el).data('__ko_vm', viewModel);
     }
   }
-
-}));
+})();

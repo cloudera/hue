@@ -14,15 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define([
-      'knockout'
-    ], factory);
-  } else {
-    root.HueDocument = factory(ko);
-  }
-}(this, function (ko) {
+var HueDocument = (function() {
 
   /**
    *
@@ -236,4 +228,4 @@
   };
 
   return HueDocument;
-}));
+})();

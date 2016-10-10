@@ -14,16 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define([
-      'desktop/js/autocomplete/sql',
-      'desktop/js/sqlFunctions'
-    ], factory);
-  } else {
-    root.SqlAutocompleter2 = factory(sql, sqlFunctions);
-  }
-}(this, function (sqlParser, sqlFunctions) {
+var SqlAutocompleter2 = (function () {
 
   var IDENTIFIER_REGEX = /[a-zA-Z_0-9\$\u00A2-\uFFFF]/;
 
@@ -54,7 +45,7 @@
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
-    var parseResult = sqlParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), sqlFunctions, false);
+    var parseResult = sql.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
 
     if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
       console.log(parseResult);
@@ -127,14 +118,14 @@
       if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
         colRefDeferral.done(function () {
           if (colRef !== null && colRef.type) {
-            sqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+            SqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           } else {
-            sqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+            SqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
           }
           suggestFunctionsDeferral.resolve();
         });
       } else {
-        sqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+        SqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
         suggestFunctionsDeferral.resolve();
       }
       deferrals.push(suggestFunctionsDeferral);
@@ -297,7 +288,7 @@
   SqlAutocompleter2.prototype.addColRefKeywords = function (parseResult, type, completions) {
     var self = this;
     Object.keys(parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
-      if (sqlFunctions.matchesType(self.snippet.type(), [typeForKeywords], [type.toUpperCase()])) {
+      if (SqlFunctions.matchesType(self.snippet.type(), [typeForKeywords], [type.toUpperCase()])) {
         parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
           completions.push({
             value: parseResult.lowerCase ? keyword.toLowerCase() : keyword,
@@ -491,8 +482,8 @@
               columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('array') === 0) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
-            } else if (sqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+            } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
+                SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             }
           });
@@ -511,8 +502,8 @@
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {
-            if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-                sqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
+            if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
               columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
           });
@@ -525,13 +516,13 @@
                 } else {
                   columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
                 }
-              } else if (sqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
-                  sqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
+              } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                  SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
                 columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
               }
             });
           } else if (typeof data.item.type !== 'undefined') {
-            if (sqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
+            if (SqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
               columnSuggestions.push({value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
           }
@@ -683,4 +674,4 @@
   };
 
   return SqlAutocompleter2;
-}));
+})();

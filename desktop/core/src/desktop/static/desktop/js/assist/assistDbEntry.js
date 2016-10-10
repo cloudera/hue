@@ -14,14 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define(['knockout'], factory);
-  } else {
-    root.AssistDbEntry = factory(ko);
-  }
-}(this, function (ko) {
-
+var AssistDbEntry = (function () {
   /**
    * @param {Object} definition
    * @param {string} definition.type
@@ -403,4 +396,4 @@
   };
 
   return AssistDbEntry;
-}));
+})();
