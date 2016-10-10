@@ -150,7 +150,6 @@ def get_document(request):
   return JsonResponse(response)
 
 
-@api_error_handler
 def _get_document_helper(request, uuid, with_data, with_dependencies, path):
   if uuid:
     if uuid.isdigit():
