@@ -13,22 +13,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-define([
-  'knockout',
-  'desktop/js/autocomplete/sql',
-  'desktop/spec/autocompleterTestUtils'
-], function(ko, sql, testUtils) {
 
+(function () {
   describe('sql.js Error statements', function() {
 
     beforeAll(function () {
       sql.yy.parseError = function (msg) {
         throw Error(msg);
       };
-      jasmine.addMatchers(testUtils.testDefinitionMatcher);
+      jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
     });
 
-    var assertAutoComplete = testUtils.assertAutocomplete;
+    var assertAutoComplete = SqlTestUtils.assertAutocomplete;
 
     it('should suggest columns for "SELECT BAABO BOOAA BLARGH, | FROM testTable"', function() {
       assertAutoComplete({
@@ -135,4 +131,4 @@ define([
       });
     });
   });
-});
+})();

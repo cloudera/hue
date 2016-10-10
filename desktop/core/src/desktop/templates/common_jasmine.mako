@@ -14,8 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-<%namespace name="require" file="/require.mako" />
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -29,37 +27,13 @@
   <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
-
-  <script src="${ static('desktop/js/ace/ace.js') }"></script>
-  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-  <script src="${ static('desktop/js/ace.extended.js') }"></script>
-
-  ${ require.config() }
-
-  <script type="text/javascript" charset="utf-8">
-    // Adds the jasmine dependencies to the existing require config.
-    require.config({
-      urlArgs: "random=" + Math.random(),
-      baseUrl: "${ static('') }",
-      paths: {
-        'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
-        'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
-        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot',
-        'mock-ajax':  'desktop/ext/js/jasmine-2.3.4/mock-ajax'
-      },
-      shim: {
-        'jasmine-html': {
-          deps: ['jasmine']
-        },
-        'jasmine-boot': {
-          deps: ['jasmine', 'jasmine-html']
-        },
-        'mock-ajax': {
-          deps: ['jasmine-boot']
-        }
-      }
-    })
-  </script>
+  <script type="text/javascript" src="${ static('desktop/js/ace/ace.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/ace.extended.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jasmine-2.3.4/jasmine') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jasmine-2.3.4/jasmine-html') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jasmine-2.3.4/boot') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jasmine-2.3.4/mock-ajax') }"></script>
 
   <%block name="specs"/>
 </head>

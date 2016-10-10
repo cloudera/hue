@@ -13,12 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-define([
-  'knockout',
-  'desktop/js/hdfsAutocompleter',
-  'desktop/js/apiHelper',
-  'desktop/spec/autocompleterTestUtils'
-], function(ko, HdfsAutocompleter, ApiHelper, testUtils) {
+(function () {
   describe("hdfsAutocompleter.js", function() {
     var subject;
 
@@ -41,7 +36,7 @@ define([
 
 
     beforeAll(function() {
-      jasmine.addMatchers(testUtils.autocompleteMatcher);
+      jasmine.addMatchers(SqlTestUtils.autocompleteMatcher);
       $.totalStorage = function(key, value) {
         return null;
       };
@@ -172,4 +167,4 @@ define([
       });
     });
   });
-});
+})();
