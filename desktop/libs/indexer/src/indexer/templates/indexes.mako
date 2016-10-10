@@ -95,7 +95,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 <script type="text/html" id="create-index">
   <div class="snippet-settings" data-bind="visible: index.showCreateModal">
 
-    <input data-bind="value: index.name"></input>
+    <input type="text" data-bind="value: index.name"/>
 
     <a href="javascript:void(0)" class="btn" data-bind="click: index.create">
       <i class="fa fa-plus-circle"></i> ${ _('Create index') }
@@ -112,7 +112,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 <script type="text/html" id="create-alias">
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
 
-    <input data-bind="value: alias.name"></input>
+    <input type="text" data-bind="value: alias.name"/>
     <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
 
     <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
@@ -130,7 +130,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 <script type="text/html" id="create-index-wizard">
   <div class="snippet-settings" data-bind="visible: createWizard.show">
 
-    ${ _('Name') } <input data-bind="value: createWizard.name"></input>
+    ${ _('Name') } <input type="text" data-bind="value: createWizard.name"/>
     
     <!-- ko if: createWizard.name() -->
     <select data-bind="options: createWizard.availableWizards, value: createWizard.wizard, optionsText: 'name'" size="5"></select>
@@ -171,7 +171,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   <!-- ko if: name() == 'file' -->
     <div class="snippet-settings" data-bind="visible: show">
 
-      ${ _('Path') } <input data-bind="value: path"></input>
+      ${ _('Path') } <input type="text" data-bind="value: path"/>
       <select data-bind="visible: path, options: availableFormats, value: format" size="5"></select>
 
     </div>
@@ -183,8 +183,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   <!-- ko if: name() == 'hive' -->
     <div class="snippet-settings" data-bind="visible: show">
 
-      ${ _('Database') } <input data-bind="value: database"></input>
-      ${ _('Table') } <input data-bind="value: table"></input>
+      ${ _('Database') } <input type="text" data-bind="value: database"/>
+      ${ _('Table') } <input type="text" data-bind="value: table"/>
 
     </div>
   <!-- /ko -->

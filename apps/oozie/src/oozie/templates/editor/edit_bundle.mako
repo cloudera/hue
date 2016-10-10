@@ -133,7 +133,7 @@ ${ layout.menubar(section='bundles') }
           <a id="backBtn" class="btn disabled">${ _('Back') }</a>
           <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
           % if bundle.is_editable(user):
-            <input type="submit" class="btn btn-primary save" style="margin-left: 30px" value="${ _('Save bundle') }"></input>
+            <input type="submit" class="btn btn-primary save" style="margin-left: 30px" value="${ _('Save bundle') }" />
           % endif
         </div>
       </div>
@@ -203,7 +203,7 @@ ${ layout.menubar(section='bundles') }
           </div>
             % if bundled_coordinator_formset.forms and bundle.is_editable(user):
               <div class="form-actions" style="padding-left:10px">
-                <input type="submit" class="btn btn-primary" value="${ _('Save') }"></input>
+                <input type="submit" class="btn btn-primary" value="${ _('Save') }" />
               </div>
             % endif
         </div>
