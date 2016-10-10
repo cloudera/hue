@@ -253,10 +253,10 @@ to include a simple form:
       <form action=${url("calculator.views.index")} method=POST>
         ${ csrf_token(request) | n,unicode }
         <input name="a">
-        <input type="radio" name="op" value="add">+</input>
-        <input type="radio" name="op" value="subtract">-</input>
-        <input type="radio" name="op" value="multiply">*</input>
-        <input type="radio" name="op" value="divide">/</input>
+        <input type="radio" name="op" value="add" />+
+        <input type="radio" name="op" value="subtract"/>-
+        <input type="radio" name="op" value="multiply"/>*
+        <input type="radio" name="op" value="divide"/>/
         <input name="b">
         <input type="submit" value="Calculate">
       </form>
