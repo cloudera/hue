@@ -99,24 +99,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 % if has_job_edition_permission(oozie_coordinator, user):
                 <div id="rerun-coord-modal" class="modal hide"></div>
                 <div class="btn-group action-button-group" style="display: block; margin-bottom: 10px">
-                  <button title="${ _('Resume the coordinator') }" id="resume-btn"
-                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
-                      data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
-                      data-confirmation-footer="normal"
-                      class="btn btn-small confirmationModal
-                      % if oozie_coordinator.is_running():
-                      hide
-                      % endif
-                      ">${ _('Resume') }</button>
-                  <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
-                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
-                      data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
-                      data-confirmation-footer="normal"
-                      class="btn btn-small confirmationModal
-                      % if not oozie_coordinator.is_running():
-                      hide
-                      % endif
-                      " rel="tooltip" data-placement="right">${ _('Suspend') }</button>
                   <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}" id="kill-btn"
                       alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
                       href="javascript:void(0)"
@@ -129,8 +111,32 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                       hide
                       % endif
                       ">${_('Kill')}</button>
+                  <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><a title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
+                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
+                      data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
+                      data-confirmation-footer="normal"
+                      class="confirmationModal
+                      % if not oozie_coordinator.is_running():
+                      hide
+                      % endif
+                      " rel="tooltip" data-placement="right">${ _('Suspend') }</a></li>
+                    <li><a title="${ _('Resume the coordinator') }" id="resume-btn"
+                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
+                      data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
+                      data-confirmation-footer="normal"
+                      class="confirmationModal
+                      % if oozie_coordinator.is_running():
+                      hide
+                      % endif
+                      ">${ _('Resume') }</a></li>
+                  </ul
                 </div>
                 % endif
+              </li>
+              <li class="nav-header">${ _('Edit') }</li>
+              <li class="white">
                 <div class="btn-group" style="margin-left: 0; margin-bottom: 5px">
                   % if has_job_edition_permission(oozie_coordinator, user):
                   <button title="${ _('Update Coordinator Job properties') }" id="edit-coord-btn"
@@ -142,11 +148,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      % if not oozie_coordinator.is_running():
                      hide
                      % endif
-                     ">${ _('Edit') }</button>
+                     ">${ _('Coordinator') }</button>
                   % endif
-                  <button title="${ _('Sync Workflow') }" id="sync-wf-btn"
-                     data-sync-url="${ url('oozie:sync_coord_workflow', job_id=oozie_coordinator.id) }"
-                     class="btn btn-small sync-wf-btn">${ _('Sync Workflow') }</button>
+                  <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><a title="${ _('Sync Workflow') }" id="sync-wf-btn"
+                      data-sync-url="${ url('oozie:sync_coord_workflow', job_id=oozie_coordinator.id) }"
+                      class="sync-wf-btn"> ${ _('Workflow') }
+                    </a></li>
+                  </ul>
                 </div>
               </li>
               % endif
