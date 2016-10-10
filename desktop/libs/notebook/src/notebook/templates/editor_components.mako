@@ -24,7 +24,6 @@ from desktop.views import _ko
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
 %>
 
-<%namespace name="require" file="/require.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
 <%def name="includes()">
@@ -42,12 +41,39 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 
+
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('notebook/js/notebook.ko.js') }"></script>
+% if ENABLE_QUERY_SCHEDULING.get():
+<script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
+<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
+% endif
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
+<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
+<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -168,8 +194,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 % endif
-
-${ require.config() }
 
 </%def>
 
@@ -2848,22 +2872,7 @@ ${ hueIcons.symbols() }
     }
   }
 
-  require([
-    "knockout",
-    "ko.charts",
-    "notebook/js/notebook.ko",
-    % if ENABLE_QUERY_SCHEDULING.get():
-    "oozie/js/coordinator-editor.ko",
-    "oozie/js/list-oozie-coordinator.ko",
-    % endif
-    "assistPanel",
-    "knockout-mapping",
-    "knockout-sortable",
-    "ko.editable",
-    "ko.hue-bindings",
-    "ko.switch-case"
-  ], function (ko, charts, EditorViewModel, CoordinatorEditorViewModel, RunningCoordinatorModel) {
-
+  (function () {
     ko.options.deferUpdates = true;
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
@@ -3747,7 +3756,7 @@ ${ hueIcons.symbols() }
         }, 200);
       });
     });
-  });
+  })();
 
   var mathjax = document.createElement("script");
   mathjax.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";

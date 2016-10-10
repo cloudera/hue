@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define([], factory);
-  } else {
-    root.SqlFunctions = factory();
-  }
-}(this, function () {
+var SqlFunctions = (function () {
 
   var MATHEMATICAL_FUNCTIONS = {
     hive: {
@@ -2436,4 +2430,4 @@
     matchesType: matchesType,
     findFunction: findFunction
   };
-}));
+})();

@@ -14,17 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define([
-      'desktop/js/sqlAutocompleter',
-      'desktop/js/sqlAutocompleter2',
-      'desktop/js/hdfsAutocompleter'
-    ], factory);
-  } else {
-    root.Autocompleter = factory(SqlAutocompleter, SqlAutocompleter2, HdfsAutocompleter);
-  }
-}(this, function (SqlAutocompleter, SqlAutocompleter2, HdfsAutocompleter) {
+var Autocompleter = (function () {
 
   /**
    * @param {Object} options {object}
@@ -112,4 +102,4 @@
   };
 
   return Autocompleter;
-}));
+})();

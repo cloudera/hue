@@ -14,18 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-importScripts('/static/desktop/ext/js/require.js');
+importScripts('/static/desktop/js/autocomplete/sql.js?version=3');
+importScripts('/static/desktop/js/sqlFunctions.js?version=3');
 
-// TODO: Figure out how to deal with this nicely, param needs to be updated for any changes
-// to sql.js and sqlFunctions.js to prevent caching issues.
-require.config({
-  urlArgs: "version=2"
-});
-
-require([
-  'autocomplete/sql',
-  'sqlFunctions'
-], function (sqlParser, sqlFunctions) {
+(function () {
 
   this.throttle = -1;
 
@@ -41,7 +33,7 @@ require([
         var locations = [];
         var lineCount = 0;
         msg.data.text.split(';').forEach(function (statement) {
-          var parseResult = sqlParser.parseSql(statement + ' ', '', msg.data.type, sqlFunctions, false);
+          var parseResult = sql.parseSql(statement + ' ', '', msg.data.type, false);
           if (parseResult.errors) {
             parseResult.errors.forEach(function (error) {
               if (error.token.indexOf('CURSOR') === -1) {
@@ -64,4 +56,4 @@ require([
       }
     }, 400);
   }
-});
+})();

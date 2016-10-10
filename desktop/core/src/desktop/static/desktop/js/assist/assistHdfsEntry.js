@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define(['knockout'], factory);
-  } else {
-    root.AssistHdfsEntry = factory(ko);
-  }
-}(this, function (ko) {
+var AssistHdfsEntry = (function () {
 
   var PAGE_SIZE = 50;
 
@@ -205,4 +199,4 @@
   };
 
   return AssistHdfsEntry;
-}));
+})();

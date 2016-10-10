@@ -481,17 +481,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require([
-          'knockout',
-          'desktop/js/apiHelper',
-          'desktop/js/sqlFunctions'
-        ], factory);
-      } else {
-        factory(ko, ApiHelper, SqlFunctions);
-      }
-    }(function (ko, ApiHelper, sqlFunctions) {
+    (function () {
 
       var HALF_SIZE_LIMIT_X = 130;
       var HALF_SIZE_LIMIT_Y = 100;
@@ -824,7 +814,7 @@ from metadata.conf import has_navigator
       function FunctionContextTabs(data, sourceType) {
         var self = this;
         self.func = ko.observable({
-          details: sqlFunctions.findFunction(sourceType, data.function),
+          details: SqlFunctions.findFunction(sourceType, data.function),
           loading: ko.observable(false),
           hasErrors: ko.observable(false)
         });
@@ -1124,7 +1114,7 @@ from metadata.conf import has_navigator
           $(document).on('click', hideOnClickOutside);
         }, 0);
       });
-    }));
+    })();
   </script>
 
   <script type="text/html" id="sql-columns-table-template">
@@ -1163,15 +1153,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require([
-          'knockout'
-        ], factory);
-      } else {
-        factory(ko);
-      }
-    }(function (ko) {
+    (function () {
 
       function SqlColumnsTable(params) {
         var self = this;
@@ -1204,6 +1186,6 @@ from metadata.conf import has_navigator
         viewModel: SqlColumnsTable,
         template: { element: 'sql-columns-table-template' }
       });
-    }));
+    })();
   </script>
 </%def>

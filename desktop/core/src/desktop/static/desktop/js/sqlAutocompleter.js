@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define([], factory);
-  } else {
-    root.SqlAutocompleter = factory();
-  }
-}(this, function () {
+var SqlAutocompleter = (function () {
 
   var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE|LOCATION|INPATH)\b/g;
 
@@ -910,4 +904,4 @@
   };
 
   return SqlAutocompleter;
-}));
+})();

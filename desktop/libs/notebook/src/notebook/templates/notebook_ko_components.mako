@@ -68,14 +68,7 @@ except ImportError, e:
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require(['knockout'], factory);
-      } else {
-        factory(ko);
-      }
-    }(function (ko) {
-
+    (function () {
       var SnippetDbSelection = function (params, element) {
         var self = this;
         self.dbSelectionVisible = ko.observable(false);
@@ -178,7 +171,7 @@ except ImportError, e:
         },
         template: { element: 'snippet-db-selection-template' }
       });
-    }));
+    })();
   </script>
 </%def>
 
@@ -225,94 +218,86 @@ except ImportError, e:
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require(['knockout'], factory);
-      } else {
-        factory(ko);
-      }
-    }(function (ko) {
-      (function () {
-        var WHEEL_RADIUS = 75;
-        var PLUS_ICON_RADIUS = 27.859; // FA-5X
+    (function () {
+      var WHEEL_RADIUS = 75;
+      var PLUS_ICON_RADIUS = 27.859; // FA-5X
 
-        var calculatePositions = function (alternativeCount) {
-          var radius = WHEEL_RADIUS;
-          var radIncrements = 2 * Math.PI / alternativeCount;
-          var currentRad = -0.5 * Math.PI;
+      var calculatePositions = function (alternativeCount) {
+        var radius = WHEEL_RADIUS;
+        var radIncrements = 2 * Math.PI / alternativeCount;
+        var currentRad = -0.5 * Math.PI;
 
-          var result = [];
+        var result = [];
 
-          for (var i = 0; i < alternativeCount; i++) {
-            result.push({
-              left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS + 'px',
-              top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS + 'px'
-            });
-            currentRad += radIncrements;
-          }
-
-          return result;
-        };
-
-        function AddSnippetMenuViewModel(params) {
-          var self = this;
-          self.notebook = params.notebook;
-          self.availableSnippets = params.availableSnippets;
-          self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0, 5)));
-          self.lastUsedSnippet = self.snippetHistory()[0];
-          self.roundCount = 0;
-          self.positions = calculatePositions(self.snippetHistory().length);
-          self.showingHistory = ko.observable(false);
-          self.hasAdditionalSnippets = params.availableSnippets().length > 5;
-          self.showingSelectSnippet = ko.observable(false);
-
-          self.addLastUsedSnippet = function () {
-            self.addNewSnippet(self.lastUsedSnippet);
-          };
-
-          self.showSnippetModal = function () {
-            $("#addSnippetModal").modal('show');
-          };
-
-          self.addNewSnippet = function (alternative) {
-            clearTimeout(hideTimeout);
-            self.showingHistory(false);
-            self.showingSelectSnippet(false);
-            $("#addSnippetModal").modal('hide');
-
-            // When fewer than 5 it's always in history
-            if (self.snippetHistory().indexOf(alternative) == -1) {
-              self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
-              self.roundCount = (self.roundCount + 1) % 5;
-            }
-
-            self.lastUsedSnippet = alternative;
-            self.notebook.newSnippet(alternative.type())
-          };
-
-          var hideTimeout = -1;
-
-          self.showHistory = function () {
-            clearTimeout(hideTimeout);
-            self.showingHistory(true);
-            self.showingSelectSnippet(true);
-          };
-
-          self.hideHistory = function () {
-            clearTimeout(hideTimeout);
-            hideTimeout = window.setTimeout(function () {
-              self.showingHistory(false);
-              self.showingSelectSnippet(false);
-            }, 500);
-          };
+        for (var i = 0; i < alternativeCount; i++) {
+          result.push({
+            left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS + 'px',
+            top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS + 'px'
+          });
+          currentRad += radIncrements;
         }
 
-        ko.components.register('add-snippet-menu', {
-          viewModel: AddSnippetMenuViewModel,
-          template: { element: 'add-snippet-menu-template' }
-        });
-      }());
-    }));
+        return result;
+      };
+
+      function AddSnippetMenuViewModel(params) {
+        var self = this;
+        self.notebook = params.notebook;
+        self.availableSnippets = params.availableSnippets;
+        self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0, 5)));
+        self.lastUsedSnippet = self.snippetHistory()[0];
+        self.roundCount = 0;
+        self.positions = calculatePositions(self.snippetHistory().length);
+        self.showingHistory = ko.observable(false);
+        self.hasAdditionalSnippets = params.availableSnippets().length > 5;
+        self.showingSelectSnippet = ko.observable(false);
+
+        self.addLastUsedSnippet = function () {
+          self.addNewSnippet(self.lastUsedSnippet);
+        };
+
+        self.showSnippetModal = function () {
+          $("#addSnippetModal").modal('show');
+        };
+
+        self.addNewSnippet = function (alternative) {
+          clearTimeout(hideTimeout);
+          self.showingHistory(false);
+          self.showingSelectSnippet(false);
+          $("#addSnippetModal").modal('hide');
+
+          // When fewer than 5 it's always in history
+          if (self.snippetHistory().indexOf(alternative) == -1) {
+            self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
+            self.roundCount = (self.roundCount + 1) % 5;
+          }
+
+          self.lastUsedSnippet = alternative;
+          self.notebook.newSnippet(alternative.type())
+        };
+
+        var hideTimeout = -1;
+
+        self.showHistory = function () {
+          clearTimeout(hideTimeout);
+          self.showingHistory(true);
+          self.showingSelectSnippet(true);
+        };
+
+        self.hideHistory = function () {
+          clearTimeout(hideTimeout);
+          hideTimeout = window.setTimeout(function () {
+            self.showingHistory(false);
+            self.showingSelectSnippet(false);
+          }, 500);
+        };
+      }
+
+      ko.components.register('add-snippet-menu', {
+        viewModel: AddSnippetMenuViewModel,
+        template: { element: 'add-snippet-menu-template' }
+      });
+    })();
   </script>
 </%def>
 
@@ -462,13 +447,7 @@ except ImportError, e:
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require(['knockout'], factory);
-      } else {
-        factory(ko);
-      }
-    }(function (ko) {
+    (function () {
       function DownloadResultsViewModel (params, element) {
         var self = this;
         self.$downloadForm = $(element).find(".download-form");
@@ -593,6 +572,6 @@ except ImportError, e:
         }},
         template: { element: 'download-results-template' }
       });
-    }));
+    })();
   </script>
 </%def>
