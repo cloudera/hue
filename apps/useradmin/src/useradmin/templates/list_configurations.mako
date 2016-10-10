@@ -24,11 +24,19 @@ from django.contrib.auth.models import Group
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%namespace name="require" file="/require.mako" />
 
 ${commonheader(_('Configurations'), "useradmin", user) | n,unicode}
 ${layout.menubar(section='configurations')}
 
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('metastore/js/metastore.ko.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 
 <script id="app-list" type="text/html">
   <div class="card card-small">
@@ -119,18 +127,10 @@ ${layout.menubar(section='configurations')}
   <!-- ko template: { if: !loading() && !hasErrors() && selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
 
-${ require.config() }
 ${ configKoComponents.config() }
 
 <script type="text/javascript" charset="utf-8">
-  require([
-    'knockout',
-    'desktop/js/apiHelper',
-    'knockout-mapping',
-    'ko.hue-bindings',
-    'knockout-sortable'
-  ], function (ko, apiHelper) {
-
+  (function () {
     var GroupOverride = function (group, allGroups) {
       var self = this;
       self.allGroups = allGroups;
@@ -155,13 +155,13 @@ ${ configKoComponents.config() }
         var groupIndex = {};
         self.allGroups().forEach(function (group) {
           groupIndex[group.id] = group.name;
-        })
+        });
 
         self.groups().forEach(function (groupOverride) {
           groupOverride.group_ids().forEach(function (id) {
             groups[groupIndex[id]] = true;
           })
-        })
+        });
         return Object.keys(groups).sort().join(', ');
       });
     };
@@ -176,7 +176,7 @@ ${ configKoComponents.config() }
 
     var ConfigurationsViewModel = function () {
       var self = this;
-      self.apiHelper = apiHelper.getInstance({
+      self.apiHelper = ApiHelper.getInstance({
         user: '${ user.username }'
       });
       self.hasErrors = ko.observable(false);
@@ -299,7 +299,7 @@ ${ configKoComponents.config() }
 
     ko.applyBindings(new ConfigurationsViewModel());
 
-  });
+  })();
 </script>
 
 ${layout.commons()}

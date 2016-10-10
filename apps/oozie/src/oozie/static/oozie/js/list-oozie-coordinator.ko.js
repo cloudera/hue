@@ -14,17 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define([
-      'knockout',
-      'knockout-mapping',
-      'ko.charts'
-    ], factory);
-  } else {
-    root.RunningCoordinatorModel = factory(ko);
-  }
-}(this, function (ko) {
+var RunningCoordinatorModel = (function () {
 
   var RunningCoordinatorModel = function (actions) {
 
@@ -204,4 +194,4 @@
   };
 
   return RunningCoordinatorModel;
-}));
+})();

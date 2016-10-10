@@ -21,16 +21,27 @@
 
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
-<%namespace name="require" file="/require.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
 
-${ require.config() }
-
-${ assist.assistPanel() }
-
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('metastore/js/metastore.ko.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
 
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
@@ -44,6 +55,8 @@ ${ assist.assistPanel() }
   }
 % endif
 </style>
+
+${ assist.assistPanel() }
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
@@ -169,18 +182,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/javascript" charset="utf-8">
-
-  require([
-    "knockout",
-    "ko.charts",
-    "desktop/js/apiHelper",
-    "assistPanel",
-    "knockout-mapping",
-    "knockout-sortable",
-    "ko.editable",
-    "ko.hue-bindings"
-  ], function (ko, charts, ApiHelper) {
-
+  (function () {
     ko.options.deferUpdates = true;
 
     function PartitionViewModel(options, partition_keys_json, partition_values_json) {
@@ -321,10 +323,8 @@ ${ assist.assistPanel() }
         viewModel.chosenPartitions(_tempList);
         $("#dropPartition").modal("show");
       });
-
     });
-  });
-
+  })();
 </script>
 
 ${ commonfooter(request, messages) | n,unicode }
