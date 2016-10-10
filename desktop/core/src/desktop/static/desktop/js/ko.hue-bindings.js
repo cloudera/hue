@@ -225,18 +225,18 @@
    */
   ko.bindingHandlers.hueSpinner = {
     update: function (element, valueAccessor) {
-      var value = ko.unwrap(valueAccessor);
+      var value = ko.unwrap(valueAccessor());
 
       var options = {
         size: 'default',
-        center: false
+        center: false,
+        overlay: false
       };
 
       var spin = false;
       if (ko.isObservable(valueAccessor())) {
         spin = value();
       } else {
-        var value = valueAccessor();
         $.extend(options, value);
         spin = ko.isObservable(value.spin) ? value.spin() : value.spin;
       }
@@ -244,18 +244,20 @@
       ko.virtualElements.emptyNode(element);
 
       if (spin) {
-        var container = document.createElement('DIV');
-        container.className = 'hue-spinner';
-        var spinner = document.createElement('I');
-        spinner.className = 'fa fa-spinner fa-spin';
-        if (options.size === 'large') {
-          spinner.className += ' hue-spinner-large';
+        var $container = $('<div>');
+        $container.addClass(options.overlay ? 'hue-spinner-overlay' : 'hue-spinner');
+        if (!options.overlay) {
+          var $spinner = $('<i>');
+          $spinner.addClass('fa fa-spinner fa-spin');
+          if (options.size === 'large') {
+            $spinner.addClass('hue-spinner-large');
+          }
+          if (options.center) {
+            $spinner.addClass('hue-spinner-center');
+          }
         }
-        if (options.center) {
-          spinner.className += ' hue-spinner-center';
-        }
-        container.appendChild(spinner);
-        ko.virtualElements.prepend(element, container);
+        $container.append($spinner);
+        ko.virtualElements.prepend(element, $container[0]);
       }
     }
   };
@@ -3697,14 +3699,8 @@
       updateVisibleEntryCount();
 
       // In case this element was rendered before use the last known indices
-      var startIndex = $parentFVOwnerElement.data('startIndex') || 0;
-      var endIndex = $parentFVOwnerElement.data('endIndex') || (visibleEntryCount + elementIncrement);
-      if (startIndex > (allEntries.length-1)) {
-        startIndex = 0
-      }
-      if (endIndex > (allEntries.length - 1)) {
-        endIndex = allEntries.length - 1;
-      }
+      var startIndex = Math.max($parentFVOwnerElement.data('startIndex') || 0, 0);
+      var endIndex = Math.min($parentFVOwnerElement.data('endIndex') || (visibleEntryCount + elementIncrement), allEntries.length - 1);
 
       var huePubSubs = [];
 
@@ -3953,7 +3949,13 @@
           return;
         }
         lastScrollTop = $container.scrollTop();
+
+        var lastEndIndex = endIndex;
         setStartAndEndFromScrollTop();
+        if (typeof options.fetchMore !== 'undefined' && endIndex !== lastEndIndex && endIndex === allEntries.length - 1) {
+          options.fetchMore();
+        };
+
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
             Math.abs($parentFVOwnerElement.data('endIndex') - endIndex) > incrementLimit) {

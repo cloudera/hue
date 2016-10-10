@@ -576,8 +576,9 @@ from metadata.conf import has_navigator
           <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
         </div>
         <div class="assist-flex-fill assist-hdfs-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()">
-            <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-hdfs-scrollable' }">
+          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
               <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
                 <div class="assist-actions table-actions" style="opacity: 0;" >
                   <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
