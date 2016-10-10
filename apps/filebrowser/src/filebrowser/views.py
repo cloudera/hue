@@ -49,7 +49,7 @@ from avro import datafile, io
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, format_preserving_redirect
+from desktop.lib.django_util import render, format_preserving_redirect
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
@@ -523,7 +523,7 @@ def _massage_stats(request, stats):
         'type': filetype(stats['mode']),
         'rwx': rwx(stats['mode'], stats['aclBit']),
         'mode': stringformat(stats['mode'], "o"),
-        'url': make_absolute(request, "view", dict(path=normalized)),
+        'url': reverse('filebrowser.views.view', kwargs=dict(path=normalized)),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
 
