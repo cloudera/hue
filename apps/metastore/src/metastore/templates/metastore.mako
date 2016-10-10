@@ -27,15 +27,21 @@ from desktop.views import commonheader, commonfooter, _ko
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
-<%namespace name="require" file="/require.mako" />
 
 ${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
 
-${ require.config() }
-
-${ assist.assistPanel() }
-
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('metastore/js/metastore.ko.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
@@ -44,6 +50,11 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
@@ -60,6 +71,8 @@ ${ assist.assistPanel() }
   }
 % endif
 </style>
+
+${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-breadcrumbs">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
@@ -1153,17 +1166,7 @@ ${ assist.assistPanel() }
     return _data;
   }
 
-  require([
-    'knockout',
-    'metastore/js/metastore.ko',
-    'ko.charts',
-    'assistPanel',
-    'knockout-mapping',
-    'knockout-sortable',
-    'ko.editable',
-    'ko.hue-bindings',
-    'desktop/ext/js/jquery/plugins/jquery.mousewheel.min'
-  ], function (ko, MetastoreViewModel) {
+  (function () {
 
     ko.options.deferUpdates = true;
 
@@ -1272,7 +1275,7 @@ ${ assist.assistPanel() }
       }
 
     });
-  });
+  })();
 </script>
 
 ${ commonfooter(request, messages) | n,unicode }
