@@ -192,10 +192,15 @@ def dt_logout(request, next_page=None):
   if backends:
     for backend in backends:
       if hasattr(backend, 'logout'):
-        response = backend.logout(request, next_page)
-        if response:
-          return response
+        try:
+          response = backend.logout(request, next_page)
+          if response:
+            return response
+        except Exception, e:
+          LOG.warn('Potential error on logout for user: %s with exception: %s' % (username, e))
 
+  if len(filter(lambda backend: hasattr(backend, 'logout'), backends)) == len(backends):
+    LOG.warn("Failed to log out from all backends for user: %s" % (username))
   return django.contrib.auth.views.logout(request, next_page)
 
 
