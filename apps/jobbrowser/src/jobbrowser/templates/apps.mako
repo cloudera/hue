@@ -18,12 +18,16 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="require" file="/require.mako" />
-
 ${ commonheader("Job Browser", "jobbrowser", user) | n,unicode }
 
-${ require.config() }
-
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('metastore/js/metastore.ko.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
     <div class="navbar-inner">
@@ -226,17 +230,7 @@ ${ require.config() }
 
 
 <script type="text/javascript" charset="utf-8">
-  require([
-    "knockout",
-    "ko.charts",
-    "desktop/js/apiHelper",
-    "notebook/js/notebook.ko",
-    "knockout-mapping",
-    "knockout-sortable",
-    "ko.editable",
-    "ko.hue-bindings"
-  ], function (ko, charts, ApiHelper, EditorViewModel) {
-
+  (function () {
     var Job = function (vm, job) {
       var self = this;
 
@@ -303,7 +297,7 @@ ${ require.config() }
           self.loadingJobs(false);
         });
       };
-    }
+    };
 
     var JobBrowserViewModel = function (options) {
       var self = this;
@@ -326,13 +320,13 @@ ${ require.config() }
         i18n: {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
         }
-      }
+      };
       viewModel = new JobBrowserViewModel(options);
       ko.applyBindings(viewModel);
 
       viewModel.jobs.fetchJobs();
     });
-  });
+  })();
 </script>
 
 ${ commonfooter(request, messages) | n,unicode }

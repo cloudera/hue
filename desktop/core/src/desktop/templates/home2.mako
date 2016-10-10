@@ -20,11 +20,27 @@
 
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="fileBrowser" file="/file_browser.mako" />
-<%namespace name="require" file="/require.mako" />
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
-${ require.config() }
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
+<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
+<script src="${ static('desktop/js/home2.vm.js') }"></script>
 
 ${ assist.assistPanel() }
 ${ fileBrowser.fileBrowser() }
@@ -220,16 +236,7 @@ ${ fileBrowser.fileBrowser() }
 </script>
 
 <script type="text/javascript" charset="utf-8">
-  require([
-    'knockout',
-    'desktop/js/home2.vm',
-    'assistPanel',
-    'fileBrowser',
-    'knockout-mapping',
-    'knockout-sortable',
-    'ko.hue-bindings'
-  ], function (ko, HomeViewModel) {
-
+  (function () {
     ko.options.deferUpdates = true;
 
     var userGroups = [];
@@ -290,7 +297,7 @@ ${ fileBrowser.fileBrowser() }
       huePubSub.publish('init.tour');
 
     });
-  });
+  })();
 
   huePubSub.subscribe('init.tour', function(){
     if ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) {

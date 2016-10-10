@@ -14,13 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (factory) {
-  if(typeof require === "function") {
-    require(['knockout'], factory);
-  } else {
-    factory(ko);
-  }
-}(function (ko) {
+(function () {
 
   ko.HUE_CHARTS = {
     TYPES: {
@@ -1653,4 +1647,4 @@
     d3.tip = tipBuilder;
   }
 
-}));
+})();

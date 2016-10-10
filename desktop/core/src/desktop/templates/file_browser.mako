@@ -730,17 +730,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        define('fileBrowser', [
-          'knockout',
-          'ko.switch-case'
-        ], factory);
-      } else {
-        factory(ko);
-      }
-    }(function (ko) {
-
+    (function () {
       ko.bindingHandlers.trashDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;
@@ -995,6 +985,6 @@ from desktop.views import _ko
         viewModel: FileBrowser,
         template: { element: 'fb-template' }
       });
-    }));
+    })();
   </script>
 </%def>

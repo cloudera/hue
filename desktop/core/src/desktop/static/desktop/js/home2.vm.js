@@ -14,19 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function (root, factory) {
-  if(typeof define === "function" && define.amd) {
-    define([
-      'knockout',
-      'desktop/js/apiHelper',
-      'desktop/js/fileBrowser/hueFileEntry',
-      'knockout-mapping'
-    ], factory);
-  } else {
-    root.HomeViewModel = factory(ko, apiHelper, HueFileEntry);
-  }
-}(this, function (ko, ApiHelper, HueFileEntry) {
-
+var HomeViewModel = (function () {
 
   /**
    * @param {Object} options
@@ -129,4 +117,4 @@
   };
 
   return HomeViewModel;
-}));
+})();

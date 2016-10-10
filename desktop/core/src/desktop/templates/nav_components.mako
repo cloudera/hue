@@ -41,18 +41,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function (factory) {
-      if(typeof require === "function") {
-        require([
-          'knockout',
-          'desktop/js/apiHelper',
-          'selectize'
-        ], factory);
-      } else {
-        factory(ko, ApiHelper);
-      }
-    }(function (ko, ApiHelper) {
-
+    (function () {
       /**
        * @param {object} params
        * @param {String} sourceType
@@ -166,6 +155,6 @@ from metadata.conf import has_navigator
         viewModel: NavTags,
         template: { element: 'nav-tags-template' }
       });
-    }));
+    })();
   </script>
 </%def>
