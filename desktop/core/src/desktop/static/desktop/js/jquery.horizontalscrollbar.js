@@ -44,12 +44,15 @@
           scrollbar.draggable('destroy');
         }
         catch (e) {}
+        var throttleScrollTimeout = -1;
         scrollbar.draggable({
           axis: 'x',
           containment: 'parent',
           drag: function (e, ui) {
             $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left / (scrollbarRail.width() - $(this).width())))
-            $(el).parents('.dataTables_wrapper').trigger('scroll');
+            throttleScrollTimeout = window.setTimeout(function () {
+              $(el).parents('.dataTables_wrapper').trigger('scroll');
+            }, 50);
           }
         });
         $(el).parents('.dataTables_wrapper').bind('mousewheel', function (e) {
@@ -61,7 +64,10 @@
             e.stopPropagation();
             e.stopImmediatePropagation();
             scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
-            $(el).parents('.dataTables_wrapper').trigger('scroll');
+            window.clearTimeout(throttleScrollTimeout);
+            throttleScrollTimeout = window.setTimeout(function () {
+              $(el).parents('.dataTables_wrapper').trigger('scroll');
+            }, 50);
             e.preventDefault();
           }
         });
