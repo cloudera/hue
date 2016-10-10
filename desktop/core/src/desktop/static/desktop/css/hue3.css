@@ -2577,6 +2577,21 @@ body {
   vertical-align: center;
 }
 
+.hue-spinner-overlay {
+  position: absolute;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,.5);
+  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 2s; /* Firefox < 16 */
+  -ms-animation: fadein 2s; /* Internet Explorer */
+  -o-animation: fadein 2s; /* Opera < 12.1 */
+  animation: fadein 2s;
+}
+
 .hue-spinner-center {
   position: absolute;
   left: 50%;

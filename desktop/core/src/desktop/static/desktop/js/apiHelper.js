@@ -29,7 +29,6 @@
   var DOCUMENTS_API = "/desktop/api2/doc/";
   var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
-  var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
@@ -243,11 +242,12 @@
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string[]} options.pathParts
+   * @param {number} [options.pageSize] - Default 500
+   * @param {number} [options.page] - Default 1
    */
   ApiHelper.prototype.fetchHdfsPath = function (options) {
     var self = this;
-    var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + HDFS_PARAMETERS;
-
+    var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });

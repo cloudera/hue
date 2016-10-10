@@ -22,6 +22,8 @@
   }
 }(this, function (ko) {
 
+  var PAGE_SIZE = 50;
+
   /**
    * @param {object} options
    * @param {object} options.definition
@@ -45,11 +47,14 @@
       }
     }
     self.path += self.definition.name;
+    self.currentPage = 1;
+    self.hasMorePages = true;
 
     self.entries = ko.observableArray([]);
 
     self.loaded = false;
     self.loading = ko.observable(false);
+    self.loadingMore = ko.observable(false);
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
 
@@ -75,9 +80,10 @@
       return;
     }
     self.loading(true);
+    self.hasErrors(false);
 
     var successCallback = function(data) {
-      self.hasErrors(false);
+      self.hasMorePages = data.page.next_page_number > self.currentPage;
       var filteredFiles = $.grep(data.files, function (file) {
         return file.name !== '.' && file.name !== '..';
       });
@@ -104,6 +110,8 @@
     };
 
     self.apiHelper.fetchHdfsPath({
+      pageSize: PAGE_SIZE,
+      page: self.currentPage,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -162,6 +170,38 @@
     } else {
       huePubSub.publish('assist.selectHdfsEntry', self);
     }
+  };
+
+  AssistHdfsEntry.prototype.fetchMore = function () {
+    var self = this;
+    if (!self.hasMorePages || self.loadingMore()) {
+      return;
+    }
+    self.currentPage++;
+    self.loadingMore(true);
+    self.hasErrors(false);
+    self.apiHelper.fetchHdfsPath({
+      pageSize: PAGE_SIZE,
+      page: self.currentPage,
+      pathParts: self.getHierarchy(),
+      successCallback: function (data) {
+        self.hasMorePages = data.page.next_page_number > self.currentPage;
+        var filteredFiles = $.grep(data.files, function (file) {
+          return file.name !== '.' && file.name !== '..';
+        });
+        self.entries(self.entries().concat($.map(filteredFiles, function (file) {
+          return new AssistHdfsEntry({
+            definition: file,
+            parent: self,
+            apiHelper: self.apiHelper
+          })
+        })));
+        self.loadingMore(false);
+      },
+      errorCallback: function () {
+        self.hasErrors(true);
+      }
+    });
   };
 
   return AssistHdfsEntry;
