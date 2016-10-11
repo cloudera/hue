@@ -102,18 +102,6 @@ def search_entities_interactive(request):
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
-  fqs = []
-  fq_type = []
-
-  if 'hive' in sources or 'impala' in sources:
-    fq_type.append('TABLE')
-    fq_type.append('VIEW') # 'DATABASE', 'PARTITION', 'FIELD'
-  elif 'hdfs' in sources:
-    fq_type.append('FILE')
-    fq_type.append('DIRECTORY')
-
-  fqs += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-
   response = api.search_entities_interactive(
       query=query_s,
       limit=limit,
@@ -121,8 +109,8 @@ def search_entities_interactive(request):
       facetFields=field_facets,
       facetPrefix=prefix,
       facetRanges=None,
-      filterQueries=fqs,
-      firstClassEntitiesOnly=None
+      firstClassEntitiesOnly=None,
+      sources=sources
   )
 
   response['status'] = 0

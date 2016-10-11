@@ -64,6 +64,18 @@ class NavigatorApi(object):
     self.__params = ()
 
 
+  def _get_types_from_sources(self, sources):
+    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
+
+    if 'sql' in sources or 'hive' in sources or 'impala' in sources:
+      default_entity_types = ('TABLE', 'VIEW')
+      entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
+    elif 'hdfs' in sources:
+      entity_types = ('FILE', 'DIRECTORY')
+      default_entity_types  = ('FILE', 'DIRECTORY')
+      
+    return default_entity_types, entity_types
+
   def search_entities(self, query_s, limit=100, offset=0, **filters):
     """
     Solr edismax query parser syntax.
@@ -74,16 +86,9 @@ class NavigatorApi(object):
       TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
     """
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
-    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
 
     sources = filters.get('sources', [])
-
-    if 'sql' in sources:
-      default_entity_types = ('TABLE', 'VIEW')
-      entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
-    elif 'hdfs' in sources:
-      entity_types = ('FILE', 'DIRECTORY')
-      default_entity_types  = ('FILE', 'DIRECTORY')
+    default_entity_types, entity_types = self._get_types_from_sources(sources)
 
     try:
       params = self.__params
@@ -126,17 +131,31 @@ class NavigatorApi(object):
       raise NavigatorApiException(msg)
 
 
-  def search_entities_interactive(self, query=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None):
+  def search_entities_interactive(self, query=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       pagination = {
         'offset': offset,
         'limit': limit,
       }
 
+      if sources:
+        default_entity_types, entity_types = self._get_types_from_sources(sources)
+        fq_type = []
+      
+        if 'hive' in sources or 'impala' in sources:
+          fq_type = default_entity_types
+        elif 'hdfs' in sources:
+          fq_type = entity_types
+      
+        fqs = ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+        if filterQueries is None:
+          filterQueries = fqs
+        else:
+          filterQueries += fqs
+
       body = {'query': query and query.strip() or '*'}
       
       # TODO
-      # Add default source filters
       # Remove empty filters like 'tag:*'
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
