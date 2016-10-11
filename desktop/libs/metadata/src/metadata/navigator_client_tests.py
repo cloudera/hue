@@ -20,6 +20,9 @@ import logging
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal
 
+from django.contrib.auth.models import User
+
+from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from metadata.conf import has_navigator
@@ -38,7 +41,9 @@ class TestNavigatorclient:
 
   @classmethod
   def setup_class(cls):
-    if not is_live_cluster() or not has_navigator(): # Until v1
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    cls.user = User.objects.get(username='test')
+    if not is_live_cluster() or not has_navigator(cls.user): # Until v1
       raise SkipTest
 
   def test_search_entities(self):

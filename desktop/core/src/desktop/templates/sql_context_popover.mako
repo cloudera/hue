@@ -605,7 +605,7 @@ from metadata.conf import has_navigator
           isColumn: isColumn
         });
 
-        %if has_navigator():
+        %if has_navigator(user):
         self.tabs.push({
           id: 'tags',
           label: '${ _("Tags") }',

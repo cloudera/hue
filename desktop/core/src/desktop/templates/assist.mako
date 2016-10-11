@@ -1415,7 +1415,7 @@ from metadata.conf import has_navigator
           user: params.user
         });
 
-        self.navigatorEnabled = ko.observable('${ has_navigator() }' === 'True');
+        self.navigatorEnabled = ko.observable('${ has_navigator(user) }' === 'True');
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();

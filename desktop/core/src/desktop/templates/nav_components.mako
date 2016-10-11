@@ -15,12 +15,8 @@
 ## limitations under the License.
 
 <%!
-from desktop import conf
-from desktop.conf import USE_NEW_SIDE_PANELS
-from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 from django.utils.translation import ugettext as _
-from metadata.conf import has_navigator
 %>
 
 <%def name="nav_tags()">
@@ -32,7 +28,7 @@ from metadata.conf import has_navigator
      <!-- /ko -->
      <div style="width: 100%" data-bind="ifnot: loading">
        <textarea style="width: 100%" data-bind="tagEditor: {
-          placeholder: '${_ko('No tags found...')}',
+          placeholder: '${_ko('No tags.')}',
           setTags: currentTags,
           onSave: onSave,
           load: loadTags
