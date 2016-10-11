@@ -73,7 +73,7 @@ class NavigatorApi(object):
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
       default_entity_types  = ('FILE', 'DIRECTORY')
-      
+
     return default_entity_types, entity_types
 
   def search_entities(self, query_s, limit=100, offset=0, **filters):
@@ -137,7 +137,7 @@ class NavigatorApi(object):
         'offset': offset,
         'limit': limit,
       }
-      
+
       entity_types = []
       if filterQueries is None:
         filterQueries = []
@@ -145,12 +145,12 @@ class NavigatorApi(object):
       if sources:
         default_entity_types, entity_types = self._get_types_from_sources(sources)
         fq_type = []
-      
+
         if 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
         elif 'hdfs' in sources:
           fq_type = entity_types
-      
+
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       search_terms = [term for term in query_s.strip().split()]
@@ -160,9 +160,9 @@ class NavigatorApi(object):
           query.append(term)
         else:
           name, val = term.split(':')
-          if val and (name != 'type' or val in entity_types):
-            filterQueries.append(term)      
-      body = {'query': query_s and query_s.strip() or '*'}
+          if val and val != '*' and (name != 'type' or val in entity_types):
+            filterQueries.append(term)
+      body = {'query': ' '.join(query) or '*'}
 
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
