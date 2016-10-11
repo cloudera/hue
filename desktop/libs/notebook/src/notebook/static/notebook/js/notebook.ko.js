@@ -637,7 +637,7 @@ var EditorViewModel = (function() {
       if (field) {
         if (self.result.cleanedMeta().length > 0) {
           self.result.cleanedMeta().forEach(function (fld) {
-            if (fld.name.toLowerCase().indexOf(field.toLowerCase()) > -1 || field.toLowerCase().indexOf(fld.name.toLowerCase()) > -1) {
+            if (fld.name.toLowerCase() === field.toLowerCase() || field.toLowerCase() === fld.name.toLowerCase()) {
               _fld = fld.name;
             }
           });
