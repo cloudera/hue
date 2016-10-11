@@ -153,7 +153,7 @@ class NavigatorApi(object):
 
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
-      search_terms = [term for term in query_s.strip().split()]
+      search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
       for term in search_terms:
         if ':' not in term:

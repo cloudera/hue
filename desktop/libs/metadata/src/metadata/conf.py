@@ -63,7 +63,7 @@ def get_navigator_url():
 
 def has_navigator(user):
   return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get()) \
-   and user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
+      and user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
 
 
 OPTIMIZER = ConfigSection(
