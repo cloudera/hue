@@ -884,10 +884,12 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: navigatorEnabled, name: 'assist-panel-navigator-search' }--><!-- /ko -->
-      <div style="position: relative; -ms-flex: 1 1 100%; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': availablePanels.length > 1 ? '10px' : '5px' }, with: visiblePanel">
+      <!-- ko with: visiblePanel -->
+      <!-- ko template: { if: showNavSearch && $parent.navigatorEnabled, name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
+      <div style="position: relative; -ms-flex: 1 1 100%; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': $parent.availablePanels.length > 1 ? '10px' : '5px' }">
         <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       </div>
+      <!-- /ko -->
     </div>
   </script>
 
@@ -1015,6 +1017,7 @@ from metadata.conf import has_navigator
        * @param {number} options.minHeight
        * @param {string} options.icon
        * @param {boolean} options.visible
+       * @param {boolean} [options.showNavSearch] - Default true
        * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel)} panelData
        * @constructor
        */
@@ -1025,6 +1028,7 @@ from metadata.conf import has_navigator
         self.type = options.type;
         self.name = options.name;
         self.panelData = options.panelData;
+        self.showNavSearch = typeof options.showNavSearch !== 'undefined' ? options.showNavSearch : true;
 
         self.visible = ko.observable(options.visible || true);
         options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
@@ -1206,6 +1210,13 @@ from metadata.conf import has_navigator
         }));
       }
 
+      AssistDocumentsPanel.prototype.init = function () {
+        var self = this;
+        if (! self.activeEntry().loaded()) {
+          self.activeEntry().load();
+        }
+      };
+
       /**
        * @param {Object} options
        * @param {ApiHelper} options.apiHelper
@@ -1327,19 +1338,20 @@ from metadata.conf import has_navigator
           minHeight: 50
         }));
 
-##         self.availablePanels.push(new AssistInnerPanel({
-##           panelData: new AssistDocumentsPanel({
-##             user: params.user,
-##             apiHelper: self.apiHelper,
-##             i18n: i18n
-##           }),
-##           apiHelper: self.apiHelper,
-##           name: '${ _("Documents") }',
-##           type: 'documents',
-##           icon: 'fa-files-o',
-##           minHeight: 50,
-##           visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-##         }));
+        self.availablePanels.push(new AssistInnerPanel({
+          panelData: new AssistDocumentsPanel({
+            user: params.user,
+            apiHelper: self.apiHelper,
+            i18n: i18n
+          }),
+          apiHelper: self.apiHelper,
+          name: '${ _("Documents") }',
+          type: 'documents',
+          icon: 'fa-files-o',
+          minHeight: 50,
+          showNavSearch: false,
+          visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+        }));
         % endif
 
         self.performSearch = function () {
@@ -1400,10 +1412,13 @@ from metadata.conf import has_navigator
         };
 
         self.visiblePanel = ko.observable(self.availablePanels[0]);
-        self.visiblePanel.subscribe(function() {
+        self.visiblePanel.subscribe(function(newValue) {
           if (self.navigatorEnabled()) {
             lastQuery = 'refresh';
             self.performSearch();
+          }
+          if (newValue.type === 'documents') {
+            newValue.panelData.init();
           }
         });
 
