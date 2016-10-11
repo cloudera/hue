@@ -78,7 +78,7 @@ class NavigatorApi(object):
 
     sources = filters.get('sources', [])
 
-    if 'hive' in sources or 'impala' in sources:
+    if 'sql' in sources:
       default_entity_types = ('TABLE', 'VIEW')
       entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
     elif 'hdfs' in sources:
@@ -105,11 +105,10 @@ class NavigatorApi(object):
       if query_clauses:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
-      if user_filters:
-        type_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters])
-      else:
-        type_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
-      filter_query = '%s AND (%s)' % (filter_query, type_filter_clause)
+      user_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters]) or '*'
+      source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
+
+      filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
 
       params += (
         ('query', filter_query),
@@ -135,8 +134,12 @@ class NavigatorApi(object):
       }
 
       body = {'query': query and query.strip() or '*'}
+      
+      # TODO
+      # Add default source filters
+      # Remove empty filters like 'tag:*'
 
-      body['facetFields'] = facetFields or [] # Currently mandatory
+      body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
         body['facetPrefix'] = facetPrefix
       if facetRanges:

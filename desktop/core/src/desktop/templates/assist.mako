@@ -1433,7 +1433,7 @@ from metadata.conf import has_navigator
           self.apiHelper.navSearchAutocomplete({
             source: self.visiblePanel().type === 'sql' ?
                 (self.visiblePanel().panelData.selectedSource() ? self.visiblePanel().panelData.selectedSource().sourceType : 'hive') : self.visiblePanel().type,
-            query:  partial + '*',
+            query:  request.term + '*',
             successCallback: function (data) {
               var values = [];
               if (isFacet && typeof data.facets !== 'undefined') {

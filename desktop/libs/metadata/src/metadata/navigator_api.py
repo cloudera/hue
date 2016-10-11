@@ -62,6 +62,9 @@ def error_handler(view_fn):
 
 @error_handler
 def search_entities(request):
+  """
+  For displaying results.
+  """
   api = NavigatorApi()
 
   query_s = request.POST.get('query_s', '')
@@ -87,6 +90,9 @@ def search_entities(request):
 
 @error_handler
 def search_entities_interactive(request):
+  """
+  For search autocomplete.
+  """  
   api = NavigatorApi()
 
   query_s = request.POST.get('query_s', '')
