@@ -39,8 +39,10 @@ class TestNavigatorApi(object):
 
   @classmethod
   def setup_class(cls):
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    cls.user = User.objects.get(username='test')
 
-    if not is_live_cluster() or not has_navigator():
+    if not is_live_cluster() or not has_navigator(cls.user):
       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)

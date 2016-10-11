@@ -22,6 +22,8 @@ from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD a
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root
 
+from metadata.settings import DJANGO_APPS
+
 
 def get_auth_username():
   """Get from top level default from desktop"""
@@ -59,8 +61,9 @@ def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
 
-def has_navigator():
-  return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get())
+def has_navigator(user):
+  return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get()) \
+   and user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
 
 
 OPTIMIZER = ConfigSection(

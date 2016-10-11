@@ -38,7 +38,7 @@ class MetadataApiException(Exception):
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
-      if has_navigator():
+      if has_navigator(args[0].user):
         return view_fn(*args, **kwargs)
       else:
         raise MetadataApiException('Navigator API is not configured.')
