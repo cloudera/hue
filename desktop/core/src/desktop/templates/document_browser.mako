@@ -320,8 +320,7 @@ from desktop.views import _ko
     .doc-browser-search-container {
       position: absolute;
       top: 26px;
-      right: 330px;
-
+      right: 370px;
       -webkit-animation-name: doc-browser-search-visible;
       animation-name: doc-browser-search-visible;
       -webkit-animation-duration: 0.4s;
