@@ -318,7 +318,7 @@ var EditorViewModel = (function() {
 
     self.queriesFilter = ko.observable('');
     self.queriesFilterVisible = ko.observable(false);
-    self.queriesFilter.extend({ rateLimit: 300 });
+    self.queriesFilter.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 900 } });
     self.queriesFilter.subscribe(function(val){
       self.fetchQueries();
     });
@@ -1359,7 +1359,7 @@ var EditorViewModel = (function() {
     });
     self.historyFilter = ko.observable('');
     self.historyFilterVisible = ko.observable(false);
-    self.historyFilter.extend({ rateLimit: 300 });
+    self.historyFilter.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 900 } });
     self.historyFilter.subscribe(function(val){
       self.fetchHistory();
     });
