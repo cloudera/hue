@@ -19,7 +19,7 @@
 %>
 
 <%namespace name="assist" file="/assist.mako" />
-<%namespace name="fileBrowser" file="/file_browser.mako" />
+<%namespace name="docBrowser" file="/document_browser.mako" />
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
@@ -38,12 +38,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
+<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 <script src="${ static('desktop/js/home2.vm.js') }"></script>
 
 ${ assist.assistPanel() }
-${ fileBrowser.fileBrowser() }
+${ docBrowser.docBrowser() }
 
 <style type="text/css">
   html {
@@ -216,8 +216,8 @@ ${ fileBrowser.fileBrowser() }
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }" style="display:none;"><div class="resize-bar">&nbsp;</div></div>
       <div class="right-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
-        <div class="file-browser" data-bind="component: {
-          name: 'file-browser',
+        <div class="doc-browser" data-bind="component: {
+          name: 'doc-browser',
           params: {
             activeEntry: activeEntry
           }
