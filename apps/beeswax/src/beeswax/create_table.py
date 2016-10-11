@@ -26,13 +26,13 @@ from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
+from aws.s3.s3fs import S3FileSystemException
 from desktop.context_processors import get_app_name
 from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
-from hadoop.fs.fsutils import remove_header
 
 from beeswax.common import TERMINATORS
 from beeswax.design import hql_query
@@ -181,7 +181,7 @@ def import_wizard(request, database='default'):
           elif load_data == 'EXTERNAL':
             if not request.fs.isdir(path):
               raise PopupException(_('Path location must refer to a directory if "Create External Table" is selected.'))
-        except IOError, e:
+        except (IOError, S3FileSystemException), e:
           raise PopupException(_('Path location "%s" is invalid: %s') % (path, e))
 
         delim_is_auto = True
