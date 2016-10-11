@@ -92,7 +92,7 @@ def search_entities(request):
 def search_entities_interactive(request):
   """
   For search autocomplete.
-  """  
+  """
   api = NavigatorApi()
 
   query_s = request.POST.get('query_s', '')
@@ -103,7 +103,7 @@ def search_entities_interactive(request):
   sources = json.loads(request.POST.get('sources') or '[]')
 
   response = api.search_entities_interactive(
-      query=query_s,
+      query_s=query_s,
       limit=limit,
       offset=offset,
       facetFields=field_facets,
@@ -112,6 +112,10 @@ def search_entities_interactive(request):
       firstClassEntitiesOnly=None,
       sources=sources
   )
+
+  if response.get('facets'):
+    for facet in response['facets']:
+      response['facets'][facet] = dict((k, v) for k, v in response['facets'][facet].items() if v > 0)
 
   response['status'] = 0
 
