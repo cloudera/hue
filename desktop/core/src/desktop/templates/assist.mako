@@ -983,7 +983,7 @@ from metadata.conf import has_navigator
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;
-          huePubSub.subscribe('file.browser.dragging', function (data) {
+          huePubSub.subscribe('doc.browser.dragging', function (data) {
             dragData = data;
           });
           var $element = $(element);

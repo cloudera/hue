@@ -23,11 +23,11 @@ from desktop.views import _ko
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
-<%def name="fileBrowser()">
+<%def name="docBrowser()">
   ${ hueIcons.symbols() }
 
   <style>
-    .fb-container {
+    .doc-browser-container {
       position: absolute;
       top: 0;
       bottom: 0;
@@ -37,8 +37,8 @@ from desktop.views import _ko
       flex-direction: column;
     }
 
-    .fb-action-bar,
-    .fb-header {
+    .doc-browser-action-bar,
+    .doc-browser-header {
       -ms-flex: 0 0 auto;
       flex: 0 0 auto;
       overflow: hidden;
@@ -50,14 +50,14 @@ from desktop.views import _ko
       flex-wrap: nowrap;
     }
 
-    .fb-header {
+    .doc-browser-header {
       border-bottom: 1px solid #f1f1f1;
       letter-spacing: 0.035em;
       font-size: 15px;
       color: #737373;
     }
 
-    .fb-empty {
+    .doc-browser-empty {
       letter-spacing: 0.035em;
       font-size: 15px;
       color: #737373;
@@ -67,20 +67,20 @@ from desktop.views import _ko
       animation-name: fadeIn;
     }
 
-    .fb-list {
+    .doc-browser-list {
       -ms-flex: 1 1 auto;
       flex: 1 1 auto;
       overflow-y: scroll;
       overflow-x: hidden;
     }
 
-    .fb-breadcrumbs {
+    .doc-browser-breadcrumbs {
       padding: 9px 9px;
       margin: 0 10px 10px 10px;
       list-style: none outside none;
     }
 
-    .fb-breadcrumbs li {
+    .doc-browser-breadcrumbs li {
       line-height: 36px;
       padding: 0;
       vertical-align: middle;
@@ -89,7 +89,7 @@ from desktop.views import _ko
       border-bottom: 2px solid transparent;
     }
 
-    .fb-breadcrumbs .fb-drop-target {
+    .doc-browser-breadcrumbs .doc-browser-drop-target {
       padding: 0 6px;
     }
 
@@ -98,23 +98,23 @@ from desktop.views import _ko
       color: #444;
     }
 
-    .fb-breadcrumbs li:not(.divider):not(.active):hover {
+    .doc-browser-breadcrumbs li:not(.divider):not(.active):hover {
       border-bottom: 2px solid #338BB8;
     }
 
-    .fb-breadcrumbs a {
+    .doc-browser-breadcrumbs a {
       color: #338BB8 !important;
     }
 
-    .fb-breadcrumbs a:hover {
+    .doc-browser-breadcrumbs a:hover {
       text-decoration: none;
     }
 
-    .fb-main-header {
+    .doc-browser-main-header {
       position: relative;
     }
 
-    .fb-folder-actions {
+    .doc-browser-folder-actions {
       display: inline-block;
       position: absolute;
       right: 10px;
@@ -123,20 +123,20 @@ from desktop.views import _ko
       line-height: 50px;
     }
 
-    .fb-folder-actions > div {
+    .doc-browser-folder-actions > div {
       float: left;
     }
 
-    .fb-list {
+    .doc-browser-list {
       padding: 4px 0;
     }
 
-    .fb-entries {
+    .doc-browser-entries {
       list-style: none;
       margin: 0;
     }
 
-    .fb-entries > li {
+    .doc-browser-entries > li {
       clear: both;
       line-height: 42px;
       border: 1px solid transparent;
@@ -146,31 +146,31 @@ from desktop.views import _ko
       cursor: pointer;
     }
 
-    .fb-entries > li:hover:not(.fb-selected) {
+    .doc-browser-entries > li:hover:not(.doc-browser-selected) {
       background-color: #E8F5FE;
     }
 
-    .fb-selected {
+    .doc-browser-selected {
       background-color: #DBE8F1;
     }
 
-    .fb-list i {
+    .doc-browser-list i {
       color: #338BB8;
       font-size: 20px;
       font-weight: lighter;
     }
 
-    .fb-list .hi {
+    .doc-browser-list .hi {
       color: #338BB8;
       font-size: 24px;
     }
 
-    .fb-action {
+    .doc-browser-action {
       font-size: 25px;
       margin-left: 5px;
     }
 
-    .fb-row {
+    .doc-browser-row {
       display: -ms-flexbox;
       display: flex;
       -ms-flex-wrap: nowrap;
@@ -179,7 +179,7 @@ from desktop.views import _ko
       height: 100%;
     }
 
-    .fb-primary-col {
+    .doc-browser-primary-col {
       -ms-flex: 2;
       flex: 2;
       vertical-align: middle;
@@ -190,26 +190,26 @@ from desktop.views import _ko
       padding-right: 20px;
     }
 
-    .fb-header .fb-primary-col {
+    .doc-browser-header .doc-browser-primary-col {
       height: 30px;
       line-height: 30px;
     }
 
-    .fb-row .fb-primary-col {
+    .doc-browser-row .doc-browser-primary-col {
       height: 42px;
     }
 
-    .fb-primary-col .fa {
+    .doc-browser-primary-col .fa {
       vertical-align: middle;
     }
 
-    .fb-primary-col .hi {
+    .doc-browser-primary-col .hi {
       vertical-align: middle;
       display: inline-block;
       margin-bottom: 0.2em;
     }
 
-    .fb-attr-group {
+    .doc-browser-attr-group {
       -ms-flex: 1;
       flex: 1;
       white-space: nowrap;
@@ -218,11 +218,11 @@ from desktop.views import _ko
       height: 30px;
     }
 
-    .fb-row .fb-attr-group {
+    .doc-browser-row .doc-browser-attr-group {
       height: 42px;
     }
 
-    .fb-attr-col {
+    .doc-browser-attr-col {
       display: inline-block;;
       height: 30px;
       line-height: 30px;
@@ -230,37 +230,37 @@ from desktop.views import _ko
       padding-right: 20px;
     }
 
-    .fb-row .fb-attr-col {
+    .doc-browser-row .doc-browser-attr-col {
       margin-bottom: 2px;
     }
 
-    .fb-shared-icon-active {
+    .doc-browser-shared-icon-active {
       color: #338BB8 !important;
     }
 
-    .fb-type {
+    .doc-browser-type {
       width: 140px;
     }
 
-    .fb-owner {
+    .doc-browser-owner {
       width: 170px;
     }
 
-    .fb-modified {
+    .doc-browser-modified {
       width: 150px;
     }
 
-    .fb-drag-container {
+    .doc-browser-drag-container {
       position: fixed;
     }
 
-    .fb-drag-select {
+    .doc-browser-drag-select {
       position: fixed;
       border: 1px solid #338BB8;
       cursor: pointer;
     }
 
-    .fb-drag-helper {
+    .doc-browser-drag-helper {
       display: none;
       position: absolute;
       width: auto;
@@ -279,18 +279,18 @@ from desktop.views import _ko
       z-index: 1000;
     }
 
-    .fb-drag-helper i {
+    .doc-browser-drag-helper i {
       line-height: 30px;
       vertical-align: middle;
       margin-right: 8px;
       font-size: 16px;
     }
 
-    .fb-drop-target {
+    .doc-browser-drop-target {
       border: 1px solid transparent;
     }
 
-    .fb-drop-hover {
+    .doc-browser-drop-hover {
       border: 1px solid #338BB8 !important;
     }
 
@@ -307,28 +307,28 @@ from desktop.views import _ko
       width: 95%;
     }
 
-    @-webkit-keyframes fb-search-visible {
+    @-webkit-keyframes doc-browser-search-visible {
       from { opacity: 0; }
       to { opacity: 1; }
     }
 
-    @keyframes fb-search-visible {
+    @keyframes doc-browser-search-visible {
       from { opacity: 0; }
       to { opacity: 1; }
     }
 
-    .fb-search-container {
+    .doc-browser-search-container {
       position: absolute;
       top: 26px;
       right: 330px;
 
-      -webkit-animation-name: fb-search-visible;
-      animation-name: fb-search-visible;
+      -webkit-animation-name: doc-browser-search-visible;
+      animation-name: doc-browser-search-visible;
       -webkit-animation-duration: 0.4s;
       animation-duration: 0.4s;
     }
 
-    .fb-search-container input {
+    .doc-browser-search-container input {
       width: 300px;
     }
 
@@ -341,8 +341,8 @@ from desktop.views import _ko
     }
   </style>
 
-  <script type="text/html" id="fb-template">
-    <div class="fb-drag-helper">
+  <script type="text/html" id="doc-browser-template">
+    <div class="doc-browser-drag-helper">
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
@@ -388,10 +388,10 @@ from desktop.views import _ko
           </div>
         </div>
         <!-- /ko -->
-        <div class="fb-empty animated" style="display: none;" data-bind="visible: loading">
+        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: loading">
           <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
         </div>
-        <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && ! loading()">
+        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: hasErrors() && ! loading()">
           ${ _('There was an error loading the document.')}
         </div>
         <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
@@ -503,7 +503,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
       <div class="modal-body">
-        <div class="fb-empty animated" style="display: none;" data-bind="visible: selectedDocsWithDependents().length === 0">
+        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: selectedDocsWithDependents().length === 0">
           <i class="fa fa-spinner fa-spin fa-2x"></i>
         </div>
         <ul data-bind="foreach: selectedDocsWithDependents()">
@@ -535,42 +535,42 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div class="fb-container">
-      <div class="fb-action-bar">
-        <h4 class="fb-main-header">
+    <div class="doc-browser-container">
+      <div class="doc-browser-action-bar">
+        <h4 class="doc-browser-main-header">
           <div data-bind="with: activeEntry">
-            <ul class="fb-breadcrumbs">
+            <ul class="doc-browser-breadcrumbs">
               <!-- ko if: isRoot -->
-              <li class="active"><div class="fb-drop-target">${ _('My documents') }</div></li>
+              <li class="active"><div class="doc-browser-drop-target">${ _('My documents') }</div></li>
               <!-- /ko -->
 
               <!-- ko if: definition().isSearchResult -->
-              <li class="active"><div class="fb-drop-target">${ _('Result for') }: <!-- ko text: definition().name --><!-- /ko --></div></li>
+              <li class="active"><div class="doc-browser-drop-target">${ _('Result for') }: <!-- ko text: definition().name --><!-- /ko --></div></li>
               <!-- /ko -->
               <!-- ko ifnot: definition().isSearchResult -->
               <!-- ko foreach: breadcrumbs -->
-              <li><div class="fb-drop-target" data-bind="fileDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
+              <li><div class="doc-browser-drop-target" data-bind="docDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifnot: isRoot -->
-              <li class="active"><div class="fb-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
+              <li class="active"><div class="doc-browser-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
               <!-- /ko -->
               <!-- /ko -->
             </ul>
           </div>
         </h4>
         <!-- ko if: searchVisible -->
-        <div class="fb-search-container">
+        <div class="doc-browser-search-container">
           <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
         </div>
         <!-- /ko -->
         <!-- ko with: activeEntry -->
-        <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <div><a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
+        <div class="doc-browser-folder-actions" data-bind="visible: ! hasErrors()">
+          <div><a class="inactive-action doc-browser-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
             <span class="dropdown">
-              <a class="inactive-action fb-action" title="${_('New document')}" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+              <a class="inactive-action doc-browser-action" title="${_('New document')}" data-toggle="dropdown" data-bind="css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
               <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
                 % if 'beeswax' in apps:
                   <li><a title="${_('Hive Query')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
@@ -599,18 +599,18 @@ from desktop.views import _ko
             </span>
           </div>
           <!-- /ko -->
-          <div><a class="inactive-action fb-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
-          <div><a class="inactive-action fb-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || (selectedEntry() != null && !selectedEntry().isDirectory()) }"><i class="fa fa-fw fa-edit"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || (selectedEntry() != null && !selectedEntry().isDirectory()) }"><i class="fa fa-fw fa-edit"></i></a></div>
 
-          <div><a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() || (sharedWithMeSelected() && superuser) ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a></div>
           <!-- ko if: app === 'documents' -->
-          <div><a class="inactive-action fb-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('Share')}" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
           <!-- /ko -->
-          <div style="margin-top: 2px"><a class="inactive-action fb-action" title="${_('Download')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a></div>
-          <div><a class="inactive-action fb-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
+          <div style="margin-top: 2px"><a class="inactive-action doc-browser-action" title="${_('Download')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div class="margin-left-20" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
-            <a class="inactive-action fb-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
+            <a class="inactive-action doc-browser-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
               <i class="fa fa-fw fa-trash-o"></i>
             </a>
             <ul class="hue-context-menu">
@@ -624,37 +624,37 @@ from desktop.views import _ko
 
       <!-- ko with: activeEntry -->
       <!-- ko if: entries().length > 0 -->
-      <div class="fb-header">
-        <div class="fb-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
-        <div class="fb-attr-group">
-          <div class="fb-attr-col fb-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
-          <div class="fb-attr-col fb-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
-          <div class="fb-attr-col fb-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
+      <div class="doc-browser-header">
+        <div class="doc-browser-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
+        <div class="doc-browser-attr-group">
+          <div class="doc-browser-attr-col doc-browser-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
+          <div class="doc-browser-attr-col doc-browser-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
+          <div class="doc-browser-attr-col doc-browser-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
         </div>
       </div>
       <!-- /ko -->
 
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && ! isTrash()">
-        ${ _('The current folder is empty, you can add a new file or folder form the top right menu')}
+      <div class="doc-browser-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && ! isTrash()">
+        ${ _('The current folder is empty, you can add a new document or folder form the top right menu')}
       </div>
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && isTrash()">
+      <div class="doc-browser-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && isTrash()">
         ${ _('The trash is empty')}
       </div>
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition().isSearchResult">
+      <div class="doc-browser-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition().isSearchResult">
         ${ _('No documents found matching your query')}
       </div>
-      <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
+      <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
         ${ _('There was an error loading the documents')}
       </div>
-      <div class="fb-empty animated" style="display: none;" data-bind="visible: entries().length === 0 && loading()">
+      <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: entries().length === 0 && loading()">
         <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
       </div>
       <!-- /ko -->
 
-      <div class="fb-list" data-bind="with: activeEntry" >
-        <ul class="fb-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
-          <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
-            <div class="fb-row" data-bind="contextMenu: { scrollContainer: '.fb-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
+      <div class="doc-browser-list" data-bind="with: activeEntry" >
+        <ul class="doc-browser-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.doc-browser-list' }">
+          <li data-bind="docSelect: $parent.entries, docDroppable: { entries: $parent.entries }, css: { 'doc-browser-selected': selected }">
+            <div class="doc-browser-row" data-bind="contextMenu: { scrollContainer: '.doc-browser-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
@@ -670,7 +670,7 @@ from desktop.views import _ko
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>
-              <div class="fb-primary-col">
+              <div class="doc-browser-primary-col">
                 <svg class="hi">
                   <!-- ko if: isDirectory -->
                   <use xlink:href="#hi-folder"></use>
@@ -699,9 +699,9 @@ from desktop.views import _ko
                 </svg>
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
               </div>
-              <div class="fb-attr-group">
+              <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
-                <div class="fb-attr-col fb-type">
+                <div class="doc-browser-attr-col doc-browser-type">
                   <!-- ko switch: type -->
                   <!-- ko case: 'directory' -->${ _('Directory')}<!-- /ko -->
                   <!-- ko case: 'link-pigscript' -->${ _('Pig Script')}<!-- /ko -->
@@ -718,8 +718,8 @@ from desktop.views import _ko
                   <!-- /ko -->
                   <!-- /ko -->
                 </div>
-                <div class="fb-attr-col fb-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
-                <div class="fb-attr-col fb-modified" data-bind="text: localeFormat(last_modified)"></div>
+                <div class="doc-browser-attr-col doc-browser-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
+                <div class="doc-browser-attr-col doc-browser-modified" data-bind="text: localeFormat(last_modified)"></div>
                 <!-- /ko -->
               </div>
             </div>
@@ -734,7 +734,7 @@ from desktop.views import _ko
       ko.bindingHandlers.trashDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;
-          huePubSub.subscribe('file.browser.dragging', function (data) {
+          huePubSub.subscribe('doc.browser.dragging', function (data) {
             dragData = data;
           });
           var $element = $(element);
@@ -757,14 +757,14 @@ from desktop.views import _ko
         }
       };
 
-      ko.bindingHandlers.fileDroppable = {
+      ko.bindingHandlers.docDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
           var options = valueAccessor();
           var allEntries = options.entries;
           var $element = $(element);
           var dragToSelect = false;
           var alreadySelected = false;
-          huePubSub.subscribe('fb.drag.to.select', function (value) {
+          huePubSub.subscribe('doc.drag.to.select', function (value) {
             alreadySelected = boundEntry.selected();
             dragToSelect = value;
           });
@@ -779,7 +779,7 @@ from desktop.views import _ko
                   boundEntry.load();
                 }
               }
-              $element.removeClass('fb-drop-hover');
+              $element.removeClass('doc-browser-drop-hover');
             },
             over: function () {
               if (! dragToSelect && boundEntry.isDirectory()) {
@@ -787,20 +787,20 @@ from desktop.views import _ko
                   return entry.selected() && ! entry.isSharedWithMe();
                 }).length;
                 if (movableCount > 0) {
-                  $element.addClass('fb-drop-hover');
+                  $element.addClass('doc-browser-drop-hover');
                 }
               }
             },
             out: function (event, ui) {
               if (! dragToSelect && boundEntry.isDirectory()) {
-                $element.removeClass('fb-drop-hover');
+                $element.removeClass('doc-browser-drop-hover');
               }
             }
           })
         }
       };
 
-      ko.bindingHandlers.fileSelect = {
+      ko.bindingHandlers.docSelect = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
           var $element = $(element);
           $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
@@ -812,8 +812,8 @@ from desktop.views import _ko
           var allRows;
           $element.draggable({
             start: function (event, ui) {
-              allRows = $('.fb-row');
-              var $container = $('.fb-drag-container');
+              allRows = $('.doc-browser-row');
+              var $container = $('.doc-browser-drag-container');
 
               var selectedEntries = $.grep(allEntries(), function (entry) {
                 return entry.selected();
@@ -821,7 +821,7 @@ from desktop.views import _ko
 
               dragToSelect = ! boundEntry.selected();
 
-              huePubSub.publish('file.browser.dragging', {
+              huePubSub.publish('doc.browser.dragging', {
                 selectedEntries: selectedEntries,
                 originEntry: boundEntry.parent,
                 dragToSelect: dragToSelect
@@ -830,7 +830,7 @@ from desktop.views import _ko
               dragStartX = event.clientX;
               dragStartY = event.clientY;
 
-              huePubSub.publish('fb.drag.to.select', dragToSelect);
+              huePubSub.publish('doc.drag.to.select', dragToSelect);
 
               if (dragToSelect && selectedEntries.length > 0 && ! (event.metaKey || event.ctrlKey)){
                 $.each(selectedEntries, function (idx, selectedEntry) {
@@ -849,7 +849,7 @@ from desktop.views import _ko
               }
 
               if (! dragToSelect) {
-                var $helper = $('.fb-drag-helper').clone().show();
+                var $helper = $('.doc-browser-drag-helper').clone().show();
                 var sharedCount = selectedEntries.filter(function (entry) {
                   return entry.isSharedWithMe();
                 }).length;
@@ -863,12 +863,12 @@ from desktop.views import _ko
                   $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
                 } else {
                   $helper.find('.drag-text').text(boundEntry.definition().name);
-                  $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
+                  $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
                 }
 
                 $helper.appendTo($container);
               } else {
-                $('<div>').addClass('fb-drag-select').appendTo('body');
+                $('<div>').addClass('doc-browser-drag-select').appendTo('body');
               }
             },
             drag: function (event) {
@@ -885,7 +885,7 @@ from desktop.views import _ko
                     boundObject.selected(false);
                   }
                 });
-                $('.fb-drag-select').css({
+                $('.doc-browser-drag-select').css({
                   top: startY + 'px',
                   left: startX + 'px',
                   height: Math.max(event.clientY, dragStartY) - startY + 'px',
@@ -894,7 +894,7 @@ from desktop.views import _ko
               }
             },
             stop: function (event) {
-              $('.fb-drag-select').remove();
+              $('.doc-browser-drag-select').remove();
               var elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
               var elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
               if (elementAtStart.nodeName === "A" && elementAtStop.nodeName === "A" && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 8) {
@@ -903,7 +903,7 @@ from desktop.views import _ko
             },
             helper: function (event) {
               if (boundEntry.selected()) {
-                return $('<div>').addClass('fb-drag-container');
+                return $('<div>').addClass('doc-browser-drag-container');
               }
               return $('<div>');
             },
@@ -920,7 +920,7 @@ from desktop.views import _ko
             if (event.metaKey || event.ctrlKey) {
               clickedEntry.selected(!clickedEntry.selected());
             } else if (event.shiftKey) {
-              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-file-index') || 0;
+              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-entry-index') || 0;
               var lower = Math.min(lastClickedIndex, clickedIndex);
               var upper = Math.max(lastClickedIndex, clickedIndex);
               for (var i = lower; i <= upper; i++) {
@@ -937,7 +937,7 @@ from desktop.views import _ko
             var selectedEntries = $.grep(allEntries(), function (entry) {
               return entry.selected();
             });
-            ko.utils.domData.set(document, 'last-clicked-file-index', selectedEntries.length > 0 ? clickedIndex : 0);
+            ko.utils.domData.set(document, 'last-clicked-entry-index', selectedEntries.length > 0 ? clickedIndex : 0);
           };
 
           ko.bindingHandlers.multiClick.init(element, function () {
@@ -954,7 +954,7 @@ from desktop.views import _ko
        * @param {HueFileEntry} params.activeEntry - Observable holding the current directory
        * @constructor
        */
-      function FileBrowser (params) {
+      function DocBrowser (params) {
         var self = this;
         self.activeEntry = params.activeEntry;
 
@@ -973,7 +973,7 @@ from desktop.views import _ko
 
         $(document).click(function (event) {
           var $target = $(event.target);
-          if ($target.parents('.fb-entries, .fb-folder-actions, .fb-header, .fb-search-container, .modal').length === 0) {
+          if ($target.parents('.doc-browser-entries, .doc-browser-folder-actions, .doc-browser-header, .doc-browser-search-container, .modal').length === 0) {
             self.activeEntry().selectedEntries().forEach(function (entry) {
               entry.selected(false);
             });
@@ -981,9 +981,9 @@ from desktop.views import _ko
         });
       }
 
-      ko.components.register('file-browser', {
-        viewModel: FileBrowser,
-        template: { element: 'fb-template' }
+      ko.components.register('doc-browser', {
+        viewModel: DocBrowser,
+        template: { element: 'doc-browser-template' }
       });
     })();
   </script>

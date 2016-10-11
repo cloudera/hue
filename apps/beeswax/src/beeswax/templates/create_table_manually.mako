@@ -41,8 +41,8 @@ ${ layout.metastore_menubar() }
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/fileBrowser/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/fileBrowser/hueFileEntry.js') }"></script>
+<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">

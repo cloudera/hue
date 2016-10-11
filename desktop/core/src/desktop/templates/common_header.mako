@@ -402,6 +402,12 @@ if USE_NEW_EDITOR.get():
         $(this).attr("src", $(this).data("orig"));
         window.clearTimeout(_skew);
       });
+
+      window.hueDebug = {
+        viewModel: function () {
+          return ko.dataFor(document.body);
+        }
+      }
     });
   </script>
 </head>
