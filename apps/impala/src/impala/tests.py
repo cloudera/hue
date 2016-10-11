@@ -29,10 +29,8 @@ import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
-from hadoop import cluster
 from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
-from beeswax import hive_site
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
@@ -41,7 +39,6 @@ from beeswax.tests import _make_query
 
 from impala import conf
 from impala.dbms import ImpalaDbms
-from impala.server import ImpalaServerClient
 
 
 LOG = logging.getLogger(__name__)
