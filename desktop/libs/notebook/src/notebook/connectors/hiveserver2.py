@@ -47,7 +47,6 @@ try:
   from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_CELL_LIMIT
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
-  from beeswax.hive_site import hiveserver2_use_ssl
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -58,7 +57,7 @@ except ImportError, e:
 
 try:
   from impala import api   # Force checking if Impala is enabled
-  from impala.conf import CONFIG_WHITELIST as impala_settings
+  from impala.conf import CONFIG_WHITELIST as impala_settings, SSL as impala_ssl_conf
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
@@ -703,12 +702,12 @@ class HS2Api(Api):
 
     query_id = self._get_impala_query_id(snippet)
     session = Session.objects.get_session(self.user, application='impala')
-    protocol = 'https' if hiveserver2_use_ssl() else 'http'
+    protocol = 'https' if impala_ssl_conf.get().get('enabled') else 'http'
     server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
     if query_id:
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
       fragment = self._get_impala_query_profile(server_url, query_id=query_id)
-      total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: (?P<total_records>\d+).*?Averaged Fragment F\d\d"
+      total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?Averaged Fragment F\d\d"
       total_records_match = re.search(total_records_re, fragment, re.MULTILINE | re.DOTALL)
     if total_records_match:
       total_records = int(total_records_match.group('total_records'))
