@@ -131,12 +131,16 @@ class NavigatorApi(object):
       raise NavigatorApiException(msg)
 
 
-  def search_entities_interactive(self, query=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       pagination = {
         'offset': offset,
         'limit': limit,
       }
+      
+      entity_types = []
+      if filterQueries is None:
+        filterQueries = []
 
       if sources:
         default_entity_types, entity_types = self._get_types_from_sources(sources)
@@ -147,16 +151,19 @@ class NavigatorApi(object):
         elif 'hdfs' in sources:
           fq_type = entity_types
       
-        fqs = ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-        if filterQueries is None:
-          filterQueries = fqs
-        else:
-          filterQueries += fqs
+        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
-      body = {'query': query and query.strip() or '*'}
-      
-      # TODO
-      # Remove empty filters like 'tag:*'
+      search_terms = [term for term in query_s.strip().split()]
+      query = []
+      for term in search_terms:
+        if ':' not in term:
+          query.append(term)
+        else:
+          name, val = term.split(':')
+          if val and (name != 'type' or val in entity_types):
+            filterQueries.append(term)      
+      body = {'query': query_s and query_s.strip() or '*'}
+
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
