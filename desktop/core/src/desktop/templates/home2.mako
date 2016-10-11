@@ -38,6 +38,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
 <script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 <script src="${ static('desktop/js/home2.vm.js') }"></script>

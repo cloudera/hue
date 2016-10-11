@@ -24,7 +24,7 @@ from metadata.conf import has_navigator
 %>
 
 
-<%def name="assistPanel()">
+<%def name="assistPanel(is_s3_enabled=False)">
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
   <%namespace name="nav_components" file="/nav_components.mako" />
 
@@ -527,6 +527,86 @@ from metadata.conf import has_navigator
       </div>
       <!-- ko with: $parents[1] -->
       <!-- ko template: { if: searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="s3-details-content">
+    <!-- ko with: definition -->
+    <div class="assist-details-wrap">
+      <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
+      <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="s3-details-title">
+    <span data-bind="text: definition.name"></span>
+  </script>
+
+  <script type="text/html" id="assist-s3-header-actions">
+    <div class="assist-db-header-actions"style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-s3-inner-panel">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedS3Entry -->
+        <div class="assist-flex-header assist-breadcrumb" >
+          <!-- ko if: parent !== null -->
+          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </a>
+          <!-- /ko -->
+          <!-- ko if: parent === null -->
+          <div>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </div>
+          <!-- /ko -->
+          <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-s3-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+                <div class="assist-actions table-actions" style="opacity: 0;" >
+                  <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
+                    <i class='fa fa-info' title="${ _('Details') }"></i>
+                  </a>
+                </div>
+
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <!-- ko if: definition.type === 'dir' -->
+                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko if: definition.type === 'file' -->
+                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 's3', 'definition': definition} }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -1260,6 +1340,50 @@ from metadata.conf import has_navigator
         });
       }
 
+
+      /**
+       * @param {Object} options
+       * @param {ApiHelper} options.apiHelper
+       * @constructor
+       **/
+      function AssistS3Panel (options) {
+        var self = this;
+        self.apiHelper = options.apiHelper;
+
+        self.selectedS3Entry = ko.observable();
+        var reload = function () {
+          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
+          var parts = lastKnownPath.split('/');
+          parts.shift();
+
+          var currentEntry = new AssistS3Entry({
+            definition: {
+              name: '/',
+              type: 'dir'
+            },
+            parent: null,
+            apiHelper: self.apiHelper
+          });
+
+          currentEntry.loadDeep(parts, function (entry) {
+            self.selectedS3Entry(entry);
+            entry.open(true);
+          });
+        };
+
+        reload();
+
+        huePubSub.subscribe('assist.selectS3Entry', function (entry) {
+          self.selectedS3Entry(entry);
+          self.apiHelper.setInTotalStorage('assist', 'currentS3Path', entry.path);
+        });
+
+        huePubSub.subscribe('assist.s3.refresh', function () {
+          huePubSub.publish('assist.clear.s3.cache');
+          reload();
+        });
+      }
+
       /**
        * @param {Object} params
        * @param {string} params.user
@@ -1337,6 +1461,19 @@ from metadata.conf import has_navigator
           icon: 'fa-folder-o',
           minHeight: 50
         }));
+
+        if (window.IS_S3_ENABLED) { // coming from common_header.mako
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistS3Panel({
+              apiHelper: self.apiHelper
+            }),
+            apiHelper: self.apiHelper,
+            name: '${ _("S3") }',
+            type: 's3',
+            icon: 'fa-cubes',
+            minHeight: 50
+          }));
+        }
 
         self.availablePanels.push(new AssistInnerPanel({
           panelData: new AssistDocumentsPanel({
