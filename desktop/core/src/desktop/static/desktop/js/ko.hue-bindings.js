@@ -3280,6 +3280,12 @@
         }
       });
 
+      huePubSub.subscribe("assist.dblClickS3Item", function(assistS3Entry) {
+        if ($el.data("last-active-editor")) {
+          editor.session.insert(editor.getCursorPosition(), "'S3A://" + assistS3Entry.path + "'");
+        }
+      });
+
       var $tableDropMenu = $el.next('.table-drop-menu');
       var $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier');
 
@@ -3348,6 +3354,9 @@
         drop: function (e, ui) {
           var position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
           var text = ui.helper.text();
+          if (draggableMeta.type === 's3' || draggableMeta.type === 'hdfs'){
+            text = "'" + draggableMeta.definition.path + "'";
+          }
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
           if (draggableMeta.table && ! draggableMeta.column && /.*;|^\s*$/.test(before)) {
