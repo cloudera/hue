@@ -31,6 +31,7 @@ def parse_column(name, type_string, comment=None):
   Returns a dictionary of a Hive column's type metadata and
    any complex or nested type info
   """
+  type_string = type_string.lower()
   column = {
     'name': name,
     'comment': comment or ''
