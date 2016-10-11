@@ -20,6 +20,7 @@ import json
 import logging
 import urllib
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from django.utils.encoding import smart_str
@@ -195,6 +196,9 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       finish()
 
   def test_read_partitions(self):
+    if not is_live_cluster():
+      raise SkipTest
+
     partition_spec = "baz='baz_one',boom='boom_two'"
     response = self.client.get("/metastore/table/%s/test_partitions/partitions/%s/read" % (self.db_name, partition_spec), follow=True)
     response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
