@@ -23,6 +23,8 @@ import stat
 
 from django.utils.translation import ugettext_lazy as _
 
+from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
+
 from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
@@ -30,8 +32,6 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
-from metadata.metadata_sites import get_navigator_server_url, get_navigator_audit_log_dir, \
-                                    get_navigator_audit_max_file_size
 
 
 LOG = logging.getLogger(__name__)

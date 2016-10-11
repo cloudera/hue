@@ -15,8 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = [ "metadata" ]
+DJANGO_APPS = ["metadata"]
 NICE_NAME = "Metadata"
 REQUIRES_HADOOP = False
 MENU_INDEX = -1
 IS_URL_NAMESPACED = True
+
+
+PERMISSION_ACTIONS = (
+  ("write", "Allow edition of metadata like tags."),
+)

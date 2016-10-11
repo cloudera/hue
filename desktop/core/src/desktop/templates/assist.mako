@@ -29,11 +29,9 @@ from metadata.conf import has_navigator
   <%namespace name="nav_components" file="/nav_components.mako" />
 
   ${ sqlContextPopover.sqlContextPopover() }
-  ${ nav_components.nav_tags() }
+  ${ nav_components.nav_tags(readOnly=not user.has_hue_permission(action="write", app="metadata")) }
 
   <style>
-
-
     .assist-icon {
       width: 16px;
       height: 16px;
