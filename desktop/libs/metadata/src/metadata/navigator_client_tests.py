@@ -64,3 +64,4 @@ class TestNavigatorclient:
     # ca es
     # "ca es"
     # ca OR es
+    # tags:a
