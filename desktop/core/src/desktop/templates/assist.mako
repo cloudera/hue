@@ -934,7 +934,8 @@ from metadata.conf import has_navigator
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
             itemTemplate: 'nav-search-autocomp-item',
-            classPrefix: 'nav-'
+            classPrefix: 'nav-',
+            showOnFocus: true
           },
           hasFocus: searchHasFocus,
           clearable: { value: searchInput, onClear: function () { huePubSub.publish('autocomplete.close'); } },
@@ -1566,7 +1567,6 @@ from metadata.conf import has_navigator
           var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
           var beforePartial = request.term.substring(0, request.term.length - partial.length);
 
-
           self.apiHelper.navSearchAutocomplete({
             source: self.visiblePanel().type === 'sql' ?
                 (self.visiblePanel().panelData.selectedSource() ? self.visiblePanel().panelData.selectedSource().sourceType : 'hive') : self.visiblePanel().type,
@@ -1586,7 +1586,7 @@ from metadata.conf import has_navigator
               } else {
                 if (typeof data.facets !== 'undefined') {
                   Object.keys(data.facets).forEach(function (facet) {
-                    if (partial.length > 0 && facet.indexOf(partial) !== -1) {
+                    if (partial.length === 0 || facet.indexOf(partial) !== -1) {
                       values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
                     } else if (partial.length > 0) {
                       Object.keys(data.facets[facet]).forEach(function (facetValue) {
