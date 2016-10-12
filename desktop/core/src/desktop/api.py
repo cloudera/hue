@@ -179,7 +179,7 @@ def massaged_documents_for_json(documents, user):
 
   for document in documents:
     try:
-      url = document.content_object.get_absolute_url()
+      url = document.content_object and hasattr(document.content_object, 'get_absolute_url') and document.content_object.get_absolute_url() or ''
     except:
       LOG.exception('failed to get absolute url')
       # If app of document is disabled
