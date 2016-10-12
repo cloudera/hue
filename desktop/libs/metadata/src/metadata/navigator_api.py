@@ -102,6 +102,94 @@ def search_entities_interactive(request):
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
+
+  f = {
+      "outputFormat" : {
+        "type" : "dynamic"
+      },
+      "name" : {
+        "type" : "dynamic"
+      },
+      "lastModified" : {
+        "type" : "date"
+      },
+      "sourceType" : {
+        "type" : "dynamic"
+      },
+      "parentPath" : {
+        "type" : "dynamic"
+      },
+      "deleteTime" : {
+        "type" : "date"
+      },
+      "lastAccessed" : {
+        "type" : "date"
+      },
+      "type" : {
+        "type" : "dynamic"
+      },
+      "sourceId" : {
+        "type" : "dynamic"
+      },
+      "partitionColNames" : {
+        "type" : "dynamic"
+      },
+      "serDeName" : {
+        "type" : "dynamic"
+      },
+      "created" : {
+        "type" : "date"
+      },
+      "fileSystemPath" : {
+        "type" : "dynamic"
+      },
+      "compressed" : {
+        "type" : "bool"
+      },
+      "clusteredByColNames" : {
+        "type" : "dynamic"
+      },
+      "deleted" : {
+        "type" : "bool"
+      },
+      "originalName" : {
+        "type" : "dynamic"
+      },
+      "owner" : {
+        "type" : "dynamic"
+      },
+      "extractorRunId" : {
+        "type" : "dynamic"
+      },
+      "userEntity" : {
+        "type" : "bool"
+      },
+      "sortByColNames" : {
+        "type" : "dynamic"
+      },
+      "inputFormat" : {
+        "type" : "dynamic"
+      },
+      "serDeLibName" : {
+        "type" : "dynamic"
+      },
+      "originalDescription" : {
+        "type" : "dynamic"
+      },
+      "lastModifiedBy" : {
+        "type" : "dynamic"
+      }
+    }
+
+  field_facets = ["tags", "type"] + f.keys()
+
+  last_query_term = [term for term in query_s.strip().split()][-1]
+
+  if last_query_term and last_query_term != '*':
+    last_query_term = last_query_term.rstrip('*')
+    field_facets = [f for f in field_facets if f.startswith(last_query_term)]
+  field_facets = field_facets[:10]
+
   response = api.search_entities_interactive(
       query_s=query_s,
       limit=limit,
@@ -113,9 +201,11 @@ def search_entities_interactive(request):
       sources=sources
   )
 
-  if response.get('facets'):
-    for facet in response['facets']:
-      response['facets'][facet] = dict((k, v) for k, v in response['facets'][facet].items() if v > 0)
+  if response.get('facets'): # Remove empty facets
+    for fname, fvalues in response['facets'].items():
+      response['facets'][fname] = dict((k, v) for k, v in fvalues.items() if v > 0)
+      if not response['facets'][fname]:
+        del response['facets'][fname]
 
   response['status'] = 0
 

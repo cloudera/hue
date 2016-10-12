@@ -1350,17 +1350,7 @@ from metadata.conf import has_navigator
         });
       }
 
-      var NAV_FACET_ICONS = {
-        'tags': 'fa-tags',
-        'tag': 'fa-tag',
-        'lastModified': 'fa-clock-o',
-        'originalDescription': 'fa-comment-o',
-        'owner': 'fa-user',
-        'type': 'fa-info',
-        'clusterName': 'fa-server',
-        'group': 'fa-users'
-      };
-
+      var NAV_FACET_ICON = 'fa-tags';
       var NAV_TYPE_ICONS = {
         'DATABASE': 'fa-database',
         'TABLE': 'fa-table',
@@ -1595,7 +1585,7 @@ from metadata.conf import has_navigator
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
                   Object.keys(data.facets[facetInQuery]).forEach(function (facetValue) {
                     if (partial === '' || facetValue.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: NAV_FACET_ICONS[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
+                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: NAV_FACET_ICON, description: '' }, value: beforePartial + facetValue})
                     }
                   });
                 }
@@ -1604,12 +1594,12 @@ from metadata.conf import has_navigator
                   Object.keys(data.facets).forEach(function (facet) {
                     if (partial.length === 0 || facet.indexOf(partial) !== -1) {
                       if (Object.keys(data.facets[facet]).length > 0) {
-                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICONS[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
                       }
                     } else if (partial.length > 0) {
                       Object.keys(data.facets[facet]).forEach(function (facetValue) {
                         if (facetValue.indexOf(partial) !== -1) {
-                          values.push({ data: { label: facet + ':' + facetValue, icon: NAV_FACET_ICONS[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                          values.push({ data: { label: facet + ':' + facetValue, icon: NAV_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
                         }
                       });
                     }
