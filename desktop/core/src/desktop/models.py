@@ -1388,6 +1388,10 @@ class Directory(Document2):
 
     documents = documents.exclude(is_history=True).exclude(is_managed=True)
 
+    # Excluding all trashed docs across users
+    trashed_ids = [doc.id for doc in documents if Document2.TRASH_DIR in doc.parent_directory.path]
+    documents = documents.exclude(id__in=trashed_ids)
+
     return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
 
