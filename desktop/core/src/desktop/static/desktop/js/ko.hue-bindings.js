@@ -22,7 +22,9 @@
 
       options = $.extend({
         closeOnEnter: true,
-        classPrefix: 'hue-'
+        classPrefix: 'hue-',
+        showOnFocus: false,
+        minLength: 0
       }, options);
 
       if (typeof $().hueAutocomplete === 'undefined') {
@@ -49,11 +51,17 @@
       }
 
       if (options.closeOnEnter) {
-        $element.keyup(function (e) {
+        $element.on('keyup', function (e) {
           if(e.which === 13) {
             $element.hueAutocomplete('close');
           }
         });
+      }
+
+      if (options.showOnFocus) {
+        $element.on('focus', function () {
+          $element.hueAutocomplete('search', $element.val());
+        })
       }
 
       var closeSubscription = huePubSub.subscribe('autocomplete.close', function () {
