@@ -91,13 +91,15 @@
 
       var $readOnlyContainer = $('<div>').hide().addClass('selectize-control selectize-read-only multi').attr('style', $element.attr('style')).insertAfter($(element));
 
-      $readOnlyContainer.on('mouseover', function () {
-        $readOnlyContainer.find('.selectize-actions').addClass('selectize-actions-visible');
-      });
+      if (!options.readOnly) {
+        $readOnlyContainer.on('mouseover', function () {
+          $readOnlyContainer.find('.selectize-actions').addClass('selectize-actions-visible');
+        });
 
-      $readOnlyContainer.on('mouseout', function () {
-        $readOnlyContainer.find('.selectize-actions').removeClass('selectize-actions-visible');
-      });
+        $readOnlyContainer.on('mouseout', function () {
+          $readOnlyContainer.find('.selectize-actions').removeClass('selectize-actions-visible');
+        });
+      }
 
       $element.hide();
 
@@ -134,11 +136,13 @@
           $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
         }
 
-        $('<i>').addClass('fa fa-edit selectize-edit').appendTo($readOnlyInner);
 
-        $readOnlyInner.click(function () {
-          showEdit();
-        });
+        if (! options.readOnly) {
+          $('<i>').addClass('fa fa-edit selectize-edit pointer').appendTo($readOnlyInner);
+          $readOnlyInner.click(function () {
+            showEdit();
+          });
+        }
 
         $readOnlyContainer.show();
       };
