@@ -56,11 +56,12 @@ nv.models.lineWithBrushChart = function() {
     , defaultState = null
     , noData = 'No Data Available.'
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
-    , controlWidth = function() { return showControls ? 300 : 0 }
+    , controlWidth = function() { return showControls ? (selectionHidden ? 240 : 300) : 0 }
     , transitionDuration = 250
     , extent
     , brushExtent = null
     , selectionEnabled = false
+    , selectionHidden = false
     , onSelectRange = null
     , onStateChange = null
     , onChartUpdate = null
@@ -205,9 +206,10 @@ nv.models.lineWithBrushChart = function() {
       }
 
       if (showControls) {
-        var controlsData = [
-          { key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true }
-        ];
+        var controlsData = [];
+        if (! selectionHidden) {
+          controlsData.push({ key: LABELS.SELECT, disabled: !selectionEnabled, checkbox: true });
+        }
 
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
         g.select('.nv-controlsWrap')
@@ -607,6 +609,17 @@ nv.models.lineWithBrushChart = function() {
     selectionEnabled = true;
     return chart;
   };
+
+  chart.disableSelection = function() {
+    selectionEnabled = false;
+    return chart;
+  };
+
+  chart.hideSelection = function() {
+    selectionHidden = true;
+    selectionEnabled = false;
+    return chart;
+  }
 
   chart.onSelectRange = function(_) {
     if (!arguments.length) return onSelectRange;

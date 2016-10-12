@@ -601,6 +601,7 @@ var EditorViewModel = (function() {
     self.chartScatterGroup = ko.observable(typeof snippet.chartScatterGroup != "undefined" && snippet.chartScatterGroup != null ? snippet.chartScatterGroup : null);
     self.chartScatterSize = ko.observable(typeof snippet.chartScatterSize != "undefined" && snippet.chartScatterSize != null ? snippet.chartScatterSize : null);
     self.chartScope = ko.observable(typeof snippet.chartScope != "undefined" && snippet.chartScope != null ? snippet.chartScope : "world");
+    self.chartTimelineType = ko.observable(typeof snippet.chartTimelineType != "undefined" && snippet.chartTimelineType != null ? snippet.chartTimelineType : "bar");
     self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
     self.chartX.extend({notify: 'always'});
     self.chartXPivot = ko.observable(typeof snippet.chartXPivot != "undefined" && snippet.chartXPivot != null ? snippet.chartXPivot : null);
@@ -612,7 +613,7 @@ var EditorViewModel = (function() {
     self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
 
     self.hasDataForChart = ko.computed(function () {
-      if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
+      if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART || self.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART) {
         return typeof self.chartX() != "undefined" && self.chartX() != null && self.chartYMulti().length > 0;
       }
       return typeof self.chartX() != "undefined" && self.chartX() != null && typeof self.chartYSingle() != "undefined" && self.chartYSingle() != null;
@@ -669,6 +670,7 @@ var EditorViewModel = (function() {
       self.chartScatterGroup(self.previousChartOptions.chartScatterGroup);
       self.chartScatterSize(self.previousChartOptions.chartScatterSize);
       self.chartScope(self.previousChartOptions.chartScope);
+      self.chartTimelineType(self.previousChartOptions.chartTimelineType);
     });
 
     self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
@@ -774,6 +776,7 @@ var EditorViewModel = (function() {
 
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
+        chartTimelineType: typeof self.chartTimelineType() !== "undefined" ? self.chartTimelineType() : self.previousChartOptions.chartTimelineType,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
@@ -2135,6 +2138,7 @@ var EditorViewModel = (function() {
             chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
             chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
             chartScope: typeof snippet.chartScope() !== "undefined" ? snippet.chartScope() : snippet.previousChartOptions.chartScope,
+            chartTimelineType: typeof snippet.chartTimelineType() !== "undefined" ? snippet.chartTimelineType() : snippet.previousChartOptions.chartTimelineType,
             chartSorting: typeof snippet.chartSorting() !== "undefined" ? snippet.chartSorting() : snippet.previousChartOptions.chartSorting,
             chartScatterGroup: typeof snippet.chartScatterGroup() !== "undefined" ? snippet.chartScatterGroup() : snippet.previousChartOptions.chartScatterGroup,
             chartScatterSize: typeof snippet.chartScatterSize() !== "undefined" ? snippet.chartScatterSize() : snippet.previousChartOptions.chartScatterSize
