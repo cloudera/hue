@@ -1194,20 +1194,12 @@ var ApiHelper = (function () {
     }));
   };
 
-  var AVAILABLE_NAV_FACETS = {
-    hive: '["lastModified","originalDescription","owner","tags","type"]',
-    impala: '["lastModified","originalDescription","owner","tags","type"]',
-    hdfs: '["clusterName","lastModified","group","owner","tags","type"]',
-    default: '["tags","type"]'
-  };
-
   ApiHelper.prototype.navSearchAutocomplete = function (options) {
     var self = this;
     $.post('/metadata/api/navigator/search_entities_interactive', {
       query_s: options.query,
       limit: 5,
-      sources: '["' + options.source + '"]',
-      field_facets: AVAILABLE_NAV_FACETS[options.source] || AVAILABLE_NAV_FACETS.default
+      sources: '["' + options.source + '"]'
     }).done(function (data) {
       if (data.status === 0 && !self.successResponseIsError(data)) {
         options.successCallback(data);
