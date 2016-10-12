@@ -1644,11 +1644,8 @@ ${ hueIcons.symbols() }
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
     </ul>
-    <div data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.TIMELINECHART">
-      <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
-    </div>
-    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART">
-      <select data-bind="options: result.cleanedDateTimeMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
+    <div>
+      <select data-bind="options: ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(chartType()) > -1) ? ( chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? result.cleanedDateTimeMeta : result.cleanedMeta ) : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
