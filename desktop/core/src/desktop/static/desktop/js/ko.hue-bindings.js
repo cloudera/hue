@@ -111,8 +111,16 @@
 
       $element.hide();
 
-      var currentSelectize;
 
+      var saveOnClickOutside = function (event) {
+        if ($.contains(document, event.target) && !$.contains($element.next()[0], event.target)) {
+          options.onSave($element.selectize(options)[0].selectize.getValue());
+          $(document).off('click', saveOnClickOutside);
+          showReadOnly();
+        }
+      };
+
+      var currentSelectize;
       var showEdit = function () {
         options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } });
         currentSelectize = $element.selectize(options)[0].selectize;
@@ -127,6 +135,9 @@
         $('<i>').addClass('fa fa-close').click(function () {
           showReadOnly();
         }).appendTo($editActions);
+        window.setTimeout(function () {
+          $(document).on('click', saveOnClickOutside);
+        }, 0);
       };
 
       var showReadOnly = function () {
