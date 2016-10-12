@@ -385,7 +385,7 @@ from metadata.conf import has_navigator
 
     .result-entry {
       clear: both;
-      width: calc(100% - 20px);
+      overflow: hidden;
       margin: 0 10px 15px 10px;
     }
 
@@ -393,11 +393,29 @@ from metadata.conf import has_navigator
       font-style: italic;
       font-size: 12px;
       line-height: 15px;
+      white-space: normal;
+      margin-left: 35px;
+    }
+
+    .nav-search-tags {
+      display: inline-block;
+      margin-left: 3px;
+    }
+
+    .nav-search-tags div {
+      display: inline-block;
+      margin: 0 1px;
+      line-height: 10px;
+      font-size: 11px;
+      padding: 3px 6px;
+      color: #FFF;
+      background-color: #338BB8;
+      border-radius: 6px;
     }
 
     .result-entry .icon-col {
       width: 35px;
-      display: inline-block;
+      float:left;
       vertical-align: top;
       padding-top: 7px;
       font-size: 20px;
@@ -405,8 +423,11 @@ from metadata.conf import has_navigator
     }
 
     .result-entry .doc-col {
-      width: calc(100% - 50px);
-      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .doc-col-no-desc {
+      padding-top: 7px;
     }
 
     .result-entry .hue-icon {
@@ -984,75 +1005,18 @@ from metadata.conf import has_navigator
       <div data-bind="foreach: searchResult" style="overflow-x:hidden">
         <div class="result-entry">
           <div class="icon-col">
-            <!-- ko if: type === 'FILE' -->
-            <i class="fa fa-fw fa-file-o valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'VIEW' -->
-            <i class="fa fa-fw fa-eye valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'DIRECTORY' -->
-            <i class="fa fa-fw fa-folder-o valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'TABLE' -->
-            <i class="fa fa-fw fa-table valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'DATABASE' -->
-            <i class="fa fa-fw fa-database valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'SOURCE' -->
-            <i class="fa fa-fw fa-server valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'SUB_OPERATION' -->
-            <i class="fa fa-fw fa-code-fork valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'FIELD' -->
-            <i class="fa fa-fw fa-columns valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'OPERATION_EXECUTION' -->
-            <i class="fa fa-fw fa-cog valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'OPERATION' -->
-            <i class="fa fa-fw fa-cogs valign-middle"></i>
-            <!-- /ko -->
-            <!-- ko if: type === 'PARTITION' -->
-            <i class="fa fa-fw fa-th valign-middle"></i>
-            <!-- /ko -->
+            <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
           </div>
-          <div class="doc-col">
+          <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
             <!-- ko if: typeof click !== 'undefined' -->
-            <a class="pointer" data-bind="click: click" target="_blank" >
-              <span data-bind="text: parentPath"></span>
-              <span data-bind="text: originalName"></span>
-            </a>
-            <span data-bind="text: tags" class="badge badge-info"></span>
-            <!-- /ko -->
+            <a class="pointer" data-bind="click: click, text: parentPath + ' ' + originalName" target="_blank" ></a>
             <!-- ko if: typeof click === 'undefined' -->
             <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
             <!-- /ko -->
-            <!-- ko if: type === 'DATABASE' -->
-            <div class="doc-desc" data-bind="text: originalDescription"></div>
+            <div class="nav-search-tags" data-bind="foreach: tags"><div data-bind="text: $data"></div></div>
             <!-- /ko -->
-            <!-- ko if: type === 'TABLE' -->
-            <div class="doc-desc" data-bind="text: originalDescription"></div>
-            <!-- /ko -->
-            <!-- ko if:  type === 'VIEW' -->
-            <div class="doc-desc" data-bind="text: originalDescription"></div>
-            <div class="doc-desc" data-bind="text: queryText.substring(0, 150)"></div>
-            <!-- /ko -->
-            <!-- ko if: type === 'FIELD' -->
-            <div class="doc-desc" data-bind="text: originalDescription"></div>
-            <!-- /ko -->
-            <!-- ko if: type === 'PARTITION' -->
-            <div class="doc-desc" data-bind="text: originalDescription"></div>
-            <!-- /ko -->
-            <!-- ko if: type === 'SUB_OPERATION' -->
-            <div class="doc-desc" data-bind="text: metaClassName"></div>
-            <!-- /ko -->
-            <!-- ko if: type === 'SOURCE' -->
-            <div class="doc-desc" data-bind="text: 'Cluster: ' + clusterName"></div>
-            <!-- /ko -->
-            <!-- ko if: type === 'FILE' || type === 'DIRECTORY' -->
-            <div class="doc-desc" data-bind="text: parentPath"></div>
+            <!-- ko if: hasDescription -->
+              <div class="doc-desc" data-bind="text: description"></div>
             <!-- /ko -->
           </div>
         </div>
@@ -1519,27 +1483,72 @@ from metadata.conf import has_navigator
             sources: ko.mapping.toJSON([self.visiblePanel().type])
           }, function (data) {
             data.entities.forEach(function (entity) {
-              if (entity.type === 'DATABASE') {
-                entity.click = function () {
-                  showInAssist(entity);
+              switch (entity.type) {
+                case 'DATABASE': {
+                  entity.icon = 'fa-database';
+                  entity.click = function () {
+                    showInAssist(entity);
+                  };
+                  break;
                 }
-              } else if (entity.type === 'TABLE') {
-                entity.click = function () {
-                  showInAssist(entity);
+                case 'TABLE': {
+                  entity.icon = 'fa-table';
+                  entity.click = function () {
+                    showInAssist(entity);
+                  };
+                  break;
                 }
-              } else if (entity.type === 'FIELD') {
-                entity.click = function () {
-                  showInAssist(entity);
+                case 'VIEW': {
+                  entity.icon = 'fa-eye';
+                  entity.click = function () {
+                    showInAssist(entity);
+                  }
                 }
-              } else if (entity.type === 'SOURCE') {
-                entity.link = entity.sourceUrl;
-              } else if (entity.type === 'OPERATION_EXECUTION') {
-                entity.link = '/jobbrowser/jobs/' + entity.jobID;
-              } else if (entity.type === 'DIRECTORY' || entity.type === 'FILE') {
-                entity.link = '/filebrowser/#' + entity.fileSystemPath;
-              } else {
-                entity.link = '#';
+                case 'FIELD': {
+                  entity.icon = 'fa-columns';
+                  entity.click = function () {
+                    showInAssist(entity);
+                  };
+                  break;
+                }
+                case 'PARTITION': {
+                  entity.icon = 'fa-th';
+                  break;
+                }
+                case 'SOURCE': {
+                  entity.icon = 'fa-server';
+                  entity.description = '${ _("Cluster") }: ' + entity.clusterName;
+                  entity.link = entity.sourceUrl;
+                  break;
+                }
+                case 'OPERATION': {
+                  entity.icon = 'fa-cogs';
+                  break;
+                }
+                case 'OPERATION_EXECUTION': {
+                  entity.icon = 'fa-cog';
+                  entity.link = '/jobbrowser/jobs/' + entity.jobID;
+                  break;
+                }
+                case 'DIRECTORY': {
+                  entity.icon = 'fa-folder-o';
+                  entity.description = entity.parentPath;
+                  entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  break;
+                }
+                case 'FILE': {
+                  entity.icon = 'fa-file-o';
+                  entity.description = entity.parentPath;
+                  entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  break;
+                }
+                case 'SUB_OPERATION': {
+                  entity.icon = 'fa-code-fork';
+                  entity.description = entity.metaClassName;
+                  break;
+                }
               }
+              entity.hasDescription = typeof entity.description !== 'undefined' && entity.description !== null && entity.description.length > 0;
             });
             self.searchResult(data.entities);
             self.searching(false);
