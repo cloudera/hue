@@ -956,7 +956,8 @@ from metadata.conf import has_navigator
             source: navAutocompleteSource,
             itemTemplate: 'nav-search-autocomp-item',
             classPrefix: 'nav-',
-            showOnFocus: true
+            showOnFocus: true,
+            reopenPattern: /.*:$/
           },
           hasFocus: searchHasFocus,
           clearable: { value: searchInput, onClear: function () { huePubSub.publish('autocomplete.close'); } },

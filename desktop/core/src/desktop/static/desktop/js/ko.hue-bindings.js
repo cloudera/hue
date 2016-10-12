@@ -72,6 +72,20 @@
         closeSubscription.remove();
       });
 
+      if (options.reopenPattern) {
+        var oldSelect = options.select;
+        options.select = function (event, ui) {
+          if (oldSelect) {
+            oldSelect(event, ui);
+          }
+          if (options.reopenPattern.test(ui.item.value)) {
+            window.setTimeout(function () {
+              $element.hueAutocomplete('search', $element.val());
+            }, 0);
+          }
+        };
+      }
+
       $element.hueAutocomplete(options);
     }
   };
