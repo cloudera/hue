@@ -20,6 +20,7 @@
     TYPES: {
       LINECHART: "lines",
       BARCHART: "bars",
+      TIMELINECHART: "timeline",
       POINTCHART: "points",
       PIECHART: "pie",
       MAP: "map",
@@ -311,6 +312,9 @@
           }
           chartsNormalState();
         }, 0);
+      }
+      else if (_datum.length > 0) {
+        ko.bindingHandlers.timelineChart.init(element, valueAccessor);
       }
     }
   };
@@ -903,6 +907,8 @@
       $(element).find("svg").empty();
     }
 
+    var _hideSelection = options.hideSelection != null ? options.hideSelection : false;
+
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
         var _chart = nv.models.lineWithBrushChart();
@@ -914,6 +920,9 @@
         }
         if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
           _chart.enableSelection();
+        }
+        if (_hideSelection) {
+          _chart.hideSelection();
         }
         if (options.showControls != null) {
           _chart.showControls(false);
@@ -993,7 +1002,6 @@
 
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
-
         var _chart;
         if (isTimeline) {
           if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
@@ -1003,6 +1011,9 @@
           $(element).data('chart_type', 'multibar_brush');
           if (_datum.length > 0 && _datum[0].values.length > 10) {
             _chart.enableSelection();
+          }
+          if (_hideSelection) {
+            _chart.hideSelection();
           }
           _chart.onSelectRange(function (from, to) {
             chartsUpdatingState();

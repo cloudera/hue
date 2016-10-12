@@ -1626,14 +1626,29 @@ ${ hueIcons.symbols() }
 
 <script type="text/html" id="snippet-chart-settings">
   <div>
+    <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF">
+      <li class="nav-header">${_('type')}</li>
+    </ul>
+    <div data-bind="visible: chartType() != ''">
+      <select data-bind="selectedOptions: chartTimelineType, optionsCaption: '${_ko('Choose a type...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a type...") }', update: chartTimelineType, dropdownAutoWidth: true}">
+        <option value="bar">${ _("Bars") }</option>
+        <option value="line">${ _("Lines") }</option>
+      </select>
+    </div>
+    <!-- /ko -->
+
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
       <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
     </ul>
-    <div data-bind="visible: chartType() != ''">
+    <div data-bind="visible: chartType() != ko.HUE_CHARTS.TYPES.TIMELINECHART">
       <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
+    </div>
+    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART">
+      <select data-bind="options: result.cleanedDateTimeMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
@@ -1643,7 +1658,7 @@ ${ hueIcons.symbols() }
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
     </ul>
 
-    <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && ((chartType() == ko.HUE_CHARTS.TYPES.BARCHART && !chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+    <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && ((chartType() == ko.HUE_CHARTS.TYPES.BARCHART && !chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.LINECHART || chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART)">
       <ul class="unstyled" data-bind="foreach: result.cleanedNumericMeta">
         <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
       </ul>
@@ -1817,6 +1832,11 @@ ${ hueIcons.symbols() }
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
                 <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: multiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+                <!-- /ko -->
+
+                <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+                <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {type: chartTimelineType, skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                      transformer: timelineChartDataTransformer, stacked: false, showLegend: true}, hideSelection: true, visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.MAP -->
@@ -2103,6 +2123,7 @@ ${ hueIcons.symbols() }
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" title="${ _('Charts') }">
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
         <i class="hcha fa-fw hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+        <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART"></i>
         <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
         <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
         <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
@@ -2121,6 +2142,11 @@ ${ hueIcons.symbols() }
         <li>
           <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
             <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+          </a>
+        </li>
+        <li data-bind="visible: result.cleanedDateTimeMeta().length > 0">
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); }">
+            <i class="hcha hcha-timeline-chart"></i> ${_('Time')}
           </a>
         </li>
         <li>
@@ -2695,6 +2721,59 @@ ${ hueIcons.symbols() }
       }
     }
     return _data;
+  }
+
+
+  function timelineChartDataTransformer(rawDatum) {
+    var _datum = [];
+    var _plottedSerie = 0;
+
+    rawDatum.snippet.result.meta().forEach(function (meta) {
+      if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
+        var col = meta.name;
+        var _idxValue = -1;
+        var _idxLabel = -1;
+        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+          if (icol.name == rawDatum.snippet.chartX()) {
+            _idxLabel = idx;
+          }
+          if (icol.name == col) {
+            _idxValue = idx;
+          }
+        });
+
+        if (_idxValue > -1) {
+          var _data = [];
+          var colors = HueColors.cuiD3Scale();
+          $(rawDatum.counts()).each(function (cnt, item) {
+            _data.push({
+              series: _plottedSerie,
+              x: new Date(moment(hueUtils.html2text(item[_idxLabel]).valueOf())),
+              y: item[_idxValue] * 1,
+              color: colors[_plottedSerie % colors.length],
+              obj: item
+            });
+          });
+          if (rawDatum.sorting == "asc") {
+            _data.sort(function (a, b) {
+              return a.y - b.y
+            });
+          }
+          if (rawDatum.sorting == "desc") {
+            _data.sort(function (a, b) {
+              return b.y - a.y
+            });
+          }
+          _datum.push({
+            key: col,
+            values: _data
+          });
+          _plottedSerie++;
+        }
+      }
+    });
+
+    return _datum;
   }
 
   function multiSerieDataTransformer(rawDatum) {
