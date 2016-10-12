@@ -3619,6 +3619,7 @@ ${ hueIcons.symbols() }
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width('100%');
           }
           redrawFixedHeaders();
+          $(window).trigger('resize');
         }, 10)
       });
 
