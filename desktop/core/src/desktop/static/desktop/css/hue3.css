@@ -3106,7 +3106,7 @@ input[type='password']::-ms-reveal {
 }
 
 .ui-widget {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Roboto,Arial,sans-serif;
   font-size: 1em;
 }
 
@@ -3118,7 +3118,7 @@ input[type='password']::-ms-reveal {
 .ui-widget select,
 .ui-widget textarea,
 .ui-widget button {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Roboto,Arial,sans-serif;
   font-size: 1em;
 }
 

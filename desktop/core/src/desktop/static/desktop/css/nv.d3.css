@@ -55,3 +55,17 @@ svg:not(.leaflet-zoom-animated) {
   width: 100%;
   height: 100%
 }
+
+.nvtooltip {
+  font-family: Roboto,Arial,sans-serif;
+}
+
+.nvtooltip h3 {
+  line-height: 13px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.nvtooltip p {
+  font-size: 12px;
+}

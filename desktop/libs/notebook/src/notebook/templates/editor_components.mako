@@ -2745,7 +2745,7 @@ ${ hueIcons.symbols() }
           $(rawDatum.counts()).each(function (cnt, item) {
             _data.push({
               series: _plottedSerie,
-              x: new Date(moment(hueUtils.html2text(item[_idxLabel]).valueOf())),
+              x: new Date(moment(hueUtils.html2text(item[_idxLabel])).valueOf()),
               y: item[_idxValue] * 1,
               color: colors[_plottedSerie % colors.length],
               obj: item

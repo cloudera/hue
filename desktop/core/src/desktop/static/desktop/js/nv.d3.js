@@ -722,6 +722,7 @@ window.nv.tooltip.* also has various helper methods.
            pos[1] = pos[1] - parentContainer.scrollTop;
         }
         nv.tooltip.calcTooltipPosition(pos, gravity, dist, container);
+
   };
 
   //Looks up the ancestry of a DOM element, and returns the first NON-svg node.
@@ -820,6 +821,7 @@ window.nv.tooltip.* also has various helper methods.
                 top = pos[1] - height - dist;
                 var tLeft = tooltipLeft(container);
                 var tTop = tooltipTop(container);
+                windowWidth = nv.tooltip.findTotalOffsetLeft(container.parentElement, 0) + container.parentElement.scrollWidth;
                 if (tLeft < scrollLeft) left = scrollLeft + 5;
                 if (tLeft + width > windowWidth) left = left - width/2 + 5;
                 if (scrollTop > tTop) top = scrollTop;
@@ -836,7 +838,7 @@ window.nv.tooltip.* also has various helper methods.
             container.style.left = left+'px';
             container.style.top = Math.max(top, 0)+'px';
             container.style.opacity = 1;
-            container.style.position = 'absolute'; 
+            container.style.position = 'absolute';
 
             return container;
     };
