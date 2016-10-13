@@ -123,7 +123,7 @@ var HueColors = {
     });
 
     // optimal visual sequence by contrasting colors
-    var sequence = ['blue-gray', 'pink', 'blue', 'lime', 'steel', 'purple', 'teal', 'red', 'orange', 'green'],
+    var sequence = ['blue', 'lime', 'blue-gray', 'pink', 'steel', 'purple', 'teal', 'red', 'orange', 'green'],
       wholeSpectrum = [],
       sequenceHalfLength = sequence.length / 2;
 

@@ -117,7 +117,7 @@ Array.prototype.diff = function (a) {
   };
 
   hueUtils.html2text = function (value){
-    return $('<div/>').html(value).text();
+    return $('<div/>').html(value).text().replace(/\u00A0/g, ' ');
   };
 
   hueUtils.goFullScreen = function () {
