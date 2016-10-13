@@ -27,6 +27,8 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import thrift_util
 from desktop.conf import DEFAULT_USER
+from desktop.models import Document2
+from beeswax import conf
 from hadoop import cluster
 
 from TCLIService import TCLIService
@@ -40,7 +42,7 @@ from beeswax import conf as beeswax_conf
 from beeswax import hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
-from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
+from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
 
@@ -617,8 +619,64 @@ class HiveServerClient:
     return session
 
 
-  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
-    session = Session.objects.get_session(self.user, self.query_server['server_name'])
+  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS,
+           withMultipleSession=False):
+    (res, session) = self.call_return_result_and_session(fn, req, status, withMultipleSession)
+    return res
+
+
+  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS,
+                                     withMultipleSession=False):
+
+    n_sessions = conf.MAX_NUMBER_OF_SESSIONS.get()
+
+    # When a single session is allowed, avoid multiple session logic
+    if n_sessions == 1:
+      withMultipleSession = False
+
+    session = None
+
+    if not withMultipleSession:
+
+      # Default behaviour: get one session
+      session = Session.objects.get_session(self.user, self.query_server['server_name'])
+
+    else:
+
+      # Get 2 + n_sessions sessions and filter out the busy ones
+      sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
+      LOG.debug('%s sessions found' % len(sessions))
+      if sessions:
+        # Include trashed documents to keep the query lazy
+        # and avoid retrieving all documents
+        docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
+        busy_sessions = set()
+
+        # Only check last 40 documents for performance
+        for doc in docs[:40]:
+          snippet_data = json.loads(doc.data)['snippets'][0]
+          session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
+          status = snippet_data.get('status')
+
+          if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
+            if session_guid is not None and session_guid not in busy_sessions:
+              busy_sessions.add(session_guid)
+
+        n_busy_sessions = 0
+        available_sessions = []
+        for session in sessions:
+          if session.guid not in busy_sessions:
+            available_sessions.append(session)
+          else:
+            n_busy_sessions += 1
+
+        if n_busy_sessions == n_sessions:
+          raise Exception('Too many open sessions. Stop a running query before starting a new one')
+
+        if available_sessions:
+          session = available_sessions[0]
+        else:
+          session = None # No available session found
 
     if session is None:
       session = self.open_session(self.user)
@@ -632,8 +690,11 @@ class HiveServerClient:
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
         re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
       LOG.info('Retrying with a new session because for %s of %s' % (self.user, res))
+      session.status_code = TStatusCode.INVALID_HANDLE_STATUS
+      session.save()
 
       session = self.open_session(self.user)
+
       req.sessionHandle = session.get_handle()
 
       # Get back the name of the function to call
@@ -647,7 +708,7 @@ class HiveServerClient:
         message = ''
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
     else:
-      return res
+      return (res, session)
 
 
   def close_session(self, sessionHandle):
@@ -762,7 +823,7 @@ class HiveServerClient:
     return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
-  def execute_async_query(self, query, statement=0):
+  def execute_async_query(self, query, statement=0, withMultipleSession=False):
     if statement == 0:
       # Impala just has settings currently
       if self.query_server['server_name'] == 'beeswax':
@@ -778,7 +839,8 @@ class HiveServerClient:
     configuration.update(self._get_query_configuration(query))
     query_statement = query.get_query_statement(statement)
 
-    return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
+    return self.execute_async_statement(statement=query_statement, confOverlay=configuration,
+                                        withMultipleSession=withMultipleSession)
 
 
   def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_NEXT):
@@ -791,18 +853,19 @@ class HiveServerClient:
     return self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation), res.operationHandle
 
 
-  def execute_async_statement(self, statement, confOverlay):
+  def execute_async_statement(self, statement, confOverlay, withMultipleSession=False):
     if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
-    res = self.call(self._client.ExecuteStatement, req)
+    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, withMultipleSession=withMultipleSession)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
                                  guid=res.operationHandle.operationId.guid,
                                  operation_type=res.operationHandle.operationType,
                                  has_result_set=res.operationHandle.hasResultSet,
-                                 modified_row_count=res.operationHandle.modifiedRowCount)
+                                 modified_row_count=res.operationHandle.modifiedRowCount,
+                                 session_guid=session.guid)
 
 
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
@@ -1046,8 +1109,8 @@ class HiveServerClientCompatible(object):
     self.query_server = client.query_server
 
 
-  def query(self, query, statement=0):
-    return self._client.execute_async_query(query, statement)
+  def query(self, query, statement=0, withMultipleSession=False):
+    return self._client.execute_async_query(query, statement, withMultipleSession=withMultipleSession)
 
 
   def get_state(self, handle):

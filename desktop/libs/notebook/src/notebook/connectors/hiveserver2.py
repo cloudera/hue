@@ -229,7 +229,7 @@ class HS2Api(Api):
     try:
       if statement.get('statement_id') == 0:
         db.use(query.database)
-      handle = db.client.query(query)
+      handle = db.client.query(query, withMultipleSession=True)
     except QueryServerException, ex:
       raise QueryError(ex.message, handle=statement)
 
@@ -242,6 +242,7 @@ class HS2Api(Api):
       'has_result_set': handle.has_result_set,
       'modified_row_count': handle.modified_row_count,
       'log_context': handle.log_context,
+      'session_guid': handle.session_guid
     }
     response.update(statement)
 
@@ -618,7 +619,10 @@ class HS2Api(Api):
 
 
   def _get_handle(self, snippet):
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    try:
+      snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    except KeyError, ex:
+      raise Exception('Operation has no valid handle attached')
 
     for key in snippet['result']['handle'].keys():
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):

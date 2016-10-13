@@ -395,6 +395,12 @@ class SessionManager(models.Manager):
     except Session.DoesNotExist, e:
       return None
 
+  def get_n_sessions(self, user, n, application='beeswax', filter_open=True):
+    q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
+    if filter_open:
+      q = q.filter(status_code=0)
+    return q.order_by("-last_used")[0:n]
+
 
 class Session(models.Model):
   """
@@ -428,7 +434,7 @@ class Session(models.Model):
 
 
 class QueryHandle(object):
-  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None):
+  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None, session_guid=None):
     self.secret = secret
     self.guid = guid
     self.operation_type = operation_type
@@ -449,10 +455,13 @@ class HiveServerQueryHandle(QueryHandle):
   QueryHandle for Hive Server 2.
 
   Store THandleIdentifier base64 encoded in order to be unicode compatible with Django.
+
+  Also store session handle if provided.
   """
   def __init__(self, **kwargs):
     super(HiveServerQueryHandle, self).__init__(**kwargs)
     self.secret, self.guid = self.get_encoded()
+    self.session_guid = kwargs.get('session_guid')
 
   def get(self):
     return self.secret, self.guid

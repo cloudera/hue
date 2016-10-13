@@ -954,8 +954,8 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     return latest_doc
 
-  def get_history(self, user, doc_type):
-    return self.documents(user, perms='owned', include_history=True).filter(type=doc_type, is_history=True)
+  def get_history(self, user, doc_type, include_trashed=False):
+    return self.documents(user, perms='owned', include_history=True, include_trashed=include_trashed).filter(type=doc_type, is_history=True)
 
   def get_home_directory(self, user):
     try:
