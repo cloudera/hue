@@ -2932,8 +2932,10 @@
             e.data.errors.forEach(function (error) {
               if (error.expected.length > 0) {
                 var token = editor.session.getTokenAt(error.loc.first_line - 1, error.loc.first_column);
-                token.error = error;
-                editor.session.addMarker(new AceRange(error.loc.first_line - 1, error.loc.first_column, error.loc.last_line - 1, error.loc.last_column), 'hue-ace-error', 'fail');
+                if (token) {
+                  token.error = error;
+                  editor.session.addMarker(new AceRange(error.loc.first_line - 1, error.loc.first_column, error.loc.last_line - 1, error.loc.last_column), 'hue-ace-error', 'fail');
+                }
               }
             });
           }
