@@ -627,7 +627,8 @@
         <!-- ko if: associatedDocument -->
           <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
               source: $root.documentsAutocompleteSource,
-              minLength: 0,
+              showOnFocus: true,
+              blurOnEnter: true,
               type: associatedDocument().type,
               create: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
               select: function (event, ui) { ko.dataFor(event.target).properties.uuid(ui.item.value); this.value = ui.item.label; return false;},
