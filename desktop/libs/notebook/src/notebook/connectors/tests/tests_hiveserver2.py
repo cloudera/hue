@@ -730,45 +730,58 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     if not is_live_cluster():
       raise SkipTest
 
-    # Assert that a query that runs a job will return rows
-    statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
-    doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
-    notebook = Notebook(document=doc)
+    # Create session so that session object is saved to DB for server URL lookup
+    session = self.api.create_session(lang='impala')
 
-    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
-    self.client.post(reverse('notebook:fetch_result_data'),
-                     {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100, 'startOver': 'false'})
-    response = self.client.post(reverse('notebook:fetch_result_size'),
-                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+    try:
+      # Assert that a query that runs a job will return rows
+      statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
+      doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
+      notebook = Notebook(document=doc)
+      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
 
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_true('size' in data['result'])
-    assert_equal(23, data['result']['rows'])
-    assert_equal(None, data['result']['size'])
+      self.client.post(reverse('notebook:fetch_result_data'),
+                       {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100, 'startOver': 'false'})
+
+      response = self.client.post(reverse('notebook:fetch_result_size'),
+                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+      data = json.loads(response.content)
+      assert_equal(0, data['status'], data)
+      assert_true('result' in data)
+      assert_true('rows' in data['result'])
+      assert_true('size' in data['result'])
+      assert_equal(23, data['result']['rows'])
+      assert_equal(None, data['result']['size'])
+    finally:
+      self.api.close_session(session)
 
 
   def test_fetch_result_abbreviated(self):
     if not is_live_cluster():
       raise SkipTest
 
-    # Assert that abbreviated rows returned (e.g. - 1.00K) still returns actual rows
-    statement = "SELECT * FROM web_logs;"
-    doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
-    notebook = Notebook(document=doc)
-    snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+    # Create session so that session object is saved to DB for server URL lookup
+    session = self.api.create_session(lang='impala')
 
-    self.client.post(reverse('notebook:fetch_result_data'),
-                     {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100,
-                      'startOver': 'false'})
+    try:
 
-    response = self.client.post(reverse('notebook:fetch_result_size'),
-                              {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+      # Assert that abbreviated rows returned (e.g. - 1.00K) still returns actual rows
+      statement = "SELECT * FROM web_logs;"
+      doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
+      notebook = Notebook(document=doc)
+      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
 
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_equal(1000, data['result']['rows'])
+      self.client.post(reverse('notebook:fetch_result_data'),
+                       {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100, 'startOver': 'false'})
+
+      response = self.client.post(reverse('notebook:fetch_result_size'),
+                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
+
+      data = json.loads(response.content)
+      assert_equal(0, data['status'], data)
+      assert_true('result' in data)
+      assert_true('rows' in data['result'])
+      assert_equal(1000, data['result']['rows'])
+    finally:
+      self.api.close_session(session)
