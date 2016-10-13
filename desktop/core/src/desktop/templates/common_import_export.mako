@@ -35,7 +35,7 @@ from django.utils.translation import ugettext as _
   <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
     <div class="modal-body form-inline">
       <div class="pull-right">
-        <a href="#" class="btn" data-dismiss="modal" data-clear="fileupload">${ _('Cancel') }</a>
+        <input type="button" class="btn" data-dismiss="modal" data-clear="fileupload" value="${ _('Cancel') }" />
         <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
       </div>
       <div class="fileupload fileupload-new" data-provides="fileupload">
@@ -52,3 +52,18 @@ from django.utils.translation import ugettext as _
     </div>
   </form>
 </div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#import-documents input[type="file"]').val('');
+    $('#import-documents input[type="submit"]').attr('disabled', 'disabled');
+    $('#import-documents input[type="file"]').on('change', function () {
+      if ($(this).val() !== '') {
+        $('#import-documents input[type="submit"]').removeAttr('disabled');
+      }
+      else {
+        $('#import-documents input[type="submit"]').attr('disabled', 'disabled');
+      }
+    });
+  });
+</script>
