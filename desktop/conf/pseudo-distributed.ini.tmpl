@@ -897,6 +897,9 @@
   # This will free all the query resources in HiveServer2, but also make its results inaccessible.
   ## close_queries=false
 
+  # Hue will use at most this many HiveServer2 sessions per user at a time
+  ## max_number_of_sessions=1
+
   # Thrift version to use when communicating with HiveServer2.
   # New column format is from version 7.
   ## thrift_version=7

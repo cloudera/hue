@@ -119,6 +119,13 @@ CLOSE_QUERIES = Config(
   default=False
 )
 
+MAX_NUMBER_OF_SESSIONS = Config(
+  key="max_number_of_sessions",
+  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"),
+  type=int,
+  default=1
+)
+
 THRIFT_VERSION = Config(
   key="thrift_version",
   help=_t("Thrift version to use when communicating with HiveServer2."),
