@@ -3421,20 +3421,25 @@
       var autocompleteThrottle = -1;
       editor.commands.on("afterExec", function (e) {
         if (editor.getOption('enableLiveAutocompletion') && e.command.name === "insertstring") {
+          if (/\S+\(\)$/.test(e.args)) {
+            editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - 1);
+            return;
+          }
           window.clearTimeout(autocompleteThrottle);
           autocompleteThrottle = window.setTimeout(function () {
-              var questionMarkMatch = editor.getTextBeforeCursor().match(/select \? from \S+[^.]$/i);
-              if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
-                editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
-                editor.removeTextBeforeCursor(1);
-                window.setTimeout(function () {
-                  editor.execCommand("startAutocomplete");
-                }, 1);
-              } else if (/\.$/.test(editor.getTextBeforeCursor())) {
-                window.setTimeout(function () {
-                  editor.execCommand("startAutocomplete");
-                }, 1);
-              }
+            var textBeforeCursor = editor.getTextBeforeCursor();
+            var questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]$/i);
+            if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
+              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
+              editor.removeTextBeforeCursor(1);
+              window.setTimeout(function () {
+                editor.execCommand("startAutocomplete");
+              }, 1);
+            } else if (/\.$/.test(textBeforeCursor)) {
+              window.setTimeout(function () {
+                editor.execCommand("startAutocomplete");
+              }, 1);
+            }
           }, 400);
         }
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
