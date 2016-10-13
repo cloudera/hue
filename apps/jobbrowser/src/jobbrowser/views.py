@@ -68,30 +68,36 @@ def check_job_permission(view_func):
   """
   def decorate(request, *args, **kwargs):
     jobid = kwargs['job']
-    try:
-      job = get_api(request.user, request.jt).get_job(jobid=jobid)
-    except ApplicationNotRunning, e:
-      if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
-        rm_pool = resource_manager_api.get_resource_manager_pool()
-        rm_api = rm_pool.get(request.user.username)
-        job = Application(e.job, rm_api)
-        rm_pool.put(rm_api)
-      else:
-        # reverse() seems broken, using request.path but beware, it discards GET and POST info
-        return job_not_assigned(request, jobid, request.path)
-    except JobExpired, e:
-      raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
-    except Exception, e:
-      msg = 'Could not find job %s.'
-      LOG.exception(msg % jobid)
-      raise PopupException(_(msg) % jobid, detail=e)
+    job = get_job(request, job_id=jobid)
 
     if not SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
     return view_func(request, *args, **kwargs)
+
   return wraps(view_func)(decorate)
+
+
+def get_job(request, job_id):
+  try:
+    job = get_api(request.user, request.jt).get_job(jobid=job_id)
+  except ApplicationNotRunning, e:
+    if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
+      rm_pool = resource_manager_api.get_resource_manager_pool()
+      rm_api = rm_pool.get(request.user.username)
+      job = Application(e.job, rm_api)
+      rm_pool.put(rm_api)
+    else:
+      # reverse() seems broken, using request.path but beware, it discards GET and POST info
+      return job_not_assigned(request, job_id, request.path)
+  except JobExpired, e:
+    raise PopupException(_('Job %s has expired.') % job_id, detail=_('Cannot be found on the History Server.'))
+  except Exception, e:
+    msg = 'Could not find job %s.'
+    LOG.exception(msg % job_id)
+    raise PopupException(_(msg) % job_id, detail=e)
+  return job
 
 
 def apps(request):

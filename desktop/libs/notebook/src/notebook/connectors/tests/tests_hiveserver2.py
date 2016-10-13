@@ -660,7 +660,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(0, data['status'], data)
     assert_true('result' in data)
     assert_true('rows' in data['result'])
+    assert_true('size' in data['result'])
     assert_equal(823, data['result']['rows'])
+    assert_true(data['result']['size'] > 0, data['result'])
 
     # Assert that a query with multiple jobs returns rows
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
@@ -676,6 +678,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_true('result' in data)
     assert_true('rows' in data['result'])
     assert_equal(23, data['result']['rows'])
+    assert_true(data['result']['size'] > 0, data['result'])
 
 
   def test_fetch_result_size_spark(self):
