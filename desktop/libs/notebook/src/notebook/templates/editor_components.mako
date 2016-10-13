@@ -3586,6 +3586,7 @@ ${ hueIcons.symbols() }
           create: function (event, ui) {
             initialPosition = $("#snippet_" + snippet.id()).find('.resize-bar').position().left;
             $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth', span3Width);
+            $("#snippet_" + snippet.id()).find('.meta-filter').width($("#snippet_" + snippet.id()).find('.table-results .column-side').width() - 28)
           },
           drag: function (event, ui) {
             if (initialPosition == 0){
