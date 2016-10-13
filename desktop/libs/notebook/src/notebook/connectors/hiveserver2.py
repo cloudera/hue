@@ -21,10 +21,8 @@ import logging
 import re
 import StringIO
 import struct
-import time
 
 from django.core.urlresolvers import reverse
-from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
@@ -64,7 +62,7 @@ except ImportError, e:
   impala_settings = None
 
 try:
-  from jobbrowser.views import job_single_logs
+  from jobbrowser.views import get_job
 except (AttributeError, ImportError), e:
   LOG.warn("Job Browser app is not enabled")
 
@@ -642,31 +640,34 @@ class HS2Api(Api):
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
 
 
-  def _get_syslog(self, job_id):
-    # TODO: Refactor this (and one in oozie_batch.py) to move to jobbrowser
-    syslog = None
-    q = QueryDict(self.request.GET, mutable=True)
-    q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
-    self.request.GET = q
+  def _parse_job_counters(self, job_id):
+    # Attempt to fetch total records from the job's Hive counter
+    total_records, total_size = None, None
+    job = get_job(self.request, job_id=job_id)
 
-    attempts = 0
-    max_attempts = 10
-    while syslog is None and attempts < max_attempts:
-      data = job_single_logs(self.request, **{'job': job_id})
-      if data:
-        log_output = data['logs'][3]
-        if log_output.startswith('Unable to locate'):
-          LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
-          time.sleep(2.0)
-        else:
-          syslog = log_output
-      attempts += 1
+    if not job or not job.counters:
+      raise PopupException(_('Failed to get job details or job does not contain counters data.'))
 
-    return syslog
+    counter_groups = job.counters.get('counterGroup')  # Returns list of counter groups with 'counterGroupName' and 'counter'
+    if counter_groups:
+      # Extract totalCounterValue from HIVE counter group
+      hive_counters = next((group for group in counter_groups if group.get('counterGroupName', '').upper() == 'HIVE'), None)
+      if hive_counters:
+        total_records = next((counter.get('totalCounterValue') for counter in hive_counters['counter'] if counter['name'] == 'RECORDS_OUT_0'), None)
+      else:
+        LOG.info("No HIVE counter group found for job: %s" % job_id)
+
+       # Extract totalCounterValue from FileSystemCounter counter group
+      fs_counters = next((group for group in counter_groups if group.get('counterGroupName') == 'org.apache.hadoop.mapreduce.FileSystemCounter'), None)
+      if fs_counters:
+        total_size = next((counter.get('totalCounterValue') for counter in fs_counters['counter'] if counter['name'] == 'HDFS_BYTES_WRITTEN'), None)
+      else:
+        LOG.info("No FileSystemCounter counter group found for job: %s" % job_id)
+
+    return total_records, total_size
 
 
   def _get_hive_result_size(self, notebook, snippet):
-    total_records_match, total_size_match = None, None
     total_records, total_size, msg = None, None, None
     engine = self._get_hive_execution_engine(notebook, snippet).lower()
     logs = self.get_log(notebook, snippet, startFrom=0)
@@ -676,14 +677,7 @@ class HS2Api(Api):
       if jobs:
         last_job_id = jobs[-1].get('name')
         LOG.info("Hive query executed %d jobs, last job is: %s" % (len(jobs), last_job_id))
-
-        # Attempt to fetch last task's syslog and parse the total records
-        task_syslog = self._get_syslog(last_job_id)
-        if task_syslog:
-          total_records_re = "org.apache.hadoop.hive.ql.exec.FileSinkOperator: RECORDS_OUT_0:(?P<total_records>\d+)"
-          total_records_match = re.search(total_records_re, task_syslog, re.MULTILINE)
-        else:
-          raise QueryError(_('Failed to get task syslog for Hive query with job: %s') % last_job_id)
+        total_records, total_size = self._parse_job_counters(job_id=last_job_id)
       else:
         msg = _('Hive query did not execute any jobs.')
     elif engine == 'spark':
@@ -692,10 +686,10 @@ class HS2Api(Api):
       total_records_match = re.search(total_records_re, logs, re.MULTILINE)
       total_size_match = re.search(total_size_re, logs, re.MULTILINE)
 
-    if total_records_match:
-      total_records = int(total_records_match.group('total_records'))
-    if total_size_match:
-      total_size = int(total_size_match.group('total_size'))
+      if total_records_match:
+        total_records = int(total_records_match.group('total_records'))
+      if total_size_match:
+        total_size = int(total_size_match.group('total_size'))
 
     return total_records, total_size, msg
 
