@@ -159,12 +159,17 @@
   border-color: transparent;
 }
 
+.selectize-input:hover .selectize-edit {
+  opacity: 1;
+}
+
 .selectize-edit {
+  opacity: 0;
   font-size: 18px;
   vertical-align: middle !important;
   margin-left: 5px;
   color: #999;
-  transition: color 0.2s linear;
+  transition: all 0.2s linear;
 }
 
 .selectize-edit:hover {
