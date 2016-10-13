@@ -652,8 +652,8 @@ class HiveServerClient:
         docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
         busy_sessions = set()
 
-        # Only check last 100 documents for performance
-        for doc in docs[:100]:
+        # Only check last 40 documents for performance
+        for doc in docs[:40]:
           snippet_data = json.loads(doc.data)['snippets'][0]
           session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
           status = snippet_data.get('status')
