@@ -1,0 +1,2 @@
+[run]
+omit = *conf.py,*settings.py,*urls.py,*metrics.py,*migrations*,*/hadoop/api/*,*/beeswaxd/*
