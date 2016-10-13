@@ -22,6 +22,7 @@
 
       options = $.extend({
         closeOnEnter: true,
+        blurOnEnter: false,
         classPrefix: 'hue-',
         showOnFocus: false,
         minLength: 0
@@ -54,6 +55,9 @@
         $element.on('keyup', function (e) {
           if(e.which === 13) {
             $element.hueAutocomplete('close');
+            if (options.blurOnEnter) {
+              $element.blur();
+            }
           }
         });
       }
