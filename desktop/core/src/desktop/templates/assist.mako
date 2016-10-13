@@ -937,10 +937,12 @@ from metadata.conf import has_navigator
   <script type="text/html" id="nav-search-autocomp-item">
     <a>
       <div class="nav-autocomplete-item-link">
-        <div style="padding: 8px;"><i style="color: #338bb8" class="fa" data-bind="css: icon"></i></div>
+        <div style="padding: 8px;"><i style="color: #338bb8" class="fa fa-fw" data-bind="css: icon"></i></div>
         <div>
-          <span style="font-size: 14px; color: #338bb8" data-bind="html: label"></span>
-          <br/><div style="display:inline-block; width: 170px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="text: description"></div>
+          <div style="font-size: 14px; color: #338bb8" data-bind="text: label, style: { 'padding-top': description ? 0 : '8px' }"></div>
+          <!-- ko if: description -->
+          <div style="display:inline-block; width: 170px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="text: description"></div>
+          <!-- /ko -->
         </div>
       </div>
     </a>
@@ -1009,11 +1011,11 @@ from metadata.conf import has_navigator
           <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
             <!-- ko if: typeof click !== 'undefined' -->
             <a class="pointer" data-bind="click: click, text: parentPath + ' ' + originalName" target="_blank" ></a>
+            <!-- /ko -->
             <!-- ko if: typeof click === 'undefined' -->
             <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
             <!-- /ko -->
             <div class="nav-search-tags" data-bind="foreach: tags"><div data-bind="text: $data"></div></div>
-            <!-- /ko -->
             <!-- ko if: hasDescription -->
               <div class="doc-desc" data-bind="text: description"></div>
             <!-- /ko -->
@@ -1348,6 +1350,31 @@ from metadata.conf import has_navigator
         });
       }
 
+      var NAV_FACET_ICONS = {
+        'tags': 'fa-tags',
+        'tag': 'fa-tag',
+        'lastModified': 'fa-clock-o',
+        'originalDescription': 'fa-comment-o',
+        'owner': 'fa-user',
+        'type': 'fa-info',
+        'clusterName': 'fa-server',
+        'group': 'fa-users'
+      };
+
+      var NAV_TYPE_ICONS = {
+        'DATABASE': 'fa-database',
+        'TABLE': 'fa-table',
+        'VIEW': 'fa-eye',
+        'FIELD': 'fa-columns',
+        'PARTITION': 'fa-th',
+        'SOURCE': 'fa-server',
+        'OPERATION': 'fa-cogs',
+        'OPERATION_EXECUTION': 'fa-cog',
+        'DIRECTORY': 'fa-folder-o',
+        'FILE': 'fa-file-o',
+        'SUB_OPERATION': 'fa-code-fork'
+      };
+
       /**
        * @param {Object} params
        * @param {string} params.user
@@ -1383,11 +1410,6 @@ from metadata.conf import has_navigator
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
-
-        var facetIcons = {
-          'tags' : 'fa-tags',
-          'tag' : 'fa-tag'
-        };
 
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
@@ -1482,70 +1504,56 @@ from metadata.conf import has_navigator
             sources: ko.mapping.toJSON([self.visiblePanel().type])
           }, function (data) {
             data.entities.forEach(function (entity) {
+              entity.icon = NAV_TYPE_ICONS[entity.type];
               switch (entity.type) {
                 case 'DATABASE': {
-                  entity.icon = 'fa-database';
                   entity.click = function () {
                     showInAssist(entity);
                   };
                   break;
                 }
                 case 'TABLE': {
-                  entity.icon = 'fa-table';
                   entity.click = function () {
                     showInAssist(entity);
                   };
                   break;
                 }
                 case 'VIEW': {
-                  entity.icon = 'fa-eye';
                   entity.click = function () {
                     showInAssist(entity);
                   }
                 }
                 case 'FIELD': {
-                  entity.icon = 'fa-columns';
                   entity.click = function () {
                     showInAssist(entity);
                   };
                   break;
                 }
-                case 'PARTITION': {
-                  entity.icon = 'fa-th';
-                  break;
-                }
                 case 'SOURCE': {
-                  entity.icon = 'fa-server';
                   entity.description = '${ _("Cluster") }: ' + entity.clusterName;
                   entity.link = entity.sourceUrl;
                   break;
                 }
-                case 'OPERATION': {
-                  entity.icon = 'fa-cogs';
-                  break;
-                }
                 case 'OPERATION_EXECUTION': {
-                  entity.icon = 'fa-cog';
                   entity.link = '/jobbrowser/jobs/' + entity.jobID;
                   break;
                 }
                 case 'DIRECTORY': {
-                  entity.icon = 'fa-folder-o';
                   entity.description = entity.parentPath;
                   entity.link = '/filebrowser/#' + entity.fileSystemPath;
                   break;
                 }
                 case 'FILE': {
-                  entity.icon = 'fa-file-o';
                   entity.description = entity.parentPath;
                   entity.link = '/filebrowser/#' + entity.fileSystemPath;
                   break;
                 }
                 case 'SUB_OPERATION': {
-                  entity.icon = 'fa-code-fork';
                   entity.description = entity.metaClassName;
                   break;
                 }
+                case 'PARTITION': {}
+                case 'OPERATION': {}
               }
               entity.hasDescription = typeof entity.description !== 'undefined' && entity.description !== null && entity.description.length > 0;
             });
@@ -1584,10 +1592,10 @@ from metadata.conf import has_navigator
               if (isFacet && typeof data.facets !== 'undefined') {
                 var facetInQuery = facetMatch[1];
 
-                if (typeof data.facets[facetInQuery.toLowerCase()] !== 'undefined') {
-                  Object.keys(data.facets[facetInQuery.toLowerCase()]).forEach(function (facetValue) {
+                if (typeof data.facets[facetInQuery] !== 'undefined') {
+                  Object.keys(data.facets[facetInQuery]).forEach(function (facetValue) {
                     if (partial === '' || facetValue.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: facetIcons[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
+                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: NAV_FACET_ICONS[facetInQuery.toLowerCase()], description: '' }, value: beforePartial + facetValue})
                     }
                   });
                 }
@@ -1595,11 +1603,13 @@ from metadata.conf import has_navigator
                 if (typeof data.facets !== 'undefined') {
                   Object.keys(data.facets).forEach(function (facet) {
                     if (partial.length === 0 || facet.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facet + ':', icon: facetIcons[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                      if (Object.keys(data.facets[facet]).length > 0) {
+                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICONS[facet], description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                      }
                     } else if (partial.length > 0) {
                       Object.keys(data.facets[facet]).forEach(function (facetValue) {
                         if (facetValue.indexOf(partial) !== -1) {
-                          values.push({ data: { label: facet + ':' + facetValue, icon: facetIcons[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                          values.push({ data: { label: facet + ':' + facetValue, icon: NAV_FACET_ICONS[facet], description: facetValue }, value: beforePartial + facet + ':' + facetValue });
                         }
                       });
                     }
@@ -1610,22 +1620,7 @@ from metadata.conf import has_navigator
                 }
                 if (typeof data.results !== 'undefined') {
                   data.results.forEach(function (result) {
-                    var icon = '';
-                    switch (result.type) { // TODO all types
-                      case 'TABLE':
-                        icon = 'fa-table';
-                        break;
-                      case 'VIEW':
-                        icon = 'fa-eye';
-                        break;
-                    }
-                    var description = result.parentPath;
-
-                    if (data.highlighting && data.highlighting[result.identity] && data.highlighting[result.identity].originalName) {
-                      values.push({ data: { label: data.highlighting[result.identity].originalName, icon: icon, description: description}, value: beforePartial + result.originalName });
-                    } else {
-                      values.push({ data: { label: result.originalName, icon: icon,  description: description}, value: beforePartial + result.originalName });
-                    }
+                    values.push({ data: { label: result.originalName, icon: NAV_TYPE_ICONS[result.type],  description: result.parentPath }, value: beforePartial + result.originalName });
                   });
                 }
               }
