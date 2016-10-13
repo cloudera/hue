@@ -103,7 +103,7 @@ class NavigatorApi(object):
         else:
           name, val = term.split(':')
           if val and (name != 'type' or val in entity_types): # Manual filter allowed
-            user_filters.append(term) # e.g. type:VIEW ca
+            user_filters.append(term + '*') # e.g. type:VIEW ca
 
       filter_query = '*'
 
@@ -162,6 +162,7 @@ class NavigatorApi(object):
           name, val = term.split(':')
           if val and val != '*' and (name != 'type' or val in entity_types):
             filterQueries.append(term)
+
       body = {'query': ' '.join(query) or '*'}
 
 
@@ -253,7 +254,6 @@ class NavigatorApi(object):
     http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
-      # TODO: Check permissions of entity
       data = json.dumps(metadata)
       return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, allow_redirects=True, clear_cookies=True)
     except RestException, e:

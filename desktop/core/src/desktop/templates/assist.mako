@@ -1579,9 +1579,8 @@ from metadata.conf import has_navigator
             query:  request.term + '*',
             successCallback: function (data) {
               var values = [];
-              if (isFacet && typeof data.facets !== 'undefined') {
+              if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
                 var facetInQuery = facetMatch[1];
-
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
                   Object.keys(data.facets[facetInQuery]).forEach(function (facetValue) {
                     if (partial === '' || facetValue.indexOf(partial) !== -1) {
@@ -1595,6 +1594,8 @@ from metadata.conf import has_navigator
                     if (partial.length === 0 || facet.indexOf(partial) !== -1) {
                       if (Object.keys(data.facets[facet]).length > 0) {
                         values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                      } else { // Potential facet from the list
+                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
                       }
                     } else if (partial.length > 0) {
                       Object.keys(data.facets[facet]).forEach(function (facetValue) {
