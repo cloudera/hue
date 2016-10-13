@@ -186,7 +186,7 @@ def search_entities_interactive(request):
   last_query_term = [term for term in query_s.strip().split()][-1]
 
   if last_query_term and last_query_term != '*':
-    last_query_term = last_query_term.rstrip('*')
+    last_query_term = last_query_term.rstrip('*').rstrip(':')
     field_facets = [f for f in field_facets if f.startswith(last_query_term)]
   field_facets = field_facets[:10]
 
@@ -204,7 +204,7 @@ def search_entities_interactive(request):
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
       response['facets'][fname] = dict((k, v) for k, v in fvalues.items() if v > 0)
-      if not response['facets'][fname]:
+      if ':' in last_query_term and not response['facets'][fname]:
         del response['facets'][fname]
 
   response['status'] = 0
