@@ -18,6 +18,11 @@
 import json
 import logging
 
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -27,6 +32,7 @@ from desktop.lib.i18n import force_unicode
 
 from metadata.conf import has_navigator
 from metadata.navigator_client import NavigatorApi
+
 
 LOG = logging.getLogger(__name__)
 
@@ -203,7 +209,8 @@ def search_entities_interactive(request):
 
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
-      response['facets'][fname] = dict((k, v) for k, v in fvalues.items() if v > 0)
+      fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
+      response['facets'][fname] = OrderedDict(fvalues)
       if ':' in last_query_term and not response['facets'][fname]:
         del response['facets'][fname]
 
