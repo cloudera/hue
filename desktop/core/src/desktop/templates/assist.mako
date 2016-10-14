@@ -1005,10 +1005,12 @@ from metadata.conf import has_navigator
         <div class="result-entry">${ _('No result found.') }</div>
       <!-- /ko -->
       <div data-bind="foreach: searchResult" style="overflow-x:hidden">
-        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
-          <!-- ko if: type === 'TABLE' || type === 'FIELD' -->
+        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopover }">
+          <!-- ko if: type === 'TABLE' || type === 'VIEW' || type === 'DATABASE' || type === 'FIELD' -->
           <div class="assist-actions table-actions" style="opacity: 0" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
-            <a class="inactive-action pointer" href="javascript:void(0)" data-bind=" click: function (data, event) { showNavContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
+            <a class="inactive-action pointer" href="javascript:void(0)" data-bind="click: function (data, event) { showNavContextPopover(data, event); }, css: { 'blue': statsVisible }">
+              <i class="fa fa-bar-chart" title="${_('Show details')}"></i>
+            </a>
           </div>
           <!-- /ko -->
 
@@ -1501,7 +1503,7 @@ from metadata.conf import has_navigator
             entry.statsVisible(true);
             huePubSub.publish('sql.context.popover.show', {
               data: {
-                type: entry.type === 'FIELD' ? 'column' : 'table',
+                type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
                 identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.originalName })
               },
               orientation: 'right',
