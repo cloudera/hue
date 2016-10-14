@@ -17,6 +17,7 @@
 import logging
 import posixpath
 import requests
+import threading
 import urllib
 
 from django.utils.encoding import iri_to_uri, smart_str
@@ -34,6 +35,21 @@ __docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
 
+CACHE_SESSION = None
+CACHE_SESSION_LOCK = threading.Lock()
+
+def get_request_session():
+  global CACHE_SESSION
+  if CACHE_SESSION is None:
+    CACHE_SESSION_LOCK.acquire()
+    try:
+      if CACHE_SESSION is None:
+        CACHE_SESSION = requests.Session()
+        CACHE_SESSION.mount('http://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
+        CACHE_SESSION.mount('https://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
+    finally:
+      CACHE_SESSION_LOCK.release()
+  return CACHE_SESSION
 
 class RestException(Exception):
   """
@@ -86,7 +102,7 @@ class HttpClient(object):
     self._base_url = base_url.rstrip('/')
     self._exc_class = exc_class or RestException
     self._logger = logger or LOG
-    self._session = requests.Session()
+    self._session = get_request_session()
     self._cookies = None
 
   def set_kerberos_auth(self):
