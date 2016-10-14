@@ -1617,9 +1617,9 @@ from metadata.conf import has_navigator
               if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
                 var facetInQuery = facetMatch[1];
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
-                  Object.keys(data.facets[facetInQuery]).forEach(function (facetValue) {
-                    if (partial === '' || facetValue.indexOf(partial) !== -1) {
-                      values.push({ data: { label: facetInQuery + ':' + facetValue, icon: NAV_FACET_ICON, description: '' }, value: beforePartial + facetValue})
+                  $.map(data.facets[facetInQuery], function (count, value) {
+                    if (partial === '' || value.indexOf(partial) !== -1) {
+                      values.push({ data: { label: facetInQuery + ':' + value, icon: NAV_FACET_ICON, description: count }, value: beforePartial + value})
                     }
                   });
                 }
