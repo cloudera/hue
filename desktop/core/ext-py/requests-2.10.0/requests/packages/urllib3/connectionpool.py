@@ -209,8 +209,8 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
         Return a fresh :class:`HTTPConnection`.
         """
         self.num_connections += 1
-        log.info("Starting new HTTP connection (%d): %s",
-                 self.num_connections, self.host)
+        log.info("Starting new HTTP connection (%d): %s:%s",
+                 self.num_connections, self.host, self.port)
 
         conn = self.ConnectionCls(host=self.host, port=self.port,
                                   timeout=self.timeout.connect_timeout,
@@ -245,7 +245,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
 
         # If this is a persistent connection, check if it got disconnected
         if conn and is_connection_dropped(conn):
-            log.info("Resetting dropped connection: %s", self.host)
+            log.info("Resetting dropped connection: %s %s", self.host, self.port)
             conn.close()
             if getattr(conn, 'auto_open', 1) == 0:
                 # This is a proxied connection that has been mutated by
@@ -391,7 +391,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
 
         # AppEngine doesn't have a version attr.
         http_version = getattr(conn, '_http_vsn_str', 'HTTP/?')
-        log.debug("\"%s %s %s\" %s %s", method, url, http_version,
+        log.debug("\"%s:%s %s %s %s\" %s %s", self.host, self.port, method, url, http_version,
                   httplib_response.status, httplib_response.length)
 
         try:
@@ -784,8 +784,8 @@ class HTTPSConnectionPool(HTTPConnectionPool):
         Return a fresh :class:`httplib.HTTPSConnection`.
         """
         self.num_connections += 1
-        log.info("Starting new HTTPS connection (%d): %s",
-                 self.num_connections, self.host)
+        log.info("Starting new HTTPS connection (%d): %s:%s",
+                 self.num_connections, self.host, self.port)
 
         if not self.ConnectionCls or self.ConnectionCls is DummyConnection:
             raise SSLError("Can't connect to HTTPS URL because the SSL "
