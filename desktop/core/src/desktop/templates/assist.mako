@@ -382,6 +382,7 @@ from metadata.conf import has_navigator
     }
 
     .result-entry {
+      position: relative;
       clear: both;
       overflow: hidden;
       margin: 0 10px 15px 10px;
@@ -564,7 +565,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-s3-header-actions">
-    <div class="assist-db-header-actions"style="margin-top: -1px;">
+    <div class="assist-db-header-actions" style="margin-top: -1px;">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -649,7 +650,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-hdfs-header-actions">
-    <div class="assist-db-header-actions"style="margin-top: -1px;">
+    <div class="assist-db-header-actions" style="margin-top: -1px;">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -843,7 +844,7 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <!-- ko if: loading -->
       <span style="color: #aaa;"><i class="fa fa-filter" title="${_('Filter tables')}"></i></span>
-      <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i></a>
+      <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i>
       <!-- /ko -->
     </div>
   </script>
@@ -1004,7 +1005,13 @@ from metadata.conf import has_navigator
         <div class="result-entry">${ _('No result found.') }</div>
       <!-- /ko -->
       <div data-bind="foreach: searchResult" style="overflow-x:hidden">
-        <div class="result-entry">
+        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
+          <!-- ko if: type === 'TABLE' || type === 'FIELD' -->
+          <div class="assist-actions table-actions" style="opacity: 0" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
+            <a class="inactive-action pointer" href="javascript:void(0)" data-bind=" click: function (data, event) { showNavContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
+          </div>
+          <!-- /ko -->
+
           <div class="icon-col">
             <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
           </div>
@@ -1488,12 +1495,40 @@ from metadata.conf import has_navigator
             }, 200); // For animation effect
           };
 
+          var showNavContextPopover = function (entry, event) {
+            var $source = $(event.target);
+            var offset = $source.offset();
+            entry.statsVisible(true);
+            huePubSub.publish('sql.context.popover.show', {
+              data: {
+                type: entry.type === 'FIELD' ? 'column' : 'table',
+                identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.originalName })
+              },
+              orientation: 'right',
+              sourceType: entry.sourceType.toLowerCase(),
+              defaultDatabase: entry.parentPath.substring(1),
+              pinEnabled: params.sql.navigationSettings.pinEnabled,
+              source: {
+                element: event.target,
+                left: offset.left,
+                top: offset.top - 3,
+                right: offset.left + $source.width() + 3,
+                bottom: offset.top + $source.height() - 3
+              }
+            });
+            huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
+              entry.statsVisible(false);
+            });
+          };
+
           $.post('/metadata/api/navigator/search_entities', {
             query_s: self.searchInput(),
             limit: 25,
             sources: ko.mapping.toJSON([self.visiblePanel().type])
           }, function (data) {
             data.entities.forEach(function (entity) {
+              entity.statsVisible = ko.observable(false);
+              entity.showNavContextPopover = showNavContextPopover;
               entity.icon = NAV_TYPE_ICONS[entity.type];
               switch (entity.type) {
                 case 'DATABASE': {

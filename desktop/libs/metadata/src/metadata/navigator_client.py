@@ -68,7 +68,7 @@ class NavigatorApi(object):
     default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
 
     if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-      default_entity_types = ('TABLE', 'VIEW')
+      default_entity_types = ('TABLE', 'VIEW', 'FIELD')
       entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
