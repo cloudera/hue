@@ -17,6 +17,7 @@
 
 import json
 import logging
+import uuid
 
 from django.utils.translation import ugettext as _
 
@@ -57,19 +58,24 @@ class QueryError(Exception):
 
 class Notebook(object):
 
-  def __init__(self, document=None):
+  def __init__(self, document=None, **options):
     self.document = None
 
     if document is not None:
       self.data = document.data
       self.document = document
     else:
-      self.data = json.dumps({
+      _data = {
           'name': 'My Notebook',
+          'uuid': str(uuid.uuid4()),
           'description': '',
           'type': 'notebook',
+          'isSaved': False,
+          'sessions': [],
           'snippets': [],
-      })
+      }
+      _data.update(options)
+      self.data = json.dumps(_data)
 
   def get_json(self):
     _data = self.get_data()
@@ -87,6 +93,69 @@ class Notebook(object):
 
   def get_str(self):
     return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw']) for snippet in self.get_data()['snippets']])
+
+
+  def add_hive_snippet(self, database, sql):
+    _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+       'status': 'running',
+       'statement_raw': sql,
+       'statement': sql,
+       'type': 'query-hive',
+       'properties': {
+            'files': [],
+            'functions': [],
+            'settings': [],
+       },
+       'database': database,
+    }))
+    self._add_session(_data, 'query-hive')
+
+    self.data = json.dumps(_data)
+
+  def add_java_snippet(self, clazz, app_jar, arguments, files):
+    _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+        u'type': u'java',
+        u'status': u'running',
+        u'properties':  {
+          u'files': files,
+          u'class': clazz,
+          u'app_jar': app_jar,
+          u'arguments': arguments,
+          u'archives': [],
+        }
+    }))
+    self._add_session(_data, 'java')
+
+    self.data = json.dumps(_data)
+
+  def _make_snippet(self, _snippet):
+    return {
+         'status': _snippet.get('status', 'ready'),
+         'id': str(uuid.uuid4()),
+         'statement_raw': _snippet.get('statement', ''),
+         'statement': _snippet.get('statement', ''),
+         'type': _snippet.get('type'),
+         'properties': _snippet['properties'],
+         'name': _snippet.get('name', '%(type)s snippet' % _snippet),
+         'database': _snippet.get('database'),
+         'result': {},
+         'variables': []
+    }
+
+  def _add_session(self, data, snippet_type):
+    from notebook.connectors.hiveserver2 import HS2Api # Cyclic dependency
+
+    if snippet_type not in [_s['type'] for _s in data['sessions']]:
+      data['sessions'].append({
+         'type': snippet_type,
+         'properties': HS2Api.get_properties(snippet_type),
+         'id': None
+      }
+    )
 
 
 def get_api(request, snippet):
@@ -183,6 +252,3 @@ class Api(object):
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None): raise NotImplementedError()
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
-
-  def fetch_result_size(self, notebook, snippet):
-    pass
