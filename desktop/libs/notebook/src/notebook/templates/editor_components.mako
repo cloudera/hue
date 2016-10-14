@@ -2606,6 +2606,10 @@ ${ hueIcons.symbols() }
     }
   }
 
+  function isNotNullForCharts(val) {
+    return val !== 'NULL' && val !== null;
+  }
+
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
 
@@ -2622,16 +2626,18 @@ ${ hueIcons.symbols() }
       });
       var colors = HueColors.cuiD3Scale();
       $(rawDatum.counts()).each(function (cnt, item) {
-        var val = item[_idxValue] * 1;
-        if (isNaN(val)) {
-          val = 0;
+        if (isNotNullForCharts(item[_idxValue])) {
+          var val = item[_idxValue] * 1;
+          if (isNaN(val)) {
+            val = 0;
+          }
+          _data.push({
+            label: hueUtils.html2text(item[_idxLabel]),
+            value: val,
+            color: colors[cnt % colors.length],
+            obj: item
+          });
         }
-        _data.push({
-          label: hueUtils.html2text(item[_idxLabel]),
-          value: val,
-          color: colors[cnt % colors.length],
-          obj: item
-        });
       });
     }
 
@@ -2664,11 +2670,13 @@ ${ hueIcons.symbols() }
       });
 
       $(rawDatum.counts()).each(function (cnt, item) {
-        _data.push({
-          label: item[_idxRegion],
-          value: item[_idxValue],
-          obj: item
-        });
+        if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxRegion])) {
+          _data.push({
+            label: item[_idxRegion],
+            value: item[_idxValue],
+            obj: item
+          });
+        }
       });
     }
 
@@ -2676,8 +2684,8 @@ ${ hueIcons.symbols() }
   }
 
   // The leaflet map can freeze the browser with numbers outside the map
-  var MIN_LAT = -85;
-  var MAX_LAT = 85;
+  var MIN_LAT = -90;
+  var MAX_LAT = 90;
   var MIN_LNG = -180;
   var MAX_LNG = 180;
 
@@ -2700,20 +2708,24 @@ ${ hueIcons.symbols() }
       });
       if (rawDatum.snippet.chartMapLabel() != null) {
         $(rawDatum.counts()).each(function (cnt, item) {
-          _data.push({
-            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
-            label: hueUtils.html2text(item[_idxLabel]),
-            obj: item
-          });
+          if (isNotNullForCharts(item[_idxLat]) && isNotNullForCharts(item[_idxLng])) {
+            _data.push({
+              lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
+              lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
+              label: hueUtils.html2text(item[_idxLabel]),
+              obj: item
+            });
+          }
         });
       } else {
         $(rawDatum.counts()).each(function (cnt, item) {
-          _data.push({
-            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
-            obj: item
-          });
+          if (isNotNullForCharts(item[_idxLat]) && isNotNullForCharts(item[_idxLng])) {
+            _data.push({
+              lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
+              lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
+              obj: item
+            });
+          }
         });
       }
     }
@@ -2743,13 +2755,15 @@ ${ hueIcons.symbols() }
           var _data = [];
           var colors = HueColors.cuiD3Scale();
           $(rawDatum.counts()).each(function (cnt, item) {
-            _data.push({
-              series: _plottedSerie,
-              x: new Date(moment(hueUtils.html2text(item[_idxLabel])).valueOf()),
-              y: item[_idxValue] * 1,
-              color: colors[_plottedSerie % colors.length],
-              obj: item
-            });
+            if (isNotNullForCharts(item[_idxLabel]) && isNotNullForCharts(item[_idxValue])) {
+              _data.push({
+                series: _plottedSerie,
+                x: new Date(moment(hueUtils.html2text(item[_idxLabel])).valueOf()),
+                y: item[_idxValue] * 1,
+                color: colors[_plottedSerie % colors.length],
+                obj: item
+              });
+            }
           });
           if (rawDatum.sorting == "asc") {
             _data.sort(function (a, b) {
@@ -2808,12 +2822,14 @@ ${ hueIcons.symbols() }
               var _data = [];
               $(rawDatum.counts()).each(function (cnt, item) {
                 if (item[_idxPivot] === val) {
-                  _data.push({
-                    x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-                    y: item[_idxValue] * 1,
-                    color: colors[pivotCnt % colors.length],
-                    obj: item
-                  });
+                  if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
+                    _data.push({
+                      x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                      y: item[_idxValue] * 1,
+                      color: colors[pivotCnt % colors.length],
+                      obj: item
+                    });
+                  }
                 }
               });
               if (rawDatum.sorting == "asc") {
@@ -2855,13 +2871,15 @@ ${ hueIcons.symbols() }
               var _data = [];
               var colors = HueColors.cuiD3Scale();
               $(rawDatum.counts()).each(function (cnt, item) {
-                _data.push({
-                  series: _plottedSerie,
-                  x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-                  y: item[_idxValue] * 1,
-                  color: colors[cnt % colors.length],
-                  obj: item
-                });
+                if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
+                  _data.push({
+                    series: _plottedSerie,
+                    x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
+                    y: item[_idxValue] * 1,
+                    color: colors[cnt % colors.length],
+                    obj: item
+                  });
+                }
               });
               if (rawDatum.sorting == "asc") {
                 _data.sort(function (a, b) {
@@ -2914,13 +2932,15 @@ ${ hueIcons.symbols() }
           var _data = [];
           $(rawDatum.counts()).each(function (cnt, item) {
             if (_idxGroup == -1 || item[_idxGroup] == col) {
-              _data.push({
-                x: item[_idxX],
-                y: item[_idxY],
-                shape: 'circle',
-                size: _idxSize > -1 ? item[_idxSize] : 100,
-                obj: item
-              });
+              if (isNotNullForCharts(item[_idxX]) && isNotNullForCharts(item[_idxY])) {
+                _data.push({
+                  x: item[_idxX],
+                  y: item[_idxY],
+                  shape: 'circle',
+                  size: _idxSize > -1 ? item[_idxSize] : 100,
+                  obj: item
+                });
+              }
             }
           });
           _datum.push({
