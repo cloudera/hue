@@ -26,6 +26,9 @@ from desktop.views import _ko
 <%def name="docBrowser()">
   ${ hueIcons.symbols() }
 
+  <script src="/static/desktop/ext/js/bootstrap-fileupload.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="/static/desktop/ext/css/bootstrap-fileupload.css">
+
   <style>
     .doc-browser-container {
       position: absolute;
@@ -428,29 +431,35 @@ from desktop.views import _ko
       </div>
         <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
           <div class="modal-body">
-              <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
-                <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
-                <div class="controls">
-                  <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
-                </div>
-              </div>
+            <div data-bind="visible: uploading() || uploadComplete()">
+              <span data-bind="visible: uploading()">${ _('Importing...') }</span>
               <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
               <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
               <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
-              ${ csrf_token(request) | n,unicode }
-              <input type="hidden" name="path" data-bind="value: definition().path" />
-          </div>
-          <div class="modal-footer">
-            <!-- ko ifnot: uploading() || uploadComplete() -->
-            <input type="button" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
-            <input type="submit" class="btn btn-danger" data-bind="click: upload" value="${ _('Import') }" />
-            <!-- /ko -->
-            <!-- ko if: uploading() || uploadComplete() -->
-            <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
-            <!-- /ko -->
+            </div>
+            <div class="pull-right">
+              <!-- ko ifnot: uploading() || uploadComplete() -->
+              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
+              <input type="submit" class="btn btn-danger" data-clear="fileupload" data-bind="enable: importEnabled, click: upload" value="${ _('Import') }" />
+              <!-- /ko -->
+              <!-- ko if: uploading() || uploadComplete() -->
+              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Close') }" />
+              <!-- /ko -->
+            </div>
+
+            <div class="fileupload fileupload-new" data-provides="fileupload" data-bind="visible: !uploading() && !uploadComplete()">
+              <span class="btn btn-file" style="line-height: 29px">
+                <span class="fileupload-new">${ _('Select json file') }</span>
+                <span class="fileupload-exists">${ _('Change') }</span>
+                <input id="importDocumentInput" type="file" name="documents" accept=".json" data-bind="value: selectedImportFile" />
+              </span>
+              &nbsp;&nbsp;<span class="fileupload-preview"></span>
+              <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
+            </div>
+            ${ csrf_token(request) | n,unicode }
+            <input type="hidden" name="path" data-bind="value: definition().path" />
           </div>
         </form>
-
       <!-- /ko -->
     </div>
 

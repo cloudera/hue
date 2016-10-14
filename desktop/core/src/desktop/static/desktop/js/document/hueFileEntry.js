@@ -165,6 +165,11 @@ var HueFileEntry = (function () {
     self.uploading = ko.observable(false);
     self.uploadComplete = ko.observable(false);
     self.uploadFailed = ko.observable(false);
+    self.selectedImportFile = ko.observable('');
+    self.importEnabled = ko.pureComputed(function () {
+      return self.selectedImportFile() !== '';
+    });
+
 
     self.entries = ko.observableArray([]);
 
