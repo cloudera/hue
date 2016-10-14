@@ -69,7 +69,28 @@ var EditorViewModel = (function() {
         if (typeof item.originalIndex === 'undefined') {
           item.originalIndex = i;
         }
-        return item.name !== '' && (item.name.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1 || item.type.toLowerCase().indexOf(self.metaFilter().toLowerCase()) > -1);
+        var metaFilterValue = self.metaFilter().toLowerCase();
+        var metaFilterValues = metaFilterValue.split(' ');
+        var toBeReturned = item.name !== '';
+        var hasPartial = false;
+        metaFilterValues.forEach(function (partial) {
+          if (partial.indexOf('column:') > -1) {
+            partial = $.trim(partial.split('column:')[1]);
+            toBeReturned = toBeReturned && item.name.toLowerCase().indexOf(partial) > -1;
+            hasPartial = true;
+          }
+          if (partial.indexOf('type:') > -1) {
+            partial = $.trim(partial.split('type:')[1]);
+            toBeReturned = toBeReturned && item.type.toLowerCase().indexOf(partial) > -1;
+            hasPartial = true;
+          }
+          if (partial.indexOf('column:') === -1 && partial.indexOf('type:') === -1) {
+            if (!hasPartial) {
+              toBeReturned = toBeReturned && (item.name.toLowerCase().indexOf(partial) > -1 || item.type.toLowerCase().indexOf(partial) > -1);
+            }
+          }
+        });
+        return toBeReturned;
       });
     });
 
