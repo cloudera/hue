@@ -522,12 +522,15 @@
 
             if (huePubSub) {
               huePubSub.subscribe('resize.leaflet.map', function(){
-                $(element).data('_map').invalidateSize();
-                if ($(element).data('_markerLayer')) {
-                  try {
-                    $(element).data('_map').fitBounds(_bounds);
+                if ($(element).data('_map')) {
+                  $(element).data('_map').invalidateSize();
+                  if ($(element).data('_markerLayer')) {
+                    try {
+                      $(element).data('_map').fitBounds(_bounds);
+                    }
+                    catch (e) {
+                    }
                   }
-                  catch (e) {}
                 }
               });
             }
