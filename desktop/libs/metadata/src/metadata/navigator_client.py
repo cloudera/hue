@@ -151,6 +151,9 @@ class NavigatorApi(object):
         elif 'hdfs' in sources:
           fq_type = entity_types
 
+        if query_s.strip().endswith('type:*'): # To list all available types
+          fq_type = entity_types
+
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       search_terms = [term for term in query_s.strip().split()] if query_s else []
@@ -160,7 +163,7 @@ class NavigatorApi(object):
           query.append(term)
         else:
           name, val = term.split(':')
-          if val and val != '*' and (name != 'type' or val in entity_types):
+          if val and val != '*' and (name != 'type' or val in entity_types): # Allow to type non default types, e.g for SQL: type:FIELD
             filterQueries.append(term)
 
       body = {'query': ' '.join(query) or '*'}
