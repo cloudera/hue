@@ -22,7 +22,9 @@ from nose.tools import assert_equal
 
 from django.contrib.auth.models import User
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from metadata.conf import has_navigator
@@ -43,7 +45,11 @@ class TestNavigatorclient:
   def setup_class(cls):
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
-    if not is_live_cluster() or not has_navigator(cls.user): # Until v1
+    cls.user = rewrite_user(cls.user)
+    add_to_group('test')
+    grant_access("test", "test", "metadata")
+
+    if not is_live_cluster() or not has_navigator(cls.user):
       raise SkipTest
 
   def test_search_entities(self):
@@ -51,7 +57,7 @@ class TestNavigatorclient:
     api._root = MockedRoot()
 
     assert_equal(
-        '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND ((type:TABLE)OR(type:VIEW))',
+        '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND (*) AND ((type:TABLE)OR(type:VIEW))',
         api.search_entities(query_s='cases', sources=['hive'])[0][1]
     )
 

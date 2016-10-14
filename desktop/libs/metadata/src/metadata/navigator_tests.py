@@ -24,9 +24,10 @@ from nose.tools import assert_equal, assert_true
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from hadoop.pseudo_hdfs4 import is_live_cluster
+from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from metadata.conf import has_navigator
 from metadata.navigator_client import NavigatorApi
@@ -41,15 +42,12 @@ class TestNavigatorApi(object):
   def setup_class(cls):
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
+    cls.user = rewrite_user(cls.user)
+    add_to_group('test')
+    grant_access("test", "test", "metadata")
 
     if not is_live_cluster() or not has_navigator(cls.user):
       raise SkipTest
-
-    cls.client = make_logged_in_client(username='test', is_superuser=False)
-    cls.user = User.objects.get(username='test')
-    add_to_group('test')
-    grant_access("test", "test", "metadata")
-    grant_access("test", "test", "navigator")
 
     cls.api = NavigatorApi()
 
@@ -91,12 +89,12 @@ class TestNavigatorApi(object):
     resp = self.client.post(reverse('metadata:add_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(tags + ['hue_test'], json_resp['entity']['tags'])
+    assert_equal(set(tags + ['hue_test']), set(json_resp['entity']['tags']))
 
     resp = self.client.post(reverse('metadata:delete_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(entity['tags'], json_resp['entity']['tags'])
+    assert_true(tags, json_resp['entity']['tags'])
 
 
   def test_api_properties(self):
