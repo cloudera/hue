@@ -36,6 +36,7 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 from desktop.models import Document, Document2
+import desktop.views as views
 
 from hadoop import cluster as originalCluster
 from hadoop.pseudo_hdfs4 import is_live_cluster
@@ -3282,6 +3283,23 @@ my_prop_not_filtered=10
     finally:
       finish()
 
+  def test_httppool(self):
+    # With http pool the http connection is reused and so new connection count is 0
+    superuser_client = make_logged_in_client(is_superuser=True)
+    start_log = "--START HTTP POOL TEST--"
+    LOG.warn(start_log)
+    superuser_client.get(reverse('oozie:list_oozie_workflows'))
+    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json")
+    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=RUNNING&status=PREP&status=SUSPENDED")
+    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=KILLED&status=FAILED")
+    end_log = "--END HTTP POOL TEST--"
+    LOG.warn(end_log)
+    response = superuser_client.get(reverse(views.log_view))
+
+    s1 = response._container[0].index(start_log)
+    e1 = response._container[0].index(end_log)
+    c1 = response._container[0][e1:s1].count('Starting new HTTP')
+    assert_equal(c1, 0)
 
 class TestDashboard(OozieMockBase):
 
