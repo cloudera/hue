@@ -192,8 +192,9 @@ def search_entities_interactive(request):
   last_query_term = [term for term in query_s.strip().split()][-1]
 
   if last_query_term and last_query_term != '*':
-    last_query_term = last_query_term.rstrip('*').rstrip(':')
-    field_facets = [f for f in field_facets if f.startswith(last_query_term)]
+    last_query_term = last_query_term.rstrip('*')
+    (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
+    field_facets = [f for f in field_facets if f.startswith(fname)]
   field_facets = field_facets[:10]
 
   response = api.search_entities_interactive(
