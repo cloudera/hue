@@ -24,20 +24,17 @@ from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 from mako.template import Template
 
-
 from desktop.models import Document2
 from notebook.api import _execute_notebook
-from notebook.models import make_notebook2
-from oozie.models2 import Job
+from notebook.connectors.base import get_api
+from notebook.models import Notebook
 
-from indexer.fields import get_field_type
-from indexer.operations import get_checked_args
-from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.conf import zkensemble
-
-from notebook.connectors.base import get_api
+from indexer.fields import get_field_type
+from indexer.file_format import get_file_format_instance, get_file_format_class
+from indexer.operations import get_checked_args
 
 
 LOG = logging.getLogger(__name__)
@@ -52,6 +49,8 @@ class Indexer(object):
     self.user = User.objects.get(username=username) # To clean
 
   def _upload_workspace(self, morphline):
+    from oozie.models2 import Job
+
     hdfs_workspace_path = Job.get_workspace(self.username)
     hdfs_morphline_path = os.path.join(hdfs_workspace_path, "morphline.conf")
     hdfs_log4j_properties_path = os.path.join(hdfs_workspace_path, "log4j.properties")
@@ -69,12 +68,11 @@ class Indexer(object):
   def run_morphline(self, request, collection_name, morphline, input_path, query=None):
     workspace_path = self._upload_workspace(morphline)
 
-    snippets = []
+    notebook = Notebook(name='Indexer job for %s' % collection_name)
 
     if query:
-      from notebook.models import Notebook
-      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
-      notebook_data = notebook.get_data()
+      q = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
+      notebook_data = q.get_data()
       snippet = notebook_data['snippets'][0]
 
       api = get_api(request, snippet)
@@ -82,57 +80,37 @@ class Indexer(object):
       destination = '__hue_%s' % notebook_data['uuid'][:4]
       location = '/user/%s/__hue-%s' % (request.user,  notebook_data['uuid'][:4])
       sql, success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
-
-      statement = sql
       input_path = '${nameNode}%s' % location
 
-      snippets.append({
-         'status': 'running',
-         'statement_raw': statement,
-         'statement': statement,
-         'type': 'query-hive',
-         'properties': {
-#             'files': [] if files is None else files,
-#             'functions': [] if functions is None else functions,
-#             'settings': [] if settings is None else settings
-         },
-         'database': snippet['database'],
-      }
+      notebook.add_hive_snippet(snippet['database'], sql)
+
+    notebook.add_java_snippet(
+      clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
+      app_jar=CONFIG_INDEXER_LIBS_PATH.get(),
+      arguments=[
+          u'--morphline-file',
+          u'morphline.conf',
+          u'--output-dir',
+          u'${nameNode}/user/%s/indexer' % self.username,
+          u'--log4j',
+          u'log4j.properties',
+          u'--go-live',
+          u'--zk-host',
+          zkensemble(),
+          u'--collection',
+          collection_name,
+          input_path,
+      ],
+      files=[
+          {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
+          {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
+      ]
     )
 
-    snippets.append({
-        u'type': u'java',
-        u'status': u'running',
-        u'properties':  {
-          u'files': [
-              {u'path': u'%s/log4j.properties' % workspace_path, u'type': u'file'},
-              {u'path': u'%s/morphline.conf' % workspace_path, u'type': u'file'}
-          ],
-          u'class': u'org.apache.solr.hadoop.MapReduceIndexerTool',
-          u'app_jar': CONFIG_INDEXER_LIBS_PATH.get(),
-          u'arguments': [
-              u'--morphline-file',
-              u'morphline.conf',
-              u'--output-dir',
-              u'${nameNode}/user/%s/indexer' % self.username,
-              u'--log4j',
-              u'log4j.properties',
-              u'--go-live',
-              u'--zk-host',
-              zkensemble(),
-              u'--collection',
-              collection_name,
-              input_path,
-          ],
-          u'archives': [],
-        }
-      }
-    )
+    notebook_data = notebook.get_data()
+    snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
 
-    notebook = make_notebook2(name='Indexer job for %s' % collection_name, snippets=snippets).get_data()
-    snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook['snippets'][0]['id'], 'statement': ''}
-
-    job_handle = _execute_notebook(request, notebook, snippet) # To set as managed
+    job_handle = _execute_notebook(request, notebook_data, snippet) # To set as managed
 
     return job_handle
 
