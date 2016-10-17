@@ -30,6 +30,14 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
     background-color: #FAFAFA;
     padding-top: 150px;
   }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    background-color: #338BB8;
+    height: 6px;
+    width: 100%;
+  }
 </style>
 
 <div class="navigator">
@@ -121,6 +129,10 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unic
 <div class="trademark center muted">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
 </div>
+
+
+<div class="footer"></div>
+
 
 <script>
   $(document).ready(function () {
