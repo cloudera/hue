@@ -293,7 +293,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </div>
 
         <div class="tab-pane" id="definition">
-          <textarea id="definitionEditor">${ oozie_workflow.definition.decode('utf-8', 'replace') }</textarea>
+          <div id="definitionEditor">${ oozie_workflow.definition.decode('utf-8', 'replace') }</div>
         </div>
 
         % if oozie_workflow.has_sla:
@@ -361,9 +361,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
-<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_workflow.has_sla:
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -385,8 +383,9 @@ ${ dashboard.import_layout() }
 %endif
 
 <style type="text/css">
-  .CodeMirror.cm-s-default {
-    height: 700px;
+  #definitionEditor {
+    min-height: 250px;
+    margin-bottom: 10px;
   }
 
   #sla th {
@@ -531,12 +530,13 @@ ${ utils.slaGlobal() }
       $(this).removeClass("hide");
     });
 
-    var definitionEditor = $("#definitionEditor")[0];
-
-    var codeMirror = CodeMirror.fromTextArea(definitionEditor, {
+    var editor = ace.edit("definitionEditor");
+    editor.setOptions({
       readOnly: true,
-      lineNumbers:true
+      maxLines: Infinity
     });
+    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.getSession().setMode("ace/mode/xml");
 
     // force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
@@ -547,9 +547,6 @@ ${ utils.slaGlobal() }
       }
       else {
         $("canvas").remove();
-      }
-      if ($(e.target).attr("href") == "#definition") {
-        codeMirror.refresh();
       }
       % if oozie_workflow.has_sla:
       if ($(e.target).attr("href") == "#sla") {

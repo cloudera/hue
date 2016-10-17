@@ -277,7 +277,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       </div>
 
       <div class="tab-pane" id="definition">
-        <textarea id="definitionEditor">${ oozie_bundle.definition.decode('utf-8', 'replace') }</textarea>
+        <div id="definitionEditor">${ oozie_bundle.definition.decode('utf-8', 'replace') }</div>
       </div>
     </div>
 
@@ -307,13 +307,12 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
-<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 <style type="text/css">
-  .CodeMirror.cm-s-default {
-    height:500px;
+  #definitionEditor {
+    min-height: 250px;
+    margin-bottom: 10px;
   }
 </style>
 
@@ -368,22 +367,13 @@ ${ layout.menubar(section='bundles', dashboard=True) }
     });
 
 
-    var definitionEditor = $("#definitionEditor")[0];
-
-    var codeMirror = CodeMirror(function(elt) {
-      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
-      }, {
-        value: definitionEditor.value,
+    var editor = ace.edit("definitionEditor");
+    editor.setOptions({
       readOnly: true,
-      lineNumbers: true
+      maxLines: Infinity
     });
-
-    // force refresh on tab change
-    $("a[data-toggle='tab']").on("shown", function (e) {
-      if ($(e.target).attr("href") == "#definition") {
-        codeMirror.refresh();
-      }
-    });
+    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.getSession().setMode("ace/mode/xml");
 
     $(".confirmationModal").click(function(){
       var _this = $(this);

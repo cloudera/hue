@@ -397,7 +397,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </div>
 
             <div class="tab-pane" id="definition" style="margin-bottom: 10px;">
-              <textarea id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</textarea>
+              <div id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</div>
             </div>
 
             % if oozie_coordinator.has_sla:
@@ -479,9 +479,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
-<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_coordinator.has_sla:
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -549,21 +547,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     $(".dataTables_filter").hide();
     % endif
 
-    var definitionEditor = $("#definitionEditor")[0];
-
-    var codeMirror = CodeMirror(function(elt) {
-      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
-      }, {
-        value: definitionEditor.value,
+    var editor = ace.edit("definitionEditor");
+    editor.setOptions({
       readOnly: true,
-      lineNumbers: true
+      maxLines: Infinity
     });
+    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.getSession().setMode("ace/mode/xml");
 
     // force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
-      if ($(e.target).attr("href") == "#definition") {
-        codeMirror.refresh();
-      }
       % if oozie_coordinator.has_sla:
       if ($(e.target).attr("href") == "#sla") {
         window.setTimeout(function () {
@@ -764,13 +757,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       });
     };
 
-    var $codeMirror = $(".CodeMirror");
     var tabPanelTop = $("#tab-panel").position().top;
     var $logPre = $("#log pre").css("overflow", "auto");
     var $window = $(window);
 
     function resizeTabs() {
-      $codeMirror.height($window.height() - tabPanelTop - 185);
       $logPre.height($window.height() - tabPanelTop - 204);
     }
 

@@ -1,5 +1,6 @@
-.CodeMirror.cm-s-default {
-  height:500px;
+#definitionEditor {
+  min-height: 250px;
+  margin-bottom: 10px;
 }
 
 .tooltip-inner {
