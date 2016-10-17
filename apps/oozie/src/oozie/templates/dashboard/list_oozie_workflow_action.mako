@@ -26,6 +26,12 @@
 ${ commonheader(_("Workflow Action"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
 
+<style type="text/css">
+  #configurationEditor {
+    min-height: 250px;
+    margin-bottom: 10px;
+  }
+</style>
 
 <div class="container-fluid">
   <div class="card card-small">
@@ -155,7 +161,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </div>
 
         <div id="configuration" class="tab-pane" style="min-height:400px">
-          <textarea id="configurationEditor">${ action.conf }</textarea>
+          <div id="configurationEditor">${ action.conf }</div>
         </div>
 
         <div id="child-jobs" class="tab-pane">
@@ -200,30 +206,18 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     </div>
 </div>
 
-
-<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
-<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
+<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 <script type="text/javascript">
 
   $(document).ready(function() {
-    var definitionEditor = $("#configurationEditor")[0];
-
-    var codeMirror = CodeMirror(function (elt) {
-      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
-    }, {
-      value:definitionEditor.value,
-      readOnly:true,
-      lineNumbers:true
+    var editor = ace.edit("configurationEditor");
+    editor.setOptions({
+      readOnly: true,
+      maxLines: Infinity
     });
-
-    // force refresh on tab change
-    $("a[data-toggle='tab']").on("shown", function (e) {
-      if ($(e.target).attr("href") == "#configuration") {
-        codeMirror.refresh();
-      }
-    });
+    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.getSession().setMode("ace/mode/xml");
   });
 </script>
 
