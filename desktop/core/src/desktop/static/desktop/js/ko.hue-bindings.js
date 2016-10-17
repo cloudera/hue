@@ -3301,7 +3301,7 @@
       });
 
       editor.commands.addCommand({
-        name: "gotolinealternetive",
+        name: "gotolinealternative",
         bindKey: {win: "Ctrl-j", mac: "Command-j|Ctrl-j"},
         exec: editor.commands.commands['gotoline'].exec
       });
@@ -3510,7 +3510,7 @@
         var editor = snippet.ace();
         var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
-        if (range) {
+        if (range && range.start.row !== range.end.row && range.start.column !== range.end.column) {
           var conflictingWithErrorMarkers = false;
           if (editor.session.$backMarkers) {
             for (var marker in editor.session.$backMarkers) {
