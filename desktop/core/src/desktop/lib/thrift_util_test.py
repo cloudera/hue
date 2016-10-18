@@ -33,7 +33,7 @@ from djangothrift_test_gen import TestService
 
 import python_util
 import thrift_util
-from thrift_util import jsonable2thrift, thrift2json
+from thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
 
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
@@ -217,6 +217,13 @@ class ThriftUtilTest(unittest.TestCase):
     thrift_util.fixup_enums(struct1,{"myenum":TestEnum})
     self.assertTrue(hasattr(struct1,"myenumAsString"))
     self.assertEquals(struct1.myenumAsString,'ENUM_ONE')
+
+  def test_unpack_guid_secret_in_handle(self):
+    hive_handle = """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), runAsync=True, statement="SELECT \'Hello World!\'"),)"""
+    self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, statement="SELECT \'Hello World!\'"),)""")
+
+    impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
+    self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)), tableName=u\'customers\', tableTypes=None, catalogName=None),)""")
 
 class TestJsonable2Thrift(unittest.TestCase):
   """
