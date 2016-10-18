@@ -19,8 +19,17 @@
     <action name="${ node['name'] }">
         <email xmlns="uri:oozie:email-action:0.2">
             <to>${ node['properties']['to'] }</to>
+            % if node['properties']['cc']:
+            <cc>${ node['properties']['cc'] }</cc>
+            % endif
             <subject>${ node['properties']['subject'] }</subject>
-            <body></body>
+            <body>${ node['properties']['body'] }</body>
+            % if node['properties']['content_type']:
+            <content_type>${ node['properties']['content_type'] }</content_type>
+            % endif
+            % if node['properties']['attachment']:
+            <attachment>${ node['properties']['attachment'] }</attachment>
+            % endif
         </email>
         <ok to="${ node['name'] }-kill"/>
         <error to="${ node['name'] }-kill"/>

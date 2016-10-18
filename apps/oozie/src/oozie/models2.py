@@ -44,7 +44,6 @@ from hadoop.fs.exceptions import WebHdfsException
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
-from notebook.connectors.oozie_batch import OozieApi
 from notebook.models import Notebook
 
 from oozie.conf import REMOTE_SAMPLE_DIR
@@ -931,7 +930,11 @@ def _upgrade_older_node(node):
   if node['type'] in ('end', 'end-widget') and 'to' not in node['properties']:
     node['properties']['enableMail'] = False
     node['properties']['to'] = ''
+    node['properties']['cc'] = ''
     node['properties']['subject'] = ''
+    node['properties']['body'] = ''
+    node['properties']['content_type'] = 'text/plain'
+    node['properties']['attachment'] = ''
 
   if node['type'] == 'email-widget' and 'bcc' not in node['properties']:
     node['properties']['bcc'] = ''
@@ -3118,6 +3121,8 @@ class Coordinator(Job):
 
   @property
   def name(self):
+    from notebook.connectors.oozie_batch import OozieApi # Import dependency
+
     if self.data['properties']['document']:
       return _("%s for %s") % (OozieApi.SCHEDULE_JOB_PREFIX, self.data['name'] or self.data['type'])
     else:
@@ -3948,7 +3953,15 @@ class WorkflowBuilder():
           u'actionParameters': [],
         }, {
           u'name': u'End',
-          u'properties': {},
+          u'properties': {
+              u'body': u'',
+              u'cc': u'',
+              u'to': u'',
+              u'enableMail': False,
+              u'message': u'Workflow ${wf:id()} finished',
+              u'subject': u'',
+              u'attachment': u''
+          },
           u'actionParametersFetched': False,
           u'id': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a',
           u'type': u'end-widget',
@@ -3963,7 +3976,8 @@ class WorkflowBuilder():
               u'enableMail': False,
               u'message': u'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]',
               u'subject': u'',
-              },
+              u'attachment': u''
+          },
           u'actionParametersFetched': False,
           u'id': u'17c9c895-5a16-7443-bb81-f34b30b21548',
           u'type': u'kill-widget',
