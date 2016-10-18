@@ -48,8 +48,8 @@ class Application(object):
 
   @property
   def logs_url(self):
-    url = self.trackingUrl
-    if self.applicationType == 'SPARK':
+    url = self.trackingUrl or ''
+    if url and self.applicationType == 'SPARK':
       url = os.path.join(self.trackingUrl, 'executors')
     return url
 

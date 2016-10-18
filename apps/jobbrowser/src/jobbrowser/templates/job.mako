@@ -114,8 +114,10 @@ ${ comps.menubar() }
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
           <li class="white" id="jobStatus">&nbsp;</li>
+          % if job.logs_url:
           <li class="nav-header">${_('Logs')}</li>
           <li><a href="${job.logs_url }" target="_blank"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
+          % endif
           <li class="nav-header">${_('Progress')}</li>
           <li class="white">${job.progress}%</li>
           <li class="nav-header">${_('Duration')}</li>
