@@ -110,12 +110,7 @@ class Indexer(object):
       ]
     )
 
-    notebook_data = notebook.get_data()
-    snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
-
-    job_handle = _execute_notebook(request, notebook_data, snippet)
-
-    return job_handle
+    return notebook.execute(request, batch=True)
 
   def guess_format(self, data):
     file_format = get_file_format_instance(data['file'])
