@@ -14,12 +14,28 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
+  from desktop import conf
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
 
 ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
+<%namespace name="assist" file="/assist.mako" />
+
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .show-assist {
+    top: 110px!important;
+  }
+  .main-content {
+    top: 112px!important;
+  }
+% endif
+</style>
+
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
@@ -28,6 +44,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
+<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
+
+${ assist.assistPanel() }
+
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
+  <i class="fa fa-chevron-right"></i>
+</a>
+
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
     <div class="navbar-inner">
@@ -49,6 +79,36 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 </div>
 
+<div class="main-content">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+    <div class="vertical-full">
+      <div class="vertical-full row-fluid panel-container">
+
+        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: {
+                user: '${user.username}',
+                sql: {
+                  sourceTypes: [{
+                    name: 'hive',
+                    type: 'hive'
+                  }],
+                  navigationSettings: {
+                    openItem: false,
+                    showStats: true
+                  }
+                },
+                visibleAssistPanels: ['sql']
+              }
+            }"></div>
+        </div>
+        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+
+        <div class="right-panel">
 
 <div class="container-fluid">
   <!-- ko if: $root.section() == 'app' -->
@@ -110,6 +170,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 
+
+
+
 <!-- ko if: $root.section() == 'app' && $root.job() -->
   <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
     <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
@@ -123,6 +186,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
   <!-- /ko -->
 <!-- /ko -->
+
+             </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script type="text/html" id="job-page">
@@ -304,6 +373,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     var JobBrowserViewModel = function (options) {
       var self = this;
+
+      self.apiHelper = ApiHelper.getInstance(options);
+      self.assistAvailable = ko.observable(true);
+      self.isLeftPanelVisible = ko.observable();
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
