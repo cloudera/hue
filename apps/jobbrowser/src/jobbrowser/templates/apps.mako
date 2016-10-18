@@ -230,21 +230,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
+
   (function () {
     var Job = function (vm, job) {
       var self = this;
 
-      self.id = ko.observable(typeof job.id != "undefined" && job.id != null ? job.id : null);
-      self.name = ko.observable(typeof job.name != "undefined" && job.name != null ? job.name : null);
-      self.type = ko.observable(typeof job.type != "undefined" && job.type != null ? job.type : null);
-      self.status = ko.observable(typeof job.status != "undefined" && job.status != null ? job.status : null);
-      self.user = ko.observable(typeof job.user != "undefined" && job.user != null ? job.user : null);
-      self.cluster = ko.observable(typeof job.cluster != "undefined" && job.cluster != null ? job.cluster : null);
-      self.progress = ko.observable(typeof job.progress != "undefined" && job.progress != null ? job.progress : null);
-      self.duration = ko.observable(typeof job.duration != "undefined" && job.duration != null ? job.duration : null);
-      self.submitted = ko.observable(typeof job.submitted != "undefined" && job.submitted != null ? job.submitted : null);
+      self.id = ko.observableDefault(job.id);
+      self.name = ko.observableDefault(job.name);
+      self.type = ko.observableDefault(job.type);
+      self.status = ko.observableDefault(job.status);
+      self.user = ko.observableDefault(job.user);
+      self.cluster = ko.observableDefault(job.cluster);
+      self.progress = ko.observableDefault(job.progress);
+      self.duration = ko.observableDefault(job.duration);
+      self.submitted = ko.observableDefault(job.submitted);
 
-      self.properties = ko.observable(typeof job.properties != "undefined" && job.properties != null ? job.properties : {});
+      self.properties = ko.observableDefault(job.properties, {});
       self.mainType = ko.observable(vm.interface());
 
       self.loadingJob = ko.observable(false);

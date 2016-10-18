@@ -15,6 +15,16 @@
 // limitations under the License.
 
 (function () {
+  ko.observableDefault = function () {
+    var prop = arguments[0], defvalue = arguments[1] || null;
+    return ko.observable(typeof prop != "undefined" && prop != null ? prop : defvalue);
+  };
+
+  ko.observableArrayDefault = function () {
+    var prop = arguments[0], defvalue = arguments[1] || null;
+    return ko.observableArray(typeof prop != "undefined" && prop != null ? prop : defvalue);
+  };
+
   ko.bindingHandlers.autocomplete = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
