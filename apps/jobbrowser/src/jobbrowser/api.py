@@ -239,9 +239,14 @@ class YarnApi(JobBrowserApi):
                   user.is_superuser or
                   job.user == user.username, jobs)
 
+
+  def _get_job_from_history_server(self, job_id):
+    resp = self.history_server_api.job(self.user, job_id)
+    return YarnJob(self.history_server_api, resp['job'])
+
+
   @rm_ha
   def get_job(self, jobid):
-
     job_id = jobid.replace('application', 'job')
     app_id = jobid.replace('job', 'application')
 
@@ -253,9 +258,8 @@ class YarnApi(JobBrowserApi):
           job = SparkJob(app, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
         elif app['state'] == 'KILLED':
           job = KilledYarnJob(self.resource_manager_api, app)
-        else:
-          resp = self.history_server_api.job(self.user, job_id)
-          job = YarnJob(self.history_server_api, resp['job'])
+        else:  # Job succeeded, attempt to fetch from JHS
+          job = self._get_job_from_history_server(job_id)
       else:
         if app['state'] == 'ACCEPTED':
           raise ApplicationNotRunning(app_id, app)
@@ -268,11 +272,15 @@ class YarnApi(JobBrowserApi):
         else:
           job = Application(app, self.resource_manager_api)
     except RestException, e:
-      if e.code == 404:  # Job not found in RM so attempt to find job in History Server
-        resp = self.history_server_api.job(self.user, job_id)
-        job = YarnJob(self.history_server_api, resp['job'])
+      if e.code == 404:  # Job not found in RM so attempt to find job in JHS
+        job = self._get_job_from_history_server(job_id)
       else:
         raise JobExpired(app_id)
+    except PopupException, e:
+      if 'NotFoundException' in e.message:
+        job = self._get_job_from_history_server(job_id)
+      else:
+        raise e
     except ApplicationNotRunning, e:
       raise e
     except Exception, e:
