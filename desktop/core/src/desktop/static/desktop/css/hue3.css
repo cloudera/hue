@@ -3223,3 +3223,22 @@ input[type='password']::-ms-reveal {
   color: #ffffff;
   text-decoration: none;
 }
+
+.select-like {
+  display: inline-block;
+  position: relative;
+}
+
+.select-like input {
+  transition: none!important;
+  box-shadow: none!important;
+  border-radius: 4px!important;
+  cursor: pointer!important;
+}
+
+.select-like .fa {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 15px;
+}
