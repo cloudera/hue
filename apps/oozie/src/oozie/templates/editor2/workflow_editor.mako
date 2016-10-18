@@ -527,7 +527,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 

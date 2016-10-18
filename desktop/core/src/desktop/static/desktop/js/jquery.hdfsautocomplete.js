@@ -32,6 +32,7 @@
         smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
         showOnFocus: false,
         skipKeydownEvents: false,
+        skipEnter: false,
         skipScrollEvent: false,
         zIndex: 33000,
         isS3: false
@@ -132,6 +133,11 @@
       }
       if (e.keyCode == 32 && e.ctrlKey) {
         e.preventDefault();
+      }
+      if (_this.options.skipEnter && e.keyCode === 13){
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
       }
     });
 

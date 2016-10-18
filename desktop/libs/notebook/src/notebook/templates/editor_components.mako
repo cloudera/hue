@@ -173,7 +173,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

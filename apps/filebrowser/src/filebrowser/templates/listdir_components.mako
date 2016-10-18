@@ -575,7 +575,6 @@ from django.utils.translation import ugettext as _
     </tr>
   </script>
 
-  <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/jquery.hdfstree.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
