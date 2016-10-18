@@ -95,7 +95,6 @@ class Notebook(object):
   def get_str(self):
     return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw']) for snippet in self.get_data()['snippets']])
 
-
   def add_hive_snippet(self, database, sql):
     _data = json.loads(self.data)
 
@@ -157,6 +156,14 @@ class Notebook(object):
          'id': None
       }
     )
+
+  def execute(self, request, batch=False):
+    from notebook.api import _execute_notebook # Cyclic dependency
+
+    notebook_data = self.get_data()
+    snippet = {'wasBatchExecuted': batch, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
+
+    return _execute_notebook(request, notebook_data, snippet)
 
 
 def get_api(request, snippet):
