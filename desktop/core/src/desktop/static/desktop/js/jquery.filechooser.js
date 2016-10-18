@@ -256,14 +256,14 @@
           'white-space': 'nowrap'
         });
 
-        var $scrollingBreadcrumbs = $("<ul>").addClass("hueBreadcrumb").css({
+        var $scrollingBreadcrumbs = $("<ul>").addClass("hueBreadcrumb editable-breadcrumbs").css({
           'padding': '0',
           'marginLeft': '10px',
           'marginBottom': '0',
+          'paddingLeft': '10px',
           'paddingRight': '10px',
           'float': 'left',
           'width': '370px',
-          'height': '30px',
           'overflow-x': 'scroll',
           'overflow-y': 'hidden',
           'white-space': 'nowrap'
@@ -290,6 +290,19 @@
           _extraHome.appendTo($scrollingBreadcrumbs);
         }
 
+        var $hdfsAutocomplete = $('<input type="text">').addClass('editable-breadcrumb-input').val(path).hide();
+
+        $scrollingBreadcrumbs.click(function (e) {
+          if ($(e.target).is('ul') || $(e.target).is('i')) {
+            $(this).hide();
+            $hdfsAutocomplete.show().focus();
+          }
+        });
+
+        var $editBreadcrumbs = $("<li>").css('marginRight', '10px');
+        var $crumbLink = $("<a>").addClass('inactive-action');
+        $crumbLink.attr("href", "javascript:void(0)").html('<i class="fa fa-pencil"></i>').appendTo($editBreadcrumbs);
+        $editBreadcrumbs.appendTo($scrollingBreadcrumbs);
         if (typeof data.breadcrumbs != "undefined" && data.breadcrumbs != null) {
           var _bLength = data.breadcrumbs.length;
           $(data.breadcrumbs).each(function (cnt, crumb) {
@@ -318,6 +331,26 @@
         $scrollingBreadcrumbs.animate({
           'scrollLeft': $scrollingBreadcrumbs.width()
         });
+
+        $hdfsAutocomplete.appendTo($(_parent.element).find('.filechooser-tree'));
+
+        $hdfsAutocomplete.jHueHdfsAutocomplete({
+          home: "/user/" + _parent.options.user + "/",
+          skipEnter: true,
+          skipKeydownEvents: true,
+          onEnter: function (el) {
+            var _url = el.val();
+            _parent.options.onFolderChange(_url);
+            _parent.navigateTo(_url);
+            $("#jHueHdfsAutocomplete").hide();
+          },
+          onBlur: function () {
+            $hdfsAutocomplete.hide();
+            $scrollingBreadcrumbs.show();
+          },
+          smartTooltip: _parent.options.labels.SMART_TOOLTIP
+        });
+
         $('<div>').addClass('clearfix').appendTo($(_parent.element).find('.filechooser-tree'));
 
         if (typeof $.nicescroll !== 'undefined') {

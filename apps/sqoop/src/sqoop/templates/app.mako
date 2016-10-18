@@ -686,7 +686,6 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('sqoop/js/cclass.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('sqoop/js/koify.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('sqoop/js/sqoop.autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
