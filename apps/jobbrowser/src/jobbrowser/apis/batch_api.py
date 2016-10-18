@@ -19,9 +19,9 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from liboozie.oozie_api import get_oozie
 from jobbrowser.apis.base_api import Api
-
+from liboozie.oozie_api import get_oozie
+from notebook.connectors.oozie_batch import OozieApi
 
 LOG = logging.getLogger(__name__)
 
@@ -40,7 +40,17 @@ class BatchApi(Api):
     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
     wf_list = oozie_api.get_workflows(**kwargs)
 
-    return [{'id': app.id, 'status': app.status} for app in wf_list.jobs]
+    return [{
+        'id': app.id,
+        'name': app.appName,
+        'status': app.status,
+        'type': 'workflow',
+        'user': app.user,
+        'progress': 100,
+        'duration': 10 * 3600,
+        'submitted': 10 * 3600
+        
+    } for app in wf_list.jobs if app.appName.startswith(OozieApi.BATCH_JOB_PREFIX)]
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)

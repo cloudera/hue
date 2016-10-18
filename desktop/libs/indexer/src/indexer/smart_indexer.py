@@ -68,7 +68,10 @@ class Indexer(object):
   def run_morphline(self, request, collection_name, morphline, input_path, query=None):
     workspace_path = self._upload_workspace(morphline)
 
-    notebook = Notebook(name='Indexer job for %s' % collection_name)
+    notebook = Notebook(
+        name='Indexer job for %s' % collection_name,
+        isManaged=True
+    )
 
     if query:
       q = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
@@ -110,7 +113,7 @@ class Indexer(object):
     notebook_data = notebook.get_data()
     snippet = {'wasBatchExecuted': True, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
 
-    job_handle = _execute_notebook(request, notebook_data, snippet) # To set as managed
+    job_handle = _execute_notebook(request, notebook_data, snippet)
 
     return job_handle
 

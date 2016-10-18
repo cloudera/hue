@@ -370,7 +370,8 @@ def _historify(notebook, user):
     name=name,
     type=query_type,
     owner=user,
-    is_history=True
+    is_history=True,
+    is_managed=notebook.get('isManaged') == True
   )
 
   # Link history of saved query
