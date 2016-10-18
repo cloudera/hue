@@ -232,6 +232,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/javascript" charset="utf-8">
 
   (function () {
+
     var Job = function (vm, job) {
       var self = this;
 
@@ -252,17 +253,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchJob = function () {
         self.loadingJob(true);
+        hueUtils.changeURL('#!' + self.id());
         vm.section('app');
         $.post("/jobbrowser/api/job", {
           appid: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
-        }, function(data) {
+        }, function (data) {
           if (data.status == 0) {
             vm.job(new Job(vm, job));
           } else {
             $(document).trigger("error", data.message);
           }
-        }).always(function(){
+        }).always(function () {
           self.loadingJob(false);
         });
       };
@@ -282,11 +284,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         $.post("/jobbrowser/api/jobs", {
           username: ko.mapping.toJSON(self.username),
           interface: ko.mapping.toJSON(vm.interface)
-        }, function(data) {
+        }, function (data) {
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {
-              data.apps.forEach(function(job) { // TODO: update and merge
+              data.apps.forEach(function (job) { // TODO: update and merge
                 apps.push(new Job(vm, job));
               });
             }
@@ -294,7 +296,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           } else {
             $(document).trigger("error", data.message);
           }
-        }).always(function(){
+        }).always(function () {
           self.loadingJobs(false);
         });
       };
@@ -308,7 +310,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.section = ko.observable('apps');
       self.interface = ko.observable('jobs');
-      self.interface.subscribe(function(val) {
+      self.interface.subscribe(function (val) {
+        hueUtils.changeURL('#!' + val);
         self.jobs.fetchJobs();
       });
     };
@@ -324,6 +327,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
       viewModel = new JobBrowserViewModel(options);
       ko.applyBindings(viewModel);
+
+      var loadHash = function () {
+        var h = window.location.hash;
+        if (h.indexOf('#!') === 0) {
+          h = h.substr(2);
+        }
+        switch (h) {
+          case 'schedules':
+          case 'jobs':
+          case 'batches':
+            viewModel.interface(h);
+            break;
+          default:
+
+        }
+      }
+
+      window.onhashchange = function () {
+        loadHash();
+      }
+      loadHash();
 
       viewModel.jobs.fetchJobs();
     });
