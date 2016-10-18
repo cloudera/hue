@@ -71,6 +71,7 @@ class Notebook(object):
           'description': '',
           'type': 'notebook',
           'isSaved': False,
+          'isManaged': False,
           'sessions': [],
           'snippets': [],
       }

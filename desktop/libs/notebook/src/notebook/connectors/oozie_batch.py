@@ -49,6 +49,7 @@ class OozieApi(Api):
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
   RESULTS_PATTERN_MAPREDUCE = "(?P<results>.+)"
   RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
+  BATCH_JOB_PREFIX = 'Hue_Batch_'
 
   def __init__(self, *args, **kwargs):
     Api.__init__(self, *args, **kwargs)
@@ -64,7 +65,7 @@ class OozieApi(Api):
 
     if notebook['type'] == 'notebook':
       # Convert notebook to workflow
-      workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True, name=_("Batch job for %s") % (notebook['name'] or notebook['type']))
+      workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True, name=_("%s for %s") % (OozieApi.BATCH_JOB_PREFIX, notebook['name'] or notebook['type']))
       workflow = Workflow(document=workflow_doc, user=self.user)
     else:
       notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')

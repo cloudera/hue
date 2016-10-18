@@ -87,3 +87,6 @@ class YarnAtsApi(Api):
 class ImpalaApi(Api):
   pass
 
+
+class Sqoop2Api(Api):
+  pass
