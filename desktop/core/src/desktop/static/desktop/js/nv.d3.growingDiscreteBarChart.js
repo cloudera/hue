@@ -212,10 +212,14 @@ nv.models.growingDiscreteBarChart = function() {
                   var self = d3.select(this),
                     textLength = self.node().getComputedTextLength(),
                     text = self.text();
-                  while (textLength > rangeBand && text.length > 0) {
+                  while (textLength > rangeBand*2 && text.length > 0) {
                     text = text.slice(0, -1);
                     self.text(text + '...');
                     textLength = self.node().getComputedTextLength();
+                    if (self.text() == '...') {
+                      self.text(' ');
+                      textLength = 0;
+                    }
                   }
                   return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')'
                 });
