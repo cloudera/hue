@@ -21,7 +21,9 @@ import logging
 import socket
 import threading
 import time
+import re
 import sasl
+import struct
 import sys
 
 from thrift.Thrift import TType, TApplicationException
@@ -424,15 +426,18 @@ class SuperClient(object):
           if not self.transport.isOpen():
             self.transport.open()
           st = time.time()
+
+          str_args = _unpack_guid_secret_in_handle(repr(args))
           logging.debug("Thrift call: %s.%s(args=%s, kwargs=%s)"
-            % (str(self.wrapped.__class__), attr, repr(args), repr(kwargs)))
+            % (str(self.wrapped.__class__), attr, str_args, repr(kwargs)))
+
           ret = res(*args, **kwargs)
-          log_msg = repr(ret)
+          log_msg = _unpack_guid_secret_in_handle(repr(ret))
 
           # Truncate log message, increase output in DEBUG mode
           log_limit = 2000 if settings.DEBUG else 1000
           log_msg = log_msg[:log_limit] + (log_msg[log_limit:] and '...')
-          
+
           duration = time.time() - st
 
           # Log the duration at different levels, depending on how long
@@ -477,6 +482,23 @@ class SuperClient(object):
         _grab_transport_from_wrapper(self.transport).setTimeout(self.timeout_seconds * 1000)
       else:
         _grab_transport_from_wrapper(self.transport).setTimeout(None)
+
+def _unpack_guid_secret_in_handle(str_args):
+  if 'operationHandle' in str_args or 'sessionHandle' in str_args:
+    secret = re.search('secret=(\".*\"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
+    guid = re.search('guid=(\".*\")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
+
+    if secret and guid:
+      try:
+        encoded_secret = eval(secret.group(1))
+        encoded_guid = eval(guid.group(1))
+
+        str_args = str_args.replace(secret.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_secret))
+        str_args = str_args.replace(guid.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_guid))
+      except Exception:
+        logging.warn("Unable to unpack the secret and guid in Thrift Handle.")
+
+  return str_args
 
 def simpler_string(thrift_obj):
   """
