@@ -31,7 +31,7 @@ from desktop.models import Document2, Document
 
 from metadata.conf import has_optimizer, has_navigator
 
-from notebook.conf import get_interpreters
+from notebook.conf import get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
@@ -77,7 +77,7 @@ def notebook(request):
       'editor_id': notebook_id or None,
       'notebooks_json': '{}',
       'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
+          'languages': get_ordered_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
           'is_navigator_enabled': has_navigator(request.user),

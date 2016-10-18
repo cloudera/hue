@@ -33,6 +33,12 @@ import notebook.connectors.hiveserver2
 from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
+from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 
 
 class TestNotebookApi(object):
@@ -358,3 +364,52 @@ class TestNotebookApiMocked(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
+
+
+def test_get_interpreters_to_show():
+  default_interpreters = OrderedDict((
+      ('hive', {
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'options': {}
+      }),
+      ('spark', {
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'options': {}
+      }),
+      ('pig', {
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'options': {}
+      }),
+      ('java', {
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'options': {}
+      })
+    ))
+
+  expected_interpreters = OrderedDict((
+      ('java', {
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'options': {}
+      }),
+      ('pig', {
+        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'options': {}
+      }),
+      ('hive', {
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'options': {}
+      }),
+      ('spark', {
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'options': {}
+      })
+    ))
+
+  try:
+    resets = [INTERPRETERS.set_for_testing(default_interpreters)]
+
+    interpreters_shown_on_wheel_unset = get_ordered_interpreters()
+    assert_equal(default_interpreters.values(), interpreters_shown_on_wheel_unset,
+                 'get_interpreters_to_show should return the same as get_interpreters when '
+                 'interpreters_shown_on_wheel is unset. expected: %s, actual: %s'
+                 % (default_interpreters.values(), interpreters_shown_on_wheel_unset))
+
+    resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
+    assert_equal(expected_interpreters.values(), get_ordered_interpreters(),
+                 'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s'
+                 % (expected_interpreters.values(), get_ordered_interpreters()))
+  finally:
+    for reset in resets:
+      reset()

@@ -17,7 +17,7 @@
 
 # Start DBProxy server if we have some JDBC snippets
 
-from notebook.conf import get_interpreters, ENABLE_DBPROXY_SERVER
+from notebook.conf import get_ordered_interpreters, ENABLE_DBPROXY_SERVER
 
 
 def _start_livy_server():
@@ -41,5 +41,5 @@ def _start_livy_server():
   atexit.register(cleanup)
 
 
-if ENABLE_DBPROXY_SERVER.get() and [interpreter for interpreter in get_interpreters() if interpreter['interface'] == 'jdbc']:
+if ENABLE_DBPROXY_SERVER.get() and [interpreter for interpreter in get_ordered_interpreters() if interpreter['interface'] == 'jdbc']:
   _start_livy_server()

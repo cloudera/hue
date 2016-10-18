@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_interpreters
+from notebook.conf import get_ordered_interpreters
 
 
 LOG = logging.getLogger(__name__)
@@ -197,7 +197,7 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
 
-  interpreter = [interpreter for interpreter in get_interpreters(request.user) if interpreter['type'] == snippet['type']]
+  interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
