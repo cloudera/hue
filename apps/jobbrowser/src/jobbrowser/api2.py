@@ -28,7 +28,6 @@ from jobbrowser.apis.base_api import get_api
 LOG = logging.getLogger(__name__)
 
 
-
 def api_error_handler(func):
   def decorator(*args, **kwargs):
     response = {}

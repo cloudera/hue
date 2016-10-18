@@ -44,6 +44,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
+from notebook.connectors.oozie_batch import OozieApi
 from notebook.models import Notebook
 
 from oozie.conf import REMOTE_SAMPLE_DIR
@@ -3117,7 +3118,10 @@ class Coordinator(Job):
 
   @property
   def name(self):
-    return self.data['name']
+    if self.data['properties']['document']:
+      return _("%s for %s") % (OozieApi.SCHEDULE_JOB_PREFIX, self.data['name'] or self.data['type'])
+    else:
+      return self.data['name']
 
   def set_workspace(self, user):
     self.data['properties']['deployment_dir'] = Job.get_workspace(user)
