@@ -41,7 +41,8 @@ from desktop.views import register_status_bar_view
 from hadoop import cluster
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 from hadoop.yarn.clients import get_log_client
-import hadoop.yarn.resource_manager_api as resource_manager_api
+from hadoop.yarn import resource_manager_api as resource_manager_api
+
 
 LOG = logging.getLogger(__name__)
 
@@ -68,7 +69,11 @@ def check_job_permission(view_func):
   """
   def decorate(request, *args, **kwargs):
     jobid = kwargs['job']
-    job = get_job(request, job_id=jobid)
+    try:
+      job = get_job(request, job_id=jobid)
+    except ApplicationNotRunning, e:
+      LOG.warn('Job %s has not yet been accepted by the RM, will poll for status.' % jobid)
+      return job_not_assigned(request, jobid, request.path)
 
     if not SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
@@ -83,14 +88,13 @@ def get_job(request, job_id):
   try:
     job = get_api(request.user, request.jt).get_job(jobid=job_id)
   except ApplicationNotRunning, e:
-    if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
+    if e.job.get('state', '').lower() == 'accepted':
       rm_pool = resource_manager_api.get_resource_manager_pool()
       rm_api = rm_pool.get(request.user.username)
       job = Application(e.job, rm_api)
       rm_pool.put(rm_api)
     else:
-      # reverse() seems broken, using request.path but beware, it discards GET and POST info
-      return job_not_assigned(request, job_id, request.path)
+      raise e  # Job has not yet been accepted by RM
   except JobExpired, e:
     raise PopupException(_('Job %s has expired.') % job_id, detail=_('Cannot be found on the History Server.'))
   except Exception, e:
@@ -156,6 +160,7 @@ def jobs(request):
     'is_yarn': cluster.is_yarn(),
     'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
   })
+
 
 def massage_job_for_json(job, request):
   job = {
