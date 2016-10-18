@@ -625,6 +625,7 @@
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <!-- ko if: associatedDocument -->
+          <div class="select-like">
           <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
               source: $root.documentsAutocompleteSource,
               showOnFocus: true,
@@ -636,6 +637,10 @@
               change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
               itemTemplate: 'doc-search-autocomp-item'
             }, valueUpdate: 'afterkeydown'">
+            <span class="inactive-action">
+                <i class="fa fa-sort"></i>
+              </span>
+          </div>
           <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>

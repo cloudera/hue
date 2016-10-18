@@ -334,17 +334,22 @@ ${ workflow.render() }
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
-          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-            source: $root.documentsAutocompleteSource,
-            minLength: 0,
-            showOnFocus: true,
-            blurOnEnter: true,
-            type: type,
-            select: function (event, ui) { ko.dataFor(event.target).value(ui.item.value); this.value = ui.item.label; $(event.target).data('prevLabel', ui.item.label); return false;},
-            focus: function (event, ui) { this.value = ui.item.label; return false;},
-            change: function (event, ui) { if(!ui.item){ ko.dataFor(event.target).value() != '' ? this.value = $(event.target).data('prevLabel') : this.value = ''; }},
-            itemTemplate: 'doc-search-autocomp-item'
-          }, valueUpdate: 'afterkeydown'">
+          <div class="select-like">
+            <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
+              source: $root.documentsAutocompleteSource,
+              minLength: 0,
+              showOnFocus: true,
+              blurOnEnter: true,
+              type: type,
+              select: function (event, ui) { ko.dataFor(event.target).value(ui.item.value); this.value = ui.item.label; $(event.target).data('prevLabel', ui.item.label); return false;},
+              focus: function (event, ui) { this.value = ui.item.label; return false;},
+              change: function (event, ui) { if(!ui.item){ ko.dataFor(event.target).value() != '' ? this.value = $(event.target).data('prevLabel') : this.value = ''; }},
+              itemTemplate: 'doc-search-autocomp-item'
+            }, valueUpdate: 'afterkeydown'">
+              <span class="inactive-action">
+                <i class="fa fa-sort"></i>
+              </span>
+          </div>
           <!-- ko if: $root.getDocumentById(type(), value()) -->
             <!-- ko with: $root.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
