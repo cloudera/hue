@@ -948,7 +948,7 @@ var Collection = function (vm, collection) {
     return _fields;
   });
   self.template.availableWidgetFields = ko.computed(function() {
-    if (self.template.fieldsModalType() == 'histogram-widget') {
+    if (self.template.fieldsModalType() == 'histogram-widget' || self.template.fieldsModalType() == 'timeline-widget') {
       return vm.availableDateFields();
     }
     else if (self.template.fieldsModalType() == 'line-widget') {
@@ -1351,6 +1351,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));
   self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "hit-widget"));
   self.draggableBucket = ko.observable(bareWidgetBuilder("Chart", "bucket-widget"));
+  self.draggableTimeline = ko.observable(bareWidgetBuilder("Timeline", "timeline-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
@@ -1379,6 +1380,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     return getWidgets(function(widget) { return widget.widgetType() == 'filter-widget'; }).length == 0;
   });
   self.availableDraggableHistogram = ko.computed(function() {
+    return self.availableDateFields().length > 0;
+  });
+  self.availableTimeline = ko.computed(function() {
     return self.availableDateFields().length > 0;
   });
   self.availableDraggableNumbers = ko.computed(function() {

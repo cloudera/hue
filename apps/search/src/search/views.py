@@ -532,7 +532,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type == 'bucket-widget' or widget_type == 'pie2-widget':
+    if widget_type == 'bucket-widget' or widget_type == 'pie2-widget' or widget_type == 'timeline-widget':
       facet_type = 'nested'
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []

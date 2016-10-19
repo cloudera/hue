@@ -254,12 +254,21 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
                        <i class="fa fa-th"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
+    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
+                       <i class="hcha hcha-timeline-chart"></i>
+         </a>
+    </div>
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableTimeline() },
+                    draggable: {data: draggableTimeline(), isEnabled: availableTimeline,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Timeline')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableTimeline() ? 'move' : 'default' }">
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
@@ -1053,6 +1062,92 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
+    </div>
+
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
+      <span data-bind="with: $root.collection.getFacetById($parent.id())">
+        <span class="facet-field-label">${ _('Chart Type') }</span>
+        <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.timelineChartType">
+        </select>&nbsp;
+        <span class="facet-field-label">${ _('Interval') }</span>
+        <select class="input-small" data-bind="options: $root.intervalOptions,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.gap">
+        </select>&nbsp;
+      </span>
+      <span class="facet-field-label">${ _('Zoom') }</span>
+      <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+      <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
+      <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
+    </div>
+
+    <!-- ko if: $root.collection.getFacetById($parent.id()) -->
+      <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
+        type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
+        fqs: $root.query.fqs,
+        onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+        onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+        onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+        onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+    <!-- /ko -->
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="timeline-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
+
+        <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
+          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+            <i class="fa fa-plus"></i> ${ _('Add') }
+          </a>
+          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
+          <div class="clearfix"></div>
+        </div>
+        <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Metric') }
+              </span>
+              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate" class="hit-options"></select>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Limit') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Min Count') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
+            </span>
+          </div>
+        </div>
+
+
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
@@ -1928,7 +2023,7 @@ ${ dashboard.layout_skeleton() }
           </span>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+      <div class="alert alert-info inline" data-bind="visible: $root.collection.template.filteredModalFields().length == 0" style="margin-left: 250px; margin-right: 50px; height: 42px;line-height: 42px">
         ${_('There are no fields matching your search term.')}
       </div>
     </div>
@@ -2038,7 +2133,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="time-filter-select">
-  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium" style="margin-right: 4px">
+  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-small" style="margin-right: 4px">
     <option value="all">${ _('All') }</option>
     <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
     <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
