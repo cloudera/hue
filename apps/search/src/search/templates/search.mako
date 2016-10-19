@@ -3023,19 +3023,26 @@ $(document).ready(function () {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       viewModel.collection.template.fieldsModalType(widget.widgetType());
-      $('#addFacetInput').typeahead({
-        'source': viewModel.collection.template.availableWidgetFieldsNames(),
-        'updater': function (item) {
-          addFacetDemiModalFieldPreview({'name': function () {
-            return item
-          }});
-          return item;
-        }
-      });
+
       selectedWidget = widget;
       selectedRow = row;
-      $("#addFacetDemiModal").modal("show");
-      $("#addFacetDemiModal input[type='text']").focus();
+
+      if (viewModel.collection.template.availableWidgetFields().length == 1){
+        addFacetDemiModalFieldPreview(viewModel.collection.template.availableWidgetFields()[0]);
+      }
+      else {
+        $('#addFacetInput').typeahead({
+          'source': viewModel.collection.template.availableWidgetFieldsNames(),
+          'updater': function (item) {
+            addFacetDemiModalFieldPreview({'name': function () {
+              return item
+            }});
+            return item;
+          }
+        });
+        $("#addFacetDemiModal").modal("show");
+        $("#addFacetDemiModal input[type='text']").focus();
+      }
     }
     else {
       distributeRowWidgetsSize(row, true);
