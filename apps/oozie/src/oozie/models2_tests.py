@@ -1051,6 +1051,22 @@ class TestModelAPI(OozieMockBase):
     assert_equal(len(_data['workflow']['nodes']), 4)
 
 
+  def test_find_all_parameters_check_validity(self):
+    wf_data = Workflow.get_default_workflow()
+
+    wf_data['properties'] = Workflow.get_properties()
+    wf_data['nodes'] = [{
+          u'name': u'Start',
+          u'properties': {'parameters': [{'value': 'a=1'}, {'value': 'b'}, {'value': ''}, {'value':'c=d=1'}]},
+          u'id': u'3f107997-04cc-8733-60a9-a4bb62cebffc',
+          u'type': u'document-widget',
+          u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}],
+          u'actionParameters': [],
+        }]
+
+    assert_equal({u'a': u'1', u'c': u'd=1'}, Workflow(data=json.dumps({'workflow': wf_data})).find_parameters())
+
+
   def test_gen_hive_xml(self):
     notebook = make_notebook(name='Browse', editor_type='hive', statement='SHOW TABLES', status='ready')
     notebook_doc, save_as = _save_notebook(notebook.get_data(), self.user)
