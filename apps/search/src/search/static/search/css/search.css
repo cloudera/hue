@@ -669,10 +669,10 @@ em {
     border-left: 1px solid #c0c0c0!important;
   }
   .dashboard {
-    margin-top: 40px;
+    margin-top: 60px;
   }
   .with-top-margin {
-    margin-top: 100px;
+    margin-top: 120px;
   }
   .form-search > strong, .form-search > .input-append .selectMask, .form-search > .input-append a.btn, .form-search > .time-filter, .form-search > .time-fixed-filter {
     display: none;
