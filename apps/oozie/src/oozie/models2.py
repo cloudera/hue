@@ -392,8 +392,9 @@ class Workflow(Job):
     for node in self.nodes:
       if 'document' in node.data['type']:
         for param in node.data['properties']['parameters']:
-          name, val = param['value'].split('=')
-          parameters[name] = val
+          if param['value'] and '=' in param['value']:
+            name, val = param['value'].split('=', 1)
+            parameters[name] = val
       else:
         extra = node.find_parameters()
         if extra:
