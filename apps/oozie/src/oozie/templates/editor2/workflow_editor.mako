@@ -689,7 +689,8 @@ ${ dashboard.import_bindings() }
         _el.css({
           "top": (lastSeenPosition.top) + "px",
           "left": lastSeenPosition.left + "px",
-          "width": _width
+          "width": _width,
+          "marginBottom": "20px"
         });
         $("#exposeOverlay").fadeIn(300);
         _el.animate({
