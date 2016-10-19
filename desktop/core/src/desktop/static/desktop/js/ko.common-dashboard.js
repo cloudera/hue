@@ -295,7 +295,9 @@ function ChangeTracker(objectToTrack, ko, mappingOptions) {
     ]
   };
 
-  $.extend(MAPPING, mappingOptions);
+  if (mappingOptions && mappingOptions.ignore) {
+    MAPPING.ignore = MAPPING.ignore.concat(mappingOptions.ignore);
+  }
 
   var result = {
     somethingHasChanged: ko.dependentObservable(function () {
