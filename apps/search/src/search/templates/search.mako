@@ -3023,7 +3023,6 @@ $(document).ready(function () {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
       viewModel.collection.template.fieldsModalFilter("");
       viewModel.collection.template.fieldsModalType(widget.widgetType());
-      viewModel.collection.template.fieldsModalFilter.valueHasMutated();
       $('#addFacetInput').typeahead({
         'source': viewModel.collection.template.availableWidgetFieldsNames(),
         'updater': function (item) {
