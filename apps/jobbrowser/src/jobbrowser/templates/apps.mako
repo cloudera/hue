@@ -194,7 +194,7 @@ ${ assist.assistPanel() }
   <!-- /ko -->
 <!-- /ko -->
 
-          <!-- ko if: $root.job() -->
+          <!-- ko if: job() && !isLoadingJob() -->
           <!-- ko with: coordVM -->
           <div>
             <table class="table table-striped table-condensed margin-top-10">
@@ -421,7 +421,9 @@ ${ assist.assistPanel() }
 
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
+      self.isLoadingJob = ko.observable(false);
       self.job.subscribe(function (val) {
+        self.isLoadingJob(true);
         $.get("/oozie/list_oozie_coordinator/" + val.id(), {
           format: 'json'
         }, function (data) {
@@ -429,7 +431,7 @@ ${ assist.assistPanel() }
         }).fail(function (xhr) {
           $(document).trigger("error", xhr.responseText);
         }).always(function () {
-          //self.loadingScheduler(false);
+          self.isLoadingJob(false);
         });
       });
 
