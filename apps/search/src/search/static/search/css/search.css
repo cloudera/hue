@@ -649,3 +649,32 @@ em {
 .grid-side-btn:hover {
   color: #338bb8;
 }
+
+@media screen and (max-width: 1000px) {
+  .card-widget, .card-column {
+    float: left !important;
+    width: 100% !important;
+    margin-left: 0!important;
+  }
+  .search-bar > .pull-right {
+    display: block;
+    text-align: center;
+    float: none!important;
+    margin-bottom: 5px;
+  }
+  .search-bar {
+    text-align: center;
+  }
+  .search-bar input {
+    border-left: 1px solid #c0c0c0!important;
+  }
+  .dashboard {
+    margin-top: 40px;
+  }
+  .with-top-margin {
+    margin-top: 100px;
+  }
+  .form-search > strong, .form-search > .input-append .selectMask, .form-search > .input-append a.btn, .form-search > .time-filter, .form-search > .time-fixed-filter {
+    display: none;
+  }
+}

@@ -644,6 +644,9 @@
         var _max = _options.maxWidth * 1;
         $(element).width(Math.min($(element).parent().width(), _max));
       }
+      else {
+        $(element).width($(element).parent().width() - 10);
+      }
 
       $(element).height($(element).width() / 2.23);
 
@@ -878,6 +881,15 @@
       $(element).parents(_parentSelector).one("resize", function () {
         ko.bindingHandlers.mapChart.render(element, valueAccessor);
       });
+
+      var _resizeTimeout = -1;
+      nv.utils.windowResize(function () {
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function () {
+          ko.bindingHandlers.mapChart.render(element, valueAccessor);
+        }, 200);
+      });
+
       chartsNormalState();
     },
     init: function (element, valueAccessor) {
