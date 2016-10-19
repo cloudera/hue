@@ -187,8 +187,17 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="hcha hcha-pie-chart"></i>
+         </a>
+    </div>
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+                    draggable: {data: draggablePie2(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
@@ -206,16 +215,6 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
                        <i class="hcha hcha-bar-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(),
-                    css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
-                    draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Line Chart')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
-                       <i class="hcha hcha-line-chart"></i>
-         </a>
-    </div>
     <div data-bind="visible: $root.isLatest(),
                     css: { 'draggable-widget': true, 'disabled': ! availableDraggableChart() },
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
@@ -224,6 +223,16 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
          title="${_('Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
+         </a>
+    </div>    
+    <div data-bind="visible: ! $root.isLatest(),
+                    css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
+                    draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Line Chart')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
+                       <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
     <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
@@ -1338,6 +1347,84 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
+    </div>
+
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <!-- ko if: type() == 'range' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: rangePieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <!-- /ko -->
+      <!-- ko if: type() == 'range-up' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: rangeUpPieChartDataTransformer,
+        rangeUp: true,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <!-- /ko -->
+      <!-- ko if: type().indexOf('range') == -1 -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: pieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+</script>
+
+
+<script type="text/html" id="pie2-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle' }">
+      </span>
+      <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
+        <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
+          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+            <i class="fa fa-plus"></i> ${ _('Add') }
+          </a>
+          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
+          <div class="clearfix"></div>
+        </div>
+        <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Metric') }
+              </span>
+              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate" class="hit-options"></select>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Limit') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Min Count') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
