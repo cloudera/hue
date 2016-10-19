@@ -23,6 +23,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <%namespace name="assist" file="/assist.mako" />
 
+<link rel="stylesheet" href="${ static('desktop/ext/css/basictable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -36,6 +37,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </style>
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
