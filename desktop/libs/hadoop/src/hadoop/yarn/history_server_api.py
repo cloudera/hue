@@ -103,6 +103,9 @@ class HistoryServerApi(object):
   def job(self, user, job_id):
     return self._root.get('mapreduce/jobs/%(job_id)s' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
+  def kill(self, user, job_id):
+    return self._root.get('mapreduce/jobs/%(job_id)s' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
+
   def counters(self, job_id):
     return self._root.get('mapreduce/jobs/%(job_id)s/counters' % {'job_id': job_id}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 

@@ -20,6 +20,7 @@ import logging
 import posixpath
 import Queue
 import threading
+import time
 
 from django.utils.translation import ugettext as _
 
@@ -150,12 +151,24 @@ class ResourceManagerApi(object):
       data['X-Hadoop-Delegation-Token'] = token = full_token.pop('token')
       LOG.debug('Received delegation token %s' % full_token)
 
+    ret = None
     try:
       params = self._get_params()
-      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+      ret = self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except:
+      attempts = 5
+      while (attempts>0):
+        time.sleep(2)
+        try:
+          ret = self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE, allow_redirects=True)
+          attempts = 0
+        except:
+          LOG.warn("Attempting to kill %s %s time" % (app_id, attempts))
+          attempts -= 1
     finally:
       if token:
         self.cancel_token(token)
+    return ret
 
   def delegation_token(self):
     params = self._get_params()
