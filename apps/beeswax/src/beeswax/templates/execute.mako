@@ -18,6 +18,12 @@
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from django.utils.translation import ugettext as _
+
+  try:
+    from beeswax.conf import DOWNLOAD_ROW_LIMIT
+  except ImportError, e:
+    LOG.warn("Hive app is not enabled")
+    DOWNLOAD_ROW_LIMIT = None
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
@@ -345,11 +351,11 @@ ${ layout.menubar(section='query') }
         </a>
 
         ## Tricks for not triggering the closing of the query on download
-        <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+        <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"" href="javascript:void(0)" title="${ _('Download first %s rows as CSV') % DOWNLOAD_ROW_LIMIT.get() }" rel="tooltip"
           class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-csv"></i></h4>
         </a>
 
-        <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
+        <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" href="javascript:void(0)" title="${ _('Download first %s rows as XLS') % DOWNLOAD_ROW_LIMIT.get() }" rel="tooltip"
           class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-xls"></i></h4></a>
         <!-- /ko -->
         <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="clear-queries pull-right" data-toggle="modal"><h4><i class="fa fa-calendar-times-o"></i></h4></a>
