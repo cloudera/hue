@@ -52,6 +52,12 @@ var RunningCoordinatorModel = (function () {
       return new self.Action(action);
     }));
 
+    self.setActions = function (actions) {
+      self.actions(ko.utils.arrayMap(actions, function (action) {
+        return new self.Action(action);
+      }));
+    }
+
     self.allSelected = ko.observable(false);
 
     self.filter = ko.observableArray([]);
