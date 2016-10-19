@@ -272,7 +272,7 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -281,6 +281,15 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+                    draggable: {data: draggableGradienMap(), isEnabled: availableDraggableMap,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
+                       <i class="hcha hcha-map-chart"></i>
+         </a>
+   </div>   
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -378,7 +387,7 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: widgetType() == 'map-widget' -->
+    <!-- ko if: widgetType() == 'map-widget' || widgetType() == 'gradient-map-widget' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">
@@ -1855,6 +1864,80 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="map-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <div class="floating-facet-toggle-section">
+        <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
+        </span>
+      </div>
+      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
+        <span class="muted">${ _('Selected dimension') }</span>
+      </div>
+      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
+        <div class="filter-box">
+          <div class="title">
+            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+              <i class="fa fa-times"></i>
+            </a>
+            <span data-bind="text: field"></span>
+            &nbsp;
+          </div>
+
+          <div class="content">
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Limit') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+              </span>
+            </div>
+
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Min Count') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+
+    <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
+      <div data-bind="with: $root.collection.getFacetById($parent.id())">
+        <!-- ko if: $data.properties.facets().length == 1 -->
+          <div class="margin-bottom-10">
+            <span data-bind="text: $data.properties.facets()[0].field"></span>
+          </div>
+        <!-- /ko -->
+      </div>
+    </div>
+
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <div data-bind="mapChart: {data: {counts: $parent.counts(), scope: $root.collection.getFacetById($parent.id()).properties.scope()},
+        transformer: mapChartDataTransformer,
+        maxWidth: 750,
+        isScale: true,
+        onClick: function(d) {
+          $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
+        },
+        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+    </div>
+  </div>
+  <!-- /ko -->
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+</script>
+
+
+<script type="text/html" id="gradient-map-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
