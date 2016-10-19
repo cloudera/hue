@@ -930,7 +930,6 @@ var Collection = function (vm, collection) {
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
 
-  self.template.filteredModalFields = ko.observableArray();
   self.template.filteredAttributeFieldsAll = ko.observable(true);
   self.template.filteredAttributeFields = ko.computed(function() {
     var _fields = [];
@@ -971,16 +970,15 @@ var Collection = function (vm, collection) {
     });
   });
 
-  self.template.fieldsModalFilter.subscribe(function(value) {
-    var _fields = [];
-    var _availableFields = self.template.availableWidgetFields();
-
-    $.each(_availableFields, function (index, field) {
-      if (self.template.fieldsModalFilter() == "" || field.name().toLowerCase().indexOf(self.template.fieldsModalFilter().toLowerCase()) > -1){
-        _fields.push(field);
-      }
-    });
-    self.template.filteredModalFields(_fields);
+  self.template.filteredModalFields = ko.pureComputed(function () {
+    var filter = self.template.fieldsModalFilter();
+    if (!filter) {
+      return self.template.availableWidgetFields();
+    } else {
+      return ko.utils.arrayFilter(self.template.availableWidgetFields(), function (field) {
+        return field.name().toLowerCase().indexOf(filter.toLowerCase()) > -1;
+      });
+    }
   });
 
   self.switchCollection = function() { // Long term would be to reload the page
