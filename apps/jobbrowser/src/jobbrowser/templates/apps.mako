@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%
   from desktop import conf
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -35,6 +35,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 </style>
 
+<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
@@ -50,6 +51,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
 <script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 
 
 ${ assist.assistPanel() }
@@ -113,7 +115,10 @@ ${ assist.assistPanel() }
 <div class="container-fluid">
   <!-- ko if: $root.section() == 'app' -->
   <a href="javascript:void(0)" data-bind="click: function() { $root.section('apps'); }">
-    <h2>${ _('Apps') } ></h2>
+    <h2>${ _('Apps') } >
+    <!-- ko if: $root.job() -->
+    <!-- /ko -->
+    </h2>
   </a>
   <!-- /ko -->
 
@@ -186,6 +191,36 @@ ${ assist.assistPanel() }
     <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
   <!-- /ko -->
 <!-- /ko -->
+
+          <!-- ko if: $root.job() -->
+          <!-- ko with: coordVM -->
+          <div>
+            <table class="table table-striped table-condensed margin-top-10">
+            <tbody data-bind="foreach: filteredActions">
+              <tr data-bind="css: { disabled: url == '' }">
+                <td data-bind="css: { disabled: url == '' }">
+                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" target="_blank">
+                    <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
+                  </a>
+                  <span class="pull-right">
+                  <i class="fa fa-exclamation-triangle" data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == '', attr: {title: '${ _ko('Workflow not available or instantiated yet') }'}"></i><i class="fa fa-exclamation-triangle" data-bind="visible: errorMessage != null && errorMessage != '', attr: {title: errorMessage}"></i> <i class="fa fa-exclamation-triangle" data-bind="visible:missingDependencies !='' && missingDependencies != null, attr: { title: '${ _ko('Missing')} ' + missingDependencies }"></i>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr data-bind="visible: filteredActions().length == 0">
+                <td>
+                  <div class="alert">
+                    ${ _('There are no actions to be shown.') }
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+          <!-- /ko -->
+          <!-- /ko -->
 
              </div>
       </div>
@@ -295,6 +330,7 @@ ${ assist.assistPanel() }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+
 </script>
 
 
@@ -371,8 +407,10 @@ ${ assist.assistPanel() }
       };
     };
 
-    var JobBrowserViewModel = function (options) {
+    var JobBrowserViewModel = function (options, RunningCoordinatorModel) {
       var self = this;
+
+      self.coordVM = new RunningCoordinatorModel([]);
 
       self.apiHelper = ApiHelper.getInstance(options);
       self.assistAvailable = ko.observable(true);
@@ -381,6 +419,17 @@ ${ assist.assistPanel() }
 
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
+      self.job.subscribe(function (val) {
+        $.get("/oozie/list_oozie_coordinator/" + val.id(), {
+          format: 'json'
+        }, function (data) {
+          self.coordVM.setActions(data.actions);
+        }).fail(function (xhr) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          //self.loadingScheduler(false);
+        });
+      });
 
       self.section = ko.observable('apps');
       self.interface = ko.observable('jobs');
@@ -399,8 +448,10 @@ ${ assist.assistPanel() }
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
         }
       };
-      viewModel = new JobBrowserViewModel(options);
+
+      viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
       ko.applyBindings(viewModel);
+
 
       var loadHash = function () {
         var h = window.location.hash;
