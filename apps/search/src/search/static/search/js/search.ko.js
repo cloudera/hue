@@ -1347,6 +1347,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableLeafletMap = ko.observable(bareWidgetBuilder("Marker Map", "leafletmap-widget"));
   self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget"));
   self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget"));
+  self.draggablePie2 = ko.observable(bareWidgetBuilder("Pie Chart", "pie2-widget"));
   self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
   self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget"));
   self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));

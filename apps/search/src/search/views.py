@@ -532,12 +532,16 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type == 'bucket-widget':
+    if widget_type == 'bucket-widget' or widget_type == 'pie2-widget':
       facet_type = 'nested'
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []
-      properties['scope'] = 'stack'
-      properties['timelineChartType'] = 'bar'
+      if widget_type == 'pie2-widget':
+        properties['scope'] = 'stack'
+        properties['timelineChartType'] = 'bar'
+      else:
+        properties['scope'] = 'stack'
+        properties['timelineChartType'] = 'bar'
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
