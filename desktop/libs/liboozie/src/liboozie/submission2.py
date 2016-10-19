@@ -307,8 +307,14 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     # Automatic setup of the required directories if needed
     create_directories(self.fs)
 
+    # Check if job owner owns the deployment directory.
+    has_deployment_dir_access = True
+    if self.job.deployment_dir:
+      statbuf = self.fs.stats(self.job.deployment_dir)
+      has_deployment_dir_access = statbuf and (statbuf.user == self.job.user.username)
+
     # Case of a shared job
-    if self.job.document and self.user != self.job.document.owner:
+    if self.job.document and self.user != self.job.document.owner or not has_deployment_dir_access:
       path = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', self.user.username).replace('$TIME', str(time.time())).replace('$JOBID', str(self.job.id))
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):
