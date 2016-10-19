@@ -461,8 +461,6 @@ var Workflow = function (vm, workflow) {
             parent.remove_link('to', childId);
           }
         }
-      } else if (parent.type() == 'decision-widget') {
-        parent.remove_link('to', childId);
       }
     }
     else {
