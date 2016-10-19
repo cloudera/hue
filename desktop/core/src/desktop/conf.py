@@ -1219,6 +1219,14 @@ USE_DEFAULT_CONFIGURATION = Config(
   help=_('Enable saved default configurations for Hive, Impala, Spark, and Oozie.')
 )
 
+IS_HUE_4 = Config( # To remove in Hue 5
+  key='is_hue_4',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to enable the new interface.')
+)
+
+
 def validate_ldap(user, config):
   res = []
 
