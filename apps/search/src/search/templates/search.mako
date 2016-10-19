@@ -465,6 +465,73 @@ ${ dashboard.layout_skeleton() }
     <div class="clearfix"></div>
 </script>
 
+
+<script type="text/html" id="facet-toggle2">
+  <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
+    <div class="filter-box">
+      <div class="title">
+        <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+          <i class="fa fa-times"></i>
+        </a>
+        <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="content">
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">${ _('Metric') }</span>
+            <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
+          </span>
+        </div>
+
+        <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label">
+              ${ _('Limit') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+          </span>
+        </div>
+
+        <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label">
+              ${ _('Min Count') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+          </span>
+        </div>
+      </div>
+    </div>
+  </span>
+  
+  <!-- ko if: widgetType() == 'gradient-map-widget' -->
+  <div class="facet-field-cnt">
+    <span class="spinedit-cnt">
+      <span class="facet-field-label facet-field-label-fixed-width">
+        ${ _('Scope') }
+      </span>
+      <select data-bind="selectedOptions: properties.scope" class="input-small">
+        <option value="world">${ _("World") }</option>
+        <option value="europe">${ _("Europe") }</option>
+        <option value="aus">${ _("Australia") }</option>
+        <option value="bra">${ _("Brazil") }</option>
+        <option value="can">${ _("Canada") }</option>
+        <option value="chn">${ _("China") }</option>
+        <option value="fra">${ _("France") }</option>
+        <option value="deu">${ _("Germany") }</option>
+        <option value="ita">${ _("Italy") }</option>
+        <option value="jpn">${ _("Japan") }</option>
+        <option value="gbr">${ _("UK") }</option>
+        <option value="usa">${ _("USA") }</option>
+      </select>
+    </span>
+  </div>
+<!-- /ko -->
+</script>
+
+
 <script type="text/html" id="facet-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -1117,47 +1184,10 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
-
-        <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
-            <i class="fa fa-plus"></i> ${ _('Add') }
-          </a>
-          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
-          <div class="clearfix"></div>
-        </div>
-        <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
-          <div class="facet-field-cnt">
-            <span class="spinedit-cnt">
-              <span class="facet-field-label">
-                ${ _('Metric') }
-              </span>
-              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate" class="hit-options"></select>
-            </span>
-          </div>
-
-          <div class="facet-field-cnt">
-            <span class="spinedit-cnt">
-              <span class="facet-field-label">
-                ${ _('Limit') }
-              </span>
-              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
-            </span>
-          </div>
-
-          <div class="facet-field-cnt">
-            <span class="spinedit-cnt">
-              <span class="facet-field-label">
-                ${ _('Min Count') }
-              </span>
-              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
-            </span>
-          </div>
-        </div>
-
-
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
+
+    <div class="clearfix"></div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
@@ -1491,43 +1521,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-
-      <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
-        <div class="filter-box">
-          <div class="title">
-            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
-              <i class="fa fa-times"></i>
-            </a>
-            <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
-            <div class="clearfix"></div>
-          </div>
-
-          <div class="content">
-            <div class="facet-field-cnt">
-              <span class="facet-field-label">${ _('Metric') }</span>
-              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
-            </div>
-
-            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
-              <span class="spinedit-cnt">
-                <span class="facet-field-label">
-                  ${ _('Limit') }
-                </span>
-                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
-              </span>
-            </div>
-
-            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
-              <span class="spinedit-cnt">
-                <span class="facet-field-label">
-                  ${ _('Min Count') }
-                </span>
-                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
-              </span>
-            </div>
-          </div>
-        </div>
-      </span>
+    <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
       <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
         <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
@@ -1941,46 +1935,10 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <div class="floating-facet-toggle-section">
-        <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
-        </span>
-      </div>
-      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
-        <span class="muted">${ _('Selected dimension') }</span>
-      </div>
-      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
-        <div class="filter-box">
-          <div class="title">
-            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
-              <i class="fa fa-times"></i>
-            </a>
-            <span data-bind="text: field"></span>
-            &nbsp;
-          </div>
-
-          <div class="content">
-            <div class="facet-field-cnt">
-              <span class="spinedit-cnt">
-                <span class="facet-field-label facet-field-label-fixed-width">
-                  ${ _('Limit') }
-                </span>
-                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
-              </span>
-            </div>
-
-            <div class="facet-field-cnt">
-              <span class="spinedit-cnt">
-                <span class="facet-field-label facet-field-label-fixed-width">
-                  ${ _('Min Count') }
-                </span>
-                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="clearfix"></div>
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
+
+    <div class="clearfix"></div>
 
     <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
       <div data-bind="with: $root.collection.getFacetById($parent.id())">
