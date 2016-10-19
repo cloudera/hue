@@ -76,7 +76,7 @@
 
       % if show_dryrun:
          <label class="checkbox" style="display: inline-block; margin-top: 5px">
-           <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job?') }
+           <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job') }
          </label>
       % endif
       % if is_oozie_mail_enabled:
@@ -88,7 +88,7 @@
           % endif
           />
         % if email_id:
-          ${_('Email notification to ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${email_id} </a>
+          ${_('Send completion email to ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${email_id} </a>
         % else:
           ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${_('profile.')} </a>
         % endif

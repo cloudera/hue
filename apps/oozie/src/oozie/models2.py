@@ -851,7 +851,7 @@ class Node():
       'workflow_mapping': workflow_mapping
     }
 
-    if mapping.get('email_checkbox'):
+    if mapping.get('send_email'):
       if self.data['type'] == KillAction.TYPE and not self.data['properties'].get('enableMail'):
         self.data['properties']['enableMail'] = True
         self.data['properties']['to'] = self.user.email
@@ -862,6 +862,14 @@ class Node():
         self.data['properties']['enableMail'] = True
         self.data['properties']['to'] = self.user.email
         self.data['properties']['subject'] = _("${wf:name()} execution successful")
+
+        if mapping.get('send_result') or True:
+          if self.data['type'] == HiveDocumentAction.TYPE:
+            # Convert SELECT to insert
+            # Add attachment loc
+            pass
+        # If send report link
+        # Convert query to create table if not exist and insert partition
 
     return django_mako.render_to_string(self.get_template_name(), data)
 
