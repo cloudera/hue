@@ -446,7 +446,7 @@ ${ dashboard.layout_skeleton() }
               ${ _('Min Count') }
             </span>
             <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
-            <a class="pull-right" href="javascript: void(0)" data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue">
+            <a class="pull-right" href="javascript: void(0)" data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue">
               <i class="fa fa-plus"></i>
             </a>
           </span>
@@ -1279,7 +1279,7 @@ ${ dashboard.layout_skeleton() }
       </span>
       <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
         <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+          <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
             <i class="fa fa-plus"></i> ${ _('Add') }
           </a>
           <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
@@ -1479,13 +1479,50 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="pie2-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle' }">
+
+      <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
+        <div class="filter-box">
+          <div class="title">
+            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+              <i class="fa fa-times"></i>
+            </a>
+            <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="content">
+            <div class="facet-field-cnt">
+              <span class="facet-field-label">${ _('Metric') }</span>
+              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
+            </div>
+
+            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label">
+                  ${ _('Limit') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+              </span>
+            </div>
+
+            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label">
+                  ${ _('Min Count') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              </span>
+            </div>
+          </div>
+        </div>
       </span>
+
       <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
         <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+          <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
             <i class="fa fa-plus"></i> ${ _('Add') }
           </a>
           <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
@@ -1521,6 +1558,8 @@ ${ dashboard.layout_skeleton() }
         </div>
       </div>
     </div>
+
+    <div class="clearfix"></div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
