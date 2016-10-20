@@ -1,3 +1,4 @@
+"""parquet - tool for inspecting parquet files."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -10,6 +11,7 @@ import sys
 
 
 def setup_logging(options=None):
+    """Configure logging based on options."""
     level = logging.DEBUG if options is not None and options.debug \
         else logging.WARNING
     console = logging.StreamHandler()
@@ -21,6 +23,7 @@ def setup_logging(options=None):
 
 
 def main(argv=None):
+    """Run parquet utility application."""
     argv = argv or sys.argv[1:]
 
     parser = argparse.ArgumentParser('parquet',

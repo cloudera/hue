@@ -1,3 +1,5 @@
+"""encoding.py - methods for reading parquet encoded data blocks."""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -5,67 +7,72 @@ from __future__ import unicode_literals
 
 import array
 import io
+import logging
 import math
 import os
 import struct
-import logging
+import sys
 
 import thriftpy
 
 THRIFT_FILE = os.path.join(os.path.dirname(__file__), "parquet.thrift")
-parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))
+parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  # pylint: disable=invalid-name
 
-logger = logging.getLogger("parquet")
+logger = logging.getLogger("parquet")  # pylint: disable=invalid-name
+
+PY3 = sys.version_info > (3,)
+
+ARRAY_BYTE_STR = u'B' if PY3 else b'B'
 
 
-def read_plain_boolean(fo, count):
-    """Reads `count` booleans using the plain encoding"""
+def read_plain_boolean(file_obj, count):
+    """Read `count` booleans using the plain encoding."""
     # for bit packed, the count is stored shifted up. But we want to pass in a count,
     # so we shift up.
     # bit width is 1 for a single-bit boolean.
-    return read_bitpacked(fo, count << 1, 1, logger.isEnabledFor(logging.DEBUG))
+    return read_bitpacked(file_obj, count << 1, 1, logger.isEnabledFor(logging.DEBUG))
 
 
-def read_plain_int32(fo, count):
-    """Reads `count` 32-bit ints using the plain encoding"""
+def read_plain_int32(file_obj, count):
+    """Read `count` 32-bit ints using the plain encoding."""
     length = 4 * count
-    data = fo.read(length)
+    data = file_obj.read(length)
     if len(data) != length:
-        raise EOFError("Expected {} bytes but got {0} bytes".format(length, len(data)))
-    res = struct.unpack(b"<{0}i".format(count), data)
+        raise EOFError("Expected {0} bytes but got {1} bytes".format(length, len(data)))
+    res = struct.unpack(b"<{0}i".format(count).encode("utf-8"), data)
     return res
 
 
-def read_plain_int64(fo, count):
-    """Reads `count` 64-bit ints using the plain encoding"""
-    return struct.unpack(b"<{0}q".format(count), fo.read(8 * count))
+def read_plain_int64(file_obj, count):
+    """Read `count` 64-bit ints using the plain encoding."""
+    return struct.unpack(b"<{0}q".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
-def read_plain_int96(fo, count):
-    """Reads `count` 96-bit ints using the plain encoding"""
-    items = struct.unpack(b"<qi" * count, fo.read(12) * count)
+def read_plain_int96(file_obj, count):
+    """Read `count` 96-bit ints using the plain encoding."""
+    items = struct.unpack(b"<qi" * count, file_obj.read(12) * count)
     args = [iter(items)] * 2
     return [q << 32 | i for (q, i) in zip(*args)]
 
 
-def read_plain_float(fo, count):
-    """Reads `count` 32-bit floats using the plain encoding"""
-    return struct.unpack(b"<{0}f".format(count), fo.read(4 * count))
+def read_plain_float(file_obj, count):
+    """Read `count` 32-bit floats using the plain encoding."""
+    return struct.unpack(b"<{0}f".format(count).encode("utf-8"), file_obj.read(4 * count))
 
 
-def read_plain_double(fo, count):
-    """Reads `count` 64-bit float (double) using the plain encoding"""
-    return struct.unpack(b"<{0}d".format(count), fo.read(8 * count))
+def read_plain_double(file_obj, count):
+    """Read `count` 64-bit float (double) using the plain encoding."""
+    return struct.unpack(b"<{0}d".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
-def read_plain_byte_array(fo, count):
-    """Read `count` byte arrays using the plain encoding"""
-    return [fo.read(struct.unpack(b"<i", fo.read(4))[0]) for i in range(count)]
+def read_plain_byte_array(file_obj, count):
+    """Read `count` byte arrays using the plain encoding."""
+    return [file_obj.read(struct.unpack(b"<i", file_obj.read(4))[0]) for i in range(count)]
 
 
-def read_plain_byte_array_fixed(fo, fixed_length):
-    """Reads a byte array of the given fixed_length"""
-    return fo.read(fixed_length)
+def read_plain_byte_array_fixed(file_obj, fixed_length):
+    """Read a byte array of the given fixed_length."""
+    return file_obj.read(fixed_length)
 
 
 DECODE_PLAIN = {
@@ -80,19 +87,20 @@ DECODE_PLAIN = {
 }
 
 
-def read_plain(fo, type_, count):
-    """Reads `count` items `type` from the fo using the plain encoding."""
+def read_plain(file_obj, type_, count):
+    """Read `count` items `type` from the fo using the plain encoding."""
     if count == 0:
         return []
     conv = DECODE_PLAIN[type_]
-    return conv(fo, count)
+    return conv(file_obj, count)
 
 
-def read_unsigned_var_int(fo):
+def read_unsigned_var_int(file_obj):
+    """Read a value using the unsigned, variable int encoding."""
     result = 0
     shift = 0
     while True:
-        byte = struct.unpack(b"<B", fo.read(1))[0]
+        byte = struct.unpack(b"<B", file_obj.read(1))[0]
         result |= ((byte & 0x7F) << shift)
         if (byte & 0x80) == 0:
             break
@@ -100,9 +108,8 @@ def read_unsigned_var_int(fo):
     return result
 
 
-def read_rle(fo, header, bit_width, debug_logging):
-    """Read a run-length encoded run from the given fo with the given header
-    and bit_width.
+def read_rle(file_obj, header, bit_width, debug_logging):
+    """Read a run-length encoded run from the given fo with the given header and bit_width.
 
     The count is determined from the header and the width is used to grab the
     value that's repeated. Yields the value repeated count times.
@@ -110,28 +117,28 @@ def read_rle(fo, header, bit_width, debug_logging):
     count = header >> 1
     zero_data = b"\x00\x00\x00\x00"
     width = (bit_width + 7) // 8
-    data = fo.read(width)
+    data = file_obj.read(width)
     data = data + zero_data[len(data):]
     value = struct.unpack(b"<i", data)[0]
     if debug_logging:
         logger.debug("Read RLE group with value %s of byte-width %s and count %s",
                      value, width, count)
-    for i in range(count):
+    for _ in range(count):
         yield value
 
 
 def width_from_max_int(value):
-    """Converts the value specified to a bit_width."""
+    """Convert the value specified to a bit_width."""
     return int(math.ceil(math.log(value + 1, 2)))
 
 
 def _mask_for_bits(i):
-    """Helper function for read_bitpacked to generage a mask to grab i bits."""
+    """Generate a mask to grab `i` bits from an int value."""
     return (1 << i) - 1
 
 
-def read_bitpacked(fo, header, width, debug_logging):
-    """Reads a bitpacked run of the rle/bitpack hybrid.
+def read_bitpacked(file_obj, header, width, debug_logging):
+    """Read a bitpacked run of the rle/bitpack hybrid.
 
     Supports width >8 (crossing bytes).
     """
@@ -140,40 +147,41 @@ def read_bitpacked(fo, header, width, debug_logging):
     byte_count = (width * count) // 8
     if debug_logging:
         logger.debug("Reading a bit-packed run with: %s groups, count %s, bytes %s",
-            num_groups, count, byte_count)
-    raw_bytes = array.array(str('B'), fo.read(byte_count)).tolist()
+                     num_groups, count, byte_count)
+    raw_bytes = array.array(ARRAY_BYTE_STR, file_obj.read(byte_count)).tolist()
     current_byte = 0
-    b = raw_bytes[current_byte]
+    data = raw_bytes[current_byte]
     mask = _mask_for_bits(width)
     bits_wnd_l = 8
     bits_wnd_r = 0
     res = []
-    total = len(raw_bytes)*8;
-    while (total >= width):
-        # TODO zero-padding could produce extra zero-values
+    total = len(raw_bytes) * 8
+    while total >= width:
+        # NOTE zero-padding could produce extra zero-values
         if debug_logging:
             logger.debug("  read bitpacked: width=%s window=(%s %s) b=%s,"
                          " current_byte=%s",
-                         width, bits_wnd_l, bits_wnd_r, bin(b), current_byte)
+                         width, bits_wnd_l, bits_wnd_r, bin(data), current_byte)
         if bits_wnd_r >= 8:
             bits_wnd_r -= 8
             bits_wnd_l -= 8
-            b >>= 8
+            data >>= 8
         elif bits_wnd_l - bits_wnd_r >= width:
-            res.append((b >> bits_wnd_r) & mask)
+            res.append((data >> bits_wnd_r) & mask)
             total -= width
             bits_wnd_r += width
             if debug_logging:
                 logger.debug("  read bitpackage: added: %s", res[-1])
         elif current_byte + 1 < len(raw_bytes):
             current_byte += 1
-            b |= (raw_bytes[current_byte] << bits_wnd_l)
+            data |= (raw_bytes[current_byte] << bits_wnd_l)
             bits_wnd_l += 8
     return res
 
 
-def read_bitpacked_deprecated(fo, byte_count, count, width, debug_logging):
-    raw_bytes = array.array(str('B'), fo.read(byte_count)).tolist()
+def read_bitpacked_deprecated(file_obj, byte_count, count, width, debug_logging):
+    """Read `count` values from `fo` using the deprecated bitpacking encoding."""
+    raw_bytes = array.array(ARRAY_BYTE_STR, file_obj.read(byte_count)).tolist()
 
     mask = _mask_for_bits(width)
     index = 0
@@ -204,17 +212,17 @@ def read_bitpacked_deprecated(fo, byte_count, count, width, debug_logging):
     return res
 
 
-def read_rle_bit_packed_hybrid(fo, width, length=None):
-    """Implemenation of a decoder for the rel/bit-packed hybrid encoding.
+def read_rle_bit_packed_hybrid(file_obj, width, length=None):
+    """Read values from `fo` using the rel/bit-packed hybrid encoding.
 
     If length is not specified, then a 32-bit int is read first to grab the
     length of the encoded data.
     """
     debug_logging = logger.isEnabledFor(logging.DEBUG)
-    io_obj = fo
+    io_obj = file_obj
     if length is None:
-        length = read_plain_int32(fo, 1)[0]
-        raw_bytes = fo.read(length)
+        length = read_plain_int32(file_obj, 1)[0]
+        raw_bytes = file_obj.read(length)
         if raw_bytes == b'':
             return None
         io_obj = io.BytesIO(raw_bytes)
