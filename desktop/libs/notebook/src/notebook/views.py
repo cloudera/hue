@@ -100,17 +100,18 @@ def editor(request):
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
       'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
-          'mode': 'editor',
-          'is_optimizer_enabled': has_optimizer(),
-          'is_navigator_enabled': has_navigator(request.user),
-          'editor_type': editor_type
+        'languages': get_interpreters(request.user),
+        'mode': 'editor',
+        'is_optimizer_enabled': has_optimizer(),
+        'is_navigator_enabled': has_navigator(request.user),
+        'editor_type': editor_type,
+        'mobile': False
       })
   })
 
 
 @check_document_access_permission()
-def editorm(request):
+def editor_m(request):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
 
@@ -118,15 +119,16 @@ def editorm(request):
     document = Document2.objects.get(id=editor_id)
     editor_type = document.type.rsplit('-', 1)[-1]
 
-  return render('editorm.mako', request, {
+  return render('editor_m.mako', request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
       'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
-          'mode': 'editor',
-          'is_optimizer_enabled': has_optimizer(),
-          'is_navigator_enabled': has_navigator(request.user),
-          'editor_type': editor_type
+        'languages': get_interpreters(request.user),
+        'mode': 'editor',
+        'is_optimizer_enabled': has_optimizer(),
+        'is_navigator_enabled': has_navigator(request.user),
+        'editor_type': editor_type,
+        'mobile': True
       })
   })
 

@@ -1,0 +1,50 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.navbar-inner {
+  background-color: #338BB8;
+}
+
+.navbar .btn-navbar {
+  background-color: #FFF;
+  background-image: -moz-linear-gradient(top,#FFF,#FFF);
+  background-image: -webkit-gradient(linear,0 0,0 100%,from(#FFF),to(#FFF));
+  background-image: -webkit-linear-gradient(top,#FFF,#FFF);
+  background-image: -o-linear-gradient(top,#FFF,#FFF);
+  background-image: linear-gradient(to bottom,#FFF,#FFF);
+  background-repeat: repeat-x;
+}
+
+.navbar .btn-navbar:hover,.navbar .btn-navbar:focus,.navbar .btn-navbar:active,.navbar .btn-navbar.active,.navbar .btn-navbar.disabled,.navbar .btn-navbar[disabled] {
+  color: #fff;
+  background-color: #FFF;
+}
+
+.navbar .brand {
+  float: none;
+  text-align: center;
+  text-shadow: none;
+  color: #FFF;
+}
+
+.navbar .brand img {
+  width: 60px;
+  height: 16px;
+  float: left;
+}
+

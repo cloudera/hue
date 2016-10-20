@@ -860,7 +860,7 @@ var EditorViewModel = (function() {
         stopLongOperationTimeout();
 
         if (vm.editorMode() && data.history_id) {
-          var url = '/notebook/editor?editor=' + data.history_id;
+          var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
@@ -1653,7 +1653,7 @@ var EditorViewModel = (function() {
               self.schedulerViewModel.coordinator.refreshParameters();
             }
 
-            hueUtils.changeURL('/notebook/editor?editor=' + data.id);
+            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?editor=' + data.id);
           }
           else {
             hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
@@ -1819,7 +1819,7 @@ var EditorViewModel = (function() {
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
-          hueUtils.changeURL('/notebook/editor?type=' + vm.editorType());
+          hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
         }
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
@@ -1978,6 +1978,7 @@ var EditorViewModel = (function() {
     var self = this;
     self.user = options.user;
     self.userId = options.userId;
+    self.isMobile = ko.observable(options.mobile);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
       console.log('Should happen on new query, or Hive --> Impala only: reload session, saved queries, history if in editor mode');
@@ -2212,7 +2213,7 @@ var EditorViewModel = (function() {
           self.loadNotebook(notebook, queryTab);
           if (typeof skipUrlChange === 'undefined'){
             if (self.editorMode()) {
-              hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
+              hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?editor=' + data.document.id);
             }
             else {
               hueUtils.changeURL('/notebook/notebook?notebook=' + data.document.id);
@@ -2243,9 +2244,9 @@ var EditorViewModel = (function() {
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
           }
           if (window.location.getParameter('type')) {
-            hueUtils.changeURL('/notebook/editor?type=' + window.location.getParameter('type'));
+            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + window.location.getParameter('type'));
           } else {
-            hueUtils.changeURL('/notebook/editor?type=' + self.editorType());
+            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + self.editorType());
           }
         } else {
           hueUtils.changeURL('/notebook/notebook');
