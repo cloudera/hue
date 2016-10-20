@@ -93,72 +93,84 @@ class SolrApi(object):
     GAPS = {
         '5MINUTES': {
             'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
+            'timeline-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'bar-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
         },
         '30MINUTES': {
             'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},
+            'timeline-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'bucket-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'bar-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+5', 'unit': 'MINUTES'},
         },
         '1HOURS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'SECONDS'},
+            'timeline-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'bucket-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'bar-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+10', 'unit': 'MINUTES'},
         },
         '12HOURS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'MINUTES'},
+            'timeline-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'bar-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+1', 'unit': 'HOURS'},
         },
         '1DAYS': {
             'histogram-widget': {'coeff': '+15', 'unit': 'MINUTES'},
+            'timeline-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'bar-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+3', 'unit': 'HOURS'},
         },
         '2DAYS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'MINUTES'},
+            'timeline-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'bar-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+6', 'unit': 'HOURS'},
         },
         '7DAYS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'HOURS'},
+            'timeline-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'bucket-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'bar-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+1', 'unit': 'DAYS'},
         },
         '1MONTHS': {
             'histogram-widget': {'coeff': '+12', 'unit': 'HOURS'},
+            'timeline-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'bucket-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'bar-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+5', 'unit': 'DAYS'},
         },
         '3MONTHS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'DAYS'},
+            'timeline-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'bar-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+30', 'unit': 'DAYS'},
         },
         '1YEARS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'DAYS'},
+            'timeline-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'bar-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+12', 'unit': 'MONTHS'},
         },
         '2YEARS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'DAYS'},
+            'timeline-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'bar-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+3', 'unit': 'MONTHS'},
         },
         '10YEARS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'MONTHS'},
+            'timeline-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'bucket-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'bar-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
