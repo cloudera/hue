@@ -1246,8 +1246,6 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
 
-    <div class="clearfix"></div>
-
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Chart Type') }</span>
@@ -1510,8 +1508,6 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-
-    <div class="clearfix"></div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
@@ -1886,8 +1882,6 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-
-    <div class="clearfix"></div>
 
     <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
       <div data-bind="with: $root.collection.getFacetById($parent.id())">
