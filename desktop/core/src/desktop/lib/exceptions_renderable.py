@@ -19,13 +19,16 @@ These methods should never be placed in 'desktop.lib.exceptions'.
 This file exists to remove circular reference caused by importing django_util.
 """
 
+import logging
 import sys
 import traceback
 
 from django.utils.encoding import force_unicode
 
-# Need full import statement
 import desktop.lib.django_util
+
+
+LOG = logging.getLogger(__name__)
 
 
 class PopupException(Exception):
@@ -43,6 +46,8 @@ class PopupException(Exception):
     # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
     (type, value, tb) = sys.exc_info()
     self.traceback = traceback.extract_tb(tb)
+    if self.traceback:
+      LOG.error('Potential trace: %s' % self.traceback)
 
   def response(self, request):
     data = dict(title=force_unicode(self.title), message=force_unicode(self.message), detail=force_unicode(self.detail) if self.detail else None, traceback=self.traceback)
