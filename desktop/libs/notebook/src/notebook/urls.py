@@ -60,6 +60,7 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/get_logs/?$', 'get_logs', name='get_logs'),
 
   url(r'^api/explain/?$', 'explain', name='explain'),
+  url(r'^api/format/?$', 'format', name='format'),
 
   url(r'^api/get_history/?', 'get_history', name='get_history'),
   url(r'^api/clear_history/?', 'clear_history', name='clear_history'),

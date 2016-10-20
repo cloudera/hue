@@ -939,14 +939,21 @@ var EditorViewModel = (function() {
     });
 
     self.format = function () {
-      if (self.isSqlDialect() && vkbeautify) {
-        if (self.ace().getSelectedText() != '') {
-          self.ace().session.replace(self.ace().session.selection.getRange(), vkbeautify.sql(self.ace().getSelectedText(), 2));
-        }
-        else {
-          self.statement_raw(vkbeautify.sql(self.statement_raw(), 2));
-          self.ace().setValue(self.statement_raw(), 1);
-        }
+      if (self.isSqlDialect()) {
+        $.post("/notebook/api/format", {
+          statements: self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw()
+        }, function(data) {
+          if (data.status == 0) {
+            if (self.ace().getSelectedText() != '') {
+              self.ace().session.replace(self.ace().session.selection.getRange(), data.formatted_statements);
+            } else {
+              self.statement_raw(data.formatted_statements);
+              self.ace().setValue(self.statement_raw(), 1);
+            }
+          } else {
+            self._ajaxError(data);
+          }
+        });
       }
       logGA('format');
     };

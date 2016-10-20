@@ -18,6 +18,8 @@
 import json
 import logging
 
+import sqlparse
+
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -583,6 +585,17 @@ def explain(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   response = get_api(request, snippet).explain(notebook, snippet)
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
+def format(request):
+  response = {'status': 0}
+
+  statements = request.POST.get('statements', '')
+  response['formatted_statements'] = sqlparse.format(statements, reindent=True, keyword_case='upper') # SQL only currently
 
   return JsonResponse(response)
 
