@@ -1,0 +1,45 @@
+python-sqlparse is written and maintained by Andi Albrecht <albrecht.andi@gmail.com>.
+
+This module contains code (namely the lexer and filter mechanism) from
+the pygments project that was written by Georg Brandl.
+
+This module contains code (Python 2/3 compatibility) from the six
+project: https://bitbucket.org/gutworth/six.
+
+Alphabetical list of contributors:
+* Adam Greenhall <agreenhall@lyft.com>
+* Alexander Beedie <ayembee@gmail.com>
+* Alexey Malyshev <nostrict@gmail.com>
+* Andrew Tipton <andrew.tipton@compareglobalgroup.com>
+* casey <casey@cloudera.com>
+* Cauê Beloni <cbeloni@gmail.com>
+* Cristian Orellana <cristiano@groupon.com>
+* Dag Wieers <dag@wieers.com>
+* Darik Gamble <darik.gamble@gmail.com>
+* Dennis Taylor <dennis.taylor@clio.com>
+* Florian Bauer <florian.bauer@zmdi.com>
+* Gavin Wahl <gwahl@fusionbox.com>
+* JacekPliszka <Jacek.Pliszka@gmail.com>
+* Jesús Leganés Combarro "Piranna" <piranna@gmail.com>
+* Kevin Jing Qiu <kevin.jing.qiu@gmail.com>
+* koljonen <koljonen@outlook.com>
+* Michael Schuller <chick@mschuller.net>
+* Mike Amy <cocoade@googlemail.com>
+* mulos <daniel.strackbein@gmail.com>
+* Piet Delport <pjdelport@gmail.com>
+* Prudhvi Vatala <pvatala@gmail.com>
+* quest <quest@wonky.windwards.net>
+* Robert Nix <com.github@rnix.org>
+* Rocky Meza <rmeza@fusionbox.com>
+* Ryan Wooden <rygwdn@gmail.com>
+* saaj <id@saaj.me>
+* Shen Longxing <shenlongxing2012@gmail.com>
+* Sjoerd Job Postmus
+* spigwitmer <itgpmc@gmail.com>
+* Tenghuan <tenghuanhe@gmail.com>
+* Tim Graham <timograham@gmail.com>
+* Victor Hahn <info@victor-hahn.de>
+* Victor Uriarte <vmuriart@gmail.com>
+* vthriller <farreva232@yandex.ru>
+* wayne.wuw <wayne.wuw@alibaba-inc.com>
+* Yago Riveiro <yago.riveiro@gmail.com>
