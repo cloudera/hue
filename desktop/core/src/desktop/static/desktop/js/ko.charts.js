@@ -410,6 +410,10 @@
         if ($(element).data('_map') != null) {
           _map = $(element).data('_map');
           _map.removeLayer($(element).data('_markerLayer'));
+          if ($(element).data('_heatLayer')){
+            _map.removeLayer($(element).data('_heatLayer'));
+            $(element).data('_heatLayer', null);
+          }
         }
 
         var _clusterGroup = L.markerClusterGroup({
@@ -486,6 +490,38 @@
               }
 
             }
+
+            var heatData = [];
+
+            function sumHeatData(data) {
+              var sumData = [];
+              data.forEach(function (d) {
+                var found = false;
+                if (d.length === 3) {
+                  sumData.forEach(function (s) {
+                    if (d[0] == s[0] && d[1] == s[1]) {
+                      found = true;
+                      s[2] += d[2];
+                    }
+                  });
+                }
+                if (!found) {
+                  sumData.push(d);
+                }
+              });
+              return sumData;
+            }
+
+            function getMaxIntensity(data) {
+              var maxIntensity = 0;
+              data.forEach(function (d) {
+                if (d[2] > maxIntensity) {
+                  maxIntensity = d[2];
+                }
+              });
+              return maxIntensity;
+            }
+
             _data.forEach(function (item) {
               if (item && item.lng != null && item.lat != null) {
                 var _addMarker = false;
@@ -500,20 +536,49 @@
                 }
                 if (_addMarker) {
                   var _marker = L.marker([item.lat, item.lng]);
-                  if (item.label != null) {
-                    _marker.bindPopup($.isArray(item.label) ? item.label.join("") : item.label);
+                  if (item.isHeat) {
+                    if (item.intensity != null) {
+                      heatData.push([item.lat, item.lng, item.intensity]);
+                    }
+                    else {
+                      heatData.push([item.lat, item.lng]);
+                    }
+                  }
+                  else {
+                    if (item.label != null) {
+                      _marker.bindPopup($.isArray(item.label) ? item.label.join("") : item.label);
+                    }
                   }
                   _clusterGroup.addLayer(_marker);
                 }
               }
             });
+            var heat;
+            if (heatData.length > 0) {
+              heatData = sumHeatData(heatData);
+              heat = L.heatLayer(heatData);
+              if (heatData[0].length === 3) { // it has intensity
+                heat.setOptions(getMaxIntensity(heatData));
+              }
+            }
 
-            window.setTimeout(function(){
+            window.setTimeout(function () {
               if (!$("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
                 _map.fitBounds(_clusterGroup.getBounds());
               }
               if ($(element).find('.leaflet-tile-pane').children().length > 0) {
-                _map.addLayer(_clusterGroup);
+                if (heatData.length == 0) {
+                  _map.addLayer(_clusterGroup);
+                  $('.leaflet-heatmap-layer').remove();
+                }
+                else {
+                  try {
+                    $('.leaflet-heatmap-layer').remove();
+                    heat.addTo(_map);
+                  }
+                  catch (e) {
+                  } // context2D not initialized yet
+                }
               }
               if (_options.onComplete != null) {
                 _options.onComplete();
@@ -521,12 +586,12 @@
             }, 0);
 
             if (huePubSub) {
-              huePubSub.subscribe('resize.leaflet.map', function(){
+              huePubSub.subscribe('resize.leaflet.map', function () {
                 if ($(element).data('_map')) {
                   $(element).data('_map').invalidateSize();
                   if ($(element).data('_markerLayer')) {
                     try {
-                      $(element).data('_map').fitBounds(_bounds);
+                      $(element).data('_map').fitBounds($(element).data('_markerLayer').getBounds());
                     }
                     catch (e) {
                     }
@@ -544,12 +609,16 @@
         var previousMarkerLayer = $(element).data('_markerLayer');
         if (previousMarkerLayer) {
           window.setTimeout(function () {
-            previousMarkerLayer.removeLayers(previousMarkerLayer.getLayers());
+            try {
+              previousMarkerLayer.removeLayers(previousMarkerLayer.getLayers());
+            }
+            catch(e){}
           }, 0);
         }
 
         $(element).data('_map', _map);
         $(element).data('_markerLayer', _clusterGroup);
+        $(element).data('_heatLayer', heat);
         if (_options.onComplete != null) {
           _options.onComplete();
         }

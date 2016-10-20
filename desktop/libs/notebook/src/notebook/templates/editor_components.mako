@@ -129,6 +129,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/leaflet/leaflet.heat.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1670,12 +1671,35 @@ ${ hueIcons.symbols() }
       <select data-bind="options: result.cleanedMeta, value: chartXPivot, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column to pivot...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column to pivot...") }', update: chartXPivot, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
 
-    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
+    <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF">
+      <li class="nav-header">${_('type')}</li>
+    </ul>
+    <div data-bind="visible: chartType() != ''">
+      <select data-bind="selectedOptions: chartMapType, optionsCaption: '${_ko('Choose a type...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a type...") }', update: chartMapType, dropdownAutoWidth: true}">
+        <option value="marker">${ _("Markers") }</option>
+        <option value="heat">${ _("Heatmap") }</option>
+      </select>
+    </div>
+
+    <!-- ko if: chartMapType() == 'marker' -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF">
       <li class="nav-header">${_('label')}</li>
     </ul>
-    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
+    <div>
       <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartMapLabel, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
+    <!-- /ko -->
+
+    <!-- ko if: chartMapType() == 'heat' -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF">
+      <li class="nav-header">${_('intensity')}</li>
+    </ul>
+    <div>
+      <select data-bind="options: result.cleanedNumericMeta, value: chartMapHeat, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartMapHeat, dropdownAutoWidth: true}" class="input-medium"></select>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
       <li class="nav-header">${_('scatter size')}</li>
@@ -2694,6 +2718,7 @@ ${ hueIcons.symbols() }
       var _idxLat = -1;
       var _idxLng = -1;
       var _idxLabel = -1;
+      var _idxHeat = -1;
       rawDatum.snippet.result.meta().forEach(function (col, idx) {
         if (col.name == rawDatum.snippet.chartX()) {
           _idxLat = idx;
@@ -2704,6 +2729,9 @@ ${ hueIcons.symbols() }
         if (col.name == rawDatum.snippet.chartMapLabel()) {
           _idxLabel = idx;
         }
+        if (col.name == rawDatum.snippet.chartMapHeat()) {
+          _idxHeat = idx;
+        }
       });
       if (rawDatum.snippet.chartMapLabel() != null) {
         $(rawDatum.counts()).each(function (cnt, item) {
@@ -2712,6 +2740,8 @@ ${ hueIcons.symbols() }
               lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
               lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
               label: hueUtils.html2text(item[_idxLabel]),
+              isHeat: rawDatum.snippet.chartMapType() === 'heat',
+              intensity: _idxHeat > -1 ? (item[_idxHeat]*1 != NaN ? item[_idxHeat]*1 : null) : null,
               obj: item
             });
           }
@@ -2722,6 +2752,8 @@ ${ hueIcons.symbols() }
             _data.push({
               lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
               lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
+              isHeat: rawDatum.snippet.chartMapType() === 'heat',
+              intensity: _idxHeat > -1 ? (item[_idxHeat]*1 != NaN ? item[_idxHeat]*1 : null) : null,
               obj: item
             });
           }

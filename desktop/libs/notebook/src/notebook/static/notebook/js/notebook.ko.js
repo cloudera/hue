@@ -631,7 +631,9 @@ var EditorViewModel = (function() {
     self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
     self.chartYMulti = ko.observableArray(typeof snippet.chartYMulti != "undefined" && snippet.chartYMulti != null ? snippet.chartYMulti : []);
     self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
+    self.chartMapType = ko.observable(typeof snippet.chartMapType != "undefined" && snippet.chartMapType != null ? snippet.chartMapType : 'marker');
     self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
+    self.chartMapHeat = ko.observable(typeof snippet.chartMapHeat != "undefined" && snippet.chartMapHeat != null ? snippet.chartMapHeat : null);
 
     self.hasDataForChart = ko.computed(function () {
       if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART || self.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART) {
@@ -685,7 +687,9 @@ var EditorViewModel = (function() {
       self.chartX(guessMetaField(self.previousChartOptions.chartX));
       self.chartXPivot(self.previousChartOptions.chartXPivot);
       self.chartYSingle(guessMetaField(self.previousChartOptions.chartYSingle));
+      self.chartMapType(self.previousChartOptions.chartMapType);
       self.chartMapLabel(guessMetaField(self.previousChartOptions.chartMapLabel));
+      self.chartMapHeat(self.previousChartOptions.chartMapHeat);
       self.chartYMulti(guessMetaFields(self.previousChartOptions.chartYMulti) || []);
       self.chartSorting(self.previousChartOptions.chartSorting);
       self.chartScatterGroup(self.previousChartOptions.chartScatterGroup);
@@ -801,7 +805,9 @@ var EditorViewModel = (function() {
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
+        chartMapType: typeof self.chartMapType() !== "undefined" ? self.chartMapType() : self.previousChartOptions.chartMapType,
         chartMapLabel: typeof self.chartMapLabel() !== "undefined" ? self.chartMapLabel() : self.previousChartOptions.chartMapLabel,
+        chartMapHeat: typeof self.chartMapHeat() !== "undefined" ? self.chartMapHeat() : self.previousChartOptions.chartMapHeat,
         chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti,
         chartSorting: typeof self.chartSorting() !== "undefined" ? self.chartSorting() : self.previousChartOptions.chartSorting,
         chartScatterGroup: typeof self.chartScatterGroup() !== "undefined" ? self.chartScatterGroup() : self.previousChartOptions.chartScatterGroup,
@@ -2156,7 +2162,9 @@ var EditorViewModel = (function() {
             chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
             chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
             chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
+            chartMapType: typeof snippet.chartMapType() !== "undefined" ? snippet.chartMapType() : snippet.previousChartOptions.chartMapType,
             chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
+            chartMapHeat: typeof snippet.chartMapHeat() !== "undefined" ? snippet.chartMapHeat() : snippet.previousChartOptions.chartMapHeat,
             chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
             chartScope: typeof snippet.chartScope() !== "undefined" ? snippet.chartScope() : snippet.previousChartOptions.chartScope,
             chartTimelineType: typeof snippet.chartTimelineType() !== "undefined" ? snippet.chartTimelineType() : snippet.previousChartOptions.chartTimelineType,
