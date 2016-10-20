@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 %>
 
-${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
+${ commonheader(_('Error'), app_name, user, request, "40px") | n,unicode }
 
   <div class="container-fluid">
     <div class="row-fluid">

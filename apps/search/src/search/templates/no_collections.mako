@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user, "120px") | n,unicode }
+${ commonheader(_('Search'), "search", user, request, "120px") | n,unicode }
 
 <style type="text/css">
 

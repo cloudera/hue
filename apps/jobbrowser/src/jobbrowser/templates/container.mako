@@ -20,7 +20,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Container: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Container: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user, request) | n,unicode }
 ${ comps.menubar()}
 
 <div class="container-fluid">

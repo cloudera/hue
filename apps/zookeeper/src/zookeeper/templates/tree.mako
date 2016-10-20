@@ -21,7 +21,7 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user) | n,unicode }
+${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user, request) | n,unicode }
 ${ shared.menubar() }
 
 <%

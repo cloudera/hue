@@ -24,7 +24,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Trashed Bundles"), "oozie", user) | n,unicode }
+${ commonheader(_("Trashed Bundles"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 

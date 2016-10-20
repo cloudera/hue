@@ -21,7 +21,7 @@
   use_new_home = USE_NEW_EDITOR.get()
 %>
 
-${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
+${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <style type="text/css">
   .sidebar-nav {

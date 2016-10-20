@@ -25,7 +25,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Coordinator Dashboard"), "oozie", user) | n,unicode }
+${ commonheader(_("Coordinator Dashboard"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <link rel="stylesheet" href="${ static('oozie/css/coordinator.css') }" type="text/css" />

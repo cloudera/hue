@@ -24,7 +24,7 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
-${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
+${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
 
 ${ editorComponents.includes() }
 

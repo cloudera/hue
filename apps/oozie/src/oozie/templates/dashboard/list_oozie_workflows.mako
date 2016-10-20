@@ -24,7 +24,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-${ commonheader(_("Workflows Dashboard"), "oozie", user) | n,unicode }
+${ commonheader(_("Workflows Dashboard"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
 
 

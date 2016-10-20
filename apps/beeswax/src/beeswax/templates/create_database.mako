@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
+${ commonheader(_("Create database"), 'metastore', user, request) | n,unicode }
 ${layout.metastore_menubar()}
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>

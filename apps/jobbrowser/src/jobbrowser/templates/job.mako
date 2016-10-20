@@ -83,7 +83,7 @@
     % endfor
 </%def>
 
-${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user, request) | n,unicode }
 ${ comps.menubar() }
 
 <link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">

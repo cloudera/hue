@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
+${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
 
 <script type="text/javascript">
   if (window.location.hash != "") {

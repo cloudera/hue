@@ -24,7 +24,7 @@
 <%namespace name="coordinator_utils" file="coordinator_utils.mako" />
 
 
-${ commonheader(_("Create Coordinator"), "oozie", user) | n,unicode }
+${ commonheader(_("Create Coordinator"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 <style type="text/css">

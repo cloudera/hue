@@ -24,7 +24,7 @@ import re
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-${ commonheader(_('Server Logs'), "about", user) | n,unicode }
+${ commonheader(_('Server Logs'), "about", user, request) | n,unicode }
 ${layout.menubar(section='log_view')}
 
 <style type="text/css">

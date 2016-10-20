@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Coordinators"), "oozie", user) | n,unicode }
+${ commonheader(_("Coordinators"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 <style type="text/css">

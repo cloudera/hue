@@ -22,7 +22,7 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "sqoop", user) | n,unicode }
+${ commonheader(None, "sqoop", user, request) | n,unicode }
 <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
   <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">

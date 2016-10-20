@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${ commonheader(_('Query Results'), app_name, user) | n,unicode }
+${ commonheader(_('Query Results'), app_name, user, request) | n,unicode }
 ${layout.menubar(section='query')}
 
 <style type="text/css">

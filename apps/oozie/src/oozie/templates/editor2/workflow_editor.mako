@@ -27,7 +27,7 @@ from oozie.conf import ENABLE_DOCUMENT_ACTION
 <%namespace name="workflow" file="common_workflow.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
+${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
 
 <div id="editor">
 

@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${ commonheader(None, 'filebrowser', user) | n,unicode }
+${ commonheader(None, 'filebrowser', user, request) | n,unicode }
 ${ fb_components.menubar() }
 
 <style type="text/css">

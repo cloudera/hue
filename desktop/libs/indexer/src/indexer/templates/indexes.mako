@@ -20,7 +20,7 @@
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
+${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
 
 
 <div class="container-fluid">

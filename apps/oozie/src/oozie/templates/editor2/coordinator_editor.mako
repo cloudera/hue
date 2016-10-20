@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="scheduler" file="common_scheduler.inc.mako" />
 
-${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
+${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
 
 <div id="editor">
 

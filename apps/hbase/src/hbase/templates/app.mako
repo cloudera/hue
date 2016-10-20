@@ -20,7 +20,7 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "hbase", user) | n,unicode } 
+${ commonheader(None, "hbase", user, request) | n,unicode }
 
 <link href="${ static('hbase/css/hbase.css') }" rel="stylesheet" type="text/css" />
 

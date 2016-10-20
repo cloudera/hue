@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
-${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
+${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 ${ layout.menubar(section='hive1') }
 
 

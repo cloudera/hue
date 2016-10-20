@@ -1054,7 +1054,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         var csrfmiddlewaretoken = document.createElement('input');
         csrfmiddlewaretoken.type = 'hidden';
         csrfmiddlewaretoken.name = 'csrfmiddlewaretoken';
-        csrfmiddlewaretoken.value = $.cookie('csrftoken');
+        csrfmiddlewaretoken.value = "${request and request.COOKIES.get('csrftoken', '')}";
         form.appendChild(csrfmiddlewaretoken);
 
         var self = this;

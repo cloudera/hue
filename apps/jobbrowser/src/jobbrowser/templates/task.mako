@@ -19,7 +19,7 @@
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "jobbrowser", user, request) | n,unicode }
 ${ comps.menubar() }
 
 <link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">

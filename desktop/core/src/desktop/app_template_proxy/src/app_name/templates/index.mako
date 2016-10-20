@@ -19,7 +19,7 @@ ${'<'}%!from ${app_name}.conf import URL %>
 
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
-${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, "28px") | n,unicode}
+${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, request, "28px") | n,unicode}
 
 ${'#'}# Use double hashes for a mako template comment
 ${'#'}# Main body

@@ -22,7 +22,7 @@ def is_selected(section, matcher):
   else:
     return ""
 %>
-${ commonheader("Hue Help", "help", user, "40px") | n,unicode }
+${ commonheader("Hue Help", "help", user, request, "40px") | n,unicode }
 
 <style type="text/css">
   .card h1, .card h2, .card h3, .card h4 {

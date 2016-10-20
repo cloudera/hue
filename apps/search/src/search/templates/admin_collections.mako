@@ -22,7 +22,7 @@
 <%namespace name="macros" file="macros.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
+${ commonheader(_('Search'), "search", user, request, "29px") | n,unicode }
 
 <link rel="stylesheet" href="${ static('search/css/admin.css') }">
 

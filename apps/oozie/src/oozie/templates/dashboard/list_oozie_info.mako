@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie Information"), "oozie", user) | n,unicode }
+${ commonheader(_("Oozie Information"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='oozie', dashboard=True) }
 
 

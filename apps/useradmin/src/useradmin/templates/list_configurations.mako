@@ -25,7 +25,7 @@ from django.contrib.auth.models import Group
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Configurations'), "useradmin", user) | n,unicode}
+${commonheader(_('Configurations'), "useradmin", user, request) | n,unicode}
 ${layout.menubar(section='configurations')}
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>

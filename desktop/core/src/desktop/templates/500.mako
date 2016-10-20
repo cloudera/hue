@@ -20,7 +20,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('500 - Server error'), "", user) | n,unicode }
+${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
 
 
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
