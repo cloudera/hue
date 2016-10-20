@@ -13,7 +13,6 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-
 <%!
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
@@ -24,26 +23,22 @@ from desktop.conf import USE_NEW_EDITOR
 if USE_NEW_EDITOR.get():
   home_url = url('desktop.views.home2')
 %>
-
+<!DOCTYPE html>
 <%def name="is_selected(selected)">
   %if selected:
     class="active"
   %endif
 </%def>
-
 <%def name="get_nice_name(app, section)">
   % if app and section == app.display_name:
     - ${app.nice_name}
   % endif
 </%def>
-
 <%def name="get_title(title)">
   % if title:
     - ${smart_unicode(title)}
   % endif
 </%def>
-
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">

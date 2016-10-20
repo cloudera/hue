@@ -377,7 +377,10 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def commonheader(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False):
+def commonheader_m(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False):
+  return commonheader(title, section, user, request, padding, skip_topbar, skip_idle_timeout, True)
+
+def commonheader(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False, is_mobile=False):
   """
   Returns the rendered common header
   """
@@ -396,7 +399,11 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
   else:
     apps_list = []
 
-  return django_mako.render_to_string("common_header.mako", {
+  template = "common_header.mako"
+  if is_mobile:
+    template = "common_header_m.mako"
+
+  return django_mako.render_to_string(template, {
     'current_app': current_app,
     'apps': apps_list,
     'other_apps': other_apps,
@@ -431,7 +438,10 @@ def login_modal(request):
 def is_idle(request):
   return HttpResponse("no!")
 
-def commonfooter(request, messages=None):
+def commonfooter_m(request, messages=None):
+  return commonfooter(request, messages, True)
+
+def commonfooter(request, messages=None, is_mobile=False):
   """
   Returns the rendered common footer
   """
@@ -440,7 +450,11 @@ def commonfooter(request, messages=None):
 
   hue_settings = Settings.get_settings()
 
-  return django_mako.render_to_string("common_footer.mako", {
+  template = "common_footer.mako"
+  if is_mobile:
+    template = "common_footer_m.mako"
+
+  return django_mako.render_to_string(template, {
     'request': request,
     'messages': messages,
     'version': hue_version(),
