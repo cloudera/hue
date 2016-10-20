@@ -93,7 +93,7 @@
           ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${_('profile.')} </a>
         % endif
         </label>
-        %endif
+        %endif       
       % if return_json:
         <input type="hidden" name="format" value="json">
       % endif

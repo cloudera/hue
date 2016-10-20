@@ -432,6 +432,7 @@ def _is_oozie_mail_enabled(user):
   oozie_conf = api.get_configuration()
   return oozie_conf.get('oozie.email.smtp.host') != 'localhost'
 
+
 def _submit_workflow(user, fs, jt, workflow, mapping):
   try:
     submission = Submission(user, workflow, fs, jt, mapping)

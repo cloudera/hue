@@ -441,8 +441,7 @@ class Workflow(Job):
     tmpl = 'editor2/gen/workflow.xml.mako'
 
     data = self.get_data()
-    nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if
-                                                                   node.name == 'End']  # End at the end
+    nodes = [node for node in self.nodes if node.name != 'End'] + [node for node in self.nodes if node.name == 'End']  # End at the end
     node_mapping = dict([(node.id, node) for node in nodes])
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict(
@@ -863,13 +862,9 @@ class Node():
         self.data['properties']['to'] = self.user.email
         self.data['properties']['subject'] = _("${wf:name()} execution successful")
 
-        if mapping.get('send_result') or True:
-          if self.data['type'] == HiveDocumentAction.TYPE:
-            # Convert SELECT to insert
-            # Add attachment loc
-            pass
-        # If send report link
-        # Convert query to create table if not exist and insert partition
+      if mapping.get('send_result_path'):
+        if self.data['type'] == EndNode.TYPE:  
+          self.data['properties']['body'] = 'View result file at %(send_result_browse_url)s' % mapping
 
     return django_mako.render_to_string(self.get_template_name(), data)
 
