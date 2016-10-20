@@ -347,12 +347,28 @@ em {
   border-radius: 0 0 3px 3px;
 }
 
+.filter-box .content-readonly {
+  border: none!important;
+}
+
+.filter-box .content-readonly strong {
+  margin-right: 6px;
+  line-height: 30px;
+}
+.filter-box .content-readonly .spinedit-cnt {
+  margin-left: 4px;
+}
+
 .filter-box:hover {
   opacity: 1!important;
 }
 
 .filter-box:hover .title, .filter-box:hover .content {
   border: 1px solid #d8d8d8!important;
+}
+
+.filter-box:hover .content-readonly {
+  border: none!important;
 }
 
 .filter-box:hover .title {

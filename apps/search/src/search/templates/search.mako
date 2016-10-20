@@ -467,6 +467,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="facet-toggle2">
+  <!-- ko if: $root.isEditing -->
   <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
     <div class="filter-box">
       <div class="title">
@@ -505,7 +506,27 @@ ${ dashboard.layout_skeleton() }
       </div>
     </div>
   </span>
-  
+  <!-- /ko -->
+  <!-- ko ifnot: $root.isEditing -->
+  <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
+    <div class="filter-box" style="opacity: 0.7">
+      <div class="content content-readonly">
+        <strong class="hit-title" data-bind="text: field, attr: {'title': field}"></strong>
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">${ _('Metric') }</span>
+          <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
+        </span>
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">
+            ${ _('Limit') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+        </span>
+      </div>
+    </div>
+  </span>
+  <!-- /ko -->
+
   <!-- ko if: widgetType() == 'gradient-map-widget' -->
   <div class="facet-field-cnt">
     <span class="spinedit-cnt">
@@ -1221,7 +1242,7 @@ ${ dashboard.layout_skeleton() }
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+    <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
 
@@ -1486,7 +1507,7 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
 
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+    <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
 
@@ -1862,7 +1883,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="gradient-map-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+    <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
 

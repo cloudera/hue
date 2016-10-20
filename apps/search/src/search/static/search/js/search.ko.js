@@ -576,6 +576,14 @@ var Collection = function (vm, collection) {
     $(document).trigger("addFunctionToSource", self.template.selectedSourceFunction());
   };
 
+  if (collection.facets.length > 0) {
+    collection.facets.forEach(function (f) {
+      if (typeof f.properties.facets_form.field === 'undefined') {
+        f.properties.facets_form.field = null;
+      }
+    });
+  }
+
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
     facet.properties.limit.subscribe(function () {
