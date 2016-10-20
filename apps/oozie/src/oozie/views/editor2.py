@@ -399,6 +399,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       mapping['email_checkbox'] = request.POST.get('email_checkbox') == 'on'
+      if '/submit_single_action/' in submit_action:
+        mapping['submit_single_action'] = True
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)

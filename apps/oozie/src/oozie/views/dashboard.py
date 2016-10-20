@@ -338,7 +338,7 @@ def list_oozie_workflow(request, job_id):
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
 
-      if not workflow_data.get('layout'):
+      if not workflow_data.get('layout') or oozie_workflow.conf_dict.get('submit_single_action'):
         try:
           workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
         except Exception, e:
