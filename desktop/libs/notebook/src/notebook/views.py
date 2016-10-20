@@ -109,6 +109,28 @@ def editor(request):
   })
 
 
+@check_document_access_permission()
+def editorm(request):
+  editor_id = request.GET.get('editor')
+  editor_type = request.GET.get('type', 'hive')
+
+  if editor_id:  # Open existing saved editor document
+    document = Document2.objects.get(id=editor_id)
+    editor_type = document.type.rsplit('-', 1)[-1]
+
+  return render('editorm.mako', request, {
+      'editor_id': editor_id or None,
+      'notebooks_json': '{}',
+      'options_json': json.dumps({
+          'languages': get_interpreters(request.user),
+          'mode': 'editor',
+          'is_optimizer_enabled': has_optimizer(),
+          'is_navigator_enabled': has_navigator(request.user),
+          'editor_type': editor_type
+      })
+  })
+
+
 def new(request):
   return notebook(request)
 
