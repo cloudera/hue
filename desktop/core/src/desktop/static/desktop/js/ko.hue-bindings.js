@@ -3287,15 +3287,18 @@
         bindKey: {win: "Ctrl-i", mac: "Command-i|Ctrl-i"},
         exec: function () {
           if (['ace/mode/hive', 'ace/mode/impala', 'ace/mode/sql', 'ace/mode/mysql', 'ace/mode/pgsql', 'ace/mode/sqlite', 'ace/mode/oracle'].indexOf(snippet.getAceMode()) > -1) {
-            if (vkbeautify) {
-              if (editor.getSelectedText() != '') {
-                editor.session.replace(editor.session.selection.getRange(), vkbeautify.sql(editor.getSelectedText(), 2));
+            $.post("/notebook/api/format", {
+              statements: editor.getSelectedText() != '' ? editor.getSelectedText() : editor.getValue()
+            }, function(data) {
+              if (data.status == 0) {
+                 if (editor.getSelectedText() != '') {
+                  editor.session.replace(editor.session.selection.getRange(), data.formatted_statements);
+                } else {
+                  editor.setValue(data.formatted_statements);
+                  snippet.statement_raw(removeUnicodes(editor.getValue()));
+                }
               }
-              else {
-                editor.setValue(vkbeautify.sql(editor.getValue(), 2), 1);
-                snippet.statement_raw(removeUnicodes(editor.getValue()));
-              }
-            }
+            });
           }
         }
       });
