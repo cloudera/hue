@@ -41,6 +41,7 @@ urlpatterns = patterns('notebook.views',
   url(r'^copy/?$', 'copy', name='copy'),
 
   url(r'^editor/?$', 'editor', name='editor'),
+  url(r'^editorm/?$', 'editor', name='editorm'),
   url(r'^browse/(?P<database>\w+)/(?P<table>\w+)/?$', 'browse', name='browse'),
   url(r'^execute_and_watch/?$', 'execute_and_watch', name='execute_and_watch'),
 )
