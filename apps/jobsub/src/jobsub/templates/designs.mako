@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "jobsub", user) | n,unicode }
+${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <link rel="stylesheet" href="${ static('jobsub/css/jobsub.css') }">
 

@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-${ commonheader(None, "impala", user) | n,unicode }
+${ commonheader(None, "impala", user, request) | n,unicode }
 
 <%dashboard:layout_toolbar>
   <%def name="widgets()">

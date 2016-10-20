@@ -22,7 +22,7 @@ from useradmin.models import group_permissions
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-${ commonheader(_('Hue Groups'), "useradmin", user) | n,unicode }
+${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
 ${layout.menubar(section='groups')}
 
 <div class="container-fluid">

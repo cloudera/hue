@@ -21,7 +21,7 @@
   from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
-${ commonheader(_("Welcome to Hue"), "login", user, "50px", True, True) | n,unicode }
+${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True) | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">

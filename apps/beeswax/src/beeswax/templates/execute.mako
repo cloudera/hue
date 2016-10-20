@@ -27,7 +27,7 @@
 <%namespace name="dashboard" file="common_dashboard.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Query'), app_name, user) | n,unicode }
+${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 ${ layout.menubar(section='query') }
 
 <div id="temporaryPlaceholder"></div>

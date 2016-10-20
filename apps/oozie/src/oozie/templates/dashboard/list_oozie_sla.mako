@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("SLA"), "sla", user) | n,unicode }
+${ commonheader(_("SLA"), "sla", user, request) | n,unicode }
 ${ layout.menubar(section='sla', dashboard=True) }
 
 <style type="text/css">

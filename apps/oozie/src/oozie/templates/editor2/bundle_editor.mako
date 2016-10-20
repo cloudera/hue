@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="../navigation-bar.mako" />
 
 
-${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
+${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
 
 <div id="editor">
 

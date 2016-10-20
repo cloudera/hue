@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Hue Users'), "useradmin", user) | n,unicode }
+${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 ${ layout.menubar(section='users') }
 
 

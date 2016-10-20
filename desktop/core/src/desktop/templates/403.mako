@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 from desktop.views import commonheader, commonfooter
 %>
-${ commonheader(_('403 - Access forbidden'), "", user) | n,unicode }
+${ commonheader(_('403 - Access forbidden'), "", user, request) | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 

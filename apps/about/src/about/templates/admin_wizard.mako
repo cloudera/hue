@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="header" file="header.mako" />
 
-${ commonheader(_('Quick Start'), "quickstart", user) | n,unicode }
+${ commonheader(_('Quick Start'), "quickstart", user, request) | n,unicode }
 ${ header.menubar() }
 
 <div class="container-fluid">

@@ -22,7 +22,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-${ commonheader(_("History Record"), "oozie", user) | n,unicode }
+${ commonheader(_("History Record"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='history') }
 
 

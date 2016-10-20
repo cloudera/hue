@@ -20,7 +20,7 @@
 
 <%namespace name="common" file="common.mako" />
 
-${ commonheader(_('Query'), app_name, user) | n,unicode }
+${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
 <%common:navbar></%common:navbar>
 

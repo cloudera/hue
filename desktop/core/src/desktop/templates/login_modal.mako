@@ -90,7 +90,12 @@
   $(document).ready(function () {
 
     $('#login-modal form').on('submit', function () {
-      $('input[name="csrfmiddlewaretoken"]').val($.cookie('csrftoken'));
+      %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
+        $('input[name="csrfmiddlewaretoken"]').val("${request.COOKIES.get('csrftoken')}");
+      %else:
+        $('input[name="csrfmiddlewaretoken"]').val("");
+      %endif
+
       $.ajax({
         type: 'POST',
         url: $(this).attr('action'),

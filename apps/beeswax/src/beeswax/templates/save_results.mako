@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Create table from file'), app_name, user) | n,unicode }
+${ commonheader(_('Create table from file'), app_name, user, request) | n,unicode }
 ${layout.menubar(section='query')}
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>

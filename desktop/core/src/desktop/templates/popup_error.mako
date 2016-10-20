@@ -20,7 +20,7 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(title, "", user, "40px") | n,unicode }
+${ commonheader(title, "", user, request, "40px") | n,unicode }
 
   <div class="container-fluid">
     <div class="row-fluid">

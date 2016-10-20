@@ -21,7 +21,7 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader("ZooKeeper Browser > Edit Znode > %s" % path, app_name, user) | n,unicode }
+${ commonheader("ZooKeeper Browser > Edit Znode > %s" % path, app_name, user, request) | n,unicode }
 ${ shared.menubar() }
 
 <%

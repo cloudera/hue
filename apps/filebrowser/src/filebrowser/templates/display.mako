@@ -28,7 +28,7 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
+${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
 ${ fb_components.menubar() }
 
 <link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" />

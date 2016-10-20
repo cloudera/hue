@@ -20,7 +20,7 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "pig", user) | n,unicode }
+${ commonheader(None, "pig", user, request) | n,unicode }
 
 <div id="pig-editor-app">
   <div class="navbar navbar-inverse navbar-fixed-top">

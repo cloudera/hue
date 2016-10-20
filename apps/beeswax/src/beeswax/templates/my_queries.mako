@@ -26,7 +26,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('My Queries'), app_name, user) | n,unicode }
+${ commonheader(_('My Queries'), app_name, user, request) | n,unicode }
 ${layout.menubar(section='my queries')}
 
 <style type="text/css">

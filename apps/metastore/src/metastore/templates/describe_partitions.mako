@@ -22,7 +22,7 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 
-${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
+${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, request) | n,unicode }
 ${ components.menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>

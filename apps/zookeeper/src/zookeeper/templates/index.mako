@@ -21,7 +21,7 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('View'), app_name, user) | n,unicode }
+${ commonheader(_('View'), app_name, user, request) | n,unicode }
 ${ shared.menubar() }
 
 <%

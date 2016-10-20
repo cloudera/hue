@@ -20,7 +20,7 @@
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
+${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 
 
 <div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">

@@ -21,7 +21,7 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
+${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">

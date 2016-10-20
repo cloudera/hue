@@ -377,7 +377,7 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_idle_timeout=False):
+def commonheader(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False):
   """
   Returns the rendered common header
   """
@@ -404,6 +404,7 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_i
     'section': section,
     'padding': padding,
     'user': user,
+    'request': request,
     'skip_topbar': skip_topbar,
     'skip_idle_timeout': skip_idle_timeout,
     'leaflet': {

@@ -26,7 +26,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Saved Queries'), app_name, user) | n,unicode }
+${ commonheader(_('Saved Queries'), app_name, user, request) | n,unicode }
 
 ${ layout.menubar(section='saved queries') }
 

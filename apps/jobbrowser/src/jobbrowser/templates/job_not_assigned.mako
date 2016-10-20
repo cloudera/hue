@@ -23,7 +23,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Job'), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Job'), "jobbrowser", user, request) | n,unicode }
 ${ comps.menubar() }
 
 <link href="${ static('jobbrowser/css/jobbrowser.css') }" rel="stylesheet">

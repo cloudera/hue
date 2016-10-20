@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Import Workflow"), "oozie", user) | n,unicode }
+${ commonheader(_("Import Workflow"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 

@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-${ commonheader("Job Browser", "jobbrowser", user) | n,unicode }
+${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>

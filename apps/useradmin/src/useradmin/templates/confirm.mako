@@ -17,7 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${ commonheader(title, "useradmin", user) | n,unicode }
+${ commonheader(title, "useradmin", user, request) | n,unicode }
 <div class="container-fluid">
 	<h1>${_('Confirm')}</h1>
 	<form action="${path}" method="POST">

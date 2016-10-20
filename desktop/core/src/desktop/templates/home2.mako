@@ -21,7 +21,7 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="docBrowser" file="/document_browser.mako" />
 
-${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
+${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>

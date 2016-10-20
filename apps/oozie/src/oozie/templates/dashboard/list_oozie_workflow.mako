@@ -26,7 +26,7 @@
 <%namespace name="workflow" file="../editor2/common_workflow.mako" />
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 
-${ commonheader(_("Workflow Dashboard"), "oozie", user) | n,unicode }
+${ commonheader(_("Workflow Dashboard"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
 
 <div class="container-fluid" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
