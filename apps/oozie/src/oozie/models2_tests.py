@@ -192,7 +192,7 @@ LIMIT $limit"""))
         u'</kill>',
         u'<action', u'name="End">',
           u'<email', u'xmlns="uri:oozie:email-action:0.2">',
-             u'<to>test@localhost</to>', u'<subject>${wf:name()}', u'execution', u'successful</subject>', u'<body></body>',
+             u'<to>test@localhost</to>', u'<subject>${wf:name()}', u'execution', u'successful</subject>', u'<body></body>', u'<content_type>text/plain</content_type>',
           u'</email>',
           u'<ok', u'to="End-kill"/>',
           u'<error', u'to="End-kill"/>',
