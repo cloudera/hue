@@ -325,7 +325,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
   var viewModel;
 
   $(document).ready(function () {
-    $("body").swipe({fingers: 'all', swipeLeft: swipeLeft, swipeRight: swipeRight, allowPageScroll: "auto"});
+    //$("body").swipe({fingers: 'all', swipeLeft: swipeLeft, swipeRight: swipeRight, allowPageScroll: "auto"});
 
     function swipeLeft() {
       if ($('body').hasClass('open-left')){
