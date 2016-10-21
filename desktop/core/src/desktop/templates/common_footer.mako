@@ -52,15 +52,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
-      if (IDLE_SESSION_TIMEOUT == -1 && settings && settings.url === '/jobbrowser/jobs/') {
-        return;
-      }
-      if (xhr.responseText === '/* login required */' && !isLoginRequired) {
+      if ((xhr.responseText === '/* login required */' || xhr.status === 403) && !isLoginRequired) {
         isLoginRequired = true;
         $('.blurred').removeClass('blurred');
         $('body').children(':not(#login-modal)').addClass('blurred');
-        if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')){
-          $('#login-modal').modal('show');
+        if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
+          $('#login-modal .link-message').hide();
+          if (xhr.status === 403) {
+            $('#login-modal .wrong-token').show();
+            $('#login-modal').modal('show');
+          }
+          else {
+            $('#login-modal .logged-out').show();
+            $('#login-modal').modal({
+              backdrop: 'static',
+              keyboard: false
+            });
+          }
           window.setTimeout(function () {
             $('.jHueNotify').remove();
           }, 200);
