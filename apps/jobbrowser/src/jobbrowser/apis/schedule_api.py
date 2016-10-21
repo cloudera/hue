@@ -54,6 +54,6 @@ class ScheduleApi(Api):
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
-    workflow = oozie_api.get_coordinator(jobid=appid)
+    coordinator = oozie_api.get_coordinator(jobid=appid)
 
-    return {'id': workflow.coordJobId, 'name': workflow.coordJobName, 'status': workflow.status}
+    return {'id': coordinator.coordJobId, 'name': coordinator.coordJobName, 'status': coordinator.status, 'actions': coordinator.actions}

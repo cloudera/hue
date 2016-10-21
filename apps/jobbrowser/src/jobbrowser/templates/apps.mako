@@ -114,117 +114,82 @@ ${ assist.assistPanel() }
 
         <div class="right-panel">
 
-<div class="container-fluid">
-  <!-- ko if: $root.section() == 'app' -->
-  <a href="javascript:void(0)" data-bind="click: function() { $root.section('apps'); }">
-    <h2>${ _('Apps') } >
-    <!-- ko if: $root.job() -->
-    <!-- /ko -->
-    </h2>
-  </a>
-  <!-- /ko -->
-
-  <!-- ko if: $root.section() == 'apps' -->
-  <h2>${ _('Apps') }</h2>
-  ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
-  &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
-
-  <span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" />${ _('Jobs') }</span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" />${ _('Batches') }</span>
-    <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" />${ _('Schedules') }</span>
-  </span>
-
-  <span class="btn-group">
-    <span class="btn-group">
-      <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
-      <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
-      <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-    </span>
-  </span>
-
-  <div class="card card-small">
-    <table id="jobsTable" class="datatables table table-condensed">
-      <thead>
-      <tr>
-        <th>${_('Logs')}</th>
-        <th>${_('Id')}</th>
-        <th>${_('Name')}</th>
-        <th>${_('Type')}</th>
-        <th>${_('Status')}</th>
-        <th>${_('User')}</th>
-        <th>${_('Progress')}</th>
-        <th>${_('Duration')}</th>
-        <th>${_('Submitted')}</th>
-      </tr>
-      </thead>
-      <tbody data-bind="foreach: jobs.apps">
-        <tr data-bind="click: fetchJob">
-          <td></td>
-          <td data-bind="text: id"></td>
-          <td data-bind="text: name"></td>
-          <td data-bind="text: type"></td>
-          <td data-bind="text: status"></td>
-          <td data-bind="text: user"></td>
-          <td data-bind="text: progress"></td>
-          <td data-bind="text: duration"></td>
-          <td data-bind="text: submitted"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <!-- /ko -->
-</div>
-
-
-
-
-
-<!-- ko if: $root.section() == 'app' && $root.job() -->
-  <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
-    <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
-  <!-- /ko -->
-
-  <!-- ko if: $root.job().mainType() == 'batches' && $root.interface() == 'batches' -->
-    <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
-  <!-- /ko -->
-
-  <!-- ko if: $root.job().mainType() == 'schedules' && $root.interface() == 'schedules' -->
-    <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
-  <!-- /ko -->
-<!-- /ko -->
-
-          <!-- ko if: job() && !isLoadingJob() -->
-          <!-- ko with: coordVM -->
-          <div>
-            <table class="table table-striped table-condensed margin-top-10">
-            <tbody data-bind="foreach: filteredActions">
-              <tr data-bind="css: { disabled: url == '' }">
-                <td data-bind="css: { disabled: url == '' }">
-                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" target="_blank">
-                    <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
-                  </a>
-                  <span class="pull-right">
-                  <i class="fa fa-exclamation-triangle" data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == '', attr: {title: '${ _ko('Workflow not available or instantiated yet') }'}"></i><i class="fa fa-exclamation-triangle" data-bind="visible: errorMessage != null && errorMessage != '', attr: {title: errorMessage}"></i> <i class="fa fa-exclamation-triangle" data-bind="visible:missingDependencies !='' && missingDependencies != null, attr: { title: '${ _ko('Missing')} ' + missingDependencies }"></i>
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr data-bind="visible: filteredActions().length == 0">
-                <td>
-                  <div class="alert">
-                    ${ _('There are no actions to be shown.') }
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+          <div class="container-fluid">
+            <!-- ko if: $root.section() == 'app' -->
+            <a href="javascript:void(0)" data-bind="click: function() { $root.section('apps'); }">
+              <h2>${ _('Apps') } >
+              <!-- ko if: $root.job() -->
+              <!-- /ko -->
+              </h2>
+            </a>
+            <!-- /ko -->
+          
+            <!-- ko if: $root.section() == 'apps' -->
+            <h2>${ _('Apps') }</h2>
+            ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
+            &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
+          
+            <span>
+              <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" />${ _('Jobs') }</span>
+              <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" />${ _('Batches') }</span>
+              <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" />${ _('Schedules') }</span>
+            </span>
+          
+            <span class="btn-group">
+              <span class="btn-group">
+                <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+                <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+                <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+              </span>
+            </span>
+          
+            <div class="card card-small">
+              <table id="jobsTable" class="datatables table table-condensed">
+                <thead>
+                <tr>
+                  <th>${_('Logs')}</th>
+                  <th>${_('Id')}</th>
+                  <th>${_('Name')}</th>
+                  <th>${_('Type')}</th>
+                  <th>${_('Status')}</th>
+                  <th>${_('User')}</th>
+                  <th>${_('Progress')}</th>
+                  <th>${_('Duration')}</th>
+                  <th>${_('Submitted')}</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: jobs.apps">
+                  <tr data-bind="click: fetchJob">
+                    <td></td>
+                    <td data-bind="text: id"></td>
+                    <td data-bind="text: name"></td>
+                    <td data-bind="text: type"></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: user"></td>
+                    <td data-bind="text: progress"></td>
+                    <td data-bind="text: duration"></td>
+                    <td data-bind="text: submitted"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- /ko -->
           </div>
-          <!-- /ko -->
+
+          <!-- ko if: $root.section() == 'app' && $root.job() -->
+            <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
+              <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
+            <!-- /ko -->
+          
+            <!-- ko if: $root.job().mainType() == 'batches' && $root.interface() == 'batches' -->
+              <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
+            <!-- /ko -->
+          
+            <!-- ko if: $root.job().mainType() == 'schedules' && $root.interface() == 'schedules' -->
+              <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
+            <!-- /ko -->
           <!-- /ko -->
 
-             </div>
       </div>
     </div>
   </div>
@@ -321,7 +286,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="schedule-page">
-  <h2>Schedule > Instance</h2>
+  <h2>Schedule</h2>
   <br/>
 
   ${ _('Id') } <span data-bind="text: id"></span>
@@ -332,6 +297,35 @@ ${ assist.assistPanel() }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+
+  <!-- ko with: coordVM -->
+  <div>
+    <table class="table table-striped table-condensed margin-top-10">
+    <tbody data-bind="foreach: filteredActions">
+      <tr data-bind="css: { disabled: url == '' }">
+        <td data-bind="css: { disabled: url == '' }">
+          <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" target="_blank">
+            <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
+          </a>
+          <span class="pull-right">
+          <i class="fa fa-exclamation-triangle" data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == '', attr: {title: '${ _ko('Workflow not available or instantiated yet') }'}"></i><i class="fa fa-exclamation-triangle" data-bind="visible: errorMessage != null && errorMessage != '', attr: {title: errorMessage}"></i> <i class="fa fa-exclamation-triangle" data-bind="visible:missingDependencies !='' && missingDependencies != null, attr: { title: '${ _ko('Missing')} ' + missingDependencies }"></i>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr data-bind="visible: filteredActions().length == 0">
+        <td>
+          <div class="alert">
+            ${ _('There are no actions to be shown.') }
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+  <!-- /ko -->
+</div>
 
 </script>
 
@@ -353,6 +347,8 @@ ${ assist.assistPanel() }
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);
 
+      self.coordVM = new RunningCoordinatorModel([]);
+
       self.properties = ko.observableDefault(job.properties, {});
       self.mainType = ko.observable(vm.interface());
 
@@ -367,7 +363,10 @@ ${ assist.assistPanel() }
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
           if (data.status == 0) {
-            vm.job(new Job(vm, job));
+            vm.job(new Job(vm, data.app));
+            if (self.mainType() == 'schedules') {
+              self.coordVM.setActions(data.actions);
+            }
           } else {
             $(document).trigger("error", data.message);
           }
@@ -412,8 +411,6 @@ ${ assist.assistPanel() }
     var JobBrowserViewModel = function (options, RunningCoordinatorModel) {
       var self = this;
 
-      self.coordVM = new RunningCoordinatorModel([]);
-
       self.apiHelper = ApiHelper.getInstance(options);
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
@@ -421,19 +418,6 @@ ${ assist.assistPanel() }
 
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
-      self.isLoadingJob = ko.observable(false);
-      self.job.subscribe(function (val) {
-        self.isLoadingJob(true);
-        $.get("/oozie/list_oozie_coordinator/" + val.id(), {
-          format: 'json'
-        }, function (data) {
-          self.coordVM.setActions(data.actions);
-        }).fail(function (xhr) {
-          $(document).trigger("error", xhr.responseText);
-        }).always(function () {
-          self.isLoadingJob(false);
-        });
-      });
 
       self.section = ko.observable('apps');
       self.interface = ko.observable('jobs');
@@ -456,7 +440,6 @@ ${ assist.assistPanel() }
       viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
       ko.applyBindings(viewModel);
 
-
       var loadHash = function () {
         var h = window.location.hash;
         if (h.indexOf('#!') === 0) {
@@ -469,7 +452,6 @@ ${ assist.assistPanel() }
             viewModel.interface(h);
             break;
           default:
-
         }
       }
 
