@@ -813,17 +813,18 @@ class Node():
       self.data['properties']['destination_path'] = action['properties']['destination_path']
 
     elif self.data['type'] == ShellDocumentAction.TYPE:
-      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
-      action = notebook.get_data()['snippets'][0]
+      if self.data['properties'].get('uuid'):
+        notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
+        action = notebook.get_data()['snippets'][0]
 
-      name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
-      self.data['properties']['shell_command'] = action['properties']['command_path']
-      self.data['properties']['env_var'] = [{'value': prop} for prop in action['properties']['env_var']]
-      self.data['properties']['capture_output'] = action['properties']['capture_output']
-      self.data['properties']['arguments'] = []
+        name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
+        self.data['properties']['shell_command'] = action['properties']['command_path']
+        self.data['properties']['env_var'] = [{'value': prop} for prop in action['properties']['env_var']]
+        self.data['properties']['capture_output'] = action['properties']['capture_output']
+        self.data['properties']['arguments'] = []
 
-      self.data['properties']['files'] = [{'value': action['properties']['command_path']}] + [{'value': prop} for prop in action['properties']['files']]
-      self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
+        self.data['properties']['files'] = [{'value': action['properties']['command_path']}] + [{'value': prop} for prop in action['properties']['files']]
+        self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
@@ -3583,6 +3584,8 @@ class WorkflowBuilder():
         node = self.get_java_snippet_node(snippet)
       elif snippet['type'] == 'query-hive':
         node = self.get_hive_snippet_node(snippet, user)
+      elif snippet['type'] == 'shell':
+        node = self.get_shell_snippet_node(snippet)
       else:
         raise PopupException(_('Snippet type %s is not supported in batch execution.') % snippet)
 
@@ -3791,7 +3794,18 @@ class WorkflowBuilder():
 
     return node
 
-  def _get_shell_node(self, node_id, credentials=None, is_document_node=False):
+  def get_shell_snippet_node(self, snippet):
+    node = self._get_shell_node(snippet['id'])
+
+    node['properties']['shell_command'] = snippet['properties'].get('shell_command')
+    node['properties']['arguments'] = snippet['properties'].get('arguments')
+    node['properties']['archives'] = snippet['properties'].get('archives')
+    node['properties']['files'] = snippet['properties'].get('files')
+    node['properties']['env_var'] = snippet['properties'].get('env_var')
+
+    return node
+
+  def _get_shell_node(self, node_id, credentials=None, is_snippet_node=False):
     if credentials is None:
       credentials = []
 

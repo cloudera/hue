@@ -132,6 +132,24 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
+  def add_shell_snippet(self, shell_command, arguments, archives, files, env_var):
+    _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+        u'type': u'shell',
+        u'status': u'running',
+        u'properties':  {
+          u'files': files,
+          u'shell_command': shell_command,
+          u'arguments': arguments,
+          u'archives': archives,
+          u'env_var': env_var,
+        }
+    }))
+    self._add_session(_data, 'shell')
+
+    self.data = json.dumps(_data)
+
   def _make_snippet(self, _snippet):
     return {
          'status': _snippet.get('status', 'ready'),
