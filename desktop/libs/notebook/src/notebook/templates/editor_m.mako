@@ -21,7 +21,7 @@
 %>
 <%namespace name="assist" file="/assist.mako" />
 
-${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
+${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
 <style>
   .ace-editor {
@@ -30,20 +30,43 @@ ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
   }
 
   body.open .main-container {
-    -webkit-transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
-    transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
     overflow: hidden;
     -webkit-transition: -webkit-transform 0.5s;
     transition: transform 0.5s;
-    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  }
+
+  body.open-left .main-container {
+    -webkit-transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
+    transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
+  }
+
+  body.open-right .main-container {
+    -webkit-transform: rotateY(32deg) scale(0.8) translateY(-120px) translateX(-185px);
+    transform: rotateY(32deg) scale(0.8) translateY(-120px) translateX(-185px);
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-y: auto;
+    _overflow: auto;
+    margin: 0 0 1em;
+  }
+
+  .table-container::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 3px solid #fff;
+    background-color: rgba(0, 0, 0, .3);
   }
 </style>
-
-<div id="menu" style="width: 200px; background: #CCC; height: 700px; margin-left: -220px; margin-top: -20px; position: absolute">
-
-</div>
 
 <div class="container main-container">
 
@@ -64,6 +87,35 @@ ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
           minLines: $root.editorMode() ? null : 3
         }
       }"></div>
+
+  <a class="btn margin-top-10" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
+    <i class="fa fa-fw fa-play"></i> ${ _('Execute') }
+  </a>
+
+  <a class="btn margin-top-10" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel operation') }">
+    <i class="fa fa-fw fa-stop"></i> ${ _('Cancel') }
+  </a>
+
+  <!-- ko if: result -->
+  <div class="table-container">
+    <table class="table table-condensed table-striped resultTable">
+      <thead>
+      <tr data-bind="foreach: result.meta">
+        <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>
+      </tr>
+      </thead>
+      <tbody data-bind="foreach: result.data">
+        <tr data-bind="foreach: $data">
+          <td data-bind="text: $data"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div data-bind="visible: status() == 'expired' && result.data() && result.data().length > 99, css: resultsKlass" style="display:none;">
+    <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
+  </div>
+  <!-- /ko -->
+
   <!-- /ko -->
 
   <div class="clearfix"></div>
@@ -276,11 +328,21 @@ ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
     $("body").swipe({fingers: 'all', swipeLeft: swipeLeft, swipeRight: swipeRight, allowPageScroll: "auto"});
 
     function swipeLeft() {
+      if ($('body').hasClass('open-left')){
+         $('body').removeClass('open open-left');
+      }
+      else {
+        $('body').addClass('open open-right');
+      }
     }
 
     function swipeRight() {
-      $('body').addClass('open');
-      $('#menu').css('margin-left', '-20px');
+      if ($('body').hasClass('open-right')){
+         $('body').removeClass('open open-right');
+      }
+      else {
+        $('body').addClass('open open-left');
+      }
     }
 
     viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);

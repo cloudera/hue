@@ -70,8 +70,15 @@ body.open {
   float: left;
 }
 
+.nav-collapse .nav>li>a {
+  color: #DBE8F1;
+}
+
+.navbar .nav>.active>a {
+  color: #FFF;
+}
+
 .ace_layer {
   word-wrap: break-word!important;
   white-space: normal!important;
 }
-
