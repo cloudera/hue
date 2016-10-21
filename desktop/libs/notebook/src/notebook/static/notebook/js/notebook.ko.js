@@ -1895,23 +1895,7 @@ var EditorViewModel = (function() {
       self.save();
     });
     self.loadingScheduler = ko.observable(false);
-    self.viewSchedulerInfo = ko.observable();
-    self.viewScheduler = function() {
-      if (typeof vm.RunningCoordinatorModel !== 'undefined') {
-        logGA('schedule/view');
-        self.loadingScheduler(true);
-        $.get("/oozie/list_oozie_coordinator/" + self.viewSchedulerId(), {
-          format: 'json'
-        }, function (data) {
-          self.schedulerViewerViewModel(new vm.RunningCoordinatorModel(data.actions));
-          self.viewSchedulerInfo(ko.mapping.fromJS(data));
-        }).fail(function (xhr) {
-          $(document).trigger("error", xhr.responseText);
-        }).always(function () {
-          self.loadingScheduler(false);
-        });
-      }
-    };
+
 
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
