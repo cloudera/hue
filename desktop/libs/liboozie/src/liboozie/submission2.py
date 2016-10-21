@@ -214,7 +214,7 @@ WITH SERDEPROPERTIES (
    "separatorChar" = "\t",
    "quoteChar"     = "'",
    "escapeChar"    = "\\"
-)  
+)
 STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), statements)
 
           if statements is not None:

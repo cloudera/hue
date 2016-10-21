@@ -863,7 +863,7 @@ class Node():
         self.data['properties']['subject'] = _("${wf:name()} execution successful")
 
       if mapping.get('send_result_path'):
-        if self.data['type'] == EndNode.TYPE:  
+        if self.data['type'] == EndNode.TYPE:
           self.data['properties']['body'] = 'View result file at %(send_result_browse_url)s' % mapping
 
     return django_mako.render_to_string(self.get_template_name(), data)

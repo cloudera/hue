@@ -224,7 +224,7 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
          </a>
-    </div>    
+    </div>
     <div data-bind="visible: ! $root.isLatest(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
@@ -289,7 +289,7 @@ ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
-   </div>   
+   </div>
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -1337,7 +1337,7 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      
+
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
       <div class="pull-right" style="margin-top: 40px">
