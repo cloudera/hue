@@ -446,6 +446,12 @@ def import_documents(request):
       deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
       doc['fields']['dependencies'] = deps_minus_history
 
+      # Replace illegal characters
+      if '/' in doc['fields']['name']:
+        new_name = doc['fields']['name'].replace('/', '-')
+        LOG.warn("Found illegal slash in document named: %s, renaming to: %s." % (doc['fields']['name'], new_name))
+        doc['fields']['name'] = new_name
+
       # Set last modified date to now
       doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
       docs.append(doc)
