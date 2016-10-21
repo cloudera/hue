@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
+  from oozie.views.dashboard import massaged_coordinator_actions_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -56,4 +57,9 @@ class ScheduleApi(Api):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
 
-    return {'id': coordinator.coordJobId, 'name': coordinator.coordJobName, 'status': coordinator.status, 'actions': coordinator.actions}
+    return {
+        'id': coordinator.coordJobId,
+        'name': coordinator.coordJobName,
+        'status': coordinator.status,
+        'actions': massaged_coordinator_actions_for_json(coordinator, None)
+    }

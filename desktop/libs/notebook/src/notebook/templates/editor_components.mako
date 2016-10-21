@@ -1073,7 +1073,6 @@ ${ hueIcons.symbols() }
       % if ENABLE_QUERY_SCHEDULING.get():
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
         <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-        <li><a href="#scheduledJobsTab" data-toggle="tab">${_('Instances')}</a></li>
       <!-- /ko -->
       % endif
     </ul>
@@ -1147,55 +1146,6 @@ ${ hueIcons.symbols() }
 
       <!-- ko ifnot: isSaved() -->
         ${ _('Query needs to be saved first.') }
-      <!-- /ko -->
-    </div>
-    <!-- /ko -->
-    <!-- /ko -->
-
-    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
-    <!-- ko with: $root.selectedNotebook() -->
-    ## To move to 'notification' panel
-    <div class="tab-pane" id="scheduledJobsTab">
-      <!-- ko if: $root.selectedNotebook().isSaved() -->
-        <a class="pointer" data-bind="click: viewScheduler">Refresh</a>
-
-        <!-- ko if: loadingScheduler -->
-        <div style="padding: 20px">
-          <i class="fa fa-spinner fa-spin muted"></i>
-        </div>
-        <!-- /ko -->
-
-        <!-- ko if: viewSchedulerInfo -->
-        <span data-bind="text: viewSchedulerInfo().data"></span>
-        <!-- /ko -->
-
-        <!-- ko with: schedulerViewerViewModel -->
-        <div id="schedulerViewer">
-          <table class="table table-striped table-condensed margin-top-10">
-            <tbody data-bind="foreach: filteredActions">
-              <tr data-bind="css: { disabled: url == '' }">
-                <td data-bind="css: { disabled: url == '' }">
-                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" target="_blank">
-                    <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
-                  </a>
-                  <span class="pull-right">
-                  <i class="fa fa-exclamation-triangle" data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == '', attr: {title: '${ _ko('Workflow not available or instantiated yet') }'}"></i><i class="fa fa-exclamation-triangle" data-bind="visible: errorMessage != null && errorMessage != '', attr: {title: errorMessage}"></i> <i class="fa fa-exclamation-triangle" data-bind="visible:missingDependencies !='' && missingDependencies != null, attr: { title: '${ _ko('Missing')} ' + missingDependencies }"></i>
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr data-bind="visible: filteredActions().length == 0 && !$parent.loadingScheduler()">
-                <td>
-                  <div class="alert">
-                    ${ _('There are no actions to be shown.') }
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- /ko -->

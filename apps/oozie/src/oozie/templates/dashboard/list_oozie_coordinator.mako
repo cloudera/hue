@@ -117,6 +117,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                       data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
                       data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
                       data-confirmation-footer="normal"
+                      href="javascript:void(0)"
                       class="confirmationModal
                       % if not oozie_coordinator.is_running():
                       hide
@@ -126,6 +127,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                       data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
                       data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
                       data-confirmation-footer="normal"
+                      href="javascript:void(0)"
                       class="confirmationModal
                       % if oozie_coordinator.is_running():
                       hide
@@ -144,6 +146,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      data-message="${ _('Successfully updated Coordinator Job Properties') }"
                      data-confirmation-header="${ _('Update Coordinator Job Properties') }"
                      data-confirmation-footer="update"
+                     href="javascript:void(0)"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
                      hide
@@ -154,6 +157,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   <ul class="dropdown-menu">
                     <li><a title="${ _('Sync Workflow') }" id="sync-wf-btn"
                       data-sync-url="${ url('oozie:sync_coord_workflow', job_id=oozie_coordinator.id) }"
+                      href="javascript:void(0)"
                       class="sync-wf-btn"> ${ _('Workflow') }
                     </a></li>
                   </ul>

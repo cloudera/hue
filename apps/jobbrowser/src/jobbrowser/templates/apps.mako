@@ -123,18 +123,18 @@ ${ assist.assistPanel() }
               </h2>
             </a>
             <!-- /ko -->
-          
+
             <!-- ko if: $root.section() == 'apps' -->
             <h2>${ _('Apps') }</h2>
             ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
             &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
-          
+
             <span>
               <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" />${ _('Jobs') }</span>
               <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" />${ _('Batches') }</span>
               <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" />${ _('Schedules') }</span>
             </span>
-          
+
             <span class="btn-group">
               <span class="btn-group">
                 <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
@@ -142,7 +142,7 @@ ${ assist.assistPanel() }
                 <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
               </span>
             </span>
-          
+
             <div class="card card-small">
               <table id="jobsTable" class="datatables table table-condensed">
                 <thead>
@@ -180,11 +180,11 @@ ${ assist.assistPanel() }
             <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
               <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
             <!-- /ko -->
-          
+
             <!-- ko if: $root.job().mainType() == 'batches' && $root.interface() == 'batches' -->
               <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
             <!-- /ko -->
-          
+
             <!-- ko if: $root.job().mainType() == 'schedules' && $root.interface() == 'schedules' -->
               <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
             <!-- /ko -->
@@ -365,7 +365,7 @@ ${ assist.assistPanel() }
           if (data.status == 0) {
             vm.job(new Job(vm, data.app));
             if (self.mainType() == 'schedules') {
-              self.coordVM.setActions(data.actions);
+              vm.job().coordVM.setActions(data.app.actions);
             }
           } else {
             $(document).trigger("error", data.message);
