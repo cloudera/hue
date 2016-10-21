@@ -22,8 +22,6 @@ from desktop.lib.i18n import smart_unicode
 
 
 
-    </div> <!-- /container -->
-
 <script type="text/javascript">
   $(document).ready(function () {
     $(document).on("info", function (e, msg) {
