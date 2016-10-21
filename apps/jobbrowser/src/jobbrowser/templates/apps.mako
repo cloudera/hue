@@ -129,14 +129,14 @@ ${ assist.assistPanel() }
             ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
             &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
 
-            <span>
-              <span><input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" />${ _('Jobs') }</span>
-              <span><input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" />${ _('Batches') }</span>
-              <span><input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" />${ _('Schedules') }</span>
+            <span class="form-inline">
+              <input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" id="jobs"><label for="jobs">${ _('Jobs') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Batches') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
             </span>
 
             <span class="btn-group">
-              <span class="btn-group">
+              <class="btn-group">
                 <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
                 <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
                 <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>

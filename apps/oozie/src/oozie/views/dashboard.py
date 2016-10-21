@@ -88,7 +88,7 @@ def _get_workflows(user):
         'value': workflow.uuid,
         'id': workflow.id
       } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2')]
-    ]  
+    ]
 
 
 def manage_oozie_jobs(request, job_id, action):
@@ -355,7 +355,7 @@ def list_oozie_workflow(request, job_id):
 
     if hue_coord and hue_coord.workflow: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
     if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
-    
+
     if hue_workflow:
       workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
       full_node_list = hue_workflow.node_list
