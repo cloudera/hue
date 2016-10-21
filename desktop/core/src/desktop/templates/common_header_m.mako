@@ -44,7 +44,7 @@ if USE_NEW_EDITOR.get():
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue ${get_nice_name(current_app, section)} - ${get_title(title)}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
   <meta name="description" content="">
   <meta name="author" content="">
@@ -150,6 +150,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -263,28 +264,26 @@ if USE_NEW_EDITOR.get():
     return found_app, count
 %>
 <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">
-            <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
-            ${get_title(title)}
-          </a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li><a title="${_('Sign out')}" href="/accounts/logout/">${ _("Sign out") }</li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
+  <div class="navbar-inner">
+    <div class="container">
+      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="brand" href="#">
+        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
+        ${get_title(title)}
+      </a>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+
+        </ul>
       </div>
     </div>
-
-    <div class="container">
+  </div>
+</div>
 

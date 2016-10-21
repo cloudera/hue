@@ -19,20 +19,70 @@
   from django.utils.translation import ugettext as _
   from desktop.views import _ko
 %>
+<%namespace name="assist" file="/assist.mako" />
 
 ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
 
+<style>
+  .ace-editor {
+    width: 100%;
+    height: 80px;
+  }
 
+  body.open .main-container {
+    -webkit-transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
+    transform: rotateY(-32deg) scale(0.8) translateY(-120px) translateX(185px);
+    overflow: hidden;
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+  }
+</style>
+
+<div id="menu" style="width: 200px; background: #CCC; height: 700px; margin-left: -220px; margin-top: -20px; position: absolute">
+
+</div>
+
+<div class="container main-container">
 
 <!-- ko with: selectedNotebook -->
+
+  <!-- ko foreach: snippets  -->
+  <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+        snippet: $data,
+        contextTooltip: '${ _ko("Right-click for details") }',
+        expandStar: '${ _ko("Shift + Click to replace with all columns") }',
+        onBlur: saveTemporarySnippet,
+        highlightedRange: result.statement_range,
+        useNewAutocompleter: $root.useNewAutocompleter,
+        aceOptions: {
+          showLineNumbers: $root.editorMode(),
+          showGutter: $root.editorMode(),
+          maxLines: $root.editorMode() ? null : 25,
+          minLines: $root.editorMode() ? null : 3
+        }
+      }"></div>
+  <!-- /ko -->
+
+  <div class="clearfix"></div>
+
+  <ul class="nav nav-tabs margin-top-20">
+    <li class="active"><a href="#history"><i class="fa fa-clock-o"></i></a></li>
+    <li><a href="#saved"><i class="fa fa-save"></i></a></li>
+    <li><a href="#results"><i class="fa fa-table"></i></a></li>
+  </ul>
+
   <!-- ko if: history().length > 0 -->
-  <table class="table table-condensed margin-top-10 history-table">
+  <table class="table table-condensed margin-top-20 history-table" style="background: #FFF">
     <tbody data-bind="foreach: history">
+    <!-- ko if: $index() < 10 -->
       <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
-        <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
+        <td class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
           <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
         </td>
-        <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
+        <td class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
           <!-- ko switch: status -->
           <!-- ko case: 'running' -->
           <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
@@ -48,16 +98,20 @@ ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
           <!-- /ko -->
           <!-- /ko -->
         </td>
-        <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
+        <td class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
         <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query(), flavor: $parent.type" class="history-item"></div></td>
       </tr>
+    <!-- /ko -->
     </tbody>
   </table>
   <!-- /ko -->
 <!-- /ko -->
 
 
+</div>
 
+
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
@@ -77,133 +131,162 @@ ${ commonheader_m(_('Editor'), editor_type, user, request, "68px") | n,unicode }
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
+<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
 
 <script type="text/javascript">
   ko.options.deferUpdates = true;
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
-    var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
-      user: '${ user.username }',
-      userId: ${ user.id },
-      assistAvailable: true,
-      % if conf.USE_NEW_AUTOCOMPLETER.get():
+  var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
+    user: '${ user.username }',
+    userId: ${ user.id },
+    assistAvailable: true,
+    % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,
-      % endif
-      autocompleteTimeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
-      snippetViewSettings: {
-        default: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/sql',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        code: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          snippetIcon: 'fa-code'
-        },
-        hive: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/hive',
-          snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-          sqlDialect: true
-        },
-        impala: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/impala',
-          snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-          sqlDialect: true
-        },
-        jar : {
-          snippetIcon: 'fa-file-archive-o '
-        },
-        mysql: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/mysql',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        mysqljdbc: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/mysql',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        oracle: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/oracle',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        pig: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          aceMode: 'ace/mode/pig',
-          snippetImage: '${ static("pig/art/icon_pig_48.png") }'
-        },
-        postgresql: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/pgsql',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        solr: {
-          placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
-          aceMode: 'ace/mode/mysql',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        java : {
-          snippetIcon: 'fa-file-archive-o '
-        },
-        py : {
-          snippetIcon: 'fa-file-code-o'
-        },
-        pyspark: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          aceMode: 'ace/mode/python',
-          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-        },
-        r: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          aceMode: 'ace/mode/r',
-          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-        },
-        scala: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          aceMode: 'ace/mode/scala',
-          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-        },
-        spark: {
-          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-          aceMode: 'ace/mode/scala',
-          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-        },
-        sqlite: {
-          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/sqlite',
-          snippetIcon: 'fa-database',
-          sqlDialect: true
-        },
-        text: {
-          placeHolder: '${ _('Type your text here') }',
-          aceMode: 'ace/mode/text',
-          snippetIcon: 'fa-header'
-        },
-        markdown: {
-          placeHolder: '${ _('Type your markdown here') }',
-          aceMode: 'ace/mode/markdown',
-          snippetIcon: 'fa-header'
+    % endif
+    autocompleteTimeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
+    snippetViewSettings: {
+      default: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/sql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      code: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        snippetIcon: 'fa-code'
+      },
+      hive: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/hive',
+        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+        sqlDialect: true
+      },
+      impala: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/impala',
+        snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+        sqlDialect: true
+      },
+      jar: {
+        snippetIcon: 'fa-file-archive-o '
+      },
+      mysql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/mysql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      mysqljdbc: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/mysql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      oracle: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/oracle',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      pig: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        aceMode: 'ace/mode/pig',
+        snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+      },
+      postgresql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/pgsql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      solr: {
+        placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
+        aceMode: 'ace/mode/mysql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      java: {
+        snippetIcon: 'fa-file-archive-o '
+      },
+      py: {
+        snippetIcon: 'fa-file-code-o'
+      },
+      pyspark: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        aceMode: 'ace/mode/python',
+        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      },
+      r: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        aceMode: 'ace/mode/r',
+        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      },
+      scala: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        aceMode: 'ace/mode/scala',
+        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      },
+      spark: {
+        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+        aceMode: 'ace/mode/scala',
+        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      },
+      sqlite: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/sqlite',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      text: {
+        placeHolder: '${ _('Type your text here') }',
+        aceMode: 'ace/mode/text',
+        snippetIcon: 'fa-header'
+      },
+      markdown: {
+        placeHolder: '${ _('Type your markdown here') }',
+        aceMode: 'ace/mode/markdown',
+        snippetIcon: 'fa-header'
+      }
+    }
+  });
+
+  function saveTemporarySnippet($element, value) {
+    if ($element.data('last-active-editor')) {
+      try {
+        if (viewModel.editorType() != 'notebook') {
+          $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + viewModel.editorType(), value);
         }
       }
-    });
+      catch (e) {
+      } // storage quota exceeded with enormous editor content
+    }
+  }
 
-    var viewModel;
+  var viewModel;
 
-    $(document).ready(function () {
-      viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
-      ko.applyBindings(viewModel);
-      viewModel.init();
-    });
+  $(document).ready(function () {
+    $("body").swipe({fingers: 'all', swipeLeft: swipeLeft, swipeRight: swipeRight, allowPageScroll: "auto"});
+
+    function swipeLeft() {
+    }
+
+    function swipeRight() {
+      $('body').addClass('open');
+      $('#menu').css('margin-left', '-20px');
+    }
+
+    viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
+    ko.applyBindings(viewModel);
+    viewModel.init();
+  });
 
 </script>
 

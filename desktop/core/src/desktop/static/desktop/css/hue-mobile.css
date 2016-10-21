@@ -16,6 +16,28 @@
  limitations under the License.
 */
 
+body {
+  background: #FFF;
+}
+
+body.open {
+  -webkit-perspective: 1200px;
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+
+.margin-top-30 {
+  margin-top: 30px;
+}
+
 .navbar-inner {
   background-color: #338BB8;
 }
@@ -46,5 +68,10 @@
   width: 60px;
   height: 16px;
   float: left;
+}
+
+.ace_layer {
+  word-wrap: break-word!important;
+  white-space: normal!important;
 }
 
