@@ -99,6 +99,7 @@ def editor(request):
   return render('editor.mako', request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
+      'editor_type': editor_type,
       'options_json': json.dumps({
         'languages': get_interpreters(request.user),
         'mode': 'editor',
@@ -122,6 +123,7 @@ def editor_m(request):
   return render('editor_m.mako', request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
+      'editor_type': editor_type,
       'options_json': json.dumps({
         'languages': get_interpreters(request.user),
         'mode': 'editor',

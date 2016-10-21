@@ -36,7 +36,7 @@ if USE_NEW_EDITOR.get():
 </%def>
 <%def name="get_title(title)">
   % if title:
-    ${smart_unicode(title)}
+    ${smart_unicode(title).upper()}
   % endif
 </%def>
 <html lang="en">
@@ -271,16 +271,24 @@ if USE_NEW_EDITOR.get():
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="brand" href="#">
+      <a class="brand" href="/about">
         <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
         ${get_title(title)}
       </a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-
+          <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }">${_('My documents')}</a></li>
+          % if 'beeswax' in apps:
+             % if USE_NEW_EDITOR.get():
+             <li><a href="${ url('notebook:editor_m') }?type=hive">${_('Hive')}</a></li>
+             % endif
+           % endif
+           % if 'impala' in apps:
+             % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
+             <li><a href="${ url('notebook:editor_m') }?type=impala">${_('Impala')}</a></li>
+             % endif
+           % endif
+          <li><a title="${_('Sign out')}" href="/accounts/logout/">${_('Sign out')}</a></li>
         </ul>
       </div>
     </div>
