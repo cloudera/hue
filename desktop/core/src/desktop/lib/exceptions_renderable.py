@@ -43,6 +43,9 @@ class PopupException(Exception):
     self.detail = detail
     self.error_code = error_code
 
+    if self.detail:
+      LOG.error('Potential detail: %s' % self.detail)
+
     # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
     (type, value, tb) = sys.exc_info()
     self.traceback = traceback.extract_tb(tb)
