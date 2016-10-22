@@ -199,12 +199,13 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
-        elif action.data['type'] == 'hive-document' or action.data['type'] == 'hive2':
+        elif action.data['type'] == 'hive-document':
           from notebook.models import Notebook
           if action.data['properties'].get('uuid'):
             notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
-            #statements = notebook.get_str()
-            statements = '\n\n\n'.join([snippet['statement_raw'] for snippet in notebook.get_data()['snippets']])
+            statements = notebook.get_str()
+          else:
+            statements = action.data['properties'].get('statements')
 
           if self.properties.get('send_result_path'):
             statements = """
@@ -215,7 +216,7 @@ WITH SERDEPROPERTIES (
    "quoteChar"     = "'",
    "escapeChar"    = "\\"
 )
-STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), statements)
+STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.join([snippet['statement_raw'] for snippet in notebook.get_data()['snippets']]))
 
           if statements is not None:
             self._create_file(deployment_dir, action.data['name'] + '.sql', statements)
