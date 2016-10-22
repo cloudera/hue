@@ -468,7 +468,21 @@ def import_documents(request):
     if request.POST.get('redirect'):
       return redirect(request.POST.get('redirect'))
     else:
-      return JsonResponse({'message': stdout.getvalue()})
+      return JsonResponse({
+        'status': 0,
+        'message': stdout.getvalue(),
+        'count': len(documents),
+        'created_count': len([doc for doc in documents if doc['pk'] is None]),
+        'updated_count': len([doc for doc in documents if doc['pk'] is not None]),
+        'username': request.user.username,
+        'documents': [
+          dict([
+            ('name', doc['fields']['name']),
+            ('uuid', doc['fields']['uuid']),
+            ('type', doc['fields']['type']),
+            ('owner', doc['fields']['owner'][0])
+          ]) for doc in docs]
+      })
   except Exception, e:
     LOG.error('Failed to run loaddata command in import_documents:\n %s' % stdout.getvalue())
     return JsonResponse({'status': -1, 'message': smart_str(e)})
