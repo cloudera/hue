@@ -181,7 +181,7 @@ class NavigatorApi(object):
 
       data = json.dumps(body)
       LOG.info(data)
-      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE)
+      response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
 
       return response
     except RestException:
