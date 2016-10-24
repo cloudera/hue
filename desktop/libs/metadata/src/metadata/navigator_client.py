@@ -102,8 +102,11 @@ class NavigatorApi(object):
           query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
         else:
           name, val = term.split(':')
-          if val and (name != 'type' or val in entity_types): # Manual filter allowed
-            user_filters.append(term + '*') # e.g. type:VIEW ca
+          if val:
+            if name == 'type':
+              term = '%s:%s' % (name, val.upper().strip('*'))
+              default_entity_types = ['*'] # Override default source types
+            user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
 
       filter_query = '*'
 
@@ -139,6 +142,7 @@ class NavigatorApi(object):
       }
 
       entity_types = []
+      defaultFilterQueries = []
       if filterQueries is None:
         filterQueries = []
 
@@ -154,7 +158,7 @@ class NavigatorApi(object):
         if query_s.strip().endswith('type:*'): # To list all available types
           fq_type = entity_types
 
-        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+        defaultFilterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
@@ -163,7 +167,10 @@ class NavigatorApi(object):
           query.append(term)
         else:
           name, val = term.split(':')
-          if val and val != '*' and (name != 'type' or val in entity_types): # Allow to type non default types, e.g for SQL: type:FIELD
+          if val: # Allow to type non default types, e.g for SQL: type:FIEL*
+            if name == 'type':
+              term = '%s:%s' % (name, val.upper())
+              defaultFilterQueries = []
             filterQueries.append(term)
 
       body = {'query': ' '.join(query) or '*'}
@@ -175,7 +182,7 @@ class NavigatorApi(object):
       if facetRanges:
         body['facetRanges'] = facetRanges
       if filterQueries:
-        body['filterQueries'] = filterQueries
+        body['filterQueries'] = filterQueries + defaultFilterQueries
       if firstClassEntitiesOnly:
         body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 
