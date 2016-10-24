@@ -700,7 +700,7 @@ class HS2Api(Api):
 
     query_id = self._get_impala_query_id(snippet)
     session = Session.objects.get_session(self.user, application='impala')
-    protocol = 'https' if impala_ssl_conf.get().get('enabled') else 'http'
+    protocol = 'https' if impala_ssl_conf.ENABLED.get() else 'http'
     server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
     if query_id:
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
