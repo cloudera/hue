@@ -5022,6 +5022,14 @@ var addFunctionLocation = function (location, functionName) {
   });
 };
 
+var addHdfsLocation = function (location, path) {
+  parser.yy.locations.push({
+    type: 'hdfs',
+    location: adjustLocationForCursor(location),
+    path: path
+  });
+};
+
 var addDatabaseLocation = function (location, identifierChain) {
   parser.yy.locations.push({
     type: 'database',
@@ -6245,23 +6253,23 @@ case 335: addFunctionLocation(yy_.yylloc, 'variance_pop'); return 325;
 break;
 case 336: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 326; 
 break;
-case 337: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 337: addFunctionLocation(yy_.yylloc, 'dense_rank'); return 327; 
 break;
-case 338: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 338: addFunctionLocation(yy_.yylloc, 'first_value'); return 327; 
 break;
-case 339: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 339: addFunctionLocation(yy_.yylloc, 'lag'); return 327; 
 break;
-case 340: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 340: addFunctionLocation(yy_.yylloc, 'last_value'); return 327; 
 break;
-case 341: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 341: addFunctionLocation(yy_.yylloc, 'lead'); return 327; 
 break;
-case 342: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 342: addFunctionLocation(yy_.yylloc, 'rank'); return 327; 
 break;
-case 343: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 343: addFunctionLocation(yy_.yylloc, 'row_number'); return 327; 
 break;
-case 344: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 344: addFunctionLocation(yy_.yylloc, 'cume_dist'); return 327; 
 break;
-case 345: addFunctionLocation(yy_.yylloc, 'variance_samp'); return 327; 
+case 345: addFunctionLocation(yy_.yylloc, 'percent_rank'); return 327; 
 break;
 case 346: return 328; 
 break;
@@ -6277,7 +6285,7 @@ case 351: parser.yy.cursorFound = true; return 379;
 break;
 case 352: return 330; 
 break;
-case 353: return 839; 
+case 353: addHdfsLocation(yy_.yylloc, yy_.yytext); return 839; 
 break;
 case 354: this.popState(); return 840; 
 break;
