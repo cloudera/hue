@@ -1024,6 +1024,14 @@ var addFunctionLocation = function (location, functionName) {
   });
 };
 
+var addHdfsLocation = function (location, path) {
+  parser.yy.locations.push({
+    type: 'hdfs',
+    location: adjustLocationForCursor(location),
+    path: path
+  });
+};
+
 var addDatabaseLocation = function (location, identifierChain) {
   parser.yy.locations.push({
     type: 'database',

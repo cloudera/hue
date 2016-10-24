@@ -278,6 +278,7 @@ from metadata.conf import has_navigator
       <div class="sql-context-link-row">
         <a class="inactive-action pointer" data-bind="visible: isTable || isColumn, click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }</a>
         <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }"><i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }</a>
       </div>
     </div>
   </script>
@@ -378,6 +379,14 @@ from metadata.conf import has_navigator
         <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
           <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
         </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="sql-context-hdfs-details">
+    <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
+      <div style="padding: 8px">
+        <div style="margin: 10px 10px 18px 10px;"><pre data-bind="text: ko.mapping.toJSON($data)"></pre></div>
       </div>
     </div>
   </script>
@@ -811,6 +820,27 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('tags');
       }
 
+      function HdfsContextTabs(data) {
+        var self = this;
+
+        // TODO: Update Ace token with selected path
+        self.data = ko.observable({
+          details: data,
+          loading: ko.observable(false),
+          hasErrors: ko.observable(false)
+        });
+
+        pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.file.browser', function () {
+          window.open((data.path.indexOf('/') === 0 ? '/filebrowser/#' : '/filebrowser/#/') + data.path, '_blank');
+        }));
+
+
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', template: 'sql-context-hdfs-details', templateData: self.data }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
       function FunctionContextTabs(data, sourceType) {
         var self = this;
         self.func = ko.observable({
@@ -1061,6 +1091,7 @@ from metadata.conf import has_navigator
         self.isTable = params.data.type === 'table';
         self.isColumn = params.data.type === 'column';
         self.isFunction = params.data.type === 'function';
+        self.isHdfs = params.data.type === 'hdfs';
 
         if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(self.data, self.sourceType);
@@ -1078,6 +1109,10 @@ from metadata.conf import has_navigator
           self.contents = new FunctionContextTabs(self.data, self.sourceType);
           self.title = self.data.function;
           self.iconClass = 'fa-superscript'
+        } else if (self.isHdfs) {
+          self.contents = new HdfsContextTabs(self.data);
+          self.title = self.data.path;
+          self.iconClass = 'fa-folder-o'
         } else {
           self.title = '';
           self.iconClass = 'fa-info'

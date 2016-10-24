@@ -153,6 +153,29 @@
       });
     });
 
+    describe('HDFS paths', function () {
+      fit('should report locations for "LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla; |"', function () {
+        assertLocations({
+          dialect: 'hive',
+          beforeCursor: 'LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla;',
+          expectedLocations: [
+            { type: 'hdfs', location: {first_line: 1, last_line: 1, first_column: 25, last_column: 44}, path: '/some/path/file.ble' },
+            { type: 'table', location: {first_line: 1, last_line: 1, first_column: 67, last_column: 70}, identifierChain: [{name: 'bla'}] }
+          ]
+        });
+      });
+
+      fit('should report locations for "CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\'; |"', function () {
+        assertLocations({
+          dialect: 'impala',
+          beforeCursor: 'CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\';',
+          expectedLocations: [
+            { type: 'hdfs', location: {first_line: 1, last_line: 1, first_column: 37, last_column: 46}, path: '/bla/bla/' }
+          ]
+        });
+      });
+    });
+
     describe('Hive specific', function () {
       it('should report locations for "SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\nSELECT t1.bla FROM testTable2 t1;\\nSELECT * FROM testTable3 t3, testTable4 t4; |"', function () {
         assertLocations({
@@ -331,7 +354,7 @@
         });
       });
     });
-//SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60;',
+
     describe('Impala specific', function () {
       it('should report locations for "SELECT tmp.bc, ROUND(tmp.r, 2) AS r FROM ( SELECT tstDb1.b1.cat AS bc, SUM(tstDb1.b1.price * tran.qua) AS r FROM tstDb1.b1 JOIN [SHUFFLE] tran ON ( tran.b_id = tstDb1.b1.id AND YEAR(tran.tran_d) BETWEEN 2008 AND 2010) GROUP BY tstDb1.b1.cat) tmp ORDER BY r DESC LIMIT 60; |"', function () {
         assertLocations({

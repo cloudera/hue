@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-importScripts('/static/desktop/js/autocomplete/sql.js?version=3');
-importScripts('/static/desktop/js/sqlFunctions.js?version=3');
+importScripts('/static/desktop/js/autocomplete/sql.js?version=4');
+importScripts('/static/desktop/js/sqlFunctions.js?version=4');
 
 (function () {
 
