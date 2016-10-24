@@ -376,15 +376,15 @@
 <impala>'VARIANCE_SAMP'                    { addFunctionLocation(yylloc, 'variance_samp'); return '<impala>VARIANCE_SAMP'; }
 
 // Analytical functions
-'DENSE_RANK'                               { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'FIRST_VALUE'                              { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'LAG'                                      { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'LAST_VALUE'                               { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'LEAD'                                     { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'RANK'                                     { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-'ROW_NUMBER'                               { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-<hive>'CUME_DIST'                          { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
-<hive>'PERCENT_RANK'                       { addFunctionLocation(yylloc, 'variance_samp'); return 'ANALYTIC'; }
+'DENSE_RANK'                               { addFunctionLocation(yylloc, 'dense_rank'); return 'ANALYTIC'; }
+'FIRST_VALUE'                              { addFunctionLocation(yylloc, 'first_value'); return 'ANALYTIC'; }
+'LAG'                                      { addFunctionLocation(yylloc, 'lag'); return 'ANALYTIC'; }
+'LAST_VALUE'                               { addFunctionLocation(yylloc, 'last_value'); return 'ANALYTIC'; }
+'LEAD'                                     { addFunctionLocation(yylloc, 'lead'); return 'ANALYTIC'; }
+'RANK'                                     { addFunctionLocation(yylloc, 'rank'); return 'ANALYTIC'; }
+'ROW_NUMBER'                               { addFunctionLocation(yylloc, 'row_number'); return 'ANALYTIC'; }
+<hive>'CUME_DIST'                          { addFunctionLocation(yylloc, 'cume_dist'); return 'ANALYTIC'; }
+<hive>'PERCENT_RANK'                       { addFunctionLocation(yylloc, 'percent_rank'); return 'ANALYTIC'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
