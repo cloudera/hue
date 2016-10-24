@@ -615,6 +615,11 @@ var Collection = function (vm, collection) {
   });
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
+
+  self.template.showFieldList.subscribe(function() {
+    $(window).trigger('resize');
+  });
+
   self.fields = ko.mapping.fromJS(collection.fields);
   self.qdefinitions = ko.mapping.fromJS(collection.qdefinitions);
 

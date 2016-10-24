@@ -19,10 +19,12 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
+  url(r'^m$', 'index_m', name='index_m'),
   url(r'^search$', 'search', name='search'),
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),
   url(r'^browse/(?P<name>.+)', 'browse', name='browse'),
+  url(r'^browse_m/(?P<name>.+)', 'browse_m', name='browse_m'),
   url(r'^download$', 'download', name='download'),
 
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
