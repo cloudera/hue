@@ -1007,14 +1007,6 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <div data-bind="foreach: searchResult" style="overflow-x:hidden">
         <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopover }">
-          <!-- ko if: type === 'TABLE' || type === 'VIEW' || type === 'DATABASE' || type === 'FIELD' -->
-          <div class="assist-actions table-actions" style="opacity: 0" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
-            <a class="inactive-action pointer" href="javascript:void(0)" data-bind="click: function (data, event) { showNavContextPopover(data, event); }, css: { 'blue': statsVisible }">
-              <i class="fa fa-bar-chart" title="${_('Show details')}"></i>
-            </a>
-          </div>
-          <!-- /ko -->
-
           <div class="icon-col">
             <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
           </div>
@@ -1499,7 +1491,10 @@ from metadata.conf import has_navigator
           };
 
           var showNavContextPopover = function (entry, event) {
-            var $source = $(event.target);
+            if (entry.type && entry.type !== 'TABLE' && entry.type !== 'VIEW' && entry.type !== 'DATABASE' && entry.type !== 'FIELD') {
+              return;
+            }
+            var $source = $(event.target).closest('.result-entry');
             var offset = $source.offset();
             entry.statsVisible(true);
             huePubSub.publish('sql.context.popover.show', {
