@@ -541,12 +541,12 @@ from metadata.conf import has_navigator
         <!-- ko with: selectedSource -->
         <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
         <!-- ko with: selectedDatabase -->
-        <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+        <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -626,7 +626,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -711,7 +711,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: (searchInput() !== '' || searchHasFocus()) && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -952,16 +952,17 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="nav-assist-search">
-        <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchInput() }"></i>
+        <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i>
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
             itemTemplate: 'nav-search-autocomp-item',
             classPrefix: 'nav-',
             showOnFocus: true,
+            onEnter: performSearch,
             reopenPattern: /.*:$/
           },
           hasFocus: searchHasFocus,
-          clearable: { value: searchInput, onClear: function () { huePubSub.publish('autocomplete.close'); } },
+          clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
           textInput: searchInput,
           valueUpdate: 'afterkeydown'">
       </div>
@@ -1412,10 +1413,7 @@ from metadata.conf import has_navigator
 
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
-
-        self.searchInput.subscribe(function (newValue) {
-          self.performSearch(newValue);
-        });
+        self.searchActive = ko.observable(false);
 
         var lastQuery = -1;
 
@@ -1477,6 +1475,9 @@ from metadata.conf import has_navigator
         % endif
 
         self.performSearch = function () {
+          if (!self.searchActive()) {
+            self.searchActive(true);
+          }
           if (self.searchInput() === lastQuery) {
             return;
           }

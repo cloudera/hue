@@ -61,10 +61,15 @@
         });
       }
 
-      if (options.closeOnEnter) {
+      if (options.closeOnEnter || options.onEnter || options.blurOnEnter) {
         $element.on('keyup', function (e) {
           if(e.which === 13) {
-            $element.hueAutocomplete('close');
+            if (options.closeOnEnter) {
+              $element.hueAutocomplete('close');
+            }
+            if (options.onEnter) {
+              options.onEnter();
+            }
             if (options.blurOnEnter) {
               $element.blur();
             }
