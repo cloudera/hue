@@ -1612,11 +1612,12 @@ from metadata.conf import has_navigator
             query:  request.term + '*',
             successCallback: function (data) {
               var values = [];
+              var facetPartialRe = new RegExp(partial, 'i');
               if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
                 var facetInQuery = facetMatch[1];
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
                   $.map(data.facets[facetInQuery], function (count, value) {
-                    if (partial === '' || value.indexOf(partial) !== -1) {
+                    if (facetPartialRe.test(value)) {
                       values.push({ data: { label: facetInQuery + ':' + value, icon: NAV_FACET_ICON, description: count }, value: beforePartial + value})
                     }
                   });
@@ -1624,7 +1625,7 @@ from metadata.conf import has_navigator
               } else {
                 if (typeof data.facets !== 'undefined') {
                   Object.keys(data.facets).forEach(function (facet) {
-                    if (partial.length === 0 || facet.indexOf(partial) !== -1) {
+                    if (facetPartialRe.test(facet)) {
                       if (Object.keys(data.facets[facet]).length > 0) {
                         values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
                       } else { // Potential facet from the list

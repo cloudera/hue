@@ -148,7 +148,7 @@ class NavigatorApi(object):
         filterQueries = []
 
       if sources:
-        default_entity_types, entity_types = self._get_types_from_sources(sources)        
+        default_entity_types, entity_types = self._get_types_from_sources(sources)
 
         if 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
