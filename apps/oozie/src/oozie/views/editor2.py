@@ -115,7 +115,7 @@ def _edit_workflow(request, doc, workflow):
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user)),
+      'can_edit_json': json.dumps(doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user)),
       'history_json': json.dumps([{
           'history': hist.data_dict.get('history', {}),
           'id': hist.id,
