@@ -77,6 +77,22 @@
         });
       }
 
+      $element.on('keydown', function (e) {
+        // ctrl + backspace to delete words
+        if (e.which === 8 && e.ctrlKey) {
+          var lastSpaceOrColon = Math.max($element.val().lastIndexOf(' '), $element.val().lastIndexOf(':'));
+          if (lastSpaceOrColon < $element.val().length - 1) {
+            if (lastSpaceOrColon !== -1) {
+              $element.val($element.val().substring(0, lastSpaceOrColon + 1));
+            } else {
+              $element.val('');
+            }
+            e.preventDefault();
+            return false;
+          }
+        }
+      });
+
       if (options.showOnFocus) {
         $element.on('focus', function () {
           $element.hueAutocomplete('search', $element.val());
