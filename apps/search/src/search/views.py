@@ -38,17 +38,19 @@ from search.management.commands import search_setup
 from search.models import Collection2, augment_solr_response, augment_solr_exception, pairwise2
 from search.search_controller import SearchController, can_edit_index
 
+from django.core.urlresolvers import reverse
+
 
 LOG = logging.getLogger(__name__)
 
 
 
-def index(request):
+def index(request, is_mobile=False):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
 
   if not hue_collections or not collection_id:
-    return admin_collections(request, True)
+    return admin_collections(request, True, is_mobile)
 
   try:
     collection_doc = Document2.objects.get(id=collection_id)
@@ -65,14 +67,21 @@ def index(request):
     if 'qd' in request.GET:
       query['qd'] = request.GET.get('qd')
 
+  template = 'search.mako'
+  if is_mobile:
+    template = 'search_m.mako'
 
-  return render('search.mako', request, {
+  return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
     'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
     'is_owner': collection_doc.doc.get().can_write(request.user),
-    'can_edit_index': can_edit_index(request.user)
+    'can_edit_index': can_edit_index(request.user),
+    'mobile': is_mobile
   })
+
+def index_m(request):
+  return index(request, True)
 
 
 def new_search(request):
@@ -105,7 +114,7 @@ def new_search(request):
   })
 
 
-def browse(request, name):
+def browse(request, name, is_mobile=False):
   collections = SearchController(request.user).get_all_indexes()
   if not collections:
     return no_collections(request)
@@ -113,23 +122,32 @@ def browse(request, name):
   collection = Collection2(user=request.user, name=name)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-  return render('search.mako', request, {
+  template = 'search.mako'
+  if is_mobile:
+    template = 'search_m.mako'
+
+  return render(template, request, {
     'collection': collection,
     'query': query,
     'initial': json.dumps({
-         'autoLoad': True,
-         'collections': collections,
-         'layout': [
-              {"size":12,"rows":[{"widgets":[
-                  {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-              "drops":["temp"],"klass":"card card-home card-column span10"}
-         ],
-         'is_latest': LATEST.get()
-     }),
-     'is_owner': True,
-     'can_edit_index': can_edit_index(request.user)
+      'autoLoad': True,
+      'collections': collections,
+      'layout': [
+          {"size":12,"rows":[{"widgets":[
+              {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
+               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+          "drops":["temp"],"klass":"card card-home card-column span10"}
+      ],
+      'is_latest': LATEST.get()
+    }),
+    'is_owner': True,
+    'can_edit_index': can_edit_index(request.user),
+    'mobile': is_mobile
   })
+
+
+def browse_m(request, name):
+  return browse(request, name, True)
 
 
 @allow_viewer_only
@@ -220,18 +238,24 @@ def no_collections(request):
   return render('no_collections.mako', request, {})
 
 
-def admin_collections(request, is_redirect=False):
+def admin_collections(request, is_redirect=False, is_mobile=False):
   existing_hue_collections = SearchController(request.user).get_search_collections()
 
   if request.GET.get('format') == 'json':
     collections = []
     for collection in existing_hue_collections:
       massaged_collection = collection.to_dict()
+      if request.GET.get('is_mobile'):
+        massaged_collection['absoluteUrl'] = reverse('search:index_m') + '?collection=%s' % collection.id
       massaged_collection['isOwner'] = collection.doc.get().can_write(request.user)
       collections.append(massaged_collection)
     return JsonResponse(collections, safe=False)
 
-  return render('admin_collections.mako', request, {
+  template = 'admin_collections.mako'
+  if is_mobile:
+    template = 'admin_collections_m.mako'
+
+  return render(template, request, {
     'existing_hue_collections': existing_hue_collections,
     'is_redirect': is_redirect
   })

@@ -15,14 +15,15 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
+from desktop.views import commonheader_m, commonfooter_m, _ko
+from desktop import conf
+from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="common_admin_collections" file="common_admin_collections.mako" />
+<%namespace name="common_search" file="common_search.mako" />
 
-${ commonheader(_('Search'), "search", user, request, "29px") | n,unicode }
+${ commonheader_m(_('Search'), "search", user, request, "80px") | n,unicode }
 
-${ common_admin_collections.page_structure() }
+${ common_search.page_structure(True) }
 
-${ commonfooter(request, messages) | n,unicode }
+${ commonfooter_m(request, messages) | n,unicode }

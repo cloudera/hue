@@ -172,7 +172,12 @@ if USE_NEW_EDITOR.get():
     //Add CSRF Token to all XHR Requests
     var xrhsend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
-      this.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
+      this.setRequestHeader('X-CSRFToken', "${request.COOKIES.get('csrftoken')}");
+    %else:
+      this.setRequestHeader('X-CSRFToken', "");
+    %endif
+
       return xrhsend.apply(this, arguments);
     }
 
@@ -287,6 +292,9 @@ if USE_NEW_EDITOR.get():
              % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
              <li><a href="${ url('notebook:editor_m') }?type=impala">${_('Impala')}</a></li>
              % endif
+           % endif
+           % if 'search' in apps:
+             <li><a href="${ url('search:index_m') }">${_('Search')}</a></li>
            % endif
           <li><a title="${_('Sign out')}" href="/accounts/logout/">${_('Sign out')}</a></li>
         </ul>

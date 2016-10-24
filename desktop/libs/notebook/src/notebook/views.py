@@ -88,7 +88,7 @@ def notebook(request):
 
 
 @check_document_access_permission()
-def editor(request):
+def editor(request, is_mobile=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
 
@@ -96,7 +96,11 @@ def editor(request):
     document = Document2.objects.get(id=editor_id)
     editor_type = document.type.rsplit('-', 1)[-1]
 
-  return render('editor.mako', request, {
+  template = 'editor.mako'
+  if is_mobile:
+    template = 'editor_m.mako'
+
+  return render(template, request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
       'editor_type': editor_type,
@@ -106,33 +110,14 @@ def editor(request):
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
         'editor_type': editor_type,
-        'mobile': False
+        'mobile': is_mobile
       })
   })
 
 
 @check_document_access_permission()
 def editor_m(request):
-  editor_id = request.GET.get('editor')
-  editor_type = request.GET.get('type', 'hive')
-
-  if editor_id:  # Open existing saved editor document
-    document = Document2.objects.get(id=editor_id)
-    editor_type = document.type.rsplit('-', 1)[-1]
-
-  return render('editor_m.mako', request, {
-      'editor_id': editor_id or None,
-      'notebooks_json': '{}',
-      'editor_type': editor_type,
-      'options_json': json.dumps({
-        'languages': get_interpreters(request.user),
-        'mode': 'editor',
-        'is_optimizer_enabled': has_optimizer(),
-        'is_navigator_enabled': has_navigator(request.user),
-        'editor_type': editor_type,
-        'mobile': True
-      })
-  })
+  return editor(request, True)
 
 
 def new(request):

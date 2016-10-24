@@ -399,9 +399,9 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
   else:
     apps_list = []
 
-  template = "common_header.mako"
+  template = 'common_header.mako'
   if is_mobile:
-    template = "common_header_m.mako"
+    template = 'common_header_m.mako'
 
   return django_mako.render_to_string(template, {
     'current_app': current_app,
@@ -450,9 +450,9 @@ def commonfooter(request, messages=None, is_mobile=False):
 
   hue_settings = Settings.get_settings()
 
-  template = "common_footer.mako"
+  template = 'common_footer.mako'
   if is_mobile:
-    template = "common_footer_m.mako"
+    template = 'common_footer_m.mako'
 
   return django_mako.render_to_string(template, {
     'request': request,
