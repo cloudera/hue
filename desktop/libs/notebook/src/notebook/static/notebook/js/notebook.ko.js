@@ -1653,7 +1653,7 @@ var EditorViewModel = (function() {
               self.schedulerViewModel.coordinator.refreshParameters();
             }
 
-            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
           }
           else {
             hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
