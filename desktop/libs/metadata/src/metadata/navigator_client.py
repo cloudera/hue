@@ -105,7 +105,7 @@ class NavigatorApi(object):
           if val:
             if name == 'type':
               term = '%s:%s' % (name, val.upper().strip('*'))
-              default_entity_types = ['*'] # Override default source types
+              default_entity_types = entity_types # Make sure type value still makes sense for the source
             user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
 
       filter_query = '*'
@@ -143,12 +143,12 @@ class NavigatorApi(object):
 
       entity_types = []
       defaultFilterQueries = []
+      fq_type = []
       if filterQueries is None:
         filterQueries = []
 
       if sources:
-        default_entity_types, entity_types = self._get_types_from_sources(sources)
-        fq_type = []
+        default_entity_types, entity_types = self._get_types_from_sources(sources)        
 
         if 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
@@ -158,8 +158,6 @@ class NavigatorApi(object):
         if query_s.strip().endswith('type:*'): # To list all available types
           fq_type = entity_types
 
-        defaultFilterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-
       search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
       for term in search_terms:
@@ -168,13 +166,13 @@ class NavigatorApi(object):
         else:
           name, val = term.split(':')
           if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-            if name == 'type':
+            if name == 'type': # Make sure type value still makes sense for the source
               term = '%s:%s' % (name, val.upper())
-              defaultFilterQueries = []
+              fq_type = entity_types
             filterQueries.append(term)
 
       body = {'query': ' '.join(query) or '*'}
-
+      defaultFilterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
