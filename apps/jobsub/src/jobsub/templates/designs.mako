@@ -120,11 +120,9 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
               <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Pig</a>
             </li>
             % endif
-            % if 'sqoop' in apps:
             <li>
               <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Sqoop</a>
             </li>
-            % endif
             <li>
               <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Fs</a>
             </li>
