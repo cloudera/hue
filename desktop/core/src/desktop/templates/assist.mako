@@ -1624,7 +1624,7 @@ from metadata.conf import has_navigator
           self.apiHelper.navSearchAutocomplete({
             source: self.visiblePanel().type === 'sql' ?
                 (self.visiblePanel().panelData.selectedSource() ? self.visiblePanel().panelData.selectedSource().sourceType : 'hive') : self.visiblePanel().type,
-            query:  request.term + '*',
+            query:  request.term,
             successCallback: function (data) {
               var values = [];
               var facetPartialRe = new RegExp(partial, 'i');
@@ -1655,15 +1655,17 @@ from metadata.conf import has_navigator
                     }
                   });
                 }
-                if (values.length > 0) {
-                  values.push({ divider: true });
-                }
-                if (typeof data.results !== 'undefined') {
-                  data.results.forEach(function (result) {
-                    values.push({ data: { label: result.originalName, icon: NAV_TYPE_ICONS[result.type],  description: result.parentPath }, value: beforePartial + result.originalName });
-                  });
-                }
               }
+
+              if (values.length > 0) {
+                values.push({ divider: true });
+              }
+              if (typeof data.results !== 'undefined') {
+                data.results.forEach(function (result) {
+                  values.push({ data: { label: result.originalName, icon: NAV_TYPE_ICONS[result.type],  description: result.parentPath }, value: beforePartial + result.originalName });
+                });
+              }
+
               if (values.length > 0 && values[values.length - 1].divider) {
                 values.pop();
               }

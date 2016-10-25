@@ -188,8 +188,9 @@ def search_entities_interactive(request):
     }
 
   field_facets = ["tags", "type"] + f.keys()
+  query_s = query_s.strip() + '*'
 
-  last_query_term = [term for term in query_s.strip().split()][-1]
+  last_query_term = [term for term in query_s.split()][-1]
 
   if last_query_term and last_query_term != '*':
     last_query_term = last_query_term.rstrip('*')
@@ -212,7 +213,7 @@ def search_entities_interactive(request):
     for fname, fvalues in response['facets'].items():
       fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
       response['facets'][fname] = OrderedDict(fvalues)
-      if ':' in last_query_term and not response['facets'][fname]:
+      if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
 
   response['status'] = 0
