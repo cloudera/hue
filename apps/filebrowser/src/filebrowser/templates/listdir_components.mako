@@ -1318,15 +1318,11 @@ from django.utils.translation import ugettext as _
       self.changePermissions = function (data, event) {
         if (!self.isCurrentDirSentryManaged()) {
           var paths = [];
-          var allFileType = true;
 
           event.preventDefault();
           event.stopPropagation();
 
           $(self.selectedFiles()).each(function (index, file) {
-            if ("dir" == file.type) {
-              allFileType = false;
-            }
             paths.push(file.path);
           });
 
@@ -1350,16 +1346,6 @@ from django.utils.translation import ugettext as _
               $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
             }
             mode >>>= 1;
-          }
-
-          if (allFileType) {
-            $("#chmodForm input[name='user_execute']").attr("disabled", "disabled");
-            $("#chmodForm input[name='group_execute']").attr("disabled", "disabled");
-            $("#chmodForm input[name='other_execute']").attr("disabled", "disabled");
-          } else {
-            $("#chmodForm input[name='user_execute']").removeAttr("disabled");
-            $("#chmodForm input[name='group_execute']").removeAttr("disabled");
-            $("#chmodForm input[name='other_execute']").removeAttr("disabled");
           }
         }
       };
