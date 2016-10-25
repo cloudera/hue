@@ -71,7 +71,7 @@ def rm_ha(funct):
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'Connection aborted' in ex_message or 'standby RM' in ex_message:
         LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
-        rm_ha = get_next_ha_yarncluster(current_user=api.user())
+        rm_ha = get_next_ha_yarncluster(current_user=api.user)
         if rm_ha is not None:
           if rm_ha[1].url == api.resource_manager_api.url:
             raise ex
