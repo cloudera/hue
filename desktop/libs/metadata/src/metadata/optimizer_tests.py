@@ -121,21 +121,9 @@ class TestOptimizerApi(object):
 
 
   def test_top_tables(self):
-    resp = self.api.authenticate()
-    token = resp['token']
+    resp = self.api.top_tables()
 
-    resp = self.api.top_tables(token=token)
-
-    assert_true(isinstance(resp, list), resp) # No status code currently
-
-
-  def test_table_details(self):  # Requires test_upload to run before
-    resp = self.api.authenticate()
-    token = resp['token']
-
-    resp = self.api.table_details(table_name='store_sales', token=token)
-
-    assert_equal('success', resp['status'], resp)
+    assert_true(isinstance(resp['results'], list), resp) # No status code currently
 
 
   def test_table_details(self):  # Requires test_upload to run before
