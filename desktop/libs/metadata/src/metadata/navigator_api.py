@@ -217,6 +217,26 @@ def search_entities_interactive(request):
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
 
+  # Highlighting
+  fs = {}
+  ts = []
+  for term in query_s.split():
+    if ':' in term:
+      fname, fval = term.split(':', 1)
+      if fval and fval.strip('*'):
+        fs[fname] = fval.strip('*')
+    else:
+      if term.strip('*'):
+        ts.append(term.strip())
+
+  # facets:aa
+  # originalName', 'name', tags 'description', 'originalDescription'
+  for record in response.get('results'):
+    record['hue_description'] = ''
+    record['hue_name'] = record.get('parentPath', '').replace('/', '') + record.get('originalName', '')
+    for fname, fval in fs.iteritems():
+      if record.get(fname, ''):
+        record['hue_description'] += re.sub('(%s)' % fval, '<em>\\1</em>', record[fname], count=1)
 
   response['status'] = 0
 

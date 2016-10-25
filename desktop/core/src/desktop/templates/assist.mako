@@ -1680,7 +1680,7 @@ from metadata.conf import has_navigator
               }
               if (typeof data.results !== 'undefined') {
                 data.results.forEach(function (result) {
-                  values.push({ data: { label: result.originalName, icon: NAV_TYPE_ICONS[result.type],  description: result.parentPath }, value: beforePartial + result.originalName });
+                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
                 });
               }
 
