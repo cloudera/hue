@@ -57,6 +57,7 @@ class TestOptimizerApi(object):
     cls.user.is_superuser = False
     cls.user.save()
 
+
   def test_tenant(self):
     resp = self.api.get_tenant(email='romain@cloudera.com')
 
@@ -103,9 +104,6 @@ class TestOptimizerApi(object):
 
 
   def test_upload(self):
-    resp = self.api.authenticate()
-    token = resp['token']
-
     queries = [
         "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;",
         "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;",
@@ -116,7 +114,7 @@ class TestOptimizerApi(object):
         "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;"
     ]
 
-    resp = self.api.upload(token=token, queries=queries)
+    resp = self.api.upload(queries=queries)
     assert_equal('success', resp['status'], resp)
 
 
