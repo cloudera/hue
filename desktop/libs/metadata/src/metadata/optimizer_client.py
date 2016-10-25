@@ -49,7 +49,7 @@ class OptimizerApi(object):
 
   def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
     self._api_url = (api_url or get_optimizer_url()).strip('/')
-    self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get()
+    self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get() # Aka "tenant"
     self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
     self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
     self._email = OPTIMIZER.EMAIL.get()
@@ -68,25 +68,29 @@ class OptimizerApi(object):
 
     return self._token
 
-
-  def get_tenant(self, email):
+  
+  def _exec(self, command, args):
     try:
       data = subprocess.check_output([
           'cws',
           'navopt',
           '--endpoint-url=%s' % self._api_url,
-          'get-tenant',
-          '--email',
-          email,
+          command,
           '--auth-config',
           self._product_secret
-      ])
+         ] +
+         args
+      )
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     
     response = json.loads(data)
     response['status'] = 'success'
     return response
+
+
+  def get_tenant(self, email):
+    return self._exec('get-tenant', ['--email', email])
 
 
   def create_product(self, product_name=None, product_secret=None, authCode=None):
@@ -166,18 +170,8 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def top_tables(self, token=None, email=None):
-    if token is None:
-      token = self._authenticate()
-
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-      }
-      return self._root.post('/api/topTables', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+  def top_tables(self, workfloadId=None):
+    return self._exec('get-top-tables', ['--tenant', self._product_name])
 
 
   def table_details(self, table_name, token=None, email=None):

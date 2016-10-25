@@ -59,7 +59,6 @@ def get_tenant(request):
   email = request.POST.get('email')
 
   api = OptimizerApi()
-
   data = api.get_tenant(email=email)
 
   if data['status'] == 'success':
@@ -103,7 +102,7 @@ def top_tables(request):
         'patternCount': table['patternCount'],
         'total': table['total'],
         'is_fact': table['type'] != 'Dimension'
-        } for table in data['details']
+        } for table in data['results']
     ]
 
   response['top_tables'] = tables
