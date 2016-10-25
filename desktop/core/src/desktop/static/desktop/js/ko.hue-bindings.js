@@ -160,17 +160,22 @@
 
       $element.hide();
 
+      var currentSelectize;
+      var optionsBeforeEdit = [];
 
       var saveOnClickOutside = function (event) {
         if ($.contains(document, event.target) && !$.contains($element.next()[0], event.target)) {
-          options.onSave($element.selectize(options)[0].selectize.getValue());
+          if (currentSelectize.getValue() !== optionsBeforeEdit.join(',')) {
+            options.onSave(currentSelectize.getValue());
+          }
           $(document).off('click', saveOnClickOutside);
           showReadOnly();
         }
       };
 
-      var currentSelectize;
+
       var showEdit = function () {
+        optionsBeforeEdit = options.setTags().concat();
         options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } });
         currentSelectize = $element.selectize(options)[0].selectize;
         $readOnlyContainer.hide();
@@ -178,7 +183,9 @@
         $element.next().find('input').focus();
         var $editActions = $('<div>').addClass('selectize-actions').appendTo($element.next());
         $('<i>').addClass('fa fa-check').click(function () {
-          options.onSave(currentSelectize.getValue());
+          if (currentSelectize.getValue() !== optionsBeforeEdit.join(',')) {
+            options.onSave(currentSelectize.getValue());
+          }
           showReadOnly();
         }).appendTo($editActions);
         $('<i>').addClass('fa fa-close').click(function () {
