@@ -931,21 +931,20 @@ div.box {
 }
 
 .filechooser-tree .editable-breadcrumb-input {
-  margin-left: 10px;
+  margin-left: 30px;
   margin-bottom: 0;
   border-radius: 2px;
   border: 1px solid #EEE;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  width: 370px;
+  width: 340px;
   height: 20px;
   line-height: 20px;
   min-height: 20px;
   font-size: 1.25em;
-  padding-left: 10px!important;
+  padding-left: 4px!important;
 }
-
 
 /*
  * jHueSelector
