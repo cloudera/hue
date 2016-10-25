@@ -43,4 +43,7 @@ urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer_api/query_complexity/?$', 'query_complexity', name='query_complexity'),
   url(r'^api/optimizer_api/popular_values/?$', 'popular_values', name='popular_values'),
   url(r'^api/optimizer_api/similar_queries/?$', 'similar_queries', name='similar_queries'),
+
+  #v2
+  url(r'^api/optimizer_api/get_tenant/?$', 'get_tenant', name='get_tenant'),
 )

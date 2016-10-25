@@ -53,6 +53,26 @@ def error_handler(view_fn):
 
 @require_POST
 @error_handler
+def get_tenant(request):
+  response = {'status': -1}
+
+  email = request.POST.get('email')
+
+  api = OptimizerApi()
+
+  data = api.get_tenant(email=email)
+
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['data'] = data['tenant']
+  else:
+    response['message'] = 'Optimizer: %s' % data['details']
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def top_tables(request):
   response = {'status': -1}
 

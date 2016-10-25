@@ -57,6 +57,10 @@ class TestOptimizerApi(object):
     cls.user.is_superuser = False
     cls.user.save()
 
+  def test_tenant(self):
+    resp = self.api.get_tenant(email='romain@cloudera.com')
+
+    assert_equal('success', resp['status'], resp)
 
   def test_create_product(self):
     resp = self.api.create_product()
