@@ -837,6 +837,11 @@ ${ hueIcons.symbols() }
         </thead>
         <tbody>
         <tr>
+          <td>Ctrl-Space</td>
+          <td>Ctrl-Space</td>
+          <td>${ _('Autocomplete when Live Autocompletion is off')}</td>
+        </tr>
+        <tr>
           <td>Tab</td>
           <td>Tab</td>
           <td>${ _('Indent')}</td>
