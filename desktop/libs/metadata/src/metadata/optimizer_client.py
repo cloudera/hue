@@ -18,6 +18,7 @@
 
 import json
 import logging
+import subprocess
 import uuid
 
 from django.utils.translation import ugettext as _
@@ -66,6 +67,26 @@ class OptimizerApi(object):
       self._token = self.authenticate()['token']
 
     return self._token
+
+
+  def get_tenant(self, email):
+    try:
+      data = subprocess.check_output([
+          'cws',
+          'navopt',
+          '--endpoint-url=%s' % self._api_url,
+          'get-tenant',
+          '--email',
+          email,
+          '--auth-config',
+          self._product_secret
+      ])
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+    
+    response = json.loads(data)
+    response['status'] = 'success'
+    return response
 
 
   def create_product(self, product_name=None, product_secret=None, authCode=None):
