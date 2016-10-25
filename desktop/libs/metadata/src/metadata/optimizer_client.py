@@ -18,12 +18,14 @@
 
 import json
 import logging
+import os
 import subprocess
 import uuid
 
+from tempfile import NamedTemporaryFile
+
 from django.utils.translation import ugettext as _
 
-from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
 from desktop.lib.rest.http_client import HttpClient, RestException
@@ -70,8 +72,11 @@ class OptimizerApi(object):
 
     return self._token
 
-  
+
   def _exec(self, command, args):
+    data = None
+    response = {'status': 'error'}
+
     try:
       data = subprocess.check_output([
           'cws',
@@ -89,9 +94,10 @@ class OptimizerApi(object):
         data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
-    
-    response = json.loads(data)
-    response['status'] = 'success'
+
+    if data:
+      response = json.loads(data) 
+      response['status'] = 'success'
     return response
 
 
@@ -157,7 +163,7 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def upload(self, queries, source_platform='generic', workflow_id=None):
+  def upload(self, queries, source_platform='generic', workload_id=None):
 
     with NamedTemporaryFile(suffix='.csv') as f:
       try:
@@ -167,7 +173,6 @@ class OptimizerApi(object):
 
         for row in queries_csv:
           f.write(row)
-
   #       data = {
   #           'fileLocation': f.name,
   #           'sourcePlatform': source_platform,
@@ -180,8 +185,8 @@ class OptimizerApi(object):
             '--source-platform', source_platform,
             '--tenant', self._product_name
         ]
-        if workflow_id:
-          args += ['--workfload-id', workflow_id]
+        if workload_id:
+          args += ['--workload-id', workload_id]
 
         return self._exec('upload', args)
         ## return self._root.post('/api/upload', data=data, files={'fileLocation': ('hue-report.json', json.dumps(queries_formatted))})
