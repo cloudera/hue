@@ -201,7 +201,6 @@
           'position': 'absolute',
           'right': '20px',
           'background-color': '#FFF',
-          'top': '2px'
         });
 
         function slideOutInput() {
@@ -263,7 +262,7 @@
           'paddingLeft': '10px',
           'paddingRight': '10px',
           'float': 'left',
-          'width': '370px',
+          'width': '350px',
           'overflow-x': 'scroll',
           'overflow-y': 'hidden',
           'white-space': 'nowrap'
@@ -293,15 +292,15 @@
         var $hdfsAutocomplete = $('<input type="text">').addClass('editable-breadcrumb-input').val(path).hide();
 
         $scrollingBreadcrumbs.click(function (e) {
-          if ($(e.target).is('ul') || $(e.target).is('i')) {
+          if ($(e.target).is('ul') || $(e.target).hasClass('spacer')) {
             $(this).hide();
             $hdfsAutocomplete.show().focus();
           }
         });
 
         var $editBreadcrumbs = $("<li>").css('marginRight', '10px');
-        var $crumbLink = $("<a>").addClass('inactive-action');
-        $crumbLink.attr("href", "javascript:void(0)").html('<i class="fa fa-pencil"></i>').appendTo($editBreadcrumbs);
+        var $crumbLink = $("<span>").addClass('spacer');
+        $crumbLink.html('&nbsp;').appendTo($editBreadcrumbs);
         $editBreadcrumbs.appendTo($scrollingBreadcrumbs);
         if (typeof data.breadcrumbs != "undefined" && data.breadcrumbs != null) {
           var _bLength = data.breadcrumbs.length;
