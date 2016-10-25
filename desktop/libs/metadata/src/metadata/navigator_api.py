@@ -17,6 +17,7 @@
 
 import json
 import logging
+import re
 
 try:
   from collections import OrderedDict
@@ -215,6 +216,7 @@ def search_entities_interactive(request):
       response['facets'][fname] = OrderedDict(fvalues)
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
+
 
   response['status'] = 0
 

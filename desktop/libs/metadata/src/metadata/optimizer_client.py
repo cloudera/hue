@@ -25,10 +25,12 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib import export_csvxls
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
+from subprocess import CalledProcessError
 
 
 LOG = logging.getLogger(__name__)
@@ -81,6 +83,10 @@ class OptimizerApi(object):
          ] +
          args
       )
+    except CalledProcessError, e:
+      if command == 'upload' and e.returncode == 1:
+        LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
+        data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     
@@ -151,23 +157,37 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def upload(self, queries, token=None, email=None, source_platform='generic'):
-    if token is None:
-      token = self._authenticate()
+  def upload(self, queries, source_platform='generic', workflow_id=None):
 
-    try:      
-      content_generator = OptimizerDataAdapter(queries)
-      queries_csv = export_csvxls.create_generator(content_generator, 'csv')
+    with NamedTemporaryFile(suffix='.csv') as f:
+      try:
+        content_generator = OptimizerDataAdapter(queries)
+        queries_csv = export_csvxls.create_generator(content_generator, 'csv')
+  #       return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
 
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-          'sourcePlatform': source_platform,
-      }
-      return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
+        for row in queries_csv:
+          f.write(row)
 
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+  #       data = {
+  #           'fileLocation': f.name,
+  #           'sourcePlatform': source_platform,
+  # #           'workloadId',
+  # #           'version'
+  #       }
+        args = [
+            '--file-location', f.name,
+            '--file-name', os.path.basename(f.name),
+            '--source-platform', source_platform,
+            '--tenant', self._product_name
+        ]
+        if workflow_id:
+          args += ['--workfload-id', workflow_id]
+
+        return self._exec('upload', args)
+        ## return self._root.post('/api/upload', data=data, files={'fileLocation': ('hue-report.json', json.dumps(queries_formatted))})
+
+      except RestException, e:
+        raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
   def top_tables(self, workfloadId=None):
@@ -239,12 +259,12 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
   if queries and len(queries[0]) == 3:
     rows = queries
-  else:  
-    rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
+  else:
+    rows = ([str(uuid.uuid4()), 0.0, q] for q in queries)
 
   yield headers, rows
+
