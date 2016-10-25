@@ -1198,7 +1198,7 @@ var ApiHelper = (function () {
     var self = this;
     $.post('/metadata/api/navigator/search_entities_interactive', {
       query_s: options.query,
-      limit: 5,
+      limit: 10,
       sources: '["' + options.source + '"]'
     }).done(function (data) {
       if (data.status === 0 && !self.successResponseIsError(data)) {

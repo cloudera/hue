@@ -195,7 +195,7 @@ def search_entities_interactive(request):
     last_query_term = last_query_term.rstrip('*')
     (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
     field_facets = [f for f in field_facets if f.startswith(fname)]
-  field_facets = field_facets[:10]
+  field_facets = field_facets[:5]
 
   response = api.search_entities_interactive(
       query_s=query_s,
