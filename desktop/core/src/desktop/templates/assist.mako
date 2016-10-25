@@ -1006,7 +1006,7 @@ from metadata.conf import has_navigator
         <div class="result-entry">${ _('No result found.') }</div>
       <!-- /ko -->
       <div data-bind="foreach: searchResult" style="overflow-x:hidden">
-        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopover }">
+        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
           <div class="icon-col">
             <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
           </div>
@@ -1502,6 +1502,7 @@ from metadata.conf import has_navigator
                 type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
                 identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.originalName })
               },
+              delayedHide: '.result-entry',
               orientation: 'right',
               sourceType: entry.sourceType.toLowerCase(),
               defaultDatabase: entry.parentPath.substring(1),
@@ -1519,6 +1520,19 @@ from metadata.conf import has_navigator
             });
           };
 
+          var navContextPopoverTimeout = -1;
+
+          var showNavContextPopoverDelayed = function (entry, event) {
+            window.clearTimeout(navContextPopoverTimeout);
+            navContextPopoverTimeout = window.setTimeout(function () {
+              showNavContextPopover(entry, event);
+            }, 500);
+          };
+
+          var clearNavContextPopoverDelay = function () {
+            window.clearTimeout(navContextPopoverTimeout);
+          };
+
           $.post('/metadata/api/navigator/search_entities', {
             query_s: self.searchInput(),
             limit: 25,
@@ -1526,7 +1540,8 @@ from metadata.conf import has_navigator
           }, function (data) {
             data.entities.forEach(function (entity) {
               entity.statsVisible = ko.observable(false);
-              entity.showNavContextPopover = showNavContextPopover;
+              entity.showNavContextPopoverDelayed = showNavContextPopoverDelayed;
+              entity.clearNavContextPopoverDelay = clearNavContextPopoverDelay;
               entity.icon = NAV_TYPE_ICONS[entity.type];
               switch (entity.type) {
                 case 'DATABASE': {

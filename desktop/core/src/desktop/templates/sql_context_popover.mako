@@ -997,6 +997,7 @@ from metadata.conf import has_navigator
 
       function SqlContextPopoverViewModel(params) {
         var self = this;
+        self.disposalFunctions = [];
 
         var apiHelper = ApiHelper.getInstance();
 
@@ -1118,7 +1119,51 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-info'
         }
         self.orientationClass = 'sql-context-popover-' + orientation;
+
+        if (params.delayedHide) {
+          var hideTimeout = -1;
+          var onLeave = function () {
+            hideTimeout = window.setTimeout(function () {
+              $('.sql-context-popover').fadeOut(200, function () {
+                hidePopover();
+              })
+            }, 1000);
+          };
+
+          var onEnter = function () {
+            window.clearTimeout(hideTimeout);
+          };
+
+          $(params.delayedHide).add($('.sql-context-popover')).on('mouseleave', onLeave).on('mouseenter', onEnter);
+
+          var keepPopoverOpenOnClick = function () {
+            window.clearTimeout(hideTimeout);
+            $(params.delayedHide).add($('.sql-context-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
+          };
+
+          $('.sql-context-popover').on('click', keepPopoverOpenOnClick);
+
+          self.disposalFunctions.push(function () {
+            $(params.delayedHide).add($('.sql-context-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
+            $('.sql-context-popover').off('click', keepPopoverOpenOnClick);
+          });
+        }
+
+        window.setTimeout(function() {
+          $(document).on('click', hideOnClickOutside);
+        }, 0);
+
+        self.disposalFunctions.push(function () {
+          $(document).off('click', hideOnClickOutside);
+        })
       }
+
+      SqlContextPopoverViewModel.prototype.dispose = function() {
+        var self = this;
+        self.disposalFunctions.forEach(function (fn) {
+          fn();
+        })
+      };
 
       SqlContextPopoverViewModel.prototype.pin = function () {
         var self = this;
@@ -1145,9 +1190,6 @@ from metadata.conf import has_navigator
         $('body').append($sqlContextPopover);
         ko.applyBindings(details, $sqlContextPopover[0]);
         huePubSub.publish('sql.context.popover.shown');
-        window.setTimeout(function() {
-          $(document).on('click', hideOnClickOutside);
-        }, 0);
       });
     })();
   </script>
