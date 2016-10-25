@@ -76,6 +76,7 @@ class NavigatorApi(object):
 
     return default_entity_types, entity_types
 
+
   def search_entities(self, query_s, limit=100, offset=0, **filters):
     """
     Solr edismax query parser syntax.
@@ -142,7 +143,6 @@ class NavigatorApi(object):
       }
 
       entity_types = []
-      defaultFilterQueries = []
       fq_type = []
       if filterQueries is None:
         filterQueries = []
@@ -172,7 +172,7 @@ class NavigatorApi(object):
             filterQueries.append(term)
 
       body = {'query': ' '.join(query) or '*'}
-      defaultFilterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+      filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
@@ -180,7 +180,7 @@ class NavigatorApi(object):
       if facetRanges:
         body['facetRanges'] = facetRanges
       if filterQueries:
-        body['filterQueries'] = filterQueries + defaultFilterQueries
+        body['filterQueries'] = filterQueries
       if firstClassEntitiesOnly:
         body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
 
