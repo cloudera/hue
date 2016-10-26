@@ -31,12 +31,26 @@
       var $element = $(element);
 
       options = $.extend({
+        addCount: false,
         closeOnEnter: true,
         blurOnEnter: false,
         classPrefix: 'hue-',
         showOnFocus: false,
         minLength: 0
       }, options);
+
+      if (options.addCount) {
+        var oldSource = options.source;
+        options.source = function (request, callback) {
+          oldSource(request, function (values) {
+            callback(values);
+            var count = options.realCountCallback ? options.realCountCallback() : values.filter(function (value) { return ! value.divider }).length;
+            var $menu = $($element.data('custom-hueAutocomplete').menu.element);
+            $menu.children('.autocomplete-count').remove();
+            $('<div>').addClass('autocomplete-count').text('(' + count + ')').appendTo($menu);
+          });
+        }
+      }
 
       if (typeof $().hueAutocomplete === 'undefined') {
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {

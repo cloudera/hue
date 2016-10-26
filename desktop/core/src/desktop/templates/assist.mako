@@ -955,6 +955,8 @@ from metadata.conf import has_navigator
         <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i>
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
+            addCount: true,
+            realCountCallback: navAutocompleteLatestCount,
             itemTemplate: 'nav-search-autocomp-item',
             classPrefix: 'nav-',
             showOnFocus: true,
@@ -1614,6 +1616,12 @@ from metadata.conf import has_navigator
           }
         });
 
+        var latestCount = 0;
+
+        self.navAutocompleteLatestCount = function () {
+          return latestCount;
+        };
+
         self.navAutocompleteSource = function (request, callback) {
           var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
           var isFacet = facetMatch !== null;
@@ -1642,7 +1650,7 @@ from metadata.conf import has_navigator
                   Object.keys(data.facets).forEach(function (facet) {
                     if (facetPartialRe.test(facet)) {
                       if (Object.keys(data.facets[facet]).length > 0) {
-                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: Object.keys(data.facets[facet]).join(', ') }, value: beforePartial + facet + ':'});
+                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
                       } else { // Potential facet from the list
                         values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
                       }
@@ -1656,6 +1664,9 @@ from metadata.conf import has_navigator
                   });
                 }
               }
+
+              // We need to add the facet matches as totalMatched is only for the entries
+              latestCount = data.totalMatched + values.length;
 
               if (values.length > 0) {
                 values.push({ divider: true });
