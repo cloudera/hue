@@ -924,7 +924,7 @@ from metadata.conf import has_navigator
       overflow:hidden;
     }
 
-    .nav-autocomplete-item-link em {
+    .nav-autocomplete-item-link em, .result-entry em {
       font-style: normal;
       font-weight: bold;
     }
@@ -1026,13 +1026,16 @@ from metadata.conf import has_navigator
           </div>
           <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
             <!-- ko if: typeof click !== 'undefined' -->
-            <a class="pointer" data-bind="click: click, text: parentPath + ' ' + originalName" target="_blank" ></a>
+            <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
             <!-- /ko -->
             <!-- ko if: typeof click === 'undefined' -->
             <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
             <!-- /ko -->
-            <div class="nav-search-tags" data-bind="foreach: tags"><div data-bind="text: $data"></div></div>
-            <!-- ko if: hasDescription -->
+            <div class="nav-search-tags" data-bind="foreach: tags">
+              <div data-bind="text: $data"></div>
+            </div>
+            <div class="doc-desc" data-bind="html: hue_description"></div>
+            <!-- ko if: hasDescription && ! hue_description -->
               <div class="doc-desc" data-bind="text: originalDescription"></div>
             <!-- /ko -->
           </div>
