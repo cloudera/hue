@@ -233,8 +233,9 @@ def search_entities_interactive(request):
   for record in response.get('results'):
     record['hue_description'] = ''
     record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
+    name = record.get('originalName', '')
     for term in ts:
-      record['hue_name'] += _highlight(term, record.get('originalName', ''))
+      name += _highlight(term, name)
       for tag in record.get('tags', []):
         if re.match(term, tag):
           record['hue_description'] += ' tags:%s' % _highlight(term, tag)
@@ -242,6 +243,7 @@ def search_entities_interactive(request):
       if record.get(fname, ''):
         record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
 
+    record['hue_name'] += name
     record['hue_name'] = escape(record['hue_name']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
     record['hue_description'] = escape(record['hue_description']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
 
