@@ -1481,11 +1481,15 @@ from metadata.conf import has_navigator
         % endif
 
         self.performSearch = function () {
-          if (!self.searchActive()) {
-            self.searchActive(true);
-          }
           if (self.searchInput() === lastQuery) {
             return;
+          }
+          if (self.searchInput() === '') {
+            self.searchActive(false);
+            return;
+          }
+          if (!self.searchActive()) {
+            self.searchActive(true);
           }
           if (self.searching()) {
             window.setTimeout(function() {
