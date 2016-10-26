@@ -227,20 +227,27 @@ def search_entities_interactive(request):
         fs[fname] = fval.strip('*')
     else:
       if term.strip('*'):
-        ts.append(term.strip())
+        ts.append(term.strip('*'))
 
-  # facets:aa
-  # originalName', 'name', tags 'description', 'originalDescription'
   for record in response.get('results'):
     record['hue_description'] = ''
-    record['hue_name'] = record.get('parentPath', '').replace('/', '') + record.get('originalName', '')
-    for fname, fval in fs.iteritems():
+    record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.' + record.get('originalName', '')).lstrip('.')
+    for term in ts:
+      record['hue_name'] = _highlight(term, record['hue_name'])
+      for tag in record.get('tags', []):
+        if re.match(term, tag):
+          record['hue_description'] += ' tags:%s' % _highlight(term, tag)
+    for fname, fval in fs.iteritems(): # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
-        record['hue_description'] += re.sub('(%s)' % fval, '<em>\\1</em>', record[fname], count=1)
+        record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
 
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+def _highlight(pattern, string):
+  return re.sub('(%s)' % pattern, '<em>\\1</em>', string, count=1)
 
 
 @error_handler
