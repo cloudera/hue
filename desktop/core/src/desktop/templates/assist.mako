@@ -924,6 +924,11 @@ from metadata.conf import has_navigator
       overflow:hidden;
     }
 
+    .nav-autocomplete-item-link em {
+      font-style: normal;
+      font-weight: bold;
+    }
+
     .nav-autocomplete-item-link > div {
       vertical-align: top;
       display:inline-block;
