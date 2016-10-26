@@ -246,12 +246,13 @@ def _augment_highlighting(query_s, records):
     for term in ts:
       name = _highlight(term, name)
       if record.get('tags'):
-        for tag in record['tags']:
-          if re.match(term, tag):
-            record['hue_description'] += ' tags:%s' % _highlight(term, tag)
+        _highlight_tags(record, term)
     for fname, fval in fs.iteritems(): # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
-        record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
+        if fname == 'tags':
+          _highlight_tags(record, fval)
+        else:
+          record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
 
     record['hue_name'] += name
     record['hue_name'] = escape(record['hue_name']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
@@ -260,6 +261,12 @@ def _augment_highlighting(query_s, records):
 
 def _highlight(pattern, string):
   return re.sub('(%s)' % pattern, '<em>\\1</em>', string, count=1)
+
+
+def _highlight_tags(record, term):
+    for tag in record['tags']:
+      if re.match(term, tag):
+        record['hue_description'] += ' tags:%s' % _highlight(term, tag)
 
 
 @error_handler
