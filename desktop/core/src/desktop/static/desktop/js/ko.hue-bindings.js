@@ -1567,7 +1567,9 @@
             }
           });
         }
-        $('.assist-flex-fill').getNiceScroll().resize();
+        if ($.fn.niceScroll) {
+          $('.assist-flex-fill').getNiceScroll().resize();
+        }
       };
 
       resizeByRatio();
@@ -1668,7 +1670,9 @@
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
             apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
-            $('.assist-flex-fill').getNiceScroll().resize();
+            if ($.fn.niceScroll) {
+              $('.assist-flex-fill').getNiceScroll().resize();
+            }
           }
         });
       });
@@ -3879,19 +3883,23 @@
           'width': '100%'
         }).appendTo($wrapper);
 
-        $container.niceScroll({
-          cursorcolor: "#CCC",
-          cursorborder: "1px solid #CCC",
-          cursoropacitymin: 0,
-          cursoropacitymax: 0.75,
-          scrollspeed: 100,
-          mousescrollstep: 60,
-          cursorminheight: options.cursorminheight || 20,
-          horizrailenabled: options.horizrailenabled || false
-        });
+        if ($.fn.niceScroll) {
+          $container.niceScroll({
+            cursorcolor: "#CCC",
+            cursorborder: "1px solid #CCC",
+            cursoropacitymin: 0,
+            cursoropacitymax: 0.75,
+            scrollspeed: 100,
+            mousescrollstep: 60,
+            cursorminheight: options.cursorminheight || 20,
+            horizrailenabled: options.horizrailenabled || false
+          });
+        }
       } else {
         window.setTimeout(function(){
-          $container.getNiceScroll().resize();
+          if ($.fn.niceScroll) {
+            $container.getNiceScroll().resize();
+          }
         }, 200);
       }
 
@@ -3914,7 +3922,9 @@
           totalHeight += height;
         });
         $wrapper.height(totalHeight + 'px');
-        $container.getNiceScroll().resize();
+        if ($.fn.niceScroll) {
+          $container.getNiceScroll().resize();
+        }
       };
       resizeWrapper();
 
@@ -4262,7 +4272,7 @@
   ko.bindingHandlers.niceScroll = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
-      if (typeof options.enable === 'undefined' || options.enable) {
+      if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
         $(element).niceScroll({
           cursorcolor: "#CCC",
           cursorborder: "1px solid #CCC",

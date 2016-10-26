@@ -276,13 +276,13 @@ if USE_NEW_EDITOR.get():
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="brand" href="/about">
+      <a class="brand" href="#">
         <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
         ${get_title(title)}
       </a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }">${_('My documents')}</a></li>
+          <li><a title="${_('Assist')}" rel="navigator-tooltip" href="${ url('desktop.views.assist_m') }">${_('Assist')}</a></li>
           % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
              <li><a href="${ url('notebook:editor_m') }?type=hive">${_('Hive')}</a></li>
