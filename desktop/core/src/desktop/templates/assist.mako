@@ -1033,7 +1033,7 @@ from metadata.conf import has_navigator
             <!-- /ko -->
             <div class="nav-search-tags" data-bind="foreach: tags"><div data-bind="text: $data"></div></div>
             <!-- ko if: hasDescription -->
-              <div class="doc-desc" data-bind="text: description"></div>
+              <div class="doc-desc" data-bind="text: originalDescription"></div>
             <!-- /ko -->
           </div>
         </div>
@@ -1586,7 +1586,7 @@ from metadata.conf import has_navigator
                   break;
                 }
                 case 'SOURCE': {
-                  entity.description = '${ _("Cluster") }: ' + entity.clusterName;
+                  entity.originalDescription = '${ _("Cluster") }: ' + entity.clusterName;
                   entity.link = entity.sourceUrl;
                   break;
                 }
@@ -1595,23 +1595,23 @@ from metadata.conf import has_navigator
                   break;
                 }
                 case 'DIRECTORY': {
-                  entity.description = entity.parentPath;
+                  entity.originalDescription = entity.parentPath;
                   entity.link = '/filebrowser/#' + entity.fileSystemPath;
                   break;
                 }
                 case 'FILE': {
-                  entity.description = entity.parentPath;
+                  entity.originalDescription = entity.parentPath;
                   entity.link = '/filebrowser/#' + entity.fileSystemPath;
                   break;
                 }
                 case 'SUB_OPERATION': {
-                  entity.description = entity.metaClassName;
+                  entity.originalDescription = entity.metaClassName;
                   break;
                 }
                 case 'PARTITION': {}
                 case 'OPERATION': {}
               }
-              entity.hasDescription = typeof entity.description !== 'undefined' && entity.description !== null && entity.description.length > 0;
+              entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
             });
             self.searchResult(data.entities);
             self.searching(false);
