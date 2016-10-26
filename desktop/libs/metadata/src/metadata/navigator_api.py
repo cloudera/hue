@@ -84,6 +84,8 @@ def search_entities(request):
 
   entities = api.search_entities(query_s, limit=limit, offset=offset, sources=sources)
 
+  _augment_highlighting(query_s, entities)
+
   response = {
     'entities': entities,
     'count': len(entities),
@@ -218,7 +220,14 @@ def search_entities_interactive(request):
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
 
-  # Highlighting
+  _augment_highlighting(query_s, response.get('results'))
+
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def _augment_highlighting(query_s, records):
   fs = {}
   ts = []
   for term in query_s.split():
@@ -230,15 +239,16 @@ def search_entities_interactive(request):
       if term.strip('*'):
         ts.append(term.strip('*'))
 
-  for record in response.get('results'):
+  for record in records:
     record['hue_description'] = ''
     record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
     name = record.get('originalName', '')
     for term in ts:
       name = _highlight(term, name)
-      for tag in record.get('tags', []):
-        if re.match(term, tag):
-          record['hue_description'] += ' tags:%s' % _highlight(term, tag)
+      if record.get('tags'):
+        for tag in record['tags']:
+          if re.match(term, tag):
+            record['hue_description'] += ' tags:%s' % _highlight(term, tag)
     for fname, fval in fs.iteritems(): # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
         record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
@@ -246,10 +256,6 @@ def search_entities_interactive(request):
     record['hue_name'] += name
     record['hue_name'] = escape(record['hue_name']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
     record['hue_description'] = escape(record['hue_description']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
-
-  response['status'] = 0
-
-  return JsonResponse(response)
 
 
 def _highlight(pattern, string):
