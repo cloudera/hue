@@ -235,7 +235,7 @@ def search_entities_interactive(request):
     record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
     name = record.get('originalName', '')
     for term in ts:
-      name += _highlight(term, name)
+      name = _highlight(term, name)
       for tag in record.get('tags', []):
         if re.match(term, tag):
           record['hue_description'] += ' tags:%s' % _highlight(term, tag)
