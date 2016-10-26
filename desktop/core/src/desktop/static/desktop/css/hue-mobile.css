@@ -82,3 +82,43 @@ body.open {
   word-wrap: break-word!important;
   white-space: normal!important;
 }
+
+.blue {
+  color: #338BB8!important;
+}
+
+.inactive-action,
+.inactive-action a {
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+  color: #999;
+}
+
+.inactive-action:hover {
+  text-decoration: none;
+}
+
+.inactive-action.disabled {
+  color: #eee !important;
+  cursor: default !important;
+}
+
+.inactive-action:not(.disabled):hover,
+.inactive-action:not(.disabled):hover > a {
+  color: #338bb8 !important;
+}
+
+.inactive-action:focus {
+  color: #999;
+}
+
+.assist-panel-switches {
+  text-align: center;
+}
+
+.assist-type-switch {
+  margin-left: 10px;
+  margin-right: 10px;
+}
