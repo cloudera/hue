@@ -44,10 +44,12 @@
         options.source = function (request, callback) {
           oldSource(request, function (values) {
             callback(values);
-            var count = options.realCountCallback ? options.realCountCallback() : values.filter(function (value) { return ! value.divider }).length;
             var $menu = $($element.data('custom-hueAutocomplete').menu.element);
             $menu.children('.autocomplete-count').remove();
-            $('<div>').addClass('autocomplete-count').text('(' + count + ')').appendTo($menu);
+            var count = options.realCountCallback ? options.realCountCallback() : values.filter(function (value) { return ! value.divider && ! value.noMatch }).length;
+            if (count > 0) {
+              $('<div>').addClass('autocomplete-count').text('(' + count + ')').appendTo($menu);
+            }
           });
         }
       }
@@ -55,7 +57,13 @@
       if (typeof $().hueAutocomplete === 'undefined') {
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
           _renderItemData: function( ul, item ) {
-            if (item.divider) {
+            if (item.noMatch && this.options.noMatchTemplate) {
+              var $li = $('<li data-bind="template: { name: \'' + this.options.noMatchTemplate + '\' }">')
+                  .addClass(this.options.classPrefix + 'autocomplete-item')
+                  .appendTo(ul)
+                  .data( "ui-autocomplete-item", item );
+              ko.applyBindings(item.data, $li[0]);
+            } else if (item.divider) {
               $('<li/>').addClass(this.options.classPrefix + 'autocomplete-divider').appendTo(ul);
             } else {
               var $li = $('<li data-bind="template: { name: \'' + this.options.itemTemplate + '\', data: $data }">')

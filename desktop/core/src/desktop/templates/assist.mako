@@ -949,6 +949,12 @@ from metadata.conf import has_navigator
     </a>
   </script>
 
+  <script type="text/html" id="nav-search-autocomp-no-match">
+    <div class="nav-autocomplete-item-link" style="height: 30px;">
+      <div style="font-size: 12px; margin: 6px 8px; color: #737373; font-style: italic;">${ _('No match found') }</div>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="nav-assist-search">
@@ -958,6 +964,7 @@ from metadata.conf import has_navigator
             addCount: true,
             realCountCallback: navAutocompleteLatestCount,
             itemTemplate: 'nav-search-autocomp-item',
+            noMatchTemplate: 'nav-search-autocomp-no-match',
             classPrefix: 'nav-',
             showOnFocus: true,
             onEnter: performSearch,
@@ -1679,6 +1686,9 @@ from metadata.conf import has_navigator
 
               if (values.length > 0 && values[values.length - 1].divider) {
                 values.pop();
+              }
+              if (values.length === 0) {
+                values.push({ noMatch: true });
               }
               callback(values);
             },
