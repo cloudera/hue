@@ -275,7 +275,7 @@ ${ docBrowser.docBrowser() }
           viewModel.activeEntry(rootEntry);
         } else {
           viewModel.activeEntry().load(function () {
-            if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().definition().type === 'directory') {
+            if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().entries()[0].definition().type === 'directory') {
               viewModel.activeEntry(viewModel.activeEntry().entries()[0]);
               viewModel.activeEntry().load();
             }
