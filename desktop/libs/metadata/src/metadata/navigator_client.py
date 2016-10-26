@@ -172,7 +172,8 @@ class NavigatorApi(object):
             filterQueries.append(term)
 
       body = {'query': ' '.join(query) or '*'}
-      filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+      if fq_type:
+        filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
