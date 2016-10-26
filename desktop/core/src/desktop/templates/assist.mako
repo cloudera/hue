@@ -940,9 +940,9 @@ from metadata.conf import has_navigator
       <div class="nav-autocomplete-item-link">
         <div style="padding: 8px;"><i style="color: #338bb8" class="fa fa-fw" data-bind="css: icon"></i></div>
         <div>
-          <div style="font-size: 14px; color: #338bb8" data-bind="text: label, style: { 'padding-top': description ? 0 : '8px' }"></div>
+          <div style="font-size: 14px; color: #338bb8" data-bind="html: label, style: { 'padding-top': description ? 0 : '8px' }"></div>
           <!-- ko if: description -->
-          <div style="display:inline-block; width: 170px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="text: description"></div>
+          <div style="display:inline-block; width: 250px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="html: description"></div>
           <!-- /ko -->
         </div>
       </div>

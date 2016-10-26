@@ -25,6 +25,7 @@ except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
 from django.http import Http404
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
@@ -240,6 +241,9 @@ def search_entities_interactive(request):
     for fname, fval in fs.iteritems(): # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
         record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
+
+    record['hue_name'] = escape(record['hue_name']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
+    record['hue_description'] = escape(record['hue_description']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
 
   response['status'] = 0
 
