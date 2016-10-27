@@ -280,6 +280,16 @@ from metadata.conf import has_navigator
         <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }"><i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }</a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }"><i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }</a>
+        <!-- ko if: isAsterisk -->
+        <!-- ko with: contents.data -->
+        <!-- ko if: selectedColumns().length > 0 -->
+        <a class="inactive-action pointer" data-bind="click: expand">${ _("Expand to selected columns") }</a>
+        <!-- /ko -->
+        <!-- ko if: selectedColumns().length === 0 -->
+        <a class="inactive-action pointer" data-bind="click: expand">${ _("Expand to all columns") }</a>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -391,6 +401,12 @@ from metadata.conf import has_navigator
           <div data-bind="hdfsTree: { path: $data.path, selectedPath: $parent.selectedPath }"></div>
         </div>
       </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="sql-context-asterisk-details">
+    <div class="sql-context-flex-fill">
+      <!-- ko component: { name: 'sql-columns-table', params: { columns: columns, scrollToColumns: false } } --><!-- /ko -->
     </div>
   </script>
 
@@ -823,6 +839,111 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('tags');
       }
 
+
+      function AsteriskData(data, sourceType, defaultDatabase) {
+        var self = this;
+        self.loading = ko.observable(true);
+        self.hasErrors = ko.observable(false);
+        self.columns = [];
+
+        self.selectedColumns = ko.pureComputed(function () {
+          return self.columns.filter(function (column) {
+            return column.selected();
+          });
+        });
+
+        self.expand = function () {
+          var colsToExpand = self.selectedColumns().length === 0 ? self.columns : self.selectedColumns();
+          var colIndex = {};
+          colsToExpand.forEach(function (col) {
+            if (colIndex[col.name]) {
+              colIndex[col.name]++;
+            } else {
+              colIndex[col.name] = 1;
+            }
+          });
+          Object.keys(colIndex).forEach(function (name) {
+            if (colIndex[name] === 1) {
+              delete colIndex[name];
+            }
+          });
+          var sqlAutocompleter = new SqlAutocompleter2({
+            snippet: {
+              type: function () {
+                return sourceType;
+              }
+            }
+          });
+          huePubSub.publish('ace.replace', {
+            location: data.location,
+            text: $.map(colsToExpand, function (column) {
+              if (column.tableAlias) {
+                return sqlAutocompleter.backTickIfNeeded(column.tableAlias) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+              }
+              if (colIndex[column.name]) {
+                return sqlAutocompleter.backTickIfNeeded(column.table) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+              }
+              return sqlAutocompleter.backTickIfNeeded(column.name)
+            }).join(', ')
+          });
+          huePubSub.publish('sql.context.popover.hide');
+        };
+
+        var apiHelper = ApiHelper.getInstance();
+        var deferrals = [];
+        data.tables.forEach(function (table) {
+          if (table.identifierChain) {
+            var fetchDeferred = $.Deferred();
+            deferrals.push(fetchDeferred);
+            apiHelper.fetchAutocomplete({
+              sourceType: sourceType,
+              defaultDatabase: defaultDatabase,
+              identifierChain: table.identifierChain,
+              successCallback: function (data) {
+                if (typeof data.extended_columns !== 'undefined') {
+                  data.extended_columns.forEach(function (column) {
+                    column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                    if (column.type.indexOf('<') !== -1) {
+                      column.type = column.type.substring(0, column.type.indexOf('<'));
+                    }
+                    column.selected = ko.observable(false);
+                    column.table = table.identifierChain[table.identifierChain.length - 1].name;
+                    if (table.alias) {
+                      column.tableAlias = table.alias
+                    }
+                  });
+                }
+                self.columns = self.columns.concat(data.extended_columns);
+                fetchDeferred.resolve();
+              },
+              silenceErrors: true,
+              errorCallback: fetchDeferred.reject
+            })
+          }
+        });
+
+        if (deferrals.length === 0) {
+          self.loading(false);
+        }
+        $.when.apply($, deferrals).done(function () {
+          self.loading(false);
+        }, function () {
+          if (self.columns.length === 0) {
+            self.hasErrors(true);
+          }
+        });
+      }
+
+      function AsteriskContextTabs(data, sourceType, defaultDatabase) {
+        var self = this;
+        self.data = new AsteriskData(data, sourceType, defaultDatabase);
+
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', template: 'sql-context-asterisk-details', templateData: self.data }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
       function HdfsContextTabs(data) {
         var self = this;
 
@@ -896,7 +1017,7 @@ from metadata.conf import has_navigator
             width: $('.sql-context-popover').width(),
             height: $('.sql-context-popover').height()
           });
-        }
+        };
 
         self.resizeStart = function (event, ui) {
           preventHide = true;
@@ -1103,6 +1224,7 @@ from metadata.conf import has_navigator
         self.isColumn = params.data.type === 'column';
         self.isFunction = params.data.type === 'function';
         self.isHdfs = params.data.type === 'hdfs';
+        self.isAsterisk = params.data.type === 'asterisk';
 
         if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(self.data, self.sourceType);
@@ -1124,6 +1246,10 @@ from metadata.conf import has_navigator
           self.contents = new HdfsContextTabs(self.data);
           self.title = self.data.path;
           self.iconClass = 'fa-folder-o'
+        } else if (self.isAsterisk) {
+          self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.defaultDatabase);
+          self.title = '*';
+          self.iconClass = 'fa-table';
         } else {
           self.title = '';
           self.iconClass = 'fa-info'
@@ -1218,17 +1344,39 @@ from metadata.conf import has_navigator
           <thead>
           <tr data-bind="visible: filteredColumns().length !== 0">
             <th width="6%">&nbsp;</th>
+            <!-- ko if: typeof filteredColumns()[0].table === 'undefined' -->
             <th width="60%">${_('Name')}</th>
+            <!-- /ko -->
+            <!-- ko if: typeof filteredColumns()[0].table !== 'undefined' -->
+            <th width="40%">${_('Name')}</th>
+            <th width="20%">${_('Table')}</th>
+            <!-- /ko -->
             <th width="34%">${_('Type')}</th>
             <th width="6%">&nbsp;</th>
           </tr>
           </thead>
           <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'sql.context.popover.dispose' }">
           <tr>
+            <!-- ko if: typeof selected === 'undefined' -->
             <td data-bind="text: $index()+$indexOffset()+1"></td>
-            <td style="overflow: hidden;">
-              <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+            <!-- /ko -->
+            <!-- ko if: typeof selected !== 'undefined' -->
+            <td data-bind="toggle: selected" class="center" style="cursor: default;">
+              <div class="hueCheckbox fa" data-bind="css: {'fa-check': selected }"></div>
             </td>
+
+            <!-- /ko -->
+            <td style="overflow: hidden;">
+              <!-- ko if: $parent.scrollToColumns -->
+              <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+              <!-- /ko -->
+              <!-- ko ifnot: $parent.scrollToColumns -->
+              <span data-bind="text: name"></span>
+              <!-- /ko -->
+            </td>
+            <!-- ko if: typeof table !== 'undefined' -->
+            <td><span data-bind="text: table"></span></td>
+            <!-- /ko -->
             <td><span data-bind="text: type, attr: { 'title': extendedType }, tooltip: { placement: 'bottom' }"></span></td>
             <td><i class="snippet-icon fa fa-question-circle" data-bind="visible: comment, attr: { 'title': comment }, tooltip: { placement: 'bottom' }"></i></td>
           </tr>
@@ -1245,7 +1393,7 @@ from metadata.conf import has_navigator
       function SqlColumnsTable(params) {
         var self = this;
         var columns = params.columns;
-
+        self.scrollToColumns = typeof params.scrollToColumns !== 'undefined' ?  params.scrollToColumns : true;
         self.searchInput = ko.observable('');
         self.searchVisible = ko.observable(false);
         self.searchFocus = ko.observable(false);
@@ -1264,7 +1412,8 @@ from metadata.conf import has_navigator
           return columns.filter(function (column) {
             return column.name.toLowerCase().indexOf(query) != -1
                 || column.type.toLowerCase().indexOf(query) != -1
-                || column.comment.toLowerCase().indexOf(query) != -1;
+                || column.comment.toLowerCase().indexOf(query) != -1
+                || (typeof column.table !== 'undefined' && column.table.toLowerCase().indexOf(query) !== -1);
           })
         });
       }

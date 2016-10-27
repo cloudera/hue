@@ -3028,13 +3028,10 @@
           beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN'],
-            locations: [
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25}, identifierChain: [{ name: 'testTableA' }]},
-              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 41}, identifierChain: [{ name: 'testTableB' }]}
-            ]
+            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN']
           }
         });
       });
@@ -3139,14 +3136,8 @@
           beforeCursor: 'SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
-            locations: [
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 27 }, identifierChain: [{ name: 'testTable' }]},
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 32 }, identifierChain: [{ name: 'testTable' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 42 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 54 }, identifierChain: [{ name: 'testTable' },{ name: 'testArray' }]}
-            ],
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }] },
             lowerCase: false
           }
@@ -3234,15 +3225,9 @@
           beforeCursor: 'SELECT * FROM testTable t, t.testMap m WHERE m.field = ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
-            locations: [
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, identifierChain: [{ name: 'testTable' }]},
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29}, identifierChain: [{ name: 'testTable' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 37}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 47}, identifierChain: [{ name: 'testTable' },{ name: 'testMap' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53}, identifierChain: [{ name: 'testTable' }, { name: 'testMap' },{ name: 'field' }]}
-            ],
             lowerCase: false,
             suggestFunctions: { types: ['COLREF'] },
             suggestValues: {},
@@ -6052,6 +6037,7 @@
           expectedResult: {
             locations: [
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 }, identifierChain: [{ name: 'testTable1' }]},
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 20 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 36}, identifierChain: [{ name: 'testTable1' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 42, last_column: 52}, identifierChain: [{ name: 'testTable2' }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 62, last_column: 72 }, identifierChain: [{ name: 'testTable1' }]},
@@ -6697,6 +6683,7 @@
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT ',
           afterCursor: '',
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestAggregateFunctions: true,
@@ -6710,11 +6697,7 @@
               prependQuestionMark: true,
               prependFrom: true,
               appendDot: true
-            },
-            locations: [
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18}, identifierChain: [{ name: 'foo' }] },
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28}, identifierChain: [{ name: 'foo' }, { name: 'bar'}] }
-            ]
+            }
           }
         });
       });
@@ -6725,6 +6708,7 @@
           beforeCursor: 'SELECT * FROM bar WHERE foo NOT IN (SELECT ',
           afterCursor: ')',
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestAggregateFunctions: true,
@@ -6738,11 +6722,7 @@
               prependQuestionMark: true,
               prependFrom: true,
               appendDot: true
-            },
-            locations: [
-              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18}, identifierChain: [{ name: 'bar' }] },
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28}, identifierChain: [{ name: 'bar' }, { name: 'foo'}] }
-            ]
+            }
           }
         });
       });
@@ -6972,14 +6952,14 @@
               { identifierChain: [{ name: 'tableThree' }] },
               { identifierChain: [{ subQuery: 'subQueryTwo'}] }
             ]},
-            suggestIdentifiers: [{ name: 'subQueryOne.', type: 'sub-query' }, { name: 'tAlias.', type: 'alias' }, { name: 'tableThree.', type: 'table' }, { name: 'subQueryTwo.', type: 'sub-query' }],
             subQueries: [{
               columns: [{ tables: [{ identifierChain: [{ name: 'tableOne' }] }] }],
               alias: 'subQueryOne'
             }, {
-              columns: [{ tables: [{ identifierChain: [{ name: 't3' }]}, { identifierChain: [{ name: 'table4' }] }] }],
+              columns: [{ tables: [{ identifierChain: [{ name: 't3' }]}, { alias:'t4', identifierChain: [{ name: 'table4' }] }] }],
               alias: 'subQueryTwo'
             }],
+            suggestIdentifiers: [{ name: 'subQueryOne.', type: 'sub-query' }, { name: 'tAlias.', type: 'alias' }, { name: 'tableThree.', type: 'table' }, { name: 'subQueryTwo.', type: 'sub-query' }],
             lowerCase: false
           }
         });

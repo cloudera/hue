@@ -439,8 +439,11 @@
         afterCursor: '\n-- other line comment',
         containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false,
-          locations: [{ type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }]
+          locations: [
+            { type: 'asterisk', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
+            { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
+          ],
+          lowerCase: false
         }
       });
     });
@@ -451,8 +454,11 @@
         afterCursor: '',
         containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false,
-          locations: [{ type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }]
+          locations: [
+            { type: 'asterisk', location: { first_line: 4, last_line: 4, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
+            { type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
+          ],
+          lowerCase: false
         }
       });
     });
