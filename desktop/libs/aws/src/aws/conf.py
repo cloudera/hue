@@ -15,6 +15,7 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+import boto.utils
 from boto.regioninfo import get_regions
 
 from django.utils.translation import ugettext_lazy as _
@@ -101,7 +102,15 @@ def is_enabled():
 
 
 def is_default_configured():
-  return is_enabled() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None
+  return is_enabled() and (AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None or has_iam_metadata())
+
+
+def has_iam_metadata():
+  iam_found = False
+  metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
+  if 'iam' in metadata:
+    iam_found = True
+  return iam_found
 
 
 def has_s3_access(user):

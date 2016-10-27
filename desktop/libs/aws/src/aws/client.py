@@ -17,8 +17,9 @@ from __future__ import absolute_import
 
 import boto
 import boto.s3
+import boto.utils
 
-from aws.conf import get_default_region
+from aws.conf import get_default_region, has_iam_metadata
 
 
 HTTP_SOCKET_TIMEOUT_S = 60
@@ -43,7 +44,7 @@ class Client(object):
     security_token = conf.SECURITY_TOKEN.get()
     env_cred_allowed = conf.ALLOW_ENVIRONMENT_CREDENTIALS.get()
 
-    if None in (access_key_id, secret_access_key) and not env_cred_allowed:
+    if None in (access_key_id, secret_access_key) and not env_cred_allowed and not has_iam_metadata():
       raise ValueError('Can\'t create AWS client, credential is not configured')
 
     return cls(
@@ -54,10 +55,17 @@ class Client(object):
     )
 
   def get_s3_connection(self):
+    # First attempt to connect via specified credentials
     connection = boto.s3.connect_to_region(self._region,
                                            aws_access_key_id=self._access_key_id,
                                            aws_secret_access_key=self._secret_access_key,
                                            security_token=self._security_token)
+
     if connection is None:
-      raise ValueError('Can not construct S3 Connection for region %s' % self._region)
+      # If no connection, attemt to fallback to IAM instance metadata
+      connection = boto.s3.connect_to_region(self._region)
+
+      if connection is None:
+        raise ValueError('Can not construct S3 Connection for region %s' % self._region)
+
     return connection
