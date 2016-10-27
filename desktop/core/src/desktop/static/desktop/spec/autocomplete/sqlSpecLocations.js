@@ -39,6 +39,7 @@
       assertLocations({
         beforeCursor: 'SELECT * FROM testTable1 JOIN db1.table2; ',
         expectedLocations: [
+          { type: 'asterisk', location: { first_line:1, last_line:1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'db1' }, { name: 'table2' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 25 }, identifierChain: [{ name: 'testTable1' }] },
           { type: 'database', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 34}, identifierChain: [{ name: 'db1' }]},
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 35, last_column: 41 }, identifierChain: [{ name: 'db1' }, { name: 'table2' }] }
@@ -79,6 +80,7 @@
       assertLocations({
         beforeCursor: 'SELECT * FROM foo WHERE bar IN (1+1, 2+2);',
         expectedLocations: [
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'foo' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]}
         ]
@@ -89,6 +91,7 @@
       assertLocations({
         beforeCursor: 'SELECT * FROM foo WHERE bar IN (id+1-1, id+1-2);',
         expectedLocations: [
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'foo' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]},
           { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 35 }, identifierChain: [{ name: 'foo' }, { name: 'id'}]},
@@ -137,6 +140,7 @@
         beforeCursor: 'SELECT tta.* FROM testTableA tta, testTableB; ',
         expectedLocations: [
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'testTableA' }]},
+          { type: 'asterisk', location:{ first_line: 1, last_line: 1, first_column: 12, last_column: 13 }, tables: [{ alias: 'tta', identifierChain: [{ name: 'testTableA' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 29}, identifierChain: [{ name: 'testTableA' }]},
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 35, last_column: 45}, identifierChain: [{ name: 'testTableB' }]}
         ]
@@ -154,7 +158,7 @@
     });
 
     describe('HDFS paths', function () {
-      fit('should report locations for "LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla; |"', function () {
+      it('should report locations for "LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla; |"', function () {
         assertLocations({
           dialect: 'hive',
           beforeCursor: 'LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla;',
@@ -165,7 +169,7 @@
         });
       });
 
-      fit('should report locations for "CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\'; |"', function () {
+      it('should report locations for "CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\'; |"', function () {
         assertLocations({
           dialect: 'impala',
           beforeCursor: 'CREATE TABLE bla (id INT) LOCATION \'/bla/bla/\';',
@@ -182,6 +186,7 @@
           dialect: 'hive',
           beforeCursor: 'SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\nSELECT t1.bla FROM testTable2 t1;\nSELECT * FROM testTable3 t3, testTable4 t4; ',
           expectedLocations: [
+            { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ alias: 't1', identifierChain: [{ name: 'testTable' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'testTable' }]},
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 39 }, identifierChain: [{ name: 'testTable' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 }, identifierChain: [{ name: 'testTable' }, { name: 'a' }]},
@@ -194,6 +199,7 @@
             { type: 'table', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable2' }]},
             { type: 'column', location: { first_line: 2, last_line: 2, first_column: 11, last_column: 14 }, identifierChain: [{ name: 'testTable2' }, { name: 'bla' }]},
             { type: 'table', location: { first_line: 2, last_line: 2, first_column: 20, last_column: 30 }, identifierChain: [{ name: 'testTable2' }]},
+            { type: 'asterisk', location: { first_line: 3, last_line: 3, first_column: 8, last_column: 9 }, tables: [{ alias: 't3', identifierChain: [{ name: 'testTable3' }]}, { alias: 't4', identifierChain: [{ name: 'testTable4' }] }] },
             { type: 'table', location: { first_line: 3, last_line: 3, first_column: 15, last_column: 25 }, identifierChain: [{ name: 'testTable3' }]},
             { type: 'table', location: { first_line: 3, last_line: 3, first_column: 30, last_column: 40 }, identifierChain: [{ name: 'testTable4' }]}
           ]
@@ -224,8 +230,10 @@
           dialect: 'hive',
           beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);',
           expectedLocations: [
+            { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'foo' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]},
+            { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 }, tables: [{ identifierChain: [{ name: 'bla' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 }, identifierChain: [{ name: 'bla' }]}
           ]
         });
@@ -401,11 +409,12 @@
           beforeCursor: 'SELECT * FROM testTable ORDER BY a ASC, b, c DESC, d; ',
           afterCursor: '',
           expectedLocations: [
-            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24}, identifierChain: [{ name: 'testTable' }]},
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35},identifierChain: [{ name: 'testTable' }, { name: 'a'}]},
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42},identifierChain: [{ name: 'testTable' }, { name: 'b'}]},
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45},identifierChain: [{ name: 'testTable' }, { name: 'c'}]},
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53},identifierChain: [{ name: 'testTable' }, { name: 'd'}]}
+            { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'testTable' }]},
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35 }, identifierChain: [{ name: 'testTable' }, { name: 'a'}]},
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 42 }, identifierChain: [{ name: 'testTable' }, { name: 'b'}]},
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 44, last_column: 45 }, identifierChain: [{ name: 'testTable' }, { name: 'c'}]},
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 52, last_column: 53 }, identifierChain: [{ name: 'testTable' }, { name: 'd'}]}
           ]
         });
       });

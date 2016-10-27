@@ -322,6 +322,19 @@ var commitLocations = function () {
       }
     }
 
+    if (location.type === 'asterisk' && !location.linked) {
+      if (parser.yy.latestTablePrimaries && parser.yy.latestTablePrimaries.length > 0) {
+        location.tables = [];
+        location.linked = false;
+        expandIdentifierChain(location, true);
+        if (location.tables.length === 0) {
+          parser.yy.locations.splice(i, 1);
+        }
+      } else {
+        parser.yy.locations.splice(i, 1);
+      }
+    }
+
     if (location.type === 'unknown') {
       location.type = 'column';
     }
@@ -537,6 +550,14 @@ parser.expandLateralViews = function (lateralViews, originalIdentifierChain, col
   return identifierChain;
 };
 
+var addCleanTablePrimary = function (tables, tablePrimary) {
+  if (tablePrimary.alias) {
+    tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
+  } else {
+    tables.push({ identifierChain: tablePrimary.identifierChain });
+  }
+};
+
 var expandIdentifierChain = function (wrapper, anyOwner) {
   if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
     return;
@@ -553,10 +574,22 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
   if (identifierChain.length > 0 && identifierChain[identifierChain.length - 1].asterisk) {
     var tables = [];
     tablePrimaries.forEach(function (tablePrimary) {
-      if (tablePrimary.subQueryAlias) {
-        tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]});
+      if (identifierChain.length > 1) {
+        if (identifierChain.length === 2 && tablePrimary.alias === identifierChain[0].name) {
+          addCleanTablePrimary(tables, tablePrimary);
+        } else if (identifierChain.length === 2 && tablePrimary.identifierChain[0].name === identifierChain[0].name) {
+          addCleanTablePrimary(tables, tablePrimary);
+        } else if (identifierChain.length === 3 && tablePrimary.identifierChain.length > 1 &&
+            tablePrimary.identifierChain[0].name === identifierChain[0].name &&
+            tablePrimary.identifierChain[1].name === identifierChain[1].name) {
+          addCleanTablePrimary(tables, tablePrimary);
+        }
       } else {
-        tables.push({ identifierChain: tablePrimary.identifierChain });
+        if (tablePrimary.subQueryAlias) {
+          tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]});
+        } else {
+          addCleanTablePrimary(tables, tablePrimary);
+        }
       }
     });
     // Possible Joins
@@ -1043,6 +1076,14 @@ var addDatabaseLocation = function (location, identifierChain) {
 var addTableLocation = function (location, identifierChain) {
   parser.yy.locations.push({
     type: 'table',
+    location: adjustLocationForCursor(location),
+    identifierChain: identifierChain
+  });
+};
+
+var addAsteriskLocation = function (location, identifierChain) {
+  parser.yy.locations.push({
+    type: 'asterisk',
     location: adjustLocationForCursor(location),
     identifierChain: identifierChain
   });

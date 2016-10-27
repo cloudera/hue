@@ -863,6 +863,9 @@ ColumnReference
      parser.yy.locations[parser.yy.locations.length - 1].type = 'column';
    }
  | BasicIdentifierChain AnyDot '*'
+   {
+     addAsteriskLocation(@3, $1.concat({ asterisk: true }));
+   }
  ;
 
 ColumnReference_EDIT
@@ -2188,6 +2191,7 @@ SelectSpecification
    }
  | '*'
    {
+     addAsteriskLocation(@1, [{ asterisk: true }]);
      $$ = { asterisk: true }
    }
  ;
