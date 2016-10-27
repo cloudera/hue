@@ -80,6 +80,7 @@
           beforeCursor: 'LOAD DATA INPATH \'/',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/'}
@@ -92,6 +93,7 @@
           beforeCursor: 'LOAD DATA INPATH \'/some/path\' ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE', 'OVERWRITE INTO TABLE']
@@ -104,6 +106,7 @@
           beforeCursor: 'LOAD DATA INPATH \'/some/path\' OVERWRITE ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE']
@@ -116,6 +119,7 @@
           beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO ',
           afterCursor: '',
           dialect: 'impala',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -232,6 +236,7 @@
           beforeCursor: 'LOAD DATA INPATH \'/',
           afterCursor: '\'',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/'}
@@ -244,6 +249,7 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE', 'OVERWRITE INTO TABLE']
@@ -256,6 +262,7 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' OVERWRITE ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE']
@@ -268,6 +275,7 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' INTO ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -280,6 +288,7 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' OVERWRITE INTO TABLE ',
           afterCursor: '',
           dialect: 'hive',
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},

@@ -178,6 +178,7 @@
             beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH DBPROPERTIES']
@@ -303,6 +304,7 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' SYMBOL=\'baaa\'; ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -316,6 +318,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'cos\' PREPARE_FN=\'cos\' CLOSE_FN=\'cos\' SERIALIZE_FN=\'cos\' FINALIZE_FN=\'cos\'; ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -425,6 +428,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['INIT_FN', 'UPDATE_FN']
@@ -437,6 +441,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
@@ -451,6 +456,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['UPDATE_FN']
@@ -463,6 +469,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
@@ -477,6 +484,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['MERGE_FN']
@@ -490,6 +498,7 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'tan\' PREPARE_FN=\'boo\' SERIALIZE_FN=\'baa\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FINALIZE_FN']
@@ -648,6 +657,7 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SYMBOL']
@@ -1185,6 +1195,7 @@
             beforeCursor: 'CREATE TABLE foo LIKE PARQUET \'/blabla/\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             containsKeywords: ['COMMENT', 'CACHED IN'],
             expectedResult: {
               lowerCase: false
@@ -1197,6 +1208,7 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'AS']
@@ -1411,6 +1423,7 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1428,6 +1441,7 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1474,6 +1488,7 @@
             'CACHED IN \'boo\' AS ',
             afterCursor: '',
             dialect: 'impala',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1624,6 +1639,7 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'AS']
@@ -1920,6 +1936,7 @@
               'STORED AS ORC LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1934,6 +1951,7 @@
               'LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1946,6 +1964,7 @@
             beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.boo LIKE ',
             afterCursor: ' LOCATION \'/some/loc\';',
             dialect: 'hive',
+            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
