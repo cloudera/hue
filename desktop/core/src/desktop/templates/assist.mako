@@ -924,6 +924,11 @@ from metadata.conf import has_navigator
       overflow:hidden;
     }
 
+    .nav-autocomplete-item-link i {
+      font-size: 18px;
+      color: #338bb8;
+    }
+
     .nav-autocomplete-item-link em, .result-entry em {
       font-style: normal;
       font-weight: bold;
@@ -943,9 +948,9 @@ from metadata.conf import has_navigator
   <script type="text/html" id="nav-search-autocomp-item">
     <a>
       <div class="nav-autocomplete-item-link">
-        <div style="padding: 8px;"><i style="color: #338bb8" class="fa fa-fw" data-bind="css: icon"></i></div>
+        <div style="padding: 12px 8px 0 8px;"><i class="fa fa-fw" data-bind="css: icon"></i></div>
         <div>
-          <div style="font-size: 14px; color: #338bb8" data-bind="html: label, style: { 'padding-top': description ? 0 : '8px' }"></div>
+          <div style="font-size: 14px; color: #338bb8" data-bind="html: label, style: { 'padding-top': description ? 0 : '10px' }"></div>
           <!-- ko if: description -->
           <div style="display:inline-block; width: 250px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="html: description"></div>
           <!-- /ko -->
