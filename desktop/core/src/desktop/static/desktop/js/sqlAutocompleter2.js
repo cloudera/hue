@@ -205,7 +205,7 @@ var SqlAutocompleter2 = (function () {
           sourceType: self.snippet.type(),
           successCallback: function (data) {
             var foundDb = data.filter(function (db) {
-              return db === parseResult.suggestTables.identifierChain[0].name;
+              return db.toLowerCase() === parseResult.suggestTables.identifierChain[0].name.toLowerCase();
             });
             if (foundDb.length > 0) {
               deferrals.push(self.addTables(parseResult, database, completions));
@@ -367,7 +367,7 @@ var SqlAutocompleter2 = (function () {
           sourceType: self.snippet.type(),
           successCallback: function (data) {
             var foundDb = data.filter(function (db) {
-              return db === identifierChain[0].name;
+              return db.toLowerCase() === identifierChain[0].name.toLowerCase();
             });
             var databaseName = foundDb.length > 0 ? identifierChain.shift().name : defaultDatabase;
             var tableName = identifierChain.shift().name;
