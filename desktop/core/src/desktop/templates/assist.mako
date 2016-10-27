@@ -961,7 +961,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="nav-search-autocomp-no-match">
     <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div style="font-size: 12px; margin: 6px 8px; color: #737373; font-style: italic;">${ _('No match found') }</div>
+      <div style="font-size: 12px; margin: 6px 8px; color: #737373; font-style: italic;">${ _('No recent match found') }</div>
     </div>
   </script>
 

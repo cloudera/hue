@@ -54,6 +54,21 @@ class TestEditor(OozieMockBase):
     self.user_not_me = User.objects.get(username="not_perm_user")
 
 
+  def test_create_new_workflow(self):
+    response = self.c.get(reverse('oozie:new_workflow'))
+    assert_equal(200, response.status_code)
+
+
+  def test_create_new_coordinator(self):
+    response = self.c.get(reverse('oozie:new_coordinator'))
+    assert_equal(200, response.status_code)
+
+
+  def test_create_new_bundle(self):
+    response = self.c.get(reverse('oozie:new_bundle'))
+    assert_equal(200, response.status_code)
+
+
   def test_parsing(self):
     assert_equal(['input', 'LIMIT', 'out'], find_dollar_variables("""
 data = '$input';
