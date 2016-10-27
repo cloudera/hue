@@ -330,7 +330,7 @@ ${ layout.menubar(section=component) }
               <th width="74%" style="text-align:left">${ _('Groups') }</th>
               <th width="3%"></th>
             </thead>
-            <tbody data-bind="foreach: $root.filteredRoles">
+            <tbody data-bind="pagedForeach: $root.filteredRoles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
                   <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
@@ -394,6 +394,11 @@ ${ layout.menubar(section=component) }
               </tr>
             </tbody>
           </table>
+
+          <div class="paging" data-bind="visible: $root.roles().length > 10 && !$root.isLoadingRoles()">
+            <div class="inline-block" data-bind="pageLinks: $root.filteredRoles"></div>
+            ${ _('Records per page') } <div class="inline-block" data-bind="pageSizeControl: $root.filteredRoles, showAllPageOption: true, defaultItemsPerPage: 25, i18n: { ALL: '${ _ko('All') }', PAGE: '${ _ko('Page') }', OF: '${ _ko('of') }', FIRST_PAGE: '${ _ko('First page') }', LAST_PAGE: '${ _ko('Last page') }', }"></div>
+          </div>
         </div>
       </div>
 
@@ -591,6 +596,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/knockout.pager.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
