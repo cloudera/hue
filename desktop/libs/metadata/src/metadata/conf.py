@@ -126,13 +126,6 @@ OPTIMIZER = ConfigSection(
       dynamic_default=default_ssl_validate,
       type=coerce_bool
     ),
-
-    MOCKING = Config(
-      key="mocking",
-      help=_t("Use mock data"),
-      default=False,
-      type=coerce_bool
-    )
   )
 )
 
