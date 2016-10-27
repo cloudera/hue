@@ -546,7 +546,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -626,7 +626,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -711,7 +711,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       </div>
       <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
