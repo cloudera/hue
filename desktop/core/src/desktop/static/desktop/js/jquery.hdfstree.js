@@ -33,6 +33,7 @@
         home: "",
         initialPath: "/",
         isS3: false,
+        withTopPadding: true,
         onPathChange: function () {
         },
         createFolder: true,
@@ -108,7 +109,9 @@
     }
 
     var _tree = $("<ul>").addClass("content unstyled").html('<li><a class="pointer"><i class="fa fa-folder-open-o"></i> /</a></li>');
-    _tree.css("padding-top", "30px");
+    if (_this.options.withTopPadding) {
+      _tree.css("padding-top", "30px");
+    }
 
     if (_this.options.home != "") {
       _homeLink.appendTo(_el);

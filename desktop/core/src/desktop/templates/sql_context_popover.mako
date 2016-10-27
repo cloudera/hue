@@ -278,6 +278,7 @@ from metadata.conf import has_navigator
       <div class="sql-context-link-row">
         <a class="inactive-action pointer" data-bind="visible: isTable || isColumn, click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }</a>
         <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }"><i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }</a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }"><i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }</a>
       </div>
     </div>
@@ -386,7 +387,9 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-hdfs-details">
     <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
       <div style="padding: 8px">
-        <div style="margin: 10px 10px 18px 10px;"><pre data-bind="text: ko.mapping.toJSON($data)"></pre></div>
+        <div style="margin: 10px 10px 18px 10px;">
+          <div data-bind="hdfsTree: { path: $data.path, selectedPath: $parent.selectedPath }"></div>
+        </div>
       </div>
     </div>
   </script>
@@ -827,13 +830,20 @@ from metadata.conf import has_navigator
         self.data = ko.observable({
           details: data,
           loading: ko.observable(false),
-          hasErrors: ko.observable(false)
+          hasErrors: ko.observable(false),
+          selectedPath: ko.observable(data.path)
         });
 
         pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.file.browser', function () {
           window.open((data.path.indexOf('/') === 0 ? '/filebrowser/#' : '/filebrowser/#/') + data.path, '_blank');
         }));
 
+        pubSubs.push(huePubSub.subscribe('sql.context.popover.replace.in.editor', function () {
+          huePubSub.publish('ace.replace', {
+            location: data.location,
+            text: self.data().selectedPath()
+          });
+        }));
 
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', template: 'sql-context-hdfs-details', templateData: self.data }

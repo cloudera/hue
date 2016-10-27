@@ -3291,6 +3291,12 @@
         }
       });
 
+      huePubSub.subscribe('ace.replace', function (data) {
+        var Range = ace.require('ace/range').Range;
+        var range = new Range(data.location.first_line - 1, data.location.first_column - 1, data.location.last_line - 1, data.location.last_column - 1);
+        editor.getSession().getDocument().replace(range, data.text);
+      });
+
       editor.on("click", function (e) {
         editor.clearErrors();
       });
@@ -4556,5 +4562,27 @@
     init: function (el, valueAccessor, allBindingsAccessor, viewModel) {
       $(el).data('__ko_vm', viewModel);
     }
-  }
+  };
+
+  ko.bindingHandlers.hdfsTree = {
+    update: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      var $element = $(element);
+
+      $element.empty();
+
+      var value = typeof options.data === 'function' ? options.data() : options.data;
+      $element.jHueHdfsTree({
+        home: '',
+        isS3: false,
+        initialPath: options.path,
+        withTopPadding: false,
+        onPathChange: function (path) {
+          options.selectedPath(path);
+        }
+      });
+
+    }
+  };
+
 })();
