@@ -798,6 +798,7 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
+          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
