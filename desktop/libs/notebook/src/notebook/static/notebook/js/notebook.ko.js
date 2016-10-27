@@ -1390,7 +1390,7 @@ var EditorViewModel = (function() {
     }
     self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
     self.history.subscribe(function(val) {
-      if (self.id() == null && val.length == 0) {
+      if (self.id() == null && val.length == 0 && self.historyFilter() === '') {
         self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
