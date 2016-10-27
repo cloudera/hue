@@ -108,6 +108,8 @@ def _edit_workflow(request, doc, workflow):
   except Exception, e:
     LOG.error(smart_str(e))
 
+  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
+
   return render('editor2/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML),
       'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML),
@@ -115,7 +117,7 @@ def _edit_workflow(request, doc, workflow):
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
-      'can_edit_json': json.dumps(doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user)),
+      'can_edit_json': json.dumps(can_edit_json),
       'history_json': json.dumps([{
           'history': hist.data_dict.get('history', {}),
           'id': hist.id,
