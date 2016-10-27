@@ -578,7 +578,7 @@ var Collection = function (vm, collection) {
 
   if (collection.facets.length > 0) {
     collection.facets.forEach(function (f) {
-      if (typeof f.properties.facets_form.field === 'undefined') {
+      if (f.properties.facets_form && typeof f.properties.facets_form.field === 'undefined') {
         f.properties.facets_form.field = null;
       }
     });
