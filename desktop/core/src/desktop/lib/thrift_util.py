@@ -36,6 +36,7 @@ from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 from django.conf import settings
 from desktop.conf import SASL_MAX_BUFFER
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
@@ -381,7 +382,10 @@ class PooledClient(object):
           logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
           raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
         except TTransportException, e:
-          logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
+          err_msg = str(e)
+          logging.info("Thrift saw a transport exception: " + err_msg, exc_info=False)
+          if err_msg and 'generic failure: Unable to find a callback: 32775' in err_msg:
+            raise PopupException(_("Increase the sasl_max_buffer value in hue.ini"))
           raise StructuredThriftTransportException(e, error_code=502)
         except Exception, e:
           # Stack tends to be only noisy here.
@@ -469,7 +473,7 @@ class SuperClient(object):
           if tries_left:
             logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
             if 'generic failure: Unable to find a callback: 32775' in str(e):
-              logging.warn("Increase the SASL_MAX_BUFFER value in hue.ini")
+              logging.warn("Increase the sasl_max_buffer value in hue.ini")
       logging.warn("Out of retries for thrift call: " + attr)
       raise
     return wrapper
