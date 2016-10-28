@@ -106,11 +106,8 @@ def is_default_configured():
 
 
 def has_iam_metadata():
-  iam_found = False
   metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
-  if 'iam' in metadata:
-    iam_found = True
-  return iam_found
+  return 'iam' in metadata
 
 
 def has_s3_access(user):
