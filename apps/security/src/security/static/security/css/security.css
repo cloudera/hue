@@ -329,29 +329,3 @@ h1.emptyMessage {
   overflow-y: auto;
 }
 
-.pager.mini {
-  display: none;
-}
-
-.pager.full {
-  display: inline-block;
-  text-align: left;
-  margin-right: 12px;
-}
-
-.pager.full .number-of-pages {
-  margin-right: 4px;
-}
-
-.pager-button {
-  cursor: pointer;
-}
-
-.pager-button.selected {
-  font-weight: bold;
-}
-
-.pager-size {
-  margin-bottom: 0;
-  width: 60px;
-}
