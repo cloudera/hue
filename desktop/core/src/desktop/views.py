@@ -35,7 +35,11 @@ from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_POST
+
 import django.views.debug
+
+from aws.conf import is_enabled as is_s3_enabled, has_s3_access
+from notebook.conf import get_interpreters
 
 import desktop.conf
 import desktop.log.log_buffer
@@ -54,8 +58,6 @@ from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _res
 from desktop.models import UserPreferences, Settings, hue_version
 from desktop import appmanager
 
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-
 
 LOG = logging.getLogger(__name__)
 
@@ -70,7 +72,9 @@ def responsive(request):
 
   return render('responsive.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
+    'interpreters': get_interpreters(request.user),
+    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user)
   })
 
 def ko_editor(request):
