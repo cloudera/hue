@@ -14,10 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-define([
-  'knockout'
-], function (ko) {
-
   var EditorViewModel = function () {
     console.log('ko metastore model loaded');
   };
@@ -26,4 +22,3 @@ define([
     viewModel: EditorViewModel,
     template: { require: 'text!/ko_metastore' }
   });
-});
