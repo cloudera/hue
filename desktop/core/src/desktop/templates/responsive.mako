@@ -102,41 +102,61 @@ ${ hueIcons.symbols() }
           </button>
           <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
-             <li><a href="${ url('notebook:notebook') }"><i class="fa fa-pencil-square-o app-icon"></i> ${_('Notebook')}</a></li>
-           % endif
-           % if 'beeswax' in apps:
              <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
            % endif
            % if 'impala' in apps: ## impala requires beeswax anyway
              <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
            % endif
-           % if 'rdbms' in apps:
-             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
-           % endif
-           % if 'pig' in apps:
-             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
-           % endif
+       % if 'search' in apps:
            <li>
-              <a href="/${apps['jobsub'].display_name}">
-                ${ _('More >>') }
-              </a>
+             <a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;">
+               <i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a>
            </li>
-           % for interpreter in interpreters:
-            <li>
-               <a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">
-                 ${ interpreter['name'] } ${ interpreter['type'] }
-               </a>
+       % endif
+       % if 'oozie' in apps:
+         <li class="dropdown oozie">
+           <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Workflows</span> <b class="caret"></b></a>
+           <ul role="menu" class="dropdown-menu">
+             % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+             <li class="dropdown-submenu">
+               <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
+               <ul class="dropdown-menu">
+                 <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+                 <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+                 <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+               </ul>
              </li>
-           % endfor
-          </ul>
-        </div>
+             % endif
+           </ul>
+         </li>
+       % endif
+         <li>
+            <a href="/${apps['jobsub'].display_name}">
+              ${ _('More >>') }
+            </a>
+         </li>
+         % for interpreter in interpreters:
+          <li>
+             <a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">
+               ${ interpreter['name'] } ${ interpreter['type'] }
+             </a>
+           </li>
+         % endfor
+        </ul>
+      </div>
 
       </span>
 
       <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }"></input><i class="fa fa-search"></i>
 
       <div class="pull-right">
-        <div class="btn-group" style="vertical-align: middle">
+
+        % if user.is_authenticated() and section != 'login':
+        <ul class="nav nav-pills">
+
+        <li>
+          <div class="btn-group" style="vertical-align: middle">
+
             <a href="${ url('notebook:new') }">
               <button class="btn btn-primary">
                 ${ _('Fin audit reporting') }
@@ -163,15 +183,65 @@ ${ hueIcons.symbols() }
               </li>
             </ul>
           </div>
+        </li>
 
-        <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
-        <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
+        <li>
+          <span title="Running jobs and workflows">
+            <i class="fa fa-circle-o"></i> ${ _('Jobs') }
+            <span class="badge badge-warning">20</span>
+            ## Batches
+            ## Schedules
+          </span>
+        </li>
 
-        [<a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a> | About Hue]
+        <li>
+          <span title="Running workflows">
+            <i class="fa fa-circle-o"></i> ${ _('Workflows') }
+            <span class="badge badge-warning">10</span>
+          </span>
+            ## Coordinators
+            ## Bundles
+        </li>
 
-        [${ user.username } | Profile | <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>]
-      </div>
-    </span>
+        <li>
+          <span title="Notifications"><i class="fa fa-bell-o"></i> <span class="badge badge-success">10</span></span>
+        </li>
+
+        <li>
+          <i class="fa fa-question-circle"></i>
+        </li>
+
+        <%
+          view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
+        %>
+        <li class="dropdown">
+          <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+            <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
+            % if view_profile:
+              <b class="caret"></b>
+            % endif
+          </a>
+          % if view_profile:
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
+                % if is_ldap_setup:
+                  ${_('View Profile')}
+                % else:
+                  ${_('Edit Profile')}
+                % endif
+              </a>
+            </li>
+            % if user.is_superuser:
+              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
+            % endif
+            <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>
+          </ul>
+        % endif
+        </li>
+      </ul>
+    </div>
+    % endif
   </div>
 
   <div class="content-wrapper">
@@ -199,19 +269,29 @@ ${ hueIcons.symbols() }
 
       Jobs<br/>
       [YARN, MR, Hive, Impala, Spark, Sqoop, Pig]<br/>
-
-      <br/>
-
+      Batch<br/>
       Schedules<br/>
-      [Dashboards]<br/>
-      [Workflows]<br/>
-
       <br/>
+
+      Oozie<br/>
+      Workflows<br/>
+      Coordinators<br/>
+      Bundles<br/>
+      <br/>
+      
+      Security<br/>
+      Hive Tables<br/>
+      Solr Collections<br/>
+      HDFS Acls<br/>
+      <br/>
+
       [Custom App 1]<br/>
       [Custom App 2]<br/>
+
+
       <span style="position: fixed; bottom: 0">
       Import File<br/>
-      Import Database<br/>
+      Import Queries<br/>
       [+]
       <br/>&nbsp
       </span>
