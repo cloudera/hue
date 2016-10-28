@@ -183,7 +183,8 @@ ${ hueIcons.symbols() }
       <a href="javascript: void(0);" title="${_('Toggle Assist')}" class="pointer show-assist" style="display:none;">
         <i class="fa fa-chevron-right"></i>
       </a>
-      <div data-bind='component: currentApp'></div>
+      ##<div data-bind='component: currentApp'></div>
+      <div data-bind='text: currentApp'></div>
     </div>
   </div>
 </div>
@@ -210,6 +211,13 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
+
+## Dynamic loading of apps
+##<script src="${ static('desktop/ext/js/text.js') }"></script>
+##<script src="${ static('desktop/js/ko.editor.js') }"></script>
+##<script src="${ static('desktop/js/ko.metastore.js') }"></script>
+
 
 ${ assist.assistPanel() }
 
@@ -247,7 +255,7 @@ ${ assist.assistPanel() }
         }
       };
   
-      //ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
     
       //ko.applyBindings({}, $('.left-nav')[0])
       ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
@@ -278,14 +286,19 @@ ${ assist.assistPanel() }
     return moment(time).format("L LT");
   }
 
-  //Add CSRF Token to all XHR Requests
+  // Add CSRF Token to all XHR Requests
   var xrhsend = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
-    this.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+    % if request and request.COOKIES and request.COOKIES.get('csrftoken'):
+      this.setRequestHeader('X-CSRFToken', "${ request.COOKIES.get('csrftoken') }");
+    % else:
+      this.setRequestHeader('X-CSRFToken', "");
+    % endif
+
     return xrhsend.apply(this, arguments);
   }
 
-  // sets global assistHelper TTL
+  // Set global assistHelper TTL
   $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
   $(document).ready(function () {
@@ -323,7 +336,7 @@ ${ assist.assistPanel() }
     %endif
 
     % if 'jobbrowser' in apps:
-var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
       function checkJobBrowserStatus(){
