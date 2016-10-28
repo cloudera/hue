@@ -21,6 +21,7 @@ import logging
 import re
 import StringIO
 import struct
+import time
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -734,9 +735,15 @@ class HS2Api(Api):
     server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
     if query_id:
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
-      fragment = self._get_impala_query_profile(server_url, query_id=query_id)
-      total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?Averaged Fragment F\d\d"
-      total_records_match = re.search(total_records_re, fragment, re.MULTILINE | re.DOTALL)
+      retries = 0
+      max_retries = 10
+      total_records_match = None
+      while not total_records_match and retries < max_retries:
+        time.sleep(1.0)
+        fragment = self._get_impala_query_profile(server_url, query_id=query_id)
+        total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?(Averaged Fragment F\d\d)"
+        total_records_match = re.search(total_records_re, fragment, re.MULTILINE | re.DOTALL)
+        retries += 1
     if total_records_match:
       total_records = int(total_records_match.group('total_records'))
 
