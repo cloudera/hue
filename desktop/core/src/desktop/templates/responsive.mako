@@ -90,7 +90,7 @@ ${ hueIcons.symbols() }
     <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
     <span style="color:white">
 
-      <span style="font-size: 130%" title="$ {_( 'Compose query or job') }">
+      <span style="font-size: 130%" title="${ _( 'Compose query or job') }">
        <div class="btn-group" style="vertical-align: middle">
           <a href="${ url('notebook:new') }">
             <button class="btn btn-primary">
@@ -107,29 +107,29 @@ ${ hueIcons.symbols() }
            % if 'impala' in apps: ## impala requires beeswax anyway
              <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
            % endif
-       % if 'search' in apps:
+           % if 'search' in apps:
            <li>
              <a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;">
-               <i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a>
+               <img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a>
            </li>
-       % endif
-       % if 'oozie' in apps:
-         <li class="dropdown oozie">
-           <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Workflows</span> <b class="caret"></b></a>
-           <ul role="menu" class="dropdown-menu">
-             % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
-             <li class="dropdown-submenu">
-               <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
-               <ul class="dropdown-menu">
-                 <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-                 <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-                 <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
-               </ul>
-             </li>
-             % endif
-           </ul>
-         </li>
-       % endif
+           % endif
+           % if 'oozie' in apps:
+           <li class="dropdown oozie">
+             <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${ _('Workflows') }</span> <b class="caret"></b></a>
+             <ul role="menu" class="dropdown-menu">
+               % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+               <li class="dropdown-submenu">
+                 <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
+                 <ul class="dropdown-menu">
+                   <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+                   <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+                   <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+                 </ul>
+               </li>
+               % endif
+             </ul>
+           </li>
+           % endif
          <li>
             <a href="/${apps['jobsub'].display_name}">
               ${ _('More >>') }
@@ -156,7 +156,6 @@ ${ hueIcons.symbols() }
 
         <li>
           <div class="btn-group" style="vertical-align: middle">
-
             <a href="${ url('notebook:new') }">
               <button class="btn btn-primary">
                 ${ _('Fin audit reporting') }
@@ -235,7 +234,9 @@ ${ hueIcons.symbols() }
             % if user.is_superuser:
               <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
             % endif
-            <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>
+            <li>
+              <a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a>
+            </li>
           </ul>
         % endif
         </li>
@@ -249,13 +250,10 @@ ${ hueIcons.symbols() }
       <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'editor'); }">Query</a><br/>
       <br/>
       [Hive, Impala, Pig, PySpark, Solr, MapReduce...]<br/>
-      [Query 1, Query 2, Query 3, Query 4]<br/>
 
       <br/>
 
-      Search<br/>
-      [Dashboards]<br/>
-      [Dashboard 1, Dashboard 2, Dashboard 3, Dashboard 4]<br/>
+      Search Dashboards<br/>
 
       <br/>
 
