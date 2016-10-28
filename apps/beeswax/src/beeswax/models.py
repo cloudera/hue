@@ -424,7 +424,7 @@ class Session(models.Model):
     return TSessionHandle(sessionId=handle_id)
 
   def get_properties(self):
-    return json.loads(self.properties)
+    return json.loads(self.properties) if self.properties else {}
 
   def get_formatted_properties(self):
     return [dict({'key': key, 'value': value}) for key, value in self.get_properties().items()]
