@@ -342,7 +342,7 @@ ${ layout.menubar(section=component) }
               <th width="74%" style="text-align:left">${ _('Groups') }</th>
               <th width="3%"></th>
             </thead>
-            <tbody data-bind="pagedForeach: $root.filteredRoles">
+            <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
                 <td class="center" data-bind="click: handleSelect" style="cursor: default">
                   <div data-bind="css: { hueCheckbox: true, 'fa': true, 'fa-check': selected }"></div>
@@ -358,25 +358,36 @@ ${ layout.menubar(section=component) }
                   <span data-bind="text: name"/>
                 </td>
                 <td>
+
+
                   <!-- ko if: $root.is_sentry_admin -->
-                  <a class="pointer" data-bind="click: function() { if ($root.is_sentry_admin) { showEditGroups(true); } }">
-                    <span data-bind="foreach: groups, visible: ! showEditGroups() && ! groupsChanged()">
-                      <span data-bind="text: $data"></span>
-                    </span>
-                    <span data-bind="visible: ! showEditGroups() && ! groupsChanged() && groups().length == 0">
-                      <i class="fa fa-plus"></i> ${ _('Add a group') }
-                    </span>
-                  </a>
-                  <div data-bind="visible: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles())">
-                    <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', onBlur: function(){ showEditGroups(false); } }" size="5" multiple="true" style="width: 400px"></select>
-                    &nbsp;
-                    <a class="pointer" data-bind="visible: groupsChanged() && !$root.isLoadingRoles(), click: resetGroups">
-                      <i class="fa fa-undo"></i>
-                    </a>
-                    <a class="pointer" data-bind="visible: groupsChanged() && !$root.isLoadingRoles(), click: saveGroups">
-                      <i class="fa fa-save"></i>
-                    </a>
-                  </div>
+                    <!-- ko if: !showEditGroups() && !groupsChanged() -->
+                      <a class="pointer" data-bind="click: function() { if ($root.is_sentry_admin) { showEditGroups(true); } }">
+                        <!-- ko if: groups().length > 0 -->
+                        <span data-bind="foreach: groups">
+                          <span data-bind="text: $data"></span>
+                        </span>
+                        <!-- /ko -->
+                        <!-- ko if: groups().length == 0 -->
+                        <span>
+                          <i class="fa fa-plus"></i> ${ _('Add a group') }
+                        </span>
+                        <!-- /ko -->
+                      </a>
+                    <!-- /ko -->
+                    <!-- ko if: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles()) -->
+                      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group' }" size="5" multiple="true" style="width: 400px"></select>
+                      <span data-bind="visible: groupsChanged() && !$root.isLoadingRoles()">
+                        &nbsp;
+                        <a class="pointer" data-bind="click: resetGroups"><i class="fa fa-undo"></i></a>
+                        &nbsp;
+                        <a class="pointer" data-bind="click: saveGroups"><i class="fa fa-save"></i></a>
+                      </span>
+                      <span data-bind="visible: !groupsChanged() && !$root.isLoadingRoles()">
+                      &nbsp;
+                      <a class="pointer" data-bind="click: function(){ showEditGroups(false); }"><i class="fa fa-times"></i></a>
+                      </span>
+                    <!-- /ko -->
                   <!-- /ko -->
                   <!-- ko ifnot: $root.is_sentry_admin -->
                     <span data-bind="foreach: groups">
@@ -406,11 +417,6 @@ ${ layout.menubar(section=component) }
               </tr>
             </tbody>
           </table>
-
-          <div class="paging" data-bind="visible: $root.roles().length > 10 && !$root.isLoadingRoles()">
-            <div class="inline-block" data-bind="pageLinks: $root.filteredRoles"></div>
-            ${ _('Records per page') } <div class="inline-block" data-bind="pageSizeControl: $root.filteredRoles, showAllPageOption: true, defaultItemsPerPage: 25, i18n: { ALL: '${ _ko('All') }', PAGE: '${ _ko('Page') }', OF: '${ _ko('of') }', FIRST_PAGE: '${ _ko('First page') }', LAST_PAGE: '${ _ko('Last page') }', }"></div>
-          </div>
         </div>
       </div>
 
@@ -608,7 +614,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/knockout.pager.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
