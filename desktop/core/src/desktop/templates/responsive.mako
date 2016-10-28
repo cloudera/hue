@@ -21,9 +21,7 @@
   from desktop.views import login_modal
 %>
 
-<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="assist" file="/assist.mako" />
-<%namespace name="require" file="/require.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
 <!DOCTYPE html>
@@ -62,6 +60,19 @@
     if (document.documentMode && document.documentMode < 9) {
       location.href = "${ url('desktop.views.unsupported') }";
     }
+    
+    
+    var LOGGED_USERNAME = '${ user.username }';
+    var IS_S3_ENABLED = 'is_s3_enabled' === 'True';
+
+    
+    ApiHelperGlobals = {
+      i18n: {
+        errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
+        errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
+      },
+      user: '${ user.username }'
+    }
   </script>
 </head>
 
@@ -90,14 +101,12 @@ ${ hueIcons.symbols() }
 
       [clusters]
 
-      ${ user.username }
-
       <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
       <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
 
-      [? | About Hue]
+      [<a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a> | About Hue]
 
-      [Profile | Log out]
+      [${ user.username } | Profile | <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>]
     </span>
   </div>
 
@@ -143,27 +152,31 @@ ${ hueIcons.symbols() }
       <br/>&nbsp
       </span>
     </div>
-    <div class="assist-panel" data-bind="css: { 'assist-hidden' : ! isAssistVisible() }">
-      <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isAssistVisible(false) }">
+
+    <div id="assist-container" class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+      <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
         <i class="fa fa-chevron-left"></i>
       </a>
 
       <div class="assist" data-bind="component: {
-        name: 'assist-panel',
-        params: {
-          user: user,
-          sql: {
-            sourceTypes: sqlSourceTypes,
-            activeSourceType: activeSqlSourceType,
-            navigationSettings: {
-              openDatabase: false,
-              openItem: false,
-              showStats: true
+          name: 'assist-panel',
+          params: {
+            user: '${user.username}',
+            sql: {
+              sourceTypes: [{
+                name: 'hive',
+                type: 'hive'
+              }],
+              navigationSettings: {
+                openItem: false,
+                showStats: true
+              }
             },
+            visibleAssistPanels: ['sql']
           }
-        }
-      }"></div>
+        }"></div>
     </div>
+
     <div class="resizer" data-bind="splitDraggable : { appName: 'notebook', leftPanelVisible: isAssistVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
 
     <div class="page-content">
@@ -180,64 +193,77 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
 
-${ require.config() }
-${ tableStats.tableStats() }
+
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }"></script>
+<script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
 ${ assist.assistPanel() }
 
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
+  <i class="fa fa-chevron-right"></i>
+</a>
+
+
 <script type="text/javascript" charset="utf-8">
-
-  require([
-    'knockout',
-    'assistPanel',
-    'text',
-    'ko.hue-bindings',
-    'knockout-sortable',
-    'ko.switch-case',
-    'desktop/js/ko.editor',
-    'desktop/js/ko.metastore'
-  ], function (ko) {
-
     var OnePageViewModel = function () {
       var self = this;
-
+  
       self.currentApp = ko.observable('editor');
-
+  
       huePubSub.subscribe('switch.app', function (name) {
         console.log(name);
         self.currentApp(name);
       })
     }
 
-    ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+    var AssistViewModel = function (options) {
+      var self = this;
 
-    ko.applyBindings({}, $('.left-nav')[0])
+      self.apiHelper = ApiHelper.getInstance(options);
+      self.assistAvailable = ko.observable(true);
+      self.isLeftPanelVisible = ko.observable();
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    };
 
-    var isAssistVisible = ko.observable(true);
-    isAssistVisible.subscribe(function (newValue) {
-      if (!newValue) {
-        $('.show-assist').show();
-      }
-    });
-
-    $('.show-assist').click(function () {
-      isAssistVisible(true);
-      $('.show-assist').hide();
-    })
-    ko.applyBindings({
-      isAssistVisible: isAssistVisible,
-      user: '${ user.username }',
-      sqlSourceTypes: [{
-        type: 'hive', name: 'Hive'
-      },{
-        type: 'impala', name: 'Impala'
-      }],
-      activeSqlSourceType: 'hive'
-    }, $('.assist-panel')[0]);
-
+    $(document).ready(function () {
+      var options = {
+        user: '${ user.username }',
+        i18n: {
+          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
+        }
+      };
+  
+      //ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+    
+      //ko.applyBindings({}, $('.left-nav')[0])
+      ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
+    
+      var isAssistVisible = ko.observable(true);
+      isAssistVisible.subscribe(function (newValue) {
+        if (!newValue) {
+          $('.show-assist').show();
+        }
+      });
   });
+
+  $('.show-assist').click(function () {
+    isAssistVisible(true);
+    $('.show-assist').hide();
+  })
 
   $(".hamburger").click(function () {
     $(this).toggleClass("is-active");
@@ -284,11 +310,10 @@ ${ assist.assistPanel() }
       function resetIdleTimer() {
         clearTimeout(idleTimer);
         idleTimer = setTimeout(function () {
-              // Check if logged out
-              $.get('/desktop/debug/is_idle');
-            }, ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000 + 1000
-      )
-        ;
+          // Check if logged out
+          $.get('/desktop/debug/is_idle');
+        }, ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000 + 1000
+        );
       }
 
       $(document).on('mousemove', resetIdleTimer);
@@ -298,24 +323,31 @@ ${ assist.assistPanel() }
     %endif
 
     % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
-      function checkJobBrowserStatus() {
-        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function (data) {
-          if (data != null && data.jobs != null) {
-            if (data.jobs.length > 0) {
-              $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
+      function checkJobBrowserStatus(){
+        $.post("/jobbrowser/jobs/", {
+            "format": "json",
+            "state": "running",
+            "user": "${user.username}"
+          },
+          function(data) {
+            if (data != null && data.jobs != null) {
+              huePubSub.publish('jobbrowser.data', data.jobs);
+              if (data.jobs.length > 0){
+                $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
+              }
+              else {
+                $("#jobBrowserCount").addClass("hide");
+              }
             }
-            else {
-              $("#jobBrowserCount").addClass("hide");
-            }
-          }
           checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
         }).fail(function () {
           window.clearTimeout(checkJobBrowserStatusIdx);
         });
       }
+      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
     % endif
   });
 </script>
