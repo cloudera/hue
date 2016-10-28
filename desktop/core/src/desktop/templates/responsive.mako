@@ -60,12 +60,12 @@
     if (document.documentMode && document.documentMode < 9) {
       location.href = "${ url('desktop.views.unsupported') }";
     }
-    
-    
-    var LOGGED_USERNAME = '${ user.username }';
-    var IS_S3_ENABLED = 'is_s3_enabled' === 'True';
 
-    
+
+    var LOGGED_USERNAME = '${ user.username }';
+    var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
+
+
     ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
@@ -90,23 +90,87 @@ ${ hueIcons.symbols() }
     <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
     <span style="color:white">
 
-      <span style="font-size: 130%" title="Query data">
-        <a href="${ url('notebook:new') }">+ Query</a>
+      <span style="font-size: 130%" title="$ {_( 'Compose query or job') }">
+       <div class="btn-group" style="vertical-align: middle">
+          <a href="${ url('notebook:new') }">
+            <button class="btn btn-primary">
+              <i class="fa fa-pencil-square-o"></i> ${ _('Compose') }
+            </button>
+          </a>
+          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+           % if 'beeswax' in apps:
+             <li><a href="${ url('notebook:notebook') }"><i class="fa fa-pencil-square-o app-icon"></i> ${_('Notebook')}</a></li>
+           % endif
+           % if 'beeswax' in apps:
+             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+           % endif
+           % if 'impala' in apps: ## impala requires beeswax anyway
+             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+           % endif
+           % if 'rdbms' in apps:
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+           % endif
+           % if 'pig' in apps:
+             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+           % endif
+           <li>
+              <a href="/${apps['jobsub'].display_name}">
+                ${ _('More >>') }
+              </a>
+           </li>
+           % for interpreter in interpreters:
+            <li>
+               <a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">
+                 ${ interpreter['name'] } ${ interpreter['type'] }
+               </a>
+             </li>
+           % endfor
+          </ul>
+        </div>
+
       </span>
 
-      [Hive..]
-      [Search..]
+      <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }"></input><i class="fa fa-search"></i>
 
-      <input class="input-xxlarge"></input>
+      <div class="pull-right">
+        <div class="btn-group" style="vertical-align: middle">
+            <a href="${ url('notebook:new') }">
+              <button class="btn btn-primary">
+                ${ _('Fin audit reporting') }
+              </button>
+            </a>
+            <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+            </button>
+            <ul role="menu" class="dropdown-menu">
+              <li>
+                <a href='#' class="ignore-btn confirmationModal">
+                  ${ _('Production') }
+                </a>
+              </li>
+              <li>
+                <a href='#' class="ignore-btn confirmationModal">
+                  ${ _('ETL customer feedback') }
+                </a>
+              </li>
+              <li>
+                <a href='#' class="ignore-btn confirmationModal">
+                  <i class="fa fa-plus"></i> ${ _('Create') }
+                </a>
+              </li>
+            </ul>
+          </div>
 
-      [clusters]
+        <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
+        <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
 
-      <span title="Running jobs"><i class="fa fa-circle-o"></i> (10)</span>
-      <span title="Notifications"><i class="fa fa-bell-o"></i> (15)</span>
+        [<a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a> | About Hue]
 
-      [<a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a> | About Hue]
-
-      [${ user.username } | Profile | <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>]
+        [${ user.username } | Profile | <a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out">${ _('Sign out') }</i></a>]
+      </div>
     </span>
   </div>
 
@@ -229,9 +293,9 @@ ${ assist.assistPanel() }
 <script type="text/javascript" charset="utf-8">
     var OnePageViewModel = function () {
       var self = this;
-  
+
       self.currentApp = ko.observable('editor');
-  
+
       huePubSub.subscribe('switch.app', function (name) {
         console.log(name);
         self.currentApp(name);
@@ -254,12 +318,12 @@ ${ assist.assistPanel() }
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
         }
       };
-  
+
       ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
-    
+
       //ko.applyBindings({}, $('.left-nav')[0])
       ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
-    
+
       var isAssistVisible = ko.observable(true);
       isAssistVisible.subscribe(function (newValue) {
         if (!newValue) {
