@@ -569,7 +569,7 @@ from desktop.views import _ko
         </h4>
         <!-- ko if: searchVisible -->
         <div class="doc-browser-search-container">
-          <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
+          <input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
         </div>
         <!-- /ko -->
         <!-- ko with: activeEntry -->

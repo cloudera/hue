@@ -138,16 +138,23 @@ ${ hueIcons.symbols() }
          % for interpreter in interpreters:
           <li>
              <a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">
-               ${ interpreter['name'] } ${ interpreter['type'] }
+               ${ interpreter['name'] }
              </a>
            </li>
          % endfor
+         % if user.is_superuser:
+         <li>
+            <a href="gethue.com">
+              ${ _('Add more...') }
+            </a>
+         </li>
+         % endif
         </ul>
       </div>
 
       </span>
 
-      <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }"></input><i class="fa fa-search"></i>
+      <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }"></input> <i class="fa fa-search"></i>
 
       <div class="pull-right">
 
