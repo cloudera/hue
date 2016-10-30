@@ -45,7 +45,7 @@ def is_optimizer_enabled():
   return get_optimizer_url() and OPTIMIZER.PRODUCT_NAME.get()
 
 
-class OptimizerApiException(Exception):
+class OptimizerApiException(PopupException):
   pass
 
 
@@ -93,7 +93,7 @@ class OptimizerApi(object):
         LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
         data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
     except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+      raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
 
     if data:
       response = json.loads(data) 
@@ -103,31 +103,6 @@ class OptimizerApi(object):
 
   def get_tenant(self, email):
     return self._exec('get-tenant', ['--email', email])
-
-
-  def create_product(self, product_name=None, product_secret=None, authCode=None):
-    try:
-      data = {
-          'productName': product_name if product_name is not None else self._product_name,
-          'productSecret': product_secret if product_secret is not None else self._product_secret,
-          'authCode': authCode if authCode is not None else self._product_auth_secret
-      }
-      return self._root.post('/api/createProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
-
-  def add_email_to_product(self, email=None, email_password=None):
-    try:
-      data = {
-          'productName': self._product_name,
-          'productSecret': self._product_secret,
-          'email': email if email is not None else self._email,
-          'password': email_password if email_password is not None else self._email_password
-      }
-      return self._root.post('/api/addEmailToProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
   def authenticate(self):
@@ -199,19 +174,12 @@ class OptimizerApi(object):
     return self._exec('get-top-tables', ['--tenant', self._product_name])
 
 
-  def table_details(self, table_name, token=None, email=None):
-    if token is None:
-      token = self._authenticate()
-
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-          'tableName': table_name
-      }
-      return self._root.post('/api/tableDetails', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+  def table_details(self, database_name, table_name):
+    return self._exec('get-tables-detail', [
+        '--tenant', self._product_name,
+        '--db-name', database_name,
+        '--table-name', table_name
+    ])
 
 
   def query_compatibility(self, source_platform, target_platform, query, token=None, email=None):

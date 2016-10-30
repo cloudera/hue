@@ -76,3 +76,6 @@ class TestNavigatorclient:
     # "ca es"
     # ca OR es
     # tags:a
+
+    # type:table tax
+    # owner:romain ca
