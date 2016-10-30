@@ -57,7 +57,7 @@ class IndexController(object):
   def is_solr_cloud_mode(self):
     if not hasattr(self, '_solr_cloud_mode'):
       try:
-        self.api.collections()
+        self.api.collections2()
         setattr(self, '_solr_cloud_mode', True)
       except Exception, e:
         LOG.info('Non SolrCloud server: %s' % e)
@@ -80,10 +80,11 @@ class IndexController(object):
       for name in solr_cores:
         indexes.append({'name': name, 'type': 'core', 'collections': []})
 
-      solr_aliases = self.api.aliases()
-      for name in solr_aliases:
-        collections = solr_aliases[name].split()
-        indexes.append({'name': name, 'type': 'alias', 'collections': collections})
+      if self.is_solr_cloud_mode():
+        solr_aliases = self.api.aliases()
+        for name in solr_aliases:
+          collections = solr_aliases[name].split()
+          indexes.append({'name': name, 'type': 'alias', 'collections': collections})
 
     except Exception, e:
       msg = _('Solr server could not be contacted properly: %s') % e
