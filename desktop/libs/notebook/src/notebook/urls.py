@@ -73,6 +73,7 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/notebook/export_result/?$', 'export_result', name='export_result'),
 
   url(r'^api/optimizer/risk/?$', 'statement_risk', name='statement_risk'),
+  url(r'^api/optimizer/compatibility/?$', 'statement_compatibility', name='statement_compatibility'),
 )
 
 # Assist API

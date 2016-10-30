@@ -182,21 +182,13 @@ class OptimizerApi(object):
     ])
 
 
-  def query_compatibility(self, source_platform, target_platform, query, token=None, email=None):
-    if token is None:
-      token = self._authenticate()
-
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-          'sourcePlatform': source_platform,
-          'targetPlatform': target_platform,
-          'query': query
-      }
-      return self._root.post('/api/queryCompatibility', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+  def query_compatibility(self, source_platform, target_platform, query):
+    return self._exec('get-query-compatible', [
+        '--tenant', self._product_name,        
+        '--source-platform', source_platform,
+        '--target-platform', target_platform,
+        '--query', query,
+    ])
 
 
   def query_risk(self, query):
