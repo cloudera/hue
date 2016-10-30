@@ -36,14 +36,15 @@ urlpatterns = patterns('metadata.navigator_api',
 
 # Optimizer API
 urlpatterns += patterns('metadata.optimizer_api',
-  url(r'^api/optimizer_api/top_tables/?$', 'top_tables', name='top_tables'),  
-  url(r'^api/optimizer_api/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
   url(r'^api/optimizer_api/upload_history/?$', 'upload_history', name='upload_history'),
   url(r'^api/optimizer_api/popular_values/?$', 'popular_values', name='popular_values'),
   url(r'^api/optimizer_api/similar_queries/?$', 'similar_queries', name='similar_queries'),
 
   #v2
   url(r'^api/optimizer_api/get_tenant/?$', 'get_tenant', name='get_tenant'),
+
+  url(r'^api/optimizer_api/top_tables/?$', 'top_tables', name='top_tables'),
   url(r'^api/optimizer_api/table_details/?$', 'table_details', name='table_details'),
   url(r'^api/optimizer_api/query_risk/?$', 'query_risk', name='query_risk'),
+  url(r'^api/optimizer_api/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
 )

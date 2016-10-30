@@ -108,7 +108,8 @@ class TestOptimizerApi(object):
 
 
   def test_top_tables(self):
-    resp = self.api.top_tables()
+    database_name = 'default'
+    resp = self.api.top_tables(database_name=database_name)
 
     assert_true(isinstance(resp['results'], list), resp) # No status code currently
 
