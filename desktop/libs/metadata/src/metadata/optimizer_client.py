@@ -170,8 +170,11 @@ class OptimizerApi(object):
         raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def top_tables(self, workfloadId=None):
-    return self._exec('get-top-tables', ['--tenant', self._product_name])
+  def top_tables(self, workfloadId=None, database_name='default'): 
+    return self._exec('get-top-tables', [
+        '--tenant', self._product_name,
+        '--db-name', database_name
+    ])
 
 
   def table_details(self, database_name, table_name):
