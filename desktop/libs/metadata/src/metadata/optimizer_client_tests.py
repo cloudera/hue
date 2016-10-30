@@ -115,10 +115,10 @@ class TestOptimizerApi(object):
 
 
   def test_table_details(self):  # Requires test_upload to run before
-    resp = self.api.table_details(table_name='default', table_name='emps')
+    resp = self.api.table_details(database_name='default', table_name='emps')
     assert_equal('success', resp['status'], resp)
 
-    resp = self.api.table_details(table_name='db1', table_name='Part')
+    resp = self.api.table_details(database_name='db1', table_name='Part')
     assert_equal('success', resp['status'], resp)
 
 
