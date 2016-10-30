@@ -199,6 +199,13 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
+  def query_risk(self, query):
+    return self._exec('get-query-risk', [
+        '--tenant', self._product_name,
+        '--query', query
+    ])
+
+
   def similar_queries(self, source_platform, query, token=None, email=None):
     if token is None:
       token = self._authenticate()

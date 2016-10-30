@@ -140,26 +140,21 @@ def query_compatibility(request):
   return JsonResponse(response)
 
 
-# Mocked
 @require_POST
 @error_handler
-def query_complexity(request):
+def query_risk(request):
   response = {'status': -1}
 
-  snippet = json.loads(request.POST.get('snippet'))
+  query = json.loads(request.POST.get('query'))
 
-  if 'select * from tsqc_date t join atd_au_dtl a on (t.date = a.date)' in snippet['statement'].lower():
-    comment = 'Large join is happening'
-  elif 'large' in snippet['statement'].lower():
-    comment = 'Previously failed 5 times in a row'
-  elif 'partition' in snippet['statement'].lower():
-    comment = 'Has 50k partitions'
-  else:
-    comment = ''
+
+  api = OptimizerApi()
+
+  data = api.query_risk(query=query)
 
   response['query_complexity'] = {
     'level': random.choice(['LOW', 'MEDIUM', 'HIGH']),
-    'comment': comment
+    'comment': data
   }
   response['status'] = 0
 

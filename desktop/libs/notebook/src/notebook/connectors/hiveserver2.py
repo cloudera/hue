@@ -32,6 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
+from metadata.optimizer_client import OptimizerApi
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
 
@@ -482,6 +483,18 @@ class HS2Api(Api):
     return hql, success_url
 
 
+  def query_risk(self, notebook, snippet):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+    
+    api = OptimizerApi()
+
+    return api.query_risk(query=query)
+
+
   def upgrade_properties(self, lang='hive', properties=None):
     upgraded_properties = copy.deepcopy(self.get_properties(lang))
 
@@ -619,7 +632,7 @@ class HS2Api(Api):
   def _get_handle(self, snippet):
     try:
       snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    except KeyError, ex:
+    except KeyError:
       raise Exception('Operation has no valid handle attached')
 
     for key in snippet['result']['handle'].keys():
@@ -657,7 +670,7 @@ class HS2Api(Api):
       else:
         LOG.info("No HIVE counter group found for job: %s" % job_id)
 
-       # Extract totalCounterValue from FileSystemCounter counter group
+      # Extract totalCounterValue from FileSystemCounter counter group
       fs_counters = next((group for group in counter_groups if group.get('counterGroupName') == 'org.apache.hadoop.mapreduce.FileSystemCounter'), None)
       if fs_counters:
         total_size = next((counter.get('totalCounterValue') for counter in fs_counters['counter'] if counter['name'] == 'HDFS_BYTES_WRITTEN'), None)

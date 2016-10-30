@@ -232,6 +232,7 @@ class HQLdesign(object):
     return not self.__eq__(other)
 
 
+# Note: Might be replaceable by sqlparse.split
 def split_statements(hql):
   """
   Split statements at semicolons ignoring the ones inside quotes and comments.

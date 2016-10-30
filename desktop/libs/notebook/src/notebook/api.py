@@ -697,3 +697,20 @@ def export_result(request):
     response['status'] = 0
 
   return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def statement_risk(request):
+  response = {'status': -1, 'message': _('Risk analysis failed.')}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  api = get_api(request, snippet)
+
+  response['data'] = api.query_risk(notebook, snippet)
+  response['status'] = 0
+
+  return JsonResponse(response)

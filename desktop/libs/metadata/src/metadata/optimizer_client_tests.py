@@ -121,6 +121,18 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
+  def test_query_risk(self):
+    query = 'Select * from (Select item.id from item)'
+
+    resp = self.api.query_risk(query=query)
+
+    assert_equal('successs', resp['status'], resp)
+
+    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+
+    assert_equal('FAIL', details['hiveRisk']['risk'], resp)
+
+
   def test_query_compatibility(self):
     source_platform = 'MySQL'
     target_platform = 'Hive'
