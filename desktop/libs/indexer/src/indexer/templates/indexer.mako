@@ -244,7 +244,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Index it!') }</div>
+        <div class="caption">${ _('Index!') }</div>
       </li>
     </ol>
 
@@ -255,18 +255,7 @@ ${ assist.assistPanel() }
       <div class="card-body">
 
         <form class="form-inline">
-          <div class="control-group">
-            <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-              <input type="text" class="form-control" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'" placeholder="${ _('Collection name') }">
-              <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('A new collection will be created') }</span>
-              <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
-              ${_('Adding data to this existing collection') }
-              <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
-              </span>
-            </label>
-          </div>
-
-          <div data-bind="visible: createWizard.fileFormat().name().length > 0">
+          <div>
             <div class="control-group">
               <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
                 <select id="collectionType" data-bind="options: createWizard.fileFormat().inputFormats, value: createWizard.fileFormat().inputFormat"></select>
@@ -275,7 +264,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
               <label for="path" class="control-label"><div>${ _('Path') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.fileFormat().path, valueUpdate:'afterkeydown', filechooser: createWizard.fileFormat().path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
               </label>
             </div>
 
@@ -290,6 +279,16 @@ ${ assist.assistPanel() }
                 <select data-bind="options: createWizard.fileFormat().queries, value: createWizard.fileFormat().query, optionsText: 'name', optionsAfterRender: createWizard.fileFormat().selectQuery"></select>
               </label>
             </div>
+          </div>
+          <div class="control-group" data-bind="visible: createWizard.fileFormat().show">
+            <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
+              <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: createWizard.fileFormat().name, valueUpdate: 'afterkeydown'" placeholder="${ _('Collection name') }">
+              <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('A new collection will be created') }</span>
+              <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
+              ${ _('Adding data to this existing collection') }
+              <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+              </span>
+            </label>
           </div>
         </form>
       </div>
@@ -408,7 +407,7 @@ ${ assist.assistPanel() }
   <label>${ _('Type') }
     <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
   </label>
-  <a href="javascript:void(0)" title="${ _('Show indexing properties) }" data-bind="click: function() {showProperties(! showProperties()) }">
+  <a href="javascript:void(0)" title="${ _('Show indexing properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
     <i class="fa fa-sliders"></i>
   </a>
   <span data-bind="visible: showProperties">
@@ -689,18 +688,33 @@ ${ assist.assistPanel() }
 
       // File
       self.path = ko.observable('');
+      self.path.subscribe(function(val) {
+        if (val) {
+          self._set_default_name(self.path().split('/').pop());
+        }
+      })
 
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[1] : self.table();
       });
+      self.tableName.subscribe(function(val) {
+        if (val && self.table().split('.', 2).length == 2) {
+          self._set_default_name(self.tableName());
+        }
+      })
       self.databaseName = ko.computed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[0] : 'default';
       });
 
       // Queries
       self.query = ko.observable('');
+      self.query.subscribe(function(val) {
+        if (val) {
+          self._set_default_name(val.name());
+        }
+      })
       self.queries = ko.observableArray([]);
       self.getDocuments = function() {
         $.get('/desktop/api2/docs/', {
@@ -740,9 +754,13 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'table') {
           return self.table().length > 0;
         } else if (self.inputFormat() == 'query') {
-          return self.query() && self.query().length > 0;
+          return self.query();
         }
       });
+
+      self._set_default_name = function(name) {
+        return self.name(name.replace(' ', '_') + '_dashboard');
+      }
     };
 
     var CreateWizard = function (vm) {
