@@ -279,4 +279,6 @@ class Api(object):
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
 
-  def query_risk(self, notebook, snippet): raise NotImplementedError()
+  def statement_risk(self, notebook, snippet): raise NotImplementedError()
+
+  def statement_compatibility(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()

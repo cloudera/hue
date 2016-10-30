@@ -714,3 +714,23 @@ def statement_risk(request):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def statement_compatibility(request):
+  response = {'status': -1, 'message': _('Compatibility analysis failed.')}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  source_platform = request.POST.get('sourcePlatform')
+  target_platform = request.POST.get('targetPlatform')
+
+  api = get_api(request, snippet)
+
+  response['data'] = api.statement_compatibility(notebook, snippet, source_platform=source_platform, target_platform=target_platform)
+  response['status'] = 0
+
+  return JsonResponse(response)
+

@@ -483,16 +483,28 @@ class HS2Api(Api):
     return hql, success_url
 
 
-  def query_risk(self, notebook, snippet):
+  def statement_risk(self, notebook, snippet):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
-    
+
     api = OptimizerApi()
 
     return api.query_risk(query=query)
+
+
+  def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+
+    api = OptimizerApi()
+
+    return api.query_compatibility(source_platform, target_platform, query)
 
 
   def upgrade_properties(self, lang='hive', properties=None):

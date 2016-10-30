@@ -134,8 +134,8 @@ class TestOptimizerApi(object):
 
 
   def test_query_compatibility(self):
-    source_platform = 'MySQL'
-    target_platform = 'Hive'
+    source_platform = 'Hive'
+    target_platform = 'Impala'
     query = 'Select * from (Select item.id from item)'
 
     resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)

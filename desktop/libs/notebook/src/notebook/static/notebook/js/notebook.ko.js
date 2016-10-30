@@ -1001,8 +1001,9 @@ var EditorViewModel = (function() {
       logGA('compatibility');
       self.suggestion(false);
 
-      $.post("/metadata/api/optimizer_api/query_compatibility", {
-        query: self.statement(),
+      $.post("/metadata/api/optimizer/compatibility", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type(),
         targetPlatform: 'impala'
       }, function(data) {
@@ -1307,6 +1308,7 @@ var EditorViewModel = (function() {
       self.complexity('');
 
       $.post("/notebook/api/optimizer/query_risk", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
