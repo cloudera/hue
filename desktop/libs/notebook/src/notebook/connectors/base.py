@@ -278,3 +278,5 @@ class Api(object):
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None): raise NotImplementedError()
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
+
+  def query_risk(self, notebook, snippet): raise NotImplementedError()
