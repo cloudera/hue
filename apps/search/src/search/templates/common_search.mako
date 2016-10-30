@@ -253,7 +253,7 @@ from django.utils.translation import ugettext as _
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
