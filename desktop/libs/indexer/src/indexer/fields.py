@@ -47,15 +47,19 @@ class Field(object):
     self.required = False
     self.unique = False
     self.multi_valued = multi_valued
+    self.show_properties = False
 
   def to_dict(self):
-    return {'name': self.name,
-    'type': self.field_type_name,
-    'unique': self.unique,
-    'keep': self.keep,
-    'operations': self.operations,
-    'required': self.required,
-    'multiValued': self.multi_valued}
+    return {
+      'name': self.name,
+      'type': self.field_type_name,
+      'unique': self.unique,
+      'keep': self.keep,
+      'operations': self.operations,
+      'required': self.required,
+      'multiValued': self.multi_valued,
+      'showProperties': self.show_properties,
+    }
 
 FIELD_TYPES = [
   FieldType('text_en', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{101,}$"),
