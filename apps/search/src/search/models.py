@@ -831,9 +831,10 @@ def augment_solr_response(response, collection, query):
               extraSeries.append({'counts': _c, 'label': name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
+          facet_fields = [collection_facet['field']] + [f['aggregate'] == 'count' for f in collection_facet['properties'].get('facets', [])]
           count = response['facets'][name]
-          _convert_nested_to_augmented_pivot_nd(facet['id'], count, selected_values)
-          dimension = 1
+          _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values)
+          dimension = len(facet_fields)
         elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
           # Single dimension or dimension 2 with analytics
           dimension = 1
@@ -1006,17 +1007,18 @@ def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
     c['fq_fields'] = fq_fields
     c['fq_values'] = fq_values
 
-# {u'buckets': [{u'count': 4, u'val': u'electronics'}, {u'count': 3, u'val': u'memory'}, {u'count': 1, u'val': u'music'}, {u'count': 0, u'val': u'camera'}, {u'count': 0, u'val': u'connector'}, {u'count': 0, u'val': u'copier'}, {u'count': 0, u'val': u'currency'}, {u'count': 0, u'val': u'electronics and computer1'}, {u'count': 0, u'val': u'electronics and stuff2'}, {u'count': 0, u'val': u'graphics card'}]}
 
-def _convert_nested_to_augmented_pivot_nd(facet_id, counts, selected_values, fields='', values=''):  
+def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, selected_values, fields='', values=''):
+  print facet_fields
   for c in counts['buckets']:
-    c['field'] = 'cat' # Hack
+    c['field'] = facet_fields[0]
     fq_fields = (fields if fields else []) + [c['field']]
     fq_values = (values if values else []) + [smart_str(c['val'])]
     c['value'] = c.pop('val')
 
-    if 'pivot' in c:
-      _augment_pivot_nd(facet_id, c['pivot'], selected_values, fq_fields, fq_values)
+    if 'd2' in c:
+      _convert_nested_to_augmented_pivot_nd(facet_fields[1:], facet_id, c['d2'], selected_values, fq_fields, fq_values)
+      c['pivot'] = c.pop('d2')['buckets']
 
     fq_filter = selected_values.get(facet_id, [])
     _selected_values = [f['value'] for f in fq_filter]
