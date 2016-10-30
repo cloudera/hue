@@ -253,8 +253,17 @@ from django.utils.translation import ugettext as _
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Tree')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-sitemap fa-rotate-270"></i>
+         </a>
+    </div>
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
+                    draggable: {data: draggableTree2(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
@@ -1521,7 +1530,6 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="pie2-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
-
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
@@ -1553,6 +1561,7 @@ ${ dashboard.layout_skeleton() }
     </div>
   </div>
   <!-- /ko -->
+
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
@@ -1606,6 +1615,37 @@ ${ dashboard.layout_skeleton() }
 
       <div class="clearfix"></div>
 
+      <!-- ko if: properties.scope() == 'tree' -->
+        <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
+          fqs: $root.query.fqs,
+          tooltip: '${ _ko('Click to zoom, double click to select') }',
+          transformer: partitionChartDataTransformer,
+          onStateChange: function(state){ },
+          onClick: function(d) {
+            $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
+          },
+          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+        />
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+</script>
+
+
+<script type="text/html" id="tree2-widget">
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div class="responsive-facet-toggle-section" data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())">
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
+    </div>
+
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.scope() == 'tree' -->
         <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
           fqs: $root.query.fqs,
