@@ -29,7 +29,6 @@ from desktop.models import Document2
 from notebook.models import Notebook
 
 from metadata.optimizer_client import OptimizerApi
-from metadata.conf import OPTIMIZER
 
 
 LOG = logging.getLogger(__name__)
@@ -103,11 +102,12 @@ def top_tables(request):
 def table_details(request):
   response = {'status': -1}
 
+  database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
 
   api = OptimizerApi()
 
-  data = api.table_details(table_name=table_name)
+  data = api.table_details(database_name=database_name, table_name=table_name)
 
   if data['status'] == 'success':
     response['status'] = 0

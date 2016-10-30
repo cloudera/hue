@@ -63,17 +63,6 @@ class TestOptimizerApi(object):
 
     assert_equal('success', resp['status'], resp)
 
-  def test_create_product(self):
-    resp = self.api.create_product()
-
-    assert_equal('success', resp['status'], resp)
-
-
-  def test_add_email_to_product(self):
-    resp = self.api.add_email_to_product()
-
-    assert_equal('success', resp['status'], resp)
-
 
   def test_authenticate(self):
     resp = self.api.authenticate()
@@ -107,7 +96,7 @@ class TestOptimizerApi(object):
     queries = [
         "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;",
         "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;",
-        "select Part.partkey, Part.name, Part.type from Part where Part.yyprice > 2095",
+        "select Part.partkey, Part.name, Part.type from db1.Part where Part.yyprice > 2095",
         "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';",
         "select count(*) as loans from account a where a.account_state_id in (5,9);",
         "select orders.key, orders.id from orders where orders.price < 9999",
@@ -125,12 +114,10 @@ class TestOptimizerApi(object):
 
 
   def test_table_details(self):  # Requires test_upload to run before
-    resp = self.api.authenticate()
-    token = resp['token']
+    resp = self.api.table_details(table_name='default', table_name='emps')
+    assert_equal('success', resp['status'], resp)
 
-    resp = self.api.popular_values(table_name='Part', token=token)
-    resp = self.api.popular_values(table_name='Part', column_name='partkey', token=token)
-
+    resp = self.api.table_details(table_name='db1', table_name='Part')
     assert_equal('success', resp['status'], resp)
 
 
