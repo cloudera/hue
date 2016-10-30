@@ -209,7 +209,7 @@ ${ assist.assistPanel() }
           <span class="fa fa-check"></span>
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Pick it') }</div>
+        <div class="caption">${ _('Pick data') }</div>
       </li>
       <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
         <div class="step" title="${ _('Go to Step 2') }">
@@ -225,7 +225,7 @@ ${ assist.assistPanel() }
           <span class="fa fa-check"></span>
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Tweak it') }</div>
+        <div class="caption">${ _('Get fields') }</div>
       </li>
       <li data-bind="css: { 'inactive': currentStep() < 3, 'active': currentStep() == 3, 'error': createWizard.indexingError, 'complete': createWizard.indexingSuccess }, click: function() { currentStep(3) }">
         <div class="step" title="${ _('Go to Step 3') }">
@@ -275,7 +275,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'file'">
               <label for="path" class="control-label"><div>${ _('Path') }</div>
-                <input type="text" class="form-control path" data-bind="value: createWizard.fileFormat().path, filechooser: createWizard.fileFormat().path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.fileFormat().path, valueUpdate:'afterkeydown', filechooser: createWizard.fileFormat().path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
               </label>
             </div>
 
@@ -408,23 +408,28 @@ ${ assist.assistPanel() }
   <label>${ _('Type') }
     <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
   </label>
-  <label class="checkbox">
-    <input type="checkbox" data-bind="checked: unique"> ${_('Unique')}
-  </label>
-  <label class="checkbox">
-    <input type="checkbox" data-bind="checked: keep"> ${_('Keep in index')}
-  </label>
-  <label class="checkbox">
-    <input type="checkbox" data-bind="checked: required"> ${_('Required')}
-  </label>
+  <a href="javascript:void(0)" title="${ _('Show indexing properties) }" data-bind="click: function() {showProperties(! showProperties()) }">
+    <i class="fa fa-sliders"></i>
+  </a>
+  <span data-bind="visible: showProperties">
+    <label class="checkbox">
+      <input type="checkbox" data-bind="checked: unique"> ${_('Unique')}
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" data-bind="checked: keep"> ${_('Keep in index')}
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" data-bind="checked: required"> ${_('Required')}
+    </label>
+  </span>
   <!-- ko if: operations().length == 0 -->
-  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Operation')}</a>
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <!-- /ko -->
   <div data-bind="foreach: operations">
     <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
   </div>
   <!-- ko if: operations().length > 0 -->
-  <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Operation to')} <span data-bind="text: name"></span></a>
+  <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation to')} <span data-bind="text: name"></span></a>
   <!-- /ko -->
 </script>
 
