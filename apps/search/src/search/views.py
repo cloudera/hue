@@ -542,7 +542,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
   elif widget_type == 'hit-widget':
-    facet_type = 'function'    
+    facet_type = 'function'
   elif widget_type == 'gradient-map-widget':
     facet_type = 'nested'
     properties['facets'] = []
@@ -571,7 +571,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['timelineChartType'] = 'bar'
       elif widget_type == 'tree2-widget':
         properties['scope'] = 'tree'
-        properties['isOldPivot'] = True 
+        properties['limit'] = 5
+        properties['isOldPivot'] = True
       else:
         properties['scope'] = 'stack'
         properties['timelineChartType'] = 'bar'

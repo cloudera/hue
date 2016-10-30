@@ -831,7 +831,7 @@ def augment_solr_response(response, collection, query):
               extraSeries.append({'counts': _c, 'label': name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
-          facet_fields = [collection_facet['field']] + [f['aggregate'] == 'count' for f in collection_facet['properties'].get('facets', [])]
+          facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate'] == 'count']
           count = response['facets'][name]
           _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values)
           dimension = len(facet_fields)
@@ -1009,7 +1009,6 @@ def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
 
 
 def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, selected_values, fields='', values=''):
-  print facet_fields
   for c in counts['buckets']:
     c['field'] = facet_fields[0]
     fq_fields = (fields if fields else []) + [c['field']]
@@ -1017,8 +1016,12 @@ def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, select
     c['value'] = c.pop('val')
 
     if 'd2' in c:
-      _convert_nested_to_augmented_pivot_nd(facet_fields[1:], facet_id, c['d2'], selected_values, fq_fields, fq_values)
-      c['pivot'] = c.pop('d2')['buckets']
+      next_dimension = facet_fields[1:]
+      if next_dimension:
+        _convert_nested_to_augmented_pivot_nd(next_dimension, facet_id, c['d2'], selected_values, fq_fields, fq_values)
+        c['pivot'] = c.pop('d2')['buckets']
+      else:
+        c['count'] = c.pop('d2')
 
     fq_filter = selected_values.get(facet_id, [])
     _selected_values = [f['value'] for f in fq_filter]
