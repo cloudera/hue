@@ -362,7 +362,7 @@ ${ assist.assistPanel() }
 
       <!-- ko if: currentStep() == 1 && createWizard.fileFormat().name().length > 0 -->
       <button class="btn" data-bind="click: createWizard.guessFormat, enable: createWizard.fileFormat().show">
-        ${_('Select fields')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i>
+        ${_('Next')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.isGuessingFormat"></i>
       </button>
       <!-- /ko -->
 
@@ -405,7 +405,7 @@ ${ assist.assistPanel() }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
   <label>${ _('Type') }
-    <select data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
+    <select class="input-small" data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
   </label>
   <a href="javascript:void(0)" title="${ _('Show indexing properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
     <i class="fa fa-sliders"></i>
