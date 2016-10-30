@@ -193,7 +193,9 @@ ${ hueIcons.symbols() }
 
         <li>
           <span title="Running jobs and workflows">
-            <i class="fa fa-circle-o"></i> ${ _('Jobs') }
+            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/jobbrowser/apps" style="color:white">
+              <i class="fa fa-circle-o"></i> ${ _('Jobs') }
+            </a>
             <span class="badge badge-warning">20</span>
             ## Batches
             ## Schedules
@@ -221,7 +223,7 @@ ${ hueIcons.symbols() }
           view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
         %>
         <li class="dropdown">
-          <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+          <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle" style="color:white">
             <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
             % if view_profile:
               <b class="caret"></b>
