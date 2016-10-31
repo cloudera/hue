@@ -1508,7 +1508,9 @@ ${ hueIcons.symbols() }
       </svg>
     </div>
     <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
-      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span><span data-bind="text: complexity"></span>
+      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span>
+      <span data-bind="text: complexity"></span>
+      </span><span data-bind="text: complexityRecommendation"></span>
     </div>
   </div>
   <div class="alert" data-bind="visible: hasSuggestion">

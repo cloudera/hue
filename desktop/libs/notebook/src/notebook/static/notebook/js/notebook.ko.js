@@ -613,8 +613,9 @@ var EditorViewModel = (function() {
 
     self.is_redacted = ko.observable(typeof snippet.is_redacted != "undefined" && snippet.is_redacted != null ? snippet.is_redacted : false);
 
-    self.complexity = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
-    self.complexityLevel = ko.observable(typeof snippet.complexity_level != "undefined" && snippet.complexity_level != null ? snippet.complexity_level : '');
+    self.complexity = ko.observable('');
+    self.complexityLevel = ko.observable('');
+    self.complexityRecommendation = ko.observable('');
     self.hasComplexity = ko.computed(function () {
       return self.complexity().length > 0;
     });
@@ -1001,14 +1002,14 @@ var EditorViewModel = (function() {
       logGA('compatibility');
       self.suggestion(false);
 
-      $.post("/metadata/api/optimizer/compatibility", {
+      $.post("/notebook/api/optimizer/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type(),
         targetPlatform: 'impala'
       }, function(data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility.platformCompilationStatus.Impala));
+         self.suggestion(ko.mapping.fromJS(data.query_compatibility.Impala));
          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
@@ -1304,16 +1305,17 @@ var EditorViewModel = (function() {
     };
 
     self.getComplexity = function () {
-      logGA('get_complexity');
+      logGA('get_query_risk');
       self.complexity('');
 
-      $.post("/notebook/api/optimizer/query_risk", {
+      $.post("/notebook/api/optimizer/statement_risk", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
-          self.complexity(data.query_complexity.comment);
-          self.complexityLevel(data.query_complexity.level);
+          self.complexityLevel(data.query_complexity.risk);
+          self.complexity(data.query_complexity.riskAnalysis);
+          self.complexityRecommendation(data.query_complexity.riskRecommendation);
         } else {
           $(document).trigger("error", data.message);
         }

@@ -111,7 +111,7 @@ def table_details(request):
 
   if data['status'] == 'success':
     response['status'] = 0
-    response['details'] = data['details']
+    response['details'] = data
   else:
     response['message'] = 'Optimizer: %s' % data['details']
 
@@ -133,9 +133,9 @@ def query_compatibility(request):
 
   if data['status'] == 'success':
     response['status'] = 0
-    response['query_compatibility'] = json.loads(data['details'])
+    response['query_compatibility'] = data
   else:
-    response['message'] = 'Optimizer: %s' % data['details']
+    response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 
@@ -147,16 +147,15 @@ def query_risk(request):
 
   query = json.loads(request.POST.get('query'))
 
-
   api = OptimizerApi()
 
   data = api.query_risk(query=query)
 
-  response['query_complexity'] = {
-    'level': random.choice(['LOW', 'MEDIUM', 'HIGH']),
-    'comment': data
-  }
-  response['status'] = 0
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['query_risk'] = data
+  else:
+    response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 
