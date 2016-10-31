@@ -168,9 +168,28 @@
         self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ')').addClass('selected');
       }
     };
+
+    var overHandler = function () {
+      self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ') td').css({
+        'border-left': '2px solid #CCC',
+        'background-color': '#EEE'
+      });
+    };
+
+    var outHandler = function () {
+      self.$parent.find('.fixed-first-column table tbody tr td').css({
+        'border-left': '2px solid #FFF',
+        'background-color': '#F9F9F9'
+      });
+    };
+
     self.$parent.children('table').on('click dblclick', 'tbody tr', clickHandler);
+    self.$parent.children('table').on('mouseover', 'tbody tr', overHandler);
+    self.$parent.children('table').on('mouseout', 'tbody tr', outHandler);
     self.disposeFunctions.push(function () {
       self.$parent.children('table').off('click dblclick', 'tbody tr', clickHandler);
+      self.$parent.children('table').on('mouseover', 'tbody tr', overHandler);
+      self.$parent.children('table').on('mouseout', 'tbody tr', outHandler);
     });
 
     var dblClickHandler = function () {
@@ -342,7 +361,7 @@
 
   Plugin.prototype.drawFirstColumn = function () {
     var self = this;
-    if (! self.options.fixedFirstColumn) {
+    if (!self.options.fixedFirstColumn) {
       self.firstColumnInner = $();
       self.firstColumnTopCell = $();
       self.firstColumn = $();
@@ -399,7 +418,7 @@
       if ($(this).html() === '') {
         foundEmptyTh = true;
       }
-      h+= '<tr><td>' + $(this).html() +'</td></tr>';
+      h+= '<tr><td style="border-left: 2px solid #FFF">' + $(this).html() +'</td></tr>';
     });
     if (foundEmptyTh) {
       // In IE it's sometimes empty so we'll redraw in a bit
