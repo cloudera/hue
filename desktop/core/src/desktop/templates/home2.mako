@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter, _ko
+  from desktop import conf
   from django.utils.translation import ugettext as _
 %>
 
@@ -66,7 +67,11 @@ ${ docBrowser.docBrowser() }
     height: auto;
     width: 100%;
     position: absolute;
+  % if conf.CUSTOM.BANNER_TOP_HTML.get():
+    top: 112px;
+  % else:
     top: 82px;
+  % endif
     bottom: 0;
     background-color: #FFF;
   }
