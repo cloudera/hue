@@ -812,8 +812,8 @@ def augment_solr_response(response, collection, query):
         extraSeries = []
         counts = response['facets'][name]['buckets']
 
-        # Date range
-        if collection_facet['properties']['isDate']:
+        # Number or Date range
+        if collection_facet['properties']['canRange']:
           dimension = 3
           # Single dimension or dimension 2 with analytics
           if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):

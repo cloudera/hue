@@ -505,15 +505,18 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="facet-toggle2">
 
     ## Dimension 1
-   <div class="facet-field-cnt" data-bind="visible: properties.canRange">
+    <!-- ko if: properties.canRange -->
+    <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
       <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet">
-        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
+        <i class="fa" data-bind="css: { 'fa-arrows-h': properties.type() == 'range', 'fa-circle': properties.type() == 'field', 'fa-level-up': properties.type() == 'range-up' }, attr: { title: properties.type() == 'field' ? 'Range' : properties.type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
         <span data-bind="visible: type() == 'range'">${_('range')}</span>
         <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
         <span data-bind="visible: type() == 'field'">${_('field')}</span>
       </a>
     </div>
+    <!-- /ko -->
+
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
       <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
@@ -533,24 +536,23 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     <!-- /ko -->
 
-    
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label facet-field-label-fixed-width">
-            ${ _('Limit') }
-          </span>
-          <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
+    <div class="facet-field-cnt">
+      <span class="spinedit-cnt">
+        <span class="facet-field-label facet-field-label-fixed-width">
+          ${ _('Limit') }
         </span>
-      </div>
-    
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Min Count') }
-          </span>
-          <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+        <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
+      </span>
+    </div>
+  
+    <div class="facet-field-cnt">
+      <span class="spinedit-cnt">
+        <span class="facet-field-label">
+          ${ _('Min Count') }
         </span>
-      </div>
+        <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+      </span>
+    </div>
 
   ## Dimensions > 1
   <!-- ko if: $root.isEditing -->  

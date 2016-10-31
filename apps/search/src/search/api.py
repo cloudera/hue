@@ -49,7 +49,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
 
     if widget_type == 'pie-widget' or widget_type == 'pie2-widget':
       SLOTS = 5
-    elif widget_type == 'facet-widget':
+    elif widget_type == 'facet-widget' or widget_type == 'text-facet-widget':
       SLOTS = 10
     else:
       SLOTS = 100
