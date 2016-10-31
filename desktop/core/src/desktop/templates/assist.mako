@@ -1570,23 +1570,9 @@ from metadata.conf import has_navigator
               entity.clearNavContextPopoverDelay = clearNavContextPopoverDelay;
               entity.icon = NAV_TYPE_ICONS[entity.type];
               switch (entity.type) {
-                case 'DATABASE': {
-                  entity.click = function () {
-                    showInAssist(entity);
-                  };
-                  break;
-                }
-                case 'TABLE': {
-                  entity.click = function () {
-                    showInAssist(entity);
-                  };
-                  break;
-                }
-                case 'VIEW': {
-                  entity.click = function () {
-                    showInAssist(entity);
-                  }
-                }
+                case 'DATABASE': { }
+                case 'TABLE': { }
+                case 'VIEW': { }
                 case 'FIELD': {
                   entity.click = function () {
                     showInAssist(entity);
@@ -1629,8 +1615,12 @@ from metadata.conf import has_navigator
           });
         };
 
-        self.visiblePanel = ko.observable(self.availablePanels[0]);
+        var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels[0].type);
+
+        var lastFoundPanel = self.availablePanels.filter(function (panel) { return panel.type === lastOpenPanelType });
+        self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels[0]);
         self.visiblePanel.subscribe(function(newValue) {
+          self.apiHelper.setInTotalStorage('assist', 'last.open.panel', newValue.type);
           if (self.navigatorEnabled()) {
             lastQuery = 'refresh';
             self.performSearch();
