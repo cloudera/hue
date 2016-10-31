@@ -147,19 +147,20 @@ var AssistDbEntry = (function () {
     });
   }
 
-  AssistDbEntry.prototype.showContextPopover = function (entry, event, pinEnabled) {
+  AssistDbEntry.prototype.showContextPopover = function (entry, event) {
+    var self = this;
     var $source = $(event.target);
     var offset = $source.offset();
-    entry.statsVisible(true);
+    self.statsVisible(true);
     huePubSub.publish('sql.context.popover.show', {
       data: {
-        type: entry.definition.isColumn ? 'column' : 'table',
-        identifierChain: entry.definition.isColumn ? [{ name: entry.tableName }, { name: entry.columnName }] : [{ name: entry.tableName }]
+        type: self.definition.isColumn ? 'column' : 'table',
+        identifierChain: self.definition.isColumn ? [{ name: self.tableName }, { name: self.columnName }] : [{ name: self.tableName }]
       },
       orientation: 'right',
-      sourceType: entry.sourceType,
-      defaultDatabase: entry.databaseName,
-      pinEnabled: pinEnabled,
+      sourceType: self.sourceType,
+      defaultDatabase: self.databaseName,
+      pinEnabled: self.navigationSettings.pinEnabled,
       source: {
         element: event.target,
         left: offset.left,
@@ -169,7 +170,7 @@ var AssistDbEntry = (function () {
       }
     });
     huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
-      entry.statsVisible(false);
+      self.statsVisible(false);
     });
   };
 
