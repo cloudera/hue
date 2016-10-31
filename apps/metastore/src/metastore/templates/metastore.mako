@@ -43,11 +43,7 @@ ${ components.menubar() }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-<script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
@@ -60,8 +56,6 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
-<link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -392,7 +386,7 @@ ${ assist.assistPanel() }
               </div>
             </div>
           </div>
-          <div class="span3 tile">
+          <div class="span6 tile">
             <!-- ko if: $root.navigatorEnabled()  -->
             <h4>${ _('Tagging') }</h4>
             <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
@@ -415,10 +409,16 @@ ${ assist.assistPanel() }
 
       <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats() && $root.database().optimizerStats().length > 0 -->
       <div class="span4 tile chart-container">
-        <h4>${ _('Popular tables') }</h4>
+        <h4>${ _('Popularity') }</h4>
 
-        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: $root.database().optimizerStats().sort(function(a, b) { return -(a.popularity - b.popularity); }).slice(0, 5)}, fqs: ko.observableArray([]),
-                      transformer: pieChartDataTransformer, maxWidth: 200, parentSelector: '.chart-container' }" class="chart"></div>
+        <ul>
+          <li>
+            <span>Diagram?</span>
+          </li>
+          <li>
+            <span>DB specific stats</span>
+          </li>
+        </ul>
 
       </div>
       <!-- /ko -->
@@ -487,20 +487,20 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <td class="center">
-                <!-- ko if: type == 'Table' -->
-                  <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
+                <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
+                  <!-- ko if: type == 'Table' -->
+                    <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
+                  <!-- /ko -->
+                  <!-- ko if: type == 'View' -->
+                    <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
+                  <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko if: type == 'View' -->
-                  <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
-                <!-- /ko -->
-                <!-- ko if: $root.optimizerEnabled  -->
-                  <!-- ko if: optimizerStats() -->
-                    <!-- ko if: optimizerStats().is_fact -->
-                      <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
-                    <!-- /ko -->
-                    <!-- ko ifnot: optimizerStats().is_fact -->
-                      <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
-                    <!-- /ko -->
+                <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
+                  <!-- ko if: optimizerStats().is_fact -->
+                    <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
+                  <!-- /ko -->
+                  <!-- ko ifnot: optimizerStats().is_fact -->
+                    <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
                   <!-- /ko -->
                 <!-- /ko -->
               </td>

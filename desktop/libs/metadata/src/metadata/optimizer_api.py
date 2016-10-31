@@ -78,7 +78,7 @@ def top_tables(request):
   len = request.POST.get('len', 1000)
 
   api = OptimizerApi()
-  data = api.top_tables()
+  data = api.top_tables(database_name=database)
 
   tables = [{
       'eid': table['eid'],
