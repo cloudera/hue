@@ -196,8 +196,17 @@ from django.utils.translation import ugettext as _
 
       </%def>
       <%def name="widgets()">
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Text Facet')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
+                       <i class="fa fa-sort-amount-asc"></i>
+         </a>
+    </div>
+    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+                    draggable: {data: draggableTextFacet(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
@@ -494,7 +503,57 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="facet-toggle2">
-  <!-- ko if: $root.isEditing -->
+
+    ## Dimension 1
+   <div class="facet-field-cnt" data-bind="visible: properties.canRange">
+      <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
+      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet">
+        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
+        <span data-bind="visible: type() == 'range'">${_('range')}</span>
+        <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
+        <span data-bind="visible: type() == 'field'">${_('field')}</span>
+      </a>
+    </div>
+    <div class="facet-field-cnt">
+      <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
+      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
+        <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+        <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
+        <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+      </a>
+    </div>
+
+    <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
+      <!-- ko ifnot: properties.isDate() -->
+        <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
+      <!-- /ko -->
+      <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
+        <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
+        <br/>
+      <!-- /ko -->
+    <!-- /ko -->
+
+    
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Limit') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
+        </span>
+      </div>
+    
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">
+            ${ _('Min Count') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+        </span>
+      </div>
+
+  ## Dimensions > 1
+  <!-- ko if: $root.isEditing -->  
   <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
     <div class="filter-box">
       <div class="title">
@@ -504,7 +563,7 @@ ${ dashboard.layout_skeleton() }
         <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
         <div class="clearfix"></div>
       </div>
-
+ 
       <div class="content">
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
@@ -534,6 +593,7 @@ ${ dashboard.layout_skeleton() }
     </div>
   </span>
   <!-- /ko -->
+
   <!-- ko ifnot: $root.isEditing -->
   <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
     <div class="filter-box" style="opacity: 0.7">
@@ -719,6 +779,110 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 </script>
+
+
+<script type="text/html" id="text-facet-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span data-bind="template: { name: 'facet-toggle2', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
+      </span>
+    </div>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <!-- ko if: properties.type() == 'field' -->
+        <div data-bind="foreach: $parent.counts">
+          <div class="trigger-exclude">
+              <!-- ko if: $index() < $parent.properties.limit() -->
+                <!-- ko if: ! $data.selected -->
+                  <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+                  <div class="hellip">
+                    <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
+                    <span class="pointer counter" dir="rtl" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                  </div>
+                <!-- /ko -->
+                <!-- ko if: $data.selected -->
+                  <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
+                    <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                    <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+                    <div class="hellip">
+                      <strong data-bind="html: prettifyDate($data.value), attr: {'title': $data.value}"></strong>
+                    </div>
+                  </span>
+                <!-- /ko -->
+              <!-- /ko -->
+              <!-- ko if: $index() == $parent.properties.limit() -->
+                <!-- ko if: $parent.properties.prevLimit == undefined || $parent.properties.prevLimit == $parent.properties.limit() -->
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                    ${ _('Show more...') }
+                  </a>
+                <!-- /ko -->
+                <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                    ${ _('Show more') }
+                  </a>
+                  /
+                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
+                    ${ _('less...') }
+                  </a>
+                <!-- /ko -->
+              <!-- /ko -->
+          </div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: properties.type() == 'range' -->
+        <div data-bind="foreach: $parent.counts">
+          <div class="trigger-exclude">
+              <!-- ko if: ! selected -->
+                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+                <div class="hellip">
+                  <a class="pointer" data-bind="html: $data.is_single_unit_gap ? prettifyDate($data.from, $parent, $data.to) : prettifyDateRange($data.from, $data.to, $parent, false), click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }, attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></a>
+                  <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
+                </div>
+              <!-- /ko -->
+              <!-- ko if: selected -->
+                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }">
+                  <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                  <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+                  <div class="hellip">
+                    <strong data-bind="html: $data.is_single_unit_gap ? prettifyDate($data.from, $parent, $data.to) : prettifyDateRange($data.from, $data.to, $parent, false), attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></strong>
+                  </div>
+                </span>
+              <!-- /ko -->
+          </div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: properties.type() == 'range-up' -->
+        <div data-bind="foreach: $parent.counts">
+          <div class="trigger-exclude">
+              <!-- ko if: ! selected -->
+                <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+                <div class="hellip">
+                  <a class="pointer" data-bind="html: prettifyDate($data.from, $parent) + ($data.is_up ? ' & Up' : ' & Less'), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }, attr: {'title': $data.from + ($data.is_up ? ' & Up' : ' & Less') + ' (' + $data.total_counts + ')'}"></a>
+                  <span class="pointer counter" data-bind="text: ' (' + $data.total_counts + ')', click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></span>
+                </div>
+              <!-- /ko -->
+              <!-- ko if: selected -->
+                <span class="pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }">
+                  <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                  <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+                  <div class="hellip">
+                    <strong data-bind="html: prettifyDate($data.from, $parent) + ($data.is_up ? ' & Up' : ' & Less')"></strong>
+                  </div>
+                </span>
+              <!-- /ko -->
+          </div>
+        </div>
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
 
 <script type="text/html" id="resultset-widget">
   <!-- ko if: $root.collection.template.isGridLayout() -->
