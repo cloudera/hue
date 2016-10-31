@@ -562,7 +562,9 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget'):
+    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget'):
+      if widget_type == 'text-facet-widget':
+        properties['type'] = facet_type
       facet_type = 'nested'
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []
@@ -571,7 +573,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['timelineChartType'] = 'bar'
       elif widget_type == 'tree2-widget':
         properties['scope'] = 'tree'
-        properties['limit'] = 5
+        properties['facets_form']['limit'] = 5
         properties['isOldPivot'] = True
       else:
         properties['scope'] = 'stack'

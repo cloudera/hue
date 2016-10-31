@@ -302,6 +302,7 @@ class SolrApi(object):
       timeFilter = self._get_range_borders(collection, query)
 
       for facet in collection['facets']:
+        print facet
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
         elif facet['type'] == 'range' or facet['type'] == 'range-up':

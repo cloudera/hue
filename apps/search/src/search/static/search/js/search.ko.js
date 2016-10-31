@@ -589,6 +589,9 @@ var Collection = function (vm, collection) {
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
+    facet.properties.mincount.subscribe(function () {
+      vm.search();
+    });
     if (facet.properties.gap) {
       facet.properties.gap.subscribe(function () {
         vm.search();
@@ -735,6 +738,9 @@ var Collection = function (vm, collection) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
           facet.properties.limit.subscribe(function () {
+            vm.search();
+          });
+          facet.properties.mincount.subscribe(function () {
             vm.search();
           });
           if (facet.properties.gap) {
@@ -1348,8 +1354,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   }
 
-  self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget"));
-  self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget"));
+  self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget")); // Not used
+  self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget")); // Deprecated
   self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget"));
   self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget"));
   self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget")); // Deprecated
@@ -1367,6 +1373,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableTimeline = ko.observable(bareWidgetBuilder("Timeline", "timeline-widget"));
   self.draggableGradienMap = ko.observable(bareWidgetBuilder("Gradient Map", "gradient-map-widget"));
   self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget"));
+  self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget")); 
+
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
