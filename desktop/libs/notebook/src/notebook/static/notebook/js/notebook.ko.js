@@ -291,7 +291,13 @@ var EditorViewModel = (function() {
       return ApiHelper.getInstance(vm);
     };
 
-    self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
+    self.database = ko.observable();
+    self.database.subscribe(function (newValue) {
+      if (newValue !== null) {
+        self.getApiHelper().setInTotalStorage('editor', 'last.selected.database', newValue);
+      }
+    });
+    self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
     self.availableDatabases = ko.observableArray();
 
     var updateDatabases = function () {

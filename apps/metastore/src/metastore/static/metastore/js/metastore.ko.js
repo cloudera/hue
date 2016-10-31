@@ -191,7 +191,7 @@ var MetastoreViewModel = (function () {
     });
 
 
-    $.totalStorage('hue.metastore.lastdb', self.name);
+    self.apiHelper.setInTotalStorage('metastore', 'last.selected.database', self.name);
   };
 
   MetastoreDatabase.prototype.setTableByName = function (tableName) {
@@ -762,7 +762,8 @@ var MetastoreViewModel = (function () {
 
     var setDatabaseByName = function (databaseName, callback) {
       if (databaseName === '') {
-        databaseName = $.totalStorage('hue.metastore.lastdb') || 'default';
+        databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
+            self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
       }
       if (self.database() && self.database().name == databaseName) {
         if (callback) {
@@ -775,6 +776,13 @@ var MetastoreViewModel = (function () {
       });
       if (foundDatabases.length === 1) {
         self.setDatabase(foundDatabases[0], callback);
+      } else {
+        foundDatabases = $.grep(self.databases(), function (database) {
+          return database.name === 'default';
+        });
+        if (foundDatabases.length === 1) {
+          self.setDatabase(foundDatabases[0], callback);
+        }
       }
     };
 
