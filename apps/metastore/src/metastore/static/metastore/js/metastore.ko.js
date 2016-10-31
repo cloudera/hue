@@ -58,7 +58,7 @@ var MetastoreViewModel = (function () {
         });
       }
       return returned.sort(function (a, b) {
-    	if (options.optimizerEnabled()) {
+        if (options.optimizerEnabled()) {
           if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
             if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
               if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
@@ -81,7 +81,7 @@ var MetastoreViewModel = (function () {
 
     self.editingTable = ko.observable(false);
     self.table = ko.observable(null);
-    
+
     self.addTags = function () {
       $.post('/metadata/api/navigator/add_tags', {
         id: ko.mapping.toJSON(self.navigatorStats().identity),
@@ -96,7 +96,7 @@ var MetastoreViewModel = (function () {
         }
       });
     };
-      
+
     self.deleteTags = function (tag) {
       $.post('/metadata/api/navigator/delete_tags', {
         id: ko.mapping.toJSON(self.navigatorStats().identity),
@@ -314,9 +314,9 @@ var MetastoreViewModel = (function () {
   };
 
   function MetastoreTableDetails(details) {
-	var self = this;
+    var self = this;
   }
-  
+
   /**
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
@@ -480,24 +480,26 @@ var MetastoreViewModel = (function () {
               }, function(data) {
                 if (data && data.status == 0) {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
-                  self.getRelationships();
+                  // self.getRelationships();
                 } else {
                   $(document).trigger("info", data.message);
                 }
               }).fail(function (xhr, textStatus, errorThrown) {
                 $(document).trigger("error", xhr.responseText);
               });
-            } else if (self.optimizerEnabled) {
+            }
+            if (self.optimizerEnabled) {
               $.post('/metadata/api/optimizer_api/table_details', {
+                databaseName: self.database.name,
                 tableName: self.name
               }, function(data){
                 self.loadingQueries(false);
                 if (data && data.status == 0) {
                   self.optimizerDetails(ko.mapping.fromJS(data.details));
-                  
+
                   // Bump the most important columns first
                   var topCol = self.optimizerDetails().table_donut.topColumns().slice(0, 5);
-                  if (topCol.length >= 3 && self.favouriteColumns().length > 0) { 
+                  if (topCol.length >= 3 && self.favouriteColumns().length > 0) {
                     self.favouriteColumns($.grep(self.columns(), function(col) {
                         return topCol.indexOf(col.name()) != -1;
                       })
@@ -547,7 +549,7 @@ var MetastoreViewModel = (function () {
         }
       });
     };
-    
+
     self.deleteTags = function (tag) {console.log(tag);
       $.post('/metadata/api/navigator/delete_tags', {
         id: ko.mapping.toJSON(self.navigatorStats().identity),
@@ -560,7 +562,7 @@ var MetastoreViewModel = (function () {
         }
       });
     };
-    
+
     self.getRelationships = function () {
       $.post('/metadata/api/navigator/lineage', {
         id: self.navigatorStats().identity

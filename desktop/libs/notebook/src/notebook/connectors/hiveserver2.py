@@ -487,20 +487,25 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
-    session = self._get_session(notebook, snippet['type'])
-    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+    query = response['statement']
 
     api = OptimizerApi()
 
-    return api.query_risk(query=query)
+    data = api.query_risk(query=query)
+    data = data.get(snippet['type'] + 'Risk', {})
+
+    return {
+      'risk': data.get('risk'),
+      'riskAnalysis': data.get('riskAnalysis'),
+      'riskRecommendation': data.get('riskRecommendation')
+    }
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
-    session = self._get_session(notebook, snippet['type'])
-    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+    query = response['statement']
 
     api = OptimizerApi()
 

@@ -710,7 +710,7 @@ def statement_risk(request):
 
   api = get_api(request, snippet)
 
-  response['data'] = api.query_risk(notebook, snippet)
+  response['query_complexity'] = api.statement_risk(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -729,7 +729,7 @@ def statement_compatibility(request):
 
   api = get_api(request, snippet)
 
-  response['data'] = api.statement_compatibility(notebook, snippet, source_platform=source_platform, target_platform=target_platform)
+  response['query_compatibility'] = api.statement_compatibility(notebook, snippet, source_platform=source_platform, target_platform=target_platform)
   response['status'] = 0
 
   return JsonResponse(response)

@@ -111,15 +111,38 @@ class TestOptimizerApi(object):
     database_name = 'default'
     resp = self.api.top_tables(database_name=database_name)
 
-    assert_true(isinstance(resp['results'], list), resp) # No status code currently
+    assert_true(isinstance(resp['results'], list), resp)
+
+    assert_true('eid' in resp['results'][0], resp)
+    assert_true('name' in resp['results'][0], resp)
 
 
   def test_table_details(self):  # Requires test_upload to run before
     resp = self.api.table_details(database_name='default', table_name='emps')
+
     assert_equal('success', resp['status'], resp)
+    assert_true('columnCount' in resp, resp)
+    assert_true('createCount' in resp, resp)
+    assert_true('table_ddl' in resp, resp)
+    assert_true('deleteCount' in resp, resp)
+    assert_true('iview_ddl' in resp, resp)
+    assert_true('updateCount' in resp, resp)
+    assert_true('colStats' in resp, resp)
+    assert_true('joinCount' in resp, resp)
+    assert_true('view_ddl' in resp, resp)
+    assert_true('tableStats' in resp, resp)
+    assert_true('queryCount' in resp, resp)
+    assert_true('selectCount' in resp, resp)
+    assert_true('insertCount' in resp, resp)
+    assert_true('tid' in resp, resp)
+    assert_true('type' in resp, resp)
+    assert_true('name' in resp, resp)
 
     resp = self.api.table_details(database_name='db1', table_name='Part')
+
     assert_equal('success', resp['status'], resp)
+    assert_true('tid' in resp, resp)
+    assert_true('columnCount' in resp, resp)
 
 
   def test_query_risk(self):
@@ -127,25 +150,32 @@ class TestOptimizerApi(object):
 
     resp = self.api.query_risk(query=query)
 
-    assert_equal('successs', resp['status'], resp)
+    assert_equal('success', resp['status'], resp)
 
-    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+    assert_true('impalaRisk' in resp, resp)
+    assert_true('riskAnalysis' in resp['impalaRisk'], resp)
+    assert_true('risk' in resp['impalaRisk'], resp)
+    assert_true('riskRecommendation' in resp['impalaRisk'], resp)
 
-    assert_equal('FAIL', details['hiveRisk']['risk'], resp)
+    assert_true('hiveRisk' in resp, resp)
+    assert_true('riskAnalysis' in resp['hiveRisk'], resp)
+    assert_true('risk' in resp['hiveRisk'], resp)
+    assert_true('riskRecommendation' in resp['hiveRisk'], resp)
 
 
   def test_query_compatibility(self):
-    source_platform = 'Hive'
-    target_platform = 'Impala'
+    source_platform = 'hive'
+    target_platform = 'impala'
     query = 'Select * from (Select item.id from item)'
 
     resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
-    assert_equal('successs', resp['status'], resp)
+    assert_equal('success', resp['status'], resp)
 
-    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
-
-    assert_equal('FAIL', details['platformCompilationStatus']['Hive']['queryStatus'], resp)
+    assert_true('clauseName' in resp, resp)
+    assert_true('clauseError' in resp, resp)
+    assert_true('queryError' in resp, resp)
+    assert_true('clauseString' in resp, resp)
 
 
   def test_similar_queries(self):
