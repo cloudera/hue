@@ -845,9 +845,6 @@ def augment_solr_response(response, collection, query):
           dimension = 2
           counts = _augment_stats_2d(name, facet, counts, selected_values)
 
-        if collection_facet['properties']['sort'] == 'asc':
-          counts.reverse()
-
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
