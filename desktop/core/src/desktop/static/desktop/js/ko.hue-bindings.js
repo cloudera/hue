@@ -605,6 +605,46 @@
     }
   };
 
+
+  ko.bindingHandlers.contextSubMenu = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var menuSelector = valueAccessor();
+      var $element = $(element);
+
+      var $menu = $element.find(menuSelector);
+      var $parentMenu = $element.parent('.hue-context-menu');
+      var open = false;
+
+      var closeSubMenu = function () {
+        open = false;
+        $menu.hide();
+        $element.removeClass('active');
+      };
+
+      var hideTimeout = -1;
+      $element.add($menu).on('mouseenter', function () {
+        $element.addClass('active');
+        if (!open) {
+          huePubSub.publish('hue.sub.menu.close');
+        }
+        open = true;
+        window.clearTimeout(hideTimeout);
+        var menuHeight = $menu.outerHeight();
+        $menu.css('top', ($element.position().top + $parentMenu.position().top + menuHeight > $(window).height()) ? $(window).height() - menuHeight - 8 : $element.position().top + $parentMenu.position().top);
+        $menu.css('left', $element.offset().left + $element.outerWidth(true));
+        $menu.css('opacity', 0);
+        $menu.show();
+        $menu.css('opacity', 1);
+        huePubSub.subscribeOnce('hue.sub.menu.close', closeSubMenu);
+      });
+
+      $element.add($menu).on('mouseleave', function () {
+        window.clearTimeout(hideTimeout);
+        hideTimeout = window.setTimeout(closeSubMenu, 300);
+      });
+    }
+  };
+
   ko.bindingHandlers.templateContextMenu = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
