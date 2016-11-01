@@ -505,7 +505,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="facet-toggle2">
 
     ## Dimension 1
-    <!-- ko if: properties.canRange -->
+    <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
       <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet">

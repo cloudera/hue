@@ -374,6 +374,8 @@ class SolrApi(object):
               _f['facet'] = {
                   'd2': self._get_aggregate_function(facet['properties']['facets'][0])
               }
+              _f['sort'] = {'d2': facet['properties']['sort']}
+              # filter = '-d2:NaN' # Solr 6.4
 
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
