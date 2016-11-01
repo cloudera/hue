@@ -1804,7 +1804,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         self.collection.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("collection") == -1) {
-          window.location.hash = '#collection=' + data.id;
+          hueUtils.changeURL('/search/?collection=' + data.id);
         }
       }
       else {

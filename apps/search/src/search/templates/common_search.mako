@@ -25,12 +25,6 @@ from django.utils.translation import ugettext as _
 <%def name="page_structure(is_mobile=False)">
 
 <script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("collection") > -1) {
-      location.href = "/search/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-  }
-
   SLIDER_LABELS = {
     STEP: "${_('Increment')}"
   }
