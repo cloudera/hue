@@ -86,16 +86,14 @@ class CollectionManagerController(object):
         solr_collections = api.collections()
         for name in solr_collections:
           solr_collections[name]['isCoreOnly'] = False
-      else:
-        solr_collections = {}
 
-      solr_aliases = api.aliases()
-      for name in solr_aliases:
-        solr_aliases[name] = {
-            'isCoreOnly': False,
-            'isAlias': True,
-            'collections': solr_aliases[name]
-        }
+        solr_aliases = api.aliases()
+        for name in solr_aliases:
+          solr_aliases[name] = {
+              'isCoreOnly': False,
+              'isAlias': True,
+              'collections': solr_aliases[name]
+          }
 
       solr_cores = api.cores()
       for name in solr_cores:
