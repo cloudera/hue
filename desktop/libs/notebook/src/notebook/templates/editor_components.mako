@@ -3217,7 +3217,19 @@ ${ hueIcons.symbols() }
       var snip = viewModel.selectedNotebook().snippets()[0];
       if (snip) {
         snip.statement_raw(content);
+        snip.result.statements_count(1);
         snip.ace().setValue(content, 1);
+        snip.result.statement_range({
+          start: {
+            row: 0,
+            column: 0
+          },
+          end: {
+            row: 0,
+            column: 0
+          }
+        });
+        snip.ace()._emit('focus');
       }
       hideHoverMsg(viewModel);
       redrawFixedHeaders(200);
