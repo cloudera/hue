@@ -335,7 +335,7 @@ class SolrApi(object):
         elif facet['type'] == 'nested':
           _f = {
               'field': facet['field'],
-              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
+              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
               'mincount': int(facet['properties']['mincount']),
               'sort': {'count': facet['properties']['sort']}
           }
