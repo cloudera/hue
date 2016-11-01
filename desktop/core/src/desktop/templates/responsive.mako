@@ -357,12 +357,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
-<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
-<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 
+${ assist.assistJSModels() }
 
 ## Dynamic loading of apps
 ##<script src="${ static('desktop/ext/js/text.js') }"></script>

@@ -36,12 +36,9 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
-<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
-<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
+${ assist.assistJSModels() }
+
 <script src="${ static('desktop/js/home2.vm.js') }"></script>
 
 ${ assist.assistPanel() }

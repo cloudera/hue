@@ -183,13 +183,8 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
-<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
-<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 
+${ assist.assistJSModels() }
 
 <script type="text/javascript">
   ko.options.deferUpdates = true;

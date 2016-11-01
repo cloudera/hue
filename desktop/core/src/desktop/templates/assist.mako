@@ -23,6 +23,15 @@ from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
 %>
 
+<%def name="assistJSModels()">
+<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistCollectionEntry.js') }"></script>
+<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
+<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+</%def>
 
 <%def name="assistPanel(is_s3_enabled=False)">
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
