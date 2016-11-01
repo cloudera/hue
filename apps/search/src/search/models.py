@@ -681,7 +681,7 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap'])) is not None
   is_up = collection_facet['properties']['sort'] == 'asc'
 
-  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] == 'range-up':
+  if collection_facet['properties']['sort'] == 'asc' and (collection_facet['type'] == 'range-up' or collection_facet['properties'].get('type') == 'range-up'):
     prev = None
     n = []
     for e in iterable:
@@ -713,7 +713,7 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
     })
     total_counts += counts.pop(0) if counts else 0
 
-  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up':
+  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up' and collection_facet['properties'].get('type') != 'range-up':
     pairs.reverse()
 
   return pairs
@@ -813,7 +813,7 @@ def augment_solr_response(response, collection, query):
         counts = response['facets'][name]['buckets']
 
         # Number or Date range
-        if collection_facet['properties']['canRange']:
+        if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
           dimension = 3
           # Single dimension or dimension 2 with analytics
           if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):

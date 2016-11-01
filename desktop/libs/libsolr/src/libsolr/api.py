@@ -340,7 +340,7 @@ class SolrApi(object):
               'sort': {'count': facet['properties']['sort']}
           }
 
-          if 'start' in facet['properties']:
+          if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
             _f.update({
                 'type': 'range',
                 'start': facet['properties']['start'],
@@ -355,6 +355,8 @@ class SolrApi(object):
                 'field': facet['field'],
                 'excludeTags': facet['id']
             })
+            if facet['properties']['canRange'] and not facet['properties']['isDate']:
+              del _f['mincount'] # Numeric fields do not support
 
           if facet['properties']['facets']:
             if facet['properties']['facets'][0]['aggregate'] == 'count':
@@ -375,7 +377,7 @@ class SolrApi(object):
                   'd2': self._get_aggregate_function(facet['properties']['facets'][0])
               }
               _f['sort'] = {'d2': facet['properties']['sort']}
-              # filter = '-d2:NaN' # Solr 6.4
+              # domain = '-d2:NaN' # Solr 6.4
 
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':

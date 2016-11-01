@@ -1112,7 +1112,21 @@ var Collection = function (vm, collection) {
     vm.search();
   };
 
-  self.toggleRangeFacet = function (facet_field, event) {
+  self.toggleSortFacet2 = function (facet_field, event) {
+    if (facet_field.properties.sort() == 'desc') {
+      facet_field.properties.sort('asc');
+    } else {
+      facet_field.properties.sort('desc');
+    }
+
+    if (facet_field.properties.type() == 'range-up') {
+      vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+    }
+
+    vm.search();
+  };
+
+  self.toggleRangeFacet = function (facet_field, event) { // Deprecated after Hue 4
     vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
 
     if (facet_field.type() == 'field') {
@@ -1121,6 +1135,20 @@ var Collection = function (vm, collection) {
        facet_field.type('range-up')
      } else if (facet_field.type() == 'range-up') {
        facet_field.type('field')
+     }
+
+    vm.search();
+  };
+
+  self.toggleRangeFacet2 = function (facet_field, event) {
+    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
+
+    if (facet_field.properties.type() == 'field') {
+       facet_field.properties.type('range');
+     } else if (facet_field.properties.type() == 'range') {
+       facet_field.properties.type('range-up')
+     } else if (facet_field.properties.type() == 'range-up') {
+       facet_field.properties.type('field')
      }
 
     vm.search();

@@ -508,18 +508,18 @@ ${ dashboard.layout_skeleton() }
     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet">
+      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet2">
         <i class="fa" data-bind="css: { 'fa-arrows-h': properties.type() == 'range', 'fa-circle': properties.type() == 'field', 'fa-level-up': properties.type() == 'range-up' }, attr: { title: properties.type() == 'field' ? 'Range' : properties.type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
-        <span data-bind="visible: type() == 'range'">${_('range')}</span>
-        <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
-        <span data-bind="visible: type() == 'field'">${_('field')}</span>
+        <span data-bind="visible: properties.type() == 'range'">${_('range')}</span>
+        <span data-bind="visible: properties.type() == 'range-up'">${_('range & up')}</span>
+        <span data-bind="visible: properties.type() == 'field'">${_('field')}</span>
       </a>
     </div>
     <!-- /ko -->
 
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
+      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet2">
         <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
         <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
