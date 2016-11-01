@@ -179,13 +179,12 @@ class TestOptimizerApi(object):
 
 
   def test_similar_queries(self):
-    source_platform = 'Hive'
+    source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
 
     resp = self.api.similar_queries(source_platform=source_platform, query=query)
 
     assert_equal('successs', resp['status'], resp)
 
-    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
-
-    assert_equal([], details['details']['similarQueries'], resp)
+    assert_true('querySignature' in resp, resp)
+    assert_true('query' in resp, resp)
