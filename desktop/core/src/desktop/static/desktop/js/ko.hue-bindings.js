@@ -600,7 +600,53 @@
       $(document).click(function (event) {
         if ($element.find($(event.target)).length === 0) {
           menu.hide();
+        }
+      });
+    }
+  };
+
+  ko.bindingHandlers.templateContextMenu = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor();
+
+      element.addEventListener("contextmenu", function(event) {
+        if(document.selection && document.selection.empty) {
+          document.selection.empty();
+        } else if(window.getSelection) {
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+        }
+
+        var $menu = $('#hueContextMenu_' + options.template);
+        if ($menu.length === 0) {
+          $menu = $('<ul id="hueContextMenu_' + options.template  + '" class="hue-context-menu" data-bind="template: { name: \'' + options.template + '\', data: viewModel, afterRender: afterRender }"></ul>').appendTo('body');
+        }
+        ko.cleanNode($menu[0]);
+
+        $menu.css('top', 0);
+        $menu.css('left', 0);
+        $menu.css('opacity', 0);
+        $menu.show();
+
+        var hideMenu = function () {
+          $menu.hide();
+          ko.cleanNode($menu[0]);
         };
+
+        ko.applyBindings({
+          afterRender: function () {
+            var menuWidth = $menu.outerWidth(true);
+            var menuHeight = $menu.outerHeight(true);
+            $menu.css('left', (event.clientX + menuWidth > $(window).width()) ? $(window).width() - menuWidth : event.clientX);
+            $menu.css('top', (event.clientY + menuHeight > $(window).height()) ? $(window).height() - menuHeight : event.clientY);
+            $menu.css('opacity', 1);
+            $(options.scrollContainer).one('scroll', hideMenu);
+            $(document).one('click', hideMenu);
+          },
+          viewModel: viewModel
+        }, $menu[0]);
+        event.preventDefault();
+        event.stopPropagation();
       });
     }
   };

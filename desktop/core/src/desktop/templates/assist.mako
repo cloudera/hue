@@ -457,13 +457,17 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-items">
+    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-pencil"></i> ${ _('Insert...') }</a></li>
+  </script>
+
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
         <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span>
       </a>
@@ -478,13 +482,13 @@ from metadata.conf import has_navigator
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }">
-        <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span>
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, click: toggleOpen, attr: {'title': definition.title }">
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="multiClick: { dblClick: dblClick }, attr: {'title': definition.title }">
-        <span class="highlightable" data-bind="css: {'query-builder-menu': definition.isColumn, 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
+      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, event: { dblClick: dblClick }, attr: {'title': definition.title }">
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
       </div>
       <!-- /ko -->
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
