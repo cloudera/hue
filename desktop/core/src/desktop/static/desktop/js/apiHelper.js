@@ -55,6 +55,10 @@ var ApiHelper = (function () {
     huePubSub.subscribe('assist.clear.hdfs.cache', function () {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hdfs'), {});
     });
+
+    huePubSub.subscribe('assist.clear.s3.cache', function () {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('s3'), {});
+    });
   }
 
   ApiHelper.prototype.hasExpired = function (timestamp) {
