@@ -17,13 +17,20 @@
 import datetime
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
 from django.utils.translation import ugettext as _
+from aws import get_client
 %>
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
       <ul class="nav nav-pills hueBreadcrumbBar">
-        %if path.lower().find('s3a://') != 0:
-        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        %if path.lower().find('s3a://') == 0:
+          <li style="padding-top: 10px">
+            <span class="homeLink" title="${ _('S3 region %s') % get_client()._region }">
+              <i class="fa fa-fw fa-cubes"></i> ${ get_client()._region }
+            </span>
+          </li>
+        %else:
+          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         %endif
         <li>
             <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
