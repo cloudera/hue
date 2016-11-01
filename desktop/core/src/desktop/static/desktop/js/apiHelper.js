@@ -31,6 +31,7 @@ var ApiHelper = (function () {
   var NAV_DELETE_TAGS_API = '/metadata/api/navigator/delete_tags';
   var NAV_LIST_TAGS_API = '/metadata/api/navigator/list_tags';
   var NAV_FIND_ENTITY_API = '/metadata/api/navigator/find_entity';
+  var SOLR_COLLECTIONS_API = '/indexer/api/collections/';
 
   /**
    * @param {Object} i18n
@@ -58,6 +59,10 @@ var ApiHelper = (function () {
 
     huePubSub.subscribe('assist.clear.s3.cache', function () {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('s3'), {});
+    });
+
+    huePubSub.subscribe('assist.clear.collections.cache', function () {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('collections'), {});
     });
   }
 
@@ -328,6 +333,54 @@ var ApiHelper = (function () {
 
     fetchCached.bind(self)($.extend({}, options, {
       sourceType: 's3',
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string[]} options.pathParts
+   * @param {number} [options.pageSize] - Default 500
+   * @param {number} [options.page] - Default 1
+   */
+  ApiHelper.prototype.fetchSolrCollections = function (options) {
+    var self = this;
+    var url = SOLR_COLLECTIONS_API + '?format=json';
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        timeout: options.timeout,
+        success: function (data) {
+          if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections.length) {
+            storeInCache(data);
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      sourceType: 'collections',
       url: url,
       fetchFunction: fetchFunction
     }));
