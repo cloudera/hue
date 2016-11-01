@@ -801,6 +801,49 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="assist-collections-header-actions">
+    <div class="assist-db-header-actions" style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-collections-inner-panel">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedCollectionEntry -->
+        <div class="assist-inner-header assist-breadcrumb" >
+          ${_('Collections')}
+          <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-collections-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-collections-scrollable' }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <i class="fa fa-fw fa-search muted valign-middle"></i>
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">${_('No collections available.')}</li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="assist-sources-template">
     <div class="assist-flex-header">
       <div class="assist-inner-header">
@@ -1096,7 +1139,7 @@ from metadata.conf import has_navigator
        * @param {string} options.icon
        * @param {boolean} options.visible
        * @param {boolean} [options.showNavSearch] - Default true
-       * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel)} panelData
+       * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
        * @constructor
        */
       function AssistInnerPanel (options) {
@@ -1382,6 +1425,45 @@ from metadata.conf import has_navigator
         });
       }
 
+      /**
+       * @param {Object} options
+       * @param {ApiHelper} options.apiHelper
+       * @constructor
+       **/
+      function AssistCollectionsPanel (options) {
+        var self = this;
+        self.apiHelper = options.apiHelper;
+
+        self.selectedCollectionEntry = ko.observable();
+        var reload = function () {
+          var currentEntry = new AssistCollectionEntry({
+            definition: {
+              name: '/',
+              type: 'collection'
+            },
+            apiHelper: self.apiHelper
+          });
+          self.selectedCollectionEntry(currentEntry);
+
+          currentEntry.loadEntries();
+        };
+
+        reload();
+
+        huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
+
+        });
+
+        huePubSub.subscribe('assist.dblClickCollectionItem', function (entry) {
+          window.open('/indexer/#edit/' + entry.definition.name);
+        });
+
+        huePubSub.subscribe('assist.collections.refresh', function () {
+          huePubSub.publish('assist.clear.collections.cache');
+          reload();
+        });
+      }
+
       var NAV_FACET_ICON = 'fa-tags';
       var NAV_TYPE_ICONS = {
         'DATABASE': 'fa-database',
@@ -1394,7 +1476,8 @@ from metadata.conf import has_navigator
         'OPERATION_EXECUTION': 'fa-cog',
         'DIRECTORY': 'fa-folder-o',
         'FILE': 'fa-file-o',
-        'SUB_OPERATION': 'fa-code-fork'
+        'SUB_OPERATION': 'fa-code-fork',
+        'COLLECTION': 'fa-search'
       };
 
       /**
@@ -1493,6 +1576,17 @@ from metadata.conf import has_navigator
           minHeight: 50,
           showNavSearch: false,
           visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+        }));
+
+        self.availablePanels.push(new AssistInnerPanel({
+          panelData: new AssistCollectionsPanel({
+            apiHelper: self.apiHelper
+          }),
+          apiHelper: self.apiHelper,
+          name: '${ _("Collections") }',
+          type: 'collections',
+          icon: 'fa-search-plus',
+          minHeight: 50
         }));
         % endif
 
