@@ -46,12 +46,8 @@ ${ components.menubar() }
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
-<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
-<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
+
+${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
