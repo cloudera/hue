@@ -201,21 +201,12 @@ class OptimizerApi(object):
     ])
 
 
-  def similar_queries(self, source_platform, query, token=None, email=None):
-    if token is None:
-      token = self._authenticate()
-
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-          'sourcePlatform': source_platform,
-          'query': query
-      }
-      return self._root.post('/api/similarQueries', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
+  def similar_queries(self, source_platform, query):
+    return self._exec('get-query-risk', [
+        '--tenant', self._product_name,
+        '--source-platform', source_platform,
+        '--query', query
+    ])
 
   def popular_filter_values(self, table_name, column_name=None, token=None, email=None):
     if token is None:

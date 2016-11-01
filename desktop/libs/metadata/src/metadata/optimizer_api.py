@@ -17,7 +17,6 @@
 
 import json
 import logging
-import random
 
 from django.http import Http404
 from django.utils.translation import ugettext as _
