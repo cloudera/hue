@@ -2514,6 +2514,7 @@ body {
 
 .hue-inner-drop-down > li > a:hover,
 .hue-inner-drop-down > li.active,
+.hue-context-menu > li.active,
 .hue-context-menu > li > a:not(.disabled):hover {
   background-color: #DBE8F1;
 }
@@ -2531,7 +2532,7 @@ body {
   vertical-align: middle;
 }
 
-.hue-context-menu > li > a > i {
+.hue-context-menu > li > a > i:not(.sub-icon) {
   position: absolute;
   top: 6px;
   left: 13px;
@@ -2541,6 +2542,19 @@ body {
 
   color: #555;
   font-size: 17px;
+  vertical-align: middle;
+}
+
+.hue-context-menu > li > a > .sub-icon {
+  position: absolute;
+  top: 6px;
+  left: auto;
+  right: 13px;
+  line-height: 22px;
+  height: 24px;
+
+  color: #555;
+  font-size: 12px;
   vertical-align: middle;
 }
 
