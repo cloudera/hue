@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.cloudera.hue.livy</groupId>
         <artifactId>livy-main</artifactId>
-        <version>3.9.0-cdh5.7.5-SNAPSHOT</version>
+        <version>3.9.0-cdh5.7.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>livy-core_2.10</artifactId>
-    <version>3.9.0-cdh5.7.5-SNAPSHOT</version>
+    <version>3.9.0-cdh5.7.5</version>
     <packaging>jar</packaging>
 
     <dependencies>
