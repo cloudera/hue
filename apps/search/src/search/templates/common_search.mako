@@ -1309,38 +1309,36 @@ ${ dashboard.layout_skeleton() }
         </tbody>
       </table>
       
-
-          <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
-            <thead>
-              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
-              </tr>
-              <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
-                <th style="width: 18px">&nbsp;</th>
-                <th>${ _('Document') }</th>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: {data: childDocuments, as: 'doc'}" class="result-tbody">
-              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
-                <td>
-                  <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
-                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
-                    <!-- ko if: doc.childDocuments != undefined -->
-                    &nbsp(<span data-bind="text: doc.childDocuments().length"></span>)
-                    <!-- /ko -->
-                  </a>
-                </td>
-                <!-- ko foreach: row -->
-                  <td data-bind="html: $data"></td>
-                <!-- /ko -->
-              </tr>
-              <tr data-bind="visible: doc.showDetails" class="show-details">
-                <td>&nbsp;</td>
-                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
-                  <span data-bind="template: {name: 'document-details', data: $data}"></span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- ko if: doc.childDocuments != undefined -->
+        <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+          <thead>
+            <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+            </tr>
+            <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
+              <th style="width: 18px">&nbsp;</th>
+              <th>${ _('Child Documents') }</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: {data: childDocuments, as: 'doc'}" class="result-tbody">
+            <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+              <td>
+                <a href="javascript:void(0)" data-bind="click: function() { doc.showDetails(! doc.showDetails()); }">
+                  <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
+                </a>
+              </td>
+              <!-- ko foreach: row -->
+                <td data-bind="html: $data"></td>
+              <!-- /ko -->
+            </tr>
+            <tr data-bind="visible: doc.showDetails" class="show-details">
+              <td>&nbsp;</td>
+              <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+                <span data-bind="template: {name: 'document-details', data: $data}"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      <!-- /ko -->
 
     </div>
   <!-- /ko -->
