@@ -1647,20 +1647,20 @@ from metadata.conf import has_navigator
         }
 
         self.performSearch = function () {
-          if (self.searchInput() === lastQuery) {
-            return;
-          }
           if (self.searchInput() === '') {
             self.searchActive(false);
             return;
           }
           if (!self.searchActive()) {
             self.searchActive(true);
+          } else if (self.searchInput() === lastQuery) {
+            return;
           }
           if (self.searching()) {
             window.setTimeout(function() {
               self.performSearch();
             }, 100);
+            return;
           }
           lastQuery = self.searchInput();
           self.searching(true);
