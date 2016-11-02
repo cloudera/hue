@@ -3083,6 +3083,10 @@ input[type='password']::-ms-reveal {
   margin: 0;
   display: block;
   outline: none;
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .ui-menu .ui-menu {

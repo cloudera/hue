@@ -1020,10 +1020,6 @@ from metadata.conf import has_navigator
   </script>
 
   <style>
-    .nav-autocomplete {
-      background-color: #F8F8F8;
-    }
-
     .nav-autocomplete-item .ui-state-focus {
       border: 1px solid #DBE8F1;
       background-color: #DBE8F1 !important;
