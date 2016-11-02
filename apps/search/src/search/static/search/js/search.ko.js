@@ -450,6 +450,7 @@ var Collection = function (vm, collection) {
   self.label = ko.mapping.fromJS(collection.label);
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
+  self.nested = ko.mapping.fromJS(collection.nested);
   self.enabled = ko.mapping.fromJS(collection.enabled);
   self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
   self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60);
@@ -1563,9 +1564,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                     var _externalLink = item.externalLink;
                     var _details = item.details;
                     var _id = item.hueId;
+                    var _childDocuments = item._childDocuments_;
                     delete item["externalLink"];
                     delete item["details"];
                     delete item["hueId"];
+                    delete item["_childDocuments_"];
                     var fields = self.collection.template.fieldsSelected();
                     // Display selected fields or whole json document
                     if (fields.length != 0) {
@@ -1592,6 +1595,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                       'details': ko.observableArray(_details),
                       'originalDetails': ko.observable(''),
                       'showDetails': ko.observable(false),
+                      'childDocuments': ko.observable(_childDocuments),
                       'leafletmap': leafletmap
                     };
                     if (!self.collection.template.isGridLayout()) {
