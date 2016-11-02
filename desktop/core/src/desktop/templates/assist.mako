@@ -29,6 +29,7 @@ from metadata.conf import has_navigator
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistCollectionEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistHBaseEntry.js') }"></script>
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
 <script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
 </%def>
@@ -903,6 +904,71 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="assist-hbase-header-actions">
+    <div class="assist-db-header-actions" style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hbase.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-hbase-inner-panel">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedHBaseEntry -->
+        <div class="assist-inner-header assist-breadcrumb" >
+          <!-- ko if: definition.host !== '' -->
+          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickHBaseRootItem'); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-th-large" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition.name"></span>
+          </a>
+          <!-- /ko -->
+          <!-- ko if: definition.host === '' -->
+          ${_('Clusters')}
+          <!-- /ko -->
+
+          <!-- ko template: 'assist-hbase-header-actions' --><!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-hbase-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <!-- ko if: definition.host -->
+                  <i class="fa fa-fw fa-th-large muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko ifnot: definition.host -->
+                  <i class="fa fa-fw fa-th muted valign-middle"></i>
+                  <!-- /ko -->
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + definition.name + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">
+                <!-- ko if: definition.host === '' -->
+                ${_('No clusters available.')}
+                <!-- /ko -->
+                <!-- ko if: definition.host !== '' -->
+                ${_('No tables available.')}
+                <!-- /ko -->
+              </li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="assist-sources-template">
     <div class="assist-flex-header">
       <div class="assist-inner-header">
@@ -1519,6 +1585,53 @@ from metadata.conf import has_navigator
         });
       }
 
+      /**
+       * @param {Object} options
+       * @param {ApiHelper} options.apiHelper
+       * @constructor
+       **/
+      function AssistHBasePanel(options) {
+        var self = this;
+        self.apiHelper = options.apiHelper;
+
+        var root = new AssistHBaseEntry({
+          definition: {
+            host: '',
+            name: '',
+            port: 0
+          },
+          apiHelper: self.apiHelper
+        });
+
+        self.selectedHBaseEntry = ko.observable();
+        var reload = function () {
+          self.selectedHBaseEntry(root);
+          root.loadEntries();
+        };
+
+        reload();
+
+        huePubSub.subscribe('assist.clickHBaseItem', function (entry) {
+          if (entry.definition.host) {
+            entry.loadEntries();
+            self.selectedHBaseEntry(entry);
+          }
+        });
+
+        huePubSub.subscribe('assist.clickHBaseRootItem', function (entry) {
+          reload();
+        });
+
+        huePubSub.subscribe('assist.dblClickHBaseItem', function (entry) {
+          window.open('/hbase/#' + self.selectedHBaseEntry().definition.name + '/' + entry.definition.name);
+        });
+
+        huePubSub.subscribe('assist.hbase.refresh', function () {
+          huePubSub.publish('assist.clear.hbase.cache');
+          reload();
+        });
+      }
+
       var NAV_FACET_ICON = 'fa-tags';
       var NAV_TYPE_ICONS = {
         'DATABASE': 'fa-database',
@@ -1532,7 +1645,8 @@ from metadata.conf import has_navigator
         'DIRECTORY': 'fa-folder-o',
         'FILE': 'fa-file-o',
         'SUB_OPERATION': 'fa-code-fork',
-        'COLLECTION': 'fa-search'
+        'COLLECTION': 'fa-search',
+        'HBASE': 'fa-th-large'
       };
 
       /**
@@ -1556,9 +1670,9 @@ from metadata.conf import has_navigator
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
           documentTypes: {
-            'query-hive' : "${ _('Hive Query') }",
-            'query' : "${ _('Query') }",
-            'notebook' : "${ _('Notebook') }"
+            'query-hive': "${ _('Hive Query') }",
+            'query': "${ _('Query') }",
+            'notebook': "${ _('Notebook') }"
           }
         };
         self.apiHelper = ApiHelper.getInstance({
@@ -1569,7 +1683,7 @@ from metadata.conf import has_navigator
         self.navigatorEnabled = ko.observable('${ has_navigator(user) }' === 'True');
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
-        self.searchInput = ko.observable('').extend({ rateLimit: 500 });
+        self.searchInput = ko.observable('').extend({rateLimit: 500});
         self.searchResult = ko.observableArray();
 
         self.searchHasFocus = ko.observable(false);
@@ -1620,6 +1734,28 @@ from metadata.conf import has_navigator
           }
 
           self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistCollectionsPanel({
+              apiHelper: self.apiHelper
+            }),
+            apiHelper: self.apiHelper,
+            name: '${ _("Collections") }',
+            type: 'collections',
+            icon: 'fa-search-plus',
+            minHeight: 50
+          }));
+
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistHBasePanel({
+              apiHelper: self.apiHelper
+            }),
+            apiHelper: self.apiHelper,
+            name: '${ _("HBase") }',
+            type: 'hbase',
+            icon: 'fa-th-large',
+            minHeight: 50
+          }));
+
+          self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
               user: params.user,
               apiHelper: self.apiHelper,
@@ -1632,17 +1768,6 @@ from metadata.conf import has_navigator
             minHeight: 50,
             showNavSearch: false,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-          }));
-
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistCollectionsPanel({
-              apiHelper: self.apiHelper
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("Collections") }',
-            type: 'collections',
-            icon: 'fa-search-plus',
-            minHeight: 50
           }));
         }
 
