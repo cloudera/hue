@@ -1402,7 +1402,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableTimeline = ko.observable(bareWidgetBuilder("Timeline", "timeline-widget"));
   self.draggableGradienMap = ko.observable(bareWidgetBuilder("Gradient Map", "gradient-map-widget"));
   self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget"));
-  self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget")); 
+  self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget"));
 
 
   self.availableDateFields = ko.computed(function() {
@@ -1557,56 +1557,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 if (self.resultsHash != _resultsHash) {
 
                   var _docs = [];
-                  var leafletmap = {};
                   var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
                   $.each(data.response.docs, function (index, item) {
-                    var row = [];
-                    var _externalLink = item.externalLink;
-                    var _details = item.details;
-                    var _id = item.hueId;
-                    var _childDocuments = item._childDocuments_;
-                    delete item["externalLink"];
-                    delete item["details"];
-                    delete item["hueId"];
-                    delete item["_childDocuments_"];
-                    var fields = self.collection.template.fieldsSelected();
-                    // Display selected fields or whole json document
-                    if (fields.length != 0) {
-                      $.each(self.collection.template.fieldsSelected(), function (index, field) {
-                        row.push(item[field]);
-                      });
-                    } else {
-                      row.push(ko.mapping.toJSON(item));
-                    }
-                    if (self.collection.template.leafletmapOn()) {
-                      leafletmap = {
-                        'latitude': item[self.collection.template.leafletmap.latitudeField()],
-                        'longitude': item[self.collection.template.leafletmap.longitudeField()],
-                        'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
-                      }
-                    }
-                    var doc = {
-                      'id': _id,
-                      'row': row,
-                      'item': ko.mapping.fromJS(item),
-                      'showEdit': ko.observable(false),
-                      'hasChanged': ko.observable(false),
-                      'externalLink': ko.observable(_externalLink),
-                      'details': ko.observableArray(_details),
-                      'originalDetails': ko.observable(''),
-                      'showDetails': ko.observable(false),
-                      'childDocuments': ko.observable(_childDocuments),
-                      'leafletmap': leafletmap
-                    };
-                    if (!self.collection.template.isGridLayout()) {
-                      // fix the fields that contain dots in the name
-                      addTemplateFunctions(item);
-                      if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
-                        self.additionalMustache(item);
-                      }
-                      doc.content = Mustache.render(_mustacheTmpl, item);
-                    }
-                    _docs.push(doc);
+                    _docs.push(self._make_result_doc(item));
                   });
                   self.results(_docs);
                 }
@@ -1614,7 +1567,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               }
             }
             catch (e) {
-
+              console.log(e);
             }
           },
           "text")
@@ -1645,6 +1598,73 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         $('.btn-loading').button('reset');
       });
   };
+
+  self._make_result_doc = function(item) {
+      var row = [];
+      var leafletmap = {};
+      var _externalLink = item.externalLink;
+      var _details = item.details;
+      var _id = item.hueId;
+      var _childDocuments = item._childDocuments_;
+      delete item["externalLink"];
+      delete item["details"];
+      delete item["hueId"];
+      delete item["_childDocuments_"];
+      var fields = self.collection.template.fieldsSelected();
+      // Display selected fields or whole json document
+      if (fields.length != 0) {
+        $.each(self.collection.template.fieldsSelected(), function (index, field) {
+          row.push(item[field]);
+        });
+      } else {
+        row.push(ko.mapping.toJSON(item));
+      }
+      if (self.collection.template.leafletmapOn()) {
+        leafletmap = {
+          'latitude': item[self.collection.template.leafletmap.latitudeField()],
+          'longitude': item[self.collection.template.leafletmap.longitudeField()],
+          'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+        }
+      }
+      var doc = {
+        'id': _id,
+        'row': row,
+        'item': ko.mapping.fromJS(item),
+        'showEdit': ko.observable(false),
+        'hasChanged': ko.observable(false),
+        'externalLink': ko.observable(_externalLink),
+        'details': ko.observableArray(_details),
+        'originalDetails': ko.observable(''),
+        'showDetails': ko.observable(false),
+        'leafletmap': leafletmap
+      };
+
+      if (_childDocuments) {
+    	var childRecords = [];
+    	$.each(_childDocuments, function (index, item) {
+    	  var record = self._make_result_doc(item);
+          $.each(item, function(key, val) {
+            var _field = ko.mapping.fromJS({
+                key: key,
+                value: val,
+                hasChanged: false
+            });
+            record.details.push(_field);
+          });
+    	  childRecords.push(record);
+        });
+    	doc['childDocuments'] = ko.observable(childRecords);
+      }
+      if (!self.collection.template.isGridLayout()) {
+        // fix the fields that contain dots in the name
+        addTemplateFunctions(item);
+        if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
+          self.additionalMustache(item);
+        }
+        doc.content = Mustache.render(_mustacheTmpl, item);
+      }
+      return doc;
+  }
 
   self.suggest = function (query, callback) {
     $.post("/search/suggest/", {
