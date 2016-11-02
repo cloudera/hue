@@ -1077,7 +1077,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
-      <div class="nav-assist-search">
+      <div class="nav-assist-search" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }">
         <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i>
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
@@ -1571,6 +1571,7 @@ from metadata.conf import has_navigator
         });
 
         self.navigatorEnabled = ko.observable('${ has_navigator(user) }' === 'True');
+        self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
         self.searchInput = ko.observable('').extend({ rateLimit: 500 });
         self.searchResult = ko.observableArray();
@@ -1597,57 +1598,57 @@ from metadata.conf import has_navigator
           })
         ];
 
-        % if USE_NEW_SIDE_PANELS.get():
-        self.availablePanels.push(new AssistInnerPanel({
-          panelData: new AssistHdfsPanel({
-            apiHelper: self.apiHelper
-          }),
-          apiHelper: self.apiHelper,
-          name: '${ _("HDFS") }',
-          type: 'hdfs',
-          icon: 'fa-folder-o',
-          minHeight: 50
-        }));
-
-        if (window.IS_S3_ENABLED) { // coming from common_header.mako
+        if (self.tabsEnabled) {
           self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistS3Panel({
+            panelData: new AssistHdfsPanel({
               apiHelper: self.apiHelper
             }),
             apiHelper: self.apiHelper,
-            name: '${ _("S3") }',
-            type: 's3',
-            icon: 'fa-cubes',
+            name: '${ _("HDFS") }',
+            type: 'hdfs',
+            icon: 'fa-folder-o',
+            minHeight: 50
+          }));
+
+          if (window.IS_S3_ENABLED) { // coming from common_header.mako
+            self.availablePanels.push(new AssistInnerPanel({
+              panelData: new AssistS3Panel({
+                apiHelper: self.apiHelper
+              }),
+              apiHelper: self.apiHelper,
+              name: '${ _("S3") }',
+              type: 's3',
+              icon: 'fa-cubes',
+              minHeight: 50
+            }));
+          }
+
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistDocumentsPanel({
+              user: params.user,
+              apiHelper: self.apiHelper,
+              i18n: i18n
+            }),
+            apiHelper: self.apiHelper,
+            name: '${ _("Documents") }',
+            type: 'documents',
+            icon: 'fa-files-o',
+            minHeight: 50,
+            showNavSearch: false,
+            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+          }));
+
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistCollectionsPanel({
+              apiHelper: self.apiHelper
+            }),
+            apiHelper: self.apiHelper,
+            name: '${ _("Collections") }',
+            type: 'collections',
+            icon: 'fa-search-plus',
             minHeight: 50
           }));
         }
-
-        self.availablePanels.push(new AssistInnerPanel({
-          panelData: new AssistDocumentsPanel({
-            user: params.user,
-            apiHelper: self.apiHelper,
-            i18n: i18n
-          }),
-          apiHelper: self.apiHelper,
-          name: '${ _("Documents") }',
-          type: 'documents',
-          icon: 'fa-files-o',
-          minHeight: 50,
-          showNavSearch: false,
-          visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-        }));
-
-        self.availablePanels.push(new AssistInnerPanel({
-          panelData: new AssistCollectionsPanel({
-            apiHelper: self.apiHelper
-          }),
-          apiHelper: self.apiHelper,
-          name: '${ _("Collections") }',
-          type: 'collections',
-          icon: 'fa-search-plus',
-          minHeight: 50
-        }));
-        % endif
 
         self.performSearch = function () {
           if (self.searchInput() === lastQuery) {
