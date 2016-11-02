@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -- coding: utf-8 --
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -36,7 +37,7 @@ from metadata.navigator_client import NavigatorApi
 LOG = logging.getLogger(__name__)
 
 
-class TestNavigatorApi(object):
+class TestNavigator(object):
 
   @classmethod
   def setup_class(cls):
@@ -58,9 +59,16 @@ class TestNavigatorApi(object):
     cls.user.save()
 
 
-  def test_search_entities(self):
-    # TODO: write me
-    pass
+  def test_search_entities_view(self):
+    resp = self.client.post(reverse('metadata:search_entities'), {'query_s': json.dumps('châteaux'), 'limit': 25, 'sources': json.dumps(['sql'])})
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+
+
+  def test_search_entities_interactive_view(self):
+    resp = self.client.post(reverse('metadata:search_entities_interactive'), {'query_s': json.dumps('châteaux'), 'limit': 10, 'sources': json.dumps(['sql'])})
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
 
 
   def test_find_entity(self):

@@ -84,7 +84,6 @@ class NavigatorApi(object):
     :param query_s: a query string of search terms (e.g. - sales quarterly);
       Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist
       of search_fields.
-      TODO: support smarter boolean searching with arbitrary ordering and precedence of conditionals
     """
     search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
 
