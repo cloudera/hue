@@ -122,24 +122,28 @@ ${layout.menubar(section='groups')}
   </form>
 </div>
 
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var viewModel;
+  var viewModel = {
+    availableGroups: ko.observableArray(${ groups_json | n,antixss }),
+    chosenGroups: ko.observableArray([])
+  };
+
+  var mainDataTable;
 
   $(document).ready(function () {
-    viewModel = {
-      availableGroups: ko.observableArray(${ groups_json | n,antixss }),
-      chosenGroups: ko.observableArray([])
-    };
 
     ko.applyBindings(viewModel);
 
-    $(".datatables").dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
+    mainDataTable = $(".datatables").dataTable({
+      "sPaginationType":"bootstrap",
+      "iDisplayLength":100,
+      "bLengthChange":false,
+      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "bInfo": false,
-      "bFilter": false,
+      "bFilter": true,
       "bAutoWidth": false,
       "aoColumns": [
         %if user.is_superuser:

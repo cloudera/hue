@@ -138,22 +138,26 @@ ${layout.menubar(section='users')}
 
 </div>
 
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+  var viewModel = {
+    availableUsers: ko.observableArray(${ users_json | n,antixss }),
+    chosenUsers: ko.observableArray([])
+  };
+  var mainDataTable;
   $(document).ready(function () {
-    var viewModel = {
-      availableUsers: ko.observableArray(${ users_json | n,antixss }),
-      chosenUsers: ko.observableArray([])
-    };
 
     ko.applyBindings(viewModel);
 
-    $(".datatables").dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
+    mainDataTable = $(".datatables").dataTable({
+      "sPaginationType":"bootstrap",
+      "iDisplayLength":100,
+      "bLengthChange":false,
+      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "bInfo": false,
-      "bFilter": false,
+      "bFilter": true,
       "aoColumns": [
         %if user.is_superuser:
             { "bSortable": false },

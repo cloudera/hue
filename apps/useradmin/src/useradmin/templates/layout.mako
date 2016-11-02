@@ -81,22 +81,13 @@ def is_selected(section, matcher):
 
   <script type="text/javascript">
     $(document).ready(function () {
-      $("#filterInput").keyup(function () {
-        var shown = 0;
-        $(".datatables tfoot").hide();
-        $.each($(".tableRow"), function (index, value) {
-          if ($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != "") {
-            $(value).hide();
-          }
-          else {
-            $(value).show();
-            shown++;
-          }
-        });
-        if (shown == 0) {
-          $(".datatables tfoot").show();
+
+      $("#filterInput").jHueDelayedInput(function () {
+        if (mainDataTable) {
+          mainDataTable.fnFilter($("#filterInput").val().toLowerCase());
         }
       });
+
       $('[data-rel="tooltip"]').tooltip({
         placement: 'right'
       });
