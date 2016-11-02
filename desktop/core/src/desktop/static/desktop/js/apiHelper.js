@@ -32,6 +32,7 @@ var ApiHelper = (function () {
   var NAV_LIST_TAGS_API = '/metadata/api/navigator/list_tags';
   var NAV_FIND_ENTITY_API = '/metadata/api/navigator/find_entity';
   var SOLR_COLLECTIONS_API = '/indexer/api/collections/';
+  var HBASE_API_PREFIX = '/hbase/api/';
 
   /**
    * @param {Object} i18n
@@ -63,6 +64,10 @@ var ApiHelper = (function () {
 
     huePubSub.subscribe('assist.clear.collections.cache', function () {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('collections'), {});
+    });
+
+    huePubSub.subscribe('assist.clear.hbase.cache', function () {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hbase'), {});
     });
   }
 
@@ -346,9 +351,6 @@ var ApiHelper = (function () {
    * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    *
-   * @param {string[]} options.pathParts
-   * @param {number} [options.pageSize] - Default 500
-   * @param {number} [options.page] - Default 1
    */
   ApiHelper.prototype.fetchSolrCollections = function (options) {
     var self = this;
@@ -381,6 +383,54 @@ var ApiHelper = (function () {
 
     fetchCached.bind(self)($.extend({}, options, {
       sourceType: 'collections',
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   */
+  ApiHelper.prototype.fetchHBase = function (options) {
+    var self = this;
+    var suffix = 'getClusters';
+    if (options.parent.name !== '') {
+      suffix = 'getTableList/' + options.parent.name;
+    }
+    var url = HBASE_API_PREFIX + suffix;
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        timeout: options.timeout,
+        success: function (data) {
+          if (!data.error && !self.successResponseIsError(data)) {
+            storeInCache(data);
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      sourceType: 'hbase',
       url: url,
       fetchFunction: fetchFunction
     }));
