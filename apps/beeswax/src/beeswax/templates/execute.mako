@@ -815,7 +815,6 @@ ${ assist.assistJSModels() }
 <script src="${ static('desktop/js/autocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
-<script src="${ static('desktop/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
@@ -2396,16 +2395,23 @@ function tryExplainQuery() {
   logGA('query/explain');
 }
 
+
 function formatQuery() {
-  if (vkbeautify) {
-    if (codeMirror.getSelection() != '') {
-      codeMirror.replaceSelection(vkbeautify.sql(codeMirror.getSelection(), 2));
+  $.post("/notebook/api/format", {
+    statements: codeMirror.getSelection() != '' ? codeMirror.getSelection() : codeMirror.getValue()
+  }, function (data) {
+    if (data.status == 0) {
+      if (codeMirror.getSelection() != '') {
+        codeMirror.replaceSelection(data.formatted_statements);
+      }
+      else {
+        codeMirror.setValue(data.formatted_statements);
+      }
+      viewModel.design.query.value(codeMirror.getValue());
+    } else {
+      $.jHueNotify.error(data);
     }
-    else {
-      codeMirror.setValue(vkbeautify.sql(codeMirror.getValue(), 2));
-    }
-    viewModel.design.query.value(codeMirror.getValue());
-  }
+  });
 }
 
 function tryExplainParameterizedQuery() {
