@@ -48,6 +48,7 @@ ${ editorComponents.topBar() }
 </%editorComponents:commonHTML>
 
 ${ assist.assistPanel() }
+${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
