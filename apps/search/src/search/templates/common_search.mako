@@ -1047,6 +1047,9 @@ ${ dashboard.layout_skeleton() }
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
                     <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
+                    <!-- ko if: doc.childDocuments != undefined -->
+                    &nbsp(<span data-bind="text: doc.childDocuments().length"></span>)
+                    <!-- /ko -->
                   </a>
                 </td>
                 <!-- ko foreach: row -->
@@ -1305,6 +1308,40 @@ ${ dashboard.layout_skeleton() }
           </tr>
         </tbody>
       </table>
+      
+
+          <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+            <thead>
+              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+              </tr>
+              <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
+                <th style="width: 18px">&nbsp;</th>
+                <th>${ _('Document') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: {data: childDocuments, as: 'doc'}" class="result-tbody">
+              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+                <td>
+                  <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
+                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
+                    <!-- ko if: doc.childDocuments != undefined -->
+                    &nbsp(<span data-bind="text: doc.childDocuments().length"></span>)
+                    <!-- /ko -->
+                  </a>
+                </td>
+                <!-- ko foreach: row -->
+                  <td data-bind="html: $data"></td>
+                <!-- /ko -->
+              </tr>
+              <tr data-bind="visible: doc.showDetails" class="show-details">
+                <td>&nbsp;</td>
+                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+                  <span data-bind="template: {name: 'document-details', data: $data}"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
     </div>
   <!-- /ko -->
 </script>
@@ -2286,6 +2323,10 @@ ${ dashboard.layout_skeleton() }
               <div class="controls">
                 <select id="settingssolrindex" data-bind="options: $root.initial.collections, value: $root.collection.name"></select>
               </div>
+              <label class="control-label" for="settingsdescription">${ _('Description') }</label>
+              <div class="controls">
+                <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
+              </div>
             </div>
             <!-- /ko -->
             <div class="control-group">
@@ -2298,10 +2339,25 @@ ${ dashboard.layout_skeleton() }
               <label class="control-label">${ _('Autocomplete') }</label>
               <div class="controls">
                 <label class="checkbox" style="padding-top:0">
-                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled"> ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="value: $root.collection.suggest.dictionary" placeholder="${ _('Dictionary name or blank for default') }">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled">
+                  <span data-bind="visible: $root.collection.suggest.enabled">
+                    ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="value: $root.collection.suggest.dictionary" placeholder="${ _('Dictionary name or blank for default') }">
+                  </span>
                 </label>
               </div>
             </div>
+            <div class="control-group" data-bind="visible: $root.isLatest">
+              <label class="control-label">${ _('Nested documents') }</label>
+              <div class="controls">
+                <label class="checkbox" style="padding-top:0">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.nested.enabled">
+                  <span data-bind="visible: $root.collection.nested.enabled">
+                    ${ _('Levels') }
+                    <span data-bind="template: {name: 'nested-document-schema-level', data: $root.collection.nested.schema()}"></span> 
+                  </span>
+                </label>
+              </div>
+            </div>            
           </fieldset>
         </form>
       </div>
@@ -2351,6 +2407,25 @@ ${ dashboard.layout_skeleton() }
   </div>
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
+
+
+<script type="text/html" id="nested-document-schema-level">
+  <ul class="unstyled airy qdefinitions" data-bind="foreach: $data">
+    <li>
+      <input type="text" data-bind="value: filter"/>
+      <input type="checkbox" data-bind="checked: selected"/>
+      <!-- ko if: values().length == 0 -->
+        <i class="fa fa-minus"></i>
+        <i class="fa fa-plus"></i>
+      <!-- /ko -->
+      <!-- ko if: values().length > 0 -->    
+        <span data-bind="template: {name: 'nested-document-schema-level', data: values()}"></span> 
+      <!-- /ko -->
+    </li>
+    <i class="fa fa-plus"></i>
+    <br/>
+  </ul>
+</script>
 
 
 <script type="text/html" id="time-filter">
