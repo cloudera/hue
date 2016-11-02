@@ -685,6 +685,8 @@
           },
           viewModel: viewModel
         }, $menu[0]);
+
+        ko.contextFor($menu[0]).$contextSourceElement = element;
         event.preventDefault();
         event.stopPropagation();
       });
