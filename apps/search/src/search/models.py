@@ -506,6 +506,20 @@ class Collection2(object):
     for field in props['collection']['template']['fieldsAttributes']:
       if 'type' not in field:
         field['type'] = 'string'
+    if 'nested' not in props['collection']:
+      props['collection']['nested'] = {
+        'enabled': False,
+        'schema': [
+          {'filter': 'type_s:book', 'name': 'books', 'selected': False, 'values': [ # limit 10 # parentFilterSelected # childrenFilterSelected
+            {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': [
+              {'filter': 'type_s:review2', 'name': 'reviews2', 'selected': False, 'values': []},
+              {'filter': 'type_s:review3', 'name': 'reviews3', 'selected': False, 'values': []}]}]},
+          {'filter': 'type_s:map', 'name': 'maps', 'selected': False, 'values': [
+            {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': []}]},
+          {'filter': 'type_s:notebook', 'name': 'notebooks', 'selected': False, 'values': [
+            {'filter': 'type_s:sheet', 'name': 'sheets', 'selected': False, 'values': []}]}
+        ]
+      }
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
@@ -873,6 +887,8 @@ def augment_solr_response(response, collection, query):
     for doc in response['response']['docs']:
       for field, value in doc.iteritems():
         if isinstance(value, numbers.Number):
+          escaped_value = value
+        elif field == '_childDocuments_': # Nested documents
           escaped_value = value
         elif isinstance(value, list): # Multivalue field
           escaped_value = [smart_unicode(val, errors='replace') for val in value]
