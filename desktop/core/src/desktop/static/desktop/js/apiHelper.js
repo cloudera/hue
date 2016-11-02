@@ -363,7 +363,7 @@ var ApiHelper = (function () {
         url: url,
         timeout: options.timeout,
         success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections.length) {
+          if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
             storeInCache(data);
             options.successCallback(data);
           } else {
