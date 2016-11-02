@@ -147,10 +147,14 @@ var AssistDbEntry = (function () {
     });
   }
 
-  AssistDbEntry.prototype.showContextPopover = function (entry, event) {
+  AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var self = this;
     var $source = $(event.target);
     var offset = $source.offset();
+    if (positionAdjustment) {
+      offset.left += positionAdjustment.left;
+      offset.top += positionAdjustment.top;
+    }
     self.statsVisible(true);
     huePubSub.publish('sql.context.popover.show', {
       data: {

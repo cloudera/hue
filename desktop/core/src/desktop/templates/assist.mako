@@ -461,13 +461,14 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable || definition.isView, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event, navigationSettings.pinEnabled); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem || (navigationSettings.openDatabase && definition.isDatabase), click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
   </script>
 
   <script type="text/html" id="sql-context-items">
-    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-pencil"></i> ${ _('Insert...') }</a></li>
+    <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-pencil"></i> ${ _('Insert') }</a></li>
     <!-- ko if: definition.isColumn -->
     <li class="divider"></li>
     <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
@@ -516,12 +517,12 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-table-entry">
-    <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
+    <li class="assist-table" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
         <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span>
       </a>
@@ -531,17 +532,17 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="assist-column-entry">
-    <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
+    <li data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
       <div class="assist-actions column-actions" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, click: toggleOpen, attr: {'title': definition.title }">
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, event: { dblClick: dblClick }, attr: {'title': definition.title }">
+      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="event: { dblClick: dblClick }, attr: {'title': definition.title }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
       </div>
       <!-- /ko -->
