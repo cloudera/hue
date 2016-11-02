@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -- coding: utf-8 --
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -30,7 +31,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.conf import has_navigator
 from metadata.navigator_client import NavigatorApi
@@ -54,7 +55,7 @@ def error_handler(view_fn):
       raise e
     except Exception, e:
       status = 500
-      message = str(e)
+      message = force_unicode(e)
       LOG.exception(message)
 
       if 'Could not find' in message:
@@ -62,7 +63,7 @@ def error_handler(view_fn):
 
       response = {
         'status': -1,
-        'message': force_unicode(message)
+        'message': message
       }
     return JsonResponse(response, status=status)
   return decorator
@@ -75,7 +76,9 @@ def search_entities(request):
   """
   api = NavigatorApi()
 
-  query_s = request.POST.get('query_s', '')
+  query_s = json.loads(request.POST.get('query_s', ''))
+  query_s = smart_str(query_s)
+
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 100)
   sources = json.loads(request.POST.get('sources')) or []
@@ -105,7 +108,7 @@ def search_entities_interactive(request):
   """
   api = NavigatorApi()
 
-  query_s = request.POST.get('query_s', '')
+  query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 25)

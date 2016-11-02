@@ -1720,7 +1720,7 @@ from metadata.conf import has_navigator
           };
 
           $.post('/metadata/api/navigator/search_entities', {
-            query_s: self.searchInput(),
+            query_s: ko.mapping.toJSON(self.searchInput()),
             limit: 25,
             sources: ko.mapping.toJSON([self.visiblePanel().type])
           }, function (data) {
