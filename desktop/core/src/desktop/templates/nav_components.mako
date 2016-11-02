@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
      <!-- /ko -->
      <div style="width: 100%" data-bind="ifnot: loading">
        <textarea style="width: 100%" data-bind="tagEditor: {
-          placeholder: '${_ko('No tags.')}',
+          placeholder: '${_ko('No tags')}',
           readOnly: '${ readOnly }' === 'True',
           setTags: currentTags,
           onSave: onSave,
