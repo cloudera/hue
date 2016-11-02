@@ -75,12 +75,13 @@ ${layout.menubar(section='permissions')}
 </div>
 
 <script type="text/javascript" charset="utf-8">
+  var mainDataTable;
   $(document).ready(function () {
-    $(".datatables").dataTable({
+    mainDataTable = $(".datatables").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
       "bInfo": false,
-      "bFilter": false,
+      "bFilter": true,
       "aoColumns": [
         null,
         null,
