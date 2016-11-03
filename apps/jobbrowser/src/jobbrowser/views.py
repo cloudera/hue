@@ -89,10 +89,8 @@ def get_job(request, job_id):
     job = get_api(request.user, request.jt).get_job(jobid=job_id)
   except ApplicationNotRunning, e:
     if e.job.get('state', '').lower() == 'accepted':
-      rm_pool = resource_manager_api.get_resource_manager_pool()
-      rm_api = rm_pool.get(request.user.username)
+      rm_api = resource_manager_api.get_resource_manager(request.user)
       job = Application(e.job, rm_api)
-      rm_pool.put(rm_api)
     else:
       raise e  # Job has not yet been accepted by RM
   except JobExpired, e:

@@ -18,7 +18,6 @@
 import json
 import logging
 import posixpath
-import Queue
 import threading
 
 from django.utils.translation import ugettext as _
@@ -37,42 +36,28 @@ LOG = logging.getLogger(__name__)
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
-API_CACHE_POOL = None
+API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
 
-def get_resource_manager_pool():
-  global API_CACHE_POOL
-  if API_CACHE_POOL is None:
+def get_resource_manager(username=None):
+  global API_CACHE
+  if API_CACHE is None:
     API_CACHE_LOCK.acquire()
     try:
-      if API_CACHE_POOL is None:
+      if API_CACHE is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        API_CACHE_POOL = ResourceManagerApiPool(yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = ResourceManagerApi(yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       API_CACHE_LOCK.release()
 
-  return API_CACHE_POOL
+  API_CACHE.setuser(username) # Set the correct user
+
+  return API_CACHE
 
 class YarnFailoverOccurred(Exception):
   pass
-
-class ResourceManagerApiPool(object):
-  def __init__(self, api_url, security_enabled, ssl_cert):
-    pool_size = 10
-    self.rmobj_pool = Queue.LifoQueue()
-    for i in range(pool_size):
-      rm_instance = ResourceManagerApi(api_url, security_enabled, ssl_cert)
-      self.rmobj_pool.put(rm_instance)
-
-  def get(self, username):
-    rmobj = self.rmobj_pool.get()
-    rmobj.setuser(username)
-    return rmobj
-
-  def put(self, rmobj):
-    self.rmobj_pool.put(rmobj)
 
 class ResourceManagerApi(object):
 
