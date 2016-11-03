@@ -451,6 +451,19 @@ var Collection = function (vm, collection) {
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.nested = ko.mapping.fromJS(collection.nested);
+  self.nestedNames = ko.computed(function() {
+	function flatten(values) {
+		var fields = [];
+		$.each(values, function (index, facet) {
+	      fields.push(facet.filter());
+		  if (facet.values().length > 0) {
+			fields.push.apply(fields, flatten(facet.values()));
+		  }
+		});
+		return fields;
+	  }
+	  return flatten(self.nested.schema());
+  });
   self.enabled = ko.mapping.fromJS(collection.enabled);
   self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
   self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60);
