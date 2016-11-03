@@ -24,7 +24,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from hadoop import cluster
-from hadoop.yarn.resource_manager_api import get_resource_manager_pool
+from hadoop.yarn.resource_manager_api import get_resource_manager
 
 
 LOG = logging.getLogger(__name__)
@@ -143,7 +143,4 @@ class MapreduceApi(object):
 
   def kill(self, job_id):
     app_id = job_id.replace('job', 'application')
-    pool = get_resource_manager_pool()
-    rmobj = pool.get(self.username)
-    rmobj.kill(app_id) # We need to call the RM
-    pool.put(rmobj)
+    get_resource_manager(self.username).kill(app_id) # We need to call the RM
