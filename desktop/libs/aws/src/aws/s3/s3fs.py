@@ -21,6 +21,7 @@ import logging
 import os
 import posixpath
 import re
+import time
 
 from boto.exception import S3ResponseError
 from boto.s3.connection import Location
@@ -427,14 +428,18 @@ class S3FileSystem(object):
   @translate_s3_error
   def check_access(self, path, permission='READ'):
     permission = permission.upper()
-    bucket_name, key_name = s3.parse_uri(path)[:2]
-    bucket = self._get_bucket(bucket_name)
-    acp = bucket.get_acl()
-    for grant in acp.acl.grants:
-      if grant.permission == permission or grant.permission == 'FULL_CONTROL':
-        # TODO: Check grant.uri for user list too
-        return True
-    return False
+    try:
+      if permission == 'WRITE':
+        tmp_file = 'temp_%s' % str(int(time.time() * 1000))
+        tmp_path = '%s/%s' % (path, tmp_file)
+        self.create(path=tmp_path, overwrite=True)
+        self.remove(path=tmp_path)
+      else:
+        self.open(path)
+    except (S3ResponseError, IOError), e:
+      LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
+      return False
+    return True
 
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation
