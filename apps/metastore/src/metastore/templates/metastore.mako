@@ -515,6 +515,11 @@ ${ assist.assistPanel() }
           <a href="#" class="close" data-dismiss="modal">&times;</a>
           <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
         </div>
+        <div class="modal-body">
+          <label class="checkbox" style="display: inline-block; margin-top: 5px">
+            <input type="checkbox" name="skip_trash" /> ${ _('skip trash? (Enable to delete tables in encryption zone)') }
+          </label>
+        </div>
         <div class="modal-footer">
           <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
           <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
