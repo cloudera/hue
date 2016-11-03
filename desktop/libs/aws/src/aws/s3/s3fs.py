@@ -47,6 +47,21 @@ class S3FileSystemException(Exception):
   pass
 
 
+def auth_error_handler(view_fn):
+  def decorator(*args, **kwargs):
+    try:
+      return view_fn(*args, **kwargs)
+    except (S3ResponseError, IOError), e:
+      if 'Forbidden' in str(e) or e.status == 403:
+        path = args[1]  # We assume the source path is the first argument
+        raise S3FileSystemException(_('User is not authorized to write or modify path: %s. Check that user has write permissions.') % path)
+      else:
+        raise S3FileSystemException(e.message or e.reason)
+    except Exception, e:
+      raise e
+  return decorator
+
+
 class S3FileSystem(object):
   def __init__(self, s3_connection):
     self._s3_connection = s3_connection
@@ -254,6 +269,7 @@ class S3FileSystem(object):
     return [s3.parse_uri(x.path)[2] for x in self.listdir_stats(path, glob)]
 
   @translate_s3_error
+  @auth_error_handler
   def rmtree(self, path, skipTrash=True):
     if not skipTrash:
       raise NotImplementedError(_('Moving to trash is not implemented for S3'))
@@ -276,13 +292,14 @@ class S3FileSystem(object):
         to_delete = itertools.chain(keys, to_delete)
       result = key.bucket.delete_keys(to_delete)
       if result.errors:
-        msg = "%d errors occurred during deleting '%s':\n%s" % (
-          len(result.errors),
-          '\n'.join(map(repr, result.errors)))
+        msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
+          len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
+        )
         LOG.error(msg)
         raise S3FileSystemException(msg)
 
   @translate_s3_error
+  @auth_error_handler
   def remove(self, path, skip_trash=True):
     self.rmtree(path, skipTrash=skip_trash)
 
@@ -290,6 +307,7 @@ class S3FileSystem(object):
     raise NotImplementedError(_('Moving to trash is not implemented for S3'))
 
   @translate_s3_error
+  @auth_error_handler
   def mkdir(self, path, *args, **kwargs):
     """
     Creates a directory and any parent directory if necessary.
@@ -315,16 +333,19 @@ class S3FileSystem(object):
     self.create(path)  # create empty object
 
   @translate_s3_error
+  @auth_error_handler
   def copy(self, src, dst, recursive=False, *args, **kwargs):
     self._copy(src, dst, recursive=recursive, use_src_basename=True)
 
   @translate_s3_error
+  @auth_error_handler
   def copyfile(self, src, dst, *args, **kwargs):
     if self.isdir(dst):
       raise S3FileSystemException("Copy dst '%s' is a directory" % dst)
     self._copy(src, dst, recursive=False, use_src_basename=False)
 
   @translate_s3_error
+  @auth_error_handler
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     self._copy(src, dst, recursive=True, use_src_basename=False)
 
@@ -365,6 +386,7 @@ class S3FileSystem(object):
       key.copy(dst_bucket, dst_name)
 
   @translate_s3_error
+  @auth_error_handler
   def rename(self, old, new):
     new = s3.abspath(old, new)
     self.copy(old, new, recursive=True)
@@ -373,6 +395,7 @@ class S3FileSystem(object):
     self.rmtree(old, skipTrash=True)
 
   @translate_s3_error
+  @auth_error_handler
   def rename_star(self, old_dir, new_dir):
     if not self.isdir(old_dir):
       raise S3FileSystemException("'%s' is not a directory" % old_dir)
@@ -383,11 +406,13 @@ class S3FileSystem(object):
       self.rename(s3.join(old_dir, entry), s3.join(new_dir, entry))
 
   @translate_s3_error
+  @auth_error_handler
   def create(self, path, overwrite=False, data=None):
     key = self._get_key(path, validate=False)
     key.set_contents_from_string(data or '', replace=overwrite)
 
   @translate_s3_error
+  @auth_error_handler
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     local_src = self._cut_separator(local_src)
     remote_dst = self._cut_separator(remote_dst)
@@ -419,6 +444,7 @@ class S3FileSystem(object):
     pass  # upload is handled by S3FileUploadHandler
 
   @translate_s3_error
+  @auth_error_handler
   def append(self, path, data):
     key = self._get_key(path, validate=False)
     current_data = key.get_contents_as_string() or ''
