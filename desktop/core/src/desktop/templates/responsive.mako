@@ -427,10 +427,20 @@ ${ assist.assistPanel() }
 
   moment.locale(window.navigator.userLanguage || window.navigator.language);
   localeFormat = function (time) {
+    var mTime = time;
     if (typeof ko !== 'undefined' && ko.isObservable(time)) {
-      return moment(time()).format("L LT");
+      mTime = time();
     }
-    return moment(time).format("L LT");
+    try {
+      mTime = new Date(mTime);
+      if (moment(mTime).isValid()) {
+        return moment.utc(mTime).format("L LT");
+      }
+    }
+    catch (e) {
+      return mTime;
+    }
+    return mTime;
   }
 
   // Add CSRF Token to all XHR Requests
