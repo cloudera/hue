@@ -115,7 +115,7 @@ ${ assist.assistPanel() }
       <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
         <tr>
           <td data-bind="text: $index() + $indexOffset() + 1"></td>
-          <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a></td>
+          <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database().table().samples.loading() -->
             <span data-bind="text: name"></span>
@@ -462,7 +462,7 @@ ${ assist.assistPanel() }
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
               </td>
-              <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-bar-chart" title="${_('Show details')}"></i></a></td>
+              <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
