@@ -186,7 +186,7 @@
       var optionsBeforeEdit = [];
 
       var saveOnClickOutside = function (event) {
-        if ($.contains(document, event.target) && !$.contains($element.next()[0], event.target)) {
+        if ($.contains(document, event.target) && currentSelectize && !$.contains(currentSelectize.$wrapper[0], event.target)) {
           if (currentSelectize.getValue() !== optionsBeforeEdit.join(',')) {
             options.onSave(currentSelectize.getValue());
           }
@@ -209,9 +209,11 @@
             options.onSave(currentSelectize.getValue());
           }
           showReadOnly();
+          $(document).off('click', saveOnClickOutside);
         }).appendTo($editActions);
         $('<i>').addClass('fa fa-close').click(function () {
           showReadOnly();
+          $(document).off('click', saveOnClickOutside);
         }).appendTo($editActions);
         window.setTimeout(function () {
           $(document).on('click', saveOnClickOutside);
