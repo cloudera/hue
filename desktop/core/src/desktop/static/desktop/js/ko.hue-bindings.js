@@ -3671,7 +3671,7 @@
         var editor = snippet.ace();
         var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
-        if (range && range.start.row !== range.end.row && range.start.column !== range.end.column) {
+        if (range && JSON.stringify(range.start) !== JSON.stringify(range.end)) {
           var conflictingWithErrorMarkers = false;
           if (editor.session.$backMarkers) {
             for (var marker in editor.session.$backMarkers) {
