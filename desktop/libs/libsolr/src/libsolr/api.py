@@ -129,6 +129,7 @@ class SolrApi(object):
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
               'mincount': int(facet['properties']['mincount'])
           }
+
           params += (
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
@@ -137,8 +138,15 @@ class SolrApi(object):
               'field': facet['field'],
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
               'mincount': int(facet['properties']['mincount']),
-              'sort': {'count': facet['properties']['sort']}, 
+              'sort': {'count': facet['properties']['sort']},
           }
+
+          if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
+            _f['domain'] = {}
+            if facet['properties']['domain'].get('blockParent'):
+              _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
+            if facet['properties']['domain'].get('blockChildren'):
+              _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
 
           if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
             _f.update({

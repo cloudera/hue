@@ -510,16 +510,17 @@ class Collection2(object):
       props['collection']['nested'] = {
         'enabled': False,
         'schema': [
-          {'filter': 'type_s:book', 'name': 'books', 'selected': False, 'values': [ # limit 10 # parentFilterSelected # childrenFilterSelected
+          {'filter': 'type_s:book', 'name': 'books', 'selected': False, 'values': [ # limit 10
             {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': [
-              {'filter': 'type_s:review2', 'name': 'reviews2', 'selected': False, 'values': []},
-              {'filter': 'type_s:review3', 'name': 'reviews3', 'selected': False, 'values': []}]}]},
-          {'filter': 'type_s:map', 'name': 'maps', 'selected': False, 'values': [
-            {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': []}]},
-          {'filter': 'type_s:notebook', 'name': 'notebooks', 'selected': False, 'values': [
-            {'filter': 'type_s:sheet', 'name': 'sheets', 'selected': False, 'values': []}]}
+#               {'filter': 'type_s:review2', 'name': 'reviews2', 'selected': False, 'values': []},
+#               {'filter': 'type_s:review3', 'name': 'reviews3', 'selected': False, 'values': []}]}]},
+#           {'filter': 'type_s:map', 'name': 'maps', 'selected': False, 'values': [
+#             {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': []}]},
+#           {'filter': 'type_s:notebook', 'name': 'notebooks', 'selected': False, 'values': [
+#             {'filter': 'type_s:sheet', 'name': 'sheets', 'selected': False, 'values': []}]}
         ]
-      }
+             
+      }]}]}
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
@@ -529,6 +530,8 @@ class Collection2(object):
         properties['initial_start'] = properties['start']
       if 'end' in properties and not 'initial_end' in properties:
         properties['initial_end'] = properties['end']
+      if 'domain' not in properties:
+        properties['domain'] = {'blockParent': [], 'blockChildren': []}
 
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
