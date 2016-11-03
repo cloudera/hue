@@ -356,7 +356,10 @@ class HS2Api(Api):
       LOG.exception(title)
 
       if hasattr(e, 'message') and e.message:
-        message = e.message
+        if 'generic failure: Unable to find a callback: 32775' in e.message:
+          message = e.message + " " + _("Increase the sasl_max_buffer value in hue.ini")
+        else:
+          message = e.message
       else:
         message = e
       raise PopupException(_(title), detail=message)
