@@ -34,9 +34,9 @@ from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from desktop.conf import SASL_MAX_BUFFER
 
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
@@ -385,7 +385,7 @@ class PooledClient(object):
           err_msg = str(e)
           logging.info("Thrift saw a transport exception: " + err_msg, exc_info=False)
           if err_msg and 'generic failure: Unable to find a callback: 32775' in err_msg:
-            raise PopupException(_("Increase the sasl_max_buffer value in hue.ini"))
+            raise StructuredException(_("Increase the sasl_max_buffer value in hue.ini"), err_msg, data=None, error_code=502)
           raise StructuredThriftTransportException(e, error_code=502)
         except Exception, e:
           # Stack tends to be only noisy here.
