@@ -69,6 +69,17 @@ var ApiHelper = (function () {
     huePubSub.subscribe('assist.clear.hbase.cache', function () {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hbase'), {});
     });
+
+    huePubSub.subscribe('assist.clear.all.caches', function () {
+      huePubSub.publish('assist.clear.db.cache', {
+        sourceType: 'hive',
+        clearAll: true
+      });
+      huePubSub.publish('assist.clear.hdfs.cache');
+      huePubSub.publish('assist.clear.s3.cache');
+      huePubSub.publish('assist.clear.collections.cache');
+      huePubSub.publish('assist.clear.hbase.cache');
+    });
   }
 
   ApiHelper.prototype.hasExpired = function (timestamp) {

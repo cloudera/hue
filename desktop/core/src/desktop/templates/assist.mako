@@ -1303,22 +1303,23 @@ from metadata.conf import has_navigator
        * @param {boolean} options.navigationSettings.pinEnabled
        * @constructor
        **/
-      function AssistDbPanel (options) {
+      function AssistDbPanel(options) {
         var self = this;
+        self.options = options;
         self.apiHelper = options.apiHelper;
         self.i18n = options.i18n;
 
         self.sources = ko.observableArray();
-        var sourceIndex = {};
+        self.sourceIndex = {};
         $.each(options.sourceTypes, function (idx, sourceType) {
-          sourceIndex[sourceType.type] = new AssistDbSource({
+          self.sourceIndex[sourceType.type] = new AssistDbSource({
             apiHelper: self.apiHelper,
             i18n: self.i18n,
             type: sourceType.type,
             name: sourceType.name,
             navigationSettings: options.navigationSettings
           });
-          self.sources.push(sourceIndex[sourceType.type]);
+          self.sources.push(self.sourceIndex[sourceType.type]);
         });
 
         huePubSub.subscribe('assist.db.highlight', function (location) {
@@ -1344,7 +1345,7 @@ from metadata.conf import has_navigator
 
         self.selectedSource = ko.observable(null);
 
-        var setDatabaseWhenLoaded = function (databaseName) {
+        self.setDatabaseWhenLoaded = function (databaseName) {
           if (self.selectedSource().loaded()) {
             self.selectedSource().setDatabase(databaseName);
           } else {
@@ -1354,25 +1355,25 @@ from metadata.conf import has_navigator
                 subscription.dispose();
               }
             });
-            if (! self.selectedSource().loaded() && ! self.selectedSource().loading()) {
+            if (!self.selectedSource().loaded() && !self.selectedSource().loading()) {
               self.selectedSource().initDatabases();
             }
           }
         };
 
         huePubSub.subscribe("assist.set.database", function (databaseDef) {
-          if (! databaseDef.source || ! sourceIndex[databaseDef.source]) {
+          if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
             return;
           }
-          self.selectedSource(sourceIndex[databaseDef.source]);
-          setDatabaseWhenLoaded(databaseDef.name);
+          self.selectedSource(self.sourceIndex[databaseDef.source]);
+          self.setDatabaseWhenLoaded(databaseDef.name);
         });
 
         huePubSub.subscribe("assist.get.database", function (source) {
-          if (sourceIndex[source] && sourceIndex[source].selectedDatabase()) {
+          if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
             huePubSub.publish("assist.database.set", {
               source: source,
-              name: sourceIndex[source].selectedDatabase().databaseName
+              name: self.sourceIndex[source].selectedDatabase().databaseName
             });
           } else {
             huePubSub.publish("assist.database.set", {
@@ -1395,18 +1396,6 @@ from metadata.conf import has_navigator
           }
         });
 
-        var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-
-        if (! self.selectedSource()) {
-          if (options.activeSourceType) {
-            self.selectedSource(sourceIndex[options.activeSourceType]);
-            setDatabaseWhenLoaded();
-          } else if (storageSourceType && sourceIndex[storageSourceType]) {
-            self.selectedSource(sourceIndex[storageSourceType]);
-            setDatabaseWhenLoaded();
-          }
-        }
-
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
             if (self.selectedSource().selectedDatabase()) {
@@ -1424,6 +1413,21 @@ from metadata.conf import has_navigator
           self.selectedSource().selectedDatabase(null)
         } else if (self.selectedSource()) {
           self.selectedSource(null);
+        }
+      };
+
+      AssistDbPanel.prototype.init = function () {
+        var self = this;
+        var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+
+        if (!self.selectedSource()) {
+          if (self.options.activeSourceType) {
+            self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
+            self.setDatabaseWhenLoaded();
+          } else if (storageSourceType && self.sourceIndex[storageSourceType]) {
+            self.selectedSource(self.sourceIndex[storageSourceType]);
+            self.setDatabaseWhenLoaded();
+          }
         }
       };
 
@@ -1469,7 +1473,7 @@ from metadata.conf import has_navigator
         self.apiHelper = options.apiHelper;
 
         self.selectedHdfsEntry = ko.observable();
-        var reload = function () {
+        self.reload = function () {
           var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
           var parts = lastKnownPath.split('/');
           parts.shift();
@@ -1489,8 +1493,6 @@ from metadata.conf import has_navigator
           });
         };
 
-        reload();
-
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
           self.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
@@ -1498,9 +1500,13 @@ from metadata.conf import has_navigator
 
         huePubSub.subscribe('assist.hdfs.refresh', function () {
           huePubSub.publish('assist.clear.hdfs.cache');
-          reload();
+          self.reload();
         });
       }
+
+      AssistHdfsPanel.prototype.init = function () {
+        this.reload();
+      };
 
 
       /**
@@ -1513,7 +1519,7 @@ from metadata.conf import has_navigator
         self.apiHelper = options.apiHelper;
 
         self.selectedS3Entry = ko.observable();
-        var reload = function () {
+        self.reload = function () {
           var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
           var parts = lastKnownPath.split('/');
           parts.shift();
@@ -1533,8 +1539,6 @@ from metadata.conf import has_navigator
           });
         };
 
-        reload();
-
         huePubSub.subscribe('assist.selectS3Entry', function (entry) {
           self.selectedS3Entry(entry);
           self.apiHelper.setInTotalStorage('assist', 'currentS3Path', entry.path);
@@ -1542,9 +1546,13 @@ from metadata.conf import has_navigator
 
         huePubSub.subscribe('assist.s3.refresh', function () {
           huePubSub.publish('assist.clear.s3.cache');
-          reload();
+          self.reload();
         });
       }
+
+      AssistS3Panel.prototype.init = function () {
+        this.reload();
+      };
 
       /**
        * @param {Object} options
@@ -1556,7 +1564,7 @@ from metadata.conf import has_navigator
         self.apiHelper = options.apiHelper;
 
         self.selectedCollectionEntry = ko.observable();
-        var reload = function () {
+        self.reload = function () {
           var currentEntry = new AssistCollectionEntry({
             definition: {
               name: '/',
@@ -1569,8 +1577,6 @@ from metadata.conf import has_navigator
           currentEntry.loadEntries();
         };
 
-        reload();
-
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
 
         });
@@ -1581,9 +1587,13 @@ from metadata.conf import has_navigator
 
         huePubSub.subscribe('assist.collections.refresh', function () {
           huePubSub.publish('assist.clear.collections.cache');
-          reload();
+          self.reload();
         });
       }
+
+      AssistCollectionsPanel.prototype.init = function () {
+        this.reload();
+      };
 
       /**
        * @param {Object} options
@@ -1604,12 +1614,10 @@ from metadata.conf import has_navigator
         });
 
         self.selectedHBaseEntry = ko.observable();
-        var reload = function () {
+        self.reload = function () {
           self.selectedHBaseEntry(root);
           root.loadEntries();
         };
-
-        reload();
 
         huePubSub.subscribe('assist.clickHBaseItem', function (entry) {
           if (entry.definition.host) {
@@ -1619,7 +1627,7 @@ from metadata.conf import has_navigator
         });
 
         huePubSub.subscribe('assist.clickHBaseRootItem', function (entry) {
-          reload();
+          self.reload();
         });
 
         huePubSub.subscribe('assist.dblClickHBaseItem', function (entry) {
@@ -1628,9 +1636,13 @@ from metadata.conf import has_navigator
 
         huePubSub.subscribe('assist.hbase.refresh', function () {
           huePubSub.publish('assist.clear.hbase.cache');
-          reload();
+          self.reload();
         });
       }
+
+      AssistHBasePanel.prototype.init = function () {
+        this.reload();
+      };
 
       var NAV_FACET_ICON = 'fa-tags';
       var NAV_TYPE_ICONS = {
@@ -1902,15 +1914,15 @@ from metadata.conf import has_navigator
 
         var lastFoundPanel = self.availablePanels.filter(function (panel) { return panel.type === lastOpenPanelType });
         self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels[0]);
+        self.visiblePanel().panelData.init();
+
         self.visiblePanel.subscribe(function(newValue) {
           self.apiHelper.setInTotalStorage('assist', 'last.open.panel', newValue.type);
           if (self.navigatorEnabled()) {
             lastQuery = 'refresh';
             self.performSearch();
           }
-          if (newValue.type === 'documents') {
-            newValue.panelData.init();
-          }
+          newValue.panelData.init();
         });
 
         var latestCount = 0;
