@@ -1341,6 +1341,8 @@ var ApiHelper = (function () {
   var fetchAssistData = function (options) {
     var self = this;
     if (!options.sourceType) {
+      options.errorCallback('No sourceType supplied');
+      console.warn('No sourceType supplied to fetchAssistData');
       return
     }
 

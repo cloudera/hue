@@ -527,7 +527,7 @@ from metadata.conf import has_navigator
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
         <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span>
       </a>
-      <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
@@ -547,7 +547,7 @@ from metadata.conf import has_navigator
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span>
       </div>
       <!-- /ko -->
-      <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
@@ -1035,7 +1035,7 @@ from metadata.conf import has_navigator
     <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()" style="display: none;">
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
       <ul class="assist-tables">
         <li class="assist-entry no-entries">${_('No results found')}</li>
@@ -1048,13 +1048,13 @@ from metadata.conf import has_navigator
         </li>
       </ul>
     </div>
-    <div class="assist-flex-fill" data-bind="visible: loading" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: loading">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()">
       <span class="assist-errors">${ _('Error loading databases.') }</span>
     </div>
-    <div class="assist-flex-fill" data-bind="visible: ! hasErrors() && ! loading() && ! hasEntries()" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: ! hasErrors() && ! loading() && ! hasEntries()">
       <span class="assist-errors">${ _('No databases found.') }</span>
     </div>
   </script>
@@ -1074,13 +1074,13 @@ from metadata.conf import has_navigator
       </div>
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()" style="display: none;">
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()">
       <span class="assist-errors">${ _('Error loading tables.') }</span>
     </div>
   </script>
@@ -1703,8 +1703,6 @@ from metadata.conf import has_navigator
         self.searchActive = ko.observable(false);
 
         var lastQuery = -1;
-
-        self.loading = ko.observable(false);
 
         self.availablePanels = [
           new AssistInnerPanel({
