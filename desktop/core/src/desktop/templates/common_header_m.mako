@@ -163,8 +163,14 @@ if USE_NEW_EDITOR.get():
       if (typeof ko !== 'undefined' && ko.isObservable(time)) {
         mTime = time();
       }
-      if (moment(mTime).isValid()) {
-        return moment.utc(mTime).format("L LT");
+      try {
+        mTime = new Date(mTime);
+        if (moment(mTime).isValid()) {
+          return moment.utc(mTime).format("L LT");
+        }
+      }
+      catch (e) {
+        return mTime;
       }
       return mTime;
     }
