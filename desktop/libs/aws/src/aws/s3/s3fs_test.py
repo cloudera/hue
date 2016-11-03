@@ -308,3 +308,10 @@ class S3FSTest(S3TestBase):
       actual = f.read(file_size)
       expected = file(local_file).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
+
+
+  def test_check_access(self):
+    dir_path = self.get_test_path('test_check_access')
+    self.fs.mkdir(dir_path)
+
+    assert_true(self.fs.check_access(dir_path, permission='WRITE'))

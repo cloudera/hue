@@ -25,7 +25,7 @@ import logging
 import StringIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload
+from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
 from django.utils.translation import ugettext as _
 
 from aws import get_s3fs
@@ -37,7 +37,7 @@ DEFAULT_WRITE_SIZE = 1024 * 1024 * 50  # TODO: set in configuration (currently 5
 LOG = logging.getLogger(__name__)
 
 
-class S3FileUploadError(Exception):
+class S3FileUploadError(UploadFileException):
   pass
 
 
