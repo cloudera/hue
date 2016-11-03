@@ -1936,7 +1936,7 @@ from metadata.conf import has_navigator
             query:  request.term,
             successCallback: function (data) {
               var values = [];
-              var facetPartialRe = new RegExp(partial, 'i');
+              var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
               if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
                 var facetInQuery = facetMatch[1];
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
