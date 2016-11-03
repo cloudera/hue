@@ -1208,13 +1208,7 @@ from metadata.conf import has_navigator
             <!-- ko if: typeof click === 'undefined' -->
             <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
             <!-- /ko -->
-            <div class="nav-search-tags" data-bind="foreach: tags">
-              <div data-bind="text: $data"></div>
-            </div>
             <div class="doc-desc" data-bind="html: hue_description"></div>
-            <!-- ko if: hasDescription && ! hue_description -->
-              <div class="doc-desc" data-bind="text: originalDescription"></div>
-            <!-- /ko -->
           </div>
         </div>
       </div>

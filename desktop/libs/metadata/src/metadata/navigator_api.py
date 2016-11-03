@@ -243,9 +243,10 @@ def _augment_highlighting(query_s, records):
         ts.append(term.strip('*'))
 
   for record in records:
+    name = record.get('originalName', '')
     record['hue_description'] = ''
     record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
-    name = record.get('originalName', '')
+
     for term in ts:
       name = _highlight(term, name)
       if record.get('tags'):
@@ -257,6 +258,10 @@ def _augment_highlighting(query_s, records):
         else:
           record['hue_description'] += ' %s:%s' % (fname, _highlight(fval, record[fname]))
 
+    originalDescription = record.get('originalDescription', '')
+    if not record['hue_description'] and originalDescription:
+      record['hue_description'] = _highlight(term, originalDescription)
+
     record['hue_name'] += name
     record['hue_name'] = escape(record['hue_name']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
     record['hue_description'] = escape(record['hue_description']).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
@@ -267,9 +272,9 @@ def _highlight(pattern, string):
 
 
 def _highlight_tags(record, term):
-    for tag in record['tags']:
-      if re.match(term, tag):
-        record['hue_description'] += ' tags:%s' % _highlight(term, tag)
+  for tag in record['tags']:
+    if re.match(term, tag):
+      record['hue_description'] += ' tags:%s' % _highlight(term, tag)
 
 
 @error_handler
