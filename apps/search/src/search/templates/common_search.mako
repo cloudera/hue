@@ -548,6 +548,20 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
 
+    <div class="facet-field-cnt">
+      <span class="spinedit-cnt">
+        <span class="facet-field-label">
+          ${ _('Domain') }
+        </span>
+        ${ _('Parent') }
+        <select data-bind="selectedOptions: properties.domain.blockParent, options: $root.collection.nestedNames" size="5" multiple="true"></select>
+        ${ _('Children') }
+        <select data-bind="selectedOptions: properties.domain.blockChildren, options: $root.collection.nestedNames" size="5" multiple="true"></select>
+
+        <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+      </span>
+    </div>
+
   ## Dimensions > 1
   <!-- ko if: $root.isEditing -->  
   <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
@@ -2350,7 +2364,7 @@ ${ dashboard.layout_skeleton() }
                 <label class="checkbox" style="padding-top:0">
                   <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.nested.enabled">
                   <span data-bind="visible: $root.collection.nested.enabled">
-                    ${ _('Levels') }
+                    ${ _('Schema') }
                     <span data-bind="template: {name: 'nested-document-schema-level', data: $root.collection.nested.schema()}"></span> 
                   </span>
                 </label>

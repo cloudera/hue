@@ -568,6 +568,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet_type = 'nested'
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []
+      properties['domain'] = {'blockParent': [], 'blockChildren': []}
       if widget_type == 'pie2-widget':
         properties['scope'] = 'stack'
         properties['timelineChartType'] = 'bar'
