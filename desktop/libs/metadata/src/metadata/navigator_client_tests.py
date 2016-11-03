@@ -79,3 +79,5 @@ class TestNavigatorclient:
 
     # type:table tax
     # owner:romain ca
+
+    # *
