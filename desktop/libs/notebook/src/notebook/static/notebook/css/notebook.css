@@ -381,18 +381,18 @@ body {
 .snippet-icon-image {
   height: 16px;
   width: 16px;
-  -webkit-filter: grayscale(1)  brightness(1.5);
-  -webkit-filter: grayscale(100%) brightness(150%);
-  filter: grayscale(100%) brightness(150%);
+  -webkit-filter: grayscale(1);
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
   -webkit-transition: -webkit-filter 0.2s ease;
   -moz-transition: filter 0.2s ease;
   -ms-transition: filter 0.2s ease;
 }
 
 .inactive-action:hover .snippet-icon-image {
-  -webkit-filter: grayscale(0)  brightness(1);
-  -webkit-filter: grayscale(0%) brightness(100%);
-  filter: grayscale(0%) brightness(100%);
+  -webkit-filter: grayscale(0);
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
 }
 
 .snippet-icon {
