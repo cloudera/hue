@@ -2637,6 +2637,8 @@ $(document).ready(function () {
     $('#queryContainer').show();
     $('#resizePanel').show();
     $('a[href="#query"]').parent().show();
+    $('.navbar-fixed-top').show();
+    $('.resultsContainer').css('marginTop', '20px');
   }
 
   function watchPageComponents() {
@@ -2647,6 +2649,9 @@ $(document).ready(function () {
     $('#resizePanel').hide();
     $('a[href="#query"]').parent().hide();
     $('a[href="#recentTab"]').parent().hide();
+    $('a[href="#queryBuilderTab"]').parent().hide();
+    $('.navbar-fixed-top').hide();
+    $('.resultsContainer').css('marginTop', '-50px');
   }
 
   function queryPage() {
