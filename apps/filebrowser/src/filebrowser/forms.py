@@ -111,6 +111,7 @@ class UploadFileForm(forms.Form):
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
   hdfs_file = FileField(forms.Form, label=_("File to Upload"))
   dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."))
+  extract_archive = BooleanField(required=False)
 
 class UploadArchiveForm(forms.Form):
   op = "upload"
