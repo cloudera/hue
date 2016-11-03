@@ -1226,6 +1226,7 @@ def _upload_file(request):
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
         dest = form.cleaned_data['dest']
+        extract_archive = form.cleaned_data.get('extract_archive')
         filepath = request.fs.join(dest, uploaded_file.name)
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
@@ -1234,6 +1235,9 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
+            if extract_archive:
+              response['batch_job_response'] = extract_archive_in_hdfs(request, dest, uploaded_file.name)
+
         except IOError, ex:
             already_exists = False
             try:
@@ -1348,9 +1352,9 @@ def _upload_archive(request):
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
-def extract_archive_in_hdfs(fs, upload_path, file_name):
+def extract_archive_in_hdfs(request, upload_path, file_name):
 
-  _upload_extract_archive_script_to_hdfs(fs)
+  _upload_extract_archive_script_to_hdfs(request.fs)
 
   from notebook.connectors.base import Notebook
 
@@ -1360,7 +1364,7 @@ def extract_archive_in_hdfs(fs, upload_path, file_name):
                                    archives=[],
                                    files=[{'value': '/user/hue/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + file_name}],
                                    env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}])
-  shell_notebook.execute(request, batch=True)
+  return shell_notebook.execute(request, batch=True)
 
 def _upload_extract_archive_script_to_hdfs(fs):
   if not fs.exists('/user/hue/common/'):
