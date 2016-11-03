@@ -517,14 +517,17 @@ class HiveServer2Dbms(object):
     return self.execute_query(query, design)
 
 
-  def drop_tables(self, database, tables, design):
+  def drop_tables(self, database, tables, design, skip_trash=False):
     hql = []
 
     for table in tables:
       if table.is_view:
         hql.append("DROP VIEW `%s`.`%s`" % (database, table.name,))
       else:
-        hql.append("DROP TABLE `%s`.`%s`" % (database, table.name,))
+        drop_query = "DROP TABLE `%s`.`%s`" % (database, table.name,)
+        drop_query += skip_trash and " PURGE" or ""
+        hql.append(drop_query)
+
     query = hql_query(';'.join(hql), database)
     design.data = query.dumps()
     design.save()
