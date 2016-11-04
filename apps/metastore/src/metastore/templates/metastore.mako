@@ -517,7 +517,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="modal-body">
           <label class="checkbox" style="display: inline-block; margin-top: 5px">
-            <input type="checkbox" name="skip_trash" /> ${ _('skip trash? (Enable to delete tables in encryption zone)') }
+            <input type="checkbox" name="skip_trash" /> ${ _('Skip the trash') }
           </label>
         </div>
         <div class="modal-footer">
