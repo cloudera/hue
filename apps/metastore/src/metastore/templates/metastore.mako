@@ -690,29 +690,34 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-queries-tab">
   <br/>
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-  <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length > 0" class="table table-condensed">
+  <table data-bind="visible: ! loadingQueries() && $data.optimizerDetails().queryList().length > 0" class="table table-condensed">
     <thead>
     <tr>
       <th width="10%">${ _('Id') }</th>
-      <th width="10%">${ _('Count') }</th>
+      <th width="10%">${ _('Popularity') }</th>
       <th>${ _('Character') }</th>
+      <th>${ _('Query') }</th>
       <th width="20%">${ _('Complexity') }</th>
       <th width="10%">${ _('Hive Compatible') }</th>
       <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $data.optimizerDetails().FullQueryList(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
-    <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + eid(), '_blank'); }">
-      <td data-bind="text: eid"></td>
-      <td data-bind="text: instanceCount"></td>
-      <td><code data-bind="text: character"></code></td>
-      <td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
-      <td data-bind="text: compatibility.hive"></td>
-      <td data-bind="text: compatibility.impala"></td>
+    <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+    <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + qid(), '_blank'); }">
+      <td data-bind="text: qid"></td>
+      <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
+        <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : Math.round(queryCount() / $parent.optimizerDetails().queryCount() * 100) + '%' }"></div>
+      </td>
+      <td><code data-bind="text: queryChar"></code></td>
+      <td><code data-bind="text: query().substring(0, 100) + '...'"></code></td>
+      ##<td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
+      <td class="alert alert-danger"></td>
+      <td data-bind="text: hiveCompatible"></td>
+      <td data-bind="text: impalaCompatible"></td>
     </tr>
     </tbody>
   </table>
-  <div data-bind="visible: ! loadingQueries() && $data.optimizerDetails().FullQueryList().length == 0" class="empty-message">
+  <div data-bind="visible: ! loadingQueries() && $data.optimizerDetails().queryList().length == 0" class="empty-message">
     ${ _('No queries found for the current table.') }
   </div>
 </script>
@@ -760,7 +765,7 @@ ${ assist.assistPanel() }
     <!-- ko if: $root.optimizerEnabled() -->
       <!-- ko if: $root.database().table().optimizerDetails() -->
       <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
-      <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().total"></span>)</a></li>
+      <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
       <li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
       <!-- /ko -->
       <!-- ko if: $root.database().table().relationshipsDetails() -->
@@ -978,18 +983,18 @@ ${ assist.assistPanel() }
 
     <div class="tab-pane" id="joins">
       <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerDetails() -->
-      <!-- ko with: $root.database().table().optimizerDetails().table_donut -->
-        <table data-bind="visible: joinedtables().length > 0" class="table table-condensed">
+      <!-- ko with: $root.database().table().optimizerDetails().joinTables -->
+        <table data-bind="visible: $data.length > 0" class="table table-condensed">
           <thead>
           <tr>
             <th width="10%">${ _('Id') }</th>
-            <th width="10%">${ _('Join Percentage') }</th>
+            <th width="10%">${ _('Popularity') }</th>
             <th width="30%">${ _('Table Name') }</th>
             <th>${ _('Join Column') }</th>
             <th width="10%">${ _('Join counts') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: joinedtables(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+          <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
@@ -997,7 +1002,7 @@ ${ assist.assistPanel() }
             </td>
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"</a></td>
             <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
-            <td data-bind="text: joincount"></td>
+            <td data-bind="text: numJoins"></td>
           </tr>
           </tbody>
         </table>

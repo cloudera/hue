@@ -498,7 +498,7 @@ var MetastoreViewModel = (function () {
                   self.optimizerDetails(ko.mapping.fromJS(data.details));
 
                   // Bump the most important columns first
-                  var topCol = self.optimizerDetails().table_donut.topColumns().slice(0, 5);
+                  var topCol = self.optimizerDetails().topColumns().slice(0, 5);
                   if (topCol.length >= 3 && self.favouriteColumns().length > 0) {
                     self.favouriteColumns($.grep(self.columns(), function(col) {
                         return topCol.indexOf(col.name()) != -1;
@@ -506,14 +506,14 @@ var MetastoreViewModel = (function () {
                     );
                   }
                   // Column popularity, stats
-                  $.each(self.optimizerDetails().sortedTotal(), function(index, optimizerCol) {
-                    var metastoreCol = $.grep(self.columns(), function(col) {
-                      return col.name() == optimizerCol.columnName();
-                    });
-                    if (metastoreCol.length > 0) {
-                      metastoreCol[0].popularity(optimizerCol.totalCount())
-                    }
-                  });
+//                  $.each(self.optimizerDetails().topColumns(), function(index, optimizerCol) {
+//                    var metastoreCol = $.grep(self.columns(), function(col) {
+//                      return col.name() == optimizerCol.columnName();
+//                    });
+//                    if (metastoreCol.length > 0) {
+//                      metastoreCol[0].popularity(optimizerCol.totalCount())
+//                    }
+//                  });
                 } else {
                   $(document).trigger("info", data.message);
                 }
