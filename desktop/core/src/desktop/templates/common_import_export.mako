@@ -32,25 +32,63 @@ from django.utils.translation import ugettext as _
     <a href="#" class="close" data-dismiss="modal" data-clear="fileupload">&times;</a>
     <h3>${_('Import Hue documents')}</h3>
   </div>
-  <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
-    <div class="modal-body form-inline">
-      <div class="pull-right">
-        <input type="button" class="btn" data-dismiss="modal" data-clear="fileupload" value="${ _('Cancel') }" />
-        <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
-      </div>
-      <div class="fileupload fileupload-new" data-provides="fileupload">
-        <span class="btn btn-file" style="line-height: 29px">
-          <span class="fileupload-new">${ _('Select json file') }</span>
-          <span class="fileupload-exists">${ _('Change') }</span>
-          <input type="file" name="documents" accept=".json" />
-        </span>
-        &nbsp;&nbsp;<span class="fileupload-preview"></span>
-          <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
-      </div>
-      ${ csrf_token(request) | n,unicode }
-      <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
+  <div class="modal-body form-inline">
+    <div class="pull-right">
+      <input type="button" class="btn" data-dismiss="modal" data-clear="fileupload" value="${ _('Cancel') }" />
+      <a class="btn btn-danger" data-bind="click: import_document"> ${ _('Import') } </a>
     </div>
-  </form>
+    <div class="fileupload fileupload-new" data-provides="fileupload">
+      <span class="btn btn-file" style="line-height: 29px">
+        <span class="fileupload-new">${ _('Select json file') }</span>
+        <span class="fileupload-exists">${ _('Change') }</span>
+        <input type="file" accept=".json" id="fileData"/>
+      </span>
+      &nbsp;&nbsp;<span class="fileupload-preview"></span>
+        <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
+    </div>
+    ${ csrf_token(request) | n,unicode }
+    <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
+  </div>
+</div>
+
+<div id="import-document-data" class="modal hide fade">
+  <div class="modal-body">
+    <div class="center animated" style="display: none;" data-bind="visible: importedDocumentCount() == 0">
+      <i class="fa fa-spinner fa-spin fa-2x"></i>
+    </div>
+    <!-- ko if: importedDocumentCount() > 0 -->
+      <h3> ${_('Document Summary')} </h3>
+      <ul>
+        <li> ${_('Imported: ')} <span data-bind="text: importedDocSummary()['count']"></span></li>
+        <li> ${_('Created: ')} <span data-bind="text: importedDocSummary()['created_count']"></span></li>
+        <li> ${_('Updated: ')} <span data-bind="text: importedDocSummary()['updated_count']"></span></li>
+      </ul>
+
+      ${_('Show Details')}
+      <button id="show-details-caret" class="btn toolbarBtn" data-bind="click: $root.toggleShowTable"><span class="caret"></span></button>
+      <!-- ko if: $root.showTable() -->
+        <table class="table table-striped table-condensed">
+          <thead>
+            <tr>
+              <th>${_('Name')}</th>
+              <th>${_('Type')}</th>
+              <th>${_('Owner')}</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: importedDocSummary()['documents']">
+            <tr>
+              <td data-bind="text: $data.name"> </td>
+              <td data-bind="text: $data.type"> </td>
+              <td data-bind="text: $data.owner"> </td>
+            </tr>
+          </tbody>
+        </table>
+      <!-- /ko -->
+    <!-- /ko -->
+  </div>
+  <div class="modal-footer">
+    <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: refreshPage"/>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -65,5 +103,66 @@ from django.utils.translation import ugettext as _
         $('#import-documents input[type="submit"]').attr('disabled', 'disabled');
       }
     });
+  });
+</script>
+
+<script type="text/javascript" charset="utf-8">
+  var ImportDocument = function () {
+    var self = this;
+    self.fileData = new FormData();
+    self.importedDocSummary = ko.observable();
+    self.showTable = ko.observable();
+
+    self.import_document = function() {
+      self.importedDocSummary(null);
+      self.showTable(false);
+      $('#import-documents').modal('hide');
+      $('#import-document-data').modal('show');
+
+      self.fileData = new FormData();
+      self.fileData.append("documents", $('#fileData')[0].files[0]);
+      $.ajax({
+        type: "POST",
+        url: "/desktop/api2/doc/import",
+        data: self.fileData,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+          if (data.status == 0) {
+            self.importedDocSummary(data);
+          } else {
+            $(document).trigger('error', data.message);
+          }
+        },
+      });
+    };
+
+    self.importedDocumentCount = function() {
+      if (self.importedDocSummary()) {
+        return self.importedDocSummary()['documents'].length;
+      }
+      return 0;
+    };
+
+    self.toggleShowTable = function() {
+      self.showTable(!self.showTable());
+    };
+
+    self.refreshPage = function() {
+      window.location.reload();
+    };
+
+    $('#import-document-data-close').keyup(function(e) {
+      if (e.keyCode == 27) {
+        self.refreshPage();
+      }
+    });
+  }
+
+  var importDocumentModel;
+  $(document).ready(function () {
+    importDocumentModel = new ImportDocument();
+    ko.applyBindings(importDocumentModel, $("#import-documents")[0]);
+    ko.applyBindings(importDocumentModel, $("#import-document-data")[0]);
   });
 </script>
