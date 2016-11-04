@@ -476,7 +476,7 @@ var MetastoreViewModel = (function () {
               }, function(data) {
                 if (data && data.status == 0) {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
-                  // self.getRelationships();
+                  self.getRelationships();
                 } else {
                   $(document).trigger("info", data.message);
                 }

@@ -297,6 +297,7 @@ ${ hueIcons.symbols() }
 
 
       <span style="position: fixed; bottom: 0">
+      Create Table<br/>
       Import File<br/>
       Import Queries<br/>
       [+]

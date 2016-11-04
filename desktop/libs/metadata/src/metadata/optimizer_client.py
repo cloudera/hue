@@ -215,6 +215,15 @@ class OptimizerApi(object):
         '--table-name', table_name.lower()
     ])
 
+  def popular_joins(self, database_name=None):
+    args = [
+        '--tenant', self._product_name,
+    ]
+    if database_name:
+      args += ['--db-name', database_name.lower()]
+
+    return self._exec('get-top-joins', args)
+
 
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']

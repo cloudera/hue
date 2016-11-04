@@ -186,6 +186,18 @@ class TestOptimizerApi(object):
     assert_true('popularValues' in resp, resp)
 
 
+  def test_popular_joins(self):
+    resp = self.api.popular_joins(database_name='db1')
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('tables' in resp['results'][0], resp)
+    assert_true('queryIds' in resp['results'][0], resp)
+    assert_true('totalTableCount' in resp['results'][0], resp)
+    assert_true('totalQueryCount' in resp['results'][0], resp)
+    assert_true('type' in resp['results'][0], resp)
+    assert_true('columns' in resp['results'][0], resp)
+
+
   def test_similar_queries(self):
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
