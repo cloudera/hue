@@ -294,15 +294,18 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-columns">
+    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
+      <!-- ko component: { name: 'sql-columns-table', params: { columns: extended_columns } } --><!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-table-details">
     <!-- ko with: fetchedData -->
-    <!-- ko if: comment || (details && details.properties) -->
     <div style="flex: 1; padding: 10px 10px 0 10px;">
-      <!-- ko if: comment -->
-      <div style="margin-bottom: 5px; font-style: italic; padding-left: 5px;" data-bind="text: comment"></div>
-      <!-- /ko -->
       <!-- ko if: details && details.properties -->
-      <div>
+      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Properties") }</div>
+      <div style="margin-left: 15px;">
         <span style="margin-right: 5px;" title="${ _('Owner') }">
           <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
         </span>
@@ -317,10 +320,14 @@ from metadata.conf import has_navigator
         </span>
       </div>
       <!-- /ko -->
-    </div>
-    <!-- /ko -->
-    <div class="sql-context-flex-fill">
-      <!-- ko component: { name: 'sql-columns-table', params: { columns: cols } } --><!-- /ko -->
+      <!-- ko if: comment -->
+      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
+      <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
+      <!-- /ko -->
+      %if has_navigator(user):
+        <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
+        <div style="margin-left: 15px;" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+      %endif
     </div>
     <!-- /ko -->
   </script>
@@ -330,24 +337,13 @@ from metadata.conf import has_navigator
       <div style="margin: 15px;">
         <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
         <!-- ko if: comment -->
-        <div style="margin-top: 10px; font-weight: bold;">${ _("Comment") }</div>
+        <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
         <div data-bind="text: comment"></div>
         <!-- /ko -->
-      </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="sql-context-table-and-column-tags">
-    <div class="sql-context-flex-fill">
-      <div class="sql-context-flex">
-        <div class="sql-context-flex-header">
-          <div style="margin: 10px 5px 0 10px;">
-            <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
-          </div>
-        </div>
-        <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
-        </div>
+        %if has_navigator(user):
+          <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
+          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+        %endif
       </div>
     </div>
   </script>
@@ -568,7 +564,7 @@ from metadata.conf import has_navigator
         }
       };
 
-      function TableAndColumnTabContents(identifierChain, sourceType, defaultDatabase, apiFunction) {
+      function GenericTabContents(identifierChain, sourceType, defaultDatabase, apiFunction) {
         var self = this;
         self.identifierChain = identifierChain;
         self.sourceType = sourceType;
@@ -581,7 +577,7 @@ from metadata.conf import has_navigator
         self.hasErrors = ko.observable(false);
       }
 
-      TableAndColumnTabContents.prototype.formatAnalysisValue = function (type, val) {
+      GenericTabContents.prototype.formatAnalysisValue = function (type, val) {
         if (type === 'last_modified_time' || type === 'transient_lastDdlTime') {
           return localeFormat(val * 1000);
         }
@@ -591,7 +587,7 @@ from metadata.conf import has_navigator
         return val;
       };
 
-      TableAndColumnTabContents.prototype.fetch = function (callback) {
+      GenericTabContents.prototype.fetch = function (callback) {
         var self = this;
         if (self.loading()) {
           return;
@@ -605,8 +601,8 @@ from metadata.conf import has_navigator
           defaultDatabase: self.defaultDatabase,
           silenceErrors: true,
           successCallback: function (data) {
-            if (typeof data.cols !== 'undefined') {
-              data.cols.forEach(function (column) {
+            if (typeof data.extended_columns !== 'undefined') {
+              data.extended_columns.forEach(function (column) {
                 column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
                 if (column.type.indexOf('<') !== -1) {
                   column.type = column.type.substring(0, column.type.indexOf('<'));
@@ -626,60 +622,59 @@ from metadata.conf import has_navigator
         });
       };
 
-      function TagsTab (identifierChain, sourceType, defaultDatabase) {
-        var self = this;
-        self.loading = ko.observable(false);
-        self.hasErrors = ko.observable(false);
-        self.identifierChain = identifierChain;
-        self.defaultDatabase = defaultDatabase;
-        self.sourceType = sourceType;
-      }
-
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn) {
         var self = this;
         self.tabs = ko.observableArray();
 
         var apiHelper = ApiHelper.getInstance();
 
-        self.columnDetails = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
-        self.tableDetails = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
-        self.tags = new TagsTab(data.identifierChain, sourceType, defaultDatabase);
-        self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
-        self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
-        self.partitions = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
+        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
+        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
+        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
+        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
 
-        self.activeTab = ko.observable('details');
+        self.activeTab = ko.observable();
+
+        self.activeTab.subscribe(function (newValue) {
+          if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
+            self.sample.fetch(self.initializeSamplesTable);
+          } else if (typeof self[newValue].fetchedData() === 'undefined') {
+            self[newValue].fetch();
+          }
+        });
 
         if (isColumn) {
           self.tabs.push({
-            id: 'details',
+            id: 'columnDetails',
             label: '${ _("Details") }',
             template: 'sql-context-column-details',
             templateData: self.columnDetails,
             errorText: '${ _("There was a problem loading the column details.") }',
             isColumn: true
           });
+          self.activeTab('columnDetails');
         } else {
           self.tabs.push({
-            id: 'details',
+            id: 'columns',
+            label: '${ _("Columns") }',
+            template: 'sql-context-columns',
+            templateData: self.columns,
+            errorText: '${ _("There was a problem loading the columns.") }',
+            isColumn: false
+          });
+          self.tabs.push({
+            id: 'tableDetails',
             label: '${ _("Details") }',
             template: 'sql-context-table-details',
             templateData: self.tableDetails,
             errorText: '${ _("There was a problem loading the table details.") }',
             isColumn: false
           });
-        }
+          self.activeTab('columns');
 
-        %if has_navigator(user):
-        self.tabs.push({
-          id: 'tags',
-          label: '${ _("Tags") }',
-          template: 'sql-context-table-and-column-tags',
-          templateData: self.tags,
-          errorText: '${ _("There was a problem loading the tags.") }',
-          isColumn: isColumn
-        });
-        %endif
+        }
 
         self.tabs.push({
           id: 'sample',
@@ -703,7 +698,6 @@ from metadata.conf import has_navigator
           });
         } else {
           self.tableDetails.fetch(function (data) {
-            console.log(data);
             if (data.partition_keys.length === 0) {
               self.tabs.push({
                 id: 'analysis',
@@ -725,18 +719,6 @@ from metadata.conf import has_navigator
             }
           });
         }
-
-
-
-        self.activeTab.subscribe(function (newValue) {
-          if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
-            self.sample.fetch(self.initializeSamplesTable);
-          } else if (newValue === 'analysis' && typeof self.analysis.fetchedData() === 'undefined') {
-            self.analysis.fetch();
-          } else if (newValue === 'partitions' && typeof self.partitions.fetchedData() === 'undefined') {
-            self.partitions.fetch();
-          }
-        });
 
         intervals.push(window.setInterval(function () {
           if (self.activeTab() !== 'sample') {
