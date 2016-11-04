@@ -313,10 +313,6 @@ var MetastoreViewModel = (function () {
     });
   };
 
-  function MetastoreTableDetails(details) {
-    var self = this;
-  }
-
   /**
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
