@@ -249,6 +249,28 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = self.client.post('/metastore/tables/drop/%s' % self.db_name, {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
     assert_equal(resp.status_code, 302)
 
+  def test_drop_multi_tables_with_skip_trash(self):
+    hql = """
+      CREATE TABLE test_drop_multi_tables_with_skip_trash_1 (a int);
+      CREATE TABLE test_drop_multi_tables_with_skip_trash_2 (a int);
+      CREATE TABLE test_drop_multi_tables_with_skip_trash_3 (a int);
+    """
+    resp = _make_query(self.client, hql, database=self.db_name)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    # Drop them
+    resp = self.client.get('/metastore/tables/drop/%s' % self.db_name, follow=True)
+    assert_true('want to delete' in resp.content, resp.content)
+    resp = self.client.post('/metastore/tables/drop/%s' % self.db_name, {u'table_selection': [u'test_drop_multi_tables_with_skip_trash_1', u'test_drop_multi_tables_with_skip_trash_2', u'test_drop_multi_tables_with_skip_trash_3'], u'skip_trash': u'on'})
+    assert_equal(resp.status_code, 302)
+
+    response = self.client.get("/metastore/tables/%s?format=json" % self.db_name)
+    assert_equal(200, response.status_code)
+    data = json.loads(response.content)
+    assert_false('test_drop_multi_tables_with_skip_trash_1' in data['tables'])
+    assert_false('test_drop_multi_tables_with_skip_trash_2' in data['tables'])
+    assert_false('test_drop_multi_tables_with_skip_trash_3' in data['tables'])
+
   def test_drop_multi_databases(self):
     db1 = '%s_test_drop_1' % self.db_name
     db2 = '%s_test_drop_2' % self.db_name
