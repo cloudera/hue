@@ -54,6 +54,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
+from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -1352,29 +1353,6 @@ def _upload_archive(request):
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
-def extract_archive_in_hdfs(request, upload_path, file_name):
-
-  _upload_extract_archive_script_to_hdfs(request.fs)
-
-  from notebook.connectors.base import Notebook
-
-  shell_notebook = Notebook()
-  shell_notebook.add_shell_snippet(shell_command='extract_archive_in_hdfs.sh',
-                                   arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}],
-                                   archives=[],
-                                   files=[{'value': '/user/hue/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + file_name}],
-                                   env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}])
-  return shell_notebook.execute(request, batch=True)
-
-def _upload_extract_archive_script_to_hdfs(fs):
-  if not fs.exists('/user/hue/common/'):
-    fs.do_as_user('hue', fs.mkdir, '/user/hue/common/')
-    fs.do_as_user('hue', fs.chmod, '/user/hue/common/', 0755)
-
-  if not fs.do_as_user('hue', fs.exists, '/user/hue/common/extract_archive_in_hdfs.sh'):
-    fs.do_as_user('hue', fs.copyFromLocal, 'desktop/core/src/desktop/lib/extract_archive_in_hdfs.sh',
-                          '/user/hue/common/extract_archive_in_hdfs.sh')
-    fs.do_as_user('hue', fs.chmod, '/user/hue/common/', 0755)
 
 def status(request):
     status = request.fs.status()

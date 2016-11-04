@@ -55,7 +55,7 @@ then
 	echo "ERROR: Missing Arguments"
 	usage
 	exit 1
-fi 
+fi
 
 exit_status=0
 
@@ -66,15 +66,15 @@ temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
 
 set -x
-if [[ $FILE_NAME =~ \.zip$ ]] 
+if [[ $FILE_NAME =~ \.zip$ ]]
 then
 	unzip $FILE_NAME -d $temp_output_dir
 	exit_status=$(echo $?)
-elif [[ $FILE_NAME =~ \.tar\.gz$ ]] || [[ $FILE_NAME =~ \.tgz$ ]] 
+elif [[ $FILE_NAME =~ \.tar\.gz$ ]] || [[ $FILE_NAME =~ \.tgz$ ]]
 then
 	tar -xvzf $FILE_NAME -C $temp_output_dir
 	exit_status=$(echo $?)
-elif [[ $FILE_NAME =~ \.bz2$ ]] || [[ $FILE_NAME =~ \.bzip2$ ]] 
+elif [[ $FILE_NAME =~ \.bz2$ ]] || [[ $FILE_NAME =~ \.bzip2$ ]]
 then
 	bzip2 -dc $FILE_NAME > $temp_output_dir/$filename_without_extension
 	exit_status=$(echo $?)
