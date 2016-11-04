@@ -295,15 +295,40 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-details">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
-      <!-- ko component: { name: 'sql-columns-table', params: { columns: extended_columns } } --><!-- /ko -->
+    <!-- ko with: fetchedData -->
+    <!-- ko if: comment || (details && details.properties) -->
+    <div style="flex: 1; padding: 10px 10px 0 10px;">
+      <!-- ko if: comment -->
+      <div style="margin-bottom: 5px; font-style: italic; padding-left: 5px;" data-bind="text: comment"></div>
+      <!-- /ko -->
+      <!-- ko if: details && details.properties -->
+      <div>
+        <span style="margin-right: 5px;" title="${ _('Owner') }">
+          <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
+        </span>
+        <span style="margin-right: 5px;" title="${ _('Created') }">
+          <i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time)"></span>
+        </span>
+        <span style="margin-right: 5px;" title="${ _('Format') }">
+          <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
+        </span>
+        <span style="margin-right: 5px;" title="${ _('Format') }">
+          <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span> <span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span>
+        </span>
+      </div>
+      <!-- /ko -->
     </div>
+    <!-- /ko -->
+    <div class="sql-context-flex-fill">
+      <!-- ko component: { name: 'sql-columns-table', params: { columns: cols } } --><!-- /ko -->
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sql-context-column-details">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
       <div style="margin: 15px;">
-        <a class="pointer" data-bind="text: name, attr: { title: comment }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+        <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
         <!-- ko if: comment -->
         <div style="margin-top: 10px; font-weight: bold;">${ _("Comment") }</div>
         <div data-bind="text: comment"></div>
@@ -580,8 +605,8 @@ from metadata.conf import has_navigator
           defaultDatabase: self.defaultDatabase,
           silenceErrors: true,
           successCallback: function (data) {
-            if (typeof data.extended_columns !== 'undefined') {
-              data.extended_columns.forEach(function (column) {
+            if (typeof data.cols !== 'undefined') {
+              data.cols.forEach(function (column) {
                 column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
                 if (column.type.indexOf('<') !== -1) {
                   column.type = column.type.substring(0, column.type.indexOf('<'));
@@ -616,7 +641,8 @@ from metadata.conf import has_navigator
 
         var apiHelper = ApiHelper.getInstance();
 
-        self.details = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.columnDetails = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
+        self.tableDetails = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
         self.tags = new TagsTab(data.identifierChain, sourceType, defaultDatabase);
         self.sample = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
         self.analysis = new TableAndColumnTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
@@ -624,14 +650,25 @@ from metadata.conf import has_navigator
 
         self.activeTab = ko.observable('details');
 
-        self.tabs.push({
-          id: 'details',
-          label: '${ _("Details") }',
-          template: isColumn ? 'sql-context-column-details' : 'sql-context-table-details',
-          templateData: self.details,
-          errorText: '${ _("There was a problem loading the details.") }',
-          isColumn: isColumn
-        });
+        if (isColumn) {
+          self.tabs.push({
+            id: 'details',
+            label: '${ _("Details") }',
+            template: 'sql-context-column-details',
+            templateData: self.columnDetails,
+            errorText: '${ _("There was a problem loading the column details.") }',
+            isColumn: true
+          });
+        } else {
+          self.tabs.push({
+            id: 'details',
+            label: '${ _("Details") }',
+            template: 'sql-context-table-details',
+            templateData: self.tableDetails,
+            errorText: '${ _("There was a problem loading the table details.") }',
+            isColumn: false
+          });
+        }
 
         %if has_navigator(user):
         self.tabs.push({
@@ -653,27 +690,43 @@ from metadata.conf import has_navigator
           isColumn: isColumn
         });
 
-        self.details.fetch(function (data) {
-          if (isColumn || data.partition_keys.length === 0) {
+        if (isColumn) {
+          self.columnDetails.fetch(function (data) {
             self.tabs.push({
               id: 'analysis',
               label: '${ _("Analysis") }',
-              template: isColumn ? 'sql-context-column-analysis' : 'sql-context-table-analysis',
+              template: 'sql-context-column-analysis',
               templateData: self.analysis,
-              errorText: '${ _("There was a problem loading the analysis.") }',
-              isColumn: isColumn
+              errorText: '${ _("There was a problem loading the column analysis.") }',
+              isColumn: true
             });
-          } else if (!isColumn && data.partition_keys.length > 0) {
-            self.tabs.push({
-              id: 'partitions',
-              label: '${ _("Partitions") }',
-              template: 'sql-context-table-partitions',
-              templateData: self.partitions,
-              errorText: '${ _("There was a problem loading the partitions.") }',
-              isColumn: isColumn
-            });
-          }
-        });
+          });
+        } else {
+          self.tableDetails.fetch(function (data) {
+            console.log(data);
+            if (data.partition_keys.length === 0) {
+              self.tabs.push({
+                id: 'analysis',
+                label: '${ _("Analysis") }',
+                template: 'sql-context-table-analysis',
+                templateData: self.analysis,
+                errorText: '${ _("There was a problem loading the table analysis.") }',
+                isColumn: false
+              });
+            } else if (data.partition_keys.length > 0) {
+              self.tabs.push({
+                id: 'partitions',
+                label: '${ _("Partitions") }',
+                template: 'sql-context-table-partitions',
+                templateData: self.partitions,
+                errorText: '${ _("There was a problem loading the table partitions.") }',
+                isColumn: false
+              });
+            }
+          });
+        }
+
+
 
         self.activeTab.subscribe(function (newValue) {
           if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
