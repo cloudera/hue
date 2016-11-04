@@ -208,21 +208,12 @@ class OptimizerApi(object):
         '--query', query
     ])
 
-  def popular_filter_values(self, table_name, column_name=None, token=None, email=None):
-    if token is None:
-      token = self._authenticate()
-
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-          'tableName': table_name.lower()
-      }
-      if column_name:
-        data['columnName'] = column_name
-      return self._root.post('/api/getPopularFilterValues', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+  def popular_filter_values(self, database_name, table_name, column_name=None):
+    return self._exec('get-top-filters', [
+        '--tenant', self._product_name,
+        '--db-name', database_name.lower(),
+        '--table-name', table_name.lower()
+    ])
 
 
 def OptimizerDataAdapter(queries):

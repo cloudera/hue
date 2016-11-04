@@ -178,6 +178,14 @@ class TestOptimizerApi(object):
     assert_true('clauseString' in resp, resp)
 
 
+  def test_popular_filter_values(self):  # Requires test_upload to run before
+    resp = self.api.popular_filter_values(database_name='db1', table_name='Part')
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('qids' in resp, resp)
+    assert_true('popularValues' in resp, resp)
+
+
   def test_similar_queries(self):
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
