@@ -312,9 +312,21 @@ class SampleQuery(object):
       LOG.info('Successfully installed sample design: %s' % (self.name,))
 
     if USE_NEW_EDITOR.get():
+      # Get or create sample user directories
+      home_dir = Directory.objects.get_home_directory(django_user)
+      examples_dir, created = Directory.objects.get_or_create(
+        parent_directory=home_dir,
+        owner=django_user,
+        name=Document2.EXAMPLES_DIR
+      )
+
       try:
         # Don't overwrite
         doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
+        # If document exists but has been trashed, recover from Trash
+        if doc2.parent_directory != examples_dir:
+          doc2.parent_directory = examples_dir
+          doc2.save()
       except Document2.DoesNotExist:
         # Create document from saved query
         notebook = import_saved_beeswax_query(query)
@@ -322,14 +334,6 @@ class SampleQuery(object):
         data['isSaved'] = True
         uuid = data.get('uuid')
         data = json.dumps(data)
-
-        # Get or create sample user directories
-        home_dir = Directory.objects.get_home_directory(django_user)
-        examples_dir, created = Directory.objects.get_or_create(
-          parent_directory=home_dir,
-          owner=django_user,
-          name=Document2.EXAMPLES_DIR
-        )
 
         doc2 = Document2.objects.create(
           uuid=uuid,
@@ -341,11 +345,9 @@ class SampleQuery(object):
           data=data
         )
 
-        # Share with default group
-        examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
-        doc2.save()
-
-        LOG.info('Successfully installed sample query: %s' % (self.name,))
+      # Share with default group
+      examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
+      LOG.info('Successfully installed sample query: %s' % (self.name,))
 
 
   def _document_type(self, type):
