@@ -1143,8 +1143,6 @@ from metadata.conf import has_navigator
         <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i>
         <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
             source: navAutocompleteSource,
-            addCount: true,
-            realCountCallback: navAutocompleteLatestCount,
             itemTemplate: 'nav-search-autocomp-item',
             noMatchTemplate: 'nav-search-autocomp-no-match',
             classPrefix: 'nav-',
@@ -1191,6 +1189,12 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="nav-search-result">
     <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;" data-bind="niceScroll">
+      <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
+        <div class="assist-db-header-actions">
+          <span class="assist-tables-counter" data-bind="visible: searchResult().length > 0">(<span data-bind="text: searchResultCount">0</span>)</span>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); searchInput(''); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
+        </div>
+      </div>
       <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !searching() -->
       <!-- ko if: searchResult().length == 0 -->
@@ -1691,6 +1695,7 @@ from metadata.conf import has_navigator
 
         self.searchInput = ko.observable('').extend({rateLimit: 500});
         self.searchResult = ko.observableArray();
+        self.searchResultCount = ko.observable();
 
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
@@ -1895,6 +1900,7 @@ from metadata.conf import has_navigator
               entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
             });
             self.searchResult(data.entities);
+            self.searchResultCount(data.count);
             self.searching(false);
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1916,12 +1922,6 @@ from metadata.conf import has_navigator
           }
           newValue.panelData.init();
         });
-
-        var latestCount = 0;
-
-        self.navAutocompleteLatestCount = function () {
-          return latestCount;
-        };
 
         self.navAutocompleteSource = function (request, callback) {
           var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
@@ -1965,9 +1965,6 @@ from metadata.conf import has_navigator
                   });
                 }
               }
-
-              // We need to add the facet matches as totalMatched is only for the entries
-              latestCount = data.totalMatched + values.length;
 
               if (values.length > 0) {
                 values.push({ divider: true });
