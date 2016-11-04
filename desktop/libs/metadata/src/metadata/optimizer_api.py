@@ -185,20 +185,18 @@ def similar_queries(request):
 def popular_values(request):
   response = {'status': -1}
 
+  database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
-  column_name = request.POST.get('columnName')
+  column_name = request.POST.get('columnName') # Unsused
 
   api = OptimizerApi()
-  data = api.popular_filter_values(table_name=table_name, column_name=column_name)
+  data = api.popular_filter_values(database_name=database_name, table_name=table_name, column_name=column_name)
 
   if data['status'] == 'success':
-    if 'status' in data['details']:
-      response['values'] = [] # Bug in Opt API
-    else:
-      response['values'] = data['details']
-      response['status'] = 0
+    response['status'] = 0
+    response['values'] = data['results']
   else:
-    response['message'] = 'Optimizer: %s' % data['details']
+    response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 
