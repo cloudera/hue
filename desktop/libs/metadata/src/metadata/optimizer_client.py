@@ -96,7 +96,7 @@ class OptimizerApi(object):
       raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
 
     if data:
-      response = json.loads(data) 
+      response = json.loads(data)
       response['status'] = 'success'
     return response
 
@@ -170,24 +170,24 @@ class OptimizerApi(object):
         raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def top_tables(self, workfloadId=None, database_name='default'): 
+  def top_tables(self, workfloadId=None, database_name='default'):
     return self._exec('get-top-tables', [
         '--tenant', self._product_name,
-        '--db-name', database_name
+        '--db-name', database_name.lower()
     ])
 
 
   def table_details(self, database_name, table_name):
     return self._exec('get-tables-detail', [
         '--tenant', self._product_name,
-        '--db-name', database_name,
-        '--table-name', table_name
+        '--db-name', database_name.lower(),
+        '--table-name', table_name.lower()
     ])
 
 
   def query_compatibility(self, source_platform, target_platform, query):
     return self._exec('get-query-compatible', [
-        '--tenant', self._product_name,        
+        '--tenant', self._product_name,
         '--source-platform', source_platform,
         '--target-platform', target_platform,
         '--query', query,
@@ -216,7 +216,7 @@ class OptimizerApi(object):
       data = {
           'email': email if email is not None else self._email,
           'token': token,
-          'tableName': table_name
+          'tableName': table_name.lower()
       }
       if column_name:
         data['columnName'] = column_name
