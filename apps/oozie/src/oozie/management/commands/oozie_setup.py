@@ -155,13 +155,15 @@ class Command(NoArgsCommand):
           data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
           data = json.dumps(data)
 
-          doc2 = Document2.objects.create(
+          # Don't overwrite
+          doc2, created = Document2.objects.get_or_create(
             owner=self.user,
             parent_directory=examples_dir,
             name=doc.name,
             type='link-workflow',
             description=doc.description,
-            data=data)
+            data=data
+          )
 
           LOG.info('Successfully installed sample link to jobsub: %s' % (doc2.name,))
 
