@@ -26,6 +26,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.lib.rest import resource
+from desktop.models import Document2
 
 from search.api import _round_number_range
 from search.models import Collection2
@@ -79,8 +80,17 @@ class TestSearchBase(object):
 
   def setUp(self):
     self.c = make_logged_in_client(username='test_search', is_superuser=False)
-    grant_access('test_search', 'test_search', 'search')
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
+
     self.user = User.objects.get(username='test_search')
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+    grant_access('test_search', 'test_search', 'search')
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access('not_perm_user', 'not_perm_user', 'search')
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
+
+    self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
     self.prev_resource = resource.Resource
     resource.Resource = MockResource
@@ -101,6 +111,59 @@ class TestWithMockedSolr(TestSearchBase):
   def test_index(self):
     response = self.c.get(reverse('search:index'))
     assert_true('search' in response.content, response.content)
+
+  def test_share_dashboard(self):
+      doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
+                                     data=self.collection.data, parent_directory=self.home_dir)
+
+      # owner can view document
+      response = self.c.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+      data = json.loads(response.content)
+      assert_equal(doc.uuid, data['document']['uuid'], data)
+
+      # other user cannot view document
+      response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+      data = json.loads(response.content)
+      assert_equal(-1, data['status'])
+
+      # Share read perm by users
+      response = self.c.post("/desktop/api2/doc/share", {
+          'uuid': json.dumps(doc.uuid),
+          'data': json.dumps({
+              'read': {
+                  'user_ids': [
+                      self.user.id,
+                      self.user_not_me.id
+                  ],
+                  'group_ids': [],
+              },
+              'write': {
+                  'user_ids': [],
+                  'group_ids': [],
+              }
+          })
+      })
+
+      assert_equal(0, json.loads(response.content)['status'], response.content)
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      # other user can view document
+      response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+      data = json.loads(response.content)
+      assert_equal(doc.uuid, data['document']['uuid'], data)
+
+      # other user can open dashboard
+      response = self.c.post(reverse('search:search'), {
+          'collection': json.dumps(self._get_collection_param(self.collection)),
+          'query': json.dumps(QUERY)
+      })
+
+      data = json.loads(response.content)
+      assert_true('response' in data, data)
+      assert_true('docs' in data['response'], data)
 
   def test_update_document(self):
     # Regular user
