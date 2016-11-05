@@ -22,6 +22,7 @@ from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
@@ -54,7 +55,10 @@ def index(request, is_mobile=False):
 
   try:
     collection_doc = Document2.objects.get(id=collection_id)
-    collection_doc.doc.get().can_read_or_exception(request.user)
+    if USE_NEW_EDITOR.get():
+      collection_doc.can_read_or_exception(request.user)
+    else:
+      collection_doc.doc.get().can_read_or_exception(request.user)
     collection = Collection2(request.user, document=collection_doc)
   except Exception, e:
     raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
