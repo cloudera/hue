@@ -519,7 +519,7 @@ class Collection2(object):
 #           {'filter': 'type_s:notebook', 'name': 'notebooks', 'selected': False, 'values': [
 #             {'filter': 'type_s:sheet', 'name': 'sheets', 'selected': False, 'values': []}]}
         ]
-             
+
       }]}]}
 
     for facet in props['collection']['facets']:
@@ -854,7 +854,7 @@ def augment_solr_response(response, collection, query):
         elif collection_facet['properties'].get('isOldPivot'):
           facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate'] == 'count']
           count = response['facets'][name]
-          _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values)
+          _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
         elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
           # Single dimension or dimension 2 with analytics
@@ -989,7 +989,9 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
     _fq_fields = fq_fields + _fields[0:1]
     _fq_values = fq_values + [val]
 
-    if 'd2' in bucket:
+    if 'd3' in bucket:
+      augmented.append(_get_augmented(bucket['d3'], val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
+    elif 'd2' in bucket:
       if type(bucket['d2']) == dict:
         augmented += __augment_stats_2d(bucket['d2']['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:])
       else:
@@ -1028,20 +1030,21 @@ def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
     c['fq_values'] = fq_values
 
 
-def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, selected_values, fields='', values=''):
+def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, selected_values, fields='', values='', dimension=2):
   for c in counts['buckets']:
     c['field'] = facet_fields[0]
     fq_fields = (fields if fields else []) + [c['field']]
     fq_values = (values if values else []) + [smart_str(c['val'])]
     c['value'] = c.pop('val')
+    bucket = 'd%s' % dimension
 
-    if 'd2' in c:
+    if bucket in c:
       next_dimension = facet_fields[1:]
       if next_dimension:
-        _convert_nested_to_augmented_pivot_nd(next_dimension, facet_id, c['d2'], selected_values, fq_fields, fq_values)
-        c['pivot'] = c.pop('d2')['buckets']
+        _convert_nested_to_augmented_pivot_nd(next_dimension, facet_id, c[bucket], selected_values, fq_fields, fq_values, dimension=dimension+1)
+        c['pivot'] = c.pop(bucket)['buckets']
       else:
-        c['count'] = c.pop('d2')
+        c['count'] = c.pop(bucket)
 
     fq_filter = selected_values.get(facet_id, [])
     _selected_values = [f['value'] for f in fq_filter]
