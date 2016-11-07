@@ -110,13 +110,7 @@ var HueColors = {
   },
 
 
-  /**
-   * Gets a palette of colors to be used in charts
-   * It can be used in several ways, e.g.
-   * getChartColor() >> the whole spectrum
-   * @return {array}                  A list of colors in the {'color': '#HEX_VALUE'} format
-   */
-  getCUIChartColors: function getChartColors(swatch, bands, reversed, distributed) {
+  getCUIChartColors: function () {
     var normalizedColors = {}, i;
     this.CUIScaleColors.forEach(function (scaleDef) {
       normalizedColors[scaleDef.name] = scaleDef.colors;
@@ -147,18 +141,24 @@ var HueColors = {
       sequence.forEach(addPlus);
       sequence.forEach(addMinus);
     }
-
     return wholeSpectrum;
-
   },
 
   d3Scale: function () {
     return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
   },
-  cuiD3Scale: function () {
-    return this.getCUIChartColors().map(function (c) {
+  cuiD3Scale: function (swatch) {
+    var colors = this.getCUIChartColors().map(function (c) {
       return c.color;
     });
+    if (swatch) {
+      this.CUIScaleColors.forEach(function (s) {
+        if (s.name === swatch) {
+          colors = s.colors;
+        }
+      });
+    }
+    return colors;
   },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
