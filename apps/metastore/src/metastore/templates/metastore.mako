@@ -715,8 +715,7 @@ ${ assist.assistPanel() }
       </td>
       <td><code data-bind="text: queryChar"></code></td>
       <td><code data-bind="text: query().substring(0, 100) + '...'"></code></td>
-      ##<td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
-      <td class="alert alert-danger"></td>
+      <td data-bind="text: complexity, css: {'alert-success': complexity() == 'Low', 'alert-warning': complexity() == 'Medium', 'alert-danger': complexity() == 'High'}" class="alert"></td>
       <td data-bind="text: hiveCompatible"></td>
       <td data-bind="text: impalaCompatible"></td>
     </tr>
