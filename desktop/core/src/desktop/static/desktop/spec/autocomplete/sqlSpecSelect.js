@@ -201,6 +201,17 @@
       });
     });
 
+    fit('should suggest tables for "SELECT * FROM 33abc.|"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM 33abc.',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { identifierChain: [{ name: '33abc' }] }
+        }
+      });
+    });
+
     it('should suggest tables for "SELECT * FROM `database_two`.`bla |"', function() {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM `database_two`.`bla ',

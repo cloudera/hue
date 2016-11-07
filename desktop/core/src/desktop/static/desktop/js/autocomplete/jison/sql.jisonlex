@@ -389,7 +389,7 @@
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
-[A-Za-z][A-Za-z0-9_]*                      { return 'REGULAR_IDENTIFIER'; }
+[A-Za-z0-9_]+                              { return 'REGULAR_IDENTIFIER'; }
 
 <hdfs>'\u2020'                             { parser.yy.cursorFound = true; return 'CURSOR'; }
 <hdfs>'\u2021'                             { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
