@@ -1073,7 +1073,7 @@ var SqlFunctions = (function () {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'INT'}]],
         signature: 'date_sub(TIMESTAMP startdate, INT days), date_sub(TIMESTAMP startdate, interval_expression)',
-        description: 'ubtracts a specified number of days from a TIMESTAMP value. The first argument can be a string, which is automatically cast to TIMESTAMP if it uses the recognized format. With an INTERVAL expression as the second argument, you can calculate a delta value using other units such as weeks, years, hours, seconds, and so on.'
+        description: 'Subtracts a specified number of days from a TIMESTAMP value. The first argument can be a string, which is automatically cast to TIMESTAMP if it uses the recognized format. With an INTERVAL expression as the second argument, you can calculate a delta value using other units such as weeks, years, hours, seconds, and so on.'
       },
       datediff: {
         returnTypes: ['INT'],
@@ -2347,7 +2347,7 @@ var SqlFunctions = (function () {
     }
   };
 
-  var suggestFunctions = function (dialect, returnTypes, includeAggregate, includeAnalytic, completions) {
+  var suggestFunctions = function (dialect, returnTypes, includeAggregate, includeAnalytic, completions, weight) {
     var functionsToSuggest = {};
     addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
     addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
@@ -2368,7 +2368,12 @@ var SqlFunctions = (function () {
       completions.push({
         value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
         meta: functionsToSuggest[name].returnTypes.join('|'),
-        weight: -2,
+        weight: returnTypes.filter(function (type) {
+          return functionsToSuggest[name].returnTypes.filter(
+              function (otherType) {
+                return otherType === type;
+              }).length > 0
+        }).length > 0 ? weight + 1 : weight,
         docHTML: createDocHtml(functionsToSuggest[name])
       })
     });
