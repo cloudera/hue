@@ -32,13 +32,14 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    COLUMN: 700,
-    VIRTUAL_COLUMN: 600,
-    SAMPLE: 500,
-    IDENTIFIER: 400,
-    CTE: 300,
-    TABLE: 200,
-    DATABASE: 100,
+    COLUMN: 800,
+    VIRTUAL_COLUMN: 700,
+    SAMPLE: 600,
+    IDENTIFIER: 500,
+    CTE: 400,
+    TABLE: 300,
+    DATABASE: 200,
+    UDF: 100,
     HDFS: 1,
     COLREF_KEYWORD: -1
   };
@@ -118,9 +119,9 @@ var SqlAutocompleter2 = (function () {
       if (parseResult.suggestFunctions.types && parseResult.suggestFunctions.types[0] === 'COLREF') {
         colRefDeferral.done(function () {
           if (colRef !== null && colRef.type) {
-            SqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+            SqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions, DEFAULT_WEIGHTS.UDF);
           } else {
-            SqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+            SqlFunctions.suggestFunctions(self.snippet.type(), ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions, DEFAULT_WEIGHTS.UDF);
           }
           suggestFunctionsDeferral.resolve();
         });
@@ -482,6 +483,8 @@ var SqlAutocompleter2 = (function () {
               columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('array') === 0) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN + 1, table: table })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
               columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
