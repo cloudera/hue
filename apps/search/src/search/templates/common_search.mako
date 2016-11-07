@@ -548,7 +548,7 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
 
-    <div class="facet-field-cnt">
+    <div class="facet-field-cnt" data-bind="visible: $root.collection.nested.enabled">
       <span class="spinedit-cnt">
         <span class="facet-field-label">
           ${ _('Domain') }
@@ -562,9 +562,9 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
 
-  ## Dimensions > 1
-  <!-- ko if: $root.isEditing -->  
-  <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
+  ## Dimensions > 1 , visible: !$parents[1].isLoading()
+  <!-- ko if: $root.isEditing -->
+  <span data-bind="foreach: properties.facets">
     <div class="filter-box">
       <div class="title">
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">

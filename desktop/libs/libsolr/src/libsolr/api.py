@@ -166,26 +166,29 @@ class SolrApi(object):
             if facet['properties']['canRange'] and not facet['properties']['isDate']:
               del _f['mincount'] # Numeric fields do not support
 
-          if facet['properties']['facets']:
-            if facet['properties']['facets'][0]['aggregate'] == 'count':
+          def _nd(_f, facets, dim):
+            facet = facets[0]
+            f_name = 'd%s' % dim
+            if facet['aggregate'] == 'count':
               _f['facet'] = {
-                  'd2': {
+                  f_name: {
                       'type': 'terms',
-                      'field': '%(field)s' % facet['properties']['facets'][0],
-                      'limit': int(facet['properties']['facets'][0].get('limit', 10)),
-                      'mincount': int(facet['properties']['facets'][0]['mincount'])
+                      'field': '%(field)s' % facet,
+                      'limit': int(facet.get('limit', 10)),
+                      'mincount': int(facet['mincount'])
                   }
               }
-              if len(facet['properties']['facets']) > 1: # Get 3rd dimension calculation
-                _f['facet']['d2']['facet'] = {
-                    'd2': self._get_aggregate_function(facet['properties']['facets'][1])
-                }
+              if len(facets) > 1: # Get n+1 dimension
+                _nd(_f['facet'][f_name], facets[1:], dim+1)
             else:
               _f['facet'] = {
-                  'd2': self._get_aggregate_function(facet['properties']['facets'][0])
+                  f_name: self._get_aggregate_function(facet)
               }
-              _f['sort'] = {'d2': facet['properties']['sort']}
+#               _f['sort'] = {f_name: facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
+
+          if facet['properties']['facets']:
+            _nd(_f, facet['properties']['facets'], 2)
 
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
