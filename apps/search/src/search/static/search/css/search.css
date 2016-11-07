@@ -491,7 +491,7 @@ em {
 
 .partitionChart text {
   pointer-events: none;
-  fill: white;
+  fill: #212121;
 }
 
 .d3-tip {

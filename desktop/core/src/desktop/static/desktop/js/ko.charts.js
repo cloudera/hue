@@ -1280,7 +1280,7 @@
 
   ko.bindingHandlers.partitionChart = {
     render: function (element, valueAccessor) {
-
+      chartsNormalState();
       var MIN_HEIGHT_FOR_TOOLTIP = 24;
 
       var _options = valueAccessor();
@@ -1353,12 +1353,12 @@
 
       if (typeof _options.zoomable == "undefined" || _options.zoomable) {
         g.on("click", click)
-            .on("dblclick", function (d, i) {
-              if (typeof _options.onClick != "undefined" && d.depth > 0) {
-                chartsUpdatingState();
-                _options.onClick(d);
-              }
-            });
+          .on("dblclick", function (d, i) {
+            if (typeof _options.onClick != "undefined" && d.depth > 0) {
+              chartsUpdatingState();
+              _options.onClick(d);
+            }
+          });
       }
       else {
         g.on("click", function (d, i) {
@@ -1372,7 +1372,7 @@
       var _kx = _w / _data.dx,
           _ky = _h / 1;
 
-      var _colors = HueColors.scale(HueColors.DARK_BLUE, HueColors.BLUE, 5)
+      var _colors = [HueColors.cuiD3Scale('gray')[0]];
 
       g.append("svg:rect")
           .attr("width", _data.dy * _kx)
@@ -1383,15 +1383,15 @@
             return d.children ? "parent" : "child";
           })
           .attr("stroke", function (d) {
-            return HueColors.DARK_BLUE;
+            return HueColors.cuiD3Scale('gray')[3];
           })
           .attr("fill", function (d, i) {
             var _fill = _colors[d.depth] || _colors[_colors.length - 1];
             if (d.obj && _options.fqs) {
               $.each(_options.fqs(), function (cnt, item) {
                 $.each(item.filter(), function (icnt, filter) {
-                  if (filter.value() == d.obj.fq_values) {
-                    _fill = HueColors.ORANGE;
+                  if (JSON.stringify(filter.value()) == JSON.stringify(d.obj.fq_values)) {
+                    _fill = HueColors.cuiD3Scale('gray')[3];
                   }
                 });
               });
@@ -1429,6 +1429,7 @@
         _y.domain([d.x, d.x + d.dx]);
 
         var t = g.transition()
+            .delay(250)
             .duration(d3.event.altKey ? 7500 : 750)
             .attr("transform", function (d) {
               return "translate(" + _x(d.y) + "," + _y(d.x) + ")";
