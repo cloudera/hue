@@ -883,11 +883,15 @@ from django.utils.translation import ugettext as _
         if (val > 0) {
           if ($('#uploadFileModal').data('modal')) {
             $('#uploadFileModal').data('modal').$element.off('keyup.dismiss.modal');
-            $('#uploadFileModal').data('modal').$backdrop.off('click');
+            if ($('#uploadFileModal').data('modal').$backdrop){
+              $('#uploadFileModal').data('modal').$backdrop.off('click');
+            }
           }
           if ($('#uploadArchiveModal').data('modal')) {
             $('#uploadArchiveModal').data('modal').$element.off('keyup.dismiss.modal');
-            $('#uploadArchiveModal').data('modal').$backdrop.off('click');
+            if ($('#uploadArchiveModal').data('modal').$backdrop) {
+              $('#uploadArchiveModal').data('modal').$backdrop.off('click');
+            }
           }
         }
       });
@@ -962,23 +966,23 @@ from django.utils.translation import ugettext as _
         return ko.utils.arrayFilter(self.files(), function (file) {
           return file.selected();
         });
-      }, self);
+      }, self).extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
       self.selectedSentryFiles = ko.computed(function () {
         return ko.utils.arrayFilter(self.files(), function (file) {
           return file.selected() && file.isSentryManaged;
         });
-      }, self);
+      }, self).extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
       self.isCurrentDirSelected = ko.computed(function () {
         return ko.utils.arrayFilter(self.files(), function (file) {
           return file.name == "." && file.selected();
         });
-      }, self);
+      }, self).extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
       self.selectedFile = ko.computed(function () {
         return self.selectedFiles()[0];
-      }, self);
+      }, self).extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
       self.currentPath = ko.observable(currentDirPath);
       self.currentPath.subscribe(function (path) {
@@ -1143,8 +1147,7 @@ from django.utils.translation import ugettext as _
       };
 
       self.selectAll = function () {
-        self.allSelected(! self.allSelected());
-
+        self.allSelected(!self.allSelected());
         ko.utils.arrayForEach(self.files(), function (file) {
           if (file.name != "." && file.name != "..") {
             file.selected(self.allSelected());
