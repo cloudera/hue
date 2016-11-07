@@ -296,6 +296,8 @@ class Collection(models.Model):
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
           properties['timelineChartType'] = 'bar'
+        if 'enableSelection' not in properties:
+          properties['enableSelection'] = True
         if 'extraSeries' not in properties:
           properties['extraSeries'] = []
 
@@ -517,6 +519,8 @@ class Collection2(object):
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
           properties['timelineChartType'] = 'bar'
+        if 'enableSelection' not in properties:
+          properties['enableSelection'] = True
         if 'extraSeries' not in properties:
           properties['extraSeries'] = []
 

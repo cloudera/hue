@@ -1408,11 +1408,11 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
-      <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
+      <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), enableSelection: $root.collection.getFacetById($parent.id()).properties.enableSelection(), field: field, label: label(), transformer: timelineChartDataTransformer,
         type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
         fqs: $root.query.fqs,
         onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-        onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+        onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); $root.collection.getFacetById($parent.id()).properties.enableSelection(state.selectionEnabled); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
     <!-- /ko -->

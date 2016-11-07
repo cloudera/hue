@@ -158,7 +158,8 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
 
     if widget_type == 'histogram-widget':
       properties.update({
-        'timelineChartType': 'bar'
+        'timelineChartType': 'bar',
+        'enableSelection': True
       })
 
 

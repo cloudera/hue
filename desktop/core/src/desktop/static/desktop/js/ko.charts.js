@@ -278,6 +278,17 @@
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
+          _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
+          var enableSelection = true;
+          if (typeof _options.enableSelection !== 'undefined') {
+            enableSelection = _options.enableSelection;
+          }
+          if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
+            _chart.enableSelection();
+          }
+          else {
+            _chart.disableSelection();
+          }
           var _d3 = d3.select($(element).find("svg")[0]);
           _d3.datum(_datum)
             .transition().duration(150)
@@ -289,7 +300,6 @@
           _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
             insertLinebreaks(d, this);
           });
-          _d3.selectAll(".nv-brush").call(_chart.brush().clear());
           if (_chart.selectBars) {
             var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
             $.each(_options.fqs(), function (cnt, item) {
@@ -1093,8 +1103,15 @@
           }
           _chart = nv.models.multiBarWithBrushChart();
           $(element).data('chart_type', 'multibar_brush');
-          if (_datum.length > 0 && _datum[0].values.length > 10) {
+          var enableSelection = true;
+          if (typeof options.enableSelection !== 'undefined') {
+            enableSelection = options.enableSelection;
+          }
+          if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
             _chart.enableSelection();
+          }
+          else {
+            _chart.disableSelection();
           }
           if (_hideSelection) {
             _chart.hideSelection();

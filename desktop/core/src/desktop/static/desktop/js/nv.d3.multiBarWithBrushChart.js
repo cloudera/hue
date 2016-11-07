@@ -54,7 +54,7 @@ nv.models.multiBarWithBrushChart = function() {
       }
     , x //can be accessed via chart.xScale()
     , y //can be accessed via chart.yScale()
-    , state = { stacked: false }
+    , state = { stacked: false, selectionEnabled: false }
     , defaultState = null
     , noData = "No Data Available."
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
@@ -450,6 +450,7 @@ nv.models.multiBarWithBrushChart = function() {
         }
 
         state.stacked = multibar.stacked();
+        state.selectionEnabled = selectionEnabled;
         if (onStateChange != null) {
           onStateChange(state);
         }
