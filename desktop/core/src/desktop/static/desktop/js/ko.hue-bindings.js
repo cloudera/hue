@@ -191,10 +191,18 @@
             options.onSave(currentSelectize.getValue());
           }
           $(document).off('click', saveOnClickOutside);
+          $(document).off('keyup', hideOnEscape);
           showReadOnly();
         }
       };
 
+      var hideOnEscape = function (event) {
+        if (event.which === 27) {
+          showReadOnly();
+          $(document).off('click', saveOnClickOutside);
+          $(document).off('keyup', hideOnEscape);
+        }
+      };
 
       var showEdit = function () {
         optionsBeforeEdit = options.setTags().concat();
@@ -210,13 +218,16 @@
           }
           showReadOnly();
           $(document).off('click', saveOnClickOutside);
+          $(document).off('keyup', hideOnEscape);
         }).appendTo($editActions);
         $('<i>').addClass('fa fa-close').click(function () {
           showReadOnly();
           $(document).off('click', saveOnClickOutside);
+          $(document).off('keyup', hideOnEscape);
         }).appendTo($editActions);
         window.setTimeout(function () {
           $(document).on('click', saveOnClickOutside);
+          $(document).on('keyup', hideOnEscape);
         }, 0);
       };
 
@@ -224,6 +235,7 @@
         if (currentSelectize) {
           currentSelectize.destroy();
           $element.hide();
+          $element.val(options.setTags().join(','))
         }
         $readOnlyContainer.empty();
         var $readOnlyInner = $('<div>').addClass('selectize-input items not-full has-options has-items').appendTo($readOnlyContainer);
