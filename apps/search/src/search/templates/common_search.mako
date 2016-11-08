@@ -499,6 +499,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="facet-toggle2">
 
     ## Dimension 1
+  <!-- ko if: $root.isEditing -->
     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
@@ -520,6 +521,7 @@ ${ dashboard.layout_skeleton() }
       </a>
     </div>
 
+
     <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
@@ -529,6 +531,7 @@ ${ dashboard.layout_skeleton() }
         <br/>
       <!-- /ko -->
     <!-- /ko -->
+
 
     <div class="facet-field-cnt">
       <span class="spinedit-cnt">
@@ -561,6 +564,7 @@ ${ dashboard.layout_skeleton() }
         <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
       </span>
     </div>
+  <!-- /ko -->
 
   ## Dimensions > 1 , visible: !$parents[1].isLoading()
   <!-- ko if: $root.isEditing -->
@@ -1482,7 +1486,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
 
-    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Chart Type') }</span>
         <select class="input-small" data-bind="options: $root.timelineChartTypes,
