@@ -86,6 +86,11 @@ from desktop.views import _ko
   <script type="text/html" id="property-selector-template">
     <!-- ko foreach: selectedProperties -->
     <div>
+      <div class="config-property-remove">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
       <!-- ko template: {
         name: 'property',
         data: {
@@ -97,11 +102,6 @@ from desktop.views import _ko
           visibleObservable: $parent.visibleObservable
         }
       } --><!-- /ko -->
-      <div class="config-property-remove">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
-          <i class="fa fa-times"></i>
-        </a>
-      </div>
     </div>
     <!-- /ko -->
     <div class="config-property-available margin-left-10" data-bind="visible: availableProperties().length > 0">
@@ -427,8 +427,8 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li style="clear:both;">
         <!-- ko if: $parent.options.length > 0 -->
-        <div class="selectize-wrapper" style="min-width: 200px;">
-          <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
+        <div class="selectize-wrapper" style="width: 200px;">
+          <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, selectizeOptions: {create: true}, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
         </div>
         <!-- /ko -->
         <div class="input-append" style="margin-bottom: 4px">
@@ -441,11 +441,12 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px; float: left">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
+    <div class="clearfix"></div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
