@@ -168,6 +168,9 @@ class SolrApi(object):
 
           if facet['properties']['facets']:
             self._n_facet_dimension(facet, _f, facet['properties']['facets'], 2)
+            if facet['widgetType'] == 'text-facet-widget':
+              _f['sort'] = {'d2': facet['properties']['sort']}
+              # domain = '-d2:NaN' # Solr 6.4
 
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
@@ -264,8 +267,6 @@ class SolrApi(object):
       _f['facet'] = {
           f_name: self._get_aggregate_function(facet)
       }
-#               _f['sort'] = {f_name: facet['properties']['sort']}
-      # domain = '-d2:NaN' # Solr 6.4
 
 
   def suggest(self, collection, query):
