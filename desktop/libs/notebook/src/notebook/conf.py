@@ -102,6 +102,13 @@ ENABLE_QUERY_SCHEDULING = Config(
   default=False
 )
 
+ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
+  key="enable_extract_uploaded_archive",
+  help=_t("Flag to enable the extraction of a uploaded archive in HDFS."),
+  type=bool,
+  default=False
+)
+
 ENABLE_BATCH_EXECUTE = Config(
   key="enable_batch_execute",
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),

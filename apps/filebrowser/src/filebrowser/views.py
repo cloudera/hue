@@ -68,6 +68,7 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
+from notebook.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -1236,7 +1237,7 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
-            if extract_archive:
+            if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get() and extract_archive:
               response['batch_job_response'] = extract_archive_in_hdfs(request, dest, uploaded_file.name)
 
         except IOError, ex:
