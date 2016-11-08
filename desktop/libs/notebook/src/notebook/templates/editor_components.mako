@@ -54,6 +54,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 % endif
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
