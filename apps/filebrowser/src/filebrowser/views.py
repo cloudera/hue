@@ -59,6 +59,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
 from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -68,7 +69,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
-from notebook.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB

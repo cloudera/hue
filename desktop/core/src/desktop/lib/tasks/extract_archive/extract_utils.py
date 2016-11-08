@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.conf import DEFAULT_USER
 from notebook.connectors.base import Notebook
+from desktop.conf import DEFAULT_USER
+
 
 def extract_archive_in_hdfs(request, upload_path, file_name):
 
@@ -27,16 +28,16 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
       shell_command='extract_archive_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}],
       archives=[],
-      files=[{'value': '/user/hue/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + file_name}],
+      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + file_name}],
       env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}])
   return shell_notebook.execute(request, batch=True)
 
 def _upload_extract_archive_script_to_hdfs(fs):
-  if not fs.exists('/user/hue/common/'):
-    fs.do_as_user(DEFAULT_USER.get(), fs.mkdir, '/user/hue/common/')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/hue/common/', 0755)
+  if not fs.exists('/user/' + DEFAULT_USER.get() + '/common/'):
+    fs.do_as_user(DEFAULT_USER.get(), fs.mkdir, '/user/' + DEFAULT_USER.get() + '/common/')
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
 
-  if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/hue/common/extract_archive_in_hdfs.sh'):
+  if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'):
     fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, 'desktop/core/src/desktop/lib/extract_archive_in_hdfs.sh',
-                          '/user/hue/common/extract_archive_in_hdfs.sh')
-    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/hue/common/', 0755)
+                          '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh')
+    fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
