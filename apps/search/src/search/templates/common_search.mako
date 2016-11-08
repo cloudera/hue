@@ -648,7 +648,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 
-  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
+  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 5" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-plus"></i> ${ _('Add') }
