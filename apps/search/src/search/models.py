@@ -846,7 +846,7 @@ def augment_solr_response(response, collection, query):
             for f in counts:
               for bucket in (f['d2']['buckets'] if 'd2' in f else []):
                 _series[bucket['val']].append(f['val'])
-                _series[bucket['val']].append(bucket['d2'] if 'd2' in bucket else bucket['count'])
+                _series[bucket['val']].append(bucket['d3'] if 'd3' in bucket else bucket['count'])
             for name, val in _series.iteritems():
               _c = range_pair(facet['field'], name, selected_values.get(facet['id'], []), val, 1, collection_facet)
               extraSeries.append({'counts': _c, 'label': name})
