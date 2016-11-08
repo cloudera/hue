@@ -23,18 +23,37 @@ var AssistCollectionEntry = (function () {
    * @param {ApiHelper} options.apiHelper
    * @constructor
    */
-  function AssistCollectionEntry (options) {
+  function AssistCollectionEntry (options, filter, showCores) {
     var self = this;
 
     self.definition = options.definition;
     self.apiHelper = options.apiHelper;
     self.path = self.definition.name;
+    self.filter = filter;
+    self.showCores = showCores;
 
     self.entries = ko.observableArray([]);
+    self.filteredEntries = ko.pureComputed(function(){
+      var result = [];
+      $.each(self.entries(), function (index, entry) {
+        if (entry.definition.name.toLowerCase().indexOf(self.filter().toLowerCase()) > -1){
+          if (self.showCores() || (!self.showCores() && !entry.definition.isCoreOnly)){
+            result.push(entry);
+          }
+        }
+      });
+      return result;
+    });
 
     self.loaded = false;
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
+
+    self.hasOnlyCores = ko.computed(function () {
+      return ko.utils.arrayFilter(self.filteredEntries(), function (entry) {
+          return entry.definition.isCoreOnly;
+        }).length === self.filteredEntries().length;
+    });
 
     self.hasEntries = ko.computed(function() {
       return self.entries().length > 0;
@@ -51,12 +70,10 @@ var AssistCollectionEntry = (function () {
 
     var successCallback = function(data) {
       self.entries($.map(data.collections, function (collection) {
-        if (!collection.isCoreOnly) {
-          return new AssistCollectionEntry({
-            definition: collection,
-            apiHelper: self.apiHelper
-          })
-        }
+        return new AssistCollectionEntry({
+          definition: collection,
+          apiHelper: self.apiHelper
+        }, self.filter, self.showCores)
       }));
       self.loaded = true;
       self.loading(false);

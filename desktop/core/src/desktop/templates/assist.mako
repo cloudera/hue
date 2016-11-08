@@ -863,6 +863,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-collections-header-actions">
     <div class="assist-db-header-actions" style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -875,9 +876,15 @@ from metadata.conf import has_navigator
           ${_('Collections')}
           <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
         </div>
+        <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
+          <div>
+            <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
+          </div>
+          <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" style="width:90%;" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
+        </div>
         <div class="assist-flex-fill assist-collections-scrollable">
           <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-collections-scrollable' }">
+            <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 20, container: '.assist-collections-scrollable' }">
               <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
                 <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
                   <i class="fa fa-fw fa-search muted valign-middle"></i>
@@ -1561,7 +1568,17 @@ from metadata.conf import has_navigator
         var self = this;
         self.apiHelper = options.apiHelper;
 
+        self.isSearchVisible = ko.observable(false);
+        self.editingSearch = ko.observable(false);
+
+        self.toggleSearch = function () {
+          self.isSearchVisible(!self.isSearchVisible());
+          self.editingSearch(self.isSearchVisible());
+        };
+
+        self.showCores = ko.observable(false);
         self.selectedCollectionEntry = ko.observable();
+        self.filter = ko.observable('');
         self.reload = function () {
           var currentEntry = new AssistCollectionEntry({
             definition: {
@@ -1569,10 +1586,12 @@ from metadata.conf import has_navigator
               type: 'collection'
             },
             apiHelper: self.apiHelper
-          });
+          }, self.filter, self.showCores);
           self.selectedCollectionEntry(currentEntry);
-
           currentEntry.loadEntries();
+          currentEntry.hasOnlyCores.subscribe(function (onlyCores) {
+            self.showCores(onlyCores);
+          });
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
