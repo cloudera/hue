@@ -199,8 +199,6 @@
       var hideOnEscape = function (event) {
         if (event.which === 27) {
           showReadOnly();
-          $(document).off('click', saveOnClickOutside);
-          $(document).off('keyup', hideOnEscape);
         }
       };
 
@@ -217,13 +215,9 @@
             options.onSave(currentSelectize.getValue());
           }
           showReadOnly();
-          $(document).off('click', saveOnClickOutside);
-          $(document).off('keyup', hideOnEscape);
         }).appendTo($editActions);
         $('<i>').addClass('fa fa-close').click(function () {
           showReadOnly();
-          $(document).off('click', saveOnClickOutside);
-          $(document).off('keyup', hideOnEscape);
         }).appendTo($editActions);
         window.setTimeout(function () {
           $(document).on('click', saveOnClickOutside);
@@ -232,6 +226,8 @@
       };
 
       var showReadOnly = function () {
+        $(document).off('click', saveOnClickOutside);
+        $(document).off('keyup', hideOnEscape);
         if (currentSelectize) {
           currentSelectize.destroy();
           $element.hide();

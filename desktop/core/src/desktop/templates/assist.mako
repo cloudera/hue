@@ -373,22 +373,32 @@ from metadata.conf import has_navigator
       padding: 10px;
     }
 
-    .nav-assist-search > i {
-      position: absolute;
-      top: 17px;
-      left: 17px;
-      font-size: 15px;
-      color: #ccc;
-    }
-
     .nav-assist-search > input {
-      -ms-flex: 1 1 100%;
+      border-bottom-left-radius: 4px;
+      border-top-left-radius: 4px;
+      border: 1px solid #DDD;
+      border-right: none;
       flex: 1 1 100%;
       height: 27px;
       box-shadow: none;
+    }
+
+    .nav-assist-search > a {
+      cursor: pointer;
+      flex: 0 0 31px;
+      border-bottom-right-radius: 4px;
+      border-top-right-radius: 4px;
       border: 1px solid #DDD;
-      border-radius: 4px;
-      padding-left: 26px;
+      box-shadow: none;
+      font-size: 15px;
+      line-height: 29px;
+      background-color: #f9f9f9;
+      width: 31px;
+      height: 29px;
+    }
+
+    .nav-assist-search > a > i {
+      margin-left: 8px;
     }
 
     .result-entry {
@@ -1147,20 +1157,20 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
       <div class="nav-assist-search" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }">
-        <i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i>
-        <input id="appendedInput" placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
-            source: navAutocompleteSource,
-            itemTemplate: 'nav-search-autocomp-item',
-            noMatchTemplate: 'nav-search-autocomp-no-match',
-            classPrefix: 'nav-',
-            showOnFocus: true,
-            onEnter: performSearch,
-            reopenPattern: /.*:$/
-          },
-          hasFocus: searchHasFocus,
-          clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
-          textInput: searchInput,
-          valueUpdate: 'afterkeydown'">
+        <input placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
+          source: navAutocompleteSource,
+          itemTemplate: 'nav-search-autocomp-item',
+          noMatchTemplate: 'nav-search-autocomp-no-match',
+          classPrefix: 'nav-',
+          showOnFocus: true,
+          onEnter: performSearch,
+          reopenPattern: /.*:$/
+        },
+        hasFocus: searchHasFocus,
+        clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
+        textInput: searchInput,
+        valueUpdate: 'afterkeydown'">
+        <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
       </div>
     <!-- /ko -->
   </script>
@@ -1199,7 +1209,7 @@ from metadata.conf import has_navigator
       <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
         <div class="assist-db-header-actions">
           <span class="assist-tables-counter" data-bind="visible: searchResult().length > 0">(<span data-bind="text: searchResultCount">0</span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); searchInput(''); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
         </div>
       </div>
       <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
@@ -1800,6 +1810,7 @@ from metadata.conf import has_navigator
         }
 
         self.performSearch = function () {
+          huePubSub.publish('autocomplete.close');
           if (self.searchInput() === '') {
             self.searchActive(false);
             return;
