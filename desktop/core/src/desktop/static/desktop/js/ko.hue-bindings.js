@@ -3104,7 +3104,7 @@
           huePubSub.publish('editor.active.locations', e.data.locations);
           e.data.locations.forEach(function (location) {
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
-            if (token.value && /`$/.test(token.value)) {
+            if (token && token.value && /`$/.test(token.value)) {
               // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
               token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
             }
