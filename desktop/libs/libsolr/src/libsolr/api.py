@@ -166,29 +166,8 @@ class SolrApi(object):
             if facet['properties']['canRange'] and not facet['properties']['isDate']:
               del _f['mincount'] # Numeric fields do not support
 
-          def _nd(_f, facets, dim):
-            facet = facets[0]
-            f_name = 'd%s' % dim
-            if facet['aggregate'] == 'count':
-              _f['facet'] = {
-                  f_name: {
-                      'type': 'terms',
-                      'field': '%(field)s' % facet,
-                      'limit': int(facet.get('limit', 10)),
-                      'mincount': int(facet['mincount'])
-                  }
-              }
-              if len(facets) > 1: # Get n+1 dimension
-                _nd(_f['facet'][f_name], facets[1:], dim+1)
-            else:
-              _f['facet'] = {
-                  f_name: self._get_aggregate_function(facet)
-              }
-#               _f['sort'] = {f_name: facet['properties']['sort']}
-              # domain = '-d2:NaN' # Solr 6.4
-
           if facet['properties']['facets']:
-            _nd(_f, facet['properties']['facets'], 2)
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 2)
 
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
@@ -262,6 +241,31 @@ class SolrApi(object):
 
     response = self._root.get('%(collection)s/select' % solr_query, params)
     return self._get_json(response)
+
+
+  def _n_facet_dimension(self, widget, _f, facets, dim):
+    facet = facets[0]
+    f_name = 'd%s' % dim
+
+    if facet['aggregate'] == 'count':
+      _f['facet'] = {
+          f_name: {
+              'type': 'terms',
+              'field': '%(field)s' % facet,
+              'limit': int(facet.get('limit', 10)),
+              'mincount': int(facet['mincount'])
+          }
+      }
+      if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate'] != 'count':
+        _f['subcount'] = self._get_aggregate_function(facets[-1])
+      if len(facets) > 1: # Get n+1 dimension
+        self._n_facet_dimension(widget, _f['facet'][f_name], facets[1:], dim+1)
+    else:
+      _f['facet'] = {
+          f_name: self._get_aggregate_function(facet)
+      }
+#               _f['sort'] = {f_name: facet['properties']['sort']}
+      # domain = '-d2:NaN' # Solr 6.4
 
 
   def suggest(self, collection, query):
