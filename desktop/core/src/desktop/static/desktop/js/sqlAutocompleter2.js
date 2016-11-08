@@ -32,16 +32,16 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    COLUMN: 800,
-    VIRTUAL_COLUMN: 700,
-    SAMPLE: 600,
-    IDENTIFIER: 500,
-    CTE: 400,
-    TABLE: 300,
-    DATABASE: 200,
-    UDF: 100,
-    HDFS: 1,
-    COLREF_KEYWORD: -1
+    COLUMN: 1000,
+    SAMPLE: 900,
+    IDENTIFIER: 800,
+    CTE: 700,
+    TABLE: 600,
+    DATABASE: 500,
+    UDF: 400,
+    HDFS: 300,
+    VIRTUAL_COLUMN: 200,
+    COLREF_KEYWORD: 100
   };
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
