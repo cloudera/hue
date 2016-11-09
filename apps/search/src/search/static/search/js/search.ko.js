@@ -452,18 +452,24 @@ var Collection = function (vm, collection) {
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
-	function flatten(values) {
-		var fields = [];
-		$.each(values, function (index, facet) {
-	      fields.push(facet.filter());
-		  if (facet.values().length > 0) {
-			fields.push.apply(fields, flatten(facet.values()));
-		  }
-		});
-		return fields;
-	  }
-	  return flatten(self.nested.schema());
+    function flatten(values) {
+      var fields = [];
+      $.each(values, function (index, facet) {
+        fields.push(facet.filter());
+        if (facet.values().length > 0) {
+          fields.push.apply(fields, flatten(facet.values()));
+        }
+      });
+      return fields;
+    }
+    return flatten(self.nested.schema());
   });
+  self.nestedAddLeaf = function(leaf) {
+    leaf.push(
+      ko.mapping.fromJS(
+        {'filter': '', 'name': '', 'selected': false, 'values': []} // limit 10
+    ));
+  };
   self.enabled = ko.mapping.fromJS(collection.enabled);
   self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
   self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60);
@@ -1653,9 +1659,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       };
 
       if (_childDocuments) {
-    	var childRecords = [];
-    	$.each(_childDocuments, function (index, item) {
-    	  var record = self._make_result_doc(item);
+        var childRecords = [];
+        $.each(_childDocuments, function (index, item) {
+          var record = self._make_result_doc(item);
           $.each(item, function(key, val) {
             var _field = ko.mapping.fromJS({
                 key: key,
@@ -1664,9 +1670,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             });
             record.details.push(_field);
           });
-    	  childRecords.push(record);
+          childRecords.push(record);
         });
-    	doc['childDocuments'] = ko.observable(childRecords);
+        doc['childDocuments'] = ko.observable(childRecords);
       }
       if (!self.collection.template.isGridLayout()) {
         // fix the fields that contain dots in the name
