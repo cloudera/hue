@@ -201,7 +201,7 @@
       });
     });
 
-    fit('should suggest tables for "SELECT * FROM 33abc.|"', function() {
+    it('should suggest tables for "SELECT * FROM 33abc.|"', function() {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM 33abc.',
         afterCursor: '',
