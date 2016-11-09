@@ -144,7 +144,7 @@
           'right': '70px',
           'opacity': 0.85
         }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
-        search.html('<input type="text"> <i class="fa fa-chevron-down pointer muted"></i> <i class="fa fa-chevron-up pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
+        search.html('<input type="text"> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-chevron-down pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
 
         search.find('.fa-times').on('click', function () {
           search.hide();
@@ -155,11 +155,15 @@
         });
 
         search.find('.fa-chevron-down').on('click', function () {
-          self.fnScrollToNextResult();
+          if (!self.isScrolling) {
+            self.fnScrollToNextResult();
+          }
         });
 
         search.find('.fa-chevron-up').on('click', function () {
-          self.fnScrollToPreviousResult();
+          if (!self.isScrolling) {
+            self.fnScrollToPreviousResult();
+          }
         });
 
         search.find('input').jHueDelayedInput(function () {
@@ -253,24 +257,27 @@
       }
     }
 
+    self.isScrolling = false;
     self.fnScrollTo = function (row, col) {
+      self.isScrolling = true;
       var $t = self.$table;
       $('.hue-datatable-search').find('span').text(($t.data('searchCoordHighlighted') + 1) + ' ' + $t.data('oInit')['i18n'].OF + ' ' + $t.data('searchCoords').length);
       var colSel = $t.find("tr th:nth-child(" + (col + 1) + ")");
       $t.parent().animate({
         scrollLeft: colSel.position().left + $t.parent().scrollLeft() - $t.parent().offset().left - 30
-      }, 300);
+      }, 300, function () {
+        self.isScrolling = false;
+      });
       $t.parents($t.data('oInit')['scrollable']).animate({
         scrollTop: $t.find('tbody tr').find('td:eq(0)').filter(function () {
           return $(this).text() - 1 == row
         }).position().top + 73
-      }, 100, function(){
+      }, 100, function () {
         $t.data('scrollToCol', col);
         $t.data('scrollToRow', row);
         $t.data('scrollAnimate', true);
         $t.parent().trigger('scroll');
       });
-
     }
 
     self.isDrawing = false;
