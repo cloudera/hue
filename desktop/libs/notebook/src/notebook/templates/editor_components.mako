@@ -2006,10 +2006,16 @@ ${ hueIcons.symbols() }
     <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
+    <!-- ko if: !isCanceling() -->
     <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel operation') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
-
+    <!-- /ko -->
+    <!-- ko if: isCanceling() -->
+    <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
+      <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
+    </a>
+    <!-- /ko -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }">
       <!-- ko if: isBatchable() && wasBatchExecuted() -->
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': statement() === '' }">
