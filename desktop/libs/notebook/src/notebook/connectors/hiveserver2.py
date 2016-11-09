@@ -428,6 +428,8 @@ class HS2Api(Api):
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     try:
+      db.use(query.database)
+
       explanation = db.explain(query)
     except QueryServerException, ex:
       raise QueryError(ex.message)
