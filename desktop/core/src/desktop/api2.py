@@ -441,6 +441,10 @@ def import_documents(request):
       else:  # Update existing doc or create new
         doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
 
+      # For oozie docs replace dependent uuids with the newly created ones
+      if doc['fields']['type'].startswith('oozie-'):
+        doc = _update_imported_oozie_document(doc, uuids_map)
+
       # If the doc contains any history dependencies, ignore them
       # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
       deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
@@ -489,6 +493,12 @@ def import_documents(request):
   finally:
     stdout.close()
 
+def _update_imported_oozie_document(doc, uuids_map):
+  for key, value in uuids_map.iteritems():
+    if value:
+      doc['fields']['data'] = doc['fields']['data'].replace(key, value)
+
+  return doc
 
 def _is_import_valid(documents):
   """
