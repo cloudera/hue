@@ -158,8 +158,8 @@ var AssistDbEntry = (function () {
     self.statsVisible(true);
     huePubSub.publish('sql.context.popover.show', {
       data: {
-        type: self.definition.isColumn ? 'column' : 'table',
-        identifierChain: self.definition.isColumn ? [{ name: self.tableName }, { name: self.columnName }] : [{ name: self.tableName }]
+        type: self.definition.isColumn ? 'column' : (self.definition.isComplex ? 'complex' : (self.definition.isTable ? 'table' : 'database')),
+        identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
       orientation: 'right',
       sourceType: self.sourceType,
@@ -284,14 +284,16 @@ var AssistDbEntry = (function () {
               name: "key",
               displayName: "key (" + data.key.type + ")",
               title: "key (" + data.key.type + ")",
-              type: data.key.type
+              type: data.key.type,
+              isComplex: true
             }),
             self.createEntry({
               name: "value",
               displayName: "value (" + data.value.type + ")",
               title: "value (" + data.value.type + ")",
               isMapValue: true,
-              type: data.value.type
+              type: data.value.type,
+              isComplex: true
             })
           ];
         } else if (data.type == "struct") {
@@ -300,7 +302,8 @@ var AssistDbEntry = (function () {
               name: field.name,
               displayName: field.name + " (" + field.type + ")",
               title: field.name + " (" + field.type + ")",
-              type: field.type
+              type: field.type,
+              isComplex: true
             });
           });
         } else if (data.type == "array") {
@@ -310,7 +313,8 @@ var AssistDbEntry = (function () {
               displayName: "item (" + data.item.type + ")",
               title: "item (" + data.item.type + ")",
               isArray: true,
-              type: data.item.type
+              type: data.item.type,
+              isComplex: true
             })
           ];
         }

@@ -375,11 +375,15 @@
       var selector = options.selector;
       var showTimeout = -1;
       var hideTimeout = -1;
-      ko.utils.domData.set(element, 'visibleOnHover.override', ko.utils.unwrapObservable(options.override) || false)
+      ko.utils.domData.set(element, 'visibleOnHover.override', ko.utils.unwrapObservable(options.override) || false);
       var inside = false;
 
       var show = function () {
-        $element.find(selector).fadeTo("fast", 1);
+        if (options.childrenOnly) {
+          $element.children(selector).fadeTo("fast", 1);
+        } else {
+          $element.find(selector).fadeTo("fast", 1);
+        }
         window.clearTimeout(hideTimeout);
       };
 
@@ -387,13 +391,17 @@
         if (! inside) {
           window.clearTimeout(showTimeout);
           hideTimeout = window.setTimeout(function () {
-            $element.find(selector).fadeTo("fast", 0);
+            if (options.childrenOnly) {
+              $element.children(selector).fadeTo("fast", 0);
+            } else {
+              $element.find(selector).fadeTo("fast", 0);
+            }
           }, 10);
         }
       };
 
-      ko.utils.domData.set(element, 'visibleOnHover.show', show)
-      ko.utils.domData.set(element, 'visibleOnHover.hide', hide)
+      ko.utils.domData.set(element, 'visibleOnHover.show', show);
+      ko.utils.domData.set(element, 'visibleOnHover.hide', hide);
 
       if (ko.utils.domData.get(element, 'visibleOnHover.override')) {
         window.setTimeout(show, 1);

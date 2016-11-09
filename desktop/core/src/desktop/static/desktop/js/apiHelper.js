@@ -1091,21 +1091,94 @@ var ApiHelper = (function () {
     return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName) > -1;
   };
 
+  ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback) {
+    var self = this;
+
+    var fetchFieldsInternal =  function (table, database, identifierChain, callback, errorCallback, fetchedFields) {
+      if (!identifierChain) {
+        identifierChain = [];
+      }
+      if (identifierChain.length > 0) {
+        fetchedFields.push(identifierChain[0].name);
+        identifierChain = identifierChain.slice(1);
+      }
+
+      // Parser sometimes knows if it's a map or array.
+      if (identifierChain.length > 0 && (identifierChain[0].name === 'item' || identifierChain[0].name === 'value')) {
+        fetchedFields.push(identifierChain[0].name);
+        identifierChain = identifierChain.slice(1);
+      }
+
+
+      self.fetchFields({
+        sourceType: sourceType,
+        databaseName: database,
+        tableName: table,
+        fields: fetchedFields,
+        timeout: self.timeout,
+        successCallback: function (data) {
+          if (sourceType === 'hive'
+              && typeof data.extended_columns !== 'undefined'
+              && data.extended_columns.length === 1
+              && data.extended_columns.length
+              && /^map|array|struct/i.test(data.extended_columns[0].type)) {
+            identifierChain.unshift({ name: data.extended_columns[0].name })
+          }
+          if (identifierChain.length > 0) {
+            if (typeof identifierChain[0].name !== 'undefined' && /value|item|key/i.test(identifierChain[0].name)) {
+              fetchedFields.push(identifierChain[0].name);
+              identifierChain.shift();
+            } else {
+              if (data.type === 'array') {
+                fetchedFields.push('item')
+              }
+              if (data.type === 'map') {
+                fetchedFields.push('value')
+              }
+            }
+            fetchFieldsInternal(table, database, identifierChain, callback, errorCallback, fetchedFields)
+          } else {
+            fetchedFields.unshift(table);
+            callback(fetchedFields);
+          }
+        },
+        silenceErrors: true,
+        errorCallback: errorCallback
+      });
+    };
+
+    fetchFieldsInternal(identifierChain.shift().name, database, identifierChain, successCallback, errorCallback, []);
+  };
+
   /**
    *
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {function} options.errorCallback
    * @param {Object[]} options.identifierChain
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
+   *
+   * @param {function} successCallback
    */
-  ApiHelper.prototype.identifierChainToPath = function (options) {
+  ApiHelper.prototype.identifierChainToPath = function (options, successCallback) {
     var self = this;
+    var identifierChainClone = options.identifierChain.concat();
     var path = [];
-    if (! self.containsDatabase(options.sourceType, options.identifierChain[0].name)) {
+    if (! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
       path.push(options.defaultDatabase);
+    } else {
+      path.push(identifierChainClone.shift().name)
     }
-    return path.concat($.map(options.identifierChain, function (identifier) { return identifier.name }));
+
+    if (identifierChainClone.length > 1) {
+      self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
+        successCallback(path.concat(fetchedFields))
+      }, options.errorCallback);
+    } else {
+      successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
+    }
+
   };
 
   /**
@@ -1123,13 +1196,13 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchAutocomplete = function (options) {
     var self = this;
-    var path = self.identifierChainToPath(options);
-
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: fieldCacheCondition
-    }));
+    self.identifierChainToPath(options, function (path) {
+      fetchAssistData.bind(self)($.extend({}, options, {
+        url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
+        errorCallback: self.assistErrorCallback(options),
+        cacheCondition: fieldCacheCondition
+      }));
+    });
   };
 
   /**
@@ -1147,14 +1220,15 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchSamples = function (options) {
     var self = this;
-    var path = self.identifierChainToPath(options);
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: SAMPLE_API_PREFIX + path.join('/'),
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: function (data) {
-        return data.status === 0 && typeof data.rows !== 'undefined' && data.rows.length > 0;
-      }
-    }));
+    self.identifierChainToPath(options, function (path) {
+      fetchAssistData.bind(self)($.extend({}, options, {
+        url: SAMPLE_API_PREFIX + path.join('/'),
+        errorCallback: self.assistErrorCallback(options),
+        cacheCondition: function (data) {
+          return data.status === 0 && typeof data.rows !== 'undefined' && data.rows.length > 0;
+        }
+      }));
+    });
   };
 
 
