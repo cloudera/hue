@@ -31,7 +31,7 @@ FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 5
 
 
-def download(handle, format, db, id=None):
+def download(handle, format, db, id=None, file_name='query_result'):
   """
   download(query_model, format) -> HttpResponse
 
@@ -46,7 +46,7 @@ def download(handle, format, db, id=None):
   content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
   generator = export_csvxls.create_generator(content_generator, format)
 
-  resp = export_csvxls.make_response(generator, format, 'query_result')
+  resp = export_csvxls.make_response(generator, format, file_name)
 
   if id:
     resp.set_cookie(

@@ -592,6 +592,20 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert_equal(self.statement, data['statement'], data)
 
 
+  def test_download(self):
+    statement = "SELECT 'hello world';"
+
+    doc = self.create_query_document(owner=self.user, statement=statement)
+    notebook = Notebook(document=doc)
+    snippet = self.execute_and_wait(doc, snippet_idx=0)
+
+    response = self.client.post(reverse('notebook:download'),
+                                {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'format': 'csv'})
+
+    assert_equal(200, response.status_code)
+    assert_equal(('Content-Disposition', 'attachment; filename=Test Query.csv'), response._headers['content-disposition'])
+
+
   def test_get_sample(self):
     doc = self.create_query_document(owner=self.user, statement=self.statement)
     notebook = Notebook(document=doc)

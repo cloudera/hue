@@ -350,7 +350,13 @@ class HS2Api(Api):
       handle = self._get_handle(snippet)
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
-      return data_export.download(handle, format, db, id=snippet['id'])
+
+      if notebook.get('name'):
+        file_name = '%(name)s' % notebook
+      else:
+        file_name = '%(type)s-%(id)s' % notebook
+
+      return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name)
     except Exception, e:
       title = 'The query result cannot be downloaded.'
       LOG.exception(title)
