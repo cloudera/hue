@@ -78,6 +78,8 @@ var HueFileEntry = (function () {
 
     self.document = ko.observable();
     self.selectedDocsWithDependents = ko.observable([]);
+    self.importedDocSummary = ko.observable();
+    self.showTable = ko.observable();
 
     self.getSelectedDocsWithDependents = function() {
       self.selectedDocsWithDependents([]);
@@ -542,6 +544,7 @@ var HueFileEntry = (function () {
     var self = this;
     if (self.app === 'documents') {
       $('#importDocumentsModal').modal('hide');
+      $('#importDocumentData').modal('hide');
       $('#importDocumentInput').val('');
     }
     // Allow the modal to hide
@@ -558,12 +561,19 @@ var HueFileEntry = (function () {
       self.uploading(true);
       self.uploadComplete(false);
       self.uploadFailed(false);
+      self.importedDocSummary(null);
+      self.showTable(false);
       self.apiHelper.uploadDocument({
         formData: new FormData($('#importDocumentsForm')[0]),
-        successCallback: function () {
+        successCallback: function (data) {
           self.uploading(false);
           self.uploadComplete(true);
           self.load();
+
+          $('#importDocumentsModal').modal('hide');
+          $('#importDocumentData').modal('show');
+
+          self.importedDocSummary(data);
         },
         progressHandler: function (event) {
           $("#importDocumentsProgress").val(Math.round((event.loaded / event.total) * 100));
@@ -575,6 +585,19 @@ var HueFileEntry = (function () {
         }
       });
     }
+  };
+
+  HueFileEntry.prototype.importedDocumentCount = function () {
+    var self = this;
+    if (self.importedDocSummary()) {
+      return self.importedDocSummary()['documents'].length;
+    }
+    return 0;
+  };
+
+  HueFileEntry.prototype.toggleShowTable = function () {
+    var self = this;
+    self.showTable(!self.showTable());
   };
 
   HueFileEntry.prototype.makeActive = function () {
