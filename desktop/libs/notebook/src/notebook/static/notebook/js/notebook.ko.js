@@ -725,7 +725,9 @@ var EditorViewModel = (function() {
         id: self.id,
         type: self.type,
         status: self.status,
+        statementType: self.statementType,
         statement: self.statement,
+        statementPath: self.statementPath,
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
@@ -778,12 +780,13 @@ var EditorViewModel = (function() {
 
     self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
     self.isReady = ko.computed(function() {
-      return (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
+      return (self.statementType() == 'text' && (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
         (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
         (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
         (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
         (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
-        (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0);
+        (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0)) ||
+        (self.statementType() == 'file' && self.statementPath().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 

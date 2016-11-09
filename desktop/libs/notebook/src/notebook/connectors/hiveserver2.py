@@ -222,12 +222,15 @@ class HS2Api(Api):
 
     statement = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
-    if snippet.get('statementType') == 'file':
-      query_s = ''
-    else:
-      query_s = statement['statement']
 
-    query = self._prepare_hql_query(snippet, query_s, session)
+    if snippet.get('statementType') == 'file':
+      script_path = snippet['statementPath']
+      if script_path:
+        script_path = script_path.replace('hdfs://', '')
+        if self.request.fs.do_as_user(self.user, self.request.fs.exists, script_path):
+          statement['statement'] = self.request.fs.do_as_user(self.user, self.request.fs.read, script_path, 0, 16 * 1024 ** 2)
+
+    query = self._prepare_hql_query(snippet, statement['statement'], session)
 
     try:
       if statement.get('statement_id') == 0:
