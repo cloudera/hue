@@ -1408,6 +1408,11 @@ ${ hueIcons.symbols() }
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div data-bind="component: { name: 'snippet-db-selection', params: { selectedDatabase: database, availableDatabases: availableDatabases } }" style="display: inline-block"></div>
     <!-- /ko -->
+    
+    <!-- ko if: isSqlDialect() -->
+      <select class="input-medium" data-bind="options: statementTypes, value: statementType"></select>
+    <!-- /ko -->
+
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></a>
@@ -1539,8 +1544,23 @@ ${ hueIcons.symbols() }
     </div>
   </div>
   <div class="row-fluid" style="margin-bottom: 5px">
+
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+      <!-- ko if: statementType() != 'text' -->
+        <div class="control-group">
+          <label class="control-label">${_('Path')}</label>
+          <div class="controls">
+            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to query, e.g. /user/hue/sample.sql, s3a:///hue/sample.sql') }"/>
+            <!-- ko if: statementPath() -->
+              <a data-bind="attr: {href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
+                <i class="fa fa-external-link-square"></i>
+              </a>
+            <!-- /ko -->
+          </div>
+      </div>
+      <!-- /ko -->
+
+      <div class="ace-editor" data-bind="visible: statementType() == 'text', css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
@@ -1563,18 +1583,18 @@ ${ hueIcons.symbols() }
         <li class="editor-drop-drop"><a href="javascript:void(0);">DROP TABLE <span class="editor-drop-identifier"></span>...</a></li>
       </ul>
     </div>
+
     <div class="clearfix"></div>
     <ul data-bind="foreach: variables" class="unstyled inline">
-        <li>
-          <div class="input-prepend margin-top-10">
-            <span class="muted add-on" data-bind="text: name"></span>
-            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
-          </div>
-        </li>
-      </ul>
+      <li>
+        <div class="input-prepend margin-top-10">
+          <span class="muted add-on" data-bind="text: name"></span>
+          <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
+        </div>
+      </li>
+    </ul>
   </div>
   <div class="clearfix"></div>
-
 </script>
 
 <script type="text/html" id="snippet-chart-settings">

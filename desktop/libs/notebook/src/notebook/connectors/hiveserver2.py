@@ -103,8 +103,7 @@ class HiveConfiguration(object):
 
   APP_NAME = 'hive'
 
-  PROPERTIES = [
-    {
+  PROPERTIES = [{
       "multiple": True,
       "defaultValue": [],
       "value": [],
@@ -137,8 +136,7 @@ class ImpalaConfiguration(object):
 
   APP_NAME = 'impala'
 
-  PROPERTIES = [
-    {
+  PROPERTIES = [{
       "multiple": True,
       "defaultValue": [],
       "value": [],
@@ -224,7 +222,12 @@ class HS2Api(Api):
 
     statement = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
-    query = self._prepare_hql_query(snippet, statement['statement'], session)
+    if snippet.get('statementType') == 'file':
+      query_s = ''
+    else:
+      query_s = statement['statement']
+
+    query = self._prepare_hql_query(snippet, query_s, session)
 
     try:
       if statement.get('statement_id') == 0:

@@ -416,6 +416,9 @@ var EditorViewModel = (function() {
       huePubSub.publish("assist.get.database", self.type());
     }
 
+    self.statementType = ko.observable(typeof snippet.statementType != "undefined" && snippet.statementType != null ? snippet.statementType : 'text');
+    self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for spark
+    self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
