@@ -1783,6 +1783,7 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.updateHistoryFailed = false;
     self.updateHistory = function (statuses, interval) {
       var items = $.grep(self.history(), function (item) {
         return statuses.indexOf(item.status()) != -1;
@@ -1791,26 +1792,38 @@ var EditorViewModel = (function() {
       function updateHistoryCall(item) {
         $.post("/notebook/api/check_status", {
           notebook: ko.mapping.toJSON({id: item.uuid()}),
-        }, function (data) {
-          var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
-          if (status && item.status() != status) {
-            item.status(status);
-          }
-        }).always(function () {
-          if (items.length > 0) {
-            window.setTimeout(function () {
-              updateHistoryCall(items.pop());
-            }, 1000);
-          } else {
-            window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
-          }
-        });
+        }).done(function (data) {
+            var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
+            if (status && item.status() != status) {
+              item.status(status);
+            }
+          }).fail(function (xhr) {
+            items = [];
+            self.updateHistoryFailed = true;
+            console.warn('Lost connectivity to the Hue backend.');
+          }).always(function () {
+            if (items.length > 0) {
+              window.setTimeout(function () {
+                updateHistoryCall(items.pop());
+              }, 1000);
+            } else {
+              if (!self.updateHistoryFailed){
+                window.setTimeout(function () {
+                  self.updateHistory(statuses, interval);
+                }, interval);
+              }
+            }
+          });
       }
 
-     if (items.length > 0) {
+      if (items.length > 0) {
         updateHistoryCall(items.pop());
       } else {
-        window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
+        if (!self.updateHistoryFailed) {
+          window.setTimeout(function () {
+            self.updateHistory(statuses, interval);
+          }, interval);
+        }
       }
     };
 
