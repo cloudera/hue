@@ -1548,7 +1548,7 @@ ${ hueIcons.symbols() }
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
       <!-- ko if: statementType() != 'text' -->
         <div class="control-group">
-          <label class="control-label">${_('Path')}</label>
+          <label class="control-label">${_('Query Path')}</label>
           <div class="controls">
             <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to query, e.g. /user/hue/sample.sql, s3a:///hue/sample.sql') }"/>
             <!-- ko if: statementPath() -->
