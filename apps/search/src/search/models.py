@@ -33,7 +33,7 @@ from desktop.models import get_data_link
 
 from libsolr.api import SolrApi
 
-from search.conf import SOLR_URL
+from search.conf import SOLR_URL, LATEST
 
 
 LOG = logging.getLogger(__name__)
@@ -506,21 +506,11 @@ class Collection2(object):
     for field in props['collection']['template']['fieldsAttributes']:
       if 'type' not in field:
         field['type'] = 'string'
-    if 'nested' not in props['collection']:
+    if 'nested' not in props['collection'] and LATEST.get():
       props['collection']['nested'] = {
         'enabled': False,
-        'schema': [
-          {'filter': 'type_s:book', 'name': 'books', 'selected': False, 'values': [ # limit 10
-            {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': [
-#               {'filter': 'type_s:review2', 'name': 'reviews2', 'selected': False, 'values': []},
-#               {'filter': 'type_s:review3', 'name': 'reviews3', 'selected': False, 'values': []}]}]},
-#           {'filter': 'type_s:map', 'name': 'maps', 'selected': False, 'values': [
-#             {'filter': 'type_s:review', 'name': 'reviews', 'selected': False, 'values': []}]},
-#           {'filter': 'type_s:notebook', 'name': 'notebooks', 'selected': False, 'values': [
-#             {'filter': 'type_s:sheet', 'name': 'sheets', 'selected': False, 'values': []}]}
-        ]
-
-      }]}]}
+        'schema': []
+      }
 
     for facet in props['collection']['facets']:
       properties = facet['properties']

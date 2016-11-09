@@ -541,7 +541,7 @@ ${ dashboard.layout_skeleton() }
         <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
       </span>
     </div>
-  
+
     <div class="facet-field-cnt">
       <span class="spinedit-cnt">
         <span class="facet-field-label">
@@ -577,7 +577,7 @@ ${ dashboard.layout_skeleton() }
         <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
         <div class="clearfix"></div>
       </div>
- 
+
       <div class="content">
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
@@ -1326,7 +1326,7 @@ ${ dashboard.layout_skeleton() }
           </tr>
         </tbody>
       </table>
-      
+
       <!-- ko if: doc.childDocuments != undefined -->
         <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
           <thead>
@@ -2339,10 +2339,6 @@ ${ dashboard.layout_skeleton() }
               <div class="controls">
                 <select id="settingssolrindex" data-bind="options: $root.initial.collections, value: $root.collection.name"></select>
               </div>
-              <label class="control-label" for="settingsdescription">${ _('Description') }</label>
-              <div class="controls">
-                <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
-              </div>
             </div>
             <!-- /ko -->
             <div class="control-group">
@@ -2362,18 +2358,20 @@ ${ dashboard.layout_skeleton() }
                 </label>
               </div>
             </div>
-            <div class="control-group" data-bind="visible: $root.isLatest">
+            <!-- ko if: $root.isLatest -->
+            <div class="control-group">
               <label class="control-label">${ _('Nested documents') }</label>
               <div class="controls">
                 <label class="checkbox" style="padding-top:0">
-                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.nested.enabled">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.nested.enabled"/>
                   <span data-bind="visible: $root.collection.nested.enabled">
                     ${ _('Schema') }
-                    <span data-bind="template: {name: 'nested-document-schema-level', data: $root.collection.nested.schema()}"></span> 
+                    <span data-bind="template: {name: 'nested-document-schema-level', data: $root.collection.nested.schema()}"></span>
                   </span>
                 </label>
               </div>
-            </div>            
+            </div>
+            <!-- /ko -->
           </fieldset>
         </form>
       </div>
@@ -2426,21 +2424,27 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="nested-document-schema-level">
-  <ul class="unstyled airy qdefinitions" data-bind="foreach: $data">
+  <ul class="unstyled airy" data-bind="foreach: $data">
     <li>
-      <input type="text" data-bind="value: filter"/>
+      <input type="text" data-bind="value: filter" placeholder="e.g. type_s:books"/>
       <input type="checkbox" data-bind="checked: selected"/>
       <!-- ko if: values().length == 0 -->
-        <i class="fa fa-minus"></i>
-        <i class="fa fa-plus"></i>
+        <a data-bind="click: function() { $root.collection.nestedAddLeaf(values); }" href="javascript:void(0)">
+          <i class="fa fa-plus"></i>
+        </a>
+        <a data-bind="click: function() { $parent.pop($data); $root.collection.nested.schema.valueHasMutated(); }" href="javascript:void(0)">
+          <i class="fa fa-minus"></i>
+        </a>
       <!-- /ko -->
-      <!-- ko if: values().length > 0 -->    
-        <span data-bind="template: {name: 'nested-document-schema-level', data: values()}"></span> 
+      <!-- ko if: values().length > 0 -->
+        <span data-bind="template: {name: 'nested-document-schema-level', data: values()}"></span>
       <!-- /ko -->
     </li>
-    <i class="fa fa-plus"></i>
-    <br/>
   </ul>
+    <a data-bind="click: function() { $root.collection.nestedAddLeaf($data); $root.collection.nested.schema.valueHasMutated(); }" href="javascript:void(0)">
+      <i class="fa fa-plus"></i> ${ _('Level') }
+    </a>
+    <br/>
 </script>
 
 
