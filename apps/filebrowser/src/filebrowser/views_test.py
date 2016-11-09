@@ -913,24 +913,24 @@ alert("XSS")
     HDFS_DEST_DIR = prefix + "/tmp/fb-upload-test"
     ZIP_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.zip')
     HDFS_ZIP_FILE = HDFS_DEST_DIR + '/test.zip'
+    try:
+      self.cluster.fs.mkdir(HDFS_DEST_DIR)
+      self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
+      self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
 
-    self.cluster.fs.mkdir(HDFS_DEST_DIR)
-    self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
-    self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+      # Upload archive
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE), extract_archive=True))
+      response = json.loads(resp.content)
+      assert_equal(0, response['status'], response)
+      assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
 
-    # Upload archive
-    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE), extract_archive=True))
-    response = json.loads(resp.content)
-    assert_equal(0, response['status'], response)
-    assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
-
-    assert_true('batch_job_response' in response)
-    batch_job_response = response['batch_job_response']
-    assert_equal(0, batch_job_response['status'], batch_job_response)
-    assert_true('handle' in batch_job_response and batch_job_response['handle']['id'], batch_job_response)
-
-
+      assert_true('batch_job_response' in response)
+      batch_job_response = response['batch_job_response']
+      assert_equal(0, batch_job_response['status'], batch_job_response)
+      assert_true('handle' in batch_job_response and batch_job_response['handle']['id'], batch_job_response)
+    finally:
+      cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
   def test_upload_zip(self):
     prefix = self.cluster.fs_prefix + '/test_upload_zip'
