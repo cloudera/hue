@@ -75,6 +75,16 @@ define([
       });
     });
 
+    it('should not suggest anything for "SELECT u.|"', function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT u.',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "SELECT foo, bar |"', function() {
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar ',

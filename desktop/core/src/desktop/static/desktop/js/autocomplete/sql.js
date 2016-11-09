@@ -4239,7 +4239,7 @@ var prioritizeSuggestions = function () {
     var suggestColumns = parser.yy.result.suggestColumns;
     if (typeof suggestColumns.tables === 'undefined' || suggestColumns.tables.length === 0) {
       // Impala supports statements like SELECT * FROM tbl1, tbl2 WHERE db.tbl1.col = tbl2.bla
-      if (isImpala() && typeof suggestColumns.identifierChain !== 'undefined' && suggestColumns.identifierChain.length > 0) {
+      if (parser.yy.result.suggestColumns.linked && isImpala() && typeof suggestColumns.identifierChain !== 'undefined' && suggestColumns.identifierChain.length > 0) {
         if (suggestColumns.identifierChain.length === 1) {
           parser.yy.result.suggestTables = suggestColumns;
           delete parser.yy.result.suggestColumns
