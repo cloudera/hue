@@ -348,6 +348,15 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-complex-details">
+    <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
+      <div style="margin: 15px;">
+        <a class="pointer" data-bind="visible: typeof sample !== 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name || $parents[2].title); }"></a>
+        <span data-bind="visible: typeof sample === 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }"></span> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-table-and-column-sample">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData">
       <div class="context-sample sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
@@ -622,7 +631,7 @@ from metadata.conf import has_navigator
         });
       };
 
-      function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn) {
+      function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
         var self = this;
         self.tabs = ko.observableArray();
 
@@ -635,11 +644,42 @@ from metadata.conf import has_navigator
         self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
         self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
 
+        self.title = data.identifierChain[data.identifierChain.length - 1].name;
+
         self.activeTab = ko.observable();
 
         self.activeTab.subscribe(function (newValue) {
-          if (newValue === 'sample' && typeof self.sample.fetchedData() === 'undefined') {
-            self.sample.fetch(self.initializeSamplesTable);
+          if (newValue === 'sample') {
+            if (typeof self.sample.fetchedData() === 'undefined') {
+              if (!isComplex) {
+                self.sample.fetch(self.initializeSamplesTable);
+              } else {
+                var data = self.columnDetails.fetchedData();
+                var rows = [];
+                data.sample.forEach(function (sample) {
+                  rows.push([sample]);
+                });
+                self.sample.fetchedData({
+                  headers: [ data.name || self.title ],
+                  rows: rows
+                });
+                self.initializeSamplesTable(self.sample.fetchedData());
+              }
+            }
+          } else if (newValue === 'complexDetails') {
+            if (typeof self.columnDetails.fetchedData() === 'undefined') {
+              self.columnDetails.fetch(function (data) {
+                if (data.sample) {
+                  self.tabs.push({
+                    id: 'sample',
+                    label: '${ _("Sample") }',
+                    template: 'sql-context-table-and-column-sample',
+                    templateData: self.sample,
+                    errorText: '${ _("There was a problem loading the samples.") }'
+                  });
+                }
+              })
+            }
           } else if (typeof self[newValue].fetchedData() === 'undefined') {
             self[newValue].fetch();
           }
@@ -655,6 +695,16 @@ from metadata.conf import has_navigator
             isColumn: true
           });
           self.activeTab('columnDetails');
+        } else if (isComplex) {
+          self.tabs.push({
+            id: 'complexDetails',
+            label: '${ _("Details") }',
+            template: 'sql-context-complex-details',
+            templateData: self.columnDetails,
+            errorText: '${ _("There was a problem loading the details.") }',
+            isColumn: false
+          });
+          self.activeTab('complexDetails');
         } else {
           self.tabs.push({
             id: 'columns',
@@ -673,17 +723,18 @@ from metadata.conf import has_navigator
             isColumn: false
           });
           self.activeTab('columns');
-
         }
 
-        self.tabs.push({
-          id: 'sample',
-          label: '${ _("Sample") }',
-          template: 'sql-context-table-and-column-sample',
-          templateData: self.sample,
-          errorText: '${ _("There was a problem loading the samples.") }',
-          isColumn: isColumn
-        });
+        if (!isComplex) {
+          self.tabs.push({
+            id: 'sample',
+            label: '${ _("Sample") }',
+            template: 'sql-context-table-and-column-sample',
+            templateData: self.sample,
+            errorText: '${ _("There was a problem loading the samples.") }',
+            isColumn: isColumn
+          });
+        }
 
         if (isColumn) {
           self.columnDetails.fetch(function (data) {
@@ -696,7 +747,7 @@ from metadata.conf import has_navigator
               isColumn: true
             });
           });
-        } else {
+        } else if (!isComplex) {
           self.tableDetails.fetch(function (data) {
             if (data.partition_keys.length === 0) {
               self.tabs.push({
@@ -769,23 +820,23 @@ from metadata.conf import has_navigator
           }
         }));
 
-        var path = apiHelper.identifierChainToPath({
+        apiHelper.identifierChainToPath({
           sourceType: sourceType,
           defaultDatabase: defaultDatabase,
           identifierChain: data.identifierChain
+        }, function (path) {
+          pubSubs.push(huePubSub.subscribe('sql.context.popover.show.in.assist', function () {
+            huePubSub.publish('assist.db.highlight', {
+              sourceType: sourceType,
+              path: path
+            });
+            huePubSub.publish('sql.context.popover.hide')
+          }));
+
+          pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
+            window.open('/metastore/table/' + path.join('/'), '_blank');
+          }));
         });
-
-        pubSubs.push(huePubSub.subscribe('sql.context.popover.show.in.assist', function () {
-          huePubSub.publish('assist.db.highlight', {
-            sourceType: sourceType,
-            path: path
-          });
-          huePubSub.publish('sql.context.popover.hide')
-        }));
-
-        pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
-          window.open('/metastore/table/' + path.join('/'), '_blank');
-        }));
       }
 
       TableAndColumnContextTabs.prototype.refetchSamples = function () {
@@ -1257,6 +1308,7 @@ from metadata.conf import has_navigator
         self.isDatabase = params.data.type === 'database';
         self.isTable = params.data.type === 'table';
         self.isColumn = params.data.type === 'column';
+        self.isComplex = params.data.type === 'complex';
         self.isFunction = params.data.type === 'function';
         self.isHdfs = params.data.type === 'hdfs';
         self.isAsterisk = params.data.type === 'asterisk';
@@ -1266,11 +1318,15 @@ from metadata.conf import has_navigator
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-database';
         } else if (self.isTable) {
-          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false);
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-table'
+        } else if (self.isComplex) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, true);
+          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          self.iconClass = 'fa-columns'
         } else if (self.isColumn) {
-          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true);
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-columns'
         } else if (self.isFunction) {
