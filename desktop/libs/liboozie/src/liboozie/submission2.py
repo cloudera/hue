@@ -311,7 +311,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     has_deployment_dir_access = False
     if self.job.deployment_dir and self.fs.exists(self.job.deployment_dir):
       statbuf = self.fs.stats(self.job.deployment_dir)
-      has_deployment_dir_access = statbuf and (statbuf.user == self.job.user.username)
+      has_deployment_dir_access = statbuf and (statbuf.user == self.user.username)
 
     # Case of a shared job
     if self.job.document and self.user != self.job.document.owner or not has_deployment_dir_access:
