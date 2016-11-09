@@ -1185,7 +1185,10 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.isCanceling = ko.observable(false);
+
     self.cancel = function () {
+      self.isCanceling(true);
       if (self.checkStatusTimeout != null) {
         clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
@@ -1199,6 +1202,7 @@ var EditorViewModel = (function() {
         }
         self.statusForButtons('canceled');
         self.status('failed');
+        self.isCanceling(false);
       } else {
         self.statusForButtons('canceling');
         $.post("/notebook/api/cancel_statement", {
@@ -1215,6 +1219,8 @@ var EditorViewModel = (function() {
           $(document).trigger("error", xhr.responseText);
           self.statusForButtons('canceled');
           self.status('failed');
+        }).always(function (){
+          self.isCanceling(false);
         });
       }
     };
