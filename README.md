@@ -176,7 +176,7 @@ Main Stack
 Hue would not be possible without:
 
    * Python 2.6.5 - 2.7
-   * Django 1.6 (https://docs.djangoproject.com/en/1.6/)
+   * Django 1.6 (https://docs.djangoproject.com/)
    * Knockout.js (http://knockoutjs.com/)
    * jQuery (http://jquery.com/)
    * Bootstrap (http://getbootstrap.com/)
