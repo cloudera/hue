@@ -800,8 +800,12 @@ class SolrApi(object):
 
     return params
 
+
   def _get_nested_fields(self, collection):
-    return [field['filter'] for field in self._flatten_schema(collection['nested']['schema']) if field['selected']] if collection['nested']['enabled'] else []
+    if collection.get('nested') and collection['nested']['enabled']:
+      return [field['filter'] for field in self._flatten_schema(collection['nested']['schema']) if field['selected']]
+    else:
+      return []
 
 
   def _flatten_schema(self, level):
