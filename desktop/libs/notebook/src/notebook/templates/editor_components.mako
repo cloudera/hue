@@ -1952,7 +1952,7 @@ ${ hueIcons.symbols() }
 
 <script type="text/html" id="snippet-execution-status">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
-    <div class="snippet-progress-container">
+    <div class="snippet-progress-container" data-bind="visible: status() != 'canceled'">
       <div class="progress-snippet progress active" data-bind="css: {
         'progress-starting': progress() == 0 && status() == 'running',
         'progress-warning': progress() > 0 && progress() < 100,
