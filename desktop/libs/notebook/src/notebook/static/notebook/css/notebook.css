@@ -178,6 +178,8 @@ body {
   border-left: 1px solid #e5e5e5;
   border-right: 1px solid #e5e5e5;
   border-bottom: 1px solid #e5e5e5;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .snippet-settings-header > h4 {
