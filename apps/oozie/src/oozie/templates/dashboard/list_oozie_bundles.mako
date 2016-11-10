@@ -185,6 +185,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
   var runningTableOffset = 1, completedTableOffset = 1;
   var totalRunningJobs = 0, totalCompletedJobs = 0;
   var PAGE_SIZE = 50;
+  var filterTimeout = null;
 
   $(document).ready(function () {
 
@@ -266,14 +267,17 @@ ${layout.menubar(section='bundles', dashboard=True)}
     });
 
     $("#filterInput").keyup(function () {
-      runningTable.fnFilter($(this).val());
-      completedTable.fnFilter($(this).val());
+      if (filterTimeout != null) {
+        clearTimeout(filterTimeout);
+      }
+      filterTimeout = setTimeout(refreshTables, 500);
 
       var hash = "#";
       if ($("a.btn-date.active").length > 0) {
         hash += "date=" + $("a.btn-date.active").text();
       }
       window.location.hash = hash;
+      refreshPagination();
     });
 
     $("a.btn-pagination").on("click", function () {
@@ -313,6 +317,22 @@ ${layout.menubar(section='bundles', dashboard=True)}
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (hash != "" && hash.indexOf("=") > -1) {
       $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
+    }
+
+    function refreshTables() {
+      refreshRunning();
+      refreshCompleted();
+      refreshProgress();
+    }
+
+
+    function getTextFilter() {
+      var filterBtn = $("#filterInput");
+      var textFilter = '';
+      if (filterBtn.val()) {
+        textFilter = '&text=' + filterBtn.val();
+      }
+      return textFilter;
     }
 
     function refreshPagination() {
@@ -385,7 +405,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     var numRunning = 0;
 
     refreshRunning = function () {
-      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getTextFilter(), function (data) {
         // Refresh pagination buttons
         totalRunningJobs = data.total_jobs;
         refreshPaginationButtons("running", totalRunningJobs);
@@ -479,7 +499,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
 
     function refreshCompleted() {
-      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed') + getTextFilter(), function (data) {
         // Refresh pagination buttons
         totalCompletedJobs = data.total_jobs;
         refreshPaginationButtons("completed", totalCompletedJobs);
@@ -506,7 +526,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
 
     function refreshProgress() {
-      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running') + getTextFilter(), function (data) {
         var nNodes = runningTable.fnGetNodes();
         $(data.jobs).each(function (iWf, item) {
             var bundle = new Bundle(item);
@@ -530,9 +550,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
       });
     }
 
-    refreshRunning();
-    refreshCompleted();
-    refreshProgress();
+    refreshTables();
 
   });
 </script>
