@@ -338,15 +338,16 @@ def list_oozie_workflow(request, job_id):
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
 
+    except Exception, e:
+      LOG.exception("Error generating full page for running workflow %s with exception: %s" % (job_id, e.message))
+    finally:
+      workflow_graph = ''
+      credentials = Credentials()
       if not workflow_data.get('layout') or oozie_workflow.conf_dict.get('submit_single_action'):
         try:
           workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
         except Exception, e:
           LOG.exception('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e))
-      workflow_graph = ''
-      credentials = Credentials()
-    except:
-      LOG.exception("Error generating full page for running workflow %s" % job_id)
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
