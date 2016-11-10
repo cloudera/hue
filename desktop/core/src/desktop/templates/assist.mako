@@ -1946,7 +1946,7 @@ from metadata.conf import has_navigator
 
         self.visiblePanel.subscribe(function(newValue) {
           self.apiHelper.setInTotalStorage('assist', 'last.open.panel', newValue.type);
-          if (self.navigatorEnabled()) {
+          if (self.navigatorEnabled() && self.searchActive()) {
             lastQuery = 'refresh';
             self.performSearch();
           }
