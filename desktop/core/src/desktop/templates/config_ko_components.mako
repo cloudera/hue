@@ -27,7 +27,7 @@ from desktop.views import _ko
 
   <style>
     .config-property {
-      display: inline-block;
+      display: block;
       vertical-align: top;
       margin-bottom: 20px;
       position: relative;
