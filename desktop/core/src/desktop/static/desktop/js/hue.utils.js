@@ -344,15 +344,16 @@ var hueDebugTimer = (function () {
 
 
 Number.prototype.toHHMMSS = function () {
-  var _s = this;
-  var _ms = _s % 1000;
-  _s = (_s - _ms) / 1000;
-  var _secs = _s % 60;
-  _s = (_s - _secs) / 60;
-  var _mins = _s % 60;
-  var _hrs = (_s - _mins) / 60;
-  return (_hrs > 0 ? _hrs + "h, " : "") + (_mins > 0 ? _mins + "m, " : "") + _secs + "." + _ms + "s";
-
+  var n = this;
+  var millis = n % 1000;
+  n = (n - millis) / 1000;
+  var seconds = n % 60;
+  n = (n - seconds) / 60;
+  var minutes = n % 60;
+  n = (n - minutes) / 60;
+  var hours = n % 24;
+  var days = (n - hours) / 24;
+  return (days > 0 ? days + "d, " : "") + (hours > 0 ? hours + "h, " : "") + (minutes > 0 ? minutes + "m, " : "") + seconds + (millis > 0 && minutes == 0 && hours == 0 && days == 0 ? "." + millis : "") + "s";
 }
 
 if (!('getParameter' in window.location)) {
