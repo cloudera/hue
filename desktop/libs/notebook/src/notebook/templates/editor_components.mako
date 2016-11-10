@@ -21,6 +21,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
+from metadata.conf import has_optimizer
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
 %>
 
@@ -1071,7 +1072,10 @@ ${ hueIcons.symbols() }
 
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
+      % if has_optimizer():
+      <li class="active"><a href="#assistantTab" data-toggle="tab">${_('Assistant')}</a></li>
+      % endif
+      <li class="${ 'active' if not has_optimizer() else '' }"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
       % if ENABLE_QUERY_SCHEDULING.get():
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
         <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
@@ -1080,7 +1084,39 @@ ${ hueIcons.symbols() }
     </ul>
 
     <div class="tab-content" style="border: none">
-      <div class="tab-pane active" id="sessionsTab">
+      % if has_optimizer():
+      <div class="tab-pane active" id="assistantTab">
+        <div class="row-fluid">
+          <div class="span12">
+            <form class="form-horizontal">
+              <fieldset>
+               ${ _('Active tables') }<br/> <i class="fa fa-object-group"></i>
+               <ul>
+                 <li>sample_07 <i class="fa fa-info"></i> <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li>
+                 <li>sample_08 <i class="fa fa-info"></i> </li>
+               </ul>
+               Outline?<br/>
+             </fieldset>
+            <form class="form-horizontal">
+              <fieldset>
+               ${ _('Suggestions') }<br/>
+               
+               Risk<br/>
+               <br/>
+               
+               Did you know?<br/>
+               Ran 100 times last week<br/>
+               Could be automated with integrated scheduler<br/>
+               Share results?<br/>
+               Parameterize the query?<br/>
+             </fieldset>
+           </form>
+         </div>
+       </div>
+      </div>
+      % endif
+
+      <div class="tab-pane ${ 'active' if not has_optimizer() else '' }" id="sessionsTab">
         <div class="row-fluid">
           <div class="span12">
             <!-- ko with: $root.selectedNotebook() -->
