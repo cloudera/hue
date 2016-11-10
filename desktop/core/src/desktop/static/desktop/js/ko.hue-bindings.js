@@ -3316,7 +3316,14 @@
             if (token !== null && token.parseLocation && !disableTooltip) {
               tooltipTimeout = window.setTimeout(function () {
                 var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                contextTooltip.show(options.contextTooltip, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+
+                var tooltipText = options.contextTooltip;
+                if (token.parseLocation.identifierChain) {
+                  tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
+                } else if (token.parseLocation.function) {
+                  tooltipText += ' (' + token.parseLocation.function + ')';
+                }
+                contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
               }, 500);
             } else {
               hideContextTooltip();
