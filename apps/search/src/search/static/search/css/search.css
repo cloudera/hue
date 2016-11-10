@@ -285,6 +285,11 @@ em {
 
 #result-container thead tr {
   border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+}
+
+#result-container td {
+  border-right: 1px solid #e5e5e5;
 }
 
 #result-container .show-details-icon {
@@ -305,6 +310,21 @@ em {
 
 #result-container .show-details-icon:hover i {
   color: #338bb8;
+}
+
+.result-sorting th {
+  border-top: 3px solid #FFFFFF !important;
+  padding-left: 3px!important;
+  padding-right: 4px!important;
+  vertical-align: middle!important;
+}
+
+.result-sorting th:hover {
+  border-top: 3px solid #EEEEEE !important;
+}
+
+.result-sorting th span, .result-sorting th i {
+  cursor: pointer;
 }
 
 .demi-modal {
