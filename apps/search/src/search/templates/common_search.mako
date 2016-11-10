@@ -1053,7 +1053,7 @@ ${ dashboard.layout_skeleton() }
         <div id="result-main" style="overflow-x: auto">
           <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
             <thead>
-              <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+              <tr class="result-sorting" data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
               </tr>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
@@ -1237,7 +1237,7 @@ ${ dashboard.layout_skeleton() }
       <div class="widget-section widget-settings-section" style="display: none">
         <div style="overflow-x: scroll; min-height: 40px">
           <table>
-            <tr data-bind="template: {name: 'result-sorting'}">
+            <tr class="result-sorting" data-bind="template: {name: 'result-sorting'}">
             </tr>
           </table>
         </div>
@@ -1365,25 +1365,17 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="result-sorting">
 <th style="width: 18px">&nbsp;</th>
 <!-- ko foreach: $root.collection.template.fieldsSelected -->
-<th data-bind="with: $root.collection.getTemplateField($data), event: { mouseover: $root.enableGridlayoutResultChevron, mouseout: $root.disableGridlayoutResultChevron }" style="white-space: nowrap">
-  <div style="display: inline-block; width:20px;">
-    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }">
-      <i class="fa fa-chevron-left" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() > 0"></i>
-      <i class="fa fa-chevron-left" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == 0"></i>
-    </a>
-  </div>
-  <div style="display: inline-block;">
-    <a href="javascript: void(0)" data-bind="click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }">
-      <span data-bind="text: name"></span>
-      <i class="fa" data-bind="visible: sort.direction() != null, css: { 'fa-chevron-down': sort.direction() == 'desc', 'fa-chevron-up': sort.direction() == 'asc' }"></i>
-    </a>
-  </div>
-  <div style="display: inline-block; width:20px;">
-    <a href="javascript: void(0)" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }">
-      <i class="fa fa-chevron-right" data-bind="visible: $root.toggledGridlayoutResultChevron() && $index() < $root.collection.template.fields().length - 1"></i>
-      <i class="fa fa-chevron-up" style="color: #FFF" data-bind="visible: !$root.toggledGridlayoutResultChevron() || $index() == $root.collection.template.fields().length - 1,"></i>
-    </a>
-  </div>
+<th data-bind="with: $root.collection.getTemplateField($data)" style="white-space: nowrap">
+  <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }"></span>
+  <i class="fa fa-sort inactive-action margin-right-10 margin-left-5" data-bind="click: $root.collection.toggleSortColumnGridLayout, css: { 'blue': sort.direction() != null, 'fa-sort-down': sort.direction() == 'desc', 'fa-sort-up': sort.direction() == 'asc' }" title="${ _('Click to sort') }"></i>
+  <!-- ko if: $root.isEditing -->
+    <!-- ko if: $index() > 0 -->
+    <i class="fa fa-caret-left inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }" title="${ _('Move to the left') }"></i>
+    <!-- /ko -->
+    <!-- ko if: $index() < $root.collection.template.fields().length - 1 -->
+    <i class="fa fa-caret-right inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }" title="${ _('Move to the right') }"></i>
+    <!-- /ko -->
+  <!-- /ko -->
 </th>
 <!-- /ko -->
 </script>
@@ -1393,7 +1385,7 @@ ${ dashboard.layout_skeleton() }
 <div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
-    <i class="fa fa-arrow-left" data-bind="
+    <i class="fa fa-chevron-left" data-bind="
         visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
     </i>
@@ -1417,7 +1409,7 @@ ${ dashboard.layout_skeleton() }
 
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
-    <i class="fa fa-arrow-right" data-bind="
+    <i class="fa fa-chevron-right" data-bind="
         visible: ($root.collection.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
     </i>
@@ -3401,6 +3393,27 @@ $(document).ready(function () {
   else if (_query.qd) {
     loadQueryDefinition(_query.qd);
   }
+
+  function throttledHeaderPadding() {
+    $('#result-main').find("thead>tr th").each(function () {
+      var leftPosition = $(this).position().left - $('#result-main').position().left;
+      if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
+        if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
+          $(this).find('span').css('paddingLeft', -leftPosition);
+        }
+      }
+      else {
+        $(this).find('span').css('paddingLeft', 0);
+      }
+    });
+  }
+
+  var scrollTimeout = -1;
+  $('#result-main').off('scroll');
+  $('#result-main').on('scroll', function () {
+    window.clearTimeout(scrollTimeout);
+    scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
+  });
 
 });
 
