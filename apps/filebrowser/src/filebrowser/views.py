@@ -1228,7 +1228,6 @@ def _upload_file(request):
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
         dest = form.cleaned_data['dest']
-        extract_archive = form.cleaned_data.get('extract_archive')
         filepath = request.fs.join(dest, uploaded_file.name)
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
@@ -1237,8 +1236,6 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
-            if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get() and extract_archive:
-              response['batch_job_response'] = extract_archive_in_hdfs(request, dest, uploaded_file.name)
 
         except IOError, ex:
             already_exists = False
@@ -1353,6 +1350,26 @@ def _upload_archive(request):
         return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
+
+
+@require_http_methods(["POST"])
+def extract_archive_using_batch_job(request):
+
+  response = {'status': -1, 'data': ''}
+  if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    upload_path = request.POST.get('upload_path', None)
+    archive_name = request.POST.get('archive_name', None)
+
+    if upload_path and archive_name:
+      try:
+        response = extract_archive_in_hdfs(request, upload_path, archive_name)
+      except Exception, e:
+        response['message'] = _('Exception occurred while extracting the archive: %s' % e)
+  else:
+    response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
+                            'has to be enabled before calling this method.')
+
+  return JsonResponse(response)
 
 
 def status(request):

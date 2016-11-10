@@ -920,15 +920,16 @@ alert("XSS")
 
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE), extract_archive=True))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
 
-      assert_true('batch_job_response' in response)
-      batch_job_response = response['batch_job_response']
-      assert_equal(0, batch_job_response['status'], batch_job_response)
-      assert_true('handle' in batch_job_response and batch_job_response['handle']['id'], batch_job_response)
+      resp = self.c.post('/filebrowser/extract_archive',
+                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.zip'))
+      response = json.loads(resp.content)
+      assert_equal(0, response['status'], response)
+      assert_true('handle' in response and response['handle']['id'], response)
     finally:
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
