@@ -38,6 +38,6 @@ def _upload_extract_archive_script_to_hdfs(fs):
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'):
-    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, 'desktop/core/src/desktop/lib/extract_archive_in_hdfs.sh',
+    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, 'desktop/core/src/desktop/lib/tasks/extract_archive/extract_in_hdfs.sh',
                           '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh')
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
