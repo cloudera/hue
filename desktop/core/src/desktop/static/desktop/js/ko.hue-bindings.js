@@ -2083,6 +2083,18 @@
     }
   };
 
+  ko.bindingHandlers.clickOutside = {
+    init: function (element, valueAccessor) {
+      var func = valueAccessor();
+
+      $(document).on('click', function (event) {
+        if ($.contains(document, event.target) && !$.contains(element, event.target)) {
+          func();
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.blurHide = {
     init: function (element, valueAccessor) {
       var $el = $(element);
