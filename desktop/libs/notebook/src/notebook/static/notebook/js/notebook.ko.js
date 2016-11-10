@@ -2002,7 +2002,16 @@ var EditorViewModel = (function() {
     self.isMobile = ko.observable(options.mobile);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
-      console.log('Should happen on new query, or Hive --> Impala only: reload session, saved queries, history if in editor mode');
+      console.log('Supported on new query or Hive <--> Impala');
+      //self.selectedNotebook().sessions.removeAll();
+      //self.selectedNotebook().createSession(new Session(self, {'type': newVal}), function() {});
+      
+      //change snippets type
+      
+      // reload saved queries and history if editor mode
+      if (newVal == 'notebook') {
+        self.editorMode(false);
+      }
     });
     self.editorTypeTitle = ko.observable(options.editor_type);
     self.useNewAutocompleter = options.useNewAutocompleter || false;
