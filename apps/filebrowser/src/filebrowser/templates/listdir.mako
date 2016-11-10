@@ -18,6 +18,8 @@
 from django.template.defaultfilters import urlencode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -105,10 +107,16 @@ ${ fb_components.menubar() }
           <!-- /ko -->
           <!-- /ko -->
           % if 'oozie' in apps:
-          <button class="btn fileToolbarBtn" title="${_('Submit')}"
-            data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
-            <i class="fa fa-play"></i> ${_('Submit')}
-          </button>
+            <button class="btn fileToolbarBtn" title="${_('Submit')}"
+              data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
+              <i class="fa fa-play"></i> ${_('Submit')}
+            </button>
+            % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+              <button class="btn extractArchiveBtn" title="${_('Extract')}"
+                data-bind="visible: selectedFiles().length == 1 && isArchive(), click: confirmExtractArchive">
+                <i class="fa fa-play"></i> ${_('Extract')}
+              </button>
+            % endif
           % endif
         </div>
       </%def>

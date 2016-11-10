@@ -96,6 +96,28 @@ from django.utils.translation import ugettext as _
     </p>
   </div>
 
+  <!-- extract modal -->
+  <div id="confirmExtractModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Extract Archive')}</h3>
+    </div>
+    <!-- ko if: selectedFile -->
+    <div class="modal-body">
+      <p>${_('Start a task to extract the contents of this archive.')}</p>
+      <ul>
+        <li>
+          <span data-bind="text: selectedFile().name"> </span>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: extractSelectedArchive"/>
+    </div>
+    <!-- /ko -->
+  </div>
+
   <!-- delete modal -->
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
@@ -1389,6 +1411,38 @@ from django.utils.translation import ugettext as _
         % else:
           $.jHueNotify.warn("${ _('Submitting is not available as the Oozie app is disabled') }");
         % endif
+      };
+
+      self.isArchive = function() {
+        var fileName = self.selectedFile().name;
+        return fileName.endsWith('.zip') || fileName.endsWith('.tar.gz') || fileName.endsWith('.tgz') || fileName.endsWith('.bz2') || fileName.endsWith('.bzip2');
+      };
+
+      self.confirmExtractArchive = function() {
+        $("#confirmExtractModal").modal({
+          keyboard:true,
+          show:true
+        });
+      };
+
+      self.extractSelectedArchive = function() {
+        $("#confirmExtractModal").modal("hide");
+        $.post("/filebrowser/extract_archive", {
+          "archive_name": self.selectedFile().name,
+          "upload_path": self.currentPath(),
+        }, function (data) {
+          if (data.status == 0) {
+            var jobId = '';
+            if (data.handle) {
+              jobId = data.handle.id;
+            }
+            $.jHueNotify.info("${ _('Oozie job ') }" + jobId + "${_(' submitted for archive extraction.') }");
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
       };
 
       self.createDirectory = function (formElement) {
