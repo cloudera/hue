@@ -313,8 +313,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         clearTimeout(filterTimeout);
       }
       filterTimeout = setTimeout(refreshTables, 500);
-      refreshRunning();
-      refreshCompleted();
+      refreshPagination();
     });
 
     $("a.btn-pagination").on("click", function () {
