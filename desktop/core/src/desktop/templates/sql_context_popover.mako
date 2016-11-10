@@ -320,7 +320,7 @@ from metadata.conf import has_navigator
         </span>
       </div>
       <!-- /ko -->
-      <!-- ko if: comment -->
+      <!-- ko if: typeof comment !== 'undefined' && comment !== '' -->
       <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
       <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
       <!-- /ko -->
@@ -336,7 +336,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
       <div style="margin: 15px;">
         <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
-        <!-- ko if: comment -->
+        <!-- ko if: typeof comment !== 'undefined' && comment !== '' -->
         <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
         <div data-bind="text: comment"></div>
         <!-- /ko -->
