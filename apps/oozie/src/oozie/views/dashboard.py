@@ -194,6 +194,9 @@ def list_oozie_workflows(request):
     if request.GET.get('startcreatedtime'):
       kwargs['filters'].extend([('startcreatedtime', request.GET.get('startcreatedtime'))])
 
+    if request.GET.get('text'):
+      kwargs['filters'].extend([('text', request.GET.get('text'))])
+
     if request.GET.get('offset'):
       kwargs['offset'] = request.GET.get('offset')
 
