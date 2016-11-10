@@ -55,11 +55,11 @@ except ImportError, e:
     </a>
     <!-- /ko -->
     <!-- ko if: dbSelectionVisible -->
-    <input class="db-selection-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': selectedDatabase }, visible: dbSelectionVisible, style: { color: filterEdited() ? '#000' : '#AAA' }"/>
+    <input class="db-selection-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': selectedDatabase }, visible: dbSelectionVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div data-bind="css: { 'open' : dbSelectionVisible }" style="display: inline-block;">
-      <div class="dropdown-menu" data-bind="visible: filteredDatabases().length > 0" style="overflow-y: scroll; width: 190px; min-height: 34px; max-height: 200px;">
+    <div data-bind="css: { 'open' : dbSelectionVisible }" style="position: absolute;">
+      <div class="dropdown-menu" data-bind="visible: filteredDatabases().length > 0" style="overflow-y: scroll; width: 190px; margin-left: 10px; min-height: 34px; max-height: 200px;">
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredDatabases, minHeight: 34, container: '.dropdown-menu' }">
           <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.selectedDatabase($data); }"></a></li>
         </ul>
