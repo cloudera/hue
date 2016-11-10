@@ -235,6 +235,9 @@ def list_oozie_coordinators(request):
     if request.GET.get('offset'):
       kwargs['offset'] = request.GET.get('offset')
 
+    if request.GET.get('text'):
+      kwargs['filters'].extend([('text', request.GET.get('text'))])
+
     json_jobs = []
     total_jobs = 0
     if request.GET.getlist('status'):
