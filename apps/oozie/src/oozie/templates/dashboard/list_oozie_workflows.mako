@@ -307,6 +307,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         clearTimeout(filterTimeout);
       }
       filterTimeout = setTimeout(refreshTables, 500);
+      refreshPagination();
     });
 
 
