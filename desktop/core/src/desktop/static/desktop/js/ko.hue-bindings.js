@@ -3111,6 +3111,16 @@
           }
           huePubSub.publish('editor.active.locations', e.data.locations);
           e.data.locations.forEach(function (location) {
+            if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
+              var clonedChain = location.identifierChain.concat();
+              if (apiHelper.containsDatabase(snippet.type(), clonedChain[0].name)) {
+                clonedChain.shift();
+              }
+              if (clonedChain.length > 1) {
+                location.type = 'complex';
+              }
+            }
+
             var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
             if (token && token.value && /`$/.test(token.value)) {
               // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
