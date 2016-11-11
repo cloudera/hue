@@ -1477,7 +1477,7 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="snippet-header-statement-type">
   % if ENABLE_BATCH_EXECUTE.get():
   <!-- ko if: isSqlDialect() -->
-  <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
   % endif
 </script>
