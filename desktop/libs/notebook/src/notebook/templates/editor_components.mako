@@ -302,7 +302,7 @@ ${ hueIcons.symbols() }
 
       <div class="nav-collapse">
         <ul class="nav editor-nav">
-          <li class="currentApp" data-bind="visible: editorMode" style="display: none">
+          <li class="currentApp">
             <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
