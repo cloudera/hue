@@ -703,7 +703,7 @@ def export_result(request):
 @check_document_access_permission()
 @api_error_handler
 def statement_risk(request):
-  response = {'status': -1, 'message': _('Risk analysis failed.')}
+  response = {'status': -1, 'message': ''}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -720,7 +720,7 @@ def statement_risk(request):
 @check_document_access_permission()
 @api_error_handler
 def statement_compatibility(request):
-  response = {'status': -1, 'message': _('Compatibility analysis failed.')}
+  response = {'status': -1, 'message': ''}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -734,3 +734,26 @@ def statement_compatibility(request):
 
   return JsonResponse(response)
 
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def statement_from_file(request):
+  response = {'status': -1, 'message': ''}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  response['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def _get_statement_from_file(user, fs, snippet):
+  if snippet.get('statementType') == 'file':
+    script_path = snippet['statementPath']
+    if script_path:
+      script_path = script_path.replace('hdfs://', '')
+      if fs.do_as_user(user, fs.exists, script_path):
+        return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)

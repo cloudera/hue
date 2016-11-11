@@ -62,6 +62,7 @@ urlpatterns += patterns('notebook.api',
 
   url(r'^api/explain/?$', 'explain', name='explain'),
   url(r'^api/format/?$', 'format', name='format'),
+  url(r'^api/statement_from_file/?$', 'statement_from_file', name='statement_from_file'),
 
   url(r'^api/get_history/?', 'get_history', name='get_history'),
   url(r'^api/clear_history/?', 'clear_history', name='clear_history'),

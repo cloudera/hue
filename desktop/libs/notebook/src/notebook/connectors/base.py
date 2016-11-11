@@ -282,5 +282,3 @@ class Api(object):
   def statement_risk(self, notebook, snippet): raise NotImplementedError()
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
-
-  def statement_variables(self, notebook, snippet): raise NotImplementedError()

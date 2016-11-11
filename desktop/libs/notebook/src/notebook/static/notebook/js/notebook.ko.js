@@ -420,7 +420,16 @@ var EditorViewModel = (function() {
     self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for spark
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
-      self.statement_raw('aaa ${aa} ddd');
+      $.post("/notebook/api/statement_from_file", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function(data) {
+        if (data.status == 0) {
+          self.statement_raw(data.statement); // why not picked up but 'aaaaaaa' ok?
+        } else {
+          self._ajaxError(data);
+        }
+      });
     });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
