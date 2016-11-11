@@ -223,13 +223,6 @@ class HS2Api(Api):
     statement = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
 
-    if snippet.get('statementType') == 'file':
-      script_path = snippet['statementPath']
-      if script_path:
-        script_path = script_path.replace('hdfs://', '')
-        if self.request.fs.do_as_user(self.user, self.request.fs.exists, script_path):
-          statement['statement'] = self.request.fs.do_as_user(self.user, self.request.fs.read, script_path, 0, 16 * 1024 ** 2)
-
     query = self._prepare_hql_query(snippet, statement['statement'], session)
 
     try:
@@ -431,6 +424,7 @@ class HS2Api(Api):
     db = self._get_db(snippet)
     response = self._get_current_statement(db, snippet)
     session = self._get_session(notebook, snippet['type'])
+
     query = self._prepare_hql_query(snippet, response.pop('statement'), session)
 
     try:
@@ -530,6 +524,10 @@ class HS2Api(Api):
     return api.query_compatibility(source_platform, target_platform, query)
 
 
+  def statement_variables(self, notebook, snippet):
+    pass
+
+
   def upgrade_properties(self, lang='hive', properties=None):
     upgraded_properties = copy.deepcopy(self.get_properties(lang))
 
@@ -615,6 +613,9 @@ class HS2Api(Api):
     else:
       statement_id = 0
 
+    if snippet.get('statementType') == 'file':
+      snippet['statement'] = self._get_statement_from_file(snippet)
+
     statements = self._get_statements(snippet['statement'])
 
     resp = {
@@ -686,6 +687,14 @@ class HS2Api(Api):
       name = 'sparksql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
+
+  def _get_statement_from_file(self, snippet):
+    if snippet.get('statementType') == 'file':
+      script_path = snippet['statementPath']
+      if script_path:
+        script_path = script_path.replace('hdfs://', '')
+        if self.request.fs.do_as_user(self.user, self.request.fs.exists, script_path):
+          return self.request.fs.do_as_user(self.user, self.request.fs.read, script_path, 0, 16 * 1024 ** 2)
 
 
   def _parse_job_counters(self, job_id):
