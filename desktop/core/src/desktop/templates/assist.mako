@@ -1602,6 +1602,7 @@ from metadata.conf import has_navigator
           currentEntry.hasOnlyCores.subscribe(function (onlyCores) {
             self.showCores(onlyCores);
           });
+          self.showCores(currentEntry.hasOnlyCores());
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
