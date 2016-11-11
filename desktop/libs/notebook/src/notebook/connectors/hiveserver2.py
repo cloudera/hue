@@ -524,10 +524,6 @@ class HS2Api(Api):
     return api.query_compatibility(source_platform, target_platform, query)
 
 
-  def statement_variables(self, notebook, snippet):
-    pass
-
-
   def upgrade_properties(self, lang='hive', properties=None):
     upgraded_properties = copy.deepcopy(self.get_properties(lang))
 
