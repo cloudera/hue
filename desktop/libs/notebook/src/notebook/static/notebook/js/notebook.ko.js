@@ -421,6 +421,9 @@ var EditorViewModel = (function() {
 
     self.statementType = ko.observable(typeof snippet.statementType != "undefined" && snippet.statementType != null ? snippet.statementType : 'text');
     self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
+    if (! vm.editorMode()) {
+      self.statementTypes.push('document');	
+    }
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
       $.post("/notebook/api/statement_from_file", {
