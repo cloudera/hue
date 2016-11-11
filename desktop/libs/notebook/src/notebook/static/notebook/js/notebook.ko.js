@@ -2017,15 +2017,9 @@ var EditorViewModel = (function() {
     self.isMobile = ko.observable(options.mobile);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
-      console.log('Supported on new query or Hive <--> Impala');
-      //self.selectedNotebook().sessions.removeAll();
-      //self.selectedNotebook().createSession(new Session(self, {'type': newVal}), function() {});
-      
-      //change snippets type
-      
-      // reload saved queries and history if editor mode
-      if (newVal == 'notebook') {
-        self.editorMode(false);
+      self.editorMode(newVal != 'notebook');
+      if (self.editorMode()) {
+    	self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
       }
     });
     self.editorTypeTitle = ko.observable(options.editor_type);
@@ -2139,9 +2133,6 @@ var EditorViewModel = (function() {
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
     self.editorMode = ko.observable(options.mode == 'editor');
-    self.editorMode.subscribe(function(newVal) {
-      console.log('should be switchable when max 1 snippet');
-    });
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
