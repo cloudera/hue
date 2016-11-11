@@ -638,8 +638,8 @@
               itemTemplate: 'doc-search-autocomp-item'
             }, valueUpdate: 'afterkeydown'">
             <span class="inactive-action">
-                <i class="fa fa-sort"></i>
-              </span>
+              <i class="fa fa-sort"></i>
+            </span>
           </div>
           <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
