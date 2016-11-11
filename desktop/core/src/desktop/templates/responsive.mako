@@ -90,17 +90,17 @@ ${ hueIcons.symbols() }
     <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
     <span style="color:white">
 
-      <span style="font-size: 130%" title="${ _( 'Compose query or job') }">
+      <span style="font-size: 130%">
        <div class="btn-group" style="vertical-align: middle">
-          <a href="${ url('notebook:new') }">
+          <a href="${ url('notebook:new') }" title="${ _( 'New Notebook') }">
             <button class="btn btn-primary">
               <i class="fa fa-pencil-square-o"></i> ${ _('Compose') }
             </button>
           </a>
-          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown">
+          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" title="${ _( 'Compose query or job') }">
             <span class="caret"></span>
           </button>
-          <ul role="menu" class="dropdown-menu">
+          <ul role="menu" class="dropdown-menu" title="${ _( 'Compose query or job') }">
            % if 'beeswax' in apps:
              <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
            % endif
@@ -165,7 +165,7 @@ ${ hueIcons.symbols() }
           <div class="btn-group" style="vertical-align: middle">
             <a href="${ url('notebook:new') }">
               <button class="btn btn-primary">
-                ${ _('Fin audit reporting') }
+                ${ _('research queue') }
               </button>
             </a>
             <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown">
@@ -179,7 +179,7 @@ ${ hueIcons.symbols() }
               </li>
               <li>
                 <a href='#' class="ignore-btn confirmationModal">
-                  ${ _('ETL customer feedback') }
+                  ${ _('ETL analytics') }
                 </a>
               </li>
               <li>
@@ -202,14 +202,18 @@ ${ hueIcons.symbols() }
           </span>
         </li>
 
+        % if 'oozie' in apps: # Merged with Jobs eventually
         <li>
           <span title="Running workflows">
-            <i class="fa fa-circle-o"></i> ${ _('Workflows') }
+            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="${ url('oozie:index') }" style="color:white">
+              <i class="fa fa-circle-o"></i> ${ _('Workflows') }
+            </a>
             <span class="badge badge-warning">10</span>
           </span>
             ## Coordinators
             ## Bundles
         </li>
+        % endif
 
         <li>
           <span title="Notifications"><i class="fa fa-bell-o"></i> <span class="badge badge-success">10</span></span>
@@ -232,7 +236,7 @@ ${ hueIcons.symbols() }
           % if view_profile:
           <ul class="dropdown-menu pull-right">
             <li>
-              <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
+              <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-user-circle"></i>&nbsp;&nbsp;
                 % if is_ldap_setup:
                   ${_('View Profile')}
                 % else:
@@ -241,7 +245,9 @@ ${ hueIcons.symbols() }
               </a>
             </li>
             % if user.is_superuser:
-              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
+              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+              <li><a href="${ url('useradmin.views.list_permissions') }"><i class="fa fa-key"></i> ${_('Set Permissions')}</a></li>
+              <li><a href="/about"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /> ${_('About Hue')}</a></li>
             % endif
             <li>
               <a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a>
