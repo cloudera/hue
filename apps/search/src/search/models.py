@@ -470,7 +470,7 @@ class Collection2(object):
 
     # For backward compatibility
     if 'rows' not in props['collection']['template']:
-      props['collection']['template']['rows'] = 10
+      props['collection']['template']['rows'] = 25
     if 'showGrid' not in props['collection']['template']:
       props['collection']['template']['showGrid'] = True
     if 'showChart' not in props['collection']['template']:
@@ -580,7 +580,7 @@ class Collection2(object):
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
-      "rows": 10,
+      "rows": 25,
     }
 
     FACETS = []
