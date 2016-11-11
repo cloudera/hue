@@ -260,6 +260,9 @@ var EditorViewModel = (function() {
     self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
     self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
     self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
+    self.type.subscribe(function(newVal) {
+      self.status('ready');
+    });
 
     self.isBatchable = ko.computed(function() {
       return self.type() == 'hive'
