@@ -424,10 +424,11 @@ def get_stats(request):
     result['message'] = ''
 
   except Exception, e:
+    LOG.exception('Failed to get stats for field')
     result['message'] = force_unicode(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
-      result['message'] = _('This field does not support stats')
+      result['message'] = _('This field type does not support stats')
 
   return JsonResponse(result)
 
