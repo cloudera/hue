@@ -1431,6 +1431,9 @@ ${ hueIcons.symbols() }
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+
+    <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->
+
     <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
@@ -1445,17 +1448,22 @@ ${ hueIcons.symbols() }
     <div data-bind="component: { name: 'snippet-db-selection', params: { selectedDatabase: database, availableDatabases: availableDatabases } }" style="display: inline-block"></div>
     <!-- /ko -->
 
-    % if ENABLE_BATCH_EXECUTE.get():
-    <!-- ko if: isSqlDialect() -->
-      <select class="input-medium" data-bind="options: statementTypes, value: statementType"></select>
-    <!-- /ko -->
-    % endif
+   <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->
 
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></a>
   </div>
   <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="visible: $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times fa-fw"></i></a>
+</script>
+
+
+<script type="text/html" id="snippet-header-statement-type">
+  % if ENABLE_BATCH_EXECUTE.get():
+  <!-- ko if: isSqlDialect() -->
+    <select class="input-medium" data-bind="options: statementTypes, value: statementType"></select>
+  <!-- /ko -->
+  % endif
 </script>
 
 <script type="text/html" id="snippet">
@@ -1586,9 +1594,9 @@ ${ hueIcons.symbols() }
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
       <!-- ko if: statementType() != 'text' -->
         <div class="control-group">
-          <label class="control-label">${_('Query Path')}</label>
+          <label class="control-label">${_('Query File')}</label>
           <div class="controls">
-            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to query, e.g. /user/hue/sample.sql, s3a:///hue/sample.sql') }"/>
+            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
             <!-- ko if: statementPath() -->
               <a data-bind="attr: {href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
