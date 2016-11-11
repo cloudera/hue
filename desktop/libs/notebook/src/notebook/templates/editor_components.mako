@@ -1100,10 +1100,10 @@ ${ hueIcons.symbols() }
             <form class="form-horizontal">
               <fieldset>
                ${ _('Suggestions') }<br/>
-               
+
                Risk<br/>
                <br/>
-               
+
                Did you know?<br/>
                Ran 100 times last week<br/>
                Could be automated with integrated scheduler<br/>
@@ -3102,7 +3102,7 @@ ${ hueIcons.symbols() }
           sqlDialect: true
         },
         java : {
-          snippetIcon: 'fa-file-archive-o '
+          snippetIcon: 'fa-file-code-o'
         },
         py : {
           snippetIcon: 'fa-file-code-o'
@@ -3126,6 +3126,21 @@ ${ hueIcons.symbols() }
           placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
           aceMode: 'ace/mode/scala',
           snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        spark2: {
+          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        mapreduce: {
+          snippetIcon: 'fa-file-archive-o'
+        },
+        shell: {
+          snippetIcon: 'fa-terminal'
+        },
+        sqoop1: {
+          snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
+        },
+        distcp: {
+          snippetIcon: 'fa-files-o'
         },
         sqlite: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
