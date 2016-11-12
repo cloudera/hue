@@ -113,7 +113,7 @@ body {
   background-color: #F1F1F1;
 }
 
-.right-panel {
+.content-panel {
   position: absolute;
   height: 100%;
   overflow: auto;
@@ -754,7 +754,7 @@ h1.empty {
   .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
     display: none !important;
   }
-  .right-panel {
+  .content-panel {
     width: 100%!important;
     left: 0px!important;
   }
@@ -766,7 +766,7 @@ h1.empty {
     font-weight: bold;
     border-bottom: 2px solid #CCC!important;
   }
-  .tab-content, .right-panel {
+  .tab-content, .content-panel {
     overflow: visible;
   }
   .ace_scroller {

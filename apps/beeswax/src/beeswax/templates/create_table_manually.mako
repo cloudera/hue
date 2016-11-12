@@ -89,7 +89,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
 
-        <div class="right-panel">
+        <div class="content-panel">
 
           <div class="metastore-main">
 
@@ -768,7 +768,7 @@ ${ assist.assistPanel() }
           if (!isValid($.trim(_field.val()))) {
             showFieldError(_field);
             if (scrollTo == 0) {
-              scrollTo = $(this).offset().top + $('.right-panel').scrollTop() - 150;
+              scrollTo = $(this).offset().top + $('.content-panel').scrollTop() - 150;
             }
             step6Valid = false;
           }
@@ -780,7 +780,7 @@ ${ assist.assistPanel() }
             if ($.trim($(this).val()) != "" && $.trim($(this).val()) == $.trim(_field.val())) {
               _lastSecondErrorField = $(this);
               if (scrollTo == 0) {
-                scrollTo = _field.offset().top + $('.right-panel').scrollTop() - 150;
+                scrollTo = _field.offset().top + $('.content-panel').scrollTop() - 150;
               }
               step6Valid = false;
             }
@@ -793,7 +793,7 @@ ${ assist.assistPanel() }
           }
         });
         if (!step6Valid && scrollTo > 0) {
-          $('.right-panel').animate({
+          $('.content-panel').animate({
             'scrollTop' : scrollTo
           }, 500);
         }

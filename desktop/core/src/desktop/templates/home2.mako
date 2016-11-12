@@ -98,7 +98,7 @@ ${ docBrowser.docBrowser() }
     background-color: #F1F1F1;
   }
 
-  .right-panel {
+  .content-panel {
     position: absolute;
     height: 100%;
     overflow: hidden;
@@ -218,7 +218,7 @@ ${ docBrowser.docBrowser() }
         }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }" style="display:none;"><div class="resize-bar">&nbsp;</div></div>
-      <div class="right-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
+      <div class="content-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
         <div class="doc-browser" data-bind="component: {
           name: 'doc-browser',
           params: {
