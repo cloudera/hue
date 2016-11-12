@@ -43,15 +43,16 @@ body {
 }
 
 .top-nav {
-  flex: 0 0 2.5em;
-  background-color: #31516a;
+  flex: 1;
+  height: 38px;
+  background-color: #31516A;
   width: 100%;
   padding: 1em 0;
 }
 
 .content-wrapper {
   display: flex;
-  flex: 2;
+  flex: 1 1 100%;
   background-color: #FFF;
   flex-direction: row;
 }

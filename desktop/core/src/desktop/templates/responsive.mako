@@ -61,10 +61,8 @@
       location.href = "${ url('desktop.views.unsupported') }";
     }
 
-
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
-
 
     ApiHelperGlobals = {
       i18n: {
@@ -88,120 +86,74 @@ ${ hueIcons.symbols() }
       </span>
     </a>
     <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
-    <span style="color:white">
+    <div class="btn-group" style="color:whitevertical-align: middle">
+      <a href="${ url('notebook:new') }" title="${ _( 'New Notebook') }">
+        <button class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> ${ _('Compose') }</button>
+      </a>
+      <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" title="${ _( 'Compose query or job') }">
+        <span class="caret"></span>
+      </button>
+      <ul role="menu" class="dropdown-menu" title="${ _( 'Compose query or job') }">
+        % if 'beeswax' in apps:
+        <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+        % endif
+        % if 'impala' in apps: ## impala requires beeswax anyway
+        <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+        % endif
+        % if 'search' in apps:
+        <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
+        % endif
+        % if 'oozie' in apps:
+        <li class="dropdown oozie">
+          <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${ _('Workflows') }</span> <b class="caret"></b></a>
+          <ul role="menu" class="dropdown-menu">
+            % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+            <li class="dropdown-submenu">
+              <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
+              <ul class="dropdown-menu">
+                <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+              </ul>
+            </li>
+            % endif
+          </ul>
+        </li>
+        % endif
+        <li><a href="/${apps['jobsub'].display_name}">${ _('More >>') }</a></li>
+        % for interpreter in interpreters:
+        <li><a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">${ interpreter['name'] }</a></li>
+        % endfor
+        % if user.is_superuser:
+        <li><a href="gethue.com">${ _('Add more...') }</a></li>
+        % endif
+      </ul>
+    </div>
 
-      <span style="font-size: 130%">
-       <div class="btn-group" style="vertical-align: middle">
-          <a href="${ url('notebook:new') }" title="${ _( 'New Notebook') }">
-            <button class="btn btn-primary">
-              <i class="fa fa-pencil-square-o"></i> ${ _('Compose') }
-            </button>
-          </a>
-          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" title="${ _( 'Compose query or job') }">
-            <span class="caret"></span>
-          </button>
-          <ul role="menu" class="dropdown-menu" title="${ _( 'Compose query or job') }">
-           % if 'beeswax' in apps:
-             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
-           % endif
-           % if 'impala' in apps: ## impala requires beeswax anyway
-             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
-           % endif
-           % if 'search' in apps:
-           <li>
-             <a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;">
-               <img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a>
-           </li>
-           % endif
-           % if 'oozie' in apps:
-           <li class="dropdown oozie">
-             <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${ _('Workflows') }</span> <b class="caret"></b></a>
-             <ul role="menu" class="dropdown-menu">
-               % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
-               <li class="dropdown-submenu">
-                 <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
-                 <ul class="dropdown-menu">
-                   <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-                   <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-                   <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
-                 </ul>
-               </li>
-               % endif
-             </ul>
-           </li>
-           % endif
-         <li>
-            <a href="/${apps['jobsub'].display_name}">
-              ${ _('More >>') }
-            </a>
-         </li>
-         % for interpreter in interpreters:
-          <li>
-             <a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">
-               ${ interpreter['name'] }
-             </a>
-           </li>
-         % endfor
-         % if user.is_superuser:
-         <li>
-            <a href="gethue.com">
-              ${ _('Add more...') }
-            </a>
-         </li>
-         % endif
-        </ul>
-      </div>
+    <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }" /> <i class="fa fa-search"></i>
 
-      </span>
-
-      <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }"></input> <i class="fa fa-search"></i>
-
-      <div class="pull-right">
-
-        % if user.is_authenticated() and section != 'login':
-        <ul class="nav nav-pills">
-
+    <div class="pull-right">
+      % if user.is_authenticated() and section != 'login':
+      <ul class="nav nav-pills">
         <li>
           <div class="btn-group" style="vertical-align: middle">
-            <a href="${ url('notebook:new') }">
-              <button class="btn btn-primary">
-                ${ _('research queue') }
-              </button>
-            </a>
-            <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-            </button>
+            <a href="${ url('notebook:new') }"><button class="btn btn-primary"> ${ _('research queue') }</button></a>
+            <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
             <ul role="menu" class="dropdown-menu">
-              <li>
-                <a href='#' class="ignore-btn confirmationModal">
-                  ${ _('Production') }
-                </a>
-              </li>
-              <li>
-                <a href='#' class="ignore-btn confirmationModal">
-                  ${ _('ETL analytics') }
-                </a>
-              </li>
-              <li>
-                <a href='#' class="ignore-btn confirmationModal">
-                  <i class="fa fa-plus"></i> ${ _('Create') }
-                </a>
-              </li>
+              <li><a href='#' class="ignore-btn confirmationModal">${ _('Production') }</a></li>
+              <li><a href='#' class="ignore-btn confirmationModal">${ _('ETL analytics') }</a></li>
+              <li><a href='#' class="ignore-btn confirmationModal"><i class="fa fa-plus"></i> ${ _('Create') }</a></li>
             </ul>
           </div>
         </li>
-
         <li>
           <span title="Running jobs and workflows">
-            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/jobbrowser/apps" style="color:white">
-              <i class="fa fa-circle-o"></i> ${ _('Jobs') }
-            </a>
+            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/jobbrowser/apps" style="color:white"><i class="fa fa-circle-o"></i> ${ _('Jobs') }</a>
             <span class="badge badge-warning">20</span>
             ## Batches
             ## Schedules
           </span>
         </li>
-
         % if 'oozie' in apps: # Merged with Jobs eventually
         <li>
           <span title="Running workflows">
@@ -215,13 +167,9 @@ ${ hueIcons.symbols() }
         </li>
         % endif
 
-        <li>
-          <span title="Notifications"><i class="fa fa-bell-o"></i> <span class="badge badge-success">10</span></span>
-        </li>
+        <li><span title="Notifications"><i class="fa fa-bell-o"></i> <span class="badge badge-success">10</span></span></li>
 
-        <li>
-          <i class="fa fa-question-circle"></i>
-        </li>
+        <li><i class="fa fa-question-circle"></i></li>
 
         <%
           view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
@@ -256,8 +204,8 @@ ${ hueIcons.symbols() }
         % endif
         </li>
       </ul>
+      % endif
     </div>
-    % endif
   </div>
 
   <div class="content-wrapper">
@@ -291,7 +239,7 @@ ${ hueIcons.symbols() }
       Coordinators<br/>
       Bundles<br/>
       <br/>
-      
+
       Security<br/>
       Hive Tables<br/>
       Solr Collections<br/>
@@ -300,15 +248,13 @@ ${ hueIcons.symbols() }
 
       [Custom App 1]<br/>
       [Custom App 2]<br/>
+    </div>
 
-
-      <span style="position: fixed; bottom: 0">
+    <div style="position: fixed; bottom: 0; left: 0">
       Create Table<br/>
       Import File<br/>
       Import Queries<br/>
       [+]
-      <br/>&nbsp
-      </span>
     </div>
 
     <div id="assist-container" class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
@@ -358,7 +304,6 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
 
-
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
@@ -391,7 +336,7 @@ ${ assist.assistPanel() }
 
       self.EMBEDDABLE_PAGE_URLS = {
         editor: '/notebook/editor_embeddable'
-      }
+      };
 
       self.embeddable_cache = {};
 
