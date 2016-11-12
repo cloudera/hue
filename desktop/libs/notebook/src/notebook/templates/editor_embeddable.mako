@@ -33,7 +33,7 @@ ${ editorComponents.includes() }
 </style>
 
 ${ editorComponents.topBar() }
-${ editorComponents.commonHTML() }
+${ editorComponents.commonHTML(with_assist=False) }
 
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }

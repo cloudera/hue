@@ -402,7 +402,7 @@ ${ hueIcons.symbols() }
 </%def>
 
 
-<%def name="commonHTML()">
+<%def name="commonHTML(with_assist=True)">
 
 <div id="detailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
@@ -977,9 +977,11 @@ ${ hueIcons.symbols() }
 </div>
 % endif
 
+% if with_assist:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
   <i class="fa fa-chevron-right"></i>
 </a>
+% endif
 
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
@@ -992,6 +994,7 @@ ${ hueIcons.symbols() }
 </div>
 
 <script type="text/html" id="notebook">
+  % if with_assist:
   <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isLeftPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
       <i class="fa fa-chevron-left"></i>
@@ -1016,6 +1019,7 @@ ${ hueIcons.symbols() }
       }"></div>
   </div>
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+  % endif
   <div class="right-panel" data-bind="event: { scroll: function(){ var ls = $('.right-panel').data('lastScroll'); if (ls && ls != $('.right-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.right-panel').data('lastScroll', $('.right-panel').scrollTop()) } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
