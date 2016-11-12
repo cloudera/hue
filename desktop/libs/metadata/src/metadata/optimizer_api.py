@@ -81,7 +81,8 @@ def top_tables(request):
 
   tables = [{
       'eid': table['eid'],
-      'name': table['name'],
+      'database': _get_table_name(table['name'])['database'],
+      'name': _get_table_name(table['name'])['table'],
       'popularity': table['workloadPercent'],
       'column_count': table['columnCount'],
       'patternCount': table['patternCount'],
@@ -238,3 +239,12 @@ def upload_history(request):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+def _get_table_name(path):
+  if '.' in path:
+    database, table = path.split('.', 1)
+  else:
+    database, table = '', path
+
+  return {'database': database, 'table': table}
