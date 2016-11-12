@@ -257,11 +257,10 @@ ${ hueIcons.symbols() }
       [+]
     </div>
 
-    <div id="assist-container" class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-      <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-        <i class="fa fa-chevron-left"></i>
-      </a>
-
+    <div id="leftAssistContainer" class="assist-container left-panel" style="position: relative">
+      <a href="javascript:void(0);" style="z-index: 1000;" title="${_('Show Assist')}" class="pointer show-assist" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer hide-assist" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <!-- ko if: leftAssistVisible -->
       <div class="assist" data-bind="component: {
           name: 'assist-panel',
           params: {
@@ -279,14 +278,12 @@ ${ hueIcons.symbols() }
             visibleAssistPanels: ['sql']
           }
         }"></div>
+      <!-- /ko -->
     </div>
 
-    <div class="resizer" data-bind="splitDraggable : { appName: 'notebook', leftPanelVisible: isAssistVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+    <div class="resizer" data-bind="splitDraggable : { appName: 'notebook', leftPanelVisible: leftAssistVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
 
     <div class="page-content">
-      <a href="javascript: void(0);" title="${_('Toggle Assist')}" class="pointer show-assist" style="display:none;">
-        <i class="fa fa-chevron-right"></i>
-      </a>
       <div data-bind='text: currentApp'></div>
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
@@ -318,92 +315,72 @@ ${ assist.assistJSModels() }
 
 ${ assist.assistPanel() }
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
-  <i class="fa fa-chevron-right"></i>
-</a>
-
-
 <script type="text/javascript" charset="utf-8">
 
-    var OnePageViewModel = function () {
-      var self = this;
+  var OnePageViewModel = function () {
+    var self = this;
 
-      self.EMBEDDABLE_PAGE_URLS = {
-        editor: '/notebook/editor_embeddable'
-      };
-
-      self.embeddable_cache = {};
-
-      self.currentApp = ko.observable('');
-      self.isLoadingEmbeddable = ko.observable(false);
-
-      self.currentApp.subscribe(function(newVal){
-        self.isLoadingEmbeddable(true);
-        if (typeof self.embeddable_cache[newVal] === 'undefined'){
-          $.ajax({
-            url: self.EMBEDDABLE_PAGE_URLS[newVal],
-            beforeSend:function (xhr) {
-              xhr.setRequestHeader('X-Requested-With', 'Hue');
-            },
-            dataType:'html',
-            success:function (response) {
-              self.embeddable_cache[newVal] = response;
-              $('#embeddable').html(response);
-              self.isLoadingEmbeddable(false);
-            }
-          });
-        }
-        else {
-          $('#embeddable').html(self.embeddable_cache[newVal]);
-          self.isLoadingEmbeddable(false);
-        }
-      });
-
-      huePubSub.subscribe('switch.app', function (name) {
-        console.log(name);
-        self.currentApp(name);
-      });
-    }
-
-    var AssistViewModel = function (options) {
-      var self = this;
-
-      self.apiHelper = ApiHelper.getInstance(options);
-      self.assistAvailable = ko.observable(true);
-      self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.EMBEDDABLE_PAGE_URLS = {
+      editor: '/notebook/editor_embeddable'
     };
 
-    $(document).ready(function () {
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-        }
-      };
+    self.embeddable_cache = {};
 
-      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+    self.currentApp = ko.observable('');
+    self.isLoadingEmbeddable = ko.observable(false);
 
-      //ko.applyBindings({}, $('.left-nav')[0])
-      ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
+    self.currentApp.subscribe(function(newVal){
+      self.isLoadingEmbeddable(true);
+      if (typeof self.embeddable_cache[newVal] === 'undefined'){
+        $.ajax({
+          url: self.EMBEDDABLE_PAGE_URLS[newVal],
+          beforeSend:function (xhr) {
+            xhr.setRequestHeader('X-Requested-With', 'Hue');
+          },
+          dataType:'html',
+          success:function (response) {
+            self.embeddable_cache[newVal] = response;
+            $('#embeddable').html(response);
+            self.isLoadingEmbeddable(false);
+          }
+        });
+      }
+      else {
+        $('#embeddable').html(self.embeddable_cache[newVal]);
+        self.isLoadingEmbeddable(false);
+      }
+    });
 
-      var isAssistVisible = ko.observable(true);
-      isAssistVisible.subscribe(function (newValue) {
-        if (!newValue) {
-          $('.show-assist').show();
-        }
-      });
+    huePubSub.subscribe('switch.app', function (name) {
+      console.log(name);
+      self.currentApp(name);
+    });
+  };
+
+  var LeftAssistViewModel = function () {
+    var self = this;
+    self.apiHelper = ApiHelper.getInstance();
+    self.leftAssistVisible = ko.observable();
+    self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
+  };
+
+  $(document).ready(function () {
+    var options = {
+      user: '${ user.username }',
+      i18n: {
+        errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
+      }
+    };
+
+    ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+
+    ko.applyBindings(new LeftAssistViewModel(options), $('#leftAssistContainer')[0]);
   });
-
-  $('.show-assist').click(function () {
-    isAssistVisible(true);
-    $('.show-assist').hide();
-  })
 
   $(".hamburger").click(function () {
     $(this).toggleClass("is-active");
     $(".left-nav").toggleClass("left-nav-visible");
-  })
+  });
 
   moment.locale(window.navigator.userLanguage || window.navigator.language);
   localeFormat = function (time) {
@@ -421,7 +398,7 @@ ${ assist.assistPanel() }
       return mTime;
     }
     return mTime;
-  }
+  };
 
   // Add CSRF Token to all XHR Requests
   var xrhsend = XMLHttpRequest.prototype.send;
@@ -433,7 +410,7 @@ ${ assist.assistPanel() }
     % endif
 
     return xrhsend.apply(this, arguments);
-  }
+  };
 
   // Set global assistHelper TTL
   $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
