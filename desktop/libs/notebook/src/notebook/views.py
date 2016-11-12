@@ -88,7 +88,7 @@ def notebook(request):
 
 
 @check_document_access_permission()
-def editor(request, is_mobile=False):
+def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
 
@@ -96,7 +96,11 @@ def editor(request, is_mobile=False):
     document = Document2.objects.get(id=editor_id)
     editor_type = document.type.rsplit('-', 1)[-1]
 
-  template = 'editor_m.mako' if is_mobile else 'editor.mako'
+  template = 'editor.mako'
+  if is_mobile:
+    template = 'editor_m.mako'
+  if is_embeddable:
+    template = 'editor_embeddable.mako'
 
   return render(template, request, {
       'editor_id': editor_id or None,
@@ -112,6 +116,9 @@ def editor(request, is_mobile=False):
       })
   })
 
+@check_document_access_permission()
+def editor_embeddable(request):
+  return editor(request, False, True)
 
 @check_document_access_permission()
 def editor_m(request):
