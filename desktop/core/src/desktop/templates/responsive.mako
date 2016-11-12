@@ -287,7 +287,6 @@ ${ hueIcons.symbols() }
       <a href="javascript: void(0);" title="${_('Toggle Assist')}" class="pointer show-assist" style="display:none;">
         <i class="fa fa-chevron-right"></i>
       </a>
-      ##<div data-bind='component: currentApp'></div>
       <div data-bind='text: currentApp'></div>
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
@@ -313,14 +312,9 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 
 ${ assist.assistJSModels() }
-
-## Dynamic loading of apps
-##<script src="${ static('desktop/ext/js/text.js') }"></script>
-##<script src="${ static('desktop/js/ko.editor.js') }"></script>
-##<script src="${ static('desktop/js/ko.metastore.js') }"></script>
-
 
 ${ assist.assistPanel() }
 

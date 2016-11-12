@@ -24,6 +24,7 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
+<span id="editorComponents">
 ${ editorComponents.includes() }
 
 <style type="text/css">
@@ -43,3 +44,4 @@ ${ notebookKoComponents.snippetDbSelection() }
 
 ${ editorComponents.commonJS() }
 
+</span>
