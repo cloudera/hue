@@ -32,14 +32,16 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
+from metadata.navigator_api import search_entities as metadata_search_entities
+from metadata.navigator_api import search_entities_interactive as metadata_search_entities_interactive
+from notebook.connectors.base import Notebook
+from notebook.views import upgrade_session_properties
+
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default
-
-from notebook.connectors.base import Notebook
-from notebook.views import upgrade_session_properties
 
 
 LOG = logging.getLogger(__name__)
@@ -499,6 +501,14 @@ def _update_imported_oozie_document(doc, uuids_map):
       doc['fields']['data'] = doc['fields']['data'].replace(key, value)
 
   return doc
+
+def search_entities(request):
+  return metadata_search_entities(request)
+
+
+def search_entities_interactive(request):
+  return metadata_search_entities_interactive(request)
+
 
 def _is_import_valid(documents):
   """
