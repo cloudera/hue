@@ -1791,7 +1791,7 @@
       var ace = options.ace;
       var $target = $(options.target);
       var $resizer = $(element);
-      var $rightPanel = $(".right-panel");
+      var $rightPanel = $(".content-panel");
       var $execStatus = $resizer.prev('.snippet-execution-status');
 
       var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 128;
@@ -1901,7 +1901,7 @@
 
       var containerSelector = options.containerSelector || ".panel-container";
       var leftPanelSelector = options.leftPanelSelector || ".left-panel";
-      var rightPanelSelector = options.rightPanelSelector || ".right-panel";
+      var rightPanelSelector = options.rightPanelSelector || ".content-panel";
 
       var onPosition = options.onPosition || function() {};
 
@@ -3566,7 +3566,7 @@
         }
       });
 
-      var menu = ko.bindingHandlers.contextMenu.initContextMenu($tableDropMenu, $('.right-panel'));
+      var menu = ko.bindingHandlers.contextMenu.initContextMenu($tableDropMenu, $('.content-panel'));
 
       var setFromDropMenu = function (text) {
         var before = editor.getTextBeforeCursor();

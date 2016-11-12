@@ -89,7 +89,7 @@ ${ assist.assistJSModels() }
     margin-left: 10px;
   }
 
-  .right-panel {
+  .content-panel {
     overflow-x: hidden;
   }
 
@@ -167,7 +167,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
 
-        <div class="right-panel">
+        <div class="content-panel">
           <div style="margin: 10px; margin-bottom: 100px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
@@ -1013,13 +1013,13 @@ ${ assist.assistPanel() }
       });
 
       huePubSub.subscribe('split.panel.resized', function () {
-        $('.form-actions').width($('.right-panel').width() - 50);
+        $('.form-actions').width($('.content-panel').width() - 50);
       });
 
-      $('.form-actions').width($('.right-panel').width() - 50);
+      $('.form-actions').width($('.content-panel').width() - 50);
 
 
-      $('.right-panel').droppable({
+      $('.content-panel').droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
           var text = ui.helper.text();

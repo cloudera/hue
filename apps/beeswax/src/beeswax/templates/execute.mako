@@ -237,7 +237,7 @@ ${ layout.menubar(section='query') }
     </div>
   </div>
   <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition, leftPanelVisible: isEditor }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
-  <div class="right-panel" id="querySide">
+  <div class="content-panel" id="querySide">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
     </div>
@@ -915,7 +915,7 @@ ${ assist.assistPanel() }
     cursor: ew-resize;
   }
 
-  .right-panel {
+  .content-panel {
     position: absolute;
     outline: none !important;
   }
@@ -1163,7 +1163,7 @@ ${ dashboard.import_charts() }
 // avoid blinking of the panels
 var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.totalStorage("${app_name}_left_panel_width") : 250;
 $(".left-panel").css("width", leftPanelWidth + "px");
-$(".right-panel").css("left", leftPanelWidth + 20 + "px");
+$(".content-panel").css("left", leftPanelWidth + 20 + "px");
 
 var codeMirror, dataTable, renderRecent, syncWithHive;
 

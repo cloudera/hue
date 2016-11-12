@@ -112,7 +112,7 @@ ${ assist.assistPanel() }
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
-      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
+      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
         <tr>
           <td data-bind="text: $index() + $indexOffset() + 1"></td>
           <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
@@ -301,7 +301,7 @@ ${ assist.assistPanel() }
 </a>
 
 <script type="text/html" id="metastore-databases">
-  <div class="actionbar-actions" data-bind="dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
+  <div class="actionbar-actions" data-bind="dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
@@ -340,7 +340,7 @@ ${ assist.assistPanel() }
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 145, scrollUp: true}">
+    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 145, scrollUp: true}">
     <tr>
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
@@ -425,7 +425,7 @@ ${ assist.assistPanel() }
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.right-panel', nicescroll: true, jumpCorrection: 5 }">
+        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
@@ -457,7 +457,7 @@ ${ assist.assistPanel() }
             <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 277, scrollUp: true}">
+          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 277, scrollUp: true}">
             <tr>
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
@@ -707,7 +707,7 @@ ${ assist.assistPanel() }
       <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+    <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200}">
     <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + qid(), '_blank'); }">
       <td data-bind="text: qid"></td>
       <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
@@ -998,7 +998,7 @@ ${ assist.assistPanel() }
             <th width="10%">${ _('Join counts') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+          <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200}">
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
@@ -1111,7 +1111,7 @@ ${ assist.assistPanel() }
           }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-      <div class="right-panel" data-bind="niceScroll">
+      <div class="content-panel" data-bind="niceScroll">
         <div class="metastore-main">
           <h3>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
@@ -1197,8 +1197,8 @@ ${ assist.assistPanel() }
       var viewModel = new MetastoreViewModel(options);
 
       huePubSub.subscribe('metastore.scroll.to.top', function () {
-        $(".right-panel").scrollTop(0);
-        $('.right-panel').getNiceScroll().resize();
+        $(".content-panel").scrollTop(0);
+        $('.content-panel').getNiceScroll().resize();
       });
 
       viewModel.currentTab.subscribe(function(tab){
@@ -1227,7 +1227,7 @@ ${ assist.assistPanel() }
                     includeNavigator: false,
                     parentId: 'sample',
                     classToRemove: 'sample-table',
-                    mainScrollable: '.right-panel',
+                    mainScrollable: '.content-panel',
                     stickToTopPosition: 73,
                     clonedContainerPosition: "fixed"
                   });
@@ -1251,7 +1251,7 @@ ${ assist.assistPanel() }
             });
           }
         }
-        $('.right-panel').getNiceScroll().resize();
+        $('.content-panel').getNiceScroll().resize();
       });
 
       ko.applyBindings(viewModel);

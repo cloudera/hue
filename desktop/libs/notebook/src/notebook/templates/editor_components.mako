@@ -1020,7 +1020,7 @@ ${ hueIcons.symbols() }
   </div>
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
-  <div class="right-panel" data-bind="event: { scroll: function(){ var ls = $('.right-panel').data('lastScroll'); if (ls && ls != $('.right-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.right-panel').data('lastScroll', $('.right-panel').scrollTop()) } }, niceScroll, with: selectedNotebook">
+  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $('.content-panel').data('lastScroll'); if (ls && ls != $('.content-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.content-panel').data('lastScroll', $('.content-panel').scrollTop()) } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -1035,10 +1035,10 @@ ${ hueIcons.symbols() }
             'greedy': true,
             'stop': function(event, ui) {
               var $element = $(event.target);
-              $element.find('.snippet-body').slideDown('fast', function () { $('.right-panel').scrollTop(lastWindowScrollPosition); });
+              $element.find('.snippet-body').slideDown('fast', function () { $('.content-panel').scrollTop(lastWindowScrollPosition); });
             },
             'helper': function(event) {
-              lastWindowScrollPosition = $('.right-panel').scrollTop();
+              lastWindowScrollPosition = $('.content-panel').scrollTop();
               var $element = $(event.target);
               $element.find('.snippet-body').slideUp('fast', function () {
                 $('.sortable-snippets').sortable('refreshPositions')
@@ -1063,7 +1063,7 @@ ${ hueIcons.symbols() }
             }
           },
           dragged: function (widget) {
-            $('.snippet-body').slideDown('fast', function () { $('.right-panel').scrollTop(lastWindowScrollPosition); });
+            $('.snippet-body').slideDown('fast', function () { $('.content-panel').scrollTop(lastWindowScrollPosition); });
           }
         }">
       </div>
@@ -2512,7 +2512,7 @@ ${ hueIcons.symbols() }
           }
         }
       },
-      scrollable: vm.editorMode() ? '.right-panel' : '.dataTables_wrapper',
+      scrollable: vm.editorMode() ? '.content-panel' : '.dataTables_wrapper',
       contained: !vm.editorMode()
     });
 
@@ -2520,7 +2520,7 @@ ${ hueIcons.symbols() }
       if (vm.editorMode()) {
         $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
         $(el).jHueTableExtender2({
-          mainScrollable: '.right-panel',
+          mainScrollable: '.content-panel',
           stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "fixed"
@@ -2528,7 +2528,7 @@ ${ hueIcons.symbols() }
         $(el).jHueHorizontalScrollbar();
       } else {
         $(el).jHueTableExtender2({
-          mainScrollable: '.right-panel',
+          mainScrollable: '.content-panel',
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "absolute"
         });
@@ -2578,7 +2578,7 @@ ${ hueIcons.symbols() }
 
     var scrollElement = dataTableEl;
     if (vm.editorMode()) {
-      scrollElement = $('.right-panel');
+      scrollElement = $('.content-panel');
     }
 
     if (scrollElement.data('scrollFnDtCreation')) {
@@ -3230,8 +3230,8 @@ ${ hueIcons.symbols() }
               tableExtender.repositionHeader();
               tableExtender.drawLockedRows();
             }
-            $('.right-panel').data('lastScroll', $('.right-panel').scrollTop());
-            $('.right-panel').trigger('scroll');
+            $('.content-panel').data('lastScroll', $('.content-panel').scrollTop());
+            $('.content-panel').trigger('scroll');
           }
         });
         $(".jHueTableExtenderClonedContainer").show();
@@ -3246,7 +3246,7 @@ ${ hueIcons.symbols() }
         renderer();
       }
 
-      $('.right-panel').jHueScrollUp();
+      $('.content-panel').jHueScrollUp();
     };
 
     var splitDraggableTimeout = -1;
@@ -3271,7 +3271,7 @@ ${ hueIcons.symbols() }
     huePubSub.subscribe('detach.scrolls', function (snippet) {
       var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
       if (viewModel.editorMode()) {
-        scrollElement = $('.right-panel');
+        scrollElement = $('.content-panel');
       }
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));

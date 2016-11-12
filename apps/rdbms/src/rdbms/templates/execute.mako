@@ -67,7 +67,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
       </div>
       <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
-      <div class="right-panel">
+      <div class="content-panel">
         <div id="query">
           <div class="card card-small">
 
@@ -233,7 +233,7 @@ ${ commonshare() | n,unicode }
     cursor: ew-resize;
   }
 
-  .right-panel {
+  .content-panel {
     position: absolute;
     outline: none !important;
   }
