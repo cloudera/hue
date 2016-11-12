@@ -860,6 +860,9 @@ from metadata.conf import has_navigator
         <span>${ _('Error loading contents.') }</span>
       </div>
       <!-- /ko -->
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
     </div>
   </script>
 
@@ -1686,7 +1689,8 @@ from metadata.conf import has_navigator
         'FILE': 'fa-file-o',
         'SUB_OPERATION': 'fa-code-fork',
         'COLLECTION': 'fa-search',
-        'HBASE': 'fa-th-large'
+        'HBASE': 'fa-th-large',
+        'HUE': 'fa-file-o'
       };
 
       /**
@@ -1768,7 +1772,8 @@ from metadata.conf import has_navigator
               name: '${ _("S3") }',
               type: 's3',
               icon: 'fa-cubes',
-              minHeight: 50
+              minHeight: 50,
+              showNavSearch: false
             }));
           }
 
@@ -1780,7 +1785,8 @@ from metadata.conf import has_navigator
             name: '${ _("Collections") }',
             type: 'collections',
             icon: 'fa-search-plus',
-            minHeight: 50
+            minHeight: 50,
+            showNavSearch: false
           }));
 
           self.availablePanels.push(new AssistInnerPanel({
@@ -1791,7 +1797,8 @@ from metadata.conf import has_navigator
             name: '${ _("HBase") }',
             type: 'hbase',
             icon: 'fa-th-large',
-            minHeight: 50
+            minHeight: 50,
+            showNavSearch: false
           }));
 
           self.availablePanels.push(new AssistInnerPanel({
@@ -1805,7 +1812,6 @@ from metadata.conf import has_navigator
             type: 'documents',
             icon: 'fa-files-o',
             minHeight: 50,
-            showNavSearch: false,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
         }
