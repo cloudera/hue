@@ -302,6 +302,19 @@ ${ hueIcons.symbols() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
+<script src="${ static('desktop/js/jquery.selector.js') }"></script>
+<script src="${ static('desktop/js/jquery.delayedinput.js') }"></script>
+<script src="${ static('desktop/js/jquery.rowselector.js') }"></script>
+<script src="${ static('desktop/js/jquery.notify.js') }"></script>
+<script src="${ static('desktop/js/jquery.titleupdater.js') }"></script>
+<script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
+<script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
+<script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
+<script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
+
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
@@ -372,9 +385,14 @@ ${ assist.assistPanel() }
       }
     };
 
-    ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+    var opvm = new OnePageViewModel();
+    ko.applyBindings(opvm, $('.page-content')[0]);
 
     ko.applyBindings(new LeftAssistViewModel(options), $('#leftAssistContainer')[0]);
+
+    if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
+      opvm.currentApp('editor');
+    }
   });
 
   $(".hamburger").click(function () {

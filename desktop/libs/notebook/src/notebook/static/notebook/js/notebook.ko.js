@@ -895,7 +895,7 @@ var EditorViewModel = (function() {
         if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
           if (vm.isResponsive()){
-            url = vm.URLS.responsive +  + '?editor=' + data.history_id;
+            url = vm.URLS.responsive + '?editor=' + data.history_id;
           }
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
