@@ -3500,7 +3500,7 @@ ${ hueIcons.symbols() }
       % else:
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
       % endif
-      ko.applyBindings(viewModel);
+      ko.applyBindings(viewModel, $('#editorComponents')[0]);
       viewModel.init();
 
       if (location.getParameter("github_status") != "") {
