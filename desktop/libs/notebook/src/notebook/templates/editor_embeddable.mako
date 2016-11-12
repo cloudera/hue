@@ -42,6 +42,6 @@ ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ notebookKoComponents.snippetDbSelection() }
 
-${ editorComponents.commonJS() }
+${ editorComponents.commonJS(is_responsive=True) }
 
 </span>

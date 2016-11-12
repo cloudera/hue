@@ -2396,7 +2396,7 @@ ${ hueIcons.symbols() }
 </%def>
 
 
-<%def name="commonJS()">
+<%def name="commonJS(is_responsive=False)">
 
 <script type="text/javascript" charset="utf-8">
 
@@ -3061,6 +3061,9 @@ ${ hueIcons.symbols() }
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
       userId: ${ user.id },
+      % if is_responsive:
+      responsive: true,
+      % endif
       assistAvailable: true,
       % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,
