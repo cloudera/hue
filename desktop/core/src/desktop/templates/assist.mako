@@ -808,9 +808,18 @@ from metadata.conf import has_navigator
     <span data-bind="text: definition().name"></span>
   </script>
 
-  <script type="text/html" id="assist-file-panel">
-    <div class="assist-flex-header assist-breadcrumb">
+  <script type="text/html" id="assist-document-header-actions">
+    <div class="assist-header-actions" style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-document-panel">
+  <div class="assist-inner-panel">
+    <div class="assist-flex-header">
       <!-- ko with: activeEntry -->
+      <div class="assist-inner-header assist-breadcrumb">
       <!-- ko ifnot: isRoot -->
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
         <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
@@ -825,6 +834,9 @@ from metadata.conf import has_navigator
         <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
       </div>
       <!-- /ko -->
+
+      <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
+      </div>
       <!-- /ko -->
     </div>
     <div class="assist-flex-fill assist-file-scrollable">
@@ -864,12 +876,13 @@ from metadata.conf import has_navigator
       <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
       <!-- /ko -->
     </div>
+  </div>
   </script>
 
   <script type="text/html" id="assist-documents-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
-        <!-- ko template: 'assist-file-panel' --><!-- /ko -->
+        <!-- ko template: 'assist-document-panel' --><!-- /ko -->
       </div>
     </div>
   </script>
@@ -885,7 +898,7 @@ from metadata.conf import has_navigator
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
         <!-- ko with: selectedCollectionEntry -->
-        <div class="assist-inner-header assist-breadcrumb" >
+        <div class="assist-inner-header assist-breadcrumb">
           ${_('Collections')}
           <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
         </div>
@@ -1472,6 +1485,11 @@ from metadata.conf import has_navigator
             type: 'directory'
           }
         }));
+
+        huePubSub.subscribe('assist.document.refresh', function () {
+          huePubSub.publish('assist.clear.document.cache');
+          self.reload();
+        });
       }
 
       AssistDocumentsPanel.prototype.init = function () {

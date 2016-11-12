@@ -70,6 +70,10 @@ var ApiHelper = (function () {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hbase'), {});
     });
 
+    huePubSub.subscribe('assist.clear.document.cache', function () {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('document'), {});
+    });
+
     huePubSub.subscribe('assist.clear.all.caches', function () {
       huePubSub.publish('assist.clear.db.cache', {
         sourceType: 'hive',
@@ -79,6 +83,7 @@ var ApiHelper = (function () {
       huePubSub.publish('assist.clear.s3.cache');
       huePubSub.publish('assist.clear.collections.cache');
       huePubSub.publish('assist.clear.hbase.cache');
+      huePubSub.publish('assist.clear.document.cache');
     });
   }
 
