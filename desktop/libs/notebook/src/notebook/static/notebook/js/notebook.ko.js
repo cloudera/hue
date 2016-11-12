@@ -2201,6 +2201,9 @@ var EditorViewModel = (function() {
       if (editor_id) {
         self.openNotebook(editor_id);
       }
+      else if (window.location.getParameter('editor') !== ''){
+        self.openNotebook(window.location.getParameter('editor'));
+      }
       else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
       } else {
