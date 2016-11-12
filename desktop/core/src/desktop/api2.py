@@ -118,6 +118,36 @@ def search_documents(request):
   return JsonResponse(response)
 
 
+def _search(user, perms='both', include_history=False, include_trashed=False, include_managed=False, search_text=None):
+  response = {
+    'documents': []
+  }
+
+  documents = Document2.objects.documents(
+    user=user,
+    perms=perms,
+    include_history=include_history,
+    include_trashed=include_trashed,
+    include_managed=include_managed
+  )
+
+  type_filters = None
+  sort = '-last_modified'
+  search_text = search_text
+  flatten = True
+
+  page = 1
+  limit = 25
+
+  # Refine results
+  response.update(__filter_documents(type_filters, sort, search_text, queryset=documents, flatten=flatten))
+
+  # Paginate
+  response.update(__paginate(page, limit, queryset=response['documents']))
+
+  return response
+
+
 @api_error_handler
 def get_document(request):
   """
@@ -503,11 +533,37 @@ def _update_imported_oozie_document(doc, uuids_map):
   return doc
 
 def search_entities(request):
-  return metadata_search_entities(request)
+  sources = json.loads(request.POST.get('sources')) or []
+
+  if 'documents' in sources:
+    search_text = json.loads(request.POST.get('query_s', ''))
+    entities = _search(user=request.user, search_text=search_text)
+    response = {
+      'entities': [{'hue_name': e.name, 'hue_description': e.description, 'type': 'HUE', 'originalName': e.name, 'link': '/home?uuid=%s' % e.uuid} for e in entities['documents']],
+      'count': len(entities['documents']),
+      'status': 0
+    }
+
+    return JsonResponse(response)
+  else:
+    return metadata_search_entities(request)
 
 
 def search_entities_interactive(request):
-  return metadata_search_entities_interactive(request)
+  sources = json.loads(request.POST.get('sources')) or []
+
+  if 'documents' in sources:
+    search_text = json.loads(request.POST.get('query_s', ''))
+    entities = _search(user=request.user, search_text=search_text)
+    response = {
+      'results': [{'hue_name': e.name, 'hue_description': e.description, 'type': 'HUE', 'originalName': e.name} for e in entities['documents']],
+      'count': len(entities['documents']),
+      'status': 0
+    }
+
+    return JsonResponse(response)
+  else:
+    return metadata_search_entities_interactive(request)
 
 
 def _is_import_valid(documents):
@@ -644,6 +700,10 @@ def _filter_documents(request, queryset, flatten=True):
   sort = request.GET.get('sort', '-last_modified')
   search_text = request.GET.get('text', None)
 
+  return __filter_documents(type_filters, sort, search_text, queryset, flatten)
+
+
+def __filter_documents(type_filters, sort, search_text, queryset, flatten=True):
   documents = queryset.search_documents(
       types=type_filters,
       search_text=search_text,
@@ -673,6 +733,11 @@ def _paginate(request, queryset):
   """
   page = int(request.GET.get('page', 1))
   limit = int(request.GET.get('limit', 0))
+
+  return __paginate(page, limit, queryset)
+
+
+def __paginate(page, limit, queryset):
 
   if limit > 0:
     offset = (page - 1) * limit
