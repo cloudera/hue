@@ -38,6 +38,7 @@
   <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/responsive.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
 
   <!--[if lt IE 9]>
   <script type="text/javascript">
