@@ -338,6 +338,25 @@ def index_fields_dynamic(request):
   return JsonResponse(result)
 
 
+def nested_documents(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  response = {}
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = {'qs': [{'q': '_root_:*'}], 'fqs': [], 'start': 0, 'limit': 0}
+
+  try:
+    response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
+    result['has_nested_documents'] = response['response']['numFound'] > 0
+    result['status'] = 0
+  except Exception, e:
+    LOG.exception('Failed to list nested documents')
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
 @allow_viewer_only
 def get_document(request):
   result = {'status': -1, 'message': 'Error'}
