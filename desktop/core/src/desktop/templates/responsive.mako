@@ -443,8 +443,7 @@ ${ assist.assistPanel() }
         }
       };
 
-      window.vm = new OnePageViewModel();
-      ko.applyBindings(window.vm, $('.page-content')[0]);
+      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
 
       //ko.applyBindings({}, $('.left-nav')[0])
       ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
@@ -562,6 +561,19 @@ ${ assist.assistPanel() }
       huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
     % endif
   });
+
+
+  window.hueDebug = {
+    viewModel: function () {
+      return ko.dataFor(document.body);
+    },
+    onePageViewModel: function () {
+      return ko.dataFor($('.page-content')[0]);
+    },
+    assistViewModel: function () {
+      return ko.dataFor($('#assist-container')[0]);
+    }
+  }
 </script>
 
 <script type="text/javascript">
