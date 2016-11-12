@@ -15,6 +15,9 @@
 // limitations under the License.
 
 var HueFileEntry = (function () {
+  var self = this;
+  self.loading = ko.observable(false);
+ 
   var sorts = {
     defaultAsc: function (a, b) {
       if (a.isDirectory() && !b.isDirectory()) {
