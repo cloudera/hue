@@ -894,6 +894,9 @@ var EditorViewModel = (function() {
 
         if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
+          if (vm.isResponsive()){
+            url = vm.URLS.responsive +  + '?editor=' + data.history_id;
+          }
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
@@ -1695,10 +1698,20 @@ var EditorViewModel = (function() {
               self.schedulerViewModel.coordinator.refreshParameters();
             }
 
-            hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            if (vm.isResponsive()){
+              hueUtils.changeURL(vm.URLS.responsive + '?editor=' + data.id);
+            }
+            else {
+              hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            }
           }
           else {
-            hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
+            if (vm.isResponsive()){
+              hueUtils.changeURL(vm.URLS.responsive + '?notebook=' + data.id);
+            }
+            else {
+              hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
+            }
           }
         }
         else {
@@ -1874,7 +1887,12 @@ var EditorViewModel = (function() {
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
-          hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
+          if (vm.isResponsive()) {
+            hueUtils.changeURL(vm.URLS.responsive + '?type=' + vm.editorType());
+          }
+          else {
+            hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
+          }
         }
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
@@ -2015,9 +2033,18 @@ var EditorViewModel = (function() {
 
   function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     var self = this;
+
+    self.URLS = {
+      editor: '/notebook/editor',
+      editorMobile: '/notebook/editor_m',
+      notebook: '/notebook/notebook',
+      responsive: '/responsive'
+    }
+
     self.user = options.user;
     self.userId = options.userId;
     self.isMobile = ko.observable(options.mobile);
+    self.isResponsive = ko.observable(options.responsive);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
       self.editorMode(newVal != 'notebook');
@@ -2252,10 +2279,20 @@ var EditorViewModel = (function() {
           self.loadNotebook(notebook, queryTab);
           if (typeof skipUrlChange === 'undefined'){
             if (self.editorMode()) {
-              hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?editor=' + data.document.id);
+              if (self.isResponsive()){
+                hueUtils.changeURL(self.URLS.responsive + '?editor=' + data.document.id);
+              }
+              else {
+                hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
+              }
             }
             else {
-              hueUtils.changeURL('/notebook/notebook?notebook=' + data.document.id);
+              if (self.isResponsive()){
+                hueUtils.changeURL(self.URLS.responsive + '?notebook=' + data.document.id);
+              }
+              else {
+                hueUtils.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
+              }
             }
           }
           if (typeof callback !== 'undefined'){
@@ -2283,9 +2320,19 @@ var EditorViewModel = (function() {
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
           }
           if (window.location.getParameter('type')) {
-            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + window.location.getParameter('type'));
+            if (self.isResponsive()){
+              hueUtils.changeURL(self.URLS.responsive + '?type=' + window.location.getParameter('type'));
+            }
+            else {
+              hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + window.location.getParameter('type'));
+            }
           } else {
-            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + self.editorType());
+            if (self.isResponsive()){
+              hueUtils.changeURL(self.URLS.responsive + '?type=' + self.editorType());
+            }
+            else {
+              hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + self.editorType());
+            }
           }
         } else {
           hueUtils.changeURL('/notebook/notebook');
