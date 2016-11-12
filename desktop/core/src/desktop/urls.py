@@ -134,6 +134,9 @@ dynamic_patterns += patterns('desktop.api2',
 
   (r'^desktop/api2/doc/export/?$', 'export_documents'),
   (r'^desktop/api2/doc/import/?$', 'import_documents'),
+
+  (r'^desktop/api/search/entities/?$', 'search_entities'),
+  (r'^desktop/api/search/entities_interactive/?$', 'search_entities_interactive'),
 )
 
 # Default Configurations

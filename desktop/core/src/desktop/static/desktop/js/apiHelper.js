@@ -1388,7 +1388,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.navSearchAutocomplete = function (options) {
     var self = this;
-    $.post('/metadata/api/navigator/search_entities_interactive', {
+    $.post('/desktop/api/search/entities_interactive', {
       query_s: ko.mapping.toJSON(options.query),
       limit: 10,
       sources: '["' + options.source + '"]'

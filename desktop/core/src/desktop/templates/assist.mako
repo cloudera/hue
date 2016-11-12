@@ -1882,7 +1882,7 @@ from metadata.conf import has_navigator
             window.clearTimeout(navContextPopoverTimeout);
           };
 
-          $.post('/metadata/api/navigator/search_entities', {
+          $.post('/desktop/api/search/entities', {
             query_s: ko.mapping.toJSON(self.searchInput()),
             limit: 25,
             sources: ko.mapping.toJSON([self.visiblePanel().type])
