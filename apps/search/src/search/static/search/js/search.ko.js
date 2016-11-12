@@ -1020,7 +1020,7 @@ var Collection = function (vm, collection) {
     }
   });
 
-  self.switchCollection = function() { // Long term would be to reload the page
+  self.switchCollection = function() {
     $.post("/search/get_collection", {
         name: self.name()
     }, function (data) {
@@ -1101,6 +1101,20 @@ var Collection = function (vm, collection) {
         if (data.status == 0) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);
           syncArray(self.fields, data.fields, true);
+        }
+    }).fail(function (xhr, textStatus, errorThrown) {});
+
+    if (vm.isLatest()) {
+      self.getNestedDocuments();
+    }
+  };
+
+  self.getNestedDocuments = function () {
+    $.post("/search/index/fields/nested_documents", {
+        collection: ko.mapping.toJSON(self),
+      }, function (data) {
+        if (data.status == 0) {
+          self.nested.enabled(data.has_nested_documents);
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };

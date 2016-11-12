@@ -33,6 +33,7 @@ urlpatterns = patterns('search.views',
   # Search
   url(r'^suggest/$', 'query_suggest', name='query_suggest'),
   url(r'^index/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
+  url(r'^index/fields/nested_documents', 'nested_documents', name='nested_documents'),
   url(r'^template/new_facet$', 'new_facet', name='new_facet'),
   url(r'^get_document$', 'get_document', name='get_document'),
   url(r'^update_document$', 'update_document', name='update_document'),

@@ -96,6 +96,8 @@ from django.utils.translation import ugettext as _
     <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
     <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
     <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+
+    <span data-bind="template: {name: 'nested-document-filter'}"></span>
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
@@ -125,6 +127,8 @@ from django.utils.translation import ugettext as _
     </div>
     <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
     <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+
+    <span data-bind="template: {name: 'nested-document-filter'}"></span>
   </form>
 </div>
 %endif
@@ -2543,6 +2547,18 @@ ${ dashboard.layout_skeleton() }
   </div>
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
+
+
+<script type="text/html" id="nested-document-filter">
+  <!-- ko if: $root.isLatest -->
+  <span data-bind="visible: $root.collection.nested.enabled" >
+    <a class="btn pointer" title="${ _('Nested schema') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal">
+      <i class="fa fa-sitemap"></i>
+    </a>
+  </span>
+  <!-- /ko -->
+</script>
+
 
 <div id="fieldAnalysis" class="popover mega-popover right">
   <div class="arrow"></div>
