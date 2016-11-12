@@ -343,6 +343,10 @@ ${ hueIcons.symbols() }
       </a>
       ##<div data-bind='component: currentApp'></div>
       <div data-bind='text: currentApp'></div>
+      <!-- ko if: isLoadingEmbeddable -->
+      <i class="fa fa-spinner fa-spin"></i>
+      <!-- /ko -->
+      <div id="embeddable"></div>
     </div>
   </div>
 </div>
@@ -381,15 +385,45 @@ ${ assist.assistPanel() }
 
 
 <script type="text/javascript" charset="utf-8">
+
     var OnePageViewModel = function () {
       var self = this;
 
-      self.currentApp = ko.observable('editor');
+      self.EMBEDDABLE_PAGE_URLS = {
+        editor: '/notebook/editor_embeddable'
+      }
+
+      self.embeddable_cache = {};
+
+      self.currentApp = ko.observable('');
+      self.isLoadingEmbeddable = ko.observable(false);
+
+      self.currentApp.subscribe(function(newVal){
+        self.isLoadingEmbeddable(true);
+        if (typeof self.embeddable_cache[newVal] === 'undefined'){
+          $.ajax({
+            url: self.EMBEDDABLE_PAGE_URLS[newVal],
+            beforeSend:function (xhr) {
+              xhr.setRequestHeader('X-Requested-With', 'Hue');
+            },
+            dataType:'html',
+            success:function (response) {
+              self.embeddable_cache[newVal] = response;
+              $('#embeddable').html(response);
+              self.isLoadingEmbeddable(false);
+            }
+          });
+        }
+        else {
+          $('#embeddable').html(self.embeddable_cache[newVal]);
+          self.isLoadingEmbeddable(false);
+        }
+      });
 
       huePubSub.subscribe('switch.app', function (name) {
         console.log(name);
         self.currentApp(name);
-      })
+      });
     }
 
     var AssistViewModel = function (options) {
@@ -409,7 +443,8 @@ ${ assist.assistPanel() }
         }
       };
 
-      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+      window.vm = new OnePageViewModel();
+      ko.applyBindings(window.vm, $('.page-content')[0]);
 
       //ko.applyBindings({}, $('.left-nav')[0])
       ko.applyBindings(new AssistViewModel(options), $('#assist-container')[0])
