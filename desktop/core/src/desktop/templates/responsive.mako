@@ -257,7 +257,7 @@ ${ hueIcons.symbols() }
       [+]
     </div>
 
-    <div id="leftAssistContainer" class="assist-container left-panel" style="position: relative">
+    <div id="leftAssistContainer" class="assist-container left-panel" style="position: relative; padding-top: 10px;">
       <a href="javascript:void(0);" style="z-index: 1000;" title="${_('Show Assist')}" class="pointer show-assist" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
       <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer hide-assist" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <!-- ko if: leftAssistVisible -->
