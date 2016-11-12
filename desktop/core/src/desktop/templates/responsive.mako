@@ -282,7 +282,14 @@ ${ hueIcons.symbols() }
       <!-- /ko -->
     </div>
 
-    <div class="resizer" data-bind="splitDraggable : { appName: 'notebook', leftPanelVisible: leftAssistVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+    <div id="leftPanelResizer" class="resizer" data-bind="splitDraggable : {
+      containerSelector: '.content-wrapper',
+      rightPanelSelector: '.page-content',
+      appName: 'hue',
+      leftPanelVisible: leftAssistVisible,
+      onPosition: function() { huePubSub.publish('split.draggable.position') }
+    }"><div class="resize-bar">&nbsp;</div></div>
+
 
     <div class="page-content">
       <div data-bind='text: currentApp'></div>
@@ -389,7 +396,9 @@ ${ assist.assistPanel() }
     var opvm = new OnePageViewModel();
     ko.applyBindings(opvm, $('.page-content')[0]);
 
-    ko.applyBindings(new LeftAssistViewModel(options), $('#leftAssistContainer')[0]);
+    var leftAssistViewModel = new LeftAssistViewModel();
+    ko.applyBindings(leftAssistViewModel, $('#leftAssistContainer')[0]);
+    ko.applyBindings(leftAssistViewModel, $('#leftPanelResizer')[0]);
 
     if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
       opvm.currentApp('editor');
