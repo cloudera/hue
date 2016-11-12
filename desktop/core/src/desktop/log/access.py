@@ -70,7 +70,10 @@ class AccessInfo(dict):
   """
   def __init__(self, request):
     self['username'] = request.user.username or '-anon-'
-    self['remote_ip'] = request.META.get('REMOTE_ADDR', '-')
+    if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+      self['remote_ip'] = request.META.get('HTTP_X_FORWARDED_FOR', '-')
+    else:
+      self['remote_ip'] = request.META.get('REMOTE_ADDR', '-')
     self['method'] = request.method
     self['path'] = request.path
     self['proto'] = request.META.get('SERVER_PROTOCOL', '-')
