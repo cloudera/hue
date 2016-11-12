@@ -494,22 +494,23 @@ var MetastoreViewModel = (function () {
                   self.optimizerDetails(ko.mapping.fromJS(data.details));
 
                   // Bump the most important columns first
-//                  var topCol = self.optimizerDetails().topColumns().slice(0, 5);
-//                  if (topCol.length >= 3 && self.favouriteColumns().length > 0) {
-//                    self.favouriteColumns($.grep(self.columns(), function(col) {
-//                        return topCol.indexOf(col.name()) != -1;
-//                      })
-//                    );
-//                  }
+                  var topCols = $.map(self.optimizerDetails().topCols().slice(0, 5), function(item) { return item.name(); });
+                  if (topCols.length >= 3 && self.favouriteColumns().length > 0) {
+                    self.favouriteColumns($.grep(self.columns(), function(col) {
+                        return topCols.indexOf(col.name()) != -1;
+                      })
+                    );
+                  }
+
                   // Column popularity, stats
-//                  $.each(self.optimizerDetails().topColumns(), function(index, optimizerCol) {
-//                    var metastoreCol = $.grep(self.columns(), function(col) {
-//                      return col.name() == optimizerCol.columnName();
-//                    });
-//                    if (metastoreCol.length > 0) {
-//                      metastoreCol[0].popularity(optimizerCol.totalCount())
-//                    }
-//                  });
+                  $.each(self.optimizerDetails().topCols(), function(index, optimizerCol) {
+                    var metastoreCol = $.grep(self.columns(), function(col) {
+                      return col.name() == optimizerCol.name();
+                    });
+                    if (metastoreCol.length > 0) {
+                      metastoreCol[0].popularity(optimizerCol.score())
+                    }
+                  });
                 } else {
                   $(document).trigger("info", data.message);
                 }
@@ -546,7 +547,7 @@ var MetastoreViewModel = (function () {
       });
     };
 
-    self.deleteTags = function (tag) {console.log(tag);
+    self.deleteTags = function (tag) {
       $.post('/metadata/api/navigator/delete_tags', {
         id: ko.mapping.toJSON(self.navigatorStats().identity),
         tags: ko.mapping.toJSON([tag])
