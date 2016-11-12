@@ -33,6 +33,7 @@ body {
 }
 
 .main-page {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -43,6 +44,7 @@ body {
 }
 
 .top-nav {
+  position: relative;
   flex: 1;
   height: 38px;
   background-color: #31516A;
@@ -51,6 +53,7 @@ body {
 }
 
 .content-wrapper {
+  position: relative;
   display: flex;
   flex: 1 1 100%;
   background-color: #FFF;
