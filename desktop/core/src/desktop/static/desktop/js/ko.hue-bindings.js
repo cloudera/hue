@@ -1791,7 +1791,7 @@
       var ace = options.ace;
       var $target = $(options.target);
       var $resizer = $(element);
-      var $rightPanel = $(".content-panel");
+      var $contentPanel = $(".content-panel");
       var $execStatus = $resizer.prev('.snippet-execution-status');
 
       var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 128;
@@ -1836,7 +1836,7 @@
         start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
           autoExpand = false;
-          var currentHeight = ui.offset.top + $rightPanel.scrollTop() - (125 + $execStatus.outerHeight(true));
+          var currentHeight = ui.offset.top + $contentPanel.scrollTop() - (125 + $execStatus.outerHeight(true));
           $target.css("height", currentHeight + "px");
           ace().resize();
           ui.offset.top = 0;
@@ -1901,29 +1901,29 @@
 
       var containerSelector = options.containerSelector || ".panel-container";
       var leftPanelSelector = options.leftPanelSelector || ".left-panel";
-      var rightPanelSelector = options.rightPanelSelector || ".content-panel";
+      var contentPanelSelector = options.contentPanelSelector || ".content-panel";
 
       var onPosition = options.onPosition || function() {};
 
       var $resizer = $(element);
       var $leftPanel = $(leftPanelSelector);
-      var $rightPanel = $(rightPanelSelector);
+      var $contentPanel = $(contentPanelSelector);
       var $container = $(containerSelector);
 
       var positionPanels = function () {
         if (ko.isObservable(options.leftPanelVisible) && ! options.leftPanelVisible()) {
-          $rightPanel.css("width", "100%");
-          $rightPanel.css("left", "0");
+          $contentPanel.css("width", "100%");
+          $contentPanel.css("left", "0");
           $resizer.hide();
         } else {
           $resizer.show();
           var totalWidth = $container.width();
           leftPanelWidth = Math.min(leftPanelWidth, totalWidth - 100);
-          var rightPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
+          var contentPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
           $leftPanel.css("width", leftPanelWidth + "px");
-          $rightPanel.css("width", rightPanelWidth + "px");
+          $contentPanel.css("width", contentPanelWidth + "px");
           $resizer.css("left", leftPanelWidth + "px");
-          $rightPanel.css("left", leftPanelWidth + $resizer.width() + "px");
+          $contentPanel.css("left", leftPanelWidth + $resizer.width() + "px");
         }
         onPosition();
       };
@@ -1942,8 +1942,8 @@
           dragTimeout = window.setTimeout(function () {
             $leftPanel.css("width", ui.position.left + "px");
             leftPanelWidth = ui.position.left;
-            $rightPanel.css("width", $container.width() - ui.position.left - $resizer.width() + "px");
-            $rightPanel.css("left", ui.position.left + $resizer.width());
+            $contentPanel.css("width", $container.width() - ui.position.left - $resizer.width() + "px");
+            $contentPanel.css("left", ui.position.left + $resizer.width());
             onPosition();
           }, 10);
 
