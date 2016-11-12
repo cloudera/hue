@@ -82,6 +82,40 @@ body {
   transition: 0.4s flex;
 }
 
+
+.inactive-action,
+.inactive-action a {
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+  color: #999;
+}
+
+.inactive-action:hover {
+  text-decoration: none;
+}
+
+.inactive-action.disabled {
+  color: #eee !important;
+  cursor: default !important;
+}
+
+.inactive-action:not(.disabled):hover,
+.inactive-action:not(.disabled):hover > a {
+  color: #338bb8 !important;
+}
+
+.inactive-action:focus {
+  color: #999;
+}
+
+.blue {
+  color: #338BB8 !important;
+}
+
+/* Assist panel */
+
 .assist-hidden {
   flex: 0;
 }
@@ -145,8 +179,9 @@ body {
 .left-nav-visible {
   flex: 0 0 15em;
   background-color: lightgrey;
-
 }
+
+/* Main page */
 
 .page-content {
   flex: 2;
