@@ -27,16 +27,14 @@ from desktop.views import commonheader, commonfooter, _ko
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
-
+% if not is_embeddable:
 ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
-${ components.menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
@@ -50,7 +48,6 @@ ${ components.menubar() }
 ${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -64,6 +61,12 @@ ${ assist.assistJSModels() }
 </style>
 
 ${ assist.assistPanel() }
+% endif
+
+${ components.menubar() }
+
+<script src="${ static('metastore/js/metastore.ko.js') }"></script>
+<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 <script type="text/html" id="metastore-breadcrumbs">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
@@ -296,9 +299,11 @@ ${ assist.assistPanel() }
   <!-- /ko -->
 </script>
 
+% if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
+% endif
 
 <script type="text/html" id="metastore-databases">
   <div class="actionbar-actions" data-bind="dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
@@ -1085,9 +1090,11 @@ ${ assist.assistPanel() }
   </div>
 </script>
 
+<span id="metastoreComponents">
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
+      % if not is_embeddable:
       <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
         <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
           <i class="fa fa-chevron-left"></i>
@@ -1111,6 +1118,7 @@ ${ assist.assistPanel() }
           }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+      % endif
       <div class="content-panel" data-bind="niceScroll">
         <div class="metastore-main">
           <h3>
@@ -1153,7 +1161,7 @@ ${ assist.assistPanel() }
 
   <div id="import-data-modal" class="modal hide fade"></div>
 </div>
-
+</span>
 <script type="text/javascript" charset="utf-8">
 
   function pieChartDataTransformer(rawDatum) {
@@ -1254,7 +1262,7 @@ ${ assist.assistPanel() }
         $('.content-panel').getNiceScroll().resize();
       });
 
-      ko.applyBindings(viewModel);
+      ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
         huePubSub.publish('assist.db.refresh', 'hive');
@@ -1284,4 +1292,6 @@ ${ assist.assistPanel() }
   })();
 </script>
 
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+% endif
