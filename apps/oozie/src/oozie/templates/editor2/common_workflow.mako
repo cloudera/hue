@@ -25,6 +25,7 @@
   from django.utils.translation import ugettext as _
   from desktop.views import _ko
 %>
+
 <%namespace name="utils" file="../utils.inc.mako" />
 
 <%def name="render()">

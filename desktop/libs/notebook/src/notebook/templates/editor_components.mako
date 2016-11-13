@@ -72,7 +72,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
-
+<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1423,6 +1423,15 @@ ${ hueIcons.symbols() }
   </div>
 </script>
 
+<script type="text/html" id="doc-search-autocomp-item">
+  <a>
+    <div>
+      <strong style="font-size: 14px;" data-bind="html: name"></strong>
+      <div style="width: 190px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" class="muted" data-bind="text: description"></div>
+    </div>
+  </a>
+</script>
+
 <script type="text/html" id="longer-operation">
   <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The operation in the server is taking longer than expected') }" class="inline-block">
     <i  class="fa fa-exclamation-triangle warning"></i>
@@ -1614,9 +1623,31 @@ ${ hueIcons.symbols() }
         <div class="control-group">
           <label class="control-label">${_('Query File')}</label>
           <div class="controls">
-            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
-            <!-- ko if: statementPath() -->
-              <a data-bind="attr: {href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
+
+          <div class="select-like">
+          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
+              source: $root.documentChooser.documentsAutocompleteSource,
+              showOnFocus: true,
+              blurOnEnter: true,
+              type: 'hive',
+              create: function (event, ui) {
+                if (associatedDocument()) {
+                  this.value = ko.dataFor(event.target).associatedDocument().name();
+                 }
+                 return false;
+               },
+              select: function (event, ui) { ko.dataFor(event.target).statementPath(ui.item.value); this.value = ui.item.label; return false;},
+              focus: function (event, ui) { this.value = ui.item.label; return false;},
+              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
+              itemTemplate: 'doc-search-autocomp-item'
+            }, valueUpdate: 'afterkeydown'">
+            <span class="inactive-action">
+              <i class="fa fa-sort"></i>
+            </span>
+          </div>
+            <!-- ko if: associatedDocument() -->
+              <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+              <a data-bind="attr: { associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
