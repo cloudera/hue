@@ -1148,7 +1148,8 @@ from metadata.conf import has_navigator
         hasFocus: searchHasFocus,
         clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
         textInput: searchInput,
-        valueUpdate: 'afterkeydown'">
+        valueUpdate: 'afterkeydown',
+        attr: { placeholder: '${ _('Search ') }' + $parent.name.replace(/s$/g, '') + ($parent.type == 'sql' ? '${ _(' tables') }' : '${ _(' files') }' ) + '...' }">
         <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
       </div>
     <!-- /ko -->

@@ -161,6 +161,9 @@ ${ hueIcons.symbols() }
 
   <div class="content-wrapper">
     <div class="left-nav">
+      Home</br>
+      </br>
+
       <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'editor'); }">Query</a><br/>
       <br/>
       [Hive, Impala, Pig, PySpark, Solr, MapReduce...]<br/>
