@@ -1618,7 +1618,7 @@ ${ hueIcons.symbols() }
           <div class="controls">
             <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
             <!-- ko if: statementPath() -->
-              <a data-bind="attr: {href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
+              <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
@@ -1628,7 +1628,7 @@ ${ hueIcons.symbols() }
 
       <!-- ko if: statementType() == 'document' -->
         <div class="control-group">
-          <label class="control-label">${_('Query File')}</label>
+          <label class="control-label">${_('Document')}</label>
           <div class="controls">
 
           <div class="select-like">
@@ -1636,16 +1636,29 @@ ${ hueIcons.symbols() }
               source: $root.documentChooser.documentsAutocompleteSource,
               showOnFocus: true,
               blurOnEnter: true,
-              type: 'hive',
+              type: 'query-hive',
               create: function (event, ui) {
                 if (associatedDocument()) {
                   this.value = ko.dataFor(event.target).associatedDocument().name();
-                 }
-                 return false;
+                } else if (associatedDocumentUuid()) {
+      $.get('/desktop/api2/doc/', {
+        uuid: associatedDocumentUuid()
+      }, function(data){
+        if (data && data.document){
+          this.value = data.document.name;
+        }
+      });
+                }
+                return false;
                },
-              select: function (event, ui) { ko.dataFor(event.target).statementPath(ui.item.value); this.value = ui.item.label; return false;},
+              select: function (event, ui) { ko.dataFor(event.target).associatedDocumentUuid(ui.item.value); this.value = ui.item.label; return false;},
               focus: function (event, ui) { this.value = ui.item.label; return false; },
-              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false; },
+              change: function (event, ui) {
+                if (associatedDocument()) {
+                  this.value = ko.dataFor(event.target).associatedDocument().name();
+                }
+                return false;
+              },
               itemTemplate: 'doc-search-autocomp-item'
             }, valueUpdate: 'afterkeydown'">
             <span class="inactive-action">
@@ -1654,7 +1667,7 @@ ${ hueIcons.symbols() }
           </div>
           <!-- ko if: associatedDocument() -->
             <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-            <a data-bind="attr: { associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
+            <a data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           <!-- /ko -->
@@ -1662,7 +1675,7 @@ ${ hueIcons.symbols() }
       </div>
       <!-- /ko -->
 
-      <div class="ace-editor" data-bind="visible: statementType() == 'text', css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',

@@ -426,7 +426,7 @@ var EditorViewModel = (function() {
     }
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
-      if (self.statementType() == 'file') {
+      if (self.statementType() == 'file') { //aaaa
         $.post("/notebook/api/get_external_statement", {
           notebook: ko.mapping.toJSON(notebook.getContext()),
           snippet: ko.mapping.toJSON(self.getContext())
@@ -441,6 +441,13 @@ var EditorViewModel = (function() {
       }
     });
     self.associatedDocument = ko.observable();
+    self.associatedDocumentUuid = ko.observable(typeof snippet.associatedDocumentUuid != "undefined" && snippet.associatedDocumentUuid != null ? snippet.associatedDocumentUuid : null);
+    if (self.associatedDocumentUuid()){
+      vm.documentChooser.setAssociatedDocument(self.associatedDocumentUuid(), self.associatedDocument);
+    }
+    self.associatedDocumentUuid.subscribe(function(val){
+      vm.documentChooser.setAssociatedDocument(val, self.associatedDocument);
+    });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
@@ -747,6 +754,7 @@ var EditorViewModel = (function() {
         statementType: self.statementType,
         statement: self.statement,
         statementPath: self.statementPath,
+        associatedDocumentUuid: self.associatedDocumentUuid,
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
@@ -808,7 +816,7 @@ var EditorViewModel = (function() {
           (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
           (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0))) ||
         (self.statementType() == 'file' && self.statementPath().length > 0) ||
-        (self.statementType() == 'document' && self.statementPath().length > 0);
+        (self.statementType() == 'document' && self.associatedDocumentUuid().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
