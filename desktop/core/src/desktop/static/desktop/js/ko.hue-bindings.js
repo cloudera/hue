@@ -1894,6 +1894,74 @@
     }
   };
 
+  ko.bindingHandlers.splitFlexDraggable = {
+    init: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      var sidePanelWidth = $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') != null ? $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') : 250;
+
+      var $resizer = $(element);
+      var $sidePanel = $(options.sidePanelSelector);
+      var $container = $(options.containerSelector);
+
+      var isLeft = options.orientation === 'left';
+
+      var onPosition = options.onPosition || function() {};
+
+      var panelStartWidth = $sidePanel.width();
+      $resizer.draggable({
+        axis: "x",
+        containment: $container,
+        start: function () {
+          panelStartWidth = $sidePanel.width();
+        },
+        drag: function (event, ui) {
+          if (isLeft) {
+            $sidePanel.css("flex-basis", Math.max(panelStartWidth + ui.position.left, 200) + "px");
+          } else {
+            $sidePanel.css("flex-basis", Math.max(panelStartWidth - ui.position.left, 200) + "px");
+          }
+          onPosition();
+          ui.position.left = 0;
+        },
+        stop: function (event, ui) {
+          sidePanelWidth = $sidePanel.width();
+          $.totalStorage(options.appName + '_' + options.orientation + '_panel_width', sidePanelWidth);
+          window.setTimeout(positionPanels, 100);
+          huePubSub.publish('split.panel.resized');
+        }
+      });
+
+      var positionPanels = function () {
+        if (options.sidePanelVisible()) {
+          $sidePanel.css('width',  Math.max(sidePanelWidth, 200) + 'px');
+          onPosition();
+        }
+      };
+
+      options.sidePanelVisible.subscribe(positionPanels);
+
+      var positionTimeout = -1;
+      $(window).resize(function() {
+        window.clearTimeout(positionTimeout);
+        positionTimeout = window.setTimeout(function () {
+          positionPanels()
+        }, 1);
+      });
+
+      function initialPositioning() {
+        if(! $container.is(":visible") && ! $sidePanel.is(":visible")) {
+          window.setTimeout(initialPositioning, 50);
+        } else {
+          positionPanels();
+          // Even though the container is visible some slow browsers might not
+          // have rendered the panels
+          window.setTimeout(positionPanels, 50);
+        }
+      }
+      initialPositioning();
+    }
+  };
+
   ko.bindingHandlers.splitDraggable = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
