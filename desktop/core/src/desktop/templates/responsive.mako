@@ -327,7 +327,7 @@ ${ assist.assistPanel() }
 
         self.embeddable_cache = {};
 
-        self.currentApp = ko.observable('');
+        self.currentApp = ko.observable();
         self.isLoadingEmbeddable = ko.observable(false);
 
         self.currentApp.subscribe(function(newVal){
@@ -349,12 +349,15 @@ ${ assist.assistPanel() }
                 self.isLoadingEmbeddable(false);
               }
             });
-          }
-          else {
+          } else {
             $('#embeddable').html(self.embeddable_cache[newVal]);
             self.isLoadingEmbeddable(false);
           }
         });
+
+        if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
+          self.currentApp('editor');
+        }
 
         huePubSub.subscribe('switch.app', function (name) {
           console.log(name);
@@ -414,10 +417,6 @@ ${ assist.assistPanel() }
         return ko.dataFor($('.top-nav')[0]);
       }
     };
-
-    if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
-      opvm.currentApp('editor');
-    }
   });
 
   $(".hamburger").click(function () {
