@@ -84,6 +84,7 @@ def databases(request):
     'is_navigator_enabled': has_navigator(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
+    'is_embeddable': request.REQUEST.get('is_embeddable', False),
   })
 
 
@@ -212,6 +213,7 @@ def show_tables(request, database=None):
     'is_navigator_enabled': has_navigator(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
+    'is_embeddable': request.REQUEST.get('is_embeddable', False),
     })
 
   return resp
@@ -287,6 +289,7 @@ def describe_table(request, database, table):
       'is_navigator_enabled': has_navigator(request.user),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
+      'is_embeddable': request.REQUEST.get('is_embeddable', False),
     })
 
 

@@ -342,7 +342,8 @@ ${ assist.assistPanel() }
     var self = this;
 
     self.EMBEDDABLE_PAGE_URLS = {
-      editor: '/notebook/editor_embeddable'
+      editor: '/notebook/editor_embeddable',
+      metastore: '/metastore/tables/?is_embeddable=true'
     };
 
     self.embeddable_cache = {};
