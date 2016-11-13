@@ -53,8 +53,7 @@ var DocumentChooser = (function () {
               });
               self.documentStore[doc.uuid] = ko.mapping.fromJS(doc);
             });
-          }
-          else {
+          } else {
             docs.push({
               data: {name: 'No matches found', description: ''},
               label: 'No matches found',
@@ -67,23 +66,23 @@ var DocumentChooser = (function () {
     };
     
     self.getDocumentById = function (type, uuid) {
-      var doc = self.documentStore[uuid];
-      return doc;
+      return self.documentStore[uuid];
     };
     
     self.setAssociatedDocument = function (uuid, associatedDocument) {
-        if (self.documentStore[uuid]){
-          associatedDocument(self.documentStore[uuid]);
-        }
-        $.get('/desktop/api2/doc/', {
-          uuid: uuid
-        }, function(data){
-          if (data && data.document){
-            associatedDocument(ko.mapping.fromJS(data.document));
-            self.documentStore[uuid] = associatedDocument();
-          }
-        });
+      if (self.documentStore[uuid]){
+        associatedDocument(self.documentStore[uuid]);
       }
+
+      $.get('/desktop/api2/doc/', {
+        uuid: uuid
+      }, function(data){
+        if (data && data.document){
+          associatedDocument(ko.mapping.fromJS(data.document));
+          self.documentStore[uuid] = associatedDocument();
+        }
+      });
+    }
   }
 
   return DocumentChooser;

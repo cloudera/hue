@@ -28,7 +28,9 @@
 
 <%namespace name="utils" file="../utils.inc.mako" />
 
+
 <%def name="render()">
+<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 
 <script type="text/html" id="doc-search-autocomp-item">
   <a>

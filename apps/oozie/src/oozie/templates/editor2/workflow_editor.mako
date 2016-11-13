@@ -535,7 +535,6 @@ ${ commonshare() | n,unicode }
 
 ${ dashboard.import_bindings() }
 
-<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 <script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
