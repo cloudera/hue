@@ -426,17 +426,19 @@ var EditorViewModel = (function() {
     }
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
-      $.post("/notebook/api/statement_from_file", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
-        snippet: ko.mapping.toJSON(self.getContext())
-      }, function(data) {
-        if (data.status == 0) {
-          self.statement_raw(data.statement);
-          self.ace().setValue(self.statement_raw(), 1);
-        } else {
-          self._ajaxError(data);
-        }
-      });
+      if (self.statementType() == 'file') {
+        $.post("/notebook/api/statement_from_file", {
+          notebook: ko.mapping.toJSON(notebook.getContext()),
+          snippet: ko.mapping.toJSON(self.getContext())
+        }, function(data) {
+          if (data.status == 0) {
+            self.statement_raw(data.statement);
+            self.ace().setValue(self.statement_raw(), 1);
+          } else {
+            self._ajaxError(data);
+          }
+        });
+      }
     });
     self.associatedDocument = ko.observable();
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
@@ -808,7 +810,8 @@ var EditorViewModel = (function() {
           (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
           (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
           (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0))) ||
-        (self.statementType() == 'file' && self.statementPath().length > 0);
+        (self.statementType() == 'file' && self.statementPath().length > 0) ||
+        (self.statementType() == 'document' && self.statementPath().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
