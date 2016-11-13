@@ -364,43 +364,6 @@ from metadata.conf import has_navigator
       padding-left: 15px;
     }
 
-    .nav-assist-search {
-      display: -ms-flexbox;
-      display: flex;
-      position: relative;
-      -ms-flex: 1 1 29px;
-      flex: 1 1 29px;
-      padding: 10px;
-    }
-
-    .nav-assist-search > input {
-      border-bottom-left-radius: 4px;
-      border-top-left-radius: 4px;
-      border: 1px solid #DDD;
-      border-right: none;
-      flex: 1 1 100%;
-      height: 27px;
-      box-shadow: none;
-    }
-
-    .nav-assist-search > a {
-      cursor: pointer;
-      flex: 0 0 31px;
-      border-bottom-right-radius: 4px;
-      border-top-right-radius: 4px;
-      border: 1px solid #DDD;
-      box-shadow: none;
-      font-size: 15px;
-      line-height: 29px;
-      background-color: #f9f9f9;
-      width: 31px;
-      height: 29px;
-    }
-
-    .nav-assist-search > a > i {
-      margin-left: 8px;
-    }
-
     .result-entry {
       position: relative;
       clear: both;
@@ -1172,7 +1135,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorEnabled -->
-      <div class="nav-assist-search" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }">
+      <div class="search-container" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }">
         <input placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
           source: navAutocompleteSource,
           itemTemplate: 'nav-search-autocomp-item',
