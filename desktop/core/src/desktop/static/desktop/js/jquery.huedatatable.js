@@ -476,6 +476,7 @@
     self.fnDestroy = function () {
       self.fnClearTable();
       self.$table.unwrap();
+      self.$table.data('isScrollAttached', null);
       self.$table.removeClass('table-huedatatable');
     };
 

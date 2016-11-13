@@ -675,9 +675,6 @@ var EditorViewModel = (function() {
     });
 
     self.hasDataForChart.subscribe(function(newValue) {
-      if (!newValue) {
-        self.isResultSettingsVisible(true);
-      }
       self.chartX.notifySubscribers();
       self.chartX.valueHasMutated();
     });
