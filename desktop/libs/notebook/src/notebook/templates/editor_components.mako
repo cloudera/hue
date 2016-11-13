@@ -2559,7 +2559,7 @@ ${ hueIcons.symbols() }
         $(el).jHueHorizontalScrollbar();
       } else {
         $(el).jHueTableExtender2({
-          mainScrollable: '.content-panel',
+          mainScrollable: $(el).parents('.dataTables_wrapper')[0],
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "absolute"
         });
