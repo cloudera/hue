@@ -292,7 +292,7 @@ ${ hueIcons.symbols() }
 
 
     <div class="page-content">
-      Load 
+      Load
       <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |
       <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a>
 
