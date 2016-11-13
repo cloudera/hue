@@ -32,10 +32,11 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
-from desktop.models import DefaultConfiguration
+from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported,\
+  Notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -611,6 +612,9 @@ class HS2Api(Api):
 
     if snippet.get('statementType') == 'file':
       snippet['statement'] = self._get_statement_from_file(snippet)
+    elif snippet.get('statementType') == 'document':
+      notebook = Notebook(Document2.objects.get_by_uuid(user=self.user, uuid=snippet['statementPath'], perm_type='read'))
+      snippet['statement'] = notebook.get_str()
 
     statements = self._get_statements(snippet['statement'])
 
