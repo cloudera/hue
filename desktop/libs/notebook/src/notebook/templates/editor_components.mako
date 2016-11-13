@@ -1625,7 +1625,7 @@ ${ hueIcons.symbols() }
           <div class="controls">
 
           <div class="select-like">
-          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
+          <input class="input-xlarge" placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
               source: $root.documentChooser.documentsAutocompleteSource,
               showOnFocus: true,
               blurOnEnter: true,
@@ -1637,20 +1637,20 @@ ${ hueIcons.symbols() }
                  return false;
                },
               select: function (event, ui) { ko.dataFor(event.target).statementPath(ui.item.value); this.value = ui.item.label; return false;},
-              focus: function (event, ui) { this.value = ui.item.label; return false;},
-              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
+              focus: function (event, ui) { this.value = ui.item.label; return false; },
+              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false; },
               itemTemplate: 'doc-search-autocomp-item'
             }, valueUpdate: 'afterkeydown'">
             <span class="inactive-action">
               <i class="fa fa-sort"></i>
             </span>
           </div>
-            <!-- ko if: associatedDocument() -->
-              <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-              <a data-bind="attr: { associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
-                <i class="fa fa-external-link-square"></i>
-              </a>
-            <!-- /ko -->
+          <!-- ko if: associatedDocument() -->
+            <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+            <a data-bind="attr: { associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
+              <i class="fa fa-external-link-square"></i>
+            </a>
+          <!-- /ko -->
           </div>
       </div>
       <!-- /ko -->
