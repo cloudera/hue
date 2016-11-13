@@ -1609,7 +1609,7 @@ ${ hueIcons.symbols() }
         <div class="control-group">
           <label class="control-label">${_('Query File')}</label>
           <div class="controls">
-            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
+            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
             <!-- ko if: statementPath() -->
               <a data-bind="attr: {href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
