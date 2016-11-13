@@ -739,11 +739,17 @@ def statement_compatibility(request):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def statement_from_file(request):
+def get_external_statement(request):
   response = {'status': -1, 'message': ''}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  if snippet.get('statementType') == 'file':
+    snippet['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
+  if snippet.get('statementType') == 'document':
+    notebook = Notebook(Document2.objects.get_by_uuid(user=request.user, uuid=snippet['statementPath'], perm_type='read'))
+    snippet['statement'] = notebook.get_str()
 
   response['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
   response['status'] = 0
@@ -752,9 +758,8 @@ def statement_from_file(request):
 
 
 def _get_statement_from_file(user, fs, snippet):
-  if snippet.get('statementType') == 'file':
-    script_path = snippet['statementPath']
-    if script_path:
-      script_path = script_path.replace('hdfs://', '')
-      if fs.do_as_user(user, fs.exists, script_path):
-        return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)
+  script_path = snippet['statementPath']
+  if script_path:
+    script_path = script_path.replace('hdfs://', '')
+    if fs.do_as_user(user, fs.exists, script_path):
+      return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)

@@ -610,12 +610,6 @@ class HS2Api(Api):
     else:
       statement_id = 0
 
-    if snippet.get('statementType') == 'file':
-      snippet['statement'] = self._get_statement_from_file(snippet)
-    elif snippet.get('statementType') == 'document':
-      notebook = Notebook(Document2.objects.get_by_uuid(user=self.user, uuid=snippet['statementPath'], perm_type='read'))
-      snippet['statement'] = notebook.get_str()
-
     statements = self._get_statements(snippet['statement'])
 
     resp = {
@@ -687,14 +681,6 @@ class HS2Api(Api):
       name = 'sparksql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
-
-  def _get_statement_from_file(self, snippet):
-    if snippet.get('statementType') == 'file':
-      script_path = snippet['statementPath']
-      if script_path:
-        script_path = script_path.replace('hdfs://', '')
-        if self.request.fs.do_as_user(self.user, self.request.fs.exists, script_path):
-          return self.request.fs.do_as_user(self.user, self.request.fs.read, script_path, 0, 16 * 1024 ** 2)
 
 
   def _parse_job_counters(self, job_id):

@@ -427,7 +427,7 @@ var EditorViewModel = (function() {
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
       if (self.statementType() == 'file') {
-        $.post("/notebook/api/statement_from_file", {
+        $.post("/notebook/api/get_external_statement", {
           notebook: ko.mapping.toJSON(notebook.getContext()),
           snippet: ko.mapping.toJSON(self.getContext())
         }, function(data) {
