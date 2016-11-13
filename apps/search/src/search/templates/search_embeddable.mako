@@ -15,17 +15,13 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader_m, commonfooter_m, _ko
+from desktop.views import commonheader, commonfooter, _ko
 from desktop import conf
 from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="common_search" file="common_search.mako" />
 
-${ commonheader_m(_('Search'), "search", user, request, "80px") | n,unicode }
-
 <span id="searchComponents">
-${ common_search.page_structure(True) }
+${ common_search.page_structure() }
 </span>
-
-${ commonfooter_m(request, messages) | n,unicode }

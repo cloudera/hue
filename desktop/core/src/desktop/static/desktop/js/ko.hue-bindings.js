@@ -2309,7 +2309,7 @@
     }
   };
 
-  ko.bindingHandlers.typeahead = {
+  ko.bindingHandlers.typdeahead = {
     init: function (element, valueAccessor) {
       var binding = this;
       var elem = $(element);
