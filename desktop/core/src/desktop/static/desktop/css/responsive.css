@@ -58,13 +58,73 @@ body {
 }
 
 .top-nav {
-  -ms-flex: 1;
-  flex: 1;
+  -ms-flex: 0 0 50px;
+  flex: 0 0 50px;
+  display: -ms-flexbox;
+  display: flex;
   position: relative;
-  height: 38px;
   background-color: #003F6C;
   width: 100%;
-  padding: 1em 0;
+}
+
+.top-nav-left {
+  -ms-flex: 0 0 300px;
+  flex: 0 0 300px;
+  line-height: 45px;
+}
+
+.top-nav-middle {
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+}
+
+.top-nav-right {
+  -ms-flex: 0 0 300px;
+  flex: 0 0 300px;
+}
+
+.top-nav-middle .search-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 500px;
+}
+
+.search-container {
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  -ms-flex: 1 1 29px;
+  flex: 1 1 29px;
+  padding: 10px;
+}
+
+.search-container > input {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  border: 1px solid #DDD;
+  border-right: none;
+  flex: 1 1 100%;
+  height: 27px;
+  box-shadow: none;
+}
+
+.search-container > a {
+  cursor: pointer;
+  flex: 0 0 31px;
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  border: 1px solid #DDD;
+  box-shadow: none;
+  font-size: 15px;
+  line-height: 29px;
+  background-color: #f9f9f9;
+  width: 31px;
+  height: 29px;
+}
+
+.search-container > a > i {
+  margin-left: 8px;
 }
 
 .left-panel,
@@ -244,7 +304,7 @@ h6 {
  * @link https://github.com/jonsuh/hamburgers
  */
 .hamburger {
-  padding: 0.4em 1em 0.4em 1.4em;
+  padding: 9px;
   display: inline-block;
   cursor: pointer;
   transition-property: opacity, -webkit-filter;

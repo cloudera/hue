@@ -81,131 +81,35 @@ ${ hueIcons.symbols() }
 
 <div class="main-page">
   <div class="top-nav">
-    <a class="hamburger hamburger--squeeze pull-left" type="button">
+    <div class="top-nav-left">
+      <a class="hamburger hamburger--squeeze pull-left" type="button">
       <span class="hamburger-box">
         <span class="hamburger-inner"></span>
       </span>
-    </a>
-    <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
-    <div class="btn-group" style="color:whitevertical-align: middle">
-      <a href="${ url('notebook:new') }" title="${ _( 'New Notebook') }">
-        <button class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> ${ _('Compose') }</button>
       </a>
-      <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" title="${ _( 'Compose query or job') }">
-        <span class="caret"></span>
-      </button>
-      <ul role="menu" class="dropdown-menu" title="${ _( 'Compose query or job') }">
-        % if 'beeswax' in apps:
-        <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
-        % endif
-        % if 'impala' in apps: ## impala requires beeswax anyway
-        <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
-        % endif
-        % if 'search' in apps:
-        <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
-        % endif
-        % if 'oozie' in apps:
-        <li class="dropdown oozie">
-          <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${ _('Workflows') }</span> <b class="caret"></b></a>
-          <ul role="menu" class="dropdown-menu">
-            % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
-            <li class="dropdown-submenu">
-              <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
-              <ul class="dropdown-menu">
-                <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
-              </ul>
-            </li>
-            % endif
-          </ul>
-        </li>
-        % endif
-        <li><a href="/${apps['jobsub'].display_name}">${ _('More >>') }</a></li>
-        % for interpreter in interpreters:
-        <li><a href="${ url('notebook:editor') }?type=${ interpreter['type'] }">${ interpreter['name'] }</a></li>
-        % endfor
-        % if user.is_superuser:
-        <li><a href="gethue.com">${ _('Add more...') }</a></li>
-        % endif
-      </ul>
+      <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
     </div>
-
-    <input class="input-xxlarge" placeholder="${ _('Search all data and saved documents...') }" /> <i class="fa fa-search"></i>
-
-    <div class="pull-right">
-      % if user.is_authenticated() and section != 'login':
-      <ul class="nav nav-pills">
-        <li>
-          <div class="btn-group" style="vertical-align: middle">
-            <a href="${ url('notebook:new') }"><button class="btn btn-primary"> ${ _('research queue') }</button></a>
-            <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-            <ul role="menu" class="dropdown-menu">
-              <li><a href='#' class="ignore-btn confirmationModal">${ _('Production') }</a></li>
-              <li><a href='#' class="ignore-btn confirmationModal">${ _('ETL analytics') }</a></li>
-              <li><a href='#' class="ignore-btn confirmationModal"><i class="fa fa-plus"></i> ${ _('Create') }</a></li>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <span title="Running jobs and workflows">
-            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/jobbrowser/apps" style="color:white"><i class="fa fa-circle-o"></i> ${ _('Jobs') }</a>
-            <span class="badge badge-warning">20</span>
-            ## Batches
-            ## Schedules
-          </span>
-        </li>
-        % if 'oozie' in apps: # Merged with Jobs eventually
-        <li>
-          <span title="Running workflows">
-            <a title="${_('Manage jobs')}" rel="navigator-tooltip" href="${ url('oozie:index') }" style="color:white">
-              <i class="fa fa-circle-o"></i> ${ _('Workflows') }
-            </a>
-            <span class="badge badge-warning">10</span>
-          </span>
-            ## Coordinators
-            ## Bundles
-        </li>
-        % endif
-
-        <li><span title="Notifications"><i class="fa fa-bell-o"></i> <span class="badge badge-success">10</span></span></li>
-
-        <li><i class="fa fa-question-circle"></i></li>
-
-        <%
-          view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
-        %>
-        <li class="dropdown">
-          <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle" style="color:white">
-            <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
-            % if view_profile:
-              <b class="caret"></b>
-            % endif
-          </a>
-          % if view_profile:
-          <ul class="dropdown-menu pull-right">
-            <li>
-              <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-user-circle"></i>&nbsp;&nbsp;
-                % if is_ldap_setup:
-                  ${_('View Profile')}
-                % else:
-                  ${_('Edit Profile')}
-                % endif
-              </a>
-            </li>
-            % if user.is_superuser:
-              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
-              <li><a href="${ url('useradmin.views.list_permissions') }"><i class="fa fa-key"></i> ${_('Set Permissions')}</a></li>
-              <li><a href="/about"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /> ${_('About Hue')}</a></li>
-            % endif
-            <li>
-              <a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a>
-            </li>
-          </ul>
-        % endif
-        </li>
-      </ul>
-      % endif
+    <div class="top-nav-middle">
+      <div class="search-container">
+        <input placeholder="${ _('Search all data and saved documents...') }" type="text"
+          data-bind="autocomplete: {
+              source: searchAutocompleteSource,
+              itemTemplate: 'nav-search-autocomp-item',
+              noMatchTemplate: 'nav-search-autocomp-no-match',
+              classPrefix: 'nav-',
+              showOnFocus: true,
+              onEnter: performSearch,
+              reopenPattern: /.*:$/
+            },
+            hasFocus: searchHasFocus,
+            clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
+            textInput: searchInput,
+            valueUpdate: 'afterkeydown'"
+        >
+        <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
+      </div>
+    </div>
+    <div class="top-nav-right">
     </div>
   </div>
 
@@ -357,61 +261,6 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
 
-  var OnePageViewModel = function () {
-    var self = this;
-
-    self.EMBEDDABLE_PAGE_URLS = {
-      editor: '/notebook/editor_embeddable',
-      metastore: '/metastore/tables/?is_embeddable=true',
-      search: '/search/embeddable?collection=4',
-    };
-
-    self.embeddable_cache = {};
-
-    self.currentApp = ko.observable('');
-    self.isLoadingEmbeddable = ko.observable(false);
-
-    self.currentApp.subscribe(function(newVal){
-      self.isLoadingEmbeddable(true);
-      if (typeof self.embeddable_cache[newVal] === 'undefined'){
-        $.ajax({
-          url: self.EMBEDDABLE_PAGE_URLS[newVal],
-          beforeSend:function (xhr) {
-            xhr.setRequestHeader('X-Requested-With', 'Hue');
-          },
-          dataType:'html',
-          success:function (response) {
-            // TODO: remove the next lines
-            // hack to avoid css caching for development
-            var r = $(response);
-            r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
-            self.embeddable_cache[newVal] = r;
-            $('#embeddable').html(r);
-            self.isLoadingEmbeddable(false);
-          }
-        });
-      }
-      else {
-        $('#embeddable').html(self.embeddable_cache[newVal]);
-        self.isLoadingEmbeddable(false);
-      }
-    });
-
-    huePubSub.subscribe('switch.app', function (name) {
-      console.log(name);
-      self.currentApp(name);
-    });
-  };
-
-  var SidePanelViewModel = function () {
-    var self = this;
-    self.apiHelper = ApiHelper.getInstance();
-    self.leftAssistVisible = ko.observable();
-    self.rightAssistVisible = ko.observable();
-    self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
-    self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
-  };
-
   $(document).ready(function () {
     var options = {
       user: '${ user.username }',
@@ -420,14 +269,105 @@ ${ assist.assistPanel() }
       }
     };
 
-    var opvm = new OnePageViewModel();
-    ko.applyBindings(opvm, $('.page-content')[0]);
+    (function () {
+      var OnePageViewModel = function () {
+        var self = this;
 
-    var sidePanelViewModel = new SidePanelViewModel();
-    ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
-    ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
-    ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
-    ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
+        self.EMBEDDABLE_PAGE_URLS = {
+          editor: '/notebook/editor_embeddable',
+          metastore: '/metastore/tables/?is_embeddable=true',
+          search: '/search/embeddable?collection=4'
+        };
+
+        self.embeddable_cache = {};
+
+        self.currentApp = ko.observable('');
+        self.isLoadingEmbeddable = ko.observable(false);
+
+        self.currentApp.subscribe(function(newVal){
+          self.isLoadingEmbeddable(true);
+          if (typeof self.embeddable_cache[newVal] === 'undefined'){
+            $.ajax({
+              url: self.EMBEDDABLE_PAGE_URLS[newVal],
+              beforeSend:function (xhr) {
+                xhr.setRequestHeader('X-Requested-With', 'Hue');
+              },
+              dataType:'html',
+              success:function (response) {
+                // TODO: remove the next lines
+                // hack to avoid css caching for development
+                var r = $(response);
+                r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
+                self.embeddable_cache[newVal] = r;
+                $('#embeddable').html(r);
+                self.isLoadingEmbeddable(false);
+              }
+            });
+          }
+          else {
+            $('#embeddable').html(self.embeddable_cache[newVal]);
+            self.isLoadingEmbeddable(false);
+          }
+        });
+
+        huePubSub.subscribe('switch.app', function (name) {
+          console.log(name);
+          self.currentApp(name);
+        });
+      };
+
+      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+    })();
+
+
+    (function () {
+      function SidePanelViewModel () {
+        var self = this;
+        self.apiHelper = ApiHelper.getInstance();
+        self.leftAssistVisible = ko.observable();
+        self.rightAssistVisible = ko.observable();
+        self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
+        self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
+      }
+
+      var sidePanelViewModel = new SidePanelViewModel();
+      ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
+      ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
+      ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
+      ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
+    })();
+
+    (function () {
+      function TopNavViewModel () {
+        var self = this;
+        self.searchActive = ko.observable(false);
+        self.searchHasFocus = ko.observable(false);
+        self.searchInput = ko.observable();
+      }
+
+      TopNavViewModel.prototype.performSearch = function () {
+      };
+
+      TopNavViewModel.prototype.searchAutocompleteSource = function () {
+      };
+
+      ko.applyBindings(new TopNavViewModel(), $('.top-nav')[0]);
+    })();
+
+    window.hueDebug = {
+      viewModel: function () {
+        return window.hueDebug.onePageViewModel();
+      },
+      onePageViewModel: function () {
+        return ko.dataFor($('.page-content')[0]);
+      },
+      sidePanelViewModel: function () {
+        return ko.dataFor($('.left-panel')[0]);
+      },
+      topNavViewModel: function () {
+        return ko.dataFor($('.top-nav')[0]);
+      }
+    };
 
     if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
       opvm.currentApp('editor');
@@ -535,18 +475,6 @@ ${ assist.assistPanel() }
     % endif
   });
 
-
-  window.hueDebug = {
-    viewModel: function () {
-      return ko.dataFor(document.body);
-    },
-    onePageViewModel: function () {
-      return ko.dataFor($('.page-content')[0]);
-    },
-    assistViewModel: function () {
-      return ko.dataFor($('#assist-container')[0]);
-    }
-  }
 </script>
 
 <script type="text/javascript">
