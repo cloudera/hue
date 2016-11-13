@@ -34,7 +34,9 @@ body {
 
 .main-page {
   position: relative;
+  display: -ms-flexbox;
   display: flex;
+  -ms-flex-direction: column;
   flex-direction: column;
   height: 100%;
   width: 100%;
@@ -44,17 +46,21 @@ body {
 }
 
 .content-wrapper {
+  -ms-flex: 1 1 100%;
   flex: 1 1 100%;
   position: relative;
+  display: -ms-flexbox;
   display: flex;
   width: 100%;
+  -ms-flex-direction: column;
   flex-direction: row;
   background-color: #FFF;
 }
 
 .top-nav {
-  position: relative;
+  -ms-flex: 1;
   flex: 1;
+  position: relative;
   height: 38px;
   background-color: #003F6C;
   width: 100%;
@@ -63,9 +69,10 @@ body {
 
 .left-panel,
 .right-panel {
-  background-color: #FFF;
+  -ms-flex: 0;
   flex: 0;
   position: relative;
+  background-color: #FFF;
   padding-top: 10px;
   min-width: 250px;
 }
@@ -75,6 +82,7 @@ body {
 }
 
 .resizer {
+  -ms-flex: 0;
   flex: 0;
   height: 100%;
   min-width: 4px;
@@ -89,12 +97,14 @@ body {
 }
 
 .page-content {
+  -ms-flex: 1;
   flex: 1;
   padding: 1em;
   position: relative;
 }
 
 .left-nav {
+  -ms-flex: 0 0 0;
   flex: 0 0 0;
   overflow-x: hidden;
   white-space: nowrap;
@@ -106,8 +116,9 @@ body {
 }
 
 .assist-panel {
-  position: relative;
+  -ms-flex: 0 0 200px;
   flex: 0 0 200px;
+  position: relative;
   overflow-x: hidden;
   white-space: nowrap;
   -webkit-transition: 0.4s flex;
@@ -148,6 +159,7 @@ body {
 }
 
 .assist-hidden {
+  -ms-flex: 0;
   flex: 0;
 }
 
@@ -195,6 +207,7 @@ body {
 }
 
 .left-nav-visible {
+  -ms-flex: 0 0 15em;
   flex: 0 0 15em;
   background-color: lightgrey;
 }
@@ -342,7 +355,6 @@ h6 {
   padding: 6px 1px;
   list-style: none;
   font-size: 13px;
-
   opacity: 0;
   transition: opacity .3s;
 }
@@ -412,7 +424,6 @@ h6 {
   line-height: 22px;
   vertical-align: middle;
   padding: 6px 16px 6px 38px;
-
   color: #333;
   text-decoration: none;
   font-weight: 400;
@@ -429,7 +440,6 @@ h6 {
   vertical-align: middle;
   padding: 6px 16px 6px 38px;
   cursor: default;
-
   color: #CCC;
   text-decoration: none;
   font-weight: 400;
@@ -449,7 +459,6 @@ h6 {
   left: 13px;
   right: auto;
   top: 6px;
-
   color: #CCC;
   font-size: 17px;
   line-height: 22px;
@@ -463,7 +472,6 @@ h6 {
   right: auto;
   line-height: 22px;
   height: 24px;
-
   color: #555;
   font-size: 17px;
   vertical-align: middle;
