@@ -389,16 +389,101 @@ ${ assist.assistPanel() }
     (function () {
       function TopNavViewModel () {
         var self = this;
+        self.apiHelper = ApiHelper.getInstance();
         self.searchActive = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
+
+
+        // TODO: Extract to common module (shared with nav search autocomplete)
+        var SEARCH_FACET_ICON = 'fa-tags';
+        var SEARCH_TYPE_ICONS = {
+          'DATABASE': 'fa-database',
+          'TABLE': 'fa-table',
+          'VIEW': 'fa-eye',
+          'FIELD': 'fa-columns',
+          'PARTITION': 'fa-th',
+          'SOURCE': 'fa-server',
+          'OPERATION': 'fa-cogs',
+          'OPERATION_EXECUTION': 'fa-cog',
+          'DIRECTORY': 'fa-folder-o',
+          'FILE': 'fa-file-o',
+          'SUB_OPERATION': 'fa-code-fork',
+          'COLLECTION': 'fa-search',
+          'HBASE': 'fa-th-large',
+          'HUE': 'fa-file-o'
+        };
+
+        self.searchAutocompleteSource = function (request, callback) {
+          // TODO: Extract complete contents to common module (shared with nav search autocomplete)
+          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
+          var isFacet = facetMatch !== null;
+          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
+          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
+          var beforePartial = request.term.substring(0, request.term.length - partial.length);
+
+          self.apiHelper.globalSearchAutocomplete({
+            query:  request.term,
+            successCallback: function (data) {
+              var values = [];
+              var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
+              if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
+                var facetInQuery = facetMatch[1];
+                if (typeof data.facets[facetInQuery] !== 'undefined') {
+                  $.map(data.facets[facetInQuery], function (count, value) {
+                    if (facetPartialRe.test(value)) {
+                      values.push({ data: { label: facetInQuery + ':' + value, icon: SEARCH_FACET_ICON, description: count }, value: beforePartial + value})
+                    }
+                  });
+                }
+              } else {
+                if (typeof data.facets !== 'undefined') {
+                  Object.keys(data.facets).forEach(function (facet) {
+                    if (facetPartialRe.test(facet)) {
+                      if (Object.keys(data.facets[facet]).length > 0) {
+                        values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
+                      } else { // Potential facet from the list
+                        values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
+                      }
+                    } else if (partial.length > 0) {
+                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
+                        if (facetValue.indexOf(partial) !== -1) {
+                          values.push({ data: { label: facet + ':' + facetValue, icon: SEARCH_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                        }
+                      });
+                    }
+                  });
+                }
+              }
+
+              if (values.length > 0) {
+                values.push({ divider: true });
+              }
+              if (typeof data.results !== 'undefined') {
+                data.results.forEach(function (result) {
+                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                });
+              }
+
+              if (values.length > 0 && values[values.length - 1].divider) {
+                values.pop();
+              }
+              if (values.length === 0) {
+                values.push({ noMatch: true });
+              }
+              callback(values);
+            },
+            silenceErrors: true,
+            errorCallback: function () {
+              callback([]);
+            }
+          });
+        };
       }
 
       TopNavViewModel.prototype.performSearch = function () {
       };
 
-      TopNavViewModel.prototype.searchAutocompleteSource = function () {
-      };
 
       ko.applyBindings(new TopNavViewModel(), $('.top-nav')[0]);
     })();

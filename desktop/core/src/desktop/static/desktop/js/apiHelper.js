@@ -1391,6 +1391,21 @@ var ApiHelper = (function () {
     }));
   };
 
+  ApiHelper.prototype.globalSearchAutocomplete = function (options) {
+    var self = this;
+    $.post('/desktop/api/search/entities_interactive', {
+      query_s: ko.mapping.toJSON(options.query),
+      limit: 10,
+      sources: '["sql"]' // TODO: Add all global search types
+    }).done(function (data) {
+      if (data.status === 0 && !self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    }).fail(self.assistErrorCallback(options));
+  };
+
   ApiHelper.prototype.navSearchAutocomplete = function (options) {
     var self = this;
     $.post('/desktop/api/search/entities_interactive', {
