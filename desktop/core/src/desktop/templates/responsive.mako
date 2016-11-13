@@ -294,7 +294,8 @@ ${ hueIcons.symbols() }
     <div class="page-content">
       Load
       <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |
-      <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a>
+      <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a> |
+      <a href="#" data-bind="click: function(){ currentApp('search') }">search</a>
 
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
@@ -361,7 +362,8 @@ ${ assist.assistPanel() }
 
     self.EMBEDDABLE_PAGE_URLS = {
       editor: '/notebook/editor_embeddable',
-      metastore: '/metastore/tables/?is_embeddable=true'
+      metastore: '/metastore/tables/?is_embeddable=true',
+      search: '/search/embeddable?collection=4',
     };
 
     self.embeddable_cache = {};
@@ -374,7 +376,6 @@ ${ assist.assistPanel() }
       if (typeof self.embeddable_cache[newVal] === 'undefined'){
         $.ajax({
           url: self.EMBEDDABLE_PAGE_URLS[newVal],
-          cache: false,
           beforeSend:function (xhr) {
             xhr.setRequestHeader('X-Requested-With', 'Hue');
           },

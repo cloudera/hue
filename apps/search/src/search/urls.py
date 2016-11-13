@@ -20,6 +20,7 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^m$', 'index_m', name='index_m'),
+  url(r'^embeddable$', 'index_embeddable', name='index_embeddable'),
   url(r'^search$', 'search', name='search'),
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),

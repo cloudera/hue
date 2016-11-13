@@ -3294,7 +3294,7 @@ $(document).ready(function () {
     }
   ]);
 
-  ko.applyBindings(viewModel);
+  ko.applyBindings(viewModel, $('#searchComponents')[0]);
 
   viewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");

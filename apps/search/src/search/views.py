@@ -46,7 +46,7 @@ LOG = logging.getLogger(__name__)
 
 
 
-def index(request, is_mobile=False):
+def index(request, is_mobile=False, is_embeddable=False):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
 
@@ -74,6 +74,8 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
+  if is_embeddable:
+    template = 'search_embeddable.mako'
 
   return render(template, request, {
     'collection': collection,
@@ -86,6 +88,9 @@ def index(request, is_mobile=False):
 
 def index_m(request):
   return index(request, True)
+
+def index_embeddable(request):
+  return index(request, False, True)
 
 
 def new_search(request):

@@ -1592,7 +1592,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   var _docs = [];
                   var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
                   $.each(data.response.docs, function (index, item) {
-                    _docs.push(self._make_result_doc(item));
+                    _docs.push(self._make_result_doc(item, _mustacheTmpl));
                   });
                   self.results(_docs);
                 }
@@ -1632,7 +1632,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
   };
 
-  self._make_result_doc = function(item) {
+  self._make_result_doc = function(item, _mustacheTmpl) {
       var row = [];
       var leafletmap = {};
       var _externalLink = item.externalLink;
@@ -1675,7 +1675,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       if (_childDocuments) {
         var childRecords = [];
         $.each(_childDocuments, function (index, item) {
-          var record = self._make_result_doc(item);
+          var record = self._make_result_doc(item, _mustacheTmpl);
           $.each(item, function(key, val) {
             var _field = ko.mapping.fromJS({
                 key: key,
