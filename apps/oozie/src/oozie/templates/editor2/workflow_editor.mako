@@ -336,7 +336,7 @@ ${ workflow.render() }
           <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
           <div class="select-like">
             <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentsAutocompleteSource,
+              source: $root.documentChooser.documentsAutocompleteSource,
               minLength: 0,
               showOnFocus: true,
               blurOnEnter: true,
@@ -350,8 +350,8 @@ ${ workflow.render() }
                 <i class="fa fa-sort"></i>
               </span>
           </div>
-          <!-- ko if: $root.getDocumentById(type(), value()) -->
-            <!-- ko with: $root.getDocumentById(type(), value()) -->
+          <!-- ko if: $root.documentChooser.getDocumentById(type(), value()) -->
+            <!-- ko with: $root.documentChooser.getDocumentById(type(), value()) -->
               <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
@@ -535,6 +535,7 @@ ${ commonshare() | n,unicode }
 
 ${ dashboard.import_bindings() }
 
+<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 <script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>

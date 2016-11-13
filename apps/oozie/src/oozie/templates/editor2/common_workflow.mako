@@ -627,7 +627,7 @@
         <!-- ko if: associatedDocument -->
           <div class="select-like">
           <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentsAutocompleteSource,
+              source: $root.documentChooser.documentsAutocompleteSource,
               showOnFocus: true,
               blurOnEnter: true,
               type: associatedDocument().type,
