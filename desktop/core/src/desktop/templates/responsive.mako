@@ -258,9 +258,9 @@ ${ hueIcons.symbols() }
       [+]
     </div>
 
-    <div id="leftAssistContainer" class="assist-container left-panel" style="position: relative; padding-top: 10px;">
-      <a href="javascript:void(0);" style="z-index: 1000;" title="${_('Show Assist')}" class="pointer show-assist" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer hide-assist" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+    <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }">
+      <a href="javascript:void(0);" style="z-index: 1000;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <!-- ko if: leftAssistVisible -->
       <div class="assist" data-bind="component: {
           name: 'assist-panel',
@@ -282,11 +282,11 @@ ${ hueIcons.symbols() }
       <!-- /ko -->
     </div>
 
-    <div id="leftPanelResizer" class="resizer" data-bind="splitDraggable : {
+    <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {
       containerSelector: '.content-wrapper',
-      rightPanelSelector: '.page-content',
-      appName: 'hue',
-      leftPanelVisible: leftAssistVisible,
+      sidePanelSelector: '.left-panel',
+      sidePanelVisible: leftAssistVisible,
+      orientation: 'left',
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }"><div class="resize-bar">&nbsp;</div></div>
 
@@ -297,6 +297,19 @@ ${ hueIcons.symbols() }
       <i class="fa fa-spinner fa-spin"></i>
       <!-- /ko -->
       <div id="embeddable"></div>
+    </div>
+
+    <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
+      containerSelector: '.content-wrapper',
+      sidePanelSelector: '.right-panel',
+      sidePanelVisible: rightAssistVisible,
+      orientation: 'right',
+      onPosition: function() { huePubSub.publish('split.draggable.position') }
+    }"><div class="resize-bar">&nbsp;</div></div>
+
+    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
+      <a href="javascript:void(0);" style="z-index: 1000;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
     </div>
   </div>
 </div>
@@ -379,11 +392,13 @@ ${ assist.assistPanel() }
     });
   };
 
-  var LeftAssistViewModel = function () {
+  var SidePanelViewModel = function () {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
     self.leftAssistVisible = ko.observable();
+    self.rightAssistVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
+    self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
   };
 
   $(document).ready(function () {
@@ -397,9 +412,11 @@ ${ assist.assistPanel() }
     var opvm = new OnePageViewModel();
     ko.applyBindings(opvm, $('.page-content')[0]);
 
-    var leftAssistViewModel = new LeftAssistViewModel();
-    ko.applyBindings(leftAssistViewModel, $('#leftAssistContainer')[0]);
-    ko.applyBindings(leftAssistViewModel, $('#leftPanelResizer')[0]);
+    var sidePanelViewModel = new SidePanelViewModel();
+    ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
+    ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
+    ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
+    ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
 
     if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
       opvm.currentApp('editor');
