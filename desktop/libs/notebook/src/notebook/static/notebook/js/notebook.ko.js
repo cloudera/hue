@@ -431,7 +431,8 @@ var EditorViewModel = (function() {
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
-          self.statement_raw(data.statement); // why not picked up but 'aaaaaaa' ok?
+          self.statement_raw(data.statement);
+          self.ace().setValue(self.statement_raw(), 1);
         } else {
           self._ajaxError(data);
         }
