@@ -292,7 +292,10 @@ ${ hueIcons.symbols() }
 
 
     <div class="page-content">
-      <div data-bind='text: currentApp'></div>
+      Load 
+      <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |
+      <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a>
+
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
       <!-- /ko -->
