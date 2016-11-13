@@ -25,7 +25,7 @@
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
 <span id="editorComponents">
-${ editorComponents.includes() }
+${ editorComponents.includes(is_responsive=True) }
 
 <style type="text/css">
   .snippet {
@@ -36,8 +36,6 @@ ${ editorComponents.includes() }
 ${ editorComponents.topBar() }
 ${ editorComponents.commonHTML(with_assist=False) }
 
-${ assist.assistPanel() }
-${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ notebookKoComponents.snippetDbSelection() }

@@ -372,13 +372,18 @@ ${ assist.assistPanel() }
       if (typeof self.embeddable_cache[newVal] === 'undefined'){
         $.ajax({
           url: self.EMBEDDABLE_PAGE_URLS[newVal],
+          cache: false,
           beforeSend:function (xhr) {
             xhr.setRequestHeader('X-Requested-With', 'Hue');
           },
           dataType:'html',
           success:function (response) {
-            self.embeddable_cache[newVal] = response;
-            $('#embeddable').html(response);
+            // TODO: remove the next lines
+            // hack to avoid css caching for development
+            var r = $(response);
+            r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
+            self.embeddable_cache[newVal] = r;
+            $('#embeddable').html(r);
             self.isLoadingEmbeddable(false);
           }
         });

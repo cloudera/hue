@@ -27,8 +27,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
-<%def name="includes()">
+<%def name="includes(is_responsive=False)">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
+% if not is_responsive:
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
+% endif
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
@@ -42,22 +45,26 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 
-
+% if not is_responsive:
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
+% endif
+
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
+
 % if ENABLE_QUERY_SCHEDULING.get():
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 % endif
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
+
 <script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -75,7 +82,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
-<script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
 % endif
 
 %if ENABLE_QUERY_BUILDER.get():
@@ -1180,8 +1187,8 @@ ${ hueIcons.symbols() }
         <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() -->
           <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
         <!-- /ko -->
-        </br>
-        </br>
+        <br>
+        <br>
         <div id="schedulerEditor">
         </div>
       <!-- /ko -->
@@ -1586,11 +1593,11 @@ ${ hueIcons.symbols() }
       <!-- /ko -->
       <!-- ko if: errorDetail.errorString -->
         ${ _('Query is not compatible with Impala') }.
-        </br>
+        <br>
         <span style="font-weight: bold;"></span><span data-bind="text: errorDetail.errorString"></span>
       <!-- /ko -->
       <!-- ko if: clauseStatus.From -->
-        </br>
+        <br>
         <!-- ko if: clauseStatus.From.category -->
           <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.category"></span>
         <!-- /ko -->

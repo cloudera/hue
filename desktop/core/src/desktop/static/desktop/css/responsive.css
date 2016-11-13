@@ -496,3 +496,7 @@ h6 {
   overflow: hidden;
   background-color: #e5e5e5;
 }
+
+.page-content .navbar.navbar-inverse.navbar-fixed-top {
+  position: static;
+}
