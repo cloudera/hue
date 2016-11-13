@@ -86,27 +86,13 @@ var Node = function (node, vm) {
 
   self.associatedDocument = ko.observable();
 
-  function setAssociatedDocument(uuid) {
-    if (vm.documentStore[uuid]){
-      self.associatedDocument(vm.documentStore[uuid]);
-    }
-    $.get('/desktop/api2/doc/', {
-      uuid: uuid
-    }, function(data){
-      if (data && data.document){
-        self.associatedDocument(ko.mapping.fromJS(data.document));
-        vm.documentStore[uuid] = self.associatedDocument();
-      }
-    });
-  }
-
   if (node.properties.uuid){
-    setAssociatedDocument(node.properties.uuid);
+    vm.documentChooser.setAssociatedDocument(node.properties.uuid, self.associatedDocument);
   }
 
   if (self.properties.uuid){
     self.properties.uuid.subscribe(function(val){
-      setAssociatedDocument(val);
+      vm.documentChooser.setAssociatedDocument(val, self.associatedDocument);
     });
   }
 
@@ -536,51 +522,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow.loadNodes(workflow_json);
   };
 
-  self.documentStore = {};
-  self.documentsAutocompleteSource = function (request, callback) {
-    var TYPE_MAP = {
-      'hive': 'query-hive',
-      'impala': 'query-impala',
-      'java': 'query-java',
-      'spark': 'query-spark2',
-      'pig': 'query-pig',
-      'sqoop': 'query-sqoop1',
-      'distcp-doc': 'query-distcp',
-      'mapreduce-doc': 'query-mapreduce'
-    }
-    var type = 'query-hive';
-    if (this.options && typeof this.options.type === 'function') {
-      type = TYPE_MAP[this.options.type()] ? TYPE_MAP[this.options.type()] : this.options.type();
-    }
-    $.get('/desktop/api2/docs/', {
-      type: type,
-      text: request.term,
-      include_trashed: false,
-      limit: 100
-    }, function (data) {
-      if (data && data.documents) {
-        var docs = [];
-        if (data.documents.length > 0) {
-          $.each(data.documents, function (index, doc) {
-            docs.push({
-              data: {name: doc.name, type: doc.type, description: doc.description},
-              value: doc.uuid,
-              label: doc.name
-            });
-            self.documentStore[doc.uuid] = ko.mapping.fromJS(doc);
-          });
-        }
-        else {
-          docs.push({
-            data: {name: 'No matches found', description: ''},
-            label: 'No matches found',
-            value: ''
-          });
-        }
-        callback(docs);
-      }
-    });
-  };
+  self.documentChooser = new DocumentChooser();
 
   self.addActionProperties = ko.observableArray([]);
   self.addActionPropertiesFilledOut = ko.computed(function () {
@@ -606,11 +548,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
   self.history = ko.mapping.fromJS(history_json);
-
-  self.getDocumentById = function (type, uuid) {
-    var doc = self.documentStore[uuid];
-    return doc;
-  };
 
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
