@@ -34,7 +34,7 @@ var EditorViewModel = (function() {
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
-    self.size = ko.observable(typeof result.size != "undefined" && result.size != null ? result.size : {});
+    self.rows = ko.observable(typeof result.rows != "undefined" && result.rows != null ? result.rows : null);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
     self.statement_range = ko.observable(typeof result.statement_range != "undefined" && result.statement_range != null ? result.statement_range : {
@@ -172,7 +172,7 @@ var EditorViewModel = (function() {
       self.endTime(new Date());
       self.explanation('');
       self.logLines = 0;
-      self.size({});
+      self.rows(null);
     };
   };
 
@@ -1101,6 +1101,10 @@ var EditorViewModel = (function() {
         _tempData.push(row);
       });
 
+      if (self.result.rows() == null || (self.result.rows() + '').indexOf('+') != -1) {
+        self.result.rows(self.result.data().length + (result.has_more ? '+' : ''));
+      }
+
       self.result.images(typeof result.images != "undefined" && result.images != null ? result.images : []);
 
       $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
@@ -1155,7 +1159,9 @@ var EditorViewModel = (function() {
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         if (data.status == 0) {
-          self.result.size(data.result);
+          if (data.result.rows != null) {
+            self.result.rows(data.result.rows);
+          }
         } else if (data.status == 5) {
           // No supported yet for this snippet
         } else {
