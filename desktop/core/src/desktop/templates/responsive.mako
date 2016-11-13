@@ -327,6 +327,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 
+<script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
+
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
 <script src="${ static('desktop/js/jquery.selector.js') }"></script>
