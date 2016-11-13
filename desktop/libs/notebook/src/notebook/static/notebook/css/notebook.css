@@ -16,31 +16,6 @@
  limitations under the License.
 */
 
-html {
-  height: 100%;
-}
-body {
-  height:100%;
-  margin: 0;
-  padding: 0;
-  background-color: #FFF;
-  overflow-y: hidden;
-}
-
-.vertical-full {
-  height:100%;
-  padding-right: 1px;
-}
-
-.main-content {
-  height: auto;
-  width: 100%;
-  position: absolute;
-  top: 82px;
-  bottom: 0;
-  background-color: #FFF;
-}
-
 .snippet-move-placeholder {
   margin: 10px;
   height: 100px;
@@ -52,51 +27,6 @@ body {
   margin: 10px;
   background-color: #FFF;
   border: 1px solid #F1F1F1;
-}
-
-.panel-container {
-  position: relative;
-}
-
-.left-panel {
-  position: absolute;
-  height: 100%;
-  overflow: hidden;
-  outline: none !important;
-}
-
-.context-panel {
-  position: fixed;
-  background: #fff;
-  height: calc(100% - 70px);
-  top: 70px;
-  transition: all;
-  -webkit-transition-duration: .3s;
-  transition-duration: .3s;
-  z-index: 401;
-  overflow-y: auto;
-  padding: 10px 0;
-  width: 420px;
-  right: -440px;
-  box-shadow: 0 0 20px rgba(14, 18, 21, .38);
-  outline: none !important;
-}
-
-.context-panel.visible {
-  right: 0;
-}
-
-.context-panel .nav-tabs {
-  padding-left: 10px;
-}
-
-.context-panel .tab-content {
-  padding: 12px;
-  min-height: calc(100% - 90px);
-}
-
-.context-panel .tab-pane {
-  height: 100%;
 }
 
 .resizer {
@@ -111,13 +41,6 @@ body {
   height: 100%;
   width: 2px;
   background-color: #F1F1F1;
-}
-
-.content-panel {
-  position: absolute;
-  height: 100%;
-  overflow: auto;
-  outline: none !important;
 }
 
 .question {
