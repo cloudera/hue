@@ -437,6 +437,7 @@ var EditorViewModel = (function() {
         }
       });
     });
+    self.associatedDocument = ko.observable();
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
@@ -2062,6 +2063,7 @@ var EditorViewModel = (function() {
     self.successUrl = ko.observable(options.success_url);
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
+    self.documentChooser = new DocumentChooser();
 
     self.CoordinatorEditorViewModel = CoordinatorEditorViewModel;
     self.RunningCoordinatorModel = RunningCoordinatorModel;
