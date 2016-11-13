@@ -88,6 +88,52 @@ ${ hueIcons.symbols() }
       </span>
       </a>
       <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+      <div class="compose-action btn-group">
+        <button class="btn">${ _('Compose') }</button>
+        <button class="btn dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          % if 'beeswax' in apps:
+            <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+          % endif
+          % if 'impala' in apps: ## impala requires beeswax anyway
+            <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+          % endif
+          % if 'search' in apps:
+            <li><a href="${ url('search:new_search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
+          % endif
+          % if 'oozie' in apps:
+          % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+            <li class="dropdown-submenu">
+              <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflows') }</a>
+              <ul class="dropdown-menu">
+                <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
+                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+              </ul>
+            </li>
+          % endif
+          % endif
+          % if len(interpreters) > 0:
+          <li class="divider"></li>
+          <li class="dropdown-submenu">
+            <a title="${_('More...')}" rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
+            <ul class="dropdown-menu">
+              % for interpreter in interpreters:
+                % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
+                <li><a href="${ url('notebook:editor') }?type=${ interpreter['type'] }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                % endif
+              % endfor
+              % if user.is_superuser:
+                <li class="divider"></li>
+                <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
+              % endif
+            </ul>
+          </li>
+          % endif
+        </ul>
+      </div>
     </div>
     <div class="top-nav-middle">
       <div class="search-container">
