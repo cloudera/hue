@@ -1966,7 +1966,12 @@ from metadata.conf import has_navigator
         var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels[0].type);
 
         var lastFoundPanel = self.availablePanels.filter(function (panel) { return panel.type === lastOpenPanelType });
+        var dbPanel = self.availablePanels.filter(function (panel) { return panel.type === 'sql' });
+        if (lastFoundPanel.length === 1) {
+          dbPanel[0].panelData.init(); // always forces the db panel to load
+        }
         self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels[0]);
+
         self.visiblePanel().panelData.init();
 
         self.visiblePanel.subscribe(function(newValue) {
