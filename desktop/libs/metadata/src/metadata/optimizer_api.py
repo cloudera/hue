@@ -204,13 +204,13 @@ def popular_values(request):
 
 @require_POST
 @error_handler
-def popular_joins(request):
+def top_joins(request):
   response = {'status': -1}
 
-  database_name = request.POST.get('databaseName')
+  db_tables = json.loads(request.POST.get('dbTables'), '[]')
 
   api = OptimizerApi()
-  data = api.popular_joins(database_name=database_name)
+  data = api.top_joins(db_tables=db_tables)
 
   if data['status'] == 'success':
     response['status'] = 0

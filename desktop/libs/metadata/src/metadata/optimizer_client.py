@@ -215,12 +215,13 @@ class OptimizerApi(object):
         '--table-name', table_name.lower()
     ])
 
-  def popular_joins(self, database_name=None):
+  def top_joins(self, db_tables=None):
     args = [
         '--tenant', self._product_name,
     ]
-    if database_name:
-      args += ['--db-name', database_name.lower()]
+    if db_tables:
+      args += ['--db-table-list']
+      args.extend([db_table.lower() for db_table in db_tables])
 
     return self._exec('get-top-joins', args)
 
