@@ -156,6 +156,29 @@ ${ hueIcons.symbols() }
       </div>
     </div>
     <div class="top-nav-right">
+      % if user.is_authenticated() and section != 'login':
+
+        <div class="compose-action btn-group">
+          <button class="btn">${user.username}</button>
+          % if user.is_superuser:
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" >
+              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+              <li><a href="${ url('useradmin.views.list_permissions') }"><i class="fa fa-key"></i> ${_('Set Permissions')}</a></li>
+              <li><a href="/about">${_('Help')}</a></li>
+              <li><a href="/about">${_('About Hue')}</a></li>
+              <li class="divider"></li>
+              <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            </ul>
+          % endif
+        </div>
+
+        <div class="compose-action btn-group">
+          <button class="btn" title="${_('Running jobs and workflows')}" >${ _('Jobs') } <div class="jobs-badge">20</div></button>
+        </div>
+      % endif
     </div>
   </div>
 

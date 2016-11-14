@@ -84,11 +84,26 @@ body {
   flex: 0 0 300px;
 }
 
+
+.top-nav-right .compose-action {
+  float: right;
+  margin-right: 15px;
+}
+
+.top-nav-right .dropdown-menu {
+  margin-left: -80px;
+}
+
 .compose-action {
   float: right;
   margin-top: 10px;
   z-index: 999999;
   line-height: 20px;
+  border-radius: 4px;
+}
+
+.compose-action:hover .btn {
+  background-color: rgba(240, 240, 240, 0.4);
 }
 
 .compose-action .btn {
@@ -103,15 +118,39 @@ body {
   -mos-transition-duration: 0.2s;
   -ms-transition-duration: 0.2s;
   transition-duration: 0.2s;
-  -webkit-transition-property: background-color, color, opacity;
-  -moz-transition-property: background-color, color, opacity;
-  -ms-transition-property: background-color, color, opacity;
-  transition-property: background-color, color, opacity;
+  -webkit-transition-property: background-color, color;
+  -moz-transition-property: background-color, color;
+  -ms-transition-property: background-color, color;
+  transition-property: background-color, color;
 }
 
 .compose-action .btn:hover {
   background-color: rgba(240, 240, 240, 0.8);
   color: #338BB8;
+}
+
+.jobs-badge {
+  color: #338BB8;
+  background-color: #f9f9f9;
+  float: right;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-size: 12px;
+
+  -webkit-transition-duration: 0.2s;
+  -mos-transition-duration: 0.2s;
+  -ms-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-property: background-color, color;
+  -moz-transition-property: background-color, color;
+  -ms-transition-property: background-color, color;
+  transition-property: background-color, color;
+}
+
+.compose-action .btn:hover .jobs-badge {
+  background-color: #338BB8;
+  color: rgba(240, 240, 240, 0.8);
 }
 
 .compose-action .btn:first-child:active,
@@ -122,9 +161,12 @@ body {
   box-shadow: none;
 }
 
-.compose-action .btn:nth-child(2) {
-  margin-left: 0;
+.compose-action .btn:last-of-type:not(:first-child) {
   padding-left: 1px;
+}
+
+.compose-action .btn:last-of-type {
+  margin-left: 0;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
   box-shadow: none;
