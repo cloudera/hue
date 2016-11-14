@@ -587,10 +587,9 @@ em {
 
 .big-counter {
   font-size: 4em;
-  padding: .5em;
-  padding-left: 0;
   letter-spacing: .1em;
   line-height: 1.45;
+  text-align: center;
 }
 
 .fields-list {
