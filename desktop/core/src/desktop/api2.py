@@ -118,7 +118,7 @@ def search_documents(request):
   return JsonResponse(response)
 
 
-def _search(user, perms='both', include_history=False, include_trashed=False, include_managed=False, search_text=None):
+def _search(user, perms='both', include_history=False, include_trashed=False, include_managed=False, search_text=None, limit=25):
   response = {
     'documents': []
   }
@@ -137,7 +137,6 @@ def _search(user, perms='both', include_history=False, include_trashed=False, in
   flatten = True
 
   page = 1
-  limit = 25
 
   # Refine results
   response.update(__filter_documents(type_filters, sort, search_text, queryset=documents, flatten=flatten))
@@ -554,7 +553,8 @@ def search_entities_interactive(request):
 
   if 'documents' in sources:
     search_text = json.loads(request.POST.get('query_s', ''))
-    entities = _search(user=request.user, search_text=search_text)
+    limit = int(request.POST.get('limit', 25))
+    entities = _search(user=request.user, search_text=search_text, limit=limit)
     response = {
       'results': [{'hue_name': e.name, 'hue_description': e.description, 'type': 'HUE', 'originalName': e.name} for e in entities['documents']],
       'count': len(entities['documents']),
