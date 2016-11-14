@@ -84,17 +84,13 @@ var Node = function (node, vm) {
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
+  self.associatedDocumentLoading = ko.observable(true);
   self.associatedDocument = ko.observable();
 
-  if (node.properties.uuid){
-    vm.documentChooser.setAssociatedDocument(node.properties.uuid, self.associatedDocument);
-  }
-
-  if (self.properties.uuid){
-    self.properties.uuid.subscribe(function(val){
-      vm.documentChooser.setAssociatedDocument(val, self.associatedDocument);
-    });
-  }
+  self.associatedDocumentUuid = ko.observable(typeof node.properties.uuid != "undefined" && node.properties.uuid != null ? node.properties.uuid : null);
+  self.associatedDocumentUuid.subscribe(function(val){
+    self.properties.uuid(val);
+  });
 
   self.actionParameters = ko.observableArray([]);
   self.actionParametersUI = ko.computed(function () {
@@ -197,7 +193,9 @@ var Workflow = function (vm, workflow) {
 
   self.tracker = new ChangeTracker(self, ko, {
     ignore: [
-      "associatedDocument"
+      "associatedDocument",
+      "associatedDocumentUuid",
+      "associatedDocumentLoading"
     ]
   }); // from ko.common-dashboard.js
 
@@ -522,7 +520,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow.loadNodes(workflow_json);
   };
 
-  self.documentChooser = new DocumentChooser();
+  self.tempDocument = ko.observable();
 
   self.addActionProperties = ko.observableArray([]);
   self.addActionPropertiesFilledOut = ko.computed(function () {

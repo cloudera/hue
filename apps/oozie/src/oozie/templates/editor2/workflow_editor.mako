@@ -334,29 +334,14 @@ ${ workflow.render() }
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
           <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
-          <div class="select-like">
-            <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentChooser.documentsAutocompleteSource,
-              minLength: 0,
-              showOnFocus: true,
-              blurOnEnter: true,
-              type: type,
-              select: function (event, ui) { ko.dataFor(event.target).value(ui.item.value); this.value = ui.item.label; $(event.target).data('prevLabel', ui.item.label); return false;},
-              focus: function (event, ui) { this.value = ui.item.label; return false;},
-              change: function (event, ui) { if(!ui.item){ ko.dataFor(event.target).value() != '' ? this.value = $(event.target).data('prevLabel') : this.value = ''; }},
-              itemTemplate: 'doc-search-autocomp-item'
-            }, valueUpdate: 'afterkeydown'">
-              <span class="inactive-action">
-                <i class="fa fa-sort"></i>
-              </span>
-          </div>
-          <!-- ko if: $root.documentChooser.getDocumentById(type(), value()) -->
-            <!-- ko with: $root.documentChooser.getDocumentById(type(), value()) -->
-              <a href="#" data-bind="attr: { href: $data.absoluteUrl() }" target="_blank" title="${ _('Open') }">
+            <div class="selectize-wrapper" style="width: 300px;">
+              <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { value: value, document: $root.tempDocument, type: type }"></select>
+            </div>
+            <!-- ko if: $root.tempDocument -->
+              <a href="#" data-bind="attr: { href: $root.tempDocument().absoluteUrl }" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
-          <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko if: type() == 'distcp' -->
