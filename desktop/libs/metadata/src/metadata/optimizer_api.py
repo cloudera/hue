@@ -183,7 +183,7 @@ def similar_queries(request):
 
 @require_POST
 @error_handler
-def popular_values(request):
+def top_filters(request):
   response = {'status': -1}
 
   database_name = request.POST.get('databaseName')
@@ -191,7 +191,7 @@ def popular_values(request):
   column_name = request.POST.get('columnName') # Unsused
 
   api = OptimizerApi()
-  data = api.popular_filter_values(database_name=database_name, table_name=table_name, column_name=column_name)
+  data = api.top_filters(database_name=database_name, table_name=table_name, column_name=column_name)
 
   if data['status'] == 'success':
     response['status'] = 0
@@ -211,6 +211,25 @@ def top_joins(request):
 
   api = OptimizerApi()
   data = api.top_joins(db_tables=db_tables)
+
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['values'] = data['results']
+  else:
+    response['message'] = 'Optimizer: %s' % data
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def top_aggs(request):
+  response = {'status': -1}
+
+  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+
+  api = OptimizerApi()
+  data = api.top_aggs(db_tables=db_tables)
 
   if data['status'] == 'success':
     response['status'] = 0

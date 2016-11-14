@@ -208,8 +208,15 @@ class OptimizerApi(object):
         '--query', query
     ])
 
-  def popular_filter_values(self, database_name, table_name, column_name=None):
+  def top_filters(self, database_name, table_name, column_name=None):
     return self._exec('get-top-filters', [
+        '--tenant', self._product_name,
+        '--db-name', database_name.lower(),
+        '--table-name', table_name.lower()
+    ])
+
+  def top_aggs(self, database_name, table_name, column_name=None):
+    return self._exec('get-top-aggs', [
         '--tenant', self._product_name,
         '--db-name', database_name.lower(),
         '--table-name', table_name.lower()
