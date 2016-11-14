@@ -1627,8 +1627,11 @@ ${ hueIcons.symbols() }
 
       <!-- ko if: statementType() == 'document' -->
         <div class="margin-top-10">
-          <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Document')}</label>
-          <div class="selectize-wrapper" style="width: 300px;">
+          <!-- ko if: associatedDocumentLoading -->
+          <i class="fa fa-spinner fa-spin muted"></i>
+          <!-- /ko -->
+          <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
+          <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
             <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument }"></select>
           </div>
           <!-- ko if: associatedDocument() -->
@@ -1657,7 +1660,7 @@ ${ hueIcons.symbols() }
           maxLines: $root.editorMode() ? null : 25,
           minLines: $root.editorMode() ? null : 3
         }
-      }"></div>
+      }, style: {opacity: statementType() !== 'text' ? '0.75' : '1'}"></div>
       <ul class="table-drop-menu hue-context-menu">
         <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
         <li class="divider"></li>
