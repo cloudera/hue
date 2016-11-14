@@ -2640,8 +2640,8 @@ var HIT_OPTIONS = [
   { value: "sum", label: "${ _('Sum') }" },
   { value: "min", label: "${ _('Min') }" },
   { value: "max", label: "${ _('Max') }" },
-  { value: "sumsq", label: "${ _('Sum of square') }" },
-  { value: "median", label: "${ _('Median') }" }
+  { value: "median", label: "${ _('Median') }" },
+  { value: "percentile", label: "${ _('Percentiles') }" },
 ];
 
 function getHitOption(value){
