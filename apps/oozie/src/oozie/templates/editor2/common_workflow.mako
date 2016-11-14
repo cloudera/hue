@@ -30,7 +30,8 @@
 
 
 <%def name="render()">
-<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 
 <script type="text/html" id="doc-search-autocomp-item">
   <a>
@@ -618,8 +619,11 @@
 <script type="text/html" id="common-document-widget">
   <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko if: associatedDocumentLoading -->
+        <i class="fa fa-spinner fa-spin muted"></i>
+      <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <a data-bind="attr: { href: absoluteUrl }" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -627,24 +631,11 @@
 
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+        <div class="selectize-wrapper" style="width: 300px;">
+          <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument }"></select>
+        </div>
         <!-- ko if: associatedDocument -->
-          <div class="select-like">
-          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentChooser.documentsAutocompleteSource,
-              showOnFocus: true,
-              blurOnEnter: true,
-              type: associatedDocument().type,
-              create: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
-              select: function (event, ui) { ko.dataFor(event.target).properties.uuid(ui.item.value); this.value = ui.item.label; return false;},
-              focus: function (event, ui) { this.value = ui.item.label; return false;},
-              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
-              itemTemplate: 'doc-search-autocomp-item'
-            }, valueUpdate: 'afterkeydown'">
-            <span class="inactive-action">
-              <i class="fa fa-sort"></i>
-            </span>
-          </div>
-          <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl }" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
           <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>

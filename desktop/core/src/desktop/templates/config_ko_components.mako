@@ -63,17 +63,6 @@ from desktop.views import _ko
       color: #888;
     }
 
-    .selectize-wrapper {
-      display: inline-block;
-      float:left;
-      margin-right: 4px;
-    }
-
-    .selectize-input {
-      padding-top: 6px !important;
-      padding-bottom: 5px !important;
-    }
-
     .config-actions {
       display: inline-block;
       font-size: 13px;

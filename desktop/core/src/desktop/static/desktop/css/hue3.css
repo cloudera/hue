@@ -3303,3 +3303,18 @@ input[type='password']::-ms-reveal {
 .search-container > a > i {
   margin-left: 8px;
 }
+
+.selectize-wrapper {
+  display: inline-block;
+  float:left;
+  margin-right: 4px;
+}
+
+.selectize-input {
+  padding-top: 6px !important;
+  padding-bottom: 5px !important;
+}
+
+.selectize-dropdown {
+  z-index: 10000!important;
+}

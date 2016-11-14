@@ -4795,6 +4795,21 @@
   ko.bindingHandlers.documentChooser = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
+      var TYPE_MAP = {
+        'hive': 'query-hive',
+        'impala': 'query-impala',
+        'java': 'query-java',
+        'spark': 'query-spark2',
+        'pig': 'query-pig',
+        'sqoop': 'query-sqoop1',
+        'distcp-doc': 'query-distcp',
+        'mapreduce-doc': 'query-mapreduce'
+      }
+      var type = 'query-hive';
+      if (options.type) {
+        type = TYPE_MAP[options.type()] ? TYPE_MAP[options.type()] : options.type();
+      }
+      var firstLoad = false;
       $(element).selectize({
         valueField: 'uuid',
         labelField: 'name',
@@ -4802,6 +4817,7 @@
         options: [],
         create: false,
         preload: true,
+        dropdownParent: 'body',
         render: {
           option: function (item, escape) {
             return '<div>' +
@@ -4811,10 +4827,13 @@
           }
         },
         load: function (query, callback) {
+          if (query === '' && options.value && !firstLoad){
+            firstLoad = true;
+          }
           $.ajax({
             url: '/desktop/api2/docs/',
             data: {
-              type: 'query-hive',
+              type: type,
               text: query,
               include_trashed: false,
               limit: 100
@@ -4846,6 +4865,7 @@
         },
       });
     },
+
     update: function (element, valueAccessor) {
       var options = valueAccessor();
       if (options.value) {
