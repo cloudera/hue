@@ -3784,6 +3784,9 @@
       var snippet = options.snippet;
       if (snippet.ace()) {
         var editor = snippet.ace();
+        if (typeof options.readOnly !== 'undefined'){
+          editor.setReadOnly(options.readOnly);
+        }
         var range = options.highlightedRange ? options.highlightedRange() : null;
         editor.session.setMode(snippet.getAceMode());
         if (range && JSON.stringify(range.start) !== JSON.stringify(range.end)) {

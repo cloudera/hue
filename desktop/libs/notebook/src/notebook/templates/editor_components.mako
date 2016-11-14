@@ -1674,6 +1674,7 @@ ${ hueIcons.symbols() }
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
+        readOnly: statementType() !== 'text',
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
