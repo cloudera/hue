@@ -167,8 +167,8 @@ ${ hueIcons.symbols() }
             <ul class="dropdown-menu" >
               <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
               <li><a href="${ url('useradmin.views.list_permissions') }"><i class="fa fa-key"></i> ${_('Set Permissions')}</a></li>
-              <li><a href="/about">${_('Help')}</a></li>
-              <li><a href="/about">${_('About Hue')}</a></li>
+              <li><a href="/about"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+              <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
               <li class="divider"></li>
               <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
             </ul>
