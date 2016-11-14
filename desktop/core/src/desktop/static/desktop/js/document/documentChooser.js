@@ -35,6 +35,7 @@ var DocumentChooser = (function () {
       if (this.options && typeof this.options.type === 'function') {
         type = TYPE_MAP[this.options.type()] ? TYPE_MAP[this.options.type()] : this.options.type();
       }
+      // Todo: multi types
 
       $.get('/desktop/api2/docs/', {
         type: type,

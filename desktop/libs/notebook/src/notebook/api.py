@@ -746,10 +746,10 @@ def get_external_statement(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   if snippet.get('statementType') == 'file':
-    snippet['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
+    response['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
   elif snippet.get('statementType') == 'document':
     notebook = Notebook(Document2.objects.get_by_uuid(user=request.user, uuid=snippet['associatedDocumentUuid'], perm_type='read'))
-    snippet['statement'] = notebook.get_str()
+    response['statement'] = notebook.get_str()
 
   response['status'] = 0
 
