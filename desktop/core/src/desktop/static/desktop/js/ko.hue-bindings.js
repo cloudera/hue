@@ -4792,4 +4792,66 @@
     }
   };
 
+  ko.bindingHandlers.documentChooser = {
+    init: function (element, valueAccessor) {
+      var options = valueAccessor();
+      $(element).selectize({
+        valueField: 'uuid',
+        labelField: 'name',
+        searchField: 'name',
+        options: [],
+        create: false,
+        preload: true,
+        render: {
+          option: function (item, escape) {
+            return '<div>' +
+              '<strong>' + escape(item.name) + '</strong><br>' +
+              '<span class="muted">' + escape(item.description) + '</span>' +
+              '</div>';
+          }
+        },
+        load: function (query, callback) {
+          $.ajax({
+            url: '/desktop/api2/docs/',
+            data: {
+              type: 'query-hive',
+              text: query,
+              include_trashed: false,
+              limit: 100
+            },
+            type: 'GET',
+            error: function () {
+              callback();
+            },
+            success: function (res) {
+              callback(res.documents);
+            }
+          });
+        },
+        onChange: function (val) {
+          if (options.value) {
+            options.value(val);
+          }
+          if (options.document) {
+            options.document(this.options[val]);
+          }
+        },
+        onLoad: function () {
+          if (options.value) {
+            this.setValue(options.value());
+          }
+          if (options.loading) {
+            options.loading(false);
+          }
+        },
+      });
+    },
+    update: function (element, valueAccessor) {
+      var options = valueAccessor();
+      if (options.value) {
+        element.selectize.setValue(options.value());
+      }
+    }
+  }
+
 })();

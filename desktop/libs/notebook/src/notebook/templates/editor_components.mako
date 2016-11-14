@@ -79,7 +79,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
-<script src="${ static('desktop/js/document/documentChooser.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():
 
@@ -1627,47 +1626,24 @@ ${ hueIcons.symbols() }
       <!-- /ko -->
 
       <!-- ko if: statementType() == 'document' -->
-        <div class="control-group">
-          <label class="control-label">${_('Document')}</label>
-          <div class="controls">
-
-          <div class="select-like">
-          <input class="input-xlarge" placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentChooser.documentsAutocompleteSource,
-              showOnFocus: true,
-              blurOnEnter: true,
-              type: 'query-hive',
-              create: function (event, ui) {
-                if (associatedDocument()) {
-                  this.value = associatedDocument().name();
-                }
-                return false;
-               },
-              select: function (event, ui) { associatedDocumentUuid(ui.item.value); this.value = ui.item.label; return false;},
-              focus: function (event, ui) { this.value = ui.item.label; return false; },
-              change: function (event, ui) {
-                if (associatedDocument()) {
-                  this.value = associatedDocument().name();
-                }
-                return false;
-              },
-              itemTemplate: 'doc-search-autocomp-item'
-            }, valueUpdate: 'afterkeydown'">
-            <span class="inactive-action">
-              <i class="fa fa-sort"></i>
-            </span>
+        <div class="margin-top-10">
+          <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Document')}</label>
+          <div class="selectize-wrapper" style="width: 300px;">
+            <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument }"></select>
           </div>
           <!-- ko if: associatedDocument() -->
-            <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
-            <a data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open in new tab') }">
-              <i class="fa fa-external-link-square"></i>
-            </a>
+            <div class="pull-left" style="margin-top: 4px">
+              <a data-bind="attr: { href: associatedDocument().absoluteUrl }" target="_blank" title="${ _('Open in new tab') }">
+                <i class="fa fa-external-link-square"></i>
+              </a>
+              <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
+            </div>
           <!-- /ko -->
-          </div>
-      </div>
+        </div>
+        <div class="clearfix margin-bottom-20"></div>
       <!-- /ko -->
 
-      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+      <div class="ace-editor" data-bind="visible: statementType() !== 'document' || statementType() === 'document' && !associatedDocumentLoading(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
