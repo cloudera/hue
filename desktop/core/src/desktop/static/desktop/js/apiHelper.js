@@ -1393,15 +1393,25 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.globalSearchAutocomplete = function (options) {
     var self = this;
-    $.post('/desktop/api/search/entities_interactive', {
-      query_s: ko.mapping.toJSON(options.query),
-      limit: 10,
-      sources: '["sql"]' // TODO: Add all global search types
-    }).done(function (data) {
-      if (data.status === 0 && !self.successResponseIsError(data)) {
-        options.successCallback(data);
+
+    $.when.apply($, [
+      $.post('/desktop/api/search/entities_interactive', {
+        query_s: ko.mapping.toJSON(options.query),
+        limit: 5,
+        sources: '["*"]'
+      }),
+      $.post('/desktop/api/search/entities_interactive', {
+          query_s: ko.mapping.toJSON(options.query),
+          limit: 5,
+          sources: '["documents"]'
+        })
+      ]
+    ).done(function (metadata, documents) {
+      if (metadata[0].status === 0 && !self.successResponseIsError(metadata[0])) {
+    	metadata[0].resultsHuedocuments = documents[0].results;
+        options.successCallback(metadata[0]);
       } else {
-        self.assistErrorCallback(options)(data);
+        self.assistErrorCallback(options)(metadata);
       }
     }).fail(self.assistErrorCallback(options));
   };

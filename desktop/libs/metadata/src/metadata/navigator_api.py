@@ -115,7 +115,6 @@ def search_entities_interactive(request):
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
-
   f = {
       "outputFormat" : {
         "type" : "dynamic"

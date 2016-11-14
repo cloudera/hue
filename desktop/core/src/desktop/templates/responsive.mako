@@ -453,6 +453,16 @@ ${ assist.assistPanel() }
             successCallback: function (data) {
               var values = [];
               var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
+
+              if (typeof data.resultsHuedocuments !== 'undefined') {
+                data.resultsHuedocuments.forEach(function (result) {
+                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                });
+              }
+              if (values.length > 0) {
+                values.push({ divider: true });
+              }
+
               if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
                 var facetInQuery = facetMatch[1];
                 if (typeof data.facets[facetInQuery] !== 'undefined') {
