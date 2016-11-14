@@ -1639,23 +1639,15 @@ ${ hueIcons.symbols() }
               type: 'query-hive',
               create: function (event, ui) {
                 if (associatedDocument()) {
-                  this.value = ko.dataFor(event.target).associatedDocument().name();
-                } else if (associatedDocumentUuid()) {
-      $.get('/desktop/api2/doc/', {
-        uuid: associatedDocumentUuid()
-      }, function(data){
-        if (data && data.document){
-          this.value = data.document.name;
-        }
-      });
+                  this.value = associatedDocument().name();
                 }
                 return false;
                },
-              select: function (event, ui) { ko.dataFor(event.target).associatedDocumentUuid(ui.item.value); this.value = ui.item.label; return false;},
+              select: function (event, ui) { associatedDocumentUuid(ui.item.value); this.value = ui.item.label; return false;},
               focus: function (event, ui) { this.value = ui.item.label; return false; },
               change: function (event, ui) {
                 if (associatedDocument()) {
-                  this.value = ko.dataFor(event.target).associatedDocument().name();
+                  this.value = associatedDocument().name();
                 }
                 return false;
               },

@@ -426,20 +426,21 @@ var EditorViewModel = (function() {
     }
     self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
     self.statementPath.subscribe(function(newVal) {
-      if (self.statementType() == 'file') { //aaaa
-        $.post("/notebook/api/get_external_statement", {
-          notebook: ko.mapping.toJSON(notebook.getContext()),
-          snippet: ko.mapping.toJSON(self.getContext())
-        }, function(data) {
-          if (data.status == 0) {
-            self.statement_raw(data.statement);
-            self.ace().setValue(self.statement_raw(), 1);
-          } else {
-            self._ajaxError(data);
-          }
-        });
-      }
+      self.getExternalStatement();
     });
+    self.getExternalStatement = function() {
+      $.post("/notebook/api/get_external_statement", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function(data) {
+        if (data.status == 0) {
+          self.statement_raw(data.statement);
+          self.ace().setValue(self.statement_raw(), 1);
+        } else {
+          self._ajaxError(data);
+        }
+      });
+    }
     self.associatedDocument = ko.observable();
     self.associatedDocumentUuid = ko.observable(typeof snippet.associatedDocumentUuid != "undefined" && snippet.associatedDocumentUuid != null ? snippet.associatedDocumentUuid : null);
     if (self.associatedDocumentUuid()){
@@ -447,6 +448,7 @@ var EditorViewModel = (function() {
     }
     self.associatedDocumentUuid.subscribe(function(val){
       vm.documentChooser.setAssociatedDocument(val, self.associatedDocument);
+      self.getExternalStatement();
     });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
@@ -551,7 +553,7 @@ var EditorViewModel = (function() {
     if (vm.isOptimizerEnabled()) {
       self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
       self.delayedStatement.subscribe(function (val) {
-        self.getComplexity();
+        //self.getComplexity();
         self.hasSuggestion(false);
       }, self);
     }
