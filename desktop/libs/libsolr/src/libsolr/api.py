@@ -610,7 +610,7 @@ class SolrApi(object):
         'aggregate': facet['properties']['aggregate'] if 'properties' in facet else facet['aggregate']
     }
 
-    if props['aggregate'] == 'median':
+    if props['aggregate'] == 'percentile':
       return 'percentile(%(field)s,50)' % props
     else:
       return '%(aggregate)s(%(field)s)' % props
