@@ -103,7 +103,7 @@ body {
 }
 
 .compose-action:hover .btn {
-  background-color: rgba(240, 240, 240, 0.4);
+  background-color: rgba(240, 240, 240, 0.6);
 }
 
 .compose-action .btn {
@@ -125,7 +125,7 @@ body {
 }
 
 .compose-action .btn:hover {
-  background-color: rgba(240, 240, 240, 0.8);
+  background-color: rgba(240, 240, 240, 0.92);
   color: #338BB8;
 }
 
@@ -150,7 +150,7 @@ body {
 
 .compose-action .btn:hover .jobs-badge {
   background-color: #338BB8;
-  color: rgba(240, 240, 240, 0.8);
+  color: rgba(240, 240, 240, 0.92);
 }
 
 .compose-action .btn:first-child:active,
