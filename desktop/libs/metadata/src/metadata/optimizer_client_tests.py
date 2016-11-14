@@ -197,6 +197,18 @@ class TestOptimizerApi(object):
     assert_true('columns' in resp['results'][0], resp)
 
 
+  def test_top_aggs(self):
+    resp = self.api.top_aggs(db_tables='db1.Part')
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('tables' in resp['results'][0], resp)
+    assert_true('queryIds' in resp['results'][0], resp)
+    assert_true('totalTableCount' in resp['results'][0], resp)
+    assert_true('totalQueryCount' in resp['results'][0], resp)
+    assert_true('type' in resp['results'][0], resp)
+    assert_true('columns' in resp['results'][0], resp)
+
+
   def test_similar_queries(self):
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'

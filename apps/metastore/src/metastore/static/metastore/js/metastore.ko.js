@@ -150,7 +150,7 @@ var MetastoreViewModel = (function () {
             $(document).trigger("error", xhr.responseText);
           });
 
-          $.post('/metadata/api/optimizer_api/top_tables', {
+          $.post('/metadata/api/optimizer/top_tables', {
             database: self.name
           }, function(data){
             if (data && data.status == 0) {
@@ -485,7 +485,7 @@ var MetastoreViewModel = (function () {
               });
             }
             if (self.optimizerEnabled) {
-              $.post('/metadata/api/optimizer_api/table_details', {
+              $.post('/metadata/api/optimizer/table_details', {
                 databaseName: self.database.name,
                 tableName: self.name
               }, function(data){
