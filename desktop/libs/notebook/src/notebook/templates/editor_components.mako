@@ -1612,17 +1612,18 @@ ${ hueIcons.symbols() }
 
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
       <!-- ko if: statementType() == 'file' -->
-        <div class="control-group">
-          <label class="control-label">${_('Query File')}</label>
-          <div class="controls">
-            <input type="text" class="input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
-            <!-- ko if: statementPath() -->
-              <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
-                <i class="fa fa-external-link-square"></i>
-              </a>
-            <!-- /ko -->
+        <div class="margin-top-10">
+          <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
+          <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
+          <!-- ko if: statementPath() -->
+          <div class="pull-left" style="margin-top: 4px">
+            <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
+              <i class="fa fa-external-link-square"></i>
+            </a>
           </div>
-      </div>
+          <!-- /ko -->
+        </div>
+        <div class="clearfix margin-bottom-20"></div>
       <!-- /ko -->
 
       <!-- ko if: statementType() == 'document' -->
@@ -1660,7 +1661,7 @@ ${ hueIcons.symbols() }
           maxLines: $root.editorMode() ? null : 25,
           minLines: $root.editorMode() ? null : 3
         }
-      }, style: {opacity: statementType() !== 'text' ? '0.75' : '1'}"></div>
+      }, style: {opacity: statementType() !== 'text' ? '0.75' : '1', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
       <ul class="table-drop-menu hue-context-menu">
         <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
         <li class="divider"></li>
