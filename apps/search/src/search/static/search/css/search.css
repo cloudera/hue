@@ -590,6 +590,8 @@ em {
   letter-spacing: .1em;
   line-height: 1.45;
   text-align: center;
+  width: 100%;
+  display: table;
 }
 
 .fields-list {
