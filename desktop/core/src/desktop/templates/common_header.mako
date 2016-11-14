@@ -412,8 +412,8 @@ if USE_NEW_EDITOR.get():
       });
 
       window.hueDebug = {
-        viewModel: function () {
-          return ko.dataFor(document.body);
+        viewModel: function (element) {
+          return ko.dataFor(element || document.body);
         }
       }
     });
