@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import logging
-import json
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
@@ -186,8 +185,8 @@ class TestOptimizerApi(object):
     assert_true('popularValues' in resp, resp)
 
 
-  def test_popular_joins(self):
-    resp = self.api.popular_joins(database_name='db1')
+  def test_top_joins(self):
+    resp = self.api.top_joins(db_tables='db1.Part')
 
     assert_equal('success', resp['status'], resp)
     assert_true('tables' in resp['results'][0], resp)
