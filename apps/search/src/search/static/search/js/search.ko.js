@@ -347,10 +347,11 @@ var Query = function (vm, query) {
 };
 
 
-var FieldAnalysis = function (vm, field_name) {
+var FieldAnalysis = function (vm, fieldName, fieldType) {
   var self = this;
 
-  self.name = ko.observable(field_name);
+  self.name = ko.observable(fieldName);
+  self.type = ko.observable(fieldType);
 
   self.isLoading = ko.observable(true);
 
@@ -1824,12 +1825,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
-  self.showFieldAnalysis = function(vm, e) {
+  self.showFieldAnalysis = function(data, e) {
     if (self.fieldAnalysesName()) {
       var analyse = self.getFieldAnalysis();
 
       if (analyse == null) {
-        analyse = new FieldAnalysis(self, self.fieldAnalysesName());
+        analyse = new FieldAnalysis(self, self.fieldAnalysesName(), data.type());
         self.fieldAnalyses.push(analyse);
       }
 
@@ -1839,11 +1840,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   }
 
   self.getFieldAnalysis = function() {
-    var field_name = self.fieldAnalysesName();
+    var fieldName = self.fieldAnalysesName();
     var _analyse = null;
 
     $.each(self.fieldAnalyses(), function (index, analyse) {
-      if (analyse.name() == field_name) {
+      if (analyse.name() == fieldName) {
         _analyse = analyse;
         return false;
       }

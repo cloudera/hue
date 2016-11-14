@@ -2564,7 +2564,10 @@ ${ dashboard.layout_skeleton() }
   <div class="arrow"></div>
   <h3 class="popover-title" style="text-align: left">
     <a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysis').hide(); $root.fieldAnalysesName(''); }"><i class="fa fa-times"></i></a>
-    <strong data-bind="text: $root.fieldAnalysesName"></strong> ${ _(' field analysis') }
+    <strong data-bind="text: $root.fieldAnalysesName"></strong>
+    <!-- ko if: $root.getFieldAnalysis() -->
+      (<span data-bind="text: $root.getFieldAnalysis().type"></span>)
+    <!-- /ko -->
   </h3>
   <div class="popover-content" data-bind="template: { name: 'analysis-window' }" style="text-align: left"></div>
 </div>
