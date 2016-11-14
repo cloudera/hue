@@ -177,6 +177,12 @@ ${ hueIcons.symbols() }
 
         <div class="compose-action btn-group">
           <button class="btn" title="${_('Running jobs and workflows')}" >${ _('Jobs') } <div class="jobs-badge">20</div></button>
+          <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
+            <span class="caret"></span>
+          </button>
+        </div>
+        <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
+          <span style="font-size: 15px; font-weight: 300">${_('Workflows')} (20)</span>
         </div>
       % endif
     </div>
@@ -419,7 +425,7 @@ ${ assist.assistPanel() }
         self.searchActive = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
-
+        self.jobsPanelVisible = ko.observable(false);
 
         // TODO: Extract to common module (shared with nav search autocomplete)
         var SEARCH_FACET_ICON = 'fa-tags';

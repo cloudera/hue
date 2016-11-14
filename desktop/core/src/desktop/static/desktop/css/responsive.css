@@ -84,7 +84,6 @@ body {
   flex: 0 0 300px;
 }
 
-
 .top-nav-right .compose-action {
   float: right;
   margin-right: 15px;
@@ -92,6 +91,21 @@ body {
 
 .top-nav-right .dropdown-menu {
   margin-left: -80px;
+}
+
+.jobs-panel {
+  position: fixed;
+  z-index: 999999;
+  top: 45px;
+  padding: 10px;
+  height: 300px;
+  width: 400px;
+  right: 10px;
+  font-size: 13px;
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .compose-action {
