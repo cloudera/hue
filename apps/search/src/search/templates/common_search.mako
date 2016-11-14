@@ -1961,7 +1961,7 @@ ${ dashboard.layout_skeleton() }
       </div>
       <div data-bind="visible: ! $root.isEditing(), text: getHitOption(properties.aggregate())" class="muted"></div>
     </div>
-    <div class="big-counter" data-bind="textSqueezer: counts"></div>
+    <span class="big-counter" data-bind="textSqueezer: counts"></span>
   </div>
   <!-- /ko -->
 </script>
