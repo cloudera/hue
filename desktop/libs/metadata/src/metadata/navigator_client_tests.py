@@ -53,7 +53,7 @@ class TestNavigatorclient:
       raise SkipTest
 
   def test_search_entities(self):
-    api = NavigatorApi()
+    api = NavigatorApi(self.user)
     api._root = MockedRoot()
 
     assert_equal(

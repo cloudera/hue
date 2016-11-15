@@ -24,6 +24,7 @@ from desktop.lib.rest import resource
 from desktop.lib.rest.http_client import HttpClient, RestException
 
 from hadoop.conf import HDFS_CLUSTERS
+from libsentry.privilege_checker import PrivilegeChecker
 
 from metadata.conf import NAVIGATOR
 
@@ -51,11 +52,12 @@ class NavigatorApi(object):
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
 
-  def __init__(self, api_url=None, user=None, password=None):
-    self._api_url = '%s/%s' % ((api_url or NAVIGATOR.API_URL.get()).strip('/'), VERSION)
-    self._username = user or NAVIGATOR.AUTH_USERNAME.get()
-    self._password = password or NAVIGATOR.AUTH_PASSWORD.get()
+  def __init__(self, user=None):
+    self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
+    self._username = NAVIGATOR.AUTH_USERNAME.get()
+    self._password = NAVIGATOR.AUTH_PASSWORD.get()
 
+    self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
@@ -127,6 +129,8 @@ class NavigatorApi(object):
       LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
 
+      self._secure_results(response)
+
       return response
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % query_s
@@ -188,11 +192,25 @@ class NavigatorApi(object):
       LOG.info(data)
       response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
 
+      self._secure_results(response)
+
       return response
     except RestException:
       msg = 'Failed to search for entities with search query %s' % json.dumps(body)
       LOG.exception(msg)
       raise NavigatorApiException(msg)
+
+
+  def _secure_results(self, response):
+    if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+      checker = PrivilegeChecker(user=self.user)
+      action = 'SELECT'
+      for result in response['results']:
+        if result['type'] == 'TABLE':
+          result.update({u'column': None, u'table': result['originalName'], u'db': result['parentPath'].strip('/'), u'server': u'server1'})
+        else:
+          result.update({u'column': None, u'table': None, u'db': None, u'server': None})
+      response['results'] = checker.filter_objects(response['results'], action)
 
 
   def suggest(self, prefix=None):

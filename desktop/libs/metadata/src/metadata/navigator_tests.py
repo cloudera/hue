@@ -50,7 +50,7 @@ class TestNavigator(object):
     if not is_live_cluster() or not has_navigator(cls.user):
       raise SkipTest
 
-    cls.api = NavigatorApi()
+    cls.api = NavigatorApi(cls.user)
 
 
   @classmethod
