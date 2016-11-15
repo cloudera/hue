@@ -1154,7 +1154,7 @@ var Collection = function (vm, collection) {
       facet_field.properties.sort('desc');
     }
 
-    if (facet_field.properties.type() == 'range-up') {
+    if (facet_field.properties.type && facet_field.properties.type() == 'range-up') {
       vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
     }
 
