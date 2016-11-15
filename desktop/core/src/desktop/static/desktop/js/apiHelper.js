@@ -1521,6 +1521,7 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.url
+   * @param {string} [options.hash] - Optional hash to use as well as the url
    * @param {Function} options.fetchFunction
    * @param {Function} options.successCallback
    * @param {Object} [options.editor] - Ace editor
@@ -1528,20 +1529,21 @@ var ApiHelper = (function () {
   var fetchCached = function (options) {
     var self = this;
     var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+    var cachedId = options.hash ? options.url + options.hash : options.url;
 
-    if (typeof cachedData[options.url] == "undefined" || self.hasExpired(cachedData[options.url].timestamp)) {
+    if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp)) {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
       options.fetchFunction(function (data) {
-        cachedData[options.url] = {
+        cachedData[cachedId] = {
           timestamp: (new Date()).getTime(),
           data: data
         };
         $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
       });
     } else {
-      options.successCallback(cachedData[options.url].data);
+      options.successCallback(cachedData[cachedId].data);
     }
   };
 
