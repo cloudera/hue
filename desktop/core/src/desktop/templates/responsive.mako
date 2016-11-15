@@ -277,6 +277,7 @@ ${ hueIcons.symbols() }
     <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <div style="position: relative; width: 100%; height: 100%;" data-bind="component: { name: 'right-assist-panel' }"></div>
     </div>
   </div>
 </div>
@@ -313,10 +314,67 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
+<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
 ${ assist.assistJSModels() }
 
 ${ assist.assistPanel() }
+
+<!-- TODO: Put right assist inside assist.mako? -->
+<script type="text/html" id="right-assist-template">
+  <div style="height: 100%; width: 100%; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative;" data-bind="niceScroll">
+    <div data-bind="foreach: availableTypes">
+      <!-- ko if: $data === $parent.activeType() -->
+      <span data-bind="text: $data"></span>
+      <!-- /ko -->
+      <!-- ko ifnot: $data === $parent.activeType() -->
+      <a href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
+      <!-- /ko -->
+    </div>
+    <div data-bind="foreach: functions">
+      <div style="margin-top: 20px;">
+        <div style="font-weight: 600"><a href="javascript:void(0);" data-bind="text: signature, toggle: open"></a></div>
+        <div data-bind="visible: open, text: description"></div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/javascript" charset="utf-8">
+  (function () {
+    function RightAssist(params) {
+      var self = this;
+      self.functions = ko.observableArray();
+      self.activeType = ko.observable();
+      self.availableTypes = ['hive', 'impala'];
+      self.cachedFunctions = {};
+
+      self.activeType.subscribe(function (newValue) {
+        if (newValue === 'hive' || newValue === 'impala') {
+          if (!self.cachedFunctions[newValue]) {
+            var functionIndex = SqlFunctions.getFunctionsWithReturnTypes(newValue, ['T'], true, true);
+            var keys = Object.keys(functionIndex);
+            keys.sort();
+            var funcs = [];
+            keys.forEach(function (key) {
+              functionIndex[key].open = ko.observable(false);
+              funcs.push(functionIndex[key]);
+            });
+            self.cachedFunctions[newValue] = funcs;
+          }
+          self.functions(self.cachedFunctions[newValue]);
+        }
+      });
+
+      self.activeType(self.availableTypes[0]);
+    }
+
+    ko.components.register('right-assist-panel', {
+      viewModel: RightAssist,
+      template: { element: 'right-assist-template' }
+    });
+  })();
+</script>
 
 <script type="text/javascript" charset="utf-8">
 

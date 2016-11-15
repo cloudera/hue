@@ -2347,23 +2347,28 @@ var SqlFunctions = (function () {
     }
   };
 
-  var suggestFunctions = function (dialect, returnTypes, includeAggregate, includeAnalytic, completions, weight) {
-    var functionsToSuggest = {};
-    addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(COMPLEX_TYPE_CONSTRUCTS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(DATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(MATHEMATICAL_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(TYPE_CONVERSION_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(STRING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(MISC_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
-    addFunctions(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+  var getFunctionsWithReturnTypes = function (dialect, returnTypes, includeAggregate, includeAnalytic) {
+    var result = {};
+    addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(COMPLEX_TYPE_CONSTRUCTS, dialect, returnTypes, result);
+    addFunctions(DATE_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(MATHEMATICAL_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(TYPE_CONVERSION_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(STRING_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(MISC_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, result);
     if (includeAggregate) {
-      addFunctions(AGGREGATE_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+      addFunctions(AGGREGATE_FUNCTIONS, dialect, returnTypes, result);
     }
     if (includeAnalytic) {
-      addFunctions(ANALYTIC_FUNCTIONS, dialect, returnTypes, functionsToSuggest);
+      addFunctions(ANALYTIC_FUNCTIONS, dialect, returnTypes, result);
     }
+    return result;
+  };
+
+  var suggestFunctions = function (dialect, returnTypes, includeAggregate, includeAnalytic, completions, weight) {
+    var functionsToSuggest = getFunctionsWithReturnTypes(dialect, returnTypes, includeAggregate, includeAnalytic);
     Object.keys(functionsToSuggest).forEach(function (name) {
       completions.push({
         value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
@@ -2431,6 +2436,7 @@ var SqlFunctions = (function () {
   return {
     suggestFunctions: suggestFunctions,
     getArgumentTypes: getArgumentTypes,
+    getFunctionsWithReturnTypes: getFunctionsWithReturnTypes,
     getReturnTypes: getReturnTypes,
     matchesType: matchesType,
     findFunction: findFunction
