@@ -1454,6 +1454,10 @@
         return "translate(8," + d.dx * _ky / 2 + ")";
       }
 
+      if (_options.onComplete) {
+        _options.onComplete();
+      }
+
     },
     init: function (element, valueAccessor) {
       ko.bindingHandlers.partitionChart.render(element, valueAccessor);
