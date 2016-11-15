@@ -157,6 +157,12 @@ NAVIGATOR = ConfigSection(
       key='conf_dir',
       help=_t('Navigator configuration directory, where navigator.client.properties is located.'),
       dynamic_default=default_navigator_config_dir
-    )
+    ),
+    APPLY_SENTRY_PERMISSIONS = Config(
+      key="apply_sentry_permissions",
+      help=_t("Perform Sentry privilege filtering."),
+      default=True,
+      type=coerce_bool
+    ),
   )
 )

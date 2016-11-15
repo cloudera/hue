@@ -74,7 +74,7 @@ def search_entities(request):
   """
   For displaying results.
   """
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   query_s = json.loads(request.POST.get('query_s', ''))
   query_s = smart_str(query_s)
@@ -106,7 +106,7 @@ def search_entities_interactive(request):
   """
   For search autocomplete.
   """
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
@@ -279,7 +279,7 @@ def _highlight_tags(record, term):
 
 @error_handler
 def list_tags(request):
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
@@ -299,7 +299,7 @@ def list_tags(request):
 def find_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_type = request.GET.get('type', '')
   database = request.GET.get('database', '')
   table = request.GET.get('table', '')
@@ -346,7 +346,7 @@ def find_entity(request):
 def suggest(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   prefix = request.POST.get('prefix')
 
   suggest = api.suggest(prefix)
@@ -361,7 +361,7 @@ def suggest(request):
 def get_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = request.REQUEST.get('id')
 
   if not entity_id:
@@ -380,7 +380,7 @@ def get_entity(request):
 def add_tags(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   tags = json.loads(request.POST.get('tags', []))
 
@@ -398,7 +398,7 @@ def add_tags(request):
 def delete_tags(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   tags = json.loads(request.POST.get('tags', []))
 
@@ -416,7 +416,7 @@ def delete_tags(request):
 def update_properties(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   properties = json.loads(request.POST.get('properties', {}))
 
@@ -434,7 +434,7 @@ def update_properties(request):
 def delete_properties(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   keys = json.loads(request.POST.get('keys', []))
 
@@ -451,7 +451,7 @@ def delete_properties(request):
 def get_lineage(request):
   response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = request.REQUEST.get('id')
 
   if not entity_id:
