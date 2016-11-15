@@ -3570,7 +3570,7 @@ ${ hueIcons.symbols() }
           % if conf.CUSTOM.BANNER_TOP_HTML.get():
           $(".main-content").css("top", "112px");
           % else:
-          $(".main-content").css("top", "82px");
+          $(".main-content").css("top", "74px");
           % endif
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);

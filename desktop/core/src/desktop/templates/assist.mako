@@ -122,13 +122,13 @@ from metadata.conf import has_navigator
 
     .assist-panel-switches {
       padding-left: 12px;
-      height: 29px;
+      height: 40px;
       border-bottom: 1px solid #f1f1f1;
     }
 
     .assist-type-switch {
       display: inline-block;
-      font-size: 16px;
+      font-size: 18px;
       margin-right: 2px;
       cursor: pointer;
     }
@@ -1167,7 +1167,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="assist-panel-template">
     <div style="display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
       <!-- ko if: availablePanels.length > 1 -->
-      <div style="position: relative; flex: 0 0 29px;" class="assist-panel-switches">
+      <div style="position: relative; flex: 0 0 40px; line-height: 40px;" class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, attr: { 'title': name }">
           <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
