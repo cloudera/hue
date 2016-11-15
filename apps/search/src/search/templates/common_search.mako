@@ -693,6 +693,8 @@ ${ dashboard.layout_skeleton() }
       </div>
     </div>
   </div>
+
+  <div class="clearfix"></div>
 </script>
 
 
@@ -1104,6 +1106,7 @@ ${ dashboard.layout_skeleton() }
 
           <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+          <div class="clearfix"></div>
 
         </div>
       </div>
@@ -1466,6 +1469,7 @@ ${ dashboard.layout_skeleton() }
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); $root.collection.getFacetById($parent.id()).properties.enableSelection(state.selectionEnabled); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+      <div class="clearfix"></div>
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -1513,6 +1517,7 @@ ${ dashboard.layout_skeleton() }
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+      <div class="clearfix"></div>
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -1560,6 +1565,7 @@ ${ dashboard.layout_skeleton() }
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
+    <div class="clearfix"></div>
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -1638,6 +1644,7 @@ ${ dashboard.layout_skeleton() }
           onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
+        <div class="clearfix"></div>
       <!-- /ko -->
 
       <!-- ko if: dimension() == 2 -->
@@ -1651,6 +1658,7 @@ ${ dashboard.layout_skeleton() }
           },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
+        <div class="clearfix"></div>
       <!-- /ko -->
 
       <!-- ko if: dimension() == 3 -->
@@ -1661,6 +1669,7 @@ ${ dashboard.layout_skeleton() }
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+        <div class="clearfix"></div>
       <!-- /ko -->
 
     <!-- /ko -->
@@ -1693,6 +1702,7 @@ ${ dashboard.layout_skeleton() }
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
+    <div class="clearfix"></div>
   </div>
   <!-- /ko -->
 </script>
@@ -1713,6 +1723,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
@@ -1721,6 +1732,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type().indexOf('range') == -1 -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
@@ -1728,6 +1740,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -1753,6 +1766,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
@@ -1761,6 +1775,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type().indexOf('range') == -1 -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
@@ -1768,6 +1783,7 @@ ${ dashboard.layout_skeleton() }
         maxWidth: 250,
         onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -1837,6 +1853,7 @@ ${ dashboard.layout_skeleton() }
           },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
+      <div class="clearfix"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -1868,6 +1885,7 @@ ${ dashboard.layout_skeleton() }
           },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
+      <div class="clearfix"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -1936,6 +1954,7 @@ ${ dashboard.layout_skeleton() }
           },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
+      <div class="clearfix"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -2135,6 +2154,7 @@ ${ dashboard.layout_skeleton() }
           $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
         },
         onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+      <div class="clearfix"></div>
     </div>
   </div>
   <!-- /ko -->
@@ -2171,6 +2191,7 @@ ${ dashboard.layout_skeleton() }
           $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
         },
         onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+      <div class="clearfix"></div>
     </div>
   </div>
   <!-- /ko -->
@@ -2201,6 +2222,7 @@ ${ dashboard.layout_skeleton() }
       onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
+    <div class="clearfix"></div>
   </div>
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
