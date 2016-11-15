@@ -18,10 +18,6 @@ var inject_binding = function (allBindings, key, value) {
 
 ko.bindingHandlers.selectize = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-    if (!allBindingsAccessor.has('optionsText'))
-      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsText', 'name');
-    if (!allBindingsAccessor.has('optionsValue'))
-      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsValue', 'id');
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined')
       allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', 'Choose...');
 

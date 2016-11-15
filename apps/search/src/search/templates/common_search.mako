@@ -459,7 +459,7 @@ ${ dashboard.layout_skeleton() }
             <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Field') }
             </span>
-            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }'"></select>
+            <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }'"></select>
           </span>
         </div>
 
@@ -2214,7 +2214,7 @@ ${ dashboard.layout_skeleton() }
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }'"></select>
+      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }'"></select>
     </div>
 
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
@@ -2610,6 +2610,7 @@ ${ dashboard.layout_skeleton() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -2624,7 +2625,8 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
-
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
 <script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
