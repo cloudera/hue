@@ -211,6 +211,7 @@
     </h2>
     <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      <div class="clearfix"></div>
     </div>
   </div>
 </script>
