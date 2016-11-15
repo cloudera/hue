@@ -23,22 +23,19 @@ from nose.tools import assert_equal, assert_false, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
-from libsentry.api import SentryApi
+from libsentry.api import get_api, SentryApi
 from libsentry.privilege_checker import PrivilegeChecker
 
 
 class TestDocumentConverter(object):
-
-  @classmethod
-  def setup_class(cls):
-    cls.api_class = SentryApi
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
     grant_access("test", "test", "libsentry")
 
-    self.checker = PrivilegeChecker(user=self.user)
+    self.api = get_api(self.user)
+    self.checker = PrivilegeChecker(user=self.user, api=self.api)
 
 
   def test_select_privilege(self):
@@ -59,8 +56,8 @@ class TestDocumentConverter(object):
       {u'column': 'total_emp', u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
     ]
 
-    self.api_class.list_sentry_roles_by_group = Mock(return_value=['test'])
-    self.api_class.list_sentry_privileges_by_role = Mock(return_value=[
+    self.api.list_sentry_roles_by_group = Mock(return_value=[{'name': 'test', 'group': 'test'}])
+    self.api.list_sentry_privileges_by_role = Mock(return_value=[
         {'column': 'total_emp', 'grantOption': False, 'timestamp': 1478810635378, 'database': 'default', 'action': 'INSERT', 'scope': 'COLUMN', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
         {'column': '', 'grantOption': False, 'timestamp': 1478810422058, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'customers', 'URI': '', 'server': 'server1'},
         {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'web_logs', 'URI': '', 'server': 'server1'},
@@ -69,4 +66,13 @@ class TestDocumentConverter(object):
     ])
 
     filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
-    #assert_equal([], filtered_set)
+    expected_filtered_set = [
+      {u'column': None, u'table': u'customers', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'code', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'salary', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'total_emp', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': u'web_logs', u'db': u'default', u'server': u'server1'},
+
+    ]
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: (obj['table'], obj['column'])))
