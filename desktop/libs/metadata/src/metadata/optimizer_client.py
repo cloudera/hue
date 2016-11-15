@@ -233,6 +233,14 @@ class OptimizerApi(object):
     return self._exec('get-top-joins', args)
 
 
+  def top_databases(self, db_tables=None):
+    args = [
+        '--tenant', self._product_name,
+    ]
+
+    return self._exec('get-top-data-bases', args)
+
+
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
   if queries and len(queries[0]) == 3:

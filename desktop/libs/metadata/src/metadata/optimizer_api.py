@@ -242,6 +242,23 @@ def top_aggs(request):
 
 @require_POST
 @error_handler
+def top_databases(request):
+  response = {'status': -1}
+
+  api = OptimizerApi()
+  data = api.top_databases()
+
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['values'] = data['results']
+  else:
+    response['message'] = 'Optimizer: %s' % data
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def upload_history(request):
   response = {'status': -1}
 
