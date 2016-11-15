@@ -259,6 +259,25 @@ def top_databases(request):
 
 @require_POST
 @error_handler
+def top_columns(request):
+  response = {'status': -1}
+
+  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+
+  api = OptimizerApi()
+  data = api.top_columns(db_tables=db_tables)
+
+  if data['status'] == 'success':
+    response['status'] = 0
+    response['values'] = data['results']
+  else:
+    response['message'] = 'Optimizer: %s' % data
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def upload_history(request):
   response = {'status': -1}
 

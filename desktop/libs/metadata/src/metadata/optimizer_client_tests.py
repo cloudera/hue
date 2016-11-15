@@ -209,6 +209,13 @@ class TestOptimizerApi(object):
     assert_true('columns' in resp['results'][0], resp)
 
 
+  def test_top_columns(self):
+    resp = self.api.top_columns(db_tables='db1.Part')
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('tables' in resp['results'][0], resp)
+
+
   def test_top_databases(self): 
     resp = self.api.top_databases()
 

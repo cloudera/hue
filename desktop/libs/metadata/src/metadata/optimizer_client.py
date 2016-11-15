@@ -208,6 +208,7 @@ class OptimizerApi(object):
         '--query', query
     ])
 
+
   def top_filters(self, database_name, table_name, column_name=None):
     return self._exec('get-top-filters', [
         '--tenant', self._product_name,
@@ -215,12 +216,22 @@ class OptimizerApi(object):
         '--table-name', table_name.lower()
     ])
 
+
   def top_aggs(self, database_name, table_name, column_name=None):
     return self._exec('get-top-aggs', [
         '--tenant', self._product_name,
         '--db-name', database_name.lower(),
         '--table-name', table_name.lower()
     ])
+
+
+  def top_columns(self, database_name, table_name, column_name=None):
+    return self._exec('get-top-columns', [
+        '--tenant', self._product_name,
+        '--db-name', database_name.lower(),
+        '--table-name', table_name.lower()
+    ])
+
 
   def top_joins(self, db_tables=None):
     args = [
