@@ -207,6 +207,13 @@ var selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
   }
 };
 
+var joinConditionsSuggest = function (details) {
+  parser.yy.result.suggestJoinConditions = details || {};
+  if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
+    parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
+  }
+};
+
 var valueExpressionSuggest = function (oppositeValueExpression, operator) {
   if (oppositeValueExpression && oppositeValueExpression.columnReference) {
     suggestValues();
@@ -421,6 +428,12 @@ var prioritizeSuggestions = function () {
     }
   } else {
     delete parser.yy.result.subQueries;
+  }
+
+  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined') {
+    if (typeof parser.yy.result.suggestJoinConditions.tables === 'undefined' || parser.yy.result.suggestJoinConditions.tables.length === 0) {
+      delete parser.yy.result.suggestJoinConditions;
+    }
   }
 
   if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
@@ -771,6 +784,16 @@ var linkTablePrimaries = function () {
   }
 
   var tablePrimaries = parser.yy.latestTablePrimaries;
+  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined' && parser.yy.result.suggestJoinConditions.tablePrimaries && !parser.yy.result.suggestJoinConditions.linked) {
+    parser.yy.result.suggestJoinConditions.tables = [];
+    parser.yy.result.suggestJoinConditions.tablePrimaries.forEach(function (tablePrimary) {
+      if (!tablePrimary.subQueryAlias) {
+        parser.yy.result.suggestJoinConditions.tables.push({ identifierChain: tablePrimary.identifierChain.concat() });
+      }
+    });
+    delete parser.yy.result.suggestJoinConditions.tablePrimaries;
+    parser.yy.result.suggestJoinConditions.linked = true;
+  }
   if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
     tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
     if (!parser.yy.result.suggestColumns.tables) {
@@ -1265,6 +1288,9 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
   });
   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
     delete parser.yy.result.suggestColumns.linked;
+  }
+  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined') {
+    delete parser.yy.result.suggestJoinConditions.linked;
   }
   if (typeof parser.yy.result.colRef !== 'undefined') {
     delete parser.yy.result.colRef.linked;

@@ -87,7 +87,7 @@ LateralView
  | '<hive>LATERAL' error                                                                                          -> { }
  ;
 
-JoinTypes_EDIT
+JoinType_EDIT
  : 'FULL' 'CURSOR' error
    {
      suggestKeywords(['JOIN', 'OUTER JOIN']);
