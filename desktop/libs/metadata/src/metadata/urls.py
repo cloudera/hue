@@ -42,6 +42,7 @@ urlpatterns += patterns('metadata.optimizer_api',
   #v2
   url(r'^api/optimizer/get_tenant/?$', 'get_tenant', name='get_tenant'),
 
+  url(r'^api/optimizer/top_databases/?$', 'top_databases', name='top_databases'),
   url(r'^api/optimizer/top_tables/?$', 'top_tables', name='top_tables'),
   url(r'^api/optimizer/top_joins/?$', 'top_joins', name='top_joins'),
   url(r'^api/optimizer/top_filters/?$', 'top_filters', name='top_filters'),

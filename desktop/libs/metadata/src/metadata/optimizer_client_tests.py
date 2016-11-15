@@ -209,6 +209,14 @@ class TestOptimizerApi(object):
     assert_true('columns' in resp['results'][0], resp)
 
 
+  def test_top_databases(self): 
+    resp = self.api.top_databases()
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('instanceCount' in resp['results'], resp)
+    assert_true('totalTableCount' in resp['results'], resp)
+
+
   def test_similar_queries(self):
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
