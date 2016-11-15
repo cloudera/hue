@@ -192,13 +192,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
   var _catchEnterKeyOnModals = false;
 
-  $(".modal").on("shown", function () {
+  $(document).on("shown", ".modal", function () {
     _catchEnterKeyOnModals = true;
     // safe ux enhancement: focus on the first editable input
     $(".modal:visible").find('input:not(.disable-autofocus):visible:first').not($('.jHueFilechooserActions input')).focus();
   });
 
-  $(".modal").on("hidden", function () {
+  $(document).on("hidden", ".modal", function () {
     _catchEnterKeyOnModals = false;
   });
 
