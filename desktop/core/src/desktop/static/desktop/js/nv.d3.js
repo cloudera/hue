@@ -14,6 +14,7 @@ nv.models = nv.models || {}; //stores all the possible models/components
 nv.charts = {}; //stores all the ready to use charts
 nv.graphs = []; //stores all the graphs currently on the page
 nv.logs = {}; //stores some statistics and potential error messages
+nv.dom = {}; //DOM manipulation functions
 
 nv.dispatch = d3.dispatch('render_start', 'render_end');
 
