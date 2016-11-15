@@ -274,7 +274,6 @@ body {
   flex: 0;
   position: relative;
   background-color: #FFF;
-  padding-top: 10px;
   min-width: 250px;
 }
 
@@ -378,7 +377,7 @@ body {
   margin: 0;
   z-index: 1000;
   color: #D1D1D1;
-  font-size: 12px;
+  font-size: 14px;
   -webkit-transition: margin 0.2s linear, color 0.5s ease;
   -moz-transition: margin 0.2s linear, color 0.5s ease;
   -ms-transition: margin 0.2s linear, color 0.5s ease;

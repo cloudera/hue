@@ -127,7 +127,6 @@ var SqlAutocompleter2 = (function () {
         silenceErrors: true,
         tables: parseResult.suggestJoins.tables,
         successCallback: function (data) {
-          console.log(data);
           data.values.forEach(function (value) {
             var suggestionString = parseResult.suggestJoins.prependJoin ? (parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
             var first = true;
