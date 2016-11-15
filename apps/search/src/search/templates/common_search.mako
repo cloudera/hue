@@ -661,7 +661,7 @@ ${ dashboard.layout_skeleton() }
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-plus"></i> ${ _('Add') }
       </a>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
       <div class="clearfix"></div>
     </div>
     <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
