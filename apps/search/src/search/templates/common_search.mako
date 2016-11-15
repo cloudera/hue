@@ -548,7 +548,7 @@ ${ dashboard.layout_skeleton() }
 
     <div class="facet-field-cnt">
       <span class="spinedit-cnt">
-        <span class="facet-field-label">
+        <span class="facet-field-label facet-field-label-fixed-width">
           ${ _('Min Count') }
         </span>
         <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
@@ -705,9 +705,9 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
-      </span>
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }"></span>
     </div>
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'field' -->
         <div data-bind="foreach: $parent.counts">
@@ -811,6 +811,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle2', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.type() == 'field' -->
         <div data-bind="foreach: $parent.counts">
@@ -1434,6 +1435,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
+    <div class="clearfix"></div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
@@ -1529,7 +1531,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
-
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.canRange -->
         <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
@@ -1679,7 +1681,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
-
+    <div class="clearfix"></div>
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
@@ -1703,7 +1705,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
-
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
@@ -1785,7 +1787,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
-
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
         <span class="muted">${ _('Selected dimensions') }</span>
@@ -1853,7 +1855,7 @@ ${ dashboard.layout_skeleton() }
     <div class="responsive-facet-toggle-section" data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.scope() == 'tree' -->
         <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
@@ -1885,7 +1887,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
-
+    <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
         <span class="muted">${ _('Selected dimension') }</span>
