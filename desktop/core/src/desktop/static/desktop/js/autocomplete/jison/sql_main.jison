@@ -1395,6 +1395,9 @@ TableExpression_EDIT
        if ($1.suggestKeywords) {
          keywords = createWeightedKeywords($1.suggestKeywords, 3);
        }
+       if ($1.tableReferenceList.suggestJoinConditions) {
+         joinConditionsSuggest($1.tableReferenceList.suggestJoinConditions);
+       }
        if (!$1.hasLateralViews && $1.tableReferenceList.suggestKeywords) {
          keywords = keywords.concat(createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
@@ -2342,21 +2345,41 @@ JoinedTable_EDIT
  ;
 
 Joins
- : JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ : JoinType OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
    {
-     $4.joinType = $1;
-     $$ = $4;
+     if ($4 && $4.valueExpression) {
+       $$ = $4.valueExpression;
+     } else {
+       $$ = {};
+     }
+     $$.joinType = $1;
+     if ($4.noJoinCondition) {
+       $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
+     }
+     if ($4.suggestKeywords) {
+       $$.suggestKeywords = $4.suggestKeywords;
+     }
    }
- | Joins JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ | Joins JoinType OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
    {
-     $5.joinType = $1;
-     $$ = $5;
+     if ($4 && $4.valueExpression) {
+       $$ = $4.valueExpression;
+     } else {
+       $$ = {};
+     }
+     $$.joinType = $1;
+     if ($4.noJoinCondition) {
+       $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
+     }
+     if ($4.suggestKeywords) {
+       $$.suggestKeywords = $4.suggestKeywords;
+     }
    }
  ;
 
 Joins_INVALID
- : JoinTypes OptionalImpalaBroadcastOrShuffle                                           -> { joinType: $1 }
- | JoinTypes OptionalImpalaBroadcastOrShuffle Joins                                     -> { joinType: $1 }
+ : JoinType OptionalImpalaBroadcastOrShuffle                                           -> { joinType: $1 }
+ | JoinType OptionalImpalaBroadcastOrShuffle Joins                                     -> { joinType: $1 }
  ;
 
 OptionalImpalaBroadcastOrShuffle
@@ -2366,11 +2389,11 @@ OptionalImpalaBroadcastOrShuffle
  ;
 
 Join_EDIT
- : JoinTypes_EDIT OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
- | JoinTypes_EDIT OptionalImpalaBroadcastOrShuffle
- | JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT OptionalJoinCondition
- | JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
- | JoinTypes OptionalImpalaBroadcastOrShuffle 'CURSOR' OptionalJoinCondition
+ : JoinType_EDIT OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ | JoinType_EDIT OptionalImpalaBroadcastOrShuffle
+ | JoinType OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT OptionalJoinCondition
+ | JoinType OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
+ | JoinType OptionalImpalaBroadcastOrShuffle 'CURSOR' OptionalJoinCondition
    {
      if (!$2 && isImpala()) {
        suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
@@ -2389,7 +2412,7 @@ Joins_EDIT
  | Joins Join_EDIT Joins
  ;
 
-JoinTypes
+JoinType
  : 'JOIN'
  | '<hive>CROSS' 'JOIN'
  | 'INNER' 'JOIN'
@@ -2405,7 +2428,7 @@ JoinTypes
  | 'RIGHT' 'SEMI' 'JOIN'
  ;
 
-JoinTypes_EDIT
+JoinType_EDIT
  : '<hive>CROSS' 'CURSOR'
    {
      suggestKeywords(['JOIN']);
@@ -2467,9 +2490,9 @@ JoinTypes_EDIT
  ;
 
 OptionalJoinCondition
- :                       -> { suggestKeywords: isImpala() ? ['ON', 'USING'] : ['ON'] }
- | 'ON' ValueExpression  -> $2
- | '<impala>USING' '(' UsingColList ')'
+ :                                       -> { noJoinCondition: true, suggestKeywords: isImpala() ? ['ON', 'USING'] : ['ON'] }
+ | 'ON' ValueExpression                  -> { valueExpression: $2 }
+ | '<impala>USING' '(' UsingColList ')'  -> {}
  ;
 
 UsingColList
@@ -2482,6 +2505,7 @@ JoinCondition_EDIT
  | 'ON' 'CURSOR'
    {
      valueExpressionSuggest();
+     joinConditionsSuggest({ prependOn: false });
    }
  ;
 

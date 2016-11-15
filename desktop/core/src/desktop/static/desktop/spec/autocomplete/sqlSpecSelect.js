@@ -2515,7 +2515,8 @@
           hasLocations: true,
           containsKeywords: ['ON'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] }
           }
         });
       });
@@ -2528,7 +2529,8 @@
           containsKeywords: ['ON'],
           hasLocations: true,
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] }
           }
         });
       });
@@ -6005,6 +6007,19 @@
         });
       });
 
+      it('should suggest join conditions for "SELECT testTable1.* FROM testTable1 JOIN testTable2 |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ',
+          afterCursor: '',
+          hasLocations: true,
+          containsKeywords: ['ON'],
+          expectedResult: {
+            lowerCase: false,
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
+          }
+        });
+      });
+
       it('should suggest tables for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ',
@@ -6012,10 +6027,11 @@
           hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
-            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
+            suggestFunctions: {},
+            suggestJoinConditions: { prependOn: false, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }],
+            lowerCase: false
           }
         });
       });
@@ -6108,6 +6124,7 @@
           expectedResult: {
             lowerCase: true,
             suggestFunctions: {},
+            suggestJoinConditions: { prependOn: false, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'db' }, { name: 'testTable2' }] }] },
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'db' }, { name: 'testTable2' }] }] },
             suggestIdentifiers: [{ name: 'testTable1.', type: 'table' }, { name: 'testTable2.', type: 'table' }]
           }
@@ -6192,7 +6209,8 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ON', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
+            suggestKeywords: ['ON', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER'],
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }] }, { identifierChain: [{ name: 'table2' }] }] }
           }
         });
       });
@@ -6531,7 +6549,8 @@
             hasLocations: true,
             containsKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'ON', 'RIGHT', 'RIGHT OUTER', 'USING'],
             expectedResult: {
-              lowerCase: false
+              lowerCase: false,
+              suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }] }, { identifierChain: [{ name: 'table2' }] }] }
             }
           });
         });
