@@ -19,6 +19,7 @@
   from django.utils.translation import ugettext as _
   from desktop.lib.i18n import smart_unicode
   from desktop.views import login_modal
+  from metadata.conf import has_optimizer
 %>
 
 <%namespace name="assist" file="/assist.mako" />
@@ -64,6 +65,7 @@
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
+    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
     ApiHelperGlobals = {
       i18n: {
