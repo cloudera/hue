@@ -192,55 +192,32 @@ ${ hueIcons.symbols() }
 
   <div class="content-wrapper">
     <div class="left-nav">
-      Home</br>
-      </br>
-
-      <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'editor'); }">Query</a><br/>
-      <br/>
-      [Hive, Impala, Pig, PySpark, Solr, MapReduce...]<br/>
-
-      <br/>
-
-      Search Dashboards<br/>
-
-      <br/>
-
-      <a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('switch.app', 'metastore'); }">Browse</a><br/>
-      [Tables]<br/>
-      [Files]<br/>
-      [Indexes]<br/>
-      [HBase]<br/>
-
-      <br/>
-
-      Jobs<br/>
-      [YARN, MR, Hive, Impala, Spark, Sqoop, Pig]<br/>
-      Batch<br/>
-      Schedules<br/>
-      <br/>
-
-      Oozie<br/>
-      Workflows<br/>
-      Coordinators<br/>
-      Bundles<br/>
-      <br/>
-
-      Security<br/>
-      Hive Tables<br/>
-      Solr Collections<br/>
-      HDFS Acls<br/>
-      <br/>
-
-      [Custom App 1]<br/>
-      [Custom App 2]<br/>
+      <ul class="left-nav-menu">
+        <li><a href="javascript: void(0);">Reporter</a></li>
+        <li><a href="javascript: void(0);">Hive</a></li>
+        <li><a href="javascript: void(0);">Impala</a></li>
+        <li><a href="javascript: void(0);">Dashboards</a></li>
+        <li><a href="javascript: void(0);">Oozie</a></li>
+        <li class="divider"></li>
+        <li><a href="javascript: void(0);">Metastore</a></li>
+        <li><a href="javascript: void(0);">Indexes</a></li>
+        <li><a href="javascript: void(0);">Job Browser</a></li>
+        <li><a href="javascript: void(0);">File Browser</a></li>
+        <li><a href="javascript: void(0);">HBase</a></li>
+        <li><a href="javascript: void(0);">Security</a></li>
+        <li class="divider"></li>
+        <li><a href="javascript: void(0);">Custom App 1</a></li>
+        <li><a href="javascript: void(0);">Custom App 2</a></li>
+        <li><a href="javascript: void(0);">Custom App 3</a></li>
+      </ul>
     </div>
 
-    <div style="position: fixed; bottom: 0; left: 0">
-      Create Table<br/>
-      Import File<br/>
-      Import Queries<br/>
-      [+]
-    </div>
+##     <div style="position: fixed; bottom: 0; left: 0">
+##       Create Table<br/>
+##       Import File<br/>
+##       Import Queries<br/>
+##       [+]
+##     </div>
 
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
