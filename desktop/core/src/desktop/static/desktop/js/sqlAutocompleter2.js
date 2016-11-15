@@ -32,6 +32,7 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
+    JOIN_CONDITION: 1100,
     COLUMN: 1000,
     SAMPLE: 900,
     IDENTIFIER: 800,
@@ -112,6 +113,38 @@ var SqlAutocompleter2 = (function () {
       }
     } else {
       colRefDeferral.resolve();
+    }
+
+    if (parseResult.suggestJoinConditions) {
+      var joinDeferral = $.Deferred();
+      deferrals.push(joinDeferral);
+      self.snippet.getApiHelper().fetchNavOptJoinConditions({
+        sourceType: self.snippet.type(),
+        timeout: self.timeout,
+        defaultDatabase: database,
+        silenceErrors: true,
+        tables: parseResult.suggestJoinConditions.tables,
+        successCallback: function (data) {
+          data.values.forEach(function (value) {
+            var suggestionString = parseResult.suggestJoinConditions.prependOn ? (parseResult.lowerCase ? 'on ' : 'ON ') : '';
+            var first = true;
+            value.joinCols.forEach(function (joinColPair) {
+              if (!first) {
+                suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+              }
+              suggestionString += joinColPair.columns[0] + ' = ' + joinColPair.columns[1];
+              first = false;
+            });
+            completions.push({
+              value: suggestionString,
+              meta: 'condition',
+              weight: DEFAULT_WEIGHTS.JOIN_CONDITION
+            });
+          });
+          joinDeferral.resolve();
+        },
+        errorCallback: joinDeferral.resolve
+      });
     }
 
     if (parseResult.suggestFunctions) {

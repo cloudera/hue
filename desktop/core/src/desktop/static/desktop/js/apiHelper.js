@@ -1391,6 +1391,72 @@ var ApiHelper = (function () {
     }));
   };
 
+  /**
+   * Fetches a navigator entity for the given identifierChain
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {Object[]} options.tables
+   * @param {Object[]} options.tables.identifierChain
+   * @param {string} options.tables.identifierChain.name
+   * @param {string} [options.defaultDatabase]
+   */
+  ApiHelper.prototype.fetchNavOptJoinConditions = function (options) {
+    var self = this;
+
+    var dbTables = [];
+    options.tables.forEach(function (table) {
+      var clonedIdentifierChain = table.identifierChain.concat();
+      var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
+      dbTables.push(database + '.' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
+    });
+
+    var url = '/metadata/api/optimizer/top_joins';
+    var hash = ko.mapping.toJSON(dbTables).hashCode();
+
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+
+      $.ajax({
+        type: 'post',
+        url: url,
+        data: {
+          dbTables: ko.mapping.toJSON(dbTables)
+        },
+        timeout: options.timeout
+      })
+      .done(function (data) {
+        if (data.status === 0 && !self.successResponseIsError(data)) {
+          if (typeof data.values !== 'undefined' && data.values.length > 0) {
+            storeInCache(data);
+          }
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      url: url,
+      hash: hash,
+      fetchFunction: fetchFunction
+    }));
+  };
+
   ApiHelper.prototype.globalSearchAutocomplete = function (options) {
     var self = this;
 
