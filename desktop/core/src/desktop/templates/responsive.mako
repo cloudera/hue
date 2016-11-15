@@ -193,22 +193,24 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav">
       <ul class="left-nav-menu">
+        <li class="header">&nbsp;</li>
+        <li class="header">Applications</li>
         <li><a href="javascript: void(0);">Reporter</a></li>
         <li><a href="javascript: void(0);">Hive</a></li>
         <li><a href="javascript: void(0);">Impala</a></li>
         <li><a href="javascript: void(0);">Dashboards</a></li>
         <li><a href="javascript: void(0);">Oozie</a></li>
-        <li class="divider"></li>
+        <li><a href="javascript: void(0);">Custom App 1</a></li>
+        <li><a href="javascript: void(0);">Custom App 2</a></li>
+        <li><a href="javascript: void(0);">Custom App 3</a></li>
+        <li class="header">&nbsp;</li>
+        <li class="header">Browse</li>
         <li><a href="javascript: void(0);">Metastore</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
         <li><a href="javascript: void(0);">Job Browser</a></li>
         <li><a href="javascript: void(0);">File Browser</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
-        <li class="divider"></li>
-        <li><a href="javascript: void(0);">Custom App 1</a></li>
-        <li><a href="javascript: void(0);">Custom App 2</a></li>
-        <li><a href="javascript: void(0);">Custom App 3</a></li>
       </ul>
     </div>
 
