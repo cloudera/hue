@@ -84,7 +84,7 @@ ${ hueIcons.symbols() }
 <div class="main-page">
   <div class="top-nav">
     <div class="top-nav-left">
-      <a class="hamburger hamburger--squeeze pull-left" type="button">
+      <a class="hamburger hamburger-hue pull-left" type="button">
       <span class="hamburger-box">
         <span class="hamburger-inner"></span>
       </span>

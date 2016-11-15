@@ -478,7 +478,13 @@ h6 {
   margin-top: -4px;
 }
 
-.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+.hamburger-inner {
+  width: 24px;
+  height: 1px;
+  position: absolute;
+}
+
+.hamburger-inner::before, .hamburger-inner::after {
   width: 24px;
   height: 3px;
   background-color: #FFF;
@@ -497,52 +503,23 @@ h6 {
 }
 
 .hamburger-inner::before {
-  top: -7px;
+  top: -5px;
 }
 
 .hamburger-inner::after {
-  bottom: -7px;
+  bottom: -5px;
 }
 
-/*
- * Squeeze
- */
-.hamburger--squeeze .hamburger-inner {
-  transition-duration: 0.1s;
-  transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+.hamburger-hue.is-active .hamburger-inner::before {
+  -webkit-transform: translate3d(-2px, 0, 0) rotate(-40deg) scale(0.6, 1);
+  transform: translate3d(-2px, 0, 0) rotate(-40deg) scale(0.6, 1);
 }
 
-.hamburger--squeeze .hamburger-inner::before {
-  transition: top 0.1s 0.14s ease, opacity 0.1s ease;
+.hamburger-hue.is-active .hamburger-inner::after {
+  -webkit-transform: translate3d(-2px, 0, 0) rotate(40deg) scale(0.6, 1);
+  transform: translate3d(-2px, 0, 0) rotate(40deg) scale(0.6, 1);
 }
 
-.hamburger--squeeze .hamburger-inner::after {
-  transition: bottom 0.1s 0.14s ease, -webkit-transform 0.1s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  transition: bottom 0.1s 0.14s ease, transform 0.1s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  transition: bottom 0.1s 0.14s ease, transform 0.1s cubic-bezier(0.55, 0.055, 0.675, 0.19), -webkit-transform 0.1s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-}
-
-.hamburger--squeeze.is-active .hamburger-inner {
-  -webkit-transform: rotate(45deg);
-  transform: rotate(45deg);
-  transition-delay: 0.14s;
-  transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-}
-
-.hamburger--squeeze.is-active .hamburger-inner::before {
-  top: 0;
-  opacity: 0;
-  transition: top 0.1s ease, opacity 0.1s 0.14s ease;
-}
-
-.hamburger--squeeze.is-active .hamburger-inner::after {
-  bottom: 0;
-  -webkit-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-  transition: bottom 0.1s ease, -webkit-transform 0.1s 0.14s cubic-bezier(0.215, 0.61, 0.355, 1);
-  transition: bottom 0.1s ease, transform 0.1s 0.14s cubic-bezier(0.215, 0.61, 0.355, 1);
-  transition: bottom 0.1s ease, transform 0.1s 0.14s cubic-bezier(0.215, 0.61, 0.355, 1), -webkit-transform 0.1s 0.14s cubic-bezier(0.215, 0.61, 0.355, 1);
-}
 
 /* Context menu, popover etc. */
 
