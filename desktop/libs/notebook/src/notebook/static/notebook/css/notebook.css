@@ -714,12 +714,8 @@ input[type="text"].filechooser-input {
   margin-bottom: 0;
 }
 
-.fileChooserBtn {
-  height: 31px;
-}
-
 #saveResultsForm .fileChooserBtn {
-  margin-top: -1px;
+  vertical-align: middle;
 }
 
 table.airy tr td {
