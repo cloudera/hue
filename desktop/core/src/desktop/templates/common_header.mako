@@ -15,11 +15,12 @@
 ## limitations under the License.
 <%!
 from desktop import conf
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from metadata.conf import has_optimizer
 
 home_url = url('desktop.views.home')
-from desktop.conf import USE_NEW_EDITOR
 if USE_NEW_EDITOR.get():
   home_url = url('desktop.views.home2')
 %>
@@ -104,6 +105,7 @@ if USE_NEW_EDITOR.get():
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
+    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
     // jHue plugins global configuration
     jHueFileChooserGlobals = {

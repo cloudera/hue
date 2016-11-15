@@ -117,7 +117,7 @@ var SqlAutocompleter2 = (function () {
       colRefDeferral.resolve();
     }
 
-    if (parseResult.suggestJoins) {
+    if (parseResult.suggestJoins && HAS_OPTIMIZER) {
       var joinsDeferral = $.Deferred();
       deferrals.push(joinsDeferral);
       self.snippet.getApiHelper().fetchNavOptPopularJoins({
@@ -169,7 +169,7 @@ var SqlAutocompleter2 = (function () {
       });
     }
 
-    if (parseResult.suggestJoinConditions) {
+    if (parseResult.suggestJoinConditions && HAS_OPTIMIZER) {
       var joinConditionsDeferral = $.Deferred();
       deferrals.push(joinConditionsDeferral);
       self.snippet.getApiHelper().fetchNavOptPopularJoins({
