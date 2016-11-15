@@ -32,6 +32,7 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
+    ACTIVE_JOIN: 1200,
     JOIN_CONDITION: 1100,
     COLUMN: 1000,
     SAMPLE: 900,
@@ -42,7 +43,8 @@ var SqlAutocompleter2 = (function () {
     UDF: 400,
     HDFS: 300,
     VIRTUAL_COLUMN: 200,
-    COLREF_KEYWORD: 100
+    COLREF_KEYWORD: 100,
+    JOIN: -1
   };
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
@@ -115,19 +117,38 @@ var SqlAutocompleter2 = (function () {
       colRefDeferral.resolve();
     }
 
-    if (parseResult.suggestJoinConditions) {
-      var joinDeferral = $.Deferred();
-      deferrals.push(joinDeferral);
-      self.snippet.getApiHelper().fetchNavOptJoinConditions({
+    if (parseResult.suggestJoins) {
+      var joinsDeferral = $.Deferred();
+      deferrals.push(joinsDeferral);
+      self.snippet.getApiHelper().fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: self.timeout,
         defaultDatabase: database,
         silenceErrors: true,
-        tables: parseResult.suggestJoinConditions.tables,
+        tables: parseResult.suggestJoins.tables,
         successCallback: function (data) {
+          console.log(data);
           data.values.forEach(function (value) {
-            var suggestionString = parseResult.suggestJoinConditions.prependOn ? (parseResult.lowerCase ? 'on ' : 'ON ') : '';
+            var suggestionString = parseResult.suggestJoins.prependJoin ? (parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
             var first = true;
+
+            var existingTables = {};
+            parseResult.suggestJoins.tables.forEach(function (table) {
+              existingTables[table.identifierChain[table.identifierChain.length - 1].name] = true;
+            });
+
+            var joinRequired = false;
+            value.tables.forEach(function (table) {
+              var tableParts = table.split('.');
+              if (!existingTables[tableParts[tableParts.length - 1]]) {
+                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + table : table;
+                joinRequired = true;
+              }
+            });
+
+            if (value.joinCols.length > 0) {
+              suggestionString += parseResult.lowerCase ? ' on ' : ' ON ';
+            }
             value.joinCols.forEach(function (joinColPair) {
               if (!first) {
                 suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
@@ -137,13 +158,49 @@ var SqlAutocompleter2 = (function () {
             });
             completions.push({
               value: suggestionString,
-              meta: 'condition',
-              weight: DEFAULT_WEIGHTS.JOIN_CONDITION
+              meta: 'join',
+              weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.ACTIVE_JOIN,
+              docHTML: self.createJoinHtml(suggestionString)
             });
           });
-          joinDeferral.resolve();
+          joinsDeferral.resolve();
         },
-        errorCallback: joinDeferral.resolve
+        errorCallback: joinsDeferral.resolve
+      });
+    }
+
+    if (parseResult.suggestJoinConditions) {
+      var joinConditionsDeferral = $.Deferred();
+      deferrals.push(joinConditionsDeferral);
+      self.snippet.getApiHelper().fetchNavOptPopularJoins({
+        sourceType: self.snippet.type(),
+        timeout: self.timeout,
+        defaultDatabase: database,
+        silenceErrors: true,
+        tables: parseResult.suggestJoinConditions.tables,
+        successCallback: function (data) {
+          data.values.forEach(function (value) {
+            if (value.joinCols.length > 0) {
+              var suggestionString = parseResult.suggestJoinConditions.prependOn ? (parseResult.lowerCase ? 'on ' : 'ON ') : '';
+              var first = true;
+              value.joinCols.forEach(function (joinColPair) {
+                if (!first) {
+                  suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+                }
+                suggestionString += joinColPair.columns[0] + ' = ' + joinColPair.columns[1];
+                first = false;
+              });
+              completions.push({
+                value: suggestionString,
+                meta: 'condition',
+                weight: DEFAULT_WEIGHTS.JOIN_CONDITION,
+                docHTML: self.createJoinHtml(suggestionString)
+              });
+            }
+          });
+          joinConditionsDeferral.resolve();
+        },
+        errorCallback: joinConditionsDeferral.resolve
       });
     }
 
@@ -305,6 +362,12 @@ var SqlAutocompleter2 = (function () {
       }
       delete suggestion.table;
     }
+  };
+
+  SqlAutocompleter2.prototype.createJoinHtml = function (value) {
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">' + value + '</span></p>';
+    html += '<div>';
+    return html;
   };
 
   SqlAutocompleter2.prototype.addValues = function (parseResult, columnReference, completions) {

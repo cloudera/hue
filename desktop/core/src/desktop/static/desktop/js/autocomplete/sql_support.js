@@ -207,11 +207,15 @@ var selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
   }
 };
 
-var joinConditionsSuggest = function (details) {
+var suggestJoinConditions = function (details) {
   parser.yy.result.suggestJoinConditions = details || {};
   if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
     parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
   }
+};
+
+var suggestJoins = function (details) {
+  parser.yy.result.suggestJoins = details || {};
 };
 
 var valueExpressionSuggest = function (oppositeValueExpression, operator) {

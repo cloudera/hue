@@ -125,6 +125,7 @@
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
+          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTableB' }] }] },
           suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
         }
       });
@@ -1293,20 +1294,21 @@
       describe('Hive specific', function () {
         it('should suggest keywords for "SELECT count(id) OVER w FROM customers |"', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT row_number() OVER w FROM customers ',
+            beforeCursor: 'SELECT count(id) OVER w FROM customers ',
             afterCursor: '',
             hasLocations: true,
             dialect: 'hive',
             containsKeywords: ['WINDOW'],
             expectedResult: {
-              lowerCase: false
+              lowerCase: false,
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'customers' }] }] }
             }
           });
         });
 
         it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w |"', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT row_number() OVER w FROM customers WINDOW w ',
+            beforeCursor: 'SELECT count(id) OVER w FROM customers WINDOW w ',
             afterCursor: '',
             hasLocations: true,
             dialect: 'hive',
@@ -1319,7 +1321,7 @@
 
         it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w AS (|"', function() {
           assertAutoComplete({
-            beforeCursor: 'SELECT row_number() OVER w FROM customers WINDOW w AS (',
+            beforeCursor: 'SELECT count(id) OVER w FROM customers WINDOW w AS (',
             afterCursor: '',
             hasLocations: true,
             dialect: 'hive',
@@ -2489,6 +2491,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestKeywords: ['TABLESAMPLE', 'AS', 'LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
@@ -2502,6 +2505,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }] }] },
             suggestKeywords: ['LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
@@ -2543,7 +2547,8 @@
           hasLocations: true,
           containsKeywords: ['WHERE', 'HAVING'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
@@ -2608,7 +2613,8 @@
           hasLocations: true,
           containsKeywords: ['AS', 'WHERE'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
@@ -3054,6 +3060,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTableB' }] }] },
             suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN']
           }
         });
@@ -5590,7 +5597,8 @@
           noErrors: true,
           containsKeywords: ['TABLESAMPLE', 'AS'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
           }
         });
       });
@@ -5603,7 +5611,8 @@
           hasLocations: true,
           containsKeywords: ['TABLESAMPLE', 'AS'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
           }
         });
       });
@@ -5887,6 +5896,7 @@
           dialect: 'generic',
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: false, joinType: 'JOIN', tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             suggestTables: {},
             suggestDatabases: { appendDot: true }
           }
@@ -6183,6 +6193,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
           }
         });
@@ -6196,6 +6207,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
           }
         });
@@ -6282,6 +6294,19 @@
         });
       });
 
+      it('should suggest joins for "SELECT * FROM testTable1 |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable1 ',
+          afterCursor: '',
+          hasLocations: true,
+          containsKeywords: ['JOIN'],
+          expectedResult: {
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }] }
+          }
+        });
+      });
+
       describe('Hive specific', function () {
         it('should suggest keywords for "SELECT t1.* FROM table1 t1 |"', function () {
           assertAutoComplete({
@@ -6291,7 +6316,8 @@
             hasLocations: true,
             containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
             expectedResult: {
-              lowerCase: false
+              lowerCase: false,
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] }
             }
           });
         });
@@ -6369,6 +6395,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
               suggestKeywords: ['LATERAL VIEW', 'CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
             }
           });
@@ -6437,6 +6464,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }] }] },
               suggestTables: {},
               suggestDatabases: { appendDot: true }
             }
@@ -6469,7 +6497,8 @@
             containsKeywords: ['LEFT ANTI JOIN', 'RIGHT ANTI JOIN'], // Tested in full above
             hasLocations: true,
             expectedResult: {
-              lowerCase: false
+              lowerCase: false,
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] }
             }
           });
         });
@@ -6536,6 +6565,7 @@
               lowerCase: false,
               suggestTables: {},
               suggestDatabases: { appendDot: true },
+              suggestJoins: { prependJoin: false, joinType: 'JOIN', tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
               suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
             }
           });
@@ -6563,6 +6593,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
               suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT ANTI', 'RIGHT OUTER', 'RIGHT SEMI']
             }
           });
@@ -6631,6 +6662,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }] }] },
               suggestTables: {},
               suggestDatabases: { appendDot: true },
               suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
