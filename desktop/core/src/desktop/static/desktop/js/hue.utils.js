@@ -356,6 +356,17 @@ Number.prototype.toHHMMSS = function () {
   return (days > 0 ? days + "d, " : "") + (hours > 0 ? hours + "h, " : "") + (minutes > 0 ? minutes + "m, " : "") + seconds + (millis > 0 && minutes == 0 && hours == 0 && days == 0 ? "." + millis : "") + "s";
 }
 
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 if (!('getParameter' in window.location)) {
   window.location.getParameter = function (name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
