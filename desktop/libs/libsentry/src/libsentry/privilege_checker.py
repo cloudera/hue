@@ -37,10 +37,9 @@ class PrivilegeChecker(object):
   Given a user, checks and applies Sentry privilege and authorization rules against Sentry objects
   """
 
-  def __init__(self, user):
+  def __init__(self, user, api=None):
     self.user = user
-    self.api = get_api(self.user)
-    self.user_roles = self.api.list_sentry_roles_by_group('*')  # Get all roles for user
+    self.api = api if api else get_api(self.user)
 
 
   def filter_objects(self, authorizableSet, action='SELECT'):
@@ -51,7 +50,8 @@ class PrivilegeChecker(object):
     filtered_objects = []
     privileges = []
 
-    for role in self.user_roles:
+    user_roles = self.api.list_sentry_roles_by_group('*')  # Get all roles for user
+    for role in user_roles:
       role_privileges = self.api.list_sentry_privileges_by_role(role['name'])
       privileges.extend(role_privileges)  # This may result in duplicates but will get reduced in hierarchy tree
 
