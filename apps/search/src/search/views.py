@@ -565,13 +565,17 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'limit': 10,
     'mincount': 0,
     'isDate': False,
-    'aggregate': 'unique'
+    'aggregate': {'function': 'unique', 'ops': []}
   }
+
+  # avg(stars)                      # {'function': 'avg', 'ops': []}
+  # avg(mul(stars,1))               # {'function': 'avg', 'ops': [{'function': 'mul', 'ops': ['stars', 1]}]}
+  # avg(mul(stars,1,max(f2)))       # {'function': 'avg', 'ops': [{'function': 'mul', 'ops': ['stars', 1, {'function': 'max', 'ops': ['f2']}]}]}
+  # avg(percentile(stars,50,100))   # {'function': 'avg', 'ops': [{'function': 'percentile', 'ops': ['stars', 50, 100]}]}
+  # percentile(mul(stars,2),50)     # {'function': 'percentile', 'ops': [{'function': 'mul', 'ops': ['stars', 2]}, extra: [50]]}
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
-  elif widget_type == 'hit-widget':
-    facet_type = 'function'
   elif widget_type == 'gradient-map-widget':
     facet_type = 'nested'
     properties['facets'] = []
@@ -591,11 +595,14 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget'):
+    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget'):
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
-      facet_type = 'nested'
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
+      if widget_type == 'hit-widget':
+        facet_type = 'function'
+      else:        
+        facet_type = 'nested'
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': []}}
       properties['facets'] = []
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
       if widget_type == 'pie2-widget':

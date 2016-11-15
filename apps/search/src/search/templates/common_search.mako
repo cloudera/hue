@@ -227,7 +227,7 @@ from django.utils.translation import ugettext as _
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="hcha hcha-pie-chart"></i>
+                       <i class="fa fa-pie-chart"></i>
          </a>
     </div>
     <div data-bind="visible: ! $root.isLatest(),
@@ -247,7 +247,7 @@ from django.utils.translation import ugettext as _
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
-                       <i class="hcha hcha-bar-chart"></i>
+                       <i class="fa fa-bar-chart"></i>
          </a>
     </div>
     <div data-bind="visible: ! $root.isLatest(),
@@ -303,7 +303,7 @@ from django.utils.translation import ugettext as _
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableTimeline() ? 'move' : 'default' }">
-                       <i class="hcha hcha-timeline-chart"></i>
+                       <i class="fa fa-line-chart"></i>
          </a>
     </div>
     <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
@@ -1974,15 +1974,28 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-        <span class="facet-field-label">${ _('Metric') }</span>
-        <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.aggregate"></select>
-      </div>
-      <div data-bind="visible: ! $root.isEditing(), text: getHitOption(properties.aggregate())" class="muted"></div>
+      <span data-bind="template: { name: 'metric-form', data: properties.aggregate }"></span>
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="metric-form">
+  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+    <span class="facet-field-label">${ _('Metric') }</span>
+    <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+    <br/>
+    <a href="javascript: void(0)" data-bind="click: function() { $data.ops.push(ko.mapping.fromJS({'function': 'unique', 'ops': []})); }">
+      <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
+    </a>
+    <!-- ko foreach: ops() -->
+      <span data-bind="template: { name: 'metric-form' }"></span>
+    <!-- /ko -->
+  </div>
+  <div data-bind="visible: ! $root.isEditing(), text: getHitOption($data.function)" class="muted"></div>
 </script>
 
 
@@ -2666,6 +2679,7 @@ var HIT_OPTIONS = [
   { value: "max", label: "${ _('Max') }" },
   { value: "median", label: "${ _('Median') }" },
   { value: "percentile", label: "${ _('Percentiles') }" },
+  { value: "mul", label: "${ _('Multiply') }" },
 ];
 
 function getHitOption(value){
