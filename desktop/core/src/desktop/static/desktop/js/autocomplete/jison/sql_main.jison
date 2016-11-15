@@ -1396,7 +1396,10 @@ TableExpression_EDIT
          keywords = createWeightedKeywords($1.suggestKeywords, 3);
        }
        if ($1.tableReferenceList.suggestJoinConditions) {
-         joinConditionsSuggest($1.tableReferenceList.suggestJoinConditions);
+         suggestJoinConditions($1.tableReferenceList.suggestJoinConditions);
+       }
+       if ($1.tableReferenceList.suggestJoins) {
+         suggestJoins($1.tableReferenceList.suggestJoins);
        }
        if (!$1.hasLateralViews && $1.tableReferenceList.suggestKeywords) {
          keywords = keywords.concat(createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
@@ -2327,6 +2330,16 @@ TableReference_EDIT
 
 TablePrimaryOrJoinedTable
  : TablePrimary
+   {
+      $$ = $1;
+      var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
+      if (!lastTablePrimary.subQueryAlias) {
+        $$.suggestJoins = {
+          prependJoin: true,
+          tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+        };
+      }
+   }
  | JoinedTable
  ;
 
@@ -2398,6 +2411,16 @@ Join_EDIT
      if (!$2 && isImpala()) {
        suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
+     if (!$2) {
+       var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
+       if (!lastTablePrimary.subQueryAlias) {
+         suggestJoins({
+           prependJoin: false,
+           joinType: $1,
+           tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+         })
+       }
+     }
      suggestTables();
      suggestDatabases({
        appendDot: true
@@ -2413,19 +2436,19 @@ Joins_EDIT
  ;
 
 JoinType
- : 'JOIN'
- | '<hive>CROSS' 'JOIN'
- | 'INNER' 'JOIN'
- | 'FULL' 'JOIN'
- | 'FULL' 'OUTER' 'JOIN'
- | 'LEFT' 'JOIN'
- | 'LEFT' '<impala>ANTI' 'JOIN'
- | 'LEFT' 'OUTER' 'JOIN'
- | 'LEFT' 'SEMI' 'JOIN'
- | 'RIGHT' 'JOIN'
- | 'RIGHT' '<impala>ANTI' 'JOIN'
- | 'RIGHT' 'OUTER' 'JOIN'
- | 'RIGHT' 'SEMI' 'JOIN'
+ : 'JOIN'                         -> 'JOIN'
+ | '<hive>CROSS' 'JOIN'           -> 'CROSS JOIN'
+ | 'INNER' 'JOIN'                 -> 'INNER JOIN'
+ | 'FULL' 'JOIN'                  -> 'FULL JOIN'
+ | 'FULL' 'OUTER' 'JOIN'          -> 'FULL OUTER JOIN'
+ | 'LEFT' 'JOIN'                  -> 'LEFT JOIN'
+ | 'LEFT' '<impala>ANTI' 'JOIN'   -> 'LEFT ANTI JOIN'
+ | 'LEFT' 'OUTER' 'JOIN'          -> 'LEFT OUTER JOIN'
+ | 'LEFT' 'SEMI' 'JOIN'           -> 'LEFT SEMI JOIN'
+ | 'RIGHT' 'JOIN'                 -> 'RIGHT JOIN'
+ | 'RIGHT' '<impala>ANTI' 'JOIN'  -> 'RIGHT ANTI JOIN'
+ | 'RIGHT' 'OUTER' 'JOIN'         -> 'RIGHT OUTER JOIN'
+ | 'RIGHT' 'SEMI' 'JOIN'          -> 'RIGHT SEMI JOIN'
  ;
 
 JoinType_EDIT
@@ -2505,7 +2528,7 @@ JoinCondition_EDIT
  | 'ON' 'CURSOR'
    {
      valueExpressionSuggest();
-     joinConditionsSuggest({ prependOn: false });
+     suggestJoinConditions({ prependOn: false });
    }
  ;
 

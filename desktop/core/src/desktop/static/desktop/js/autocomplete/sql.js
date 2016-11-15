@@ -616,7 +616,10 @@ case 792:
          keywords = createWeightedKeywords($$[$0-3].suggestKeywords, 3);
        }
        if ($$[$0-3].tableReferenceList.suggestJoinConditions) {
-         joinConditionsSuggest($$[$0-3].tableReferenceList.suggestJoinConditions);
+         suggestJoinConditions($$[$0-3].tableReferenceList.suggestJoinConditions);
+       }
+       if ($$[$0-3].tableReferenceList.suggestJoins) {
+         suggestJoins($$[$0-3].tableReferenceList.suggestJoins);
        }
        if (!$$[$0-3].hasLateralViews && $$[$0-3].tableReferenceList.suggestKeywords) {
          keywords = keywords.concat(createWeightedKeywords($$[$0-3].tableReferenceList.suggestKeywords, 3));
@@ -1476,6 +1479,18 @@ case 1152: case 1153:
       });
     
 break;
+case 1163:
+
+      this.$ = $$[$0];
+      var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
+      if (!lastTablePrimary.subQueryAlias) {
+        this.$.suggestJoins = {
+          prependJoin: true,
+          tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+        };
+      }
+   
+break;
 case 1170:
 
      if ($$[$0] && $$[$0].valueExpression) {
@@ -1519,11 +1534,60 @@ case 1181:
      if (!$$[$0-2] && isImpala()) {
        suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
+     if (!$$[$0-2]) {
+       var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
+       if (!lastTablePrimary.subQueryAlias) {
+         suggestJoins({
+           prependJoin: false,
+           joinType: $$[$0-3],
+           tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+         })
+       }
+     }
      suggestTables();
      suggestDatabases({
        appendDot: true
      });
    
+break;
+case 1186:
+this.$ = 'JOIN';
+break;
+case 1187:
+this.$ = 'CROSS JOIN';
+break;
+case 1188:
+this.$ = 'INNER JOIN';
+break;
+case 1189:
+this.$ = 'FULL JOIN';
+break;
+case 1190:
+this.$ = 'FULL OUTER JOIN';
+break;
+case 1191:
+this.$ = 'LEFT JOIN';
+break;
+case 1192:
+this.$ = 'LEFT ANTI JOIN';
+break;
+case 1193:
+this.$ = 'LEFT OUTER JOIN';
+break;
+case 1194:
+this.$ = 'LEFT SEMI JOIN';
+break;
+case 1195:
+this.$ = 'RIGHT JOIN';
+break;
+case 1196:
+this.$ = 'RIGHT ANTI JOIN';
+break;
+case 1197:
+this.$ = 'RIGHT OUTER JOIN';
+break;
+case 1198:
+this.$ = 'RIGHT SEMI JOIN';
 break;
 case 1199: case 1200: case 1201: case 1203: case 1204: case 1205: case 1207: case 1208: case 1209:
 
@@ -1592,7 +1656,7 @@ break;
 case 1220:
 
      valueExpressionSuggest();
-     joinConditionsSuggest({ prependOn: false });
+     suggestJoinConditions({ prependOn: false });
    
 break;
 case 1221:
@@ -4246,11 +4310,15 @@ var selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
   }
 };
 
-var joinConditionsSuggest = function (details) {
+var suggestJoinConditions = function (details) {
   parser.yy.result.suggestJoinConditions = details || {};
   if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
     parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
   }
+};
+
+var suggestJoins = function (details) {
+  parser.yy.result.suggestJoins = details || {};
 };
 
 var valueExpressionSuggest = function (oppositeValueExpression, operator) {

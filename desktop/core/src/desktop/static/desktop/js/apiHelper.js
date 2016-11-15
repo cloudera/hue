@@ -1392,7 +1392,7 @@ var ApiHelper = (function () {
   };
 
   /**
-   * Fetches a navigator entity for the given identifierChain
+   * Fetches the popular joins for the given tables
    *
    * @param {Object} options
    * @param {string} options.sourceType
@@ -1405,7 +1405,7 @@ var ApiHelper = (function () {
    * @param {string} options.tables.identifierChain.name
    * @param {string} [options.defaultDatabase]
    */
-  ApiHelper.prototype.fetchNavOptJoinConditions = function (options) {
+  ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
 
     var dbTables = [];
