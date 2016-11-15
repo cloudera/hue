@@ -619,7 +619,7 @@ var Collection = function (vm, collection) {
       });
     }
     if (facet.properties.aggregate) {
-      facet.properties.aggregate.subscribe(function () {
+      facet.properties.aggregate.function.subscribe(function () {
         vm.search();
       });
     }
@@ -770,7 +770,7 @@ var Collection = function (vm, collection) {
             });
           }
           if (facet.properties.aggregate) {
-            facet.properties.aggregate.subscribe(function () {
+            facet.properties.aggregate.function.subscribe(function () {
               vm.search();
             });
           }

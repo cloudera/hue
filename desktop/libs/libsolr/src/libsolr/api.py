@@ -607,13 +607,25 @@ class SolrApi(object):
   def _get_aggregate_function(self, facet):
     props = {
         'field': facet['field'],
-        'aggregate': facet['properties']['aggregate'] if 'properties' in facet else facet['aggregate']
+        'aggregate': facet['properties']['aggregate']['function'] #if 'properties' in facet else facet['aggregate']
     }
 
-    if props['aggregate'] == 'percentile':
-      return 'percentile(%(field)s,50)' % props
+    if  facet['properties']['aggregate']['ops']:
+      a = self.__get_aggregate_function()
+      return ''
     else:
-      return '%(aggregate)s(%(field)s)' % props
+      return '%(aggregate)s(%(field)s)' % props 
+#     if props['aggregate'] == 'percentile':
+#       return 'percentile(%(field)s,50)' % props
+#     else:
+#       return '%(aggregate)s(%(field)s)' % props
+  
+  def __get_aggregate_function(self):
+    pass
+    
+  # 'aggregate': {'function': 'count', 'ops': []}
+  # avg(stars)                      # {'function': 'avg', 'ops': []}
+  # avg(mul(stars,1))               # {'function': 'avg', 'ops': [{'function': 'mul', 'ops': ['stars', 1]}]}
 
   def _get_range_borders(self, collection, query):
     props = {}
