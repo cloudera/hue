@@ -277,7 +277,7 @@ ${ hueIcons.symbols() }
     <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <div style="position: relative; width: 100%; height: 100%;" data-bind="component: { name: 'right-assist-panel' }"></div>
+      <div style="position: absolute; top: 25px; bottom: 0; left: 0; right: 0" data-bind="component: { name: 'right-assist-panel' }"></div>
     </div>
   </div>
 </div>
@@ -331,12 +331,17 @@ ${ assist.assistPanel() }
       <a href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
       <!-- /ko -->
     </div>
-    <div data-bind="foreach: functions">
-      <div style="margin-top: 20px;">
-        <div style="font-weight: 600"><a href="javascript:void(0);" data-bind="text: signature, toggle: open"></a></div>
-        <div data-bind="visible: open, text: description"></div>
-      </div>
-    </div>
+    <ul data-bind="foreach: activeCategories">
+      <li>
+        <a href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
+        <ul data-bind="slideVisible: open, foreach: functions">
+          <li>
+            <a href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
+            <div data-bind="slideVisible: open, text: description"></div>
+          </li>
+        </ul>
+      </li>
+    </ul>
   </div>
 </script>
 
@@ -344,30 +349,40 @@ ${ assist.assistPanel() }
   (function () {
     function RightAssist(params) {
       var self = this;
-      self.functions = ko.observableArray();
+      self.categories = {};
+
       self.activeType = ko.observable();
       self.availableTypes = ['hive', 'impala'];
-      self.cachedFunctions = {};
+
+      self.initSqlFunctions('hive');
+      self.initSqlFunctions('impala');
+
+      self.activeCategories = ko.observable();
 
       self.activeType.subscribe(function (newValue) {
-        if (newValue === 'hive' || newValue === 'impala') {
-          if (!self.cachedFunctions[newValue]) {
-            var functionIndex = SqlFunctions.getFunctionsWithReturnTypes(newValue, ['T'], true, true);
-            var keys = Object.keys(functionIndex);
-            keys.sort();
-            var funcs = [];
-            keys.forEach(function (key) {
-              functionIndex[key].open = ko.observable(false);
-              funcs.push(functionIndex[key]);
-            });
-            self.cachedFunctions[newValue] = funcs;
-          }
-          self.functions(self.cachedFunctions[newValue]);
-        }
+        self.activeCategories(self.categories[newValue]);
       });
 
       self.activeType(self.availableTypes[0]);
     }
+
+    RightAssist.prototype.initSqlFunctions = function (dialect) {
+      var self = this;
+      self.categories[dialect] = [];
+      SqlFunctions.CATEGORIZED_FUNCTIONS[dialect].forEach(function (category) {
+        self.categories[dialect].push({
+          name: category.name,
+          open: ko.observable(false),
+          functions: $.map(category.functions, function(fn) {
+            return {
+              signature: fn.signature,
+              open: ko.observable(false),
+              description: fn.description
+            }
+          })
+        })
+      });
+    };
 
     ko.components.register('right-assist-panel', {
       viewModel: RightAssist,
