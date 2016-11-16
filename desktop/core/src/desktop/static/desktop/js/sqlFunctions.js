@@ -2178,29 +2178,27 @@ var SqlFunctions = (function () {
 
   var CATEGORIZED_FUNCTIONS = {
     hive: [
+      { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['hive'] },
+      { name: 'Analytic', functions: ANALYTIC_FUNCTIONS['hive'] },
       { name: 'Collection', functions: COLLECTION_FUNCTIONS['hive'] },
-      { name: 'Conditional', functions: CONDITIONAL_FUNCTIONS['hive'] },
       { name: 'Complex Type', functions: COMPLEX_TYPE_CONSTRUCTS['hive'] },
+      { name: 'Conditional', functions: CONDITIONAL_FUNCTIONS['hive'] },
       { name: 'Date', functions: DATE_FUNCTIONS['hive'] },
       { name: 'Mathematical', functions: MATHEMATICAL_FUNCTIONS['hive'] },
-      { name: 'Type Conversion', functions: TYPE_CONVERSION_FUNCTIONS['hive'] },
-      { name: 'String', functions: STRING_FUNCTIONS['hive'] },
       { name: 'Misc', functions: MISC_FUNCTIONS['hive'] },
+      { name: 'String', functions: STRING_FUNCTIONS['hive'] },
       { name: 'Table Generating', functions: TABLE_GENERATING_FUNCTIONS['hive'] },
-      { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['hive'] },
-      { name: 'Analytic', functions: ANALYTIC_FUNCTIONS['hive'] }
+      { name: 'Type Conversion', functions: TYPE_CONVERSION_FUNCTIONS['hive'] }
     ],
     impala: [
-      { name: 'Collection', functions: COLLECTION_FUNCTIONS['impala'] },
+      { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['impala'] },
+      { name: 'Analytic', functions: ANALYTIC_FUNCTIONS['impala'] },
       { name: 'Conditional', functions: CONDITIONAL_FUNCTIONS['impala'] },
-      { name: 'Complex Type', functions: COMPLEX_TYPE_CONSTRUCTS['impala'] },
       { name: 'Date', functions: DATE_FUNCTIONS['impala'] },
       { name: 'Mathematical', functions: MATHEMATICAL_FUNCTIONS['impala'] },
-      { name: 'Type Conversion', functions: TYPE_CONVERSION_FUNCTIONS['impala'] },
-      { name: 'String', functions: STRING_FUNCTIONS['impala'] },
       { name: 'Misc', functions: MISC_FUNCTIONS['impala'] },
-      { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['impala'] },
-      { name: 'Analytic', functions: ANALYTIC_FUNCTIONS['impala'] }
+      { name: 'String', functions: STRING_FUNCTIONS['impala'] },
+      { name: 'Type Conversion', functions: TYPE_CONVERSION_FUNCTIONS['impala'] }
     ]
   };
 
