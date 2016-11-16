@@ -500,7 +500,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="facet-toggle2">
-
+  <div class="pull-left margin-right-20">
     ## Dimension 1
   <!-- ko if: $root.isEditing -->
     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
@@ -567,6 +567,7 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
   <!-- /ko -->
+  </div>
 
   ## Dimensions > 1 , visible: !$parents[1].isLoading()
   <!-- ko if: $root.isEditing -->

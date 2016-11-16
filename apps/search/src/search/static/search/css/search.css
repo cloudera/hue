@@ -399,6 +399,12 @@ em {
   border-top: none!important;
 }
 
+.filter-box .selectize-control {
+  margin-bottom: -10px;
+  margin-top: -6px;
+  margin-left: -6px;
+}
+
 .field-selector {
   display: inline-block;
   margin-left: 3px;
