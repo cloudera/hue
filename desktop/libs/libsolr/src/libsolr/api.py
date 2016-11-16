@@ -594,7 +594,6 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def _get_params(self):
     if self.security_enabled:
       return (('doAs', self._user ),)
@@ -605,28 +604,22 @@ class SolrApi(object):
     return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
   def _get_aggregate_function(self, facet):
-    props = {
-        'field': facet['field'],
-        'aggregate': facet['properties']['aggregate']['function'] #if 'properties' in facet else facet['aggregate']
-    }
-
-    if  facet['properties']['aggregate']['ops']:
-      a = self.__get_aggregate_function()
-      return ''
-    else:
-      return '%(aggregate)s(%(field)s)' % props 
-#     if props['aggregate'] == 'percentile':
-#       return 'percentile(%(field)s,50)' % props
-#     else:
-#       return '%(aggregate)s(%(field)s)' % props
-  
-  def __get_aggregate_function(self):
-    pass
+    f = facet['properties']['aggregate']
     
-  # 'aggregate': {'function': 'count', 'ops': []}
-  # avg(stars)                      # {'function': 'avg', 'ops': []}
-  # avg(mul(stars,1))               # {'function': 'avg', 'ops': [{'function': 'mul', 'ops': ['stars', 1]}]}
+    if not f['ops']:
+      f['ops'] = [{u'function': u'field', 'value': facet['field'], u'ops': []}]
+    
+    return self.__get_aggregate_function(f)
 
+  def __get_aggregate_function(self, f):
+    if f['function'] == 'field' or f['function'] == 'constant':
+      return f['value']
+    else:
+      fields = []
+      for _f in f['ops']:
+        fields.append(self.__get_aggregate_function(_f))
+      return '%s(%s)' % (f['function'], ','.join(fields))
+    
   def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
