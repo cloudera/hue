@@ -186,12 +186,11 @@ def similar_queries(request):
 def top_filters(request):
   response = {'status': -1}
 
-  database_name = request.POST.get('databaseName')
-  table_name = request.POST.get('tableName')
+  db_tables = json.loads(request.POST.get('dbTables'), '[]')
   column_name = request.POST.get('columnName') # Unsused
 
   api = OptimizerApi()
-  data = api.top_filters(database_name=database_name, table_name=table_name, column_name=column_name)
+  data = api.top_filters(db_tables=db_tables)
 
   if data['status'] == 'success':
     response['status'] = 0
@@ -269,7 +268,7 @@ def top_columns(request):
 
   if data['status'] == 'success':
     response['status'] = 0
-    response['values'] = data['results']
+    response['values'] = data
   else:
     response['message'] = 'Optimizer: %s' % data
 
