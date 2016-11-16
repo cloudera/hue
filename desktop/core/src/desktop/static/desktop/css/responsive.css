@@ -429,6 +429,73 @@ body {
   bottom: 0;
 }
 
+.assist-function-categories,
+.assist-functions {
+  list-style: none;
+  overflow-x: hidden;
+}
+
+a:hover,
+a:active,
+a:focus,
+a:visited {
+  text-decoration: none;
+}
+
+.black-link {
+  color: #444;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.black-link:active,
+.black-link:focus,
+.black-link:visited {
+  color: #444;
+}
+
+.black-link:hover {
+  color: #338BB8;
+}
+
+.assist-function-categories {
+  margin: 5px;
+}
+
+.assist-function-categories li {
+  line-height: 23px;
+}
+
+.assist-function-categories li a i {
+  font-size: 12px;
+}
+
+.assist-function-categories li a span {
+  font-size: 14px;
+}
+
+.assist-functions {
+  margin: 0 0 0 20px;
+}
+
+.assist-functions li {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.assist-functions li div {
+  margin: 0 0 0 10px;
+  font-style: italic;
+}
+
+.assist-function-type-switch {
+  text-align: right;
+  padding: 5px 10px;
+  font-size: 15px;
+}
+
 .side-panel-toggle {
   position: absolute;
   top: 2px;
