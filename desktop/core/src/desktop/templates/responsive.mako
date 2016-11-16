@@ -277,7 +277,7 @@ ${ hueIcons.symbols() }
     <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <div style="position: absolute; top: 25px; bottom: 0; left: 0; right: 0" data-bind="component: { name: 'right-assist-panel' }"></div>
+      <div style="position: absolute; top: 15px; bottom: 0; left: 0; right: 0;" data-bind="component: { name: 'right-assist-panel' }"></div>
     </div>
   </div>
 </div>
@@ -322,21 +322,21 @@ ${ assist.assistPanel() }
 
 <!-- TODO: Put right assist inside assist.mako? -->
 <script type="text/html" id="right-assist-template">
-  <div style="height: 100%; width: 100%; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative;" data-bind="niceScroll">
-    <div data-bind="foreach: availableTypes">
+  <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
+    <div class="assist-function-type-switch" data-bind="foreach: availableTypes">
       <!-- ko if: $data === $parent.activeType() -->
-      <span data-bind="text: $data"></span>
+      <span style="font-weight: 600;" data-bind="text: $data"></span>
       <!-- /ko -->
       <!-- ko ifnot: $data === $parent.activeType() -->
-      <a href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
+      <a class="black-link" href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
       <!-- /ko -->
     </div>
-    <ul data-bind="foreach: activeCategories">
+    <ul class="assist-function-categories" data-bind="foreach: activeCategories">
       <li>
-        <a href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-        <ul data-bind="slideVisible: open, foreach: functions">
+        <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
+        <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
           <li>
-            <a href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
+            <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
             <div data-bind="slideVisible: open, text: description"></div>
           </li>
         </ul>
