@@ -1975,6 +1975,7 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <span class="facet-field-label">${ _('Metric') }</span>
       <span data-bind="template: { name: 'metric-form', data: properties.aggregate }"></span>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
@@ -1985,11 +1986,29 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="metric-form">
-  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    <span class="facet-field-label">${ _('Metric') }</span>
-    <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
+    <!-- ko if: ['sum', 'avg', 'mul', 'unique'].indexOf($data.function()) != -1 -->
+      <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+    <!-- /ko -->
+    
+    <!-- ko if: $data.function() == 'field' -->
+      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
+    <!-- /ko -->
+
+    <!-- ko if: $data.function() == 'constant' -->
+      <input data-bind="value: value" class="hit-options" style="margin-bottom: 0"></select>
+    <!-- /ko -->
+
+    <a href="javascript: void(0)" data-bind="click: function() {
+        $parent.ops.pop($data); }
+      ">
+      <i class="fa fa-minus" title="${ _('Delete') }"></i>
+    </a>
+
     <br/>
-    <a href="javascript: void(0)" data-bind="click: function() { $data.ops.push(ko.mapping.fromJS({'function': 'unique', 'ops': []})); }">
+    <a href="javascript: void(0)" data-bind="click: function() {
+        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'constant', 'value': '2', 'ops': []}]})); }
+      ">
       <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
     </a>
     <!-- ko foreach: ops() -->
