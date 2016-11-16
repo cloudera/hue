@@ -406,7 +406,6 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
       <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
-        <br/>
       <!-- /ko -->
     <!-- /ko -->
 
@@ -532,7 +531,6 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
       <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
-        <br/>
       <!-- /ko -->
     <!-- /ko -->
 
