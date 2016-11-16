@@ -53,8 +53,13 @@ def auth_error_handler(view_fn):
       return view_fn(*args, **kwargs)
     except (S3ResponseError, IOError), e:
       if 'Forbidden' in str(e) or e.status == 403:
-        path = args[1]  # We assume the source path is the first argument
-        raise S3FileSystemException(_('User is not authorized to write or modify path: %s. Check that user has write permissions.') % path)
+        path = kwargs.get('path')
+        if not path and len(args) > 1:
+          path = args[1]  # We assume that the path is the first argument
+        msg = _('User is not authorized to perform the attempted operation. Check that the user has appropriate permissions.')
+        if path:
+          msg = _('User is not authorized to write or modify path: %s. Check that the user has write permissions.') % path
+        raise S3FileSystemException(msg)
       else:
         raise S3FileSystemException(e.message or e.reason)
     except Exception, e:
@@ -462,7 +467,7 @@ class S3FileSystem(object):
         self.remove(path=tmp_path)
       else:
         self.open(path)
-    except (S3ResponseError, IOError), e:
+    except Exception, e:
       LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
       return False
     return True
