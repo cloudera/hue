@@ -1207,6 +1207,14 @@
       }
 
       var _tmpl = $('<div class="simpledaterangepicker">' +
+              '<div class="facet-field-cnt custom">' +
+              '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
+              '<div class="facet-field-switch"><i class="fa fa-calendar muted"></i> <a href="javascript:void(0)">' + KO_DATERANGEPICKER_LABELS.DATE_PICKERS + '</a></div>' +
+              '</div>' +
+              '<div class="facet-field-cnt picker">' +
+              '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
+              '<div class="facet-field-switch"><i class="fa fa-calendar-o muted"></i> <a href="javascript:void(0)">' + KO_DATERANGEPICKER_LABELS.CUSTOM_FORMAT + '</a></div>' +
+              '</div>' +
               '<div class="facet-field-cnt picker">' +
               '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.START + '</div>' +
               '<div class="input-prepend input-group">' +
@@ -1237,14 +1245,10 @@
               '</select>' +
               '<input class="input interval hide" type="hidden" value="" />' +
               '</div>' +
-              '<div class="facet-field-cnt picker">' +
-              '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
-              '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar-o"></i> ' + KO_DATERANGEPICKER_LABELS.CUSTOM_FORMAT + '</a></div>' +
-              '</div>' +
               '<div class="facet-field-cnt custom">' +
               '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.START + '</div>' +
               '<div class="input-prepend input-group">' +
-              '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
+              '<span class="add-on input-group-addon"><i class="fa fa-calendar-o"></i></span>' +
               '<input type="text" class="input-large form-control start-date-custom" />' +
               '</div>' +
               '<span class="pointer custom-popover" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover" data-html="true"' +
@@ -1256,7 +1260,7 @@
               '<div class="facet-field-cnt custom">' +
               '<div class="facet-field-label facet-field-label-fixed-width">' + KO_DATERANGEPICKER_LABELS.END + '</div>' +
               '<div class="input-prepend input-group">' +
-              '<span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span>' +
+              '<span class="add-on input-group-addon"><i class="fa fa-calendar-o"></i></span>' +
               '<input type="text" class="input-large form-control end-date-custom" />' +
               '</div>' +
               '</div>' +
@@ -1267,10 +1271,7 @@
               '<input type="text" class="input-large form-control interval-custom" />' +
               '</div>' +
               '</div>' +
-              '<div class="facet-field-cnt custom">' +
-              '<div class="facet-field-label facet-field-label-fixed-width"></div>' +
-              '<div class="facet-field-switch"><a href="javascript:void(0)"><i class="fa fa-calendar"></i> ' + KO_DATERANGEPICKER_LABELS.DATE_PICKERS + '</a></div>' +
-              '</div>' +
+
 
               '</div>'
       );

@@ -243,8 +243,8 @@
       START: "${_('Start')}",
       END: "${_('End')}",
       INTERVAL: "${_('Interval')}",
-      CUSTOM_FORMAT: "${_('Custom Format')}",
-      DATE_PICKERS: "${_('Date Pickers')}",
+      CUSTOM_FORMAT: "${_('Switch to custom format')}",
+      DATE_PICKERS: "${_('Switch to date pickers')}",
       CUSTOM_POPOVER_TITLE: "${_('e.g.')}",
       CUSTOM_POPOVER_CONTENT: "${_('Start')}: NOW-5DAYS<br/>${_('End')}: NOW<br/>${_('Interval')}: +1HOURS<br/><a href='http://lucene.apache.org/solr/4_10_2/solr-core/org/apache/solr/util/DateMathParser.html' target='_blank'>${_('Read more...')}</a>"
     };

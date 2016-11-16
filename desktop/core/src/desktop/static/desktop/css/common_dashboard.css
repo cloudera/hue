@@ -302,6 +302,7 @@ body.modal-open {
 .facet-field-switch {
   display: inline;
   margin-top: 10px;
+  margin-left: 3px;
 }
 
 .facet-field-label {
@@ -336,6 +337,10 @@ body.modal-open {
 
 .facet-field-tile {
   float: left;
+}
+
+.card-column .simpledaterangepicker .input-prepend {
+  margin-left: 3px;
 }
 
 .card-column.span2 .facet-field-label-fixed-width {
