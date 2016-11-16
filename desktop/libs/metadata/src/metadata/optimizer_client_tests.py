@@ -177,8 +177,8 @@ class TestOptimizerApi(object):
     assert_true('clauseString' in resp, resp)
 
 
-  def test_popular_filter_values(self):  # Requires test_upload to run before
-    resp = self.api.popular_filter_values(database_name='db1', table_name='Part')
+  def test_top_filters(self):  # Requires test_upload to run before
+    resp = self.api.top_filters(db_tables='db1.Part')
 
     assert_equal('success', resp['status'], resp)
     assert_true('qids' in resp, resp)
