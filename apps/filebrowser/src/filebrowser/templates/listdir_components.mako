@@ -1425,6 +1425,16 @@ from django.utils.translation import ugettext as _
         });
       };
 
+      self.isSql = function() {
+        var fileName = self.selectedFile().name;
+        if (fileName.endsWith('.sql')) {
+          url = "${ url('notebook:editor') }?type=hive&load_fb_path=" + self.selectedFile().path;
+          $("a.openSqlEditorBtn").attr("href", url);
+          return true;
+        }
+        return false;
+      };
+
       self.extractSelectedArchive = function() {
         $("#confirmExtractModal").modal("hide");
         $.post("/filebrowser/extract_archive", {

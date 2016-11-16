@@ -91,25 +91,35 @@ def notebook(request):
 def editor(request, is_mobile=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+  load_fb_path = request.GET.get('load_fb_path', None)
 
   if editor_id:  # Open existing saved editor document
     document = Document2.objects.get(id=editor_id)
     editor_type = document.type.rsplit('-', 1)[-1]
 
   template = 'editor_m.mako' if is_mobile else 'editor.mako'
-
-  return render(template, request, {
-      'editor_id': editor_id or None,
-      'notebooks_json': '{}',
-      'editor_type': editor_type,
-      'options_json': json.dumps({
+  options_json = {
         'languages': get_interpreters(request.user),
         'mode': 'editor',
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
         'editor_type': editor_type,
-        'mobile': is_mobile
-      })
+        'mobile': is_mobile,
+      }
+  if load_fb_path:
+    if not load_fb_path.endswith('.sql'):
+      raise PopupException(_('Only .sql files can be externally loaded into the Editor'))
+
+    options_json['snippet_options'] = {
+      'statement_type': 'file',
+      'statement_path': load_fb_path
+    }
+
+  return render(template, request, {
+      'editor_id': editor_id or None,
+      'notebooks_json': '{}',
+      'editor_type': editor_type,
+      'options_json': json.dumps(options_json)
   })
 
 

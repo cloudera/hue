@@ -1612,14 +1612,19 @@ var EditorViewModel = (function() {
       );
     };
 
-    self.newSnippet = function (type) {
+    self.newSnippet = function (type, snippet_options) {
       if (type) {
         self.selectedSnippet(type);
       }
-      var snippet = self.addSnippet({
+      snippet_params = {
         type: self.selectedSnippet(),
         result: {}
-      });
+      }
+      if (snippet_options && snippet_options['statement_path']) {
+        snippet_params['statementType'] = snippet_options['statement_type'];
+        snippet_params['statementPath'] = snippet_options['statement_path'];
+      }
+      var snippet = self.addSnippet(snippet_params);
 
       window.setTimeout(function () {
         var lastSnippet = snippet;
@@ -2170,7 +2175,8 @@ var EditorViewModel = (function() {
       return '';
     };
 
-    self.init = function () {
+    self.init = function (snippet_options) {
+      self.snippet_options = snippet_options
       if (editor_id) {
         self.openNotebook(editor_id);
       }
@@ -2276,7 +2282,7 @@ var EditorViewModel = (function() {
       }, function (data) {
         self.loadNotebook(data.notebook);
         if (self.editorMode()) {
-          self.selectedNotebook().newSnippet(self.editorType());
+          self.selectedNotebook().newSnippet(self.editorType(), self.snippet_options);
           huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
           if (window.location.getParameter('new') == '') {
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));

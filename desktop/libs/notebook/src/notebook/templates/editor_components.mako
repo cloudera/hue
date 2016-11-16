@@ -3497,7 +3497,7 @@ ${ hueIcons.symbols() }
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
       % endif
       ko.applyBindings(viewModel);
-      viewModel.init();
+      viewModel.init(VIEW_MODEL_OPTIONS['snippet_options']);
 
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
