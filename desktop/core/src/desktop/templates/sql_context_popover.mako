@@ -25,115 +25,6 @@ from metadata.conf import has_navigator
 
 <%def name="sqlContextPopover()">
   <style>
-    .sql-context-popover {
-      position: absolute;
-      display: -ms-flexbox;
-      display: flex;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      top: 0;
-      left: 0;
-      z-index: 1060;
-      padding: 1px;
-      background-color: #fff;
-      -webkit-background-clip: padding-box;
-      background-clip: padding-box;
-      border: 1px solid transparent;
-    }
-
-    .sql-context-popover.sql-context-popover-top {
-      margin-top: -5px;
-    }
-
-    .sql-context-popover.sql-context-popover-top .sql-context-popover-arrow {
-      bottom: -6px;
-      left: 50%;
-      margin-left: -6px;
-      border-top-color: #338BB8;
-      border-bottom-width: 0;
-    }
-
-    .sql-context-popover.sql-context-popover-top .sql-context-popover-arrow::after {
-      bottom: 1px;
-      margin-left: -3px;
-      content: "";
-      border-top-color: #338BB8;
-      border-bottom-width: 0;
-    }
-
-    .sql-context-popover.sql-context-popover-right {
-      margin-left: 5px;
-    }
-
-    .sql-context-popover.sql-context-popover-right .sql-context-popover-arrow {
-      top: 50%;
-      left: -6px;
-      margin-top: -6px;
-      border-right-color: #338BB8;
-      border-left-width: 0;
-    }
-
-    .sql-context-popover.sql-context-popover-right .sql-context-popover-arrow::after {
-      bottom: -3px;
-      left: 1px;
-      content: "";
-      border-right-color: #338BB8;
-      border-left-width: 0;
-    }
-
-    .sql-context-popover.sql-context-popover-bottom {
-      margin-top: 7px;
-    }
-
-    .sql-context-popover.sql-context-popover-bottom .sql-context-popover-arrow {
-      top: -6px;
-      left: 50%;
-      margin-left: -6px;
-      border-top-width: 0;
-      border-bottom-color: #338BB8;
-    }
-
-    .sql-context-popover.sql-context-popover-bottom .sql-context-popover-arrow::after {
-      top: 3px;
-      margin-left: -3px;
-      content: "";
-      border-top-width: 0;
-      border-bottom-color: #338BB8;
-    }
-
-    .sql-context-popover.sql-context-popover-left {
-      margin-left: -5px;
-    }
-
-    .sql-context-popover.sql-context-popover-left .sql-context-popover-arrow {
-      top: 50%;
-      right: -6px;
-      margin-top: -3px;
-      border-right-width: 0;
-      border-left-color: #338BB8;
-    }
-
-    .sql-context-popover.sql-context-popover-left .sql-context-popover-arrow::after {
-      right: 2px;
-      bottom: -3px;
-      content: "";
-      border-right-width: 0;
-      border-left-color: #338BB8;
-    }
-
-    .sql-context-popover-title {
-      -ms-flex: 0 1 auto;
-      flex: 0 1 auto;
-      padding: 6px 10px;
-      margin: 0;
-      font-size: 0.9rem;
-      background-color: #fff;
-    }
-
-    .sql-context-popover-title:empty {
-      display: none;
-    }
-
     .sql-context-popover-content {
       -ms-flex: 1 1 100%;
       flex: 1 1 100%;
@@ -150,15 +41,6 @@ from metadata.conf import has_navigator
       top: 0;
       bottom: 0;
       width: 100%;
-    }
-
-    .sql-context-popover-arrow, .sql-context-popover-arrow::after {
-      position: absolute;
-      display: block;
-      width: 0;
-      height: 0;
-      border-color: transparent;
-      border-style: solid;
     }
 
     .sql-context-tabs {
@@ -182,15 +64,6 @@ from metadata.conf import has_navigator
       padding-top: 0 !important;
       padding-bottom: 5px !important;
       margin-bottom: -1px !important
-    }
-
-    .sql-context-popover-arrow {
-      border-width: 6px;
-    }
-
-    .popover-arrow::after {
-      content: "";
-      border-width: 5px;
     }
 
     .sql-context-flex {
@@ -497,9 +370,9 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-popover-template">
-    <div class="sql-context-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
-      <div class="sql-context-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
-      <div class="sql-context-popover-title">
+    <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
+      <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
+      <div class="hue-popover-title">
         <i class="pull-left fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span data-bind="text: title"></span>
         <a class="pull-right pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
         <a class="pull-right pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
@@ -1082,14 +955,14 @@ from metadata.conf import has_navigator
         var redrawHeaders = false;
 
         window.setTimeout(function () {
-          var offset = $('.sql-context-popover').offset();
+          var offset = $('.hue-popover').offset();
           if (orientation === 'right') {
             offset.left -= 5;
           } else if (orientation === 'bottom') {
             offset.top -= 5;
           }
-          originalHeight = $('.sql-context-popover').height();
-          originalWidth = $('.sql-context-popover').width();
+          originalHeight = $('.hue-popover').height();
+          originalWidth = $('.hue-popover').width();
           originalMidX = offset.left + originalWidth / 2;
           originalMidY = offset.top + originalHeight / 2;
           originalLeftX = offset.left;
@@ -1100,8 +973,8 @@ from metadata.conf import has_navigator
 
         self.saveSize = function () {
           apiHelper.setInTotalStorage('assist', 'popover.size', {
-            width: $('.sql-context-popover').width(),
-            height: $('.sql-context-popover').height()
+            width: $('.hue-popover').width(),
+            height: $('.hue-popover').height()
           });
         };
 
@@ -1129,7 +1002,7 @@ from metadata.conf import has_navigator
           if (rightX < originalMidX + HALF_SIZE_LIMIT_X) {
             ui.size.width = originalMidX + HALF_SIZE_LIMIT_X - ui.position.left;
             rightX = ui.position.left + ui.size.width;
-            $('.sql-context-popover').css('width', ui.size.width + 'px');
+            $('.hue-popover').css('width', ui.size.width + 'px');
           }
 
           if (leftX > originalMidX - HALF_SIZE_LIMIT_X) {
@@ -1137,13 +1010,13 @@ from metadata.conf import has_navigator
             ui.size.width = ui.originalSize.width - (ui.position.left - ui.originalPosition.left);
             leftX = ui.position.left;
             rightX = ui.position.left + ui.size.width;
-            $('.sql-context-popover').css('left', ui.position.left + 'px');
-            $('.sql-context-popover').css('width', ui.size.width + 'px');
+            $('.hue-popover').css('left', ui.position.left + 'px');
+            $('.hue-popover').css('width', ui.size.width + 'px');
           }
 
           leftDiff = originalLeftX - leftX;
           rightDiff = originalRightX - rightX;
-          $('.sql-context-popover-arrow').css('margin-left', (leftDiff + rightDiff) / 2 + leftAdjust() + 'px');
+          $('.hue-popover-arrow').css('margin-left', (leftDiff + rightDiff) / 2 + leftAdjust() + 'px');
         };
 
         var resizeLeftRightVertical = function (event, ui) {
@@ -1157,7 +1030,7 @@ from metadata.conf import has_navigator
           if (bottomY < originalMidY + HALF_SIZE_LIMIT_Y) {
             ui.size.height = originalMidY + HALF_SIZE_LIMIT_Y - ui.position.top;
             bottomY = ui.position.top + ui.size.height;
-            $('.sql-context-popover').css('height', ui.size.height + 'px');
+            $('.hue-popover').css('height', ui.size.height + 'px');
           }
 
           if (topY > originalMidY - HALF_SIZE_LIMIT_Y) {
@@ -1165,13 +1038,13 @@ from metadata.conf import has_navigator
             ui.size.height = ui.originalSize.height - (ui.position.top - ui.originalPosition.top);
             topY = ui.position.top;
             bottomY = ui.position.top + ui.size.height;
-            $('.sql-context-popover').css('top', ui.position.top + 'px');
-            $('.sql-context-popover').css('height', ui.size.height + 'px');
+            $('.hue-popover').css('top', ui.position.top + 'px');
+            $('.hue-popover').css('height', ui.size.height + 'px');
           }
 
           topDiff = originalTopY - topY;
           bottomDiff = originalBottomY - bottomY;
-          $('.sql-context-popover-arrow').css('margin-top', (topDiff + bottomDiff) / 2 + topAdjust() + 'px');
+          $('.hue-popover-arrow').css('margin-top', (topDiff + bottomDiff) / 2 + topAdjust() + 'px');
         };
 
         switch(orientation) {
@@ -1188,7 +1061,7 @@ from metadata.conf import has_navigator
               resizeLeftRightVertical(event, ui);
               if (ui.size.width < 260) {
                 ui.size.width = 260;
-                $('.sql-context-popover').css('width', 260 + 'px');
+                $('.hue-popover').css('width', 260 + 'px');
               }
             };
             break;
@@ -1198,7 +1071,7 @@ from metadata.conf import has_navigator
               resizeTopBottomHorizontal(event, ui);
               if (ui.size.height < 200) {
                 ui.size.height = 200;
-                $('.sql-context-popover').css('height', 200 + 'px');
+                $('.hue-popover').css('height', 200 + 'px');
               }
             };
             break;
@@ -1345,13 +1218,13 @@ from metadata.conf import has_navigator
           self.title = '';
           self.iconClass = 'fa-info'
         }
-        self.orientationClass = 'sql-context-popover-' + orientation;
+        self.orientationClass = 'hue-popover-' + orientation;
 
         if (params.delayedHide) {
           var hideTimeout = -1;
           var onLeave = function () {
             hideTimeout = window.setTimeout(function () {
-              $('.sql-context-popover').fadeOut(200, function () {
+              $('.hue-popover').fadeOut(200, function () {
                 hidePopover();
               })
             }, 1000);
@@ -1361,18 +1234,18 @@ from metadata.conf import has_navigator
             window.clearTimeout(hideTimeout);
           };
 
-          $(params.delayedHide).add($('.sql-context-popover')).on('mouseleave', onLeave).on('mouseenter', onEnter);
+          $(params.delayedHide).add($('.hue-popover')).on('mouseleave', onLeave).on('mouseenter', onEnter);
 
           var keepPopoverOpenOnClick = function () {
             window.clearTimeout(hideTimeout);
-            $(params.delayedHide).add($('.sql-context-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
+            $(params.delayedHide).add($('.hue-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
           };
 
-          $('.sql-context-popover').on('click', keepPopoverOpenOnClick);
+          $('.hue-popover').on('click', keepPopoverOpenOnClick);
 
           self.disposalFunctions.push(function () {
-            $(params.delayedHide).add($('.sql-context-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
-            $('.sql-context-popover').off('click', keepPopoverOpenOnClick);
+            $(params.delayedHide).add($('.hue-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
+            $('.hue-popover').off('click', keepPopoverOpenOnClick);
           });
         }
 
