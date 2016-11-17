@@ -329,8 +329,11 @@ ${ assist.assistPanel() }
 <script type="text/html" id="right-assist-template">
   <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
     <div class="assist-function-type-switch" data-bind="foreach: availableTypes">
+      <!-- ko if: $index() > 0 -->
+      |
+      <!-- /ko -->
       <!-- ko if: $data === $parent.activeType() -->
-      <span style="font-weight: 600;" data-bind="text: $data"></span>
+      <span style="font-weight: 600; color: #338BB8;" data-bind="text: $data"></span>
       <!-- /ko -->
       <!-- ko ifnot: $data === $parent.activeType() -->
       <a class="black-link" href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
@@ -341,8 +344,13 @@ ${ assist.assistPanel() }
         <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
         <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
           <li>
+            <!-- ko if: typeof description !== 'undefined' && description !== '' -->
             <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
             <div data-bind="slideVisible: open, text: description"></div>
+            <!-- /ko -->
+            <!-- ko if: typeof description === 'undefined' || description === '' -->
+            <span class="assist-field-link" data-bind="text: signature"></span>
+            <!-- /ko -->
           </li>
         </ul>
       </li>
@@ -357,10 +365,11 @@ ${ assist.assistPanel() }
       self.categories = {};
 
       self.activeType = ko.observable();
-      self.availableTypes = ['hive', 'impala'];
+      self.availableTypes = ['hive', 'impala', 'pig'];
 
-      self.initSqlFunctions('hive');
-      self.initSqlFunctions('impala');
+      self.availableTypes.forEach(function (type) {
+        self.initFunctions(type);
+      })
 
       self.activeCategories = ko.observable();
 
@@ -371,10 +380,12 @@ ${ assist.assistPanel() }
       self.activeType(self.availableTypes[0]);
     }
 
-    RightAssist.prototype.initSqlFunctions = function (dialect) {
+    RightAssist.prototype.initFunctions = function (dialect) {
       var self = this;
       self.categories[dialect] = [];
-      SqlFunctions.CATEGORIZED_FUNCTIONS[dialect].forEach(function (category) {
+      var functions = dialect === 'pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect];
+
+      functions.forEach(function (category) {
         self.categories[dialect].push({
           name: category.name,
           open: ko.observable(false),

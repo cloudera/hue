@@ -14,6 +14,132 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var PigFunctions = (function () {
+  var EVAL_FUNCTIONS = {
+    avg: { signature: 'AVG(%VAR%)' },
+    concat: { signature: 'CONCAT(%VAR1%, %VAR2%)' },
+    count: { signature: 'COUNT(%VAR%)' },
+    count_start: { signature: 'COUNT_START(%VAR%)' },
+    is_empty: { signature: 'IsEmpty(%VAR%)' },
+    diff: { signature: 'DIFF(%VAR1%, %VAR2%)' },
+    max: { signature: 'MAX(%VAR%)' },
+    min: { signature: 'MIN(%VAR%)' },
+    size: { signature: 'SIZE(%VAR%)' },
+    sum: { signature: 'SUM(%VAR%)' },
+    tokenize: { signature: 'TOKENIZE(%VAR%, %DELIM%)' }
+  }
+
+  var RELATIONAL_OPERATORS = {
+    cogroup: { signature: 'COGROUP %VAR% BY %VAR%' },
+    cross: { signature: 'CROSS %VAR1%, %VAR2%;' },
+    distinct: { signature: 'DISTINCT %VAR%;' },
+    filter: { signature: 'FILTER %VAR% BY %COND%' },
+    flatten: { signature: 'FLATTEN(%VAR%)' },
+    foreach_generate: { signature: 'FOREACH %DATA% GENERATE %NEW_DATA%;' },
+    foreach: { signature: 'FOREACH %DATA% {%NESTED_BLOCK%};' },
+    group_by: { signature: 'GROUP %VAR% BY %VAR%' },
+    group_all: { signature: 'GROUP %VAR% ALL' },
+    join: { signature: 'JOIN %VAR% BY ' },
+    limit: { signature: 'LIMIT %VAR% %N%' },
+    order: { signature: 'ORDER %VAR% BY %FIELD%' },
+    sample: { signature: 'SAMPLE %VAR% %SIZE%' },
+    split: { signature: 'SPLIT %VAR1% INTO %VAR2% IF %EXPRESSIONS%' },
+    union: { signature: 'UNION %VAR1%, %VAR2%' }
+  }
+
+  var INPUT_OUTPUT = {
+    load: { signature: 'LOAD \'%FILE%\';' },
+    dump: { signature: 'DUMP %VAR%;' },
+    store: { signature: 'STORE %VAR% INTO %PATH%;' }
+  }
+
+  var DEBUG = {
+    explain: { signature: 'EXPLAIN %VAR%;' },
+    illustrate: { signature: 'ILLUSTRATE %VAR%;' },
+    describe: { signature: 'DESCRIBE %VAR%;' }
+  }
+
+  var HCATALOG = {
+    LOAD: { signature: 'LOAD \'%TABLE%\' USING org.apache.hcatalog.pig.HCatLoader();' }
+  }
+
+  var MATH_FUNCTIONS = {
+    abs: { signature: 'ABS(%VAR%)' },
+    acos: { signature: 'ACOS(%VAR%)' },
+    asin: { signature: 'ASIN(%VAR%)' },
+    atan: { signature: 'ATAN(%VAR%)' },
+    cbrt: { signature: 'CBRT(%VAR%)' },
+    ceil: { signature: 'CEIL(%VAR%)' },
+    cos: { signature: 'COS(%VAR%)' },
+    cosh: { signature: 'COSH(%VAR%)' },
+    exp: { signature: 'EXP(%VAR%)' },
+    floor: { signature: 'FLOOR(%VAR%)' },
+    log: { signature: 'LOG(%VAR%)' },
+    log10: { signature: 'LOG10(%VAR%)' },
+    random: { signature: 'RANDOM(%VAR%)' },
+    round: { signature: 'ROUND(%VAR%)' },
+    sin: { signature: 'SIN(%VAR%)' },
+    sinh: { signature: 'SINH(%VAR%)' },
+    sqrt: { signature: 'SQRT(%VAR%)' },
+    tan: { signature: 'TAN(%VAR%)' },
+    tanh: { signature: 'TANH(%VAR%)' }
+  }
+
+  var TUPLE_BAG_MAP = {
+    totuple: { signature: 'TOTUPLE(%VAR%)' },
+    tobag: { signature: 'TOBAG(%VAR%)' },
+    tomap: { signature: 'TOMAP(%KEY%, %VALUE%)' },
+    top: { signature: 'TOP(%topN%, %COLUMN%, %RELATION%)' }
+  }
+
+  var STRING_FUNCTIONS = {
+    indexof: { signature: 'INDEXOF(%STRING%, \'%CHARACTER%\', %STARTINDEX%)' },
+    last_index_of: { signature: 'LAST_INDEX_OF(%STRING%, \'%CHARACTER%\', %STARTINDEX%)' },
+    lower: { signature: 'LOWER(%STRING%)' },
+    regex_extract: { signature: 'REGEX_EXTRACT(%STRING%, %REGEX%, %INDEX%)' },
+    regex_extract_all: { signature: 'REGEX_EXTRACT_ALL(%STRING%, %REGEX%)' },
+    replace: { signature: 'REPLACE(%STRING%, \'%oldChar%\', \'%newChar%\')' },
+    strsplit: { signature: 'STRSPLIT(%STRING%, %REGEX%, %LIMIT%)' },
+    substring: { signature: 'SUBSTRING(%STRING%, %STARTINDEX%, %STOPINDEX%)' },
+    trim: { signature: 'TRIM(%STRING%)' },
+    ucfirst: { signature: 'UCFIRST(%STRING%)' },
+    upper: { signature: 'UPPER(%STRING%)' }
+  }
+
+  var MACROS = {
+    import: { signature: 'IMPORT \'%PATH_TO_MACRO%\';' }
+  }
+
+  var HBASE = {
+    load: { signature: 'LOAD \'hbase://%TABLE%\' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage(\'%columnList%\')' },
+    store: { signature: 'STORE %VAR% INTO \'hbase://%TABLE%\' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage(\'%columnList%\')' }
+  }
+
+  var PYTHON_UDF = {
+    register: { signature: 'REGISTER \'python_udf.py\' USING jython AS myfuncs;' }
+  }
+
+  var CATEGORIZED_FUNCTIONS = [
+    { name: 'Eval', functions: EVAL_FUNCTIONS },
+    { name: 'Relational Operators', functions: RELATIONAL_OPERATORS },
+    { name: 'Input and Output', functions: INPUT_OUTPUT },
+    { name: 'Debug', functions: DEBUG },
+    { name: 'HCatalog', functions: HCATALOG },
+    { name: 'Math', functions: MATH_FUNCTIONS },
+    { name: 'Tuple, Bag and Map', functions: TUPLE_BAG_MAP },
+    { name: 'String', functions: STRING_FUNCTIONS },
+    { name: 'Macros', functions: MACROS },
+    { name: 'HBase', functions: HBASE },
+    { name: 'Python UDF', functions: PYTHON_UDF }
+  ];
+
+  return {
+    CATEGORIZED_FUNCTIONS: CATEGORIZED_FUNCTIONS
+  }
+})();
+
+
+
 var SqlFunctions = (function () {
 
   var MATHEMATICAL_FUNCTIONS = {
