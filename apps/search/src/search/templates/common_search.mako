@@ -1992,11 +1992,7 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
     
     <!-- ko if: $data.function() == 'field' -->
-      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
-    <!-- /ko -->
-
-    <!-- ko if: $data.function() == 'constant' -->
-      <input data-bind="value: value" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
     <!-- /ko -->
 
     <a href="javascript: void(0)" data-bind="click: function() {
@@ -2007,7 +2003,7 @@ ${ dashboard.layout_skeleton() }
 
     <br/>
     <a href="javascript: void(0)" data-bind="click: function() {
-        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'constant', 'value': '2', 'ops': []}]})); }
+        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'field', 'value': '2', 'ops': []}]})); }
       ">
       <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
     </a>
