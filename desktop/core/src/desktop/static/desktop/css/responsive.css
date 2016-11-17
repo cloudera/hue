@@ -65,7 +65,7 @@ body {
   position: relative;
   background-color: #338BB8;
   width: 100%;
-  z-index: 100;
+  z-index: 999999;
 }
 
 .top-nav-left {
@@ -310,7 +310,7 @@ body {
 
 .left-nav {
   position:absolute;
-  background-color: #003F6C;
+  background-color: #338BB8;
   color: #f9f9f9;
   z-index: 99999;
   top: 0;
@@ -376,6 +376,16 @@ body {
   width: 200px;
   -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+}
+
+.left-nav-drop {
+  border-top: 1px solid rgba(240, 240, 240, 0.9);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 15px 30px;
+  font-size: 16px;
+  width: 100%
 }
 
 .assist-panel {

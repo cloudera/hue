@@ -213,6 +213,9 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
+      <div class="left-nav-drop">
+        <i class="fa fa-fw fa-cloud-upload"></i> <span>Drop files here</span>
+      </div>
     </div>
 
 ##     <div style="position: fixed; bottom: 0; left: 0">
