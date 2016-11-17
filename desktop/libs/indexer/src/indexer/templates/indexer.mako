@@ -44,6 +44,7 @@ ${ assist.assistJSModels() }
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 
 <style type="text/css">
