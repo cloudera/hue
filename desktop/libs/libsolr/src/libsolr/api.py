@@ -607,12 +607,12 @@ class SolrApi(object):
     f = facet['properties']['aggregate']
     
     if not f['ops']:
-      f['ops'] = [{u'function': u'field', 'value': facet['field'], u'ops': []}]
+      f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
     
     return self.__get_aggregate_function(f)
 
   def __get_aggregate_function(self, f):
-    if f['function'] == 'field' or f['function'] == 'constant':
+    if f['function'] == 'field':
       return f['value']
     else:
       fields = []
