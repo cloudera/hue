@@ -90,7 +90,7 @@ ${ hueIcons.symbols() }
         <span class="hamburger-inner"></span>
       </span>
       </a>
-      <a class="brand nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
       <div class="compose-action btn-group">
         <button class="btn">${ _('Compose') }</button>
         <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -255,7 +255,7 @@ ${ hueIcons.symbols() }
     }"><div class="resize-bar">&nbsp;</div></div>
 
 
-    <div class="page-content">
+    <div class="page-content" data-bind="niceScroll">
       <!-- ko ifnot: currentApp() -->
       Load
       <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |

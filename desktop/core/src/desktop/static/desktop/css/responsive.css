@@ -29,7 +29,7 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .main-page {
@@ -42,7 +42,7 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .content-wrapper {
@@ -65,6 +65,7 @@ body {
   position: relative;
   background-color: #338BB8;
   width: 100%;
+  z-index: 100;
 }
 
 .top-nav-left {
@@ -300,6 +301,11 @@ body {
   -ms-flex: 1;
   flex: 1;
   position: relative;
+  /*overflow-y: auto;*/
+}
+
+.page-content .content-panel {
+  overflow-y: auto;
 }
 
 .left-nav {

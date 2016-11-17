@@ -25,7 +25,7 @@
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
 <span id="editorComponents">
-${ editorComponents.includes(is_responsive=True) }
+${ editorComponents.includes(is_embeddable=True) }
 
 <style type="text/css">
   .snippet {
@@ -40,6 +40,6 @@ ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ notebookKoComponents.snippetDbSelection() }
 
-${ editorComponents.commonJS(is_responsive=True) }
+${ editorComponents.commonJS(is_embeddable=True) }
 
 </span>
