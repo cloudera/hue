@@ -113,6 +113,7 @@ class TestDocumentConverter(object):
 
       # Verify default properties
       assert_true(doc2.data_dict['isSaved'])
+      assert_false(doc.last_modified == doc2.last_modified)
 
 
       #
@@ -123,6 +124,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doch.name, doc2.data_dict['name'])
       assert_equal(doch.description, doc2.data_dict['description'])
+      assert_equal(doch.last_modified, doc2.last_modified)
 
       # Verify session type
       assert_equal('hive', doc2.data_dict['sessions'][0]['type'])

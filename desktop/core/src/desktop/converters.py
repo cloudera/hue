@@ -89,7 +89,10 @@ class DocumentConverter(object):
 
           doc2 = _historify(data, self.user)
           doc2.last_modified = doc.last_modified
+
+          # save() updates the last_modified to current time. Resetting it using update()
           doc2.save()
+          Document2.objects.filter(id=doc2.id).update(last_modified=doc.last_modified)
 
           self.imported_docs.append(doc2)
 
