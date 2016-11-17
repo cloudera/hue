@@ -21,7 +21,6 @@ import json
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
 
@@ -37,10 +36,7 @@ def allow_viewer_only(view_func):
     if collection_json['id']:
       try:
         doc2 = Document2.objects.get(id=collection_json['id'])
-        if USE_NEW_EDITOR.get():
-          doc2.can_read_or_exception(request.user)
-        else:
-          doc2.doc.get().can_read_or_exception(request.user)
+        doc2.doc.get().can_read_or_exception(request.user)
       except Document2.DoesNotExist:
         message = _("Dashboard does not exist or you don't have the permission to access it.")
         raise PopupException(message)
@@ -57,10 +53,7 @@ def allow_owner_only(view_func):
     if collection_json['id']:
       try:
         doc2 = Document2.objects.get(id=collection_json['id'])
-        if USE_NEW_EDITOR.get():
-          doc2.can_write_or_exception(request.user)
-        else:
-          doc2.doc.get().can_write_or_exception(request.user)
+        doc2.doc.get().can_write_or_exception(request.user)
       except Document2.DoesNotExist:
         message = _("Dashboard does not exist or you don't have the permission to access it.")
         raise PopupException(message)
