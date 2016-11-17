@@ -163,7 +163,19 @@ class WebHdfs(Hdfs):
 
   @property
   def trash_path(self):
-    return self.join(self.get_home_dir(), '.Trash')
+    trash_path = self.join(self.get_home_dir(), '.Trash')
+    try:
+      path = '/'
+      params = self._getparams()
+      params['op'] = 'GETTRASHROOT'
+      json = self._root.get(path, params)
+      trash_path = json['Path']
+    except WebHdfsException, e:
+      if 'IllegalArgumentException' in e.message:
+        LOG.warn('WebHDFS operation GETTRASHROOT is not implemented, returning default trash path: %s' % trash_path)
+      else:
+        raise e
+    return trash_path
 
   @property
   def current_trash_path(self):
