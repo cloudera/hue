@@ -282,7 +282,7 @@ ${ hueIcons.symbols() }
     <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <div style="position: absolute; top: 15px; bottom: 0; left: 0; right: 0;" data-bind="component: { name: 'right-assist-panel' }"></div>
+      <div style="position: absolute; top: 15px; bottom: 0; left: 0; right: 0;" data-bind="component: { name: 'functions-panel' }"></div>
     </div>
   </div>
 </div>
@@ -324,88 +324,6 @@ ${ hueIcons.symbols() }
 ${ assist.assistJSModels() }
 
 ${ assist.assistPanel() }
-
-<!-- TODO: Put right assist inside assist.mako? -->
-<script type="text/html" id="right-assist-template">
-  <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
-    <div class="assist-function-type-switch" data-bind="foreach: availableTypes">
-      <!-- ko if: $index() > 0 -->
-      |
-      <!-- /ko -->
-      <!-- ko if: $data === $parent.activeType() -->
-      <span style="font-weight: 600; color: #338BB8;" data-bind="text: $data"></span>
-      <!-- /ko -->
-      <!-- ko ifnot: $data === $parent.activeType() -->
-      <a class="black-link" href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
-      <!-- /ko -->
-    </div>
-    <ul class="assist-function-categories" data-bind="foreach: activeCategories">
-      <li>
-        <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-        <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
-          <li>
-            <!-- ko if: typeof description !== 'undefined' && description !== '' -->
-            <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
-            <div data-bind="slideVisible: open, text: description"></div>
-            <!-- /ko -->
-            <!-- ko if: typeof description === 'undefined' || description === '' -->
-            <span class="assist-field-link" data-bind="text: signature"></span>
-            <!-- /ko -->
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</script>
-
-<script type="text/javascript" charset="utf-8">
-  (function () {
-    function RightAssist(params) {
-      var self = this;
-      self.categories = {};
-
-      self.activeType = ko.observable();
-      self.availableTypes = ['hive', 'impala', 'pig'];
-
-      self.availableTypes.forEach(function (type) {
-        self.initFunctions(type);
-      })
-
-      self.activeCategories = ko.observable();
-
-      self.activeType.subscribe(function (newValue) {
-        self.activeCategories(self.categories[newValue]);
-      });
-
-      self.activeType(self.availableTypes[0]);
-    }
-
-    RightAssist.prototype.initFunctions = function (dialect) {
-      var self = this;
-      self.categories[dialect] = [];
-      var functions = dialect === 'pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect];
-
-      functions.forEach(function (category) {
-        self.categories[dialect].push({
-          name: category.name,
-          open: ko.observable(false),
-          functions: $.map(category.functions, function(fn) {
-            return {
-              signature: fn.signature,
-              open: ko.observable(false),
-              description: fn.description
-            }
-          })
-        })
-      });
-    };
-
-    ko.components.register('right-assist-panel', {
-      viewModel: RightAssist,
-      template: { element: 'right-assist-template' }
-    });
-  })();
-</script>
 
 <script type="text/javascript" charset="utf-8">
 

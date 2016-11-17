@@ -2021,4 +2021,85 @@ from metadata.conf import has_navigator
       });
     })();
   </script>
+
+  <script type="text/html" id="functions-panel-template">
+    <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
+      <div class="assist-function-type-switch" data-bind="foreach: availableTypes">
+        <!-- ko if: $index() > 0 -->
+        |
+        <!-- /ko -->
+        <!-- ko if: $data === $parent.activeType() -->
+        <span style="font-weight: 600; color: #338BB8;" data-bind="text: $data"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: $data === $parent.activeType() -->
+        <a class="black-link" href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
+        <!-- /ko -->
+      </div>
+      <ul class="assist-function-categories" data-bind="foreach: activeCategories">
+        <li>
+          <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
+          <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
+            <li>
+              <!-- ko if: typeof description !== 'undefined' && description !== '' -->
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
+              <div data-bind="slideVisible: open, text: description"></div>
+              <!-- /ko -->
+              <!-- ko if: typeof description === 'undefined' || description === '' -->
+              <span class="assist-field-link" data-bind="text: signature"></span>
+              <!-- /ko -->
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function () {
+      function FunctionsPanel(params) {
+        var self = this;
+        self.categories = {};
+
+        self.activeType = ko.observable();
+        self.availableTypes = ['hive', 'impala', 'pig'];
+
+        self.availableTypes.forEach(function (type) {
+          self.initFunctions(type);
+        })
+
+        self.activeCategories = ko.observable();
+
+        self.activeType.subscribe(function (newValue) {
+          self.activeCategories(self.categories[newValue]);
+        });
+
+        self.activeType(self.availableTypes[0]);
+      }
+
+      FunctionsPanel.prototype.initFunctions = function (dialect) {
+        var self = this;
+        self.categories[dialect] = [];
+        var functions = dialect === 'pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect];
+
+        functions.forEach(function (category) {
+          self.categories[dialect].push({
+            name: category.name,
+            open: ko.observable(false),
+            functions: $.map(category.functions, function(fn) {
+              return {
+                signature: fn.signature,
+                open: ko.observable(false),
+                description: fn.description
+              }
+            })
+          })
+        });
+      };
+
+      ko.components.register('functions-panel', {
+        viewModel: FunctionsPanel,
+        template: { element: 'functions-panel-template' }
+      });
+    })();
+  </script>
 </%def>
