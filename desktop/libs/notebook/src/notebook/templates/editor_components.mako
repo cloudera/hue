@@ -2183,11 +2183,6 @@ ${ hueIcons.symbols() }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: $root.newNotebook" title="${ _('Open a new query') }">
-            <i class="fa fa-fw fa-file-o"></i> ${_('New query')}
-          </a>
-        </li>
-        <li>
           <a href="javascript:void(0)" data-bind="click: queryCompatibility, visible: $root.isOptimizerEnabled" title="${ _('Get Impala compatibility hints') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
           </a>
