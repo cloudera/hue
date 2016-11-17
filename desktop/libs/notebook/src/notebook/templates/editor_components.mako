@@ -1026,7 +1026,7 @@ ${ hueIcons.symbols() }
   </div>
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
-  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $('.content-panel').data('lastScroll'); if (ls && ls != $('.content-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.content-panel').data('lastScroll', $('.content-panel').scrollTop()) } }, niceScroll, with: selectedNotebook">
+  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $('.content-panel').data('lastScroll'); if (ls && ls != $('.content-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.content-panel').data('lastScroll', $('.content-panel').scrollTop()) } }, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {

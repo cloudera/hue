@@ -37,6 +37,7 @@
   <meta name="author" content="">
 
   <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/responsive.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
@@ -255,10 +256,12 @@ ${ hueIcons.symbols() }
 
 
     <div class="page-content">
+      <!-- ko ifnot: currentApp() -->
       Load
       <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |
       <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a> |
       <a href="#" data-bind="click: function(){ currentApp('search') }">search</a>
+      <!-- /ko -->
 
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
@@ -585,8 +588,8 @@ ${ assist.assistPanel() }
     })();
 
     window.hueDebug = {
-      viewModel: function () {
-        return window.hueDebug.onePageViewModel();
+      viewModel: function (element) {
+        return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel();
       },
       onePageViewModel: function () {
         return ko.dataFor($('.page-content')[0]);

@@ -299,7 +299,6 @@ body {
 .page-content {
   -ms-flex: 1;
   flex: 1;
-  padding: 1em;
   position: relative;
 }
 
@@ -915,6 +914,20 @@ h6 {
   background-color: #e5e5e5;
 }
 
+/* styling for the imported apps */
 .page-content .navbar.navbar-inverse.navbar-fixed-top {
   position: static;
+}
+
+.page-content .navbar .navbar-inner {
+  box-shadow: none;
+}
+
+/* editor */
+.progress {
+  border: none;
+}
+
+.context-panel {
+  display: none;
 }
