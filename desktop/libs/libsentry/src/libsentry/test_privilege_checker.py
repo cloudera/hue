@@ -57,6 +57,8 @@ class TestDocumentConverter(object):
       {u'column': 'code', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
       {u'column': 'total_emp', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
       {u'column': 'total_emp', u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'file:///path/to/nfs/local/to/nfs'},
       # V2 authorizables
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'logs_demo'},
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'test_demo'},
@@ -65,6 +67,8 @@ class TestDocumentConverter(object):
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'twitter_demo'},
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'managedTemplate'},
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'yelp_demo'},
+      {u'component': u'hdfs', u'serviceName': u'server1', u'type': u'URI', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'component': u'nfs', u'serviceName': u'server1', u'type': u'URI', u'name': u'file:///path/to/nfs/local/to/nfs'},
     ]
 
     self.api_v1.list_sentry_roles_by_group = Mock(return_value=[{'name': 'test', 'group': 'test'}])
@@ -73,7 +77,8 @@ class TestDocumentConverter(object):
       {'column': '', 'grantOption': False, 'timestamp': 1478810422058, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'customers', 'URI': '', 'server': 'server1'},
       {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'web_logs', 'URI': '', 'server': 'server1'},
       {'column': '', 'grantOption': False, 'timestamp': 1478810590335, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
-      {'column': 'salary', 'grantOption': False, 'timestamp': 1478810635396, 'database': 'default', 'action': 'ALL', 'scope': 'COLUMN', 'table': 'sample_08', 'URI': '', 'server': 'server1'}
+      {'column': 'salary', 'grantOption': False, 'timestamp': 1478810635396, 'database': 'default', 'action': 'ALL', 'scope': 'COLUMN', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': '', 'action': 'ALL', 'scope': 'URI', 'table': '', 'URI': 'hdfs://ha-nn-uri/data/landing-skid', 'server': 'server1'},
     ])
 
     self.api_v2.list_sentry_roles_by_group = Mock(return_value=[{'name': 'test', 'group': 'test'}])
@@ -81,17 +86,20 @@ class TestDocumentConverter(object):
       {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'CONFIG', 'name': 'managedTemplate'}]},
       {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'QUERY', 'authorizables': [{'type': 'COLLECTION', 'name': 'twitter_demo'}]},
       {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'UPDATE', 'authorizables': [{'type': 'COLLECTION', 'name': 'yelp_demo'}]},
-      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'CONFIG', 'name': 'yelp_demo'}]}
+      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'CONFIG', 'name': 'yelp_demo'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 'hdfs', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'URI', 'name': 'hdfs://ha-nn-uri/data/landing-skid'}]},
     ])
 
     filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
     expected_filtered_set = [
       # V2 authorizables
+      {u'type': u'URI', u'serviceName': u'server1', u'component': u'hdfs', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
       {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'twitter_demo'},
       {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'},
       {u'type': u'CONFIG', u'serviceName': u'server1', u'component': u'solr', u'name': u'managedTemplate'},
       {u'type': u'CONFIG', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'},
       # V1 authorizables
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'hdfs://ha-nn-uri/data/landing-skid'},
       {u'column': None, u'table': u'customers', u'db': u'default', u'server': u'server1'},
       {u'column': None, u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
       {u'column': 'code', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
@@ -99,4 +107,73 @@ class TestDocumentConverter(object):
       {u'column': 'total_emp', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
       {u'column': None, u'table': u'web_logs', u'db': u'default', u'server': u'server1'},
     ]
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: (obj.get('table'), obj.get('column'), obj.get('component'), obj.get('type'), obj.get('name'))))
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+
+
+  def test_write_privilege(self):
+    try:
+      from mock import Mock
+    except ImportError:
+      raise SkipTest("Skips until HUE-2947 is resolved")
+
+    action = 'WRITE'
+    authorizableSet = [
+      # V1 authorizables
+      {u'column': None, u'table': u'customers', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': u'web_logs', u'db': u'default', u'server': u'server1'},
+      {u'column': 'salary', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'code', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'total_emp', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'total_emp', u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'file:///path/to/nfs/local/to/nfs'},
+      # V2 authorizables
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'logs_demo'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'test_demo'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'twitter_demo'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'yelp_demo'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'twitter_demo'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'managedTemplate'},
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'yelp_demo'},
+      {u'component': u'hdfs', u'serviceName': u'server1', u'type': u'URI', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'component': u'nfs', u'serviceName': u'server1', u'type': u'URI', u'name': u'file:///path/to/nfs/local/to/nfs'},
+    ]
+
+    self.api_v1.list_sentry_roles_by_group = Mock(return_value=[{'name': 'test', 'group': 'test'}])
+    self.api_v1.list_sentry_privileges_by_role = Mock(return_value=[
+      {'column': 'total_emp', 'grantOption': False, 'timestamp': 1478810635378, 'database': 'default', 'action': 'INSERT', 'scope': 'COLUMN', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810422058, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'customers', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'web_logs', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810590335, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
+      {'column': 'salary', 'grantOption': False, 'timestamp': 1478810635396, 'database': 'default', 'action': 'ALL', 'scope': 'COLUMN', 'table': 'sample_08', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': '', 'action': 'ALL', 'scope': 'URI', 'table': '', 'URI': 'hdfs://ha-nn-uri/data/landing-skid', 'server': 'server1'},
+    ])
+
+    self.api_v2.list_sentry_roles_by_group = Mock(return_value=[{'name': 'test', 'group': 'test'}])
+    self.api_v2.list_sentry_privileges_by_role = Mock(return_value=[
+      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'CONFIG', 'name': 'managedTemplate'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'QUERY', 'authorizables': [{'type': 'COLLECTION', 'name': 'twitter_demo'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'UPDATE', 'authorizables': [{'type': 'COLLECTION', 'name': 'yelp_demo'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 'solr', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'CONFIG', 'name': 'yelp_demo'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 'hdfs', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'URI', 'name': 'hdfs://ha-nn-uri/data/landing-skid'}]},
+    ])
+
+    filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
+    expected_filtered_set = [
+      # V2 authorizables
+      {u'type': u'URI', u'serviceName': u'server1', u'component': u'hdfs', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'},
+      {u'type': u'CONFIG', u'serviceName': u'server1', u'component': u'solr', u'name': u'managedTemplate'},
+      {u'type': u'CONFIG', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'},
+      # V1 authorizables
+      {u'column': None, u'table': None, u'db': None, u'server': u'server1', u'URI': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'column': 'salary', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+      {u'column': 'total_emp', u'table': u'sample_08', u'db': u'default', u'server': u'server1'},
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
