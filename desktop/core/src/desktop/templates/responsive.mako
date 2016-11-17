@@ -266,7 +266,9 @@ ${ hueIcons.symbols() }
       <!-- ko if: isLoadingEmbeddable -->
       <i class="fa fa-spinner fa-spin"></i>
       <!-- /ko -->
-      <div id="embeddable"></div>
+      <div id="embeddable_editor" class="embeddable"></div>
+      <div id="embeddable_metastore" class="embeddable"></div>
+      <div id="embeddable_search" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -434,14 +436,15 @@ ${ assist.assistPanel() }
                 var r = $(response);
                 r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
                 self.embeddable_cache[newVal] = r;
-                $('#embeddable').html(r);
+                $('#embeddable_' + newVal).html(r);
                 self.isLoadingEmbeddable(false);
               }
             });
           } else {
-            $('#embeddable').html(self.embeddable_cache[newVal]);
             self.isLoadingEmbeddable(false);
           }
+          $('.embeddable').hide();
+          $('#embeddable_' + newVal).show();
         });
 
         if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
