@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-<%def name="page_structure(is_mobile=False)">
+<%def name="page_structure(is_mobile=False, is_embeddable=False)">
 
 <script type="text/javascript">
   SLIDER_LABELS = {
@@ -2668,7 +2668,6 @@ ${ dashboard.import_charts() }
 
 var viewModel;
 
-nv.dev = false;
 moment.suppressDeprecationWarnings = true;
 
 var HIT_OPTIONS = [
