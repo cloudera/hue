@@ -65,8 +65,8 @@ class PrivilegeChecker(object):
     Given a set of authorizable Sentry objects and a requested action, return a filtered set of objects that the user
     has privileges to perform the given action upon.
     :param authorizableSet: a list of Sentry authorizable objects which can consist of V1 or V2 objects:
-      V1 - {'column': 'total_emp', 'table': 'sample_08', 'db': 'default', 'server': 'server1'}
-      V2 - {'component': 'solr', 'serviceName': 'server1', 'type': 'COLLECTION', 'name': 'twitter_demo'}
+      V1 - {'column': 'total_emp', 'table': 'sample_08', 'db': 'default', 'server': 'server1', 'URI': None}
+      V2 - {'component': 'solr', 'serviceName': 'server1', 'type': 'COLLECTION', 'name': 'twitter_demo', 'URI': None}
     :param action: requested action-level that we should check privileges against (default: READ)
     """
     action = action.upper()
@@ -115,13 +115,16 @@ class PrivilegeChecker(object):
     hierarchy = tree()
 
     for privilege in privileges:
-      column, table, database, server = privilege['column'], privilege['table'], privilege['database'], privilege['server']
+      column, table, database, server, uri = \
+        privilege.get('column'), privilege.get('table'), privilege.get('database'), privilege.get('server'), privilege.get('URI')
       if column:
         hierarchy[server][database][table][column][SENTRY_PRIVILEGE_KEY] = privilege
       elif table:
         hierarchy[server][database][table][SENTRY_PRIVILEGE_KEY] = privilege
       elif database:
         hierarchy[server][database][SENTRY_PRIVILEGE_KEY] = privilege
+      elif uri:
+        hierarchy[server][uri][SENTRY_PRIVILEGE_KEY] = privilege
       else:
         hierarchy[server][SENTRY_PRIVILEGE_KEY] = privilege
 
@@ -152,12 +155,16 @@ class PrivilegeChecker(object):
     # Initialize all privileges for all object levels to non-authorized by default
     privileges_applied = dict((obj, -1) for obj in SENTRY_OBJECTS)
 
-    server, db, table, column = object['server'], object['db'], object['table'], object['column']
+    server, db, table, column, uri = \
+      object.get('server'), object.get('db'), object.get('table'), object.get('column'), object.get('URI')
 
     if server:  # Get server-level privilege
       if server in hierarchy:
         if SENTRY_PRIVILEGE_KEY in hierarchy[server]:
           privileges_applied['SERVER'] = PRIVILEGE_HIERARCHY[hierarchy[server][SENTRY_PRIVILEGE_KEY]['action']]
+        if uri and uri in hierarchy[server]:  # Get URI-level privilege
+          if SENTRY_PRIVILEGE_KEY in hierarchy[server][uri]:
+            privileges_applied['URI'] = PRIVILEGE_HIERARCHY[hierarchy[server][uri][SENTRY_PRIVILEGE_KEY]['action']]
         if db and db in hierarchy[server]: # Get db-level privilege
           if SENTRY_PRIVILEGE_KEY in hierarchy[server][db]:
             privileges_applied['DB'] = PRIVILEGE_HIERARCHY[hierarchy[server][db][SENTRY_PRIVILEGE_KEY]['action']]
