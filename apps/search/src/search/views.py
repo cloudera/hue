@@ -92,8 +92,7 @@ def index_m(request):
 def index_embeddable(request):
   return index(request, False, True)
 
-
-def new_search(request):
+def new_search(request, is_embeddable=False):
   collections = SearchController(request.user).get_all_indexes()
   if not collections:
     return no_collections(request)
@@ -101,7 +100,11 @@ def new_search(request):
   collection = Collection2(user=request.user, name=collections[0])
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-  return render('search.mako', request, {
+  template = 'search.mako'
+  if is_embeddable:
+    template = 'search_embeddable.mako'
+
+  return render(template, request, {
     'collection': collection,
     'query': query,
     'initial': json.dumps({
@@ -122,6 +125,8 @@ def new_search(request):
     'can_edit_index': can_edit_index(request.user)
   })
 
+def new_search_embeddable(request):
+  return new_search(request, True)
 
 def browse(request, name, is_mobile=False):
   collections = SearchController(request.user).get_all_indexes()
@@ -600,7 +605,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['type'] = facet_type
       if widget_type == 'hit-widget':
         facet_type = 'function'
-      else:        
+      else:
         facet_type = 'nested'
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': []}}
       properties['facets'] = []

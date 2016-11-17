@@ -418,13 +418,24 @@ ${ assist.assistPanel() }
     };
 
     (function () {
+      var LOADED_JS = [];
+      var LOADED_CSS = [];
+
+      $('script[src]').each(function(){
+        LOADED_JS.push($(this).attr('src'));
+      });
+
+      $('link[href]').each(function(){
+        LOADED_CSS.push($(this).attr('href'));
+      });
+
       var OnePageViewModel = function () {
         var self = this;
 
         self.EMBEDDABLE_PAGE_URLS = {
           editor: '/notebook/editor_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
-          search: '/search/embeddable?collection=4'
+          search: '/search/embeddable/new_search'
         };
 
         self.embeddable_cache = {};
@@ -446,6 +457,25 @@ ${ assist.assistPanel() }
                 // hack to avoid css caching for development
                 var r = $(response);
                 r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
+                // load just CSS and JS files that are not loaded before
+                r.find('script[src]').each(function(){
+                  var jsFile = $(this).attr('src').split('?')[0];
+                  if (LOADED_JS.indexOf(jsFile) > -1){
+                    $(this).remove();
+                  }
+                  else {
+                    LOADED_JS.push(jsFile);
+                  }
+                });
+                r.find('link[href]').each(function(){
+                  var cssFile = $(this).attr('href').split('?')[0];
+                  if (LOADED_CSS.indexOf(cssFile) > -1){
+                    $(this).remove();
+                  }
+                  else {
+                    LOADED_CSS.push(cssFile);
+                  }
+                });
                 self.embeddable_cache[newVal] = r;
                 $('#embeddable_' + newVal).html(r);
                 self.isLoadingEmbeddable(false);
