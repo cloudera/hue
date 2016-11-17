@@ -27,9 +27,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
-<%def name="includes(is_responsive=False)">
+<%def name="includes(is_embeddable=False)">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
-% if not is_responsive:
+% if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 % endif
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
@@ -45,7 +45,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 
-% if not is_responsive:
+% if not is_embeddable:
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
@@ -1026,7 +1026,7 @@ ${ hueIcons.symbols() }
   </div>
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
-  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $('.content-panel').data('lastScroll'); if (ls && ls != $('.content-panel').scrollTop()){ $(document).trigger('hideAutocomplete'); }; $('.content-panel').data('lastScroll', $('.content-panel').scrollTop()) } }, with: selectedNotebook">
+  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, niceScroll, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -1041,10 +1041,10 @@ ${ hueIcons.symbols() }
             'greedy': true,
             'stop': function(event, ui) {
               var $element = $(event.target);
-              $element.find('.snippet-body').slideDown('fast', function () { $('.content-panel').scrollTop(lastWindowScrollPosition); });
+              $element.find('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
             },
             'helper': function(event) {
-              lastWindowScrollPosition = $('.content-panel').scrollTop();
+              lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
               var $element = $(event.target);
               $element.find('.snippet-body').slideUp('fast', function () {
                 $('.sortable-snippets').sortable('refreshPositions')
@@ -1069,7 +1069,7 @@ ${ hueIcons.symbols() }
             }
           },
           dragged: function (widget) {
-            $('.snippet-body').slideDown('fast', function () { $('.content-panel').scrollTop(lastWindowScrollPosition); });
+            $('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
           }
         }">
       </div>
@@ -2420,9 +2420,14 @@ ${ hueIcons.symbols() }
 </%def>
 
 
-<%def name="commonJS(is_responsive=False)">
+<%def name="commonJS(is_embeddable=False)">
 
 <script type="text/javascript" charset="utf-8">
+  % if is_embeddable:
+  var MAIN_SCROLLABLE = '.page-content';
+  % else:
+  var MAIN_SCROLLABLE = '.content-panel';
+  % endif
 
   function authorizeGithub() {
     if ($("#importGithubUrl").val().trim() != "") {
@@ -2536,7 +2541,7 @@ ${ hueIcons.symbols() }
           }
         }
       },
-      scrollable: vm.editorMode() ? '.content-panel' : '.dataTables_wrapper',
+      scrollable: vm.editorMode() ? MAIN_SCROLLABLE : '.dataTables_wrapper',
       contained: !vm.editorMode()
     });
 
@@ -2544,8 +2549,12 @@ ${ hueIcons.symbols() }
       if (vm.editorMode()) {
         $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
         $(el).jHueTableExtender2({
-          mainScrollable: '.content-panel',
+          mainScrollable: MAIN_SCROLLABLE,
+          % if is_embeddable:
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 50 },
+          % else:
           stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
+          % endif
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "fixed"
         });
@@ -2602,7 +2611,7 @@ ${ hueIcons.symbols() }
 
     var scrollElement = dataTableEl;
     if (vm.editorMode()) {
-      scrollElement = $('.content-panel');
+      scrollElement = $(MAIN_SCROLLABLE);
     }
 
     if (scrollElement.data('scrollFnDtCreation')) {
@@ -3085,7 +3094,7 @@ ${ hueIcons.symbols() }
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
       userId: ${ user.id },
-      % if is_responsive:
+      % if is_embeddable:
       responsive: true,
       % endif
       assistAvailable: true,
@@ -3254,8 +3263,8 @@ ${ hueIcons.symbols() }
               tableExtender.repositionHeader();
               tableExtender.drawLockedRows();
             }
-            $('.content-panel').data('lastScroll', $('.content-panel').scrollTop());
-            $('.content-panel').trigger('scroll');
+            $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop());
+            $(MAIN_SCROLLABLE).trigger('scroll');
           }
         });
         $(".jHueTableExtenderClonedContainer").show();
@@ -3270,7 +3279,7 @@ ${ hueIcons.symbols() }
         renderer();
       }
 
-      $('.content-panel').jHueScrollUp();
+      $(MAIN_SCROLLABLE).jHueScrollUp();
     };
 
     var splitDraggableTimeout = -1;
@@ -3295,7 +3304,7 @@ ${ hueIcons.symbols() }
     huePubSub.subscribe('detach.scrolls', function (snippet) {
       var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
       if (viewModel.editorMode()) {
-        scrollElement = $('.content-panel');
+        scrollElement = $(MAIN_SCROLLABLE);
       }
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
