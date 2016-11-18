@@ -249,8 +249,8 @@ class SolrApi(object):
   def _n_facet_dimension(self, widget, _f, facets, dim):
     facet = facets[0]
     f_name = 'd%s' % dim
-
-    if facet['aggregate'] == 'count':
+    print facets
+    if facet['aggregate']['function'] == 'count':
       _f['facet'] = {
           f_name: {
               'type': 'terms',
@@ -259,7 +259,7 @@ class SolrApi(object):
               'mincount': int(facet['mincount'])
           }
       }
-      if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate'] != 'count':
+      if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
       if len(facets) > 1: # Get n+1 dimension
         self._n_facet_dimension(widget, _f['facet'][f_name], facets[1:], dim+1)
@@ -604,7 +604,10 @@ class SolrApi(object):
     return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
   def _get_aggregate_function(self, facet):
-    f = facet['properties']['aggregate']
+    if 'properties' in facet:
+      f = facet['properties']['aggregate'] # Level 1 facet
+    else:
+      f = facet['aggregate']
 
     if not f['ops']:
       f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]

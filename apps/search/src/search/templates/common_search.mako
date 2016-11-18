@@ -585,7 +585,7 @@ ${ dashboard.layout_skeleton() }
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
             <span class="facet-field-label">${ _('Metric') }</span>
-            <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
+            <span data-bind="template: { name: 'metric-form', data: aggregate }"></span>
           </span>
         </div>
 
@@ -618,7 +618,7 @@ ${ dashboard.layout_skeleton() }
         <strong class="hit-title" data-bind="text: field, attr: {'title': field}"></strong>
         <span class="spinedit-cnt">
           <span class="facet-field-label">${ _('Metric') }</span>
-          <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
+          <span data-bind="template: { name: 'metric-form', data: aggregate }"></span>
         </span>
         <span class="spinedit-cnt">
           <span class="facet-field-label">
@@ -657,7 +657,7 @@ ${ dashboard.layout_skeleton() }
 
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 5" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-      <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+      <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-plus"></i> ${ _('Add') }
       </a>
       <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
@@ -669,7 +669,7 @@ ${ dashboard.layout_skeleton() }
           <span class="facet-field-label">
             ${ _('Metric') }
           </span>
-          <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate" class="hit-options"></select>
+          <span data-bind="template: { name: 'metric-form', data: properties.facets_form.aggregate }"></span>
         </span>
       </div>
 
@@ -1987,9 +1987,9 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
-    <!-- ko if: ['sum', 'avg', 'unique', 'percentile', 'mul', 'add', 'sub', 'ms'].indexOf($data.function()) != -1 -->
+    ##<!-- ko if: ['sum', 'avg', 'unique', 'percentile', 'mul', 'add', 'sub', 'ms'].indexOf($data.function()) != -1 -->
       <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
-    <!-- /ko -->
+    ##<!-- /ko -->
     
     <!-- ko if: $data.function() == 'field' -->
       <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
