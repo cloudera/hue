@@ -415,6 +415,11 @@ from metadata.conf import has_navigator
     .result-entry .hue-icon {
       font-size: 30px;
     }
+
+    .function-dialect-dropdown a span {
+      font-size: 14px;
+      font-weight: 600;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -2024,7 +2029,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="functions-panel-template">
     <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+      <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
       <ul class="assist-function-categories" data-bind="foreach: activeCategories">
         <li>
           <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
@@ -2051,7 +2056,7 @@ from metadata.conf import has_navigator
         self.categories = {};
 
         self.activeType = ko.observable();
-        self.availableTypes = ko.observableArray(['hive', 'impala', 'pig']);
+        self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
 
         self.availableTypes().forEach(function (type) {
           self.initFunctions(type);
@@ -2069,7 +2074,7 @@ from metadata.conf import has_navigator
       FunctionsPanel.prototype.initFunctions = function (dialect) {
         var self = this;
         self.categories[dialect] = [];
-        var functions = dialect === 'pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect];
+        var functions = dialect === 'Pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect.toLowerCase()];
 
         functions.forEach(function (category) {
           self.categories[dialect].push({
