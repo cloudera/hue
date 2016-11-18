@@ -417,8 +417,14 @@ from metadata.conf import has_navigator
     }
 
     .function-dialect-dropdown a span {
+      color: #444;
       font-size: 14px;
       font-weight: 600;
+    }
+    
+    .function-dialect-dropdown a i {
+      color: #444;
+      font-size: 14px;
     }
   </style>
 
