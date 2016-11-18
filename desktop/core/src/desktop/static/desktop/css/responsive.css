@@ -312,7 +312,7 @@ body {
   position:absolute;
   background-color: #338BB8;
   color: #f9f9f9;
-  z-index: 99999;
+  z-index: 1048;
   top: 0;
   left: 0;
   bottom: 0;
