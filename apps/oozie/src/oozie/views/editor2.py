@@ -118,6 +118,7 @@ def _edit_workflow(request, doc, workflow):
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
       'can_edit_json': json.dumps(can_edit_json),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'history_json': json.dumps([{
           'history': hist.data_dict.get('history', {}),
           'id': hist.id,

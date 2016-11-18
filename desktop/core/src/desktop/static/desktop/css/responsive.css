@@ -972,3 +972,8 @@ h6 {
 #searchComponents .form-search .input-append .search-query {
   width: 50px;
 }
+
+/* oozie workflow */
+#wfEditor .card-toolbar {
+  position: static;
+}

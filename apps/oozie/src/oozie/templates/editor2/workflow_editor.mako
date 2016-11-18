@@ -27,9 +27,11 @@ from oozie.conf import ENABLE_DOCUMENT_ACTION
 <%namespace name="workflow" file="common_workflow.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
+% if not is_embeddable:
 ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
+% endif
 
-<div id="editor">
+<div id="wfEditor">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
@@ -539,7 +541,7 @@ ${ dashboard.import_bindings() }
   ${ utils.slaGlobal() }
 
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
-  ko.applyBindings(viewModel, $("#editor")[0]);
+  ko.applyBindings(viewModel, $("#wfEditor")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocUuid('${ doc_uuid }');
@@ -797,4 +799,6 @@ ${ dashboard.import_bindings() }
 
 </script>
 
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+% endif
