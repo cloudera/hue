@@ -321,7 +321,7 @@ class TestDocument2(object):
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps(invalid_name)})
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_true("contains some special characters: [u'/']" in data['message'])
+    assert_true("contains some special characters: /" in data['message'])
 
 
   def test_validate_immutable_user_directories(self):
