@@ -23,7 +23,7 @@
             fill: #f2f2f2;
           }
           .logo-trunk {
-            fill: #C16FC1;
+            fill: #D7B9EB;
           }
         </style>
       </defs>
