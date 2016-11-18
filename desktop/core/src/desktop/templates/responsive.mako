@@ -224,9 +224,9 @@ ${ hueIcons.symbols() }
       </div>
     </div>
 
-    <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }">
+    <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <!-- ko if: leftAssistVisible -->
       <div class="assist" data-bind="component: {
           name: 'assist-panel',
@@ -274,9 +274,9 @@ ${ hueIcons.symbols() }
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
-    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
+    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }, visibleOnHover: { selector: '.hide-right-side-panel' }">
       <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
       <div data-bind="visible: rightAssistVisible" style="display: none; height: 100%; width: 100%; position: relative;">
         <ul class="right-panel-tabs nav nav-pills">
