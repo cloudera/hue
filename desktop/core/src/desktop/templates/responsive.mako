@@ -268,7 +268,7 @@ ${ hueIcons.symbols() }
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
-    <div class="right-panel" data-bind="visible: { 'side-panel-closed': !rightAssistVisible() }">
+    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
       <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
